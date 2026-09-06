@@ -1,0 +1,186 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0900",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C2H7PO3+  (CH3O)",
+  "cas_as_published": "95120-13-1",
+  "formula": "C2H7PO3",
+  "phase": "condensed",
+  "phase_as_published": "CH3O",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 2.",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 7.",
+      "element": "H",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "P ",
+      "count_as_published": " 1.",
+      "element": "P",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "110.04839",
+    "value": 110.04839
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.35536731E+01",
+          "value": 13.5536731
+        },
+        {
+          "as_published": "1.92367196E-02",
+          "value": 0.0192367196
+        },
+        {
+          "as_published": "-6.72754509E-06",
+          "value": -6.72754509e-06
+        },
+        {
+          "as_published": "1.06231524E-09",
+          "value": 1.06231524e-09
+        },
+        {
+          "as_published": "-6.26248802E-14",
+          "value": -6.26248802e-14
+        },
+        {
+          "as_published": "6.64986966E+03",
+          "value": 6649.86966
+        },
+        {
+          "as_published": "-3.58094684E+01",
+          "value": -35.8094684
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "7.09618826E+00",
+          "value": 7.09618826
+        },
+        {
+          "as_published": "2.73955106E-02",
+          "value": 0.0273955106
+        },
+        {
+          "as_published": "6.24818169E-06",
+          "value": 6.24818169e-06
+        },
+        {
+          "as_published": "-2.51735193E-08",
+          "value": -2.51735193e-08
+        },
+        {
+          "as_published": "1.14961767E-11",
+          "value": 1.14961767e-11
+        },
+        {
+          "as_published": "8.94991503E+03",
+          "value": 8949.91503
+        },
+        {
+          "as_published": "6.17997245E-03",
+          "value": 0.00617997245
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.22941701E+04",
+    "value": 12294.1701,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "95120-13-1",
+    "C2H7PO3+  DiMethylPhosphonate cation  (CH3O)2PH=O+  SIGMA=2  STATWT=1",
+    "IA=18.3823  IB=38.8340  IC=54.03  [Ir(CH3O-)=2.082  ROSYM=1  V(3)=600. cm-1]x2",
+    "Nu=3762,3214(2),3198(2),3091(2),1498(2),1492.6(2),1478(2),1177.7(2),1161(2),",
+    "1056,1043,973,893,802,722,421,396,344,252,193,162,97.1,89,[72,71 internal rot]",
+    "HF298=102.22+/-8. kJ  Thermal Electron  REF=Burcar G3B3  {HF298=179. kJ estim",
+    "REF=Lias et al JPCRD 17,(1988),Suppl. 1}  Max Lst Sq Error Cp @ 6000 K 0.44%.",
+    "WARNING! The electron is calculated in the polynomial but taken into account",
+    "only in NEWNASA polynomial and in THERM.DAT file for use with enhanced CHEMKIN."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "phase_suffix_normalized_to_condensed",
+      "phase_as_published": "CH3O",
+      "phase_normalized": "condensed",
+      "note": "Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am', 'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 9397,
+    "header_line": 9406,
+    "end_line": 9409
+  },
+  "source_text": {
+    "header_line": "C2H7PO3+  (CH3O)  T 7/16C  2.H  7.P  1.O  3.G   298.150  6000.000  B 110.04839 1",
+    "coeff_lines": [
+      " 1.35536731E+01 1.92367196E-02-6.72754509E-06 1.06231524E-09-6.26248802E-14    2",
+      " 6.64986966E+03-3.58094684E+01 7.09618826E+00 2.73955106E-02 6.24818169E-06    3",
+      "-2.51735193E-08 1.14961767E-11 8.94991503E+03 6.17997245E-03 1.22941701E+04    4"
+    ]
+  }
+}

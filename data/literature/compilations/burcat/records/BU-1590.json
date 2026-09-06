@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1590",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H5  FULVENYL M",
+  "cas_as_published": "97937-92-3 ??",
+  "formula": "C6H5",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T05/97",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 5.",
+      "element": "H",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "77.10570",
+    "value": 77.1057
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.29807636E+01",
+          "value": 12.9807636
+        },
+        {
+          "as_published": "1.62661044E-02",
+          "value": 0.0162661044
+        },
+        {
+          "as_published": "-5.90215593E-06",
+          "value": -5.90215593e-06
+        },
+        {
+          "as_published": "9.59452737E-10",
+          "value": 9.59452737e-10
+        },
+        {
+          "as_published": "-5.77215384E-14",
+          "value": -5.77215384e-14
+        },
+        {
+          "as_published": "5.31703711E+04",
+          "value": 53170.3711
+        },
+        {
+          "as_published": "-4.45338857E+01",
+          "value": -44.5338857
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-8.96711182E-01",
+          "value": -0.896711182
+        },
+        {
+          "as_published": "4.31740526E-02",
+          "value": 0.0431740526
+        },
+        {
+          "as_published": "2.41329970E-06",
+          "value": 2.4132997e-06
+        },
+        {
+          "as_published": "-4.48391263E-08",
+          "value": -4.48391263e-08
+        },
+        {
+          "as_published": "2.43949284E-11",
+          "value": 2.43949284e-11
+        },
+        {
+          "as_published": "5.73811680E+04",
+          "value": 57381.168
+        },
+        {
+          "as_published": "2.94156683E+01",
+          "value": 29.4156683
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "5.89769932E+04",
+    "value": 58976.9932,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "97937-92-3 ??",
+    "C6H5  FULVENYL RADICAL  METHYLENE-CYCLOPENTA-2,4-DIENE-2-YL  -C(=CH2)C*=CHCH=CH-",
+    "SIGMA=1  STATWT=2  IA=9.09378  IB=22.7103  IC=31.8041  NU=3059,3057,3043,3028,",
+    "2979,1509,1405,1367,1321,1230,1182,1139,997,952,911,870,853,826,746,734,691,654,",
+    "590,580,461,330,200.5  HF298=117.2 +/- 12.3 kcal  REF=C.Melius Database BACMP4",
+    "#2538 A72B  Max Lst Sq Error Cp @ 200 K 0.79%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17561,
+    "header_line": 17567,
+    "end_line": 17570
+  },
+  "source_text": {
+    "header_line": "C6H5  FULVENYL M  T05/97C  6.H  5.   0.   0.G   200.000  6000.000  B  77.10570 1",
+    "coeff_lines": [
+      " 1.29807636E+01 1.62661044E-02-5.90215593E-06 9.59452737E-10-5.77215384E-14    2",
+      " 5.31703711E+04-4.45338857E+01-8.96711182E-01 4.31740526E-02 2.41329970E-06    3",
+      "-4.48391263E-08 2.43949284E-11 5.73811680E+04 2.94156683E+01 5.89769932E+04    4"
+    ]
+  }
+}

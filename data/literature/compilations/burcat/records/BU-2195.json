@@ -1,0 +1,187 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2195",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C20H38O2 Gondoic",
+  "cas_as_published": "506-31-0",
+  "formula": "C20H38O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 4/11",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "20.",
+      "element": "C",
+      "count": 20.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "38.",
+      "element": "H",
+      "count": 38.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "310.51452",
+    "value": 310.51452
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.55432946E+01",
+          "value": 45.5432946
+        },
+        {
+          "as_published": "1.15684192E-01",
+          "value": 0.115684192
+        },
+        {
+          "as_published": "-4.16670844E-05",
+          "value": -4.16670844e-05
+        },
+        {
+          "as_published": "6.73764047E-09",
+          "value": 6.73764047e-09
+        },
+        {
+          "as_published": "-4.03782894E-13",
+          "value": -4.03782894e-13
+        },
+        {
+          "as_published": "-1.07688541E+05",
+          "value": -107688.541
+        },
+        {
+          "as_published": "-2.08374681E+02",
+          "value": -208.374681
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.21083169E+01",
+          "value": 22.1083169
+        },
+        {
+          "as_published": "-2.91182454E-03",
+          "value": -0.00291182454
+        },
+        {
+          "as_published": "4.99366527E-04",
+          "value": 0.000499366527
+        },
+        {
+          "as_published": "-6.50029674E-07",
+          "value": -6.50029674e-07
+        },
+        {
+          "as_published": "2.57360915E-10",
+          "value": 2.57360915e-10
+        },
+        {
+          "as_published": "-9.26612026E+04",
+          "value": -92661.2026
+        },
+        {
+          "as_published": "-4.39311149E+01",
+          "value": -43.9311149
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-8.29502352E+04",
+    "value": -82950.2352,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "506-31-0",
+    "C20H38O2  Gondoic (cis-11-eicosenoic) acid C8H17CH=CHC9H18COOH  SIGMA=1 STATWT=1",
+    "IA=264.7833  IB=2187.5624  IC=2414.6277  Ir(OH)=0.14246  ROSYM=1  V(3)=280. cm-1",
+    "Ir(CH3)=0.52574  ROSYM=3  V(3)=340. cm=1  Ir(COOH)=7.026  ROSYM=1  V(3)=1800.",
+    "Ir(C8H17)=80.42  ROSYM=1  V(3)=2000. cm-1  Nu=28.99,35.5,39,45,68.7,78,80.4,84,",
+    "98.1,108,110,118,137.5,140,157,160.5,185,199,222.5,239,250,257.5,268.5,285,320,",
+    "354,362,389,438,472,503,517,520,545,549,635.5,672,732,734,737,741,752,769,775,",
+    "821,828,839,854.5,865,882.5,887,915,925.5,958,981,993,999,1004.5,1014,1016,1033,",
+    "1046(2),1050,1060,1068,1072,1079,1090.5(2),1101,1106,1120,1141(2),1160,1175,",
+    "1202,1219,1230,1236,1250,1263,1274,1284,1286,1298.5,1307,1316,1321,1326,1327.5,",
+    "1331,1338(2),1342(2),1345,1348,1354,1359,1364,1377.5,1392,1406,1407,1410,1413,",
+    "1416,1417,1429,1431,1473,1492,1494,1496,1498,1499(2),1500,1501,1506,1509,1510,",
+    "1514,1515,1517,1523,1526,1527,1748,1845,3004,3009(3),3010,3011,3013.5,3015(2),",
+    "3018,3024,3026(2),3028,3034,3036,3038,3040,3041,3044(2),3051,3053,3055,3060,",
+    "3062.5,3067,3069,3071,3077,3078,3079.5,3097,3105,3110,3119,3134,3753",
+    "REF=Burcat B3LYP/6=31G(d)   HF298=-164.85 kcal  REF=NIST 94  Max Lst Sq Error",
+    "Cp @ 200 K 0.71%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 25296,
+    "header_line": 25313,
+    "end_line": 25316
+  },
+  "source_text": {
+    "header_line": "C20H38O2 Gondoic  T 4/11C 20.H 38.O  2.   0.G   200.000  6000.000  B 310.51452 1",
+    "coeff_lines": [
+      " 4.55432946E+01 1.15684192E-01-4.16670844E-05 6.73764047E-09-4.03782894E-13    2",
+      "-1.07688541E+05-2.08374681E+02 2.21083169E+01-2.91182454E-03 4.99366527E-04    3",
+      "-6.50029674E-07 2.57360915E-10-9.26612026E+04-4.39311149E+01-8.29502352E+04    4"
+    ]
+  }
+}

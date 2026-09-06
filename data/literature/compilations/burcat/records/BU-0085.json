@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0085",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "BH4  RADICAL",
+  "cas_as_published": "37365-60-9",
+  "formula": "BH4",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "g 5/00",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "B ",
+      "count_as_published": " 1.",
+      "element": "B",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "14.84276",
+    "value": 14.84276
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.99717697E+00",
+          "value": 4.99717697
+        },
+        {
+          "as_published": "7.54691378E-03",
+          "value": 0.00754691378
+        },
+        {
+          "as_published": "-2.81116159E-06",
+          "value": -2.81116159e-06
+        },
+        {
+          "as_published": "4.64635113E-10",
+          "value": 4.64635113e-10
+        },
+        {
+          "as_published": "-2.82647889E-14",
+          "value": -2.82647889e-14
+        },
+        {
+          "as_published": "2.84460556E+04",
+          "value": 28446.0556
+        },
+        {
+          "as_published": "-6.09010154E+00",
+          "value": -6.09010154
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.07170585E+00",
+          "value": 3.07170585
+        },
+        {
+          "as_published": "3.96501941E-03",
+          "value": 0.00396501941
+        },
+        {
+          "as_published": "1.87998198E-05",
+          "value": 1.87998198e-05
+        },
+        {
+          "as_published": "-2.55910479E-08",
+          "value": -2.55910479e-08
+        },
+        {
+          "as_published": "9.92380230E-12",
+          "value": 9.9238023e-12
+        },
+        {
+          "as_published": "2.94823208E+04",
+          "value": 29482.3208
+        },
+        {
+          "as_published": "6.18419626E+00",
+          "value": 6.18419626
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.06945901E+04",
+    "value": 30694.5901,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "37365-60-9",
+    "BH4  Radical  SIGMA=2  STATWT=2  IA=0.4846  IB=0.6356  IC=0.9549  Nu=2505,2390,",
+    "1967,1850,1332,993,939,837,598  HF298=255.210 kJ  REF=B. McBride from Saxon JPC",
+    "97,(1993),9356 and Yu & Bauer JPCRD 27,(1998),807  Max Lst Sq Error Cp @ 1300 K",
+    "0.67%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 855,
+    "header_line": 860,
+    "end_line": 863
+  },
+  "source_text": {
+    "header_line": "BH4  RADICAL      g 5/00B  1.H  4.   0.   0.G   200.000  6000.000  B  14.84276 1",
+    "coeff_lines": [
+      " 4.99717697E+00 7.54691378E-03-2.81116159E-06 4.64635113E-10-2.82647889E-14    2",
+      " 2.84460556E+04-6.09010154E+00 3.07170585E+00 3.96501941E-03 1.87998198E-05    3",
+      "-2.55910479E-08 9.92380230E-12 2.94823208E+04 6.18419626E+00 3.06945901E+04    4"
+    ]
+  }
+}

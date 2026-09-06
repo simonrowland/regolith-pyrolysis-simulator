@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1470",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C5H9 CyPentyl Rad",
+  "cas_as_published": "3889-74-5",
+  "formula": "C5H9",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "A12/04",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 5.",
+      "element": "C",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "69.12496",
+    "value": 69.12496
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.62172581E+00",
+          "value": 9.62172581
+        },
+        {
+          "as_published": "2.69929422E-02",
+          "value": 0.0269929422
+        },
+        {
+          "as_published": "-9.68947889E-06",
+          "value": -9.68947889e-06
+        },
+        {
+          "as_published": "1.56341602E-09",
+          "value": 1.56341602e-09
+        },
+        {
+          "as_published": "-9.35571341E-14",
+          "value": -9.35571341e-14
+        },
+        {
+          "as_published": "7.88729754E+03",
+          "value": 7887.29754
+        },
+        {
+          "as_published": "-2.98816293E+01",
+          "value": -29.8816293
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.95252891E+00",
+          "value": 3.95252891
+        },
+        {
+          "as_published": "-2.62301053E-03",
+          "value": -0.00262301053
+        },
+        {
+          "as_published": "1.27596618E-04",
+          "value": 0.000127596618
+        },
+        {
+          "as_published": "-1.67919906E-07",
+          "value": -1.67919906e-07
+        },
+        {
+          "as_published": "6.73888175E-11",
+          "value": 6.73888175e-11
+        },
+        {
+          "as_published": "1.14767941E+04",
+          "value": 11476.7941
+        },
+        {
+          "as_published": "9.87654675E+00",
+          "value": 9.87654675
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.33659379E+04",
+    "value": 13365.9379,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "3889-74-5",
+    "C5H9 CYCLOPENTYL RADICAL   SIGMA=2  STATWT=2  IA=11.9909  IB=12.7666  IC=21.9880",
+    "NU=3213,3106,3098,3052(2),3030.4(2),2951(2),1537,1521,1504,1502,1386,1370,1349,",
+    "1317,1305,1249,1237,1198,1106,1055,1040,1023,939,918,903(2),857,829,664,572,337,",
+    "238,172.6    HF298=111.131 kJ HF0=138.404 kJ REF=Burcat G3B3 calc  {HF298=115.06",
+    "kJ  REF=NIST 1991.; HF298=81.59 kJ REF=Zhang JOC 63, (1998),1872-1877;",
+    "HF298=105.9+/-4.2 kJ  REF=Luo CRC tables 2006}   Max Lst Sq  Error Cp @ 200 K",
+    "**1.12%** @ 6000 K 0.62%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 16074,
+    "header_line": 16082,
+    "end_line": 16085
+  },
+  "source_text": {
+    "header_line": "C5H9 CyPentyl Rad A12/04C  5.H  9.   0.   0.G   200.000  6000.000  B  69.12496 1",
+    "coeff_lines": [
+      " 9.62172581E+00 2.69929422E-02-9.68947889E-06 1.56341602E-09-9.35571341E-14    2",
+      " 7.88729754E+03-2.98816293E+01 3.95252891E+00-2.62301053E-03 1.27596618E-04    3",
+      "-1.67919906E-07 6.73888175E-11 1.14767941E+04 9.87654675E+00 1.33659379E+04    4"
+    ]
+  }
+}

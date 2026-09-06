@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0986",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3F7H  FC227EA",
+  "cas_as_published": "431-89-0",
+  "formula": "C3HF7",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/99",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 1.",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": " 7.",
+      "element": "F",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "170.02886",
+    "value": 170.02886
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.03195617E+01",
+          "value": 20.3195617
+        },
+        {
+          "as_published": "1.04618873E-02",
+          "value": 0.0104618873
+        },
+        {
+          "as_published": "-3.99351610E-06",
+          "value": -3.9935161e-06
+        },
+        {
+          "as_published": "6.70976809E-10",
+          "value": 6.70976809e-10
+        },
+        {
+          "as_published": "-4.12886922E-14",
+          "value": -4.12886922e-14
+        },
+        {
+          "as_published": "-1.96070480E+05",
+          "value": -196070.48
+        },
+        {
+          "as_published": "-7.39087817E+01",
+          "value": -73.9087817
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.19381844E+00",
+          "value": 3.19381844
+        },
+        {
+          "as_published": "5.64358210E-02",
+          "value": 0.056435821
+        },
+        {
+          "as_published": "-4.24435538E-05",
+          "value": -4.24435538e-05
+        },
+        {
+          "as_published": "6.01422805E-09",
+          "value": 6.01422805e-09
+        },
+        {
+          "as_published": "4.21730731E-12",
+          "value": 4.21730731e-12
+        },
+        {
+          "as_published": "-1.91302556E+05",
+          "value": -191302.556
+        },
+        {
+          "as_published": "1.47970140E+01",
+          "value": 14.797014
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.88203033E+05",
+    "value": -188203.033,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "431-89-0",
+    "C3HF7 2-HEPTAFLUORO-PROPANE CF3-CHF-CF3 (FC-227ea) SIGMA=2 STATWT=1  IA=38.9667",
+    "IB=78.08525  IC=88.49144  NU=2966,1428,1392,1324,1296,1280,1242,1224,1150,1131,",
+    "896,853,725,669,593,535,519,502,442,335,314,283,232,214,152,89.7.26.9",
+    "HF298=-374.00 kcal REF=Melius Database 1987 AB1V  {HF298=-374.47 kcal  REF=Zhang",
+    "JOC 63,(1998),3590-94}  Max Lst Sq Error Cp @  1300 K 0.44%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 10299,
+    "header_line": 10305,
+    "end_line": 10308
+  },
+  "source_text": {
+    "header_line": "C3F7H  FC227EA    T12/99C  3.H  1.F  7.   0.G   200.000  6000.000  C 170.02886 1",
+    "coeff_lines": [
+      " 2.03195617E+01 1.04618873E-02-3.99351610E-06 6.70976809E-10-4.12886922E-14    2",
+      "-1.96070480E+05-7.39087817E+01 3.19381844E+00 5.64358210E-02-4.24435538E-05    3",
+      " 6.01422805E-09 4.21730731E-12-1.91302556E+05 1.47970140E+01-1.88203033E+05    4"
+    ]
+  }
+}

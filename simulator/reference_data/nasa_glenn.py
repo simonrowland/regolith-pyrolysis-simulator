@@ -87,6 +87,22 @@ _PHASE_TAGS = frozenset(
     }
 )
 _GAS_PHASE_TAGS = frozenset({"g", "G", "gas"})
+NASA7_PHASE_CHAR_NORMALIZED = {
+    "G": "gas",
+    "S": "cr",
+    "L": "L",
+    "C": "condensed",
+}
+PHASE_NORMALIZATION_RULE = (
+    "phase_as_published is the parenthetical name suffix when present, else "
+    "the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). "
+    "phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / "
+    "NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list "
+    "is kept as that suffix; a suffix outside the allow-list maps to "
+    "'condensed' and is listed as phase_suffix_normalized_to_condensed "
+    "(never silently rewritten); no suffix + condensed CEA flag maps to "
+    "'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed."
+)
 
 COMPILATION_SOURCE = {
     "database": "NASA Glenn / CEA thermo.inp",
@@ -202,6 +218,7 @@ class SpeciesRecord:
     formula: str
     phase_flag: int | None
     phase_flag_as_published: str
+    phase_as_published: str
     phase: str
     molecular_weight: PublishedNumber
     delta_f_H_298_15: PublishedNumber
@@ -243,8 +260,10 @@ class SpeciesRecord:
             "cea_section": self.cea_section,
             "formula": self.formula,
             "phase": self.phase,
+            "phase_as_published": self.phase_as_published,
             "phase_flag": self.phase_flag,
             "phase_flag_as_published": self.phase_flag_as_published,
+            "phase_normalization_rule": PHASE_NORMALIZATION_RULE,
             "n_intervals_declared": self.n_intervals_declared,
             "source_ref_code": self.source_ref_code,
             "composition": [slot.to_dict() for slot in self.composition_slots],
@@ -289,10 +308,18 @@ def _interval_source_lines(intervals: Iterable[IntervalRecord]) -> list[str]:
     return lines
 
 
+NASA9_COEFF_FIELD_WIDTH = 16
+NASA7_COEFF_FIELD_WIDTH = 15
+NASA7_COEFFS_PER_LINE = 5
+NASA7_COEFFICIENT_COUNT = 15  # 7 high-T + 7 low-T + H298/R
+
+
 def parse_fortran_float(token: str) -> float:
     text = token.strip().replace("D", "E").replace("d", "e")
     if not text:
         raise NasaGlennParseError("empty Fortran float token")
+    # Published NASA-7 lines sometimes drop the exponent sign: "E 00".
+    text = re.sub(r"([Ee])\s+(\d)", r"\1+\2", text)
     return float(text)
 
 
@@ -356,35 +383,97 @@ def _formula_from_slots(slots: list[CompositionSlot]) -> str:
     return "".join(parts) if parts else ""
 
 
-def _phase_from_name(name: str) -> str | None:
+def published_name_phase_suffix(name: str) -> str | None:
+    """Return the parenthetical suffix exactly as printed, or None."""
     match = _PHASE_SUFFIX_RE.search(name.strip())
     if not match:
         return None
-    tag = match.group(1)
-    if tag in _PHASE_TAGS:
-        return tag
-    return None
+    return match.group(1)
+
+
+def _phase_from_name(name: str) -> str | None:
+    """Raw parenthetical suffix. Allow-list filtering is not applied here."""
+    return published_name_phase_suffix(name)
+
+
+def resolve_phase(
+    name: str,
+    *,
+    phase_flag: int | None = None,
+    phase_flag_as_published: str = "",
+    phase_char: str | None = None,
+) -> tuple[str, str, list[dict[str, Any]]]:
+    """Return ``(phase_as_published, phase_normalized, ambiguities)``.
+
+    Published tokens are never rewritten. Normalization is a separate field;
+    any suffix mapped to ``condensed`` because it is outside the closed
+    allow-list is listed as an ambiguity (Glenn review F-1).
+    """
+    ambiguities: list[dict[str, Any]] = []
+    suffix = published_name_phase_suffix(name)
+    if suffix is not None:
+        phase_as_published = suffix
+        if suffix in _GAS_PHASE_TAGS:
+            return phase_as_published, "gas", ambiguities
+        if suffix in _PHASE_TAGS:
+            return phase_as_published, suffix, ambiguities
+        ambiguities.append(
+            {
+                "kind": "phase_suffix_normalized_to_condensed",
+                "phase_as_published": suffix,
+                "phase_normalized": "condensed",
+                "note": (
+                    "Parenthetical suffix kept verbatim in phase_as_published. "
+                    "Normalized phase is 'condensed' because the suffix is "
+                    "outside the closed allow-list "
+                    f"{sorted(_PHASE_TAGS)}. Records are not merged."
+                ),
+            }
+        )
+        return phase_as_published, "condensed", ambiguities
+    if phase_char:
+        phase_as_published = phase_char
+        if phase_char.upper() == "G":
+            return phase_as_published, "gas", ambiguities
+        mapped = NASA7_PHASE_CHAR_NORMALIZED.get(phase_char, "condensed")
+        if mapped == "condensed" and phase_char not in NASA7_PHASE_CHAR_NORMALIZED:
+            ambiguities.append(
+                {
+                    "kind": "phase_char_unmapped",
+                    "phase_as_published": phase_char,
+                    "phase_normalized": "condensed",
+                }
+            )
+        return phase_as_published, mapped, ambiguities
+    phase_as_published = (phase_flag_as_published or "").strip()
+    if phase_flag == 0:
+        return phase_as_published, "gas", ambiguities
+    if phase_flag is None:
+        return phase_as_published, "not_parsed", ambiguities
+    return phase_as_published, "condensed", ambiguities
 
 
 def _phase_label(name: str, phase_flag: int | None) -> str:
-    suffix = _phase_from_name(name)
-    if suffix:
-        return suffix
-    if phase_flag == 0:
-        return "gas"
-    if phase_flag is None:
-        return "not_parsed"
-    return "condensed"
+    _published, normalized, _amb = resolve_phase(name, phase_flag=phase_flag)
+    return normalized
 
 
-def _parse_composition_slots(header_line: str) -> tuple[list[CompositionSlot], list[dict[str, Any]]]:
+def parse_composition_slots_from_line(
+    line: str,
+    *,
+    start: int,
+    n_slots: int,
+    slot_width: int,
+    element_width: int = 2,
+) -> tuple[list[CompositionSlot], list[dict[str, Any]]]:
+    """Parse fixed-width element/count slots (NASA-9 8-char or NASA-7 5-char)."""
     ambiguities: list[dict[str, Any]] = []
     slots: list[CompositionSlot] = []
-    block = _col(header_line, 10, 50)
-    for index in range(5):
-        chunk = block[index * 8 : (index + 1) * 8]
-        element_raw = chunk[0:2]
-        count_raw = chunk[2:8]
+    block = _col(line, start, start + n_slots * slot_width)
+    for index in range(n_slots):
+        chunk = block[index * slot_width : (index + 1) * slot_width]
+        element_raw = chunk[0:element_width]
+        count_raw = chunk[element_width:slot_width]
         element = _normalize_element_symbol(element_raw)
         count: float | None
         try:
@@ -428,6 +517,17 @@ def _parse_composition_slots(header_line: str) -> tuple[list[CompositionSlot], l
             )
         )
     return slots, ambiguities
+
+
+def _parse_composition_slots(header_line: str) -> tuple[list[CompositionSlot], list[dict[str, Any]]]:
+    """CEA thermo.inp header: 5 × (A2, F6.2) starting at column 11."""
+    return parse_composition_slots_from_line(
+        header_line,
+        start=10,
+        n_slots=5,
+        slot_width=8,
+        element_width=2,
+    )
 
 
 def _parse_header_mw_hf(header_line: str) -> tuple[int | None, str, PublishedNumber, PublishedNumber, list[dict[str, Any]]]:
@@ -521,9 +621,274 @@ def parse_header_line(header_line: str) -> dict[str, Any]:
     }
 
 
+def parse_coeff_fields(
+    line: str,
+    *,
+    field_width: int = NASA9_COEFF_FIELD_WIDTH,
+    line_width: int = 80,
+) -> list[str]:
+    """Split a coefficient line into fixed-width Fortran fields.
+
+    NASA-9 CEA thermo.inp uses 16-character fields; NASA-7 (Burcat / Chemkin
+    4-line) uses 15-character fields. Same splitter, different width.
+    """
+    padded = _col(line, 0, line_width)
+    return [padded[i : i + field_width] for i in range(0, line_width, field_width)]
+
+
 def _parse_coeff_fields(line: str) -> list[str]:
-    padded = _col(line, 0, 80)
-    return [padded[i : i + 16] for i in range(0, 80, 16)]
+    return parse_coeff_fields(
+        line,
+        field_width=NASA9_COEFF_FIELD_WIDTH,
+        line_width=80,
+    )
+
+
+def _nasa7_token_is_missing(token: str) -> bool:
+    stripped = token.strip()
+    return (not stripped) or stripped.upper() in {"N/A", "NA", "*****"}
+
+
+def parse_nasa7_coefficient_lines(
+    coeff_lines: list[str],
+) -> tuple[list[PublishedNumber], list[dict[str, Any]]]:
+    """Parse the three NASA-7 coefficient lines into 15 published tokens.
+
+    Published order (unchanged): 7 high-T ``a`` coefficients, 7 low-T ``a``
+    coefficients, then H298/R. Tokens are kept as printed; N/A and misaligned
+    columns are recorded, not repaired.
+    """
+    ambiguities: list[dict[str, Any]] = []
+    if len(coeff_lines) != 3:
+        raise NasaGlennParseError(
+            f"NASA-7 record expects 3 coefficient lines, got {len(coeff_lines)}"
+        )
+    tokens: list[PublishedNumber] = []
+    for line_index, raw in enumerate(coeff_lines):
+        fields = parse_coeff_fields(
+            raw,
+            field_width=NASA7_COEFF_FIELD_WIDTH,
+            line_width=75,
+        )
+        if len(fields) != NASA7_COEFFS_PER_LINE:
+            ambiguities.append(
+                {
+                    "kind": "nasa7_coeff_field_count",
+                    "line_index": line_index,
+                    "field_count": len(fields),
+                    "raw": raw,
+                }
+            )
+        line_ok = True
+        line_values: list[PublishedNumber] = []
+        for field in fields[:NASA7_COEFFS_PER_LINE]:
+            if _nasa7_token_is_missing(field):
+                line_values.append(PublishedNumber(as_published=field, value=None))
+                ambiguities.append(
+                    {
+                        "kind": "nasa7_coefficient_unparsed",
+                        "line_index": line_index,
+                        "token_as_published": field,
+                    }
+                )
+                continue
+            if re.search(r"[DdEe]\s+\d", field):
+                ambiguities.append(
+                    {
+                        "kind": "nasa7_fortran_exponent_missing_sign",
+                        "line_index": line_index,
+                        "token_as_published": field,
+                        "note": "Value parsed by treating 'E 00' as 'E+00'; token kept as published.",
+                    }
+                )
+            try:
+                line_values.append(_published(field))
+            except (ValueError, NasaGlennParseError):
+                line_ok = False
+                line_values.append(PublishedNumber(as_published=field, value=None))
+        if (not line_ok) or any(
+            item.value is None and not _nasa7_token_is_missing(item.as_published)
+            for item in line_values
+        ):
+            scanned = [
+                _published(tok) for tok in _FLOAT_TOKEN_RE.findall(raw[:75] if len(raw) >= 75 else raw)
+            ]
+            ambiguities.append(
+                {
+                    "kind": "nasa7_coeff_columns_misaligned",
+                    "line_index": line_index,
+                    "raw": raw,
+                    "fixed_width_tokens": [item.as_published for item in line_values],
+                    "free_scanned_count": len(scanned),
+                    "note": (
+                        "15-character columns did not yield 5 Fortran floats; "
+                        "free-scanned tokens used for .value only. as_published "
+                        "keeps the column slices. Not silently repaired."
+                    ),
+                }
+            )
+            if len(scanned) == NASA7_COEFFS_PER_LINE:
+                merged: list[PublishedNumber] = []
+                for column, scanned_item in zip(line_values, scanned):
+                    merged.append(
+                        PublishedNumber(
+                            as_published=column.as_published,
+                            value=scanned_item.value,
+                        )
+                    )
+                line_values = merged
+        tokens.extend(line_values)
+    if len(tokens) != NASA7_COEFFICIENT_COUNT:
+        ambiguities.append(
+            {
+                "kind": "nasa7_coefficient_count",
+                "count": len(tokens),
+                "note": "NASA-7 4-line form publishes 15 numeric fields.",
+            }
+        )
+    return tokens, ambiguities
+
+
+def parse_nasa7_header_line(header_line: str) -> dict[str, Any]:
+    """Parse a NASA-7 1-line header (Burcat / Chemkin 4-line species form).
+
+    Columns (1-based, 80-character card): name 1-18; date 19-24; four
+    (A2,A3) composition slots 25-44; phase 45; T_low 46-55; T_high 56-65;
+    quality + molecular weight + card number 66-80. T_common is not printed
+    (XML labels the two coefficient ranges as 1000 K / Tmin).
+    """
+    ambiguities: list[dict[str, Any]] = []
+    name = header_line[:18].rstrip() if len(header_line) >= 18 else header_line.strip()
+    date_raw = _col(header_line, 18, 24)
+    slots, slot_ambiguities = parse_composition_slots_from_line(
+        header_line,
+        start=24,
+        n_slots=4,
+        slot_width=5,
+        element_width=2,
+    )
+    ambiguities.extend(slot_ambiguities)
+    phase_raw = _col(header_line, 44, 45)
+    t_min = _published(_col(header_line, 45, 55))
+    t_max = _published(_col(header_line, 55, 65))
+    tail = header_line[65:] if len(header_line) > 65 else ""
+    quality = ""
+    mw_token = ""
+    card_token = ""
+    tail_match = re.match(
+        r"\s*([A-Za-z?]{1,2})?\s*"
+        r"([+-]?(?:\d+\.\d*|\.\d+|\d+)(?:[DdEe][+-]?\d+)?)\s*"
+        r"(\d)\s*$",
+        tail,
+    )
+    if tail_match:
+        quality = tail_match.group(1) or ""
+        mw_token = tail_match.group(2)
+        card_token = tail_match.group(3)
+    else:
+        floats = _FLOAT_TOKEN_RE.findall(tail)
+        if floats:
+            mw_token = floats[0]
+            card_token = floats[1] if len(floats) > 1 else ""
+            prefix = tail[: tail.find(mw_token)] if mw_token in tail else tail
+            quality = prefix.strip()
+        ambiguities.append(
+            {
+                "kind": "nasa7_header_tail_unparsed",
+                "tail_as_published": tail.rstrip(),
+                "note": (
+                    "Quality/MW/card columns did not match the usual "
+                    "optional-letter + float + 1 pattern. Tokens taken from "
+                    "a free scan of the tail; not repaired."
+                ),
+            }
+        )
+    try:
+        mw = _published(mw_token) if mw_token else PublishedNumber(as_published="", value=None)
+    except (ValueError, NasaGlennParseError):
+        mw = PublishedNumber(as_published=mw_token, value=None)
+        ambiguities.append(
+            {
+                "kind": "molecular_weight_unparsed",
+                "as_published": mw_token,
+            }
+        )
+    if quality in {"?", "Bx", "bx"}:
+        ambiguities.append(
+            {
+                "kind": "nasa7_quality_nonstandard",
+                "quality_as_published": quality,
+            }
+        )
+    if (
+        t_min.value is not None
+        and t_max.value is not None
+        and not (t_min.value < t_max.value)
+    ):
+        ambiguities.append(
+            {
+                "kind": "inverted_or_zero_width_T_interval",
+                "T_min_K_as_published": t_min.as_published,
+                "T_max_K_as_published": t_max.as_published,
+                "note": "Published T bounds retained; interval not dropped.",
+            }
+        )
+    if len(name) == 18:
+        ambiguities.append(
+            {
+                "kind": "name_occupies_full_18_column_field",
+                "name_as_published": name,
+                "note": "NASA-7 name field is cols 1-18; no trailing pad in this record.",
+            }
+        )
+    phase_char = phase_raw.strip()
+    return {
+        "name_as_published": name,
+        "date_as_published": date_raw,
+        "composition_slots": slots,
+        "formula": _formula_from_slots(slots),
+        "phase_as_published": phase_char,
+        "T_min_K": t_min,
+        "T_max_K": t_max,
+        "calc_quality_as_published": quality,
+        "molecular_weight": mw,
+        "card_number_as_published": card_token,
+        "header_tail_as_published": tail.rstrip(),
+        "ambiguities": ambiguities,
+    }
+
+
+def is_nasa7_coefficient_line(line: str, card: int) -> bool:
+    """True if ``line`` looks like NASA-7 coefficient card 2, 3, or 4."""
+    stripped = line.rstrip()
+    if not stripped.endswith(str(card)):
+        return False
+    if not line or line[0] not in " +-":
+        return False
+    body = stripped[:-1]
+    return bool(_FLOAT_TOKEN_RE.search(body) or "N/A" in body.upper())
+
+
+def is_nasa7_four_line_record(lines: list[str], index: int) -> bool:
+    """True if ``lines[index:index+4]`` is a NASA-7 4-line polynomial record."""
+    if index + 3 >= len(lines):
+        return False
+    header = lines[index]
+    if not header or header[0] in " \t":
+        return False
+    stripped = header.rstrip()
+    if not stripped.endswith("1") or len(stripped) < 70:
+        return False
+    try:
+        parse_fortran_float(_col(header, 45, 55))
+        parse_fortran_float(_col(header, 55, 65))
+    except (ValueError, NasaGlennParseError):
+        return False
+    return (
+        is_nasa7_coefficient_line(lines[index + 1], 2)
+        and is_nasa7_coefficient_line(lines[index + 2], 3)
+        and is_nasa7_coefficient_line(lines[index + 3], 4)
+    )
 
 
 def parse_interval_block(
@@ -695,7 +1060,13 @@ def parse_thermo_inp(
                 }
             )
         phase_flag = header["phase_flag"]
-        suffix = _phase_from_name(name)
+        phase_as_published, phase_normalized, phase_ambiguities = resolve_phase(
+            name,
+            phase_flag=phase_flag,
+            phase_flag_as_published=str(header["phase_flag_as_published"]),
+        )
+        ambiguities.extend(phase_ambiguities)
+        suffix = published_name_phase_suffix(name)
         if suffix and phase_flag == 0 and suffix not in _GAS_PHASE_TAGS:
             ambiguities.append(
                 {
@@ -723,7 +1094,8 @@ def parse_thermo_inp(
             formula=_formula_from_slots(list(header["composition_slots"])),
             phase_flag=phase_flag,
             phase_flag_as_published=str(header["phase_flag_as_published"]),
-            phase=_phase_label(name, phase_flag),
+            phase_as_published=phase_as_published,
+            phase=phase_normalized,
             molecular_weight=header["molecular_weight"],
             delta_f_H_298_15=header["delta_f_H_298_15"],
             intervals=intervals,
@@ -811,6 +1183,9 @@ def published_float_pairs(record_doc: Mapping[str, Any]) -> list[tuple[str, floa
 
     walk(record_doc.get("molecular_weight"), "molecular_weight")
     walk(record_doc.get("delta_f_H_298_15"), "delta_f_H_298_15")
+    walk(record_doc.get("T_min_K"), "T_min_K")
+    walk(record_doc.get("T_max_K"), "T_max_K")
+    walk(record_doc.get("hf298_div_r"), "hf298_div_r")
     walk(record_doc.get("intervals"), "intervals")
     for index, slot in enumerate(record_doc.get("composition") or []):
         if isinstance(slot, Mapping) and slot.get("count") is not None:
@@ -874,7 +1249,7 @@ def coverage_by_element(
 ) -> dict[str, dict[str, Any]]:
     present: dict[str, list[str]] = defaultdict(list)
     for rec in records:
-        if isinstance(rec, SpeciesRecord):
+        if hasattr(rec, "elements") and hasattr(rec, "record_id") and not isinstance(rec, Mapping):
             rec_id = rec.record_id
             rec_elements = rec.elements()
         else:

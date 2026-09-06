@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2162",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C18H15N  Triphen",
+  "cas_as_published": "603-34-9",
+  "formula": "C18H15N",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 8/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "18.",
+      "element": "C",
+      "count": 18.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "15.",
+      "element": "H",
+      "count": 15.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "245.31844",
+    "value": 245.31844
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.49653823E+01",
+          "value": 34.9653823
+        },
+        {
+          "as_published": "5.72683973E-02",
+          "value": 0.0572683973
+        },
+        {
+          "as_published": "-2.10215351E-05",
+          "value": -2.10215351e-05
+        },
+        {
+          "as_published": "3.44006060E-09",
+          "value": 3.4400606e-09
+        },
+        {
+          "as_published": "-2.07820037E-13",
+          "value": -2.07820037e-13
+        },
+        {
+          "as_published": "2.23209221E+04",
+          "value": 22320.9221
+        },
+        {
+          "as_published": "-1.62045407E+02",
+          "value": -162.045407
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.32643662E+00",
+          "value": 1.32643662
+        },
+        {
+          "as_published": "8.25037269E-02",
+          "value": 0.0825037269
+        },
+        {
+          "as_published": "1.21823879E-04",
+          "value": 0.000121823879
+        },
+        {
+          "as_published": "-2.36402080E-07",
+          "value": -2.3640208e-07
+        },
+        {
+          "as_published": "1.05192523E-10",
+          "value": 1.05192523e-10
+        },
+        {
+          "as_published": "3.46075316E+04",
+          "value": 34607.5316
+        },
+        {
+          "as_published": "2.72634555E+01",
+          "value": 27.2634555
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.93288360E+04",
+    "value": 39328.836,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "603-34-9",
+    "C18H15N  TriPhenylAmine  (C6H5)3N  SIGMA=6  STATWT=1  IA=209.6508  IB=209.8804",
+    "IC=380.8827  Ir(C6H5)=7.116  ROSYM=2  V(3)=524.6 cm-1  Nu=[3217(3),3215(3)],",
+    "3176(3),3077(3),3077(3),3043(3),1932,1856(2),1785(2),1714,1595(3),1495(2),",
+    "[1492],1329(3),1305(3),1277(2),[1219],1210(2),[1204],1167(3),[1112],1025(3),",
+    "1016(3),996(3),964(3),937(2),[913],897(2),830(3),749(3),[729],697(3),635(3),",
+    "[524,513.6(2),432,427,421(2),334(2),286,243.5(2),213,80(3)]  REF=IR Webbook 2009",
+    "+ [ ] B3LYP/6-31G(d)  HF298=327.+/-4.2 kJ   REF=Steele JCT 10,(1978),441",
+    "HF298(solid)=235+/-3. kJ  REF=Steele ibid   Max Lst Sq Error Cp @ 200 K 0.75%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24817,
+    "header_line": 24826,
+    "end_line": 24829
+  },
+  "source_text": {
+    "header_line": "C18H15N  Triphen  T 8/09C 18.H 15.N  1.   0.G   200.000  6000.000  B 245.31844 1",
+    "coeff_lines": [
+      " 3.49653823E+01 5.72683973E-02-2.10215351E-05 3.44006060E-09-2.07820037E-13    2",
+      " 2.23209221E+04-1.62045407E+02 1.32643662E+00 8.25037269E-02 1.21823879E-04    3",
+      "-2.36402080E-07 1.05192523E-10 3.46075316E+04 2.72634555E+01 3.93288360E+04    4"
+    ]
+  }
+}

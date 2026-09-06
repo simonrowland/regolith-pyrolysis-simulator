@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0236",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CD5N  CD3ND2",
+  "cas_as_published": "3767-37-1",
+  "formula": "CD5N",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/15",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "D ",
+      "count_as_published": " 5.",
+      "element": "D",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "36.08795",
+    "value": 36.08795
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "7.73769021E+00",
+          "value": 7.73769021
+        },
+        {
+          "as_published": "1.03305152E-02",
+          "value": 0.0103305152
+        },
+        {
+          "as_published": "-3.89130215E-06",
+          "value": -3.89130215e-06
+        },
+        {
+          "as_published": "6.47941130E-10",
+          "value": 6.4794113e-10
+        },
+        {
+          "as_published": "-3.96189080E-14",
+          "value": -3.9618908e-14
+        },
+        {
+          "as_published": "-8.64814518E+03",
+          "value": -8648.14518
+        },
+        {
+          "as_published": "-1.87181160E+01",
+          "value": -18.718116
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.02516419E+00",
+          "value": 3.02516419
+        },
+        {
+          "as_published": "4.31583211E-03",
+          "value": 0.00431583211
+        },
+        {
+          "as_published": "4.57758391E-05",
+          "value": 4.57758391e-05
+        },
+        {
+          "as_published": "-6.46517733E-08",
+          "value": -6.46517733e-08
+        },
+        {
+          "as_published": "2.63201634E-11",
+          "value": 2.63201634e-11
+        },
+        {
+          "as_published": "-6.43101922E+03",
+          "value": -6431.01922
+        },
+        {
+          "as_published": "1.01925988E+01",
+          "value": 10.1925988
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-5.04815245E+03",
+    "value": -5048.15245,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "3767-37-1",
+    "CD5N  MethylAmine-d5  CD3ND2  SIGMA=1  STATWT=1  IA=1.6111  IB=5.0591  IC=5.3707",
+    "Ir=0.5288  ROSYM=3  V(3)=1980. cm-1  Nu=2477,2202,2073,1227,1065,1123,880,942,",
+    "601,2556,2238,1077,1072,910,[201 torsion]  REF=Shimanouchi  HF0=-27.405+/-06 kJ",
+    "REF= From CH3NH2 ATcT 2013  MAX lst Sq Error Cp @ 200 & 1300 K 0.61%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 2327,
+    "header_line": 2332,
+    "end_line": 2335
+  },
+  "source_text": {
+    "header_line": "CD5N  CD3ND2      T12/15C  1.D  5.N  1.   0.G   200.000  6000.000  B  36.08795 1",
+    "coeff_lines": [
+      " 7.73769021E+00 1.03305152E-02-3.89130215E-06 6.47941130E-10-3.96189080E-14    2",
+      "-8.64814518E+03-1.87181160E+01 3.02516419E+00 4.31583211E-03 4.57758391E-05    3",
+      "-6.46517733E-08 2.63201634E-11-6.43101922E+03 1.01925988E+01-5.04815245E+03    4"
+    ]
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1595",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H5Cl chloroben",
+  "cas_as_published": "108-90-7",
+  "formula": "C6H5Cl",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/06",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 5.",
+      "element": "H",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 1.",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "112.55660",
+    "value": 112.5566
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.30901399E+01",
+          "value": 13.0901399
+        },
+        {
+          "as_published": "1.87767416E-02",
+          "value": 0.0187767416
+        },
+        {
+          "as_published": "-6.79334385E-06",
+          "value": -6.79334385e-06
+        },
+        {
+          "as_published": "1.10243437E-09",
+          "value": 1.10243437e-09
+        },
+        {
+          "as_published": "-6.62523384E-14",
+          "value": -6.62523384e-14
+        },
+        {
+          "as_published": "1.88362608E+02",
+          "value": 188.362608
+        },
+        {
+          "as_published": "-4.54546468E+01",
+          "value": -45.4546468
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "9.77172249E-01",
+          "value": 0.977172249
+        },
+        {
+          "as_published": "3.00024214E-02",
+          "value": 0.0300024214
+        },
+        {
+          "as_published": "3.92995950E-05",
+          "value": 3.9299595e-05
+        },
+        {
+          "as_published": "-8.07708061E-08",
+          "value": -8.07708061e-08
+        },
+        {
+          "as_published": "3.66013371E-11",
+          "value": 3.66013371e-11
+        },
+        {
+          "as_published": "4.45896961E+03",
+          "value": 4458.96961
+        },
+        {
+          "as_published": "2.20708028E+01",
+          "value": 22.0708028
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "6.28869867E+03",
+    "value": 6288.69867,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "108-90-7",
+    "C6H5Cl CHLOROBENZENE  SIGMA=2  STATWT=1  IA=14.7989  IB=53.9206  IC=68.7196",
+    "Nu=3226,3224,3212,3199,3190,1645,1643,1527,1493,1356,1335,1208,1193,1107,1106,",
+    "1050,1015,995,966,914,844,756,710,698,628,480,410,415,298,190  HF298=52.29 kJ",
+    "HF0=67.45 kJ  REF=Burcat G3B3 calc   (HF298=52.2+/-0.6 kJ  REF=ATcT B:",
+    "HF298=12.39 kcal. REF=Stull,Westrum & Sinke 1969  HF298=53.14 kJ  REF=NIST 94;",
+    "HF298=54.4 kJ   REF=Platanov & Simulin Russ JPC 59,(1985),179}  Max Lst Sq Error",
+    "Cp @ 200 K 0.71%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17617,
+    "header_line": 17625,
+    "end_line": 17628
+  },
+  "source_text": {
+    "header_line": "C6H5Cl chloroben  T 1/06C  6.H  5.CL 1.   0.G   200.000  6000.000  B 112.55660 1",
+    "coeff_lines": [
+      " 1.30901399E+01 1.87767416E-02-6.79334385E-06 1.10243437E-09-6.62523384E-14    2",
+      " 1.88362608E+02-4.54546468E+01 9.77172249E-01 3.00024214E-02 3.92995950E-05    3",
+      "-8.07708061E-08 3.66013371E-11 4.45896961E+03 2.20708028E+01 6.28869867E+03    4"
+    ]
+  }
+}

@@ -15,12 +15,18 @@ import pytest
 
 from simulator.reference_data.nasa_glenn import (
     COMPILATION_ROOT,
+    NASA7_COEFF_FIELD_WIDTH,
+    NASA9_COEFF_FIELD_WIDTH,
     SOURCE_REL,
     coverage_by_element,
     feedstock_element_symbols,
+    is_nasa7_four_line_record,
     iter_record_paths,
     load_all_record_documents,
     load_manifest,
+    parse_coeff_fields,
+    parse_nasa7_coefficient_lines,
+    parse_nasa7_header_line,
     parse_thermo_inp,
     published_float_pairs,
 )
@@ -136,6 +142,37 @@ def test_complete_ingest_keeps_inverted_ions_reactants_and_assigned_enthalpy(
     electron = by_name["e-"][0]
     assert electron["molecular_weight"]["value"] == 0.000548579903
     assert electron["phase"] == "gas"
+    assert electron["phase_as_published"] == "0"
+    sio2_aqz = by_name["SiO2(a-qz)"][0]
+    assert sio2_aqz["phase_as_published"] == "a-qz"
+    assert sio2_aqz["phase"] == "condensed"
+    assert any(
+        item["kind"] == "phase_suffix_normalized_to_condensed"
+        and item["phase_as_published"] == "a-qz"
+        for item in sio2_aqz["ambiguities"]
+    )
+    unlisted = [
+        doc
+        for doc in docs
+        if any(
+            item.get("kind") == "phase_suffix_normalized_to_condensed"
+            for item in doc["ambiguities"]
+        )
+    ]
+    assert len(unlisted) == 16
+    suffixes = {
+        next(
+            item["phase_as_published"]
+            for item in doc["ambiguities"]
+            if item["kind"] == "phase_suffix_normalized_to_condensed"
+        )
+        for doc in unlisted
+    }
+    assert "a-qz" in suffixes
+    assert "b-qz" in suffixes
+    assert "b-crt" in suffixes
+    assert "crI" in suffixes
+    assert "an" in suffixes
     assert "Air" in by_name
     assert by_name["Air"][0]["cea_section"] == "reactants"
     assigned = [
@@ -181,3 +218,50 @@ def test_held_extract_left_in_place_and_marked_incomplete(manifest) -> None:
     text = EXTRACT.read_text(encoding="utf-8")
     assert "schema_version: literature_extract.v1" in text
     assert "source_id: nasa-cea-thermo" in text
+
+
+# Shared NASA-7 / NASA-9 coefficient field splitter (Burcat uses the 7-coeff form).
+_NASA7_AG_SOLID = [
+    "Ag (solid)        T 6/12AG 1.   0.   0.   0.S   200.000  1235.080  A 107.86820 1",
+    " 2.07216824E+00 2.46393729E-03-1.34351116E-06 3.69321107E-10 0.00000000E+00    2",
+    "-6.37725170E+02-7.18810718E+00 2.25225065E+00 5.43263008E-03-1.32153990E-05    3",
+    " 1.50423505E-08-5.94991675E-12-8.23132027E+02-8.86835190E+00 0.00000000E+00    4",
+]
+
+
+def test_coeff_field_parser_serves_nasa9_and_nasa7_widths() -> None:
+    """One splitter; 16-char CEA NASA-9 fields and 15-char NASA-7 fields."""
+    nasa9 = " 0.000000000D+00 0.000000000D+00 2.500000000D+00 0.000000000D+00 0.000000000D+00"
+    nasa9_fields = parse_coeff_fields(
+        nasa9, field_width=NASA9_COEFF_FIELD_WIDTH, line_width=80
+    )
+    assert len(nasa9_fields) == 5
+    assert nasa9_fields[2].strip() == "2.500000000D+00"
+    nasa7_fields = parse_coeff_fields(
+        _NASA7_AG_SOLID[1],
+        field_width=NASA7_COEFF_FIELD_WIDTH,
+        line_width=75,
+    )
+    assert len(nasa7_fields) == 5
+    assert nasa7_fields[0].strip() == "2.07216824E+00"
+    assert nasa7_fields[3].strip() == "3.69321107E-10"
+
+
+def test_nasa7_four_line_variant_parses_burcat_header_and_fifteen_coeffs() -> None:
+    assert is_nasa7_four_line_record(_NASA7_AG_SOLID, 0)
+    header = parse_nasa7_header_line(_NASA7_AG_SOLID[0])
+    assert header["name_as_published"] == "Ag (solid)"
+    assert header["phase_as_published"] == "S"
+    assert header["formula"] == "Ag"
+    assert header["T_min_K"].value == 200.0
+    assert header["T_max_K"].value == 1235.08
+    assert header["molecular_weight"].value == 107.86820
+    assert header["calc_quality_as_published"] == "A"
+    coeffs, ambiguities = parse_nasa7_coefficient_lines(_NASA7_AG_SOLID[1:])
+    assert ambiguities == []
+    assert len(coeffs) == 15
+    assert coeffs[0].as_published == "2.07216824E+00"
+    assert coeffs[0].value == 2.07216824e00
+    assert coeffs[6].value == -7.18810718e00
+    assert coeffs[7].value == 2.25225065e00
+    assert coeffs[14].value == 0.0

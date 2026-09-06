@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0148",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "BrNO2",
+  "cas_as_published": "13536-70-4",
+  "formula": "BrNO2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "BR",
+      "count_as_published": " 1.",
+      "element": "Br",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "125.90954",
+    "value": 125.90954
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "7.52300188E+00",
+          "value": 7.52300188
+        },
+        {
+          "as_published": "2.48349903E-03",
+          "value": 0.00248349903
+        },
+        {
+          "as_published": "-9.60414705E-07",
+          "value": -9.60414705e-07
+        },
+        {
+          "as_published": "1.62648232E-10",
+          "value": 1.62648232e-10
+        },
+        {
+          "as_published": "-1.00604776E-14",
+          "value": -1.00604776e-14
+        },
+        {
+          "as_published": "7.45421630E+03",
+          "value": 7454.2163
+        },
+        {
+          "as_published": "-9.56895383E+00",
+          "value": -9.56895383
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.23841432E+00",
+          "value": 3.23841432
+        },
+        {
+          "as_published": "1.60795285E-02",
+          "value": 0.0160795285
+        },
+        {
+          "as_published": "-1.85570694E-05",
+          "value": -1.85570694e-05
+        },
+        {
+          "as_published": "1.15066033E-08",
+          "value": 1.15066033e-08
+        },
+        {
+          "as_published": "-3.06880272E-12",
+          "value": -3.06880272e-12
+        },
+        {
+          "as_published": "8.58210039E+03",
+          "value": 8582.10039
+        },
+        {
+          "as_published": "1.22135936E+01",
+          "value": 12.2135936
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.01196583E+04",
+    "value": 10119.6583,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "13536-70-4",
+    "BrNO2  Nitroso Bromine  BrONO  SIGMA=1  STATWT=1  IA=1.6034  IB=42.0971",
+    "IC=43.7005  Nu=1667,1291,783,606,290,281  REF=Exper Vib.  Jacox  Webbook 2014",
+    "HF298=84.14+/-8. kJ  REF=Burcat G3B3  Max Lst Sq Error Cp @ 1300 K 0.36%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 1458,
+    "header_line": 1462,
+    "end_line": 1465
+  },
+  "source_text": {
+    "header_line": "BrNO2             T 6/14BR 1.N  1.O  2.   0.G   200.000  6000.000  B 125.90954 1",
+    "coeff_lines": [
+      " 7.52300188E+00 2.48349903E-03-9.60414705E-07 1.62648232E-10-1.00604776E-14    2",
+      " 7.45421630E+03-9.56895383E+00 3.23841432E+00 1.60795285E-02-1.85570694E-05    3",
+      " 1.15066033E-08-3.06880272E-12 8.58210039E+03 1.22135936E+01 1.01196583E+04    4"
+    ]
+  }
+}

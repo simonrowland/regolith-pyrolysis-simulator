@@ -1,0 +1,181 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0537",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CN Cyanogen",
+  "cas_as_published": "2074-87-5",
+  "formula": "CN",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "IU8/03",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "26.01744",
+    "value": 26.01744
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.39912850E+00",
+          "value": 3.3991285
+        },
+        {
+          "as_published": "7.46548662E-04",
+          "value": 0.000746548662
+        },
+        {
+          "as_published": "-1.41493852E-07",
+          "value": -1.41493852e-07
+        },
+        {
+          "as_published": "1.86747736E-11",
+          "value": 1.86747736e-11
+        },
+        {
+          "as_published": "-1.26032540E-15",
+          "value": -1.2603254e-15
+        },
+        {
+          "as_published": "5.16569715E+04",
+          "value": 51656.9715
+        },
+        {
+          "as_published": "4.67148681E+00",
+          "value": 4.67148681
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.61256069E+00",
+          "value": 3.61256069
+        },
+        {
+          "as_published": "-9.53015737E-04",
+          "value": -0.000953015737
+        },
+        {
+          "as_published": "2.13757271E-06",
+          "value": 2.13757271e-06
+        },
+        {
+          "as_published": "-3.05001808E-10",
+          "value": -3.05001808e-10
+        },
+        {
+          "as_published": "-4.70518097E-13",
+          "value": -4.70518097e-13
+        },
+        {
+          "as_published": "5.17084034E+04",
+          "value": 51708.4034
+        },
+        {
+          "as_published": "3.98238722E+00",
+          "value": 3.98238722
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "5.27611901E+04",
+    "value": 52761.1901,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "2074-87-5",
+    "CN  CYANID RADICAL  REF=TSIV  T0=0 WE=2068.435 WEXE=12.9765 WEYE=-3.082E-2",
+    "WEZE=-1.228E-3 BE=1.89931 ALFAB1=1.72786E-2 ALFAB2=-4.74E-5 ALFAB3=-4.512E-7",
+    "ALFAB4=3.533E-10 ALFAB5=-7.87E-12 DE=6.3782E-6 BETA1=-4.39E-8 BETA2=-9.65E-9",
+    "BETA3=-6.9E-10 T0=9240.041 WE=1813.474 WEXE=12.8272 WEYE=5.61E-3 WEZE=4.192E-4",
+    "BE=1.71547 ALFAB1=1.73452E-2 ALFAB2= 9.583E-6 ALFAB3=2.756E-6 ALFAB4=4.323E-8",
+    "ALFAB5=3.324E-9 ALFAB6=1.6E-10 ALFAB7=-3E-12 DE=6.1534E-6 BETA1=-0.781E-8",
+    "BETA2=6.83E-10 BETA3=-1.164E-10   T0=25752. WE=2163.9 WEXE=20.2 BE=1.985",
+    "ALFAB1=2.3E-2 DE=6.543 BETA1=8.7E-8  REF Gurvich 1991  HF298=438.68+/-2 kJ",
+    "HF0=435.4 kJ  REF=Huang, Barts & Halpern J.Phys.Chem. 96, (1992), 425.",
+    "{HF298=439.97+/-0.14  REF=ATcT C 2011}   Max Lst Sq Error Cp @ 1300 K 0.51%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 5458,
+    "header_line": 5469,
+    "end_line": 5472
+  },
+  "source_text": {
+    "header_line": "CN Cyanogen       IU8/03C  1.N  1.   0.   0.G   200.000  6000.000  B  26.01744 1",
+    "coeff_lines": [
+      " 3.39912850E+00 7.46548662E-04-1.41493852E-07 1.86747736E-11-1.26032540E-15    2",
+      " 5.16569715E+04 4.67148681E+00 3.61256069E+00-9.53015737E-04 2.13757271E-06    3",
+      "-3.05001808E-10-4.70518097E-13 5.17084034E+04 3.98238722E+00 5.27611901E+04    4"
+    ]
+  }
+}

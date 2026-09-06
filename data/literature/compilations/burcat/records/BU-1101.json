@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1101",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3H6O2 EthylForm",
+  "cas_as_published": "109-94-4",
+  "formula": "C3H6O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T03/08",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "74.07854",
+    "value": 74.07854
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "8.65736746E+00",
+          "value": 8.65736746
+        },
+        {
+          "as_published": "1.90386888E-02",
+          "value": 0.0190386888
+        },
+        {
+          "as_published": "-6.86671205E-06",
+          "value": -6.86671205e-06
+        },
+        {
+          "as_published": "1.10734809E-09",
+          "value": 1.10734809e-09
+        },
+        {
+          "as_published": "-6.61562843E-14",
+          "value": -6.61562843e-14
+        },
+        {
+          "as_published": "-4.96314922E+04",
+          "value": -49631.4922
+        },
+        {
+          "as_published": "-1.70491120E+01",
+          "value": -17.049112
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "5.59040899E+00",
+          "value": 5.59040899
+        },
+        {
+          "as_published": "2.42724317E-03",
+          "value": 0.00242724317
+        },
+        {
+          "as_published": "6.61618398E-05",
+          "value": 6.61618398e-05
+        },
+        {
+          "as_published": "-8.61263826E-08",
+          "value": -8.61263826e-08
+        },
+        {
+          "as_published": "3.38174267E-11",
+          "value": 3.38174267e-11
+        },
+        {
+          "as_published": "-4.75699454E+04",
+          "value": -47569.9454
+        },
+        {
+          "as_published": "4.84087081E+00",
+          "value": 4.84087081
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-4.53649824E+04",
+    "value": -45364.9824,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "109-94-4",
+    "C3H6O2 EthylFormate ester HC(O)-O-C2H5  SYGMA=1  STATWT=1  IA=4.5665 IB=32.8433",
+    "IC=33.9592  Ir(CH3)=0.5216  ROSYM=3  V(3)=1126 cm-1  Ir(HC(O)O-)=3.5178  ROSYM=1",
+    "V(3)=272. cm-1  Nu=3144,3132,3113,3059,3046,2966,1872,1543,1524,1516,1453,1440,",
+    "1414,1345,1242,1141,1131,1056,1038,927,811,628,408384,233   HF298=-90.15 kcal",
+    "REF=Burcat G3B3 calc.  {HF298=-96.8 kcal  REF=Osmont et al IJCK 39,(2007),481;",
+    "HF298=-95.2 kcal REF=Hine, Klueppel JACS 96,(1974),2924;  HF298=-361.7 kJ",
+    "REF=NIST Webbook 2008}  HF298(liq.)=-394.2 +/0.8 kJ REF=Frolov Petrov J Appl",
+    "Chem. USSR, 74,(1991).2361  Max Lst Sq Error Cp @ 6000 K 0.58%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 11599,
+    "header_line": 11608,
+    "end_line": 11611
+  },
+  "source_text": {
+    "header_line": "C3H6O2 EthylForm  T03/08C  3.H  6.O  2.   0.G   200.000  6000.000  B  74.07854 1",
+    "coeff_lines": [
+      " 8.65736746E+00 1.90386888E-02-6.86671205E-06 1.10734809E-09-6.61562843E-14    2",
+      "-4.96314922E+04-1.70491120E+01 5.59040899E+00 2.42724317E-03 6.61618398E-05    3",
+      "-8.61263826E-08 3.38174267E-11-4.75699454E+04 4.84087081E+00-4.53649824E+04    4"
+    ]
+  }
+}

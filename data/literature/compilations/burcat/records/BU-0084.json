@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0084",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "BH3",
+  "cas_as_published": "13283-31-3",
+  "formula": "BH3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "g 1/00",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "B ",
+      "count_as_published": " 1.",
+      "element": "B",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 3.",
+      "element": "H",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "13.83482",
+    "value": 13.83482
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.17527850E+00",
+          "value": 3.1752785
+        },
+        {
+          "as_published": "6.17427788E-03",
+          "value": 0.00617427788
+        },
+        {
+          "as_published": "-2.23882272E-06",
+          "value": -2.23882272e-06
+        },
+        {
+          "as_published": "3.63406302E-10",
+          "value": 3.63406302e-10
+        },
+        {
+          "as_published": "-2.18285343E-14",
+          "value": -2.18285343e-14
+        },
+        {
+          "as_published": "1.12094785E+04",
+          "value": 11209.4785
+        },
+        {
+          "as_published": "2.41422435E+00",
+          "value": 2.41422435
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.42666215E+00",
+          "value": 4.42666215
+        },
+        {
+          "as_published": "-7.00976798E-03",
+          "value": -0.00700976798
+        },
+        {
+          "as_published": "3.12943526E-05",
+          "value": 3.12943526e-05
+        },
+        {
+          "as_published": "-3.32541110E-08",
+          "value": -3.3254111e-08
+        },
+        {
+          "as_published": "1.19951756E-11",
+          "value": 1.19951756e-11
+        },
+        {
+          "as_published": "1.13733711E+04",
+          "value": 11373.3711
+        },
+        {
+          "as_published": "-1.61098145E+00",
+          "value": -1.61098145
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.25980484E+04",
+    "value": 12598.0484,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "13283-31-3",
+    "BH3   SIGMA=6  STATWT=1  A0=B0=7.874  C0=3.879   NU=2601.57(2),2495.6,1196.7(2),",
+    "1147.5  REF= JACOX JPCRD 27(2),(1998),115 and Martin & Lee Chem Phys Letters",
+    "200(5),(1992),502  HF298=104.747 kJ  HF0=108.603 kJ  REF=B. McBride based on:",
+    "Alendorf & Melius JPC A 101,(1997),2670; Ruscic et al JCP 88,(1988),5580",
+    "{HF298=106.7+/-10 kJ  REF=JANAF 64}  Max Lst Sq Error Cp @ 6000 K 0.58%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 844,
+    "header_line": 850,
+    "end_line": 853
+  },
+  "source_text": {
+    "header_line": "BH3               g 1/00B  1.H  3.   0.   0.G   200.000  6000.000  C  13.83482 1",
+    "coeff_lines": [
+      " 3.17527850E+00 6.17427788E-03-2.23882272E-06 3.63406302E-10-2.18285343E-14    2",
+      " 1.12094785E+04 2.41422435E+00 4.42666215E+00-7.00976798E-03 3.12943526E-05    3",
+      "-3.32541110E-08 1.19951756E-11 1.13733711E+04-1.61098145E+00 1.25980484E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0221",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CDClO  Formyl Ch",
+  "cas_as_published": "N/A",
+  "formula": "CDOCl",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T05/15",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "D ",
+      "count_as_published": " 1.",
+      "element": "D",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 1.",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "65.47690",
+    "value": 65.4769
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "6.18042262E+00",
+          "value": 6.18042262
+        },
+        {
+          "as_published": "3.70260174E-03",
+          "value": 0.00370260174
+        },
+        {
+          "as_published": "-1.40324887E-06",
+          "value": -1.40324887e-06
+        },
+        {
+          "as_published": "2.34592735E-10",
+          "value": 2.34592735e-10
+        },
+        {
+          "as_published": "-1.43839621E-14",
+          "value": -1.43839621e-14
+        },
+        {
+          "as_published": "-2.52616700E+04",
+          "value": -25261.67
+        },
+        {
+          "as_published": "-5.52155766E+00",
+          "value": -5.52155766
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.33913254E+00",
+          "value": 2.33913254
+        },
+        {
+          "as_published": "1.43071599E-02",
+          "value": 0.0143071599
+        },
+        {
+          "as_published": "-1.19883090E-05",
+          "value": -1.1988309e-05
+        },
+        {
+          "as_published": "4.44450989E-09",
+          "value": 4.44450989e-09
+        },
+        {
+          "as_published": "-4.02509034E-13",
+          "value": -4.02509034e-13
+        },
+        {
+          "as_published": "-2.41691599E+04",
+          "value": -24169.1599
+        },
+        {
+          "as_published": "1.43948317E+01",
+          "value": 14.3948317
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-2.29331618E+04",
+    "value": -22933.1618,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A",
+    "CDCLO  Deutherated Formyl Chloride  SIGMA=1  STATWT=1  IA=1.4702  IB=14.1275",
+    "IC=15.5977  REF=Burcat G3B3  Nu=2204,1749,986,781,701,456  REF=Jacox Webbook",
+    "NIST 2915  HF0=-44.844 kcal REF=from Ruscic's HF0 of CHCLO  {HF0=-45.283 kcal",
+    "REF=Burcat G3B3}  Max Lst Sq Error Cp @ 1300 K 0.46%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 2184,
+    "header_line": 2189,
+    "end_line": 2192
+  },
+  "source_text": {
+    "header_line": "CDClO  Formyl Ch  T05/15C  1.D  1.O  1.CL 1.G   200.000  6000.000  B  65.47690 1",
+    "coeff_lines": [
+      " 6.18042262E+00 3.70260174E-03-1.40324887E-06 2.34592735E-10-1.43839621E-14    2",
+      "-2.52616700E+04-5.52155766E+00 2.33913254E+00 1.43071599E-02-1.19883090E-05    3",
+      " 4.44450989E-09-4.02509034E-13-2.41691599E+04 1.43948317E+01-2.29331618E+04    4"
+    ]
+  }
+}

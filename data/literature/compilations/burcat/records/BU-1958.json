@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1958",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C10H8 PentaFulval",
+  "cas_as_published": "91-12-3",
+  "formula": "C10H8",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "10.",
+      "element": "C",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 8.",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "128.17052",
+    "value": 128.17052
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.92175329E+01",
+          "value": 19.2175329
+        },
+        {
+          "as_published": "2.92669226E-02",
+          "value": 0.0292669226
+        },
+        {
+          "as_published": "-1.05499085E-05",
+          "value": -1.05499085e-05
+        },
+        {
+          "as_published": "1.70796833E-09",
+          "value": 1.70796833e-09
+        },
+        {
+          "as_published": "-1.02475755E-13",
+          "value": -1.02475755e-13
+        },
+        {
+          "as_published": "3.58476932E+04",
+          "value": 35847.6932
+        },
+        {
+          "as_published": "-8.04839624E+01",
+          "value": -80.4839624
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "9.97563082E-02",
+          "value": 0.0997563082
+        },
+        {
+          "as_published": "4.40385029E-02",
+          "value": 0.0440385029
+        },
+        {
+          "as_published": "7.50003535E-05",
+          "value": 7.50003535e-05
+        },
+        {
+          "as_published": "-1.44982463E-07",
+          "value": -1.44982463e-07
+        },
+        {
+          "as_published": "6.53838898E-11",
+          "value": 6.53838898e-11
+        },
+        {
+          "as_published": "4.26382603E+04",
+          "value": 42638.2603
+        },
+        {
+          "as_published": "2.65554674E+01",
+          "value": 26.5554674
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.50323562E+04",
+    "value": 45032.3562,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "91-12-3",
+    "C10H8 Penta Fulvalene  C5H4=C5H4  SIGMA=4  STATWT=1  IA=19.9023  IB=96.2281",
+    "IC=116.1303  Nu=3266(2),3261,3258,3236.5(2),3225(2),1694,1632,1627,1551,1549,",
+    "1412,1399,1339,1336,1250,1135.5(2),1125,1119,1114,1035,1011,958,937,934,925,917,",
+    "906,838,819,805,791,781,724,719,667,614,578,522,445,400,246,159,120,101",
+    "HF298=89.489+/-2. kcal  REF=Burcat G3B3  max Lst Sq Error Cp @ 200 K ***1.00%***"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 22118,
+    "header_line": 22124,
+    "end_line": 22127
+  },
+  "source_text": {
+    "header_line": "C10H8 PentaFulval T 7/14C 10.H  8.   0.   0.G   200.000  6000.000  B 128.17052 1",
+    "coeff_lines": [
+      " 1.92175329E+01 2.92669226E-02-1.05499085E-05 1.70796833E-09-1.02475755E-13    2",
+      " 3.58476932E+04-8.04839624E+01 9.97563082E-02 4.40385029E-02 7.50003535E-05    3",
+      "-1.44982463E-07 6.53838898E-11 4.26382603E+04 2.65554674E+01 4.50323562E+04    4"
+    ]
+  }
+}

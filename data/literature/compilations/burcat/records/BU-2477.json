@@ -1,0 +1,173 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2477",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Ge(cr) Ref Elemen",
+  "cas_as_published": "7440-56-4",
+  "formula": "Ge",
+  "phase": "condensed",
+  "phase_as_published": "C",
+  "phase_card_as_published": "C",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 5/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "GE",
+      "count_as_published": " 1.",
+      "element": "Ge",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "72.61000",
+    "value": 72.61
+  },
+  "T_min_K": {
+    "as_published": "400.000",
+    "value": 400.0
+  },
+  "T_max_K": {
+    "as_published": "1211.000",
+    "value": 1211.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "8.04437807E+00",
+          "value": 8.04437807
+        },
+        {
+          "as_published": "-1.38178737E-02",
+          "value": -0.0138178737
+        },
+        {
+          "as_published": "1.29070084E-05",
+          "value": 1.29070084e-05
+        },
+        {
+          "as_published": "-3.89624779E-09",
+          "value": -3.89624779e-09
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "-2.30850121E+03",
+          "value": -2308.50121
+        },
+        {
+          "as_published": "-3.95007375E+01",
+          "value": -39.5007375
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.41278079E+00",
+          "value": 1.41278079
+        },
+        {
+          "as_published": "8.68970806E-03",
+          "value": 0.00868970806
+        },
+        {
+          "as_published": "-1.84462490E-05",
+          "value": -1.8446249e-05
+        },
+        {
+          "as_published": "1.81473176E-08",
+          "value": 1.81473176e-08
+        },
+        {
+          "as_published": "-6.56629250E-12",
+          "value": -6.5662925e-12
+        },
+        {
+          "as_published": "-6.77241879E+02",
+          "value": -677.241879
+        },
+        {
+          "as_published": "-6.22852151E+00",
+          "value": -6.22852151
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "0.00000000E+00",
+    "value": 0.0,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "7440-56-4",
+    "Ge(S) REFERENCE ELEMENT Cubic crystal and Liquid. REF=gurvich 91. Max Lst Sq",
+    "Error  Cp @ 200 K 0.24%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 27847,
+    "header_line": 27854,
+    "end_line": 27857
+  },
+  "source_text": {
+    "header_line": "Ge(cr) Ref Elemen T 5/14GE 1.   0.   0.   0.C   400.000  1211.000  B  72.61000 1",
+    "coeff_lines": [
+      " 8.04437807E+00-1.38178737E-02 1.29070084E-05-3.89624779E-09 0.00000000E+00    2",
+      "-2.30850121E+03-3.95007375E+01 1.41278079E+00 8.68970806E-03-1.84462490E-05    3",
+      " 1.81473176E-08-6.56629250E-12-6.77241879E+02-6.22852151E+00 0.00000000E+00    4"
+    ]
+  }
+}

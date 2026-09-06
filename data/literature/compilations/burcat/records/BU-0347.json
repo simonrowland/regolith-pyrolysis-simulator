@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0347",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CH2CLF  GC-31",
+  "cas_as_published": "593-70-4",
+  "formula": "CH2FCl",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/08",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 2.",
+      "element": "H",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": " 1.",
+      "element": "F",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 1.",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "68.47768",
+    "value": 68.47768
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.72901958E+00",
+          "value": 5.72901958
+        },
+        {
+          "as_published": "6.55434234E-03",
+          "value": 0.00655434234
+        },
+        {
+          "as_published": "-2.37533364E-06",
+          "value": -2.37533364e-06
+        },
+        {
+          "as_published": "3.85757886E-10",
+          "value": 3.85757886e-10
+        },
+        {
+          "as_published": "-2.31898849E-14",
+          "value": -2.31898849e-14
+        },
+        {
+          "as_published": "-3.39820173E+04",
+          "value": -33982.0173
+        },
+        {
+          "as_published": "-3.65473412E+00",
+          "value": -3.65473412
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.61772664E+00",
+          "value": 3.61772664
+        },
+        {
+          "as_published": "1.12919221E-03",
+          "value": 0.00112919221
+        },
+        {
+          "as_published": "2.99707793E-05",
+          "value": 2.99707793e-05
+        },
+        {
+          "as_published": "-4.12417501E-08",
+          "value": -4.12417501e-08
+        },
+        {
+          "as_published": "1.67946483E-11",
+          "value": 1.67946483e-11
+        },
+        {
+          "as_published": "-3.28968776E+04",
+          "value": -32896.8776
+        },
+        {
+          "as_published": "9.85303098E+00",
+          "value": 9.85303098
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-3.15768458E+04",
+    "value": -31576.8458,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "593-70-4",
+    "CH2ClF  CLOROFLUOROMETHANE FC-31  SIGMA=1 STATWT=1  IAIBIC=481.65  Nu=2993,1475,",
+    "760,385,1236,3048,1068,1351,1001  REF=Gurvich 91  HF298=-62.749 kcal REF=Burcat",
+    "G3B3  {HF298=-263.72+/-1.26 kJ  REF=ATcT C 2011; HF298=-63.2 kcal REF=TRC 12/75;",
+    "HF298=-270+/-15. kJ  REF=TRC 6/89 and Gurvich 91}  Max Lst Sq Error Cp @ 6000 K",
+    "0.48 %."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 3458,
+    "header_line": 3464,
+    "end_line": 3467
+  },
+  "source_text": {
+    "header_line": "CH2CLF  GC-31     T12/08C  1.H  2.F  1.CL 1.G   200.000  6000.000  C  68.47768 1",
+    "coeff_lines": [
+      " 5.72901958E+00 6.55434234E-03-2.37533364E-06 3.85757886E-10-2.31898849E-14    2",
+      "-3.39820173E+04-3.65473412E+00 3.61772664E+00 1.12919221E-03 2.99707793E-05    3",
+      "-4.12417501E-08 1.67946483E-11-3.28968776E+04 9.85303098E+00-3.15768458E+04    4"
+    ]
+  }
+}

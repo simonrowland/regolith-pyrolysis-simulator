@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1959",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "NAPHTOL C10H8O I",
+  "cas_as_published": "135-19-3",
+  "formula": "C10H8O",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/98",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "10.",
+      "element": "C",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 8.",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "144.17292",
+    "value": 144.17292
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.08930252E+01",
+          "value": 20.8930252
+        },
+        {
+          "as_published": "3.10560066E-02",
+          "value": 0.0310560066
+        },
+        {
+          "as_published": "-1.14407562E-05",
+          "value": -1.14407562e-05
+        },
+        {
+          "as_published": "1.87872866E-09",
+          "value": 1.87872866e-09
+        },
+        {
+          "as_published": "-1.13823881E-13",
+          "value": -1.13823881e-13
+        },
+        {
+          "as_published": "-1.35886443E+04",
+          "value": -13588.6443
+        },
+        {
+          "as_published": "-8.88597101E+01",
+          "value": -88.8597101
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-2.08768263E+00",
+          "value": -2.08768263
+        },
+        {
+          "as_published": "7.68099506E-02",
+          "value": 0.0768099506
+        },
+        {
+          "as_published": "-1.53593023E-05",
+          "value": -1.53593023e-05
+        },
+        {
+          "as_published": "-4.04657632E-08",
+          "value": -4.04657632e-08
+        },
+        {
+          "as_published": "2.33759779E-11",
+          "value": 2.33759779e-11
+        },
+        {
+          "as_published": "-6.29056385E+03",
+          "value": -6290.56385
+        },
+        {
+          "as_published": "3.43331051E+01",
+          "value": 34.3331051
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-3.70367466E+03",
+    "value": -3703.67466,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "135-19-3",
+    "C10H7OH Naphtol    Ia = 43.59471  Ib = 75.763548  Ic = 119.35822   Ir = 0.12236",
+    "ROSYM  = 2  V(2) = 3.468 kcal    NU = 3652,(3135),3067,2967,2923,2859,1946,",
+    "1905,1847,1828,1820,1718,1682,1634,1591,1520,1462,1404,1359,1277,1239,1189,1152,",
+    "1089,1081,1041,1014,(943,925,894),874,(848,819),790,766,(742),715,(704),583,570,",
+    "522,479,467,459,(453,411,286,255,220,170). REF = NIST Webbook 1997",
+    "Hf(298)= -7.36 kcal    REF =Da Silva et al. J. Chem Thermo. 20,(1988),969",
+    "Max Lst Sq Error Cp @ 1300 K 0.63%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 22129,
+    "header_line": 22137,
+    "end_line": 22140
+  },
+  "source_text": {
+    "header_line": "NAPHTOL C10H8O I  T 7/98C 10.H  8.O  1.   0.G   200.000  6000.000  B 144.17292 1",
+    "coeff_lines": [
+      " 2.08930252E+01 3.10560066E-02-1.14407562E-05 1.87872866E-09-1.13823881E-13    2",
+      "-1.35886443E+04-8.88597101E+01-2.08768263E+00 7.68099506E-02-1.53593023E-05    3",
+      "-4.04657632E-08 2.33759779E-11-6.29056385E+03 3.43331051E+01-3.70367466E+03    4"
+    ]
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2766",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "NBrH2",
+  "cas_as_published": "14519-10-9",
+  "formula": "NBrH2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/15",
+  "calc_quality_as_published": "",
+  "composition": [
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "BR",
+      "count_as_published": " 1.",
+      "element": "Br",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 2.",
+      "element": "H",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "95.92662",
+    "value": 95.92662
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.22900251E+00",
+          "value": 4.22900251
+        },
+        {
+          "as_published": "4.68107007E-03",
+          "value": 0.00468107007
+        },
+        {
+          "as_published": "-1.57769911E-06",
+          "value": -1.57769911e-06
+        },
+        {
+          "as_published": "2.43606984E-10",
+          "value": 2.43606984e-10
+        },
+        {
+          "as_published": "-1.41256020E-14",
+          "value": -1.4125602e-14
+        },
+        {
+          "as_published": "8.46327200E+03",
+          "value": 8463.272
+        },
+        {
+          "as_published": "4.63288105E+00",
+          "value": 4.63288105
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.57853728E+00",
+          "value": 3.57853728
+        },
+        {
+          "as_published": "1.66306162E-03",
+          "value": 0.00166306162
+        },
+        {
+          "as_published": "1.38149040E-05",
+          "value": 1.3814904e-05
+        },
+        {
+          "as_published": "-1.96498046E-08",
+          "value": -1.96498046e-08
+        },
+        {
+          "as_published": "8.15515653E-12",
+          "value": 8.15515653e-12
+        },
+        {
+          "as_published": "8.83137022E+03",
+          "value": 8831.37022
+        },
+        {
+          "as_published": "9.03665924E+00",
+          "value": 9.03665924
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.00593011E+04",
+    "value": 10059.3011,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "14519-10-9",
+    "NBrH2  Bromimide  SIGMA=1  STATWT=1  IA=0.3182  IB=8.6848  IC=8.8057  Nu=3530,",
+    "3421,1629,1138,1085,572  HF298=19.99+/-2 kcal  REF=Burcat G3B3  {HF298=18.97",
+    "kcal  REF=Trogolo et al PCCP 17,(2015),3584;  HF298=19.90 kcal  REF=Rayne &",
+    "Forest Comp.Theor. Chem 974,(2011),163}  Max Lst Sq Error Cp @ 6000 K 0.32%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 30203,
+    "header_line": 30208,
+    "end_line": 30211
+  },
+  "source_text": {
+    "header_line": "NBrH2             T 6/15N  1.BR 1.H  2.   0.G   200.000  6000.000     95.92662 1",
+    "coeff_lines": [
+      " 4.22900251E+00 4.68107007E-03-1.57769911E-06 2.43606984E-10-1.41256020E-14    2",
+      " 8.46327200E+03 4.63288105E+00 3.57853728E+00 1.66306162E-03 1.38149040E-05    3",
+      "-1.96498046E-08 8.15515653E-12 8.83137022E+03 9.03665924E+00 1.00593011E+04    4"
+    ]
+  }
+}

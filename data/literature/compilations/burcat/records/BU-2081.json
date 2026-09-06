@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2081",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C12H18  HexaMeth",
+  "cas_as_published": "87-85-4",
+  "formula": "C12H18",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 9/13",
+  "calc_quality_as_published": "D",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "12.",
+      "element": "C",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "18.",
+      "element": "H",
+      "count": 18.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "162.27132",
+    "value": 162.27132
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "5000.000",
+    "value": 5000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.25340154E+01",
+          "value": 22.5340154
+        },
+        {
+          "as_published": "5.87280391E-02",
+          "value": 0.0587280391
+        },
+        {
+          "as_published": "-2.27830381E-05",
+          "value": -2.27830381e-05
+        },
+        {
+          "as_published": "4.10749001E-09",
+          "value": 4.10749001e-09
+        },
+        {
+          "as_published": "-2.80030125E-13",
+          "value": -2.80030125e-13
+        },
+        {
+          "as_published": "-2.06793655E+04",
+          "value": -20679.3655
+        },
+        {
+          "as_published": "-9.52261516E+01",
+          "value": -95.2261516
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "8.56247507E+00",
+          "value": 8.56247507
+        },
+        {
+          "as_published": "6.21066182E-02",
+          "value": 0.0621066182
+        },
+        {
+          "as_published": "4.67337762E-05",
+          "value": 4.67337762e-05
+        },
+        {
+          "as_published": "-9.42345140E-08",
+          "value": -9.4234514e-08
+        },
+        {
+          "as_published": "3.91381210E-11",
+          "value": 3.9138121e-11
+        },
+        {
+          "as_published": "-1.48675154E+04",
+          "value": -14867.5154
+        },
+        {
+          "as_published": "-1.39250260E+01",
+          "value": -13.925026
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-9.30902723E+03",
+    "value": -9309.02723,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "87-85-4",
+    "C12H18  HexaMethylBenzene (Melitene)  NIST Webbook Tables Cp of Dreager JCT 17,",
+    "(1985),263; S298=108.7 cal  REF=Stull Westrum & Sinke 1969  HF298=-77.4+/-2.5 kJ",
+    "REF=Colomina et al JCT 11,(1989),275  {HF298=87.86+/-3. kJ  REF=Pedley & Rilance",
+    "1977.}  IA=82.0988  IB=82.8714  IC=161.8427 REF=G3B3  Max Lst Sq Error Cp @ 1300",
+    "K 0.47%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 23732,
+    "header_line": 23738,
+    "end_line": 23741
+  },
+  "source_text": {
+    "header_line": "C12H18  HexaMeth  T 9/13C 12.H 18.   0.   0.G   200.000  5000.000  D 162.27132 1",
+    "coeff_lines": [
+      " 2.25340154E+01 5.87280391E-02-2.27830381E-05 4.10749001E-09-2.80030125E-13    2",
+      "-2.06793655E+04-9.52261516E+01 8.56247507E+00 6.21066182E-02 4.67337762E-05    3",
+      "-9.42345140E-08 3.91381210E-11-1.48675154E+04-1.39250260E+01-9.30902723E+03    4"
+    ]
+  }
+}

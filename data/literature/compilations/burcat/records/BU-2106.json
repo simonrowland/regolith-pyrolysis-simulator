@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2106",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C14H8 5-EthynylA",
+  "cas_as_published": "33918-41-1",
+  "formula": "C14H8",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/13",
+  "calc_quality_as_published": "",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "14.",
+      "element": "C",
+      "count": 14.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 8.",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "176.21332",
+    "value": 176.21332
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.57239580E+01",
+          "value": 25.723958
+        },
+        {
+          "as_published": "3.46851704E-02",
+          "value": 0.0346851704
+        },
+        {
+          "as_published": "-1.26252136E-05",
+          "value": -1.26252136e-05
+        },
+        {
+          "as_published": "2.05730888E-09",
+          "value": 2.05730888e-09
+        },
+        {
+          "as_published": "-1.23996573E-13",
+          "value": -1.23996573e-13
+        },
+        {
+          "as_published": "4.26161479E+04",
+          "value": 42616.1479
+        },
+        {
+          "as_published": "-1.14207237E+02",
+          "value": -114.207237
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-3.07297192E+00",
+          "value": -3.07297192
+        },
+        {
+          "as_published": "8.97179979E-02",
+          "value": 0.0897179979
+        },
+        {
+          "as_published": "-3.88114416E-07",
+          "value": -3.88114416e-07
+        },
+        {
+          "as_published": "-7.93379499E-08",
+          "value": -7.93379499e-08
+        },
+        {
+          "as_published": "4.27982654E-11",
+          "value": 4.27982654e-11
+        },
+        {
+          "as_published": "5.15819933E+04",
+          "value": 51581.9933
+        },
+        {
+          "as_published": "3.99647182E+01",
+          "value": 39.9647182
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "5.45134614E+04",
+    "value": 54513.4614,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "33918-41-1",
+    "C14H8  5-EthynylAcenaphthenyl  SIGMA=1  STATWT=1  IA=67.2901  IB=122.2377",
+    "IC=189.5278  No Internal Rotor  Nu=3489,3244,3224,3209(2),3195,3187,3181,2214,",
+    "1668,1658,1641,1553,1524,1496,1472.5,1444,1398.5,1393.5,1333,1286,1250,1229,",
+    "1203,1171,1137,1111,1062,1042,983,959,947,937,924,865,848,836,792,776,750,697,",
+    "684,661,644,625.5,592(2),575,535,505,480,463,403,387.5,365.5,258.5,220,168,130,",
+    "92  REF=Burcat B3LYP/6-31G(d)  HF298=108.33+/-5. kcal  REF=Green RMG 2013",
+    "{HF298=125.72 kcal  MOPAC 2000 PM3}  Max Lst Sq Error Cp @ 200 K 0.57%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24064,
+    "header_line": 24072,
+    "end_line": 24075
+  },
+  "source_text": {
+    "header_line": "C14H8 5-EthynylA  T12/13C 14.H  8.   0.   0.G   200.000  6000.000    176.21332 1",
+    "coeff_lines": [
+      " 2.57239580E+01 3.46851704E-02-1.26252136E-05 2.05730888E-09-1.23996573E-13    2",
+      " 4.26161479E+04-1.14207237E+02-3.07297192E+00 8.97179979E-02-3.88114416E-07    3",
+      "-7.93379499E-08 4.27982654E-11 5.15819933E+04 3.99647182E+01 5.45134614E+04    4"
+    ]
+  }
+}

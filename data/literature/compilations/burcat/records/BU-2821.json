@@ -1,0 +1,186 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2821",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "NOCL",
+  "cas_as_published": "2696-92-6",
+  "formula": "NOCl",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "ATcT/A",
+  "calc_quality_as_published": "A",
+  "composition": [
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 1.",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "65.45884",
+    "value": 65.45884
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "6.17974764E+00",
+          "value": 6.17974764
+        },
+        {
+          "as_published": "2.86794479E-04",
+          "value": 0.000286794479
+        },
+        {
+          "as_published": "1.72637356E-07",
+          "value": 1.72637356e-07
+        },
+        {
+          "as_published": "-3.01424760E-11",
+          "value": -3.0142476e-11
+        },
+        {
+          "as_published": "9.00332651E-16",
+          "value": 9.00332651e-16
+        },
+        {
+          "as_published": "4.24508262E+03",
+          "value": 4245.08262
+        },
+        {
+          "as_published": "-4.32250346E+00",
+          "value": -4.32250346
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.23254446E+00",
+          "value": 3.23254446
+        },
+        {
+          "as_published": "1.18880467E-02",
+          "value": 0.0118880467
+        },
+        {
+          "as_published": "-2.10711856E-05",
+          "value": -2.10711856e-05
+        },
+        {
+          "as_published": "1.95533925E-08",
+          "value": 1.95533925e-08
+        },
+        {
+          "as_published": "-6.99286074E-12",
+          "value": -6.99286074e-12
+        },
+        {
+          "as_published": "4.97580248E+03",
+          "value": 4975.80248
+        },
+        {
+          "as_published": "1.02773094E+01",
+          "value": 10.2773094
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "6.31714918E+03",
+    "value": 6317.14918,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "2696-92-6",
+    "NOCl  SIGMA=1  STATWT=1  A0=2.9145  B0=.19139  C0=.17933    NU=1800,596,332",
+    "X11=-17.8  X12=0. X13=-.6  X22=-2.6  X23=-4.3  X33=-1.    ALFAA1=.04016",
+    "ALFAA2=-.03888  ALFAA3=-.01061  ALFAB1=-.00033  ALFAB2=.00053  ALFAB3=-.0016",
+    "ALFAC1=-.00013  ALFAC2=.00069  ALFAC3=.00153  TAAA=-.00057778   TBBB=-9.75E-7",
+    "TAAB=8.5222E-6  TABA=-3.6732E-6   TCCC=-.7.032E-7     TAAC=5.2943E-6",
+    "TBBC=-8.2374E-7    T0=10000.  STATWT=3 SIGMA=1   T0=16000.  STATWT=1 SIGMA=1",
+    "REF=Gurvich 1989   HF298=52.524+/-0.09 kJ  REF=ATcT A  {HF0=54.6+/-0.5 kJ",
+    "REF=Gurvich 89}  Max Lst Sq Error Cp @ 1300 0.66%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "xml_coefficient_mismatch",
+      "xml_formula": "NOCL",
+      "xml_cas": "2696-92-6",
+      "note": "BURCAT_THR.xml (2005 snapshot) coefficients differ from this BURCAT.THR.txt record. THR tokens retained."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 30729,
+    "header_line": 30738,
+    "end_line": 30741
+  },
+  "source_text": {
+    "header_line": "NOCL              ATcT/AN  1.O  1.CL 1.   0.G   200.000  6000.000  A  65.45884 1",
+    "coeff_lines": [
+      " 6.17974764E+00 2.86794479E-04 1.72637356E-07-3.01424760E-11 9.00332651E-16    2",
+      " 4.24508262E+03-4.32250346E+00 3.23254446E+00 1.18880467E-02-2.10711856E-05    3",
+      " 1.95533925E-08-6.99286074E-12 4.97580248E+03 1.02773094E+01 6.31714918E+03    4"
+    ]
+  }
+}

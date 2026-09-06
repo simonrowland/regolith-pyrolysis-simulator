@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1105",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3H6O3 Trioxane",
+  "cas_as_published": "110-88-3",
+  "formula": "C3H6O3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/10",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "90.07794",
+    "value": 90.07794
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.92478422E+00",
+          "value": 9.92478422
+        },
+        {
+          "as_published": "2.18093198E-02",
+          "value": 0.0218093198
+        },
+        {
+          "as_published": "-7.93042731E-06",
+          "value": -7.93042731e-06
+        },
+        {
+          "as_published": "1.29091522E-09",
+          "value": 1.29091522e-09
+        },
+        {
+          "as_published": "-7.77324725E-14",
+          "value": -7.77324725e-14
+        },
+        {
+          "as_published": "-6.25507483E+04",
+          "value": -62550.7483
+        },
+        {
+          "as_published": "-3.12305136E+01",
+          "value": -31.2305136
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.55243730E+00",
+          "value": 3.5524373
+        },
+        {
+          "as_published": "1.70629316E-03",
+          "value": 0.00170629316
+        },
+        {
+          "as_published": "9.91146863E-05",
+          "value": 9.91146863e-05
+        },
+        {
+          "as_published": "-1.31998807E-07",
+          "value": -1.31998807e-07
+        },
+        {
+          "as_published": "5.26422498E-11",
+          "value": 5.26422498e-11
+        },
+        {
+          "as_published": "-5.90301584E+04",
+          "value": -59030.1584
+        },
+        {
+          "as_published": "1.06184813E+01",
+          "value": 10.6184813
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-5.72554890E+04",
+    "value": -57255.489,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "110-88-3",
+    "C3H6O3  1,3,5-Cy Trioxane (CH2O)3  SIGMA=3  STATWT=1  IA=15.9752  IB=15.9816",
+    "IC=28.7895  Nu=3169,3164.7(2),2964,2944(2),1548,1530(2),1467(2),1414,1341.7(2),",
+    "1261,1251,1199.5(2),1092(2),991,964(2),962,759,530.5(2),457,293.5,290.8",
+    "HF298=-113.779+/-2 kcal  REF=Burcat G3B3 {HF298=-465.76+/-0.50  REF=Mansson et",
+    "al Acta Chem Scand 23,(1969),56; HF298=110.   kcal  REF=Chemkin database 2000}",
+    "Max Lst Sq Error Cp @ 200 K 0.76%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 11653,
+    "header_line": 11660,
+    "end_line": 11663
+  },
+  "source_text": {
+    "header_line": "C3H6O3 Trioxane   T10/10C  3.H  6.O  3.   0.G   200.000  6000.000  B  90.07794 1",
+    "coeff_lines": [
+      " 9.92478422E+00 2.18093198E-02-7.93042731E-06 1.29091522E-09-7.77324725E-14    2",
+      "-6.25507483E+04-3.12305136E+01 3.55243730E+00 1.70629316E-03 9.91146863E-05    3",
+      "-1.31998807E-07 5.26422498E-11-5.90301584E+04 1.06184813E+01-5.72554890E+04    4"
+    ]
+  }
+}

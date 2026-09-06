@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1214",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H4N2 PYRAZINE",
+  "cas_as_published": "290-37-9",
+  "formula": "C4H4N2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 9/96",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  4",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  4",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": "  2",
+      "element": "N",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "80.08924",
+    "value": 80.08924
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "0.10551339E+02",
+          "value": 10.551339
+        },
+        {
+          "as_published": "0.16036746E-01",
+          "value": 0.016036746
+        },
+        {
+          "as_published": "-0.58863657E-05",
+          "value": -5.8863657e-06
+        },
+        {
+          "as_published": "0.96422235E-09",
+          "value": 9.6422235e-10
+        },
+        {
+          "as_published": "-0.58315531E-13",
+          "value": -5.8315531e-14
+        },
+        {
+          "as_published": "0.18418344E+05",
+          "value": 18418.344
+        },
+        {
+          "as_published": "-0.33943388E+02",
+          "value": -33.943388
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "0.13116930E+01",
+          "value": 1.311693
+        },
+        {
+          "as_published": "0.14100415E-01",
+          "value": 0.014100415
+        },
+        {
+          "as_published": "0.64443831E-04",
+          "value": 6.4443831e-05
+        },
+        {
+          "as_published": "-0.10163885E-06",
+          "value": -1.0163885e-07
+        },
+        {
+          "as_published": "0.43390536E-10",
+          "value": 4.3390536e-11
+        },
+        {
+          "as_published": "0.22143754E+05",
+          "value": 22143.754
+        },
+        {
+          "as_published": "0.19991866E+02",
+          "value": 19.991866
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "0.23550540E+05",
+    "value": 23550.54,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "290-37-9",
+    "C4H4N2 PYRAZINE (SIX MEMBERED RING WITH N IN PARA POSITION)   SIGMA=4  STATWT=1",
+    "IA=12.8266  IB=13.8011  IC=26.6277  NU= 3037,3031,3015,3014,1615,1579,1493,1404,",
+    "1337,1215,1227,1074,1010,1003,1001,995,982,935,801,748,695,584,435.7,380.6",
+    "REF= C. Melius Database #PJ11 HF298=46.8+-0.3 Kcal   REF=Pedley, Nylor & Kirby",
+    "Max Lst Sq Error Cp @ 200 K **1.06 %**."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 12957,
+    "header_line": 12963,
+    "end_line": 12966
+  },
+  "source_text": {
+    "header_line": "C4H4N2 PYRAZINE   T 9/96C   4H   4N   2    0G   200.000  6000.000  B  80.08924 1",
+    "coeff_lines": [
+      " 0.10551339E+02 0.16036746E-01-0.58863657E-05 0.96422235E-09-0.58315531E-13    2",
+      " 0.18418344E+05-0.33943388E+02 0.13116930E+01 0.14100415E-01 0.64443831E-04    3",
+      "-0.10163885E-06 0.43390536E-10 0.22143754E+05 0.19991866E+02 0.23550540E+05    4"
+    ]
+  }
+}

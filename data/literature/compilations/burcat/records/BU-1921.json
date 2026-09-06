@@ -1,0 +1,185 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1921",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C9H10 PropenylBenz",
+  "cas_as_published": "300-57-2",
+  "formula": "C9H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/13",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 9.",
+      "element": "C",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "118.17570",
+    "value": 118.1757
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.66464102E+01",
+          "value": 16.6464102
+        },
+        {
+          "as_published": "3.32313398E-02",
+          "value": 0.0332313398
+        },
+        {
+          "as_published": "-1.20397212E-05",
+          "value": -1.20397212e-05
+        },
+        {
+          "as_published": "1.94989704E-09",
+          "value": 1.94989704e-09
+        },
+        {
+          "as_published": "-1.16896395E-13",
+          "value": -1.16896395e-13
+        },
+        {
+          "as_published": "8.02178295E+03",
+          "value": 8021.78295
+        },
+        {
+          "as_published": "-6.23533894E+01",
+          "value": -62.3533894
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.44794580E+00",
+          "value": 3.4479458
+        },
+        {
+          "as_published": "2.66742382E-02",
+          "value": 0.0266742382
+        },
+        {
+          "as_published": "9.83835920E-05",
+          "value": 9.8383592e-05
+        },
+        {
+          "as_published": "-1.53454700E-07",
+          "value": -1.534547e-07
+        },
+        {
+          "as_published": "6.46199530E-11",
+          "value": 6.4619953e-11
+        },
+        {
+          "as_published": "1.35948063E+04",
+          "value": 13594.8063
+        },
+        {
+          "as_published": "1.57811372E+01",
+          "value": 15.7811372
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.64048633E+04",
+    "value": 16404.8633,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "300-57-2",
+    "C9H10  2-Propenyl Benzene  C6H5-CH2-CH=CH2  SIGMA=1  STATWT=2  IA=19.8995",
+    "IB=86.4597  IC=101.6715  Ir(CH2=CH-)=3.28588  ROSYM=2  V(3)=700. cm-1",
+    "Ir(C6H5)=7.166  ROSYM=2  V(3)=525. cm-1  Nu=3235,3208,3197,3189,3180,3173,3158,",
+    "3149,3061.5,3026,1728.5,1664.5,1644,1546,1508,1499,1472,1376,1363,1339,1323,",
+    "1248,1221,1214,1192,1137,1109,1059,1037,1018.5,995,967.5,952,940,934,914,862,",
+    "835,758,716,669,636,538.5,498,418,400,330,275,147  REF=Burcat B3LYP/6-31G(d)",
+    "HF298=32.6 kcal  REF=NIST 94  {HF298=37.0+/-2. kcal  REF=Chickos Liebman et al",
+    "JCO 46,(1981),4294}  Max Lst Sq Error Cp @ 200 K 0.71%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C9H10 PropenylBenz",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 21653,
+    "header_line": 21662,
+    "end_line": 21665
+  },
+  "source_text": {
+    "header_line": "C9H10 PropenylBenzT10/13C  9.H 10.   0.   0.G   200.000  6000.000  B 118.17570 1",
+    "coeff_lines": [
+      " 1.66464102E+01 3.32313398E-02-1.20397212E-05 1.94989704E-09-1.16896395E-13    2",
+      " 8.02178295E+03-6.23533894E+01 3.44794580E+00 2.66742382E-02 9.83835920E-05    3",
+      "-1.53454700E-07 6.46199530E-11 1.35948063E+04 1.57811372E+01 1.64048633E+04    4"
+    ]
+  }
+}

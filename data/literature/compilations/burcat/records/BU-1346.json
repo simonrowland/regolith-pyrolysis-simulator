@@ -1,0 +1,183 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1346",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H10 n-butane",
+  "cas_as_published": "106-97-8",
+  "formula": "C4H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "g12/00",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "58.12220",
+    "value": 58.1222
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.44547835E+00",
+          "value": 9.44547835
+        },
+        {
+          "as_published": "2.57856620E-02",
+          "value": 0.025785662
+        },
+        {
+          "as_published": "-9.23613194E-06",
+          "value": -9.23613194e-06
+        },
+        {
+          "as_published": "1.48631762E-09",
+          "value": 1.48631762e-09
+        },
+        {
+          "as_published": "-8.87891206E-14",
+          "value": -8.87891206e-14
+        },
+        {
+          "as_published": "-2.01383773E+04",
+          "value": -20138.3773
+        },
+        {
+          "as_published": "-2.63477585E+01",
+          "value": -26.3477585
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "6.14474013E+00",
+          "value": 6.14474013
+        },
+        {
+          "as_published": "1.64500242E-04",
+          "value": 0.000164500242
+        },
+        {
+          "as_published": "9.67848789E-05",
+          "value": 9.67848789e-05
+        },
+        {
+          "as_published": "-1.25486208E-07",
+          "value": -1.25486208e-07
+        },
+        {
+          "as_published": "4.97846257E-11",
+          "value": 4.97846257e-11
+        },
+        {
+          "as_published": "-1.75989467E+04",
+          "value": -17598.9467
+        },
+        {
+          "as_published": "-1.08058878E+00",
+          "value": -1.08058878
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.51289733E+04",
+    "value": -15128.9733,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "106-97-8",
+    "N-C4H10  N-BUTANE  ***This is an equilibrium mixture of 1/3 trans and 2/3 gauche",
+    "through STATWT. T0=760 cal for gauche is included in V of C3H5***   STATWT=1/3",
+    "SIGMA=2  IA=3.6865  IB=24.704  IC=23.093   Ir=0.52483  ROSYM=3 V(3)=1154. cm-1",
+    "Ir=0.40633 ROSYM=3 V(3)=1154. cm-1 Brot1=1.5443 Brot2=-0.10258 Brot3=0.06043",
+    "Brot4=-0.00612  ROSYM=1 V(1)=401. V(2)=-40.97 V(3)=1152.7 cm-1   NU=2965,2872,",
+    "2853,1460,1442,1382,1361,1151,1059,842,432,2968,2930,1461,1257,948,731,2965,",
+    "2912,1460,1300,1180,803,2968,2780,2853,1461(2),1379,1290,1009,964,271",
+    "For Gauche T0=0 STATWT=2/3 SIGMA=2  IA=6.589  IB=20.299 IC=17.05 Internal rot as",
+    "for trans  Nu=2968(4),2920(2),2870(2),2860(2),1460(4),1450(2),1380(2),1370,1350,",
+    "1281,1233,1168,1133,1077,980(2),955,827,788,747,469,320  REF = CHEN, WILHOIT &",
+    "ZWOLINSKI JPCRD 4,(1975),859 HF298=-125.79 kJ  HF0=-98.463 kJ REF=TRC 10/85",
+    "{HF298=-125.852+/-0.37 kJ REF=ATcT C}   MAX LST SQ ERROR Cp @ 200 K O.66 %."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 14568,
+    "header_line": 14581,
+    "end_line": 14584
+  },
+  "source_text": {
+    "header_line": "C4H10 n-butane    g12/00C  4.H 10.   0.   0.G   200.000  6000.000  B  58.12220 1",
+    "coeff_lines": [
+      " 9.44547835E+00 2.57856620E-02-9.23613194E-06 1.48631762E-09-8.87891206E-14    2",
+      "-2.01383773E+04-2.63477585E+01 6.14474013E+00 1.64500242E-04 9.67848789E-05    3",
+      "-1.25486208E-07 4.97846257E-11-1.75989467E+04-1.08058878E+00-1.51289733E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2159",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C18H12",
+  "cas_as_published": "217-59-4",
+  "formula": "C18H12",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/05",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "18.",
+      "element": "C",
+      "count": 18.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "12.",
+      "element": "H",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "228.28788",
+    "value": 228.28788
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.23692778E+01",
+          "value": 32.3692778
+        },
+        {
+          "as_published": "5.05001645E-02",
+          "value": 0.0505001645
+        },
+        {
+          "as_published": "-1.84004568E-05",
+          "value": -1.84004568e-05
+        },
+        {
+          "as_published": "3.00025561E-09",
+          "value": 3.00025561e-09
+        },
+        {
+          "as_published": "-1.80901476E-13",
+          "value": -1.80901476e-13
+        },
+        {
+          "as_published": "1.76447014E+04",
+          "value": 17644.7014
+        },
+        {
+          "as_published": "-1.54285580E+02",
+          "value": -154.28558
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-1.97977711E+00",
+          "value": -1.97977711
+        },
+        {
+          "as_published": "8.49435086E-02",
+          "value": 0.0849435086
+        },
+        {
+          "as_published": "9.96440464E-05",
+          "value": 9.96440464e-05
+        },
+        {
+          "as_published": "-2.10795604E-07",
+          "value": -2.10795604e-07
+        },
+        {
+          "as_published": "9.54761656E-11",
+          "value": 9.54761656e-11
+        },
+        {
+          "as_published": "2.97414679E+04",
+          "value": 29741.4679
+        },
+        {
+          "as_published": "3.68747093E+01",
+          "value": 36.8747093
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.34355242E+04",
+    "value": 33435.5242,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "217-59-4",
+    "C18H12 TRIPHENYLENE  SIGMA=6  STATWT=1  IA=16.41534  IB=16.41808  IC=32.83342",
+    "Nu=3241,3239(2),3221(2),3217.5,3204,3201(2),3187(3),1670,1665(2),1663(2),1605,",
+    "1549(2),1505,1495,1481(2),1382(2),1375,1335(2),1321,1284(2),1261,1221,1202(2),",
+    "1179,1141(2),1099,1086(2),1022(2),1015,980(2),970,947,925(2),876,865(2),789(2),",
+    "784(3),758,721(2),713,635(2),617,578,565,557(2),438(2),434,424,410(2),275(2),",
+    "263.5(2),124.4,107.7,52.04,50.93  HF298=278.0+/-10. kJ HF0=312.98 kJ",
+    "REF=Sivaramakrishnan et al JPC A 109,(2005),1621  {HF298=274.2 kJ REF= Dorofeeva",
+    "& Gurvich 1988 Preprint IVTAN 1-238 1988; HF298=265.5+/-2.5 kJ",
+    "HF298(s)=146.5+/-1.5 kJ  REF=Slyden & Liebman Chem. Rev 101,(2001),1541;",
+    "HF298=258.6 kJ  REF=NIST 94; HF298=267.8+/-0.8 kJ  REF= Kudchadker Kudchadker &",
+    "Wilhoit API Monograph 709-79 1979;  HF298=239.99 kJ  REF=Blanquart & Pistch JPC",
+    "111,(2007),6510;  HF298=259.1 kJ (PM6) & 241.9 kJ (PM3)  REF=Rayne & Forest",
+    "G4MP2 & MOPAC 9 study of PAH species Free Internet Article 2013}  Max Lst Sq",
+    "Error Cp @ 200 K 0.79%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24774,
+    "header_line": 24789,
+    "end_line": 24792
+  },
+  "source_text": {
+    "header_line": "C18H12            T11/05C 18.H 12.   0.   0.G   200.000  6000.000  B 228.28788 1",
+    "coeff_lines": [
+      " 3.23692778E+01 5.05001645E-02-1.84004568E-05 3.00025561E-09-1.80901476E-13    2",
+      " 1.76447014E+04-1.54285580E+02-1.97977711E+00 8.49435086E-02 9.96440464E-05    3",
+      "-2.10795604E-07 9.54761656E-11 2.97414679E+04 3.68747093E+01 3.34355242E+04    4"
+    ]
+  }
+}

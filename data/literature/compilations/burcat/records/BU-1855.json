@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1855",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C8H7   n-styryl",
+  "cas_as_published": "23065-05-6",
+  "formula": "C8H7",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/07",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 8.",
+      "element": "C",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 7.",
+      "element": "H",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "103.14118",
+    "value": 103.14118
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.60668682E+01",
+          "value": 16.0668682
+        },
+        {
+          "as_published": "2.35522834E-02",
+          "value": 0.0235522834
+        },
+        {
+          "as_published": "-8.47352807E-06",
+          "value": -8.47352807e-06
+        },
+        {
+          "as_published": "1.36928204E-09",
+          "value": 1.36928204e-09
+        },
+        {
+          "as_published": "-8.20829942E-14",
+          "value": -8.20829942e-14
+        },
+        {
+          "as_published": "3.98109546E+04",
+          "value": 39810.9546
+        },
+        {
+          "as_published": "-6.01469382E+01",
+          "value": -60.1469382
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.78678850E-01",
+          "value": 0.27867885
+        },
+        {
+          "as_published": "4.12517677E-02",
+          "value": 0.0412517677
+        },
+        {
+          "as_published": "4.27417783E-05",
+          "value": 4.27417783e-05
+        },
+        {
+          "as_published": "-9.66212597E-08",
+          "value": -9.66212597e-08
+        },
+        {
+          "as_published": "4.47818574E-11",
+          "value": 4.47818574e-11
+        },
+        {
+          "as_published": "4.52024803E+04",
+          "value": 45202.4803
+        },
+        {
+          "as_published": "2.70544015E+01",
+          "value": 27.0544015
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.73269020E+04",
+    "value": 47326.902,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "23065-05-6",
+    "C8H7  n-STYRYL RADICAL C6H5CH=CH*  SIGMA=1 STATWT=2  IA=15.9016  IB=52.8808",
+    "IC=68.7820  Ir= 1.6096   V2=4.67 kcal  ROSYM=1.   NU=3271,3211,3202,3189(2),",
+    "3177,3138,1672,1661,1633,1543,1496,1369,1357,1283,1230,1212,1192,1112,1057,1017,",
+    "995,969,932,906,862,836,769,766,708,642,635,558,466,451,416,229,216",
+    "HF298=393.5 kJ REF=G3(MP2)B3  Blamquart & Pitsch JPC A 111,(2007),6510",
+    "{HF298=93.0 kcal  REF=NIST 94; HF298=94.2+/-2. kcal  REF=Tolkmakov & Lin JACS",
+    "125,(2003),11397;  HF298=389.0 kJ REF=Thergas} Max Lst Sq Error Cp @ 200 K 0.77%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 20865,
+    "header_line": 20873,
+    "end_line": 20876
+  },
+  "source_text": {
+    "header_line": "C8H7   n-styryl   T12/07C  8.H  7.   0.   0.G   200.000  6000.000  B 103.14118 1",
+    "coeff_lines": [
+      " 1.60668682E+01 2.35522834E-02-8.47352807E-06 1.36928204E-09-8.20829942E-14    2",
+      " 3.98109546E+04-6.01469382E+01 2.78678850E-01 4.12517677E-02 4.27417783E-05    3",
+      "-9.66212597E-08 4.47818574E-11 4.52024803E+04 2.70544015E+01 4.73269020E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1588",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H5- phenyl ani",
+  "cas_as_published": "30922-78-2",
+  "formula": "C6H5E",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T07/10",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 5.",
+      "element": "H",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "77.10445",
+    "value": 77.10445
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.08634348E+01",
+          "value": 10.8634348
+        },
+        {
+          "as_published": "1.83497433E-02",
+          "value": 0.0183497433
+        },
+        {
+          "as_published": "-6.69819699E-06",
+          "value": -6.69819699e-06
+        },
+        {
+          "as_published": "1.09316457E-09",
+          "value": 1.09316457e-09
+        },
+        {
+          "as_published": "-6.59443297E-14",
+          "value": -6.59443297e-14
+        },
+        {
+          "as_published": "2.18149854E+04",
+          "value": 21814.9854
+        },
+        {
+          "as_published": "-3.60130119E+01",
+          "value": -36.0130119
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-3.80164800E+00",
+          "value": -3.801648
+        },
+        {
+          "as_published": "5.38073593E-02",
+          "value": 0.0538073593
+        },
+        {
+          "as_published": "-2.96127100E-05",
+          "value": -2.961271e-05
+        },
+        {
+          "as_published": "-2.88027724E-09",
+          "value": -2.88027724e-09
+        },
+        {
+          "as_published": "6.02947728E-12",
+          "value": 6.02947728e-12
+        },
+        {
+          "as_published": "2.61637074E+04",
+          "value": 26163.7074
+        },
+        {
+          "as_published": "4.10900569E+01",
+          "value": 41.0900569
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.71573430E+04",
+    "value": 27157.343,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "30922-78-2",
+    "C6H5-  Phenyl Anion  SIGMA=2  STATWT=1  IA=14.3061  IB=14.5748  IC=28.8809",
+    "Nu=3122,3054,3049,2964,2962,1589.5(2),1472,1446,1355,1265,1207,1164,1065,1049,",
+    "1009,965,959,942,863,846,728,686,636,598,408,345  REF=Burcat G3B3  HF298=225.8",
+    "+/-0.5 kJ  REF=ATcT B  {HF298=222.3+/-8. kJ  REF=Burcat G3B3}  Max Lst Sq Error",
+    "Cp @ 1300 K 0.66%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17539,
+    "header_line": 17545,
+    "end_line": 17548
+  },
+  "source_text": {
+    "header_line": "C6H5- phenyl ani  T07/10C  6.H  5.E  1.   0.G   298.150  6000.000  B  77.10445 1",
+    "coeff_lines": [
+      " 1.08634348E+01 1.83497433E-02-6.69819699E-06 1.09316457E-09-6.59443297E-14    2",
+      " 2.18149854E+04-3.60130119E+01-3.80164800E+00 5.38073593E-02-2.96127100E-05    3",
+      "-2.88027724E-09 6.02947728E-12 2.61637074E+04 4.10900569E+01 2.71573430E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1170",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3H9PO3 (MeO)3P",
+  "cas_as_published": "121.45-9",
+  "formula": "C3H9PO3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "P ",
+      "count_as_published": " 1.",
+      "element": "P",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "124.07552",
+    "value": 124.07552
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.40266011E+01",
+          "value": 14.0266011
+        },
+        {
+          "as_published": "2.71012505E-02",
+          "value": 0.0271012505
+        },
+        {
+          "as_published": "-9.79383395E-06",
+          "value": -9.79383395e-06
+        },
+        {
+          "as_published": "1.57511719E-09",
+          "value": 1.57511719e-09
+        },
+        {
+          "as_published": "-9.37835608E-14",
+          "value": -9.37835608e-14
+        },
+        {
+          "as_published": "-8.96624429E+04",
+          "value": -89662.4429
+        },
+        {
+          "as_published": "-3.62698050E+01",
+          "value": -36.269805
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.10860674E+01",
+          "value": 11.0860674
+        },
+        {
+          "as_published": "8.10188867E-03",
+          "value": 0.00810188867
+        },
+        {
+          "as_published": "6.61051088E-05",
+          "value": 6.61051088e-05
+        },
+        {
+          "as_published": "-8.45223535E-08",
+          "value": -8.45223535e-08
+        },
+        {
+          "as_published": "3.20446400E-11",
+          "value": 3.204464e-11
+        },
+        {
+          "as_published": "-8.74251928E+04",
+          "value": -87425.1928
+        },
+        {
+          "as_published": "-1.42428758E+01",
+          "value": -14.2428758
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-8.33276477E+04",
+    "value": -83327.6477,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "121.45-9",
+    "C3H9PO3 TriMethyl Phosphite  (CH3O)3P  SIGMA=3  STATWT=1  IA=36.102  IB=39.6581",
+    "IC=62.8149  [Ir(CH3O-)=3.7003  ROSYM=1  V(3)=600. cm-1]x3  Nu=3156,3144(2),3135,",
+    "3099,3090,3066.3,3028(2),1536.4(2),1533,1523,1522(2),1501(2),1488,1211(2),1201,",
+    "1187.5(2),1178,1098,1070,1052,765,755,718,499,402,359,271,240,184,132,126,101.3",
+    "[98,84,63 interal rotation]  HF298=-165.59+/-2 kcal  REF=Burcat G3B3",
+    "{HF298=-167+/-5. kcal  REF=Pedley Rylance 1977;  HF298=-166.0 kcal  REF=Hartley",
+    "et al Quarterly Reviews Chem. Soc 17,(1963),204;  HF298=-699.0 kJ  REF=Dorofeeva",
+    "& Moiseeva  JPC A 110(28),(2006),8925}   Max Lst Sq Error Cp @ 6000 K 0.55%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "cas_identifier_nonstandard",
+      "cas_as_published": "121.45-9"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 12472,
+    "header_line": 12481,
+    "end_line": 12484
+  },
+  "source_text": {
+    "header_line": "C3H9PO3 (MeO)3P   T 7/16C  3.H  9.P  1.O  3.G   200.000  6000.000  B 124.07552 1",
+    "coeff_lines": [
+      " 1.40266011E+01 2.71012505E-02-9.79383395E-06 1.57511719E-09-9.37835608E-14    2",
+      "-8.96624429E+04-3.62698050E+01 1.10860674E+01 8.10188867E-03 6.61051088E-05    3",
+      "-8.45223535E-08 3.20446400E-11-8.74251928E+04-1.42428758E+01-8.33276477E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0958",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3Cl3 1,2,3-tric",
+  "cas_as_published": "N/A  (6262-69-5 for the C3Cl3+ ion)",
+  "formula": "C3Cl3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T07/07",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 3.",
+      "element": "Cl",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "142.39020",
+    "value": 142.3902
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.25058656E+01",
+          "value": 12.5058656
+        },
+        {
+          "as_published": "3.51976800E-03",
+          "value": 0.003519768
+        },
+        {
+          "as_published": "-1.36521471E-06",
+          "value": -1.36521471e-06
+        },
+        {
+          "as_published": "2.31662484E-10",
+          "value": 2.31662484e-10
+        },
+        {
+          "as_published": "-1.43493212E-14",
+          "value": -1.43493212e-14
+        },
+        {
+          "as_published": "4.35219413E+04",
+          "value": 43521.9413
+        },
+        {
+          "as_published": "-3.16727000E+01",
+          "value": -31.6727
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.60760333E+00",
+          "value": 2.60760333
+        },
+        {
+          "as_published": "4.21844819E-02",
+          "value": 0.0421844819
+        },
+        {
+          "as_published": "-6.38673214E-05",
+          "value": -6.38673214e-05
+        },
+        {
+          "as_published": "4.88743916E-08",
+          "value": 4.88743916e-08
+        },
+        {
+          "as_published": "-1.49214234E-11",
+          "value": -1.49214234e-11
+        },
+        {
+          "as_published": "4.57426148E+04",
+          "value": 45742.6148
+        },
+        {
+          "as_published": "1.68009386E+01",
+          "value": 16.8009386
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.79203167E+04",
+    "value": 47920.3167,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A  (6262-69-5 for the C3Cl3+ ion)",
+    "C3Cl3 1,2,3-TrichloroCycloPropen-1-yl  SIGMA=3  STATWT=2  IA=53.7161  IB=55.2114",
+    "IC=106.3053     Nu=1809,1227,1040,674,612,565,560,466,374,150,119,113.4",
+    "HF298=95.228 kcal  REF=Burcat G3B3 calc.  Max Lst Sq Error Cp @ 1200 K 0.33%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "cas_identifier_nonstandard",
+      "cas_as_published": "N/A  (6262-69-5 for the C3Cl3+ ion)"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 10006,
+    "header_line": 10010,
+    "end_line": 10013
+  },
+  "source_text": {
+    "header_line": "C3Cl3 1,2,3-tric  T07/07C  3.CL 3.   0.   0.G   200.000  6000.000  B 142.39020 1",
+    "coeff_lines": [
+      " 1.25058656E+01 3.51976800E-03-1.36521471E-06 2.31662484E-10-1.43493212E-14    2",
+      " 4.35219413E+04-3.16727000E+01 2.60760333E+00 4.21844819E-02-6.38673214E-05    3",
+      " 4.88743916E-08-1.49214234E-11 4.57426148E+04 1.68009386E+01 4.79203167E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1532",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6F14  FC 51-14",
+  "cas_as_published": "355-42-0",
+  "formula": "C6F14",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/94",
+  "calc_quality_as_published": "E",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  6",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": " 14",
+      "element": "F",
+      "count": 14.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "338.04364",
+    "value": 338.04364
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "5000.000",
+    "value": 5000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "0.44067386E+02",
+          "value": 44.067386
+        },
+        {
+          "as_published": "0.12770763E-01",
+          "value": 0.012770763
+        },
+        {
+          "as_published": "-0.53399367E-05",
+          "value": -5.3399367e-06
+        },
+        {
+          "as_published": "0.95791650E-09",
+          "value": 9.579165e-10
+        },
+        {
+          "as_published": "-0.61923975E-13",
+          "value": -6.1923975e-14
+        },
+        {
+          "as_published": "-0.37074786E+06",
+          "value": -370747.86
+        },
+        {
+          "as_published": "-0.18473799E+03",
+          "value": -184.73799
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-0.14298519E+02",
+          "value": -14.298519
+        },
+        {
+          "as_published": "0.24055087E+00",
+          "value": 0.24055087
+        },
+        {
+          "as_published": "-0.34353654E-03",
+          "value": -0.00034353654
+        },
+        {
+          "as_published": "0.22553364E-06",
+          "value": 2.2553364e-07
+        },
+        {
+          "as_published": "-0.55889775E-10",
+          "value": -5.5889775e-11
+        },
+        {
+          "as_published": "-0.35851817E+06",
+          "value": -358518.17
+        },
+        {
+          "as_published": "0.98855981E+02",
+          "value": 98.855981
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-0.35470535E+06",
+    "value": -354705.35,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "355-42-0",
+    "C6F14 PERFLUOROHEXANE (FC-5-1-14)  SIGMA=18  CALCULATED and EXTRAPOLATED USING",
+    "NIST 94 AND BOZZELLI & RITTER'S PROGRAM. HF298=-704.87 KCAL Max Lst Sq Error Cp",
+    "@ 1000 K 0.07%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 16873,
+    "header_line": 16877,
+    "end_line": 16880
+  },
+  "source_text": {
+    "header_line": "C6F14  FC 51-14   T12/94C   6F  14    0    0G   298.150  5000.000  E 338.04364 1",
+    "coeff_lines": [
+      " 0.44067386E+02 0.12770763E-01-0.53399367E-05 0.95791650E-09-0.61923975E-13    2",
+      "-0.37074786E+06-0.18473799E+03-0.14298519E+02 0.24055087E+00-0.34353654E-03    3",
+      " 0.22553364E-06-0.55889775E-10-0.35851817E+06 0.98855981E+02-0.35470535E+06    4"
+    ]
+  }
+}

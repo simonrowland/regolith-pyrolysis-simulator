@@ -1,0 +1,173 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3129",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Ra(cr) Radium",
+  "cas_as_published": "7440-14-4",
+  "formula": "Ra",
+  "phase": "cr",
+  "phase_as_published": "S",
+  "phase_card_as_published": "S",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/13",
+  "calc_quality_as_published": "D",
+  "composition": [
+    {
+      "element_as_published": "RA",
+      "count_as_published": " 1.",
+      "element": "Ra",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "226.02540",
+    "value": 226.0254
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "969.000",
+    "value": 969.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.62348115E+00",
+          "value": 2.62348115
+        },
+        {
+          "as_published": "2.93359755E-03",
+          "value": 0.00293359755
+        },
+        {
+          "as_published": "-1.60780115E-07",
+          "value": -1.60780115e-07
+        },
+        {
+          "as_published": "1.68141326E-10",
+          "value": 1.68141326e-10
+        },
+        {
+          "as_published": "-6.36034098E-14",
+          "value": -6.36034098e-14
+        },
+        {
+          "as_published": "-9.11461446E+02",
+          "value": -911.461446
+        },
+        {
+          "as_published": "-7.51785729E+00",
+          "value": -7.51785729
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "0.00000000E+00",
+    "value": 0.0,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "7440-14-4",
+    "Ra  Radium (cr,l) REFERENCE ELEMENT  Calculated from Gurvich's THERMEL table",
+    "1992  HF298=0.0 kJ  Max Lst Sq Error Cp @ 300 K 0.06%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 33385,
+    "header_line": 33388,
+    "end_line": 33391
+  },
+  "source_text": {
+    "header_line": "Ra(cr) Radium     T 7/13RA 1.   0.   0.   0.S   298.150   969.000  D 226.02540 1",
+    "coeff_lines": [
+      " 0.00000000E+00 0.00000000E+00 0.00000000E+00 0.00000000E+00 0.00000000E+00    2",
+      " 0.00000000E+00 0.00000000E+00 2.62348115E+00 2.93359755E-03-1.60780115E-07    3",
+      " 1.68141326E-10-6.36034098E-14-9.11461446E+02-7.51785729E+00 0.00000000E+00    4"
+    ]
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1623",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H6 1,3-Butadie",
+  "cas_as_published": "6929-96-0",
+  "formula": "C6H6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T06/11",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "78.11184",
+    "value": 78.11184
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.23218959E+01",
+          "value": 12.3218959
+        },
+        {
+          "as_published": "1.88371054E-02",
+          "value": 0.0188371054
+        },
+        {
+          "as_published": "-6.66549991E-06",
+          "value": -6.66549991e-06
+        },
+        {
+          "as_published": "1.06532424E-09",
+          "value": 1.06532424e-09
+        },
+        {
+          "as_published": "-6.33348904E-14",
+          "value": -6.33348904e-14
+        },
+        {
+          "as_published": "3.62403313E+04",
+          "value": 36240.3313
+        },
+        {
+          "as_published": "-3.86746959E+01",
+          "value": -38.6746959
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "7.44284205E-01",
+          "value": 0.744284205
+        },
+        {
+          "as_published": "4.72659274E-02",
+          "value": 0.0472659274
+        },
+        {
+          "as_published": "-2.19463897E-05",
+          "value": -2.19463897e-05
+        },
+        {
+          "as_published": "-9.84218905E-09",
+          "value": -9.84218905e-09
+        },
+        {
+          "as_published": "9.27385794E-12",
+          "value": 9.27385794e-12
+        },
+        {
+          "as_published": "3.95566017E+04",
+          "value": 39556.6017
+        },
+        {
+          "as_published": "2.18137752E+01",
+          "value": 21.8137752
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.16703657E+04",
+    "value": 41670.3657,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "6929-96-0",
+    "C6H6  1,3-Butadiene-2-Ethynyl (3-Methylene-1-penten-4-yne) CH2=CH-C(=CH2)-CCH",
+    "SIGMA=1  STATWT=1  IA=17.6994  IB=23.8886  IC=41.5880  Nu=3495,3269,3259,",
+    "3178.5(2),3165,2226,1712.5,1656,1476,1436,1337,1330,1068,1028,954,946,919,777,",
+    "759.5,724,731,613,584,506,468,307.5,276,161.7,151   HF298=82.808+/-2. kcal",
+    "REF=Elke Goos G3B3  Max Lst Sq Error Cp @ 6000 K 048%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17949,
+    "header_line": 17955,
+    "end_line": 17958
+  },
+  "source_text": {
+    "header_line": "C6H6 1,3-Butadie  T06/11C  6.H  6.   0.   0.G   200.000  6000.000  C  78.11184 1",
+    "coeff_lines": [
+      " 1.23218959E+01 1.88371054E-02-6.66549991E-06 1.06532424E-09-6.33348904E-14    2",
+      " 3.62403313E+04-3.86746959E+01 7.44284205E-01 4.72659274E-02-2.19463897E-05    3",
+      "-9.84218905E-09 9.27385794E-12 3.95566017E+04 2.18137752E+01 4.16703657E+04    4"
+    ]
+  }
+}

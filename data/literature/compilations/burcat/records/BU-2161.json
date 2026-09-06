@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2161",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C18H15Bi (C6H5)3",
+  "cas_as_published": "603-33-8",
+  "formula": "C18H15Bi",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 8/17",
+  "calc_quality_as_published": "E",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "18.",
+      "element": "C",
+      "count": 18.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "15.",
+      "element": "H",
+      "count": 15.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "BI",
+      "count_as_published": " 1.",
+      "element": "Bi",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "440.29208",
+    "value": 440.29208
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.81745019E+01",
+          "value": 38.1745019
+        },
+        {
+          "as_published": "5.49215172E-02",
+          "value": 0.0549215172
+        },
+        {
+          "as_published": "-2.02952161E-05",
+          "value": -2.02952161e-05
+        },
+        {
+          "as_published": "3.33527927E-09",
+          "value": 3.33527927e-09
+        },
+        {
+          "as_published": "-2.02062510E-13",
+          "value": -2.0206251e-13
+        },
+        {
+          "as_published": "5.29316700E+04",
+          "value": 52931.67
+        },
+        {
+          "as_published": "-1.70116756E+02",
+          "value": -170.116756
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.37984285E+00",
+          "value": 4.37984285
+        },
+        {
+          "as_published": "7.05590581E-02",
+          "value": 0.0705590581
+        },
+        {
+          "as_published": "1.59047731E-04",
+          "value": 0.000159047731
+        },
+        {
+          "as_published": "-2.81616248E-07",
+          "value": -2.81616248e-07
+        },
+        {
+          "as_published": "1.23563636E-10",
+          "value": 1.23563636e-10
+        },
+        {
+          "as_published": "6.56113185E+04",
+          "value": 65611.3185
+        },
+        {
+          "as_published": "2.20618818E+01",
+          "value": 22.0618818
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "7.09602851E+04",
+    "value": 70960.2851,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "603-33-8",
+    "C18H15Bi TriPhenyl Bismuthine (C6H5)3Bi  SIGMA=3  STATWT=1  IA=IB=250.  IC=459.",
+    "REF=Burcat estimate  [Ir(C6H5)=7.116  ROSYM=2  V(3)=150. cm-1]x3  Nu=3060(3),",
+    "3046(3),3032(3),3017(3),3008(3),1572(3),1570(3),1476(3),1444(3),1337(3),1268(3),",
+    "1197(3),1177(3),1064(2),1050(3),1009(3),1005(3),996(3),964(3),912(3),860(3),775,",
+    "743,736,693(3),646(3),617(3),434(3),359(3),260,247,241,214,206,201,182,177,175,",
+    "35(3),[74(3) internal rotation]  REF=Ludwig & Gotze Spectrochim Acta A 51,",
+    "(1995),2019  HF298=590.+/-20. kJ  REF=Martinho Simoes has two estimates 580 and ",
+    "600 kJ. The average was taken from Webbook NIST.  Max Lst Sq Error Cp @ 200 K",
+    "0.82%  @ 6000 K 0.57%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24802,
+    "header_line": 24812,
+    "end_line": 24815
+  },
+  "source_text": {
+    "header_line": "C18H15Bi (C6H5)3  T 8/17C 18.H 15.BI 1.   0.G   200.000  6000.000  E 440.29208 1",
+    "coeff_lines": [
+      " 3.81745019E+01 5.49215172E-02-2.02952161E-05 3.33527927E-09-2.02062510E-13    2",
+      " 5.29316700E+04-1.70116756E+02 4.37984285E+00 7.05590581E-02 1.59047731E-04    3",
+      "-2.81616248E-07 1.23563636E-10 6.56113185E+04 2.20618818E+01 7.09602851E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0227",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CD2 Deutherometh",
+  "cas_as_published": "14863-68-4",
+  "formula": "CD2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "D ",
+      "count_as_published": " 2.",
+      "element": "D",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "16.03890",
+    "value": 16.0389
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.55917214E+00",
+          "value": 3.55917214
+        },
+        {
+          "as_published": "3.53718129E-03",
+          "value": 0.00353718129
+        },
+        {
+          "as_published": "-1.33967043E-06",
+          "value": -1.33967043e-06
+        },
+        {
+          "as_published": "2.24531142E-10",
+          "value": 2.24531142e-10
+        },
+        {
+          "as_published": "-1.38201140E-14",
+          "value": -1.3820114e-14
+        },
+        {
+          "as_published": "4.47238493E+04",
+          "value": 44723.8493
+        },
+        {
+          "as_published": "3.13097669E+00",
+          "value": 3.13097669
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.55503203E+00",
+          "value": 3.55503203
+        },
+        {
+          "as_published": "3.36946943E-03",
+          "value": 0.00336946943
+        },
+        {
+          "as_published": "-3.50280157E-06",
+          "value": -3.50280157e-06
+        },
+        {
+          "as_published": "4.99692869E-09",
+          "value": 4.99692869e-09
+        },
+        {
+          "as_published": "-2.45123455E-12",
+          "value": -2.45123455e-12
+        },
+        {
+          "as_published": "4.48272726E+04",
+          "value": 44827.2726
+        },
+        {
+          "as_published": "3.42740741E+00",
+          "value": 3.42740741
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.60147381E+04",
+    "value": 46014.7381,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "14863-68-4",
+    "CD2  METHYLENE-D2 RAD  SIGMA=2.  T0=0(3)=30300(1)  IA=.0744  IB=.60878 IC=.6831",
+    "NU=2115,767,2345   T0=2600(1)  IA=.24223  IB=.50049  IC=.74272 NU=2209,926,2273",
+    "T0=9700(1)  IA=.06458  IB=.6511  IC=.71567  NU=2093,545,2338  HF298=382.59 kJ",
+    "REF=Burcat 1980   MAX LST SQ ERROR CP @ 1300K 0.62% ."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 2240,
+    "header_line": 2245,
+    "end_line": 2248
+  },
+  "source_text": {
+    "header_line": "CD2 Deutherometh  T10/09C  1.D  2.   0.   0.G   200.000  6000.000  B  16.03890 1",
+    "coeff_lines": [
+      " 3.55917214E+00 3.53718129E-03-1.33967043E-06 2.24531142E-10-1.38201140E-14    2",
+      " 4.47238493E+04 3.13097669E+00 3.55503203E+00 3.36946943E-03-3.50280157E-06    3",
+      " 4.99692869E-09-2.45123455E-12 4.48272726E+04 3.42740741E+00 4.60147381E+04    4"
+    ]
+  }
+}

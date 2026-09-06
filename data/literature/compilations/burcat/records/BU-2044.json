@@ -1,0 +1,185 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2044",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C12H4CL5O2 radical",
+  "cas_as_published": "177182-71-7",
+  "formula": "C12H4O2Cl5",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/06",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "12.",
+      "element": "C",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 5.",
+      "element": "Cl",
+      "count": 5.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "357.42246",
+    "value": 357.42246
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.90488533E+01",
+          "value": 39.0488533
+        },
+        {
+          "as_published": "2.63532964E-02",
+          "value": 0.0263532964
+        },
+        {
+          "as_published": "-9.83705879E-06",
+          "value": -9.83705879e-06
+        },
+        {
+          "as_published": "1.62981266E-09",
+          "value": 1.62981266e-09
+        },
+        {
+          "as_published": "-9.93615690E-14",
+          "value": -9.9361569e-14
+        },
+        {
+          "as_published": "-2.71547701E+04",
+          "value": -27154.7701
+        },
+        {
+          "as_published": "-1.68020684E+02",
+          "value": -168.020684
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.17883527E+00",
+          "value": 2.17883527
+        },
+        {
+          "as_published": "1.25031549E-01",
+          "value": 0.125031549
+        },
+        {
+          "as_published": "-8.92998192E-05",
+          "value": -8.92998192e-05
+        },
+        {
+          "as_published": "6.87135977E-09",
+          "value": 6.87135977e-09
+        },
+        {
+          "as_published": "1.23136174E-11",
+          "value": 1.23136174e-11
+        },
+        {
+          "as_published": "-1.69292741E+04",
+          "value": -16929.2741
+        },
+        {
+          "as_published": "2.28710780E+01",
+          "value": 22.871078
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.14919580E+04",
+    "value": -11491.958,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "177182-71-7",
+    "C12H4Cl5O2 Radical 2',4,4',6,6'-pentachlorosporol[1,3-benzodioxole-2,1'-",
+    "cyclohexa[2,5]diene]-4'-yl   SIGMA=1  STATWT=2  IA=192.7335  IB=640.2686",
+    "IC=650.6940  Nu=3255,3246,3238,3237,1664,1651,1595,1515,1492,1457,1385,1384,",
+    "1387,1282,1268,1236,1218,1160,1132,1117,1102,1051,988,904,885,883,872,857,840,",
+    "835,809,787,760,701,674,646,580,579,565,535,524,523,457,421,412,384,370,346,300,",
+    "262,256,251,212,193,188,183.158,141,140,101,53,27,23  HF298=-95.55+/-10. kJ",
+    "REF=Janoshck Comb & Flame 145,(2006),282 G3MP2B3 calc {HF298=-50.2 kJ AM1 UHF",
+    "REF=Tuppurainen Chemosphere 32,(1996),1349} Max Lst Sq Error Cp @ 1300 0.46%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C12H4CL5O2 radical",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 23224,
+    "header_line": 23233,
+    "end_line": 23236
+  },
+  "source_text": {
+    "header_line": "C12H4CL5O2 radicalT 6/06C 12.H  4.O  2.CL 5.G   200.000  6000.000  B 357.42246 1",
+    "coeff_lines": [
+      " 3.90488533E+01 2.63532964E-02-9.83705879E-06 1.62981266E-09-9.93615690E-14    2",
+      "-2.71547701E+04-1.68020684E+02 2.17883527E+00 1.25031549E-01-8.92998192E-05    3",
+      " 6.87135977E-09 1.23136174E-11-1.69292741E+04 2.28710780E+01-1.14919580E+04    4"
+    ]
+  }
+}

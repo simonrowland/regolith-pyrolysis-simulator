@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2074",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C12H10N BiPhN*",
+  "cas_as_published": "2143-67-1",
+  "formula": "C12H10N",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/13",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "12.",
+      "element": "C",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "168.21454",
+    "value": 168.21454
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.42840270E+01",
+          "value": 24.284027
+        },
+        {
+          "as_published": "3.74779746E-02",
+          "value": 0.0374779746
+        },
+        {
+          "as_published": "-1.37321861E-05",
+          "value": -1.37321861e-05
+        },
+        {
+          "as_published": "2.24461333E-09",
+          "value": 2.24461333e-09
+        },
+        {
+          "as_published": "-1.35497431E-13",
+          "value": -1.35497431e-13
+        },
+        {
+          "as_published": "3.09352817E+04",
+          "value": 30935.2817
+        },
+        {
+          "as_published": "-1.03905901E+02",
+          "value": -103.905901
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.56312337E+00",
+          "value": 1.56312337
+        },
+        {
+          "as_published": "4.89681864E-02",
+          "value": 0.0489681864
+        },
+        {
+          "as_published": "1.03436048E-04",
+          "value": 0.000103436048
+        },
+        {
+          "as_published": "-1.85050715E-07",
+          "value": -1.85050715e-07
+        },
+        {
+          "as_published": "8.12222879E-11",
+          "value": 8.12222879e-11
+        },
+        {
+          "as_published": "3.94072762E+04",
+          "value": 39407.2762
+        },
+        {
+          "as_published": "2.50625413E+01",
+          "value": 25.0625413
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.26363069E+04",
+    "value": 42636.3069,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "2143-67-1",
+    "C12H10N BiPhenylAmine Radical (C6H5)2N*  SIGMA=2  STATWT=2  IA=33.3468",
+    "IB=198.2715  IC=220.5257  [Ir(C6H5)=6.965  ROSYM=2  V(3)=534.6 cm-1]x2  Nu=3220,",
+    "3215(3),3204(2),3188.5(2),3180(2),1630,1620,1598,1595,1512,1496,1486,1477.5,",
+    "1366,1360,1341,1331,1306,1234,1186(2),1181,1178,1114,1104,1044.5(2),1003,1001,",
+    "995(2),980,974,931.5,919.5,896,851,841,810,773,769,701,692,642,624,615,575,511,",
+    "493,429,414,359.5,317,236.5,223,104  REF=Burcat G3B3  HF298=354.5+/-3.3 kJ",
+    "REF=Marochkin & Dorofeeva Comp Theor Chem 991,(2012),182  {HF298=366.0+/-6.3 kJ",
+    "REF=Luo Comprehn Handbook Chem Bond Energy CRC 2007}  Max Lst Sq Error Cp @",
+    "200 K 0.81%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 23630,
+    "header_line": 23640,
+    "end_line": 23643
+  },
+  "source_text": {
+    "header_line": "C12H10N BiPhN*    T 1/13C 12.H 10.N  1.   0.G   200.000  6000.000  B 168.21454 1",
+    "coeff_lines": [
+      " 2.42840270E+01 3.74779746E-02-1.37321861E-05 2.24461333E-09-1.35497431E-13    2",
+      " 3.09352817E+04-1.03905901E+02 1.56312337E+00 4.89681864E-02 1.03436048E-04    3",
+      "-1.85050715E-07 8.12222879E-11 3.94072762E+04 2.50625413E+01 4.26363069E+04    4"
+    ]
+  }
+}

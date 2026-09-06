@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1455",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C5H8+ 1,4-Pentadie",
+  "cas_as_published": "91631-63-9",
+  "formula": "C5H8E-1",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/21",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 5.",
+      "element": "C",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 8.",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": "-1.",
+      "element": "E",
+      "count": -1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "68.11647",
+    "value": 68.11647
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.07505874E+01",
+          "value": 10.7505874
+        },
+        {
+          "as_published": "2.27961792E-02",
+          "value": 0.0227961792
+        },
+        {
+          "as_published": "-8.06130875E-06",
+          "value": -8.06130875e-06
+        },
+        {
+          "as_published": "1.28770164E-09",
+          "value": 1.28770164e-09
+        },
+        {
+          "as_published": "-7.65206925E-14",
+          "value": -7.65206925e-14
+        },
+        {
+          "as_published": "1.14417051E+05",
+          "value": 114417.051
+        },
+        {
+          "as_published": "-3.28861822E+01",
+          "value": -32.8861822
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-7.13586196E-01",
+          "value": -0.713586196
+        },
+        {
+          "as_published": "4.70986332E-02",
+          "value": 0.0470986332
+        },
+        {
+          "as_published": "-1.45131501E-05",
+          "value": -1.45131501e-05
+        },
+        {
+          "as_published": "-1.49373827E-08",
+          "value": -1.49373827e-08
+        },
+        {
+          "as_published": "9.76212462E-12",
+          "value": 9.76212462e-12
+        },
+        {
+          "as_published": "1.17969153E+05",
+          "value": 117969.153
+        },
+        {
+          "as_published": "2.81776903E+01",
+          "value": 28.1776903
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.19696651E+05",
+    "value": 119696.651,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "91631-63-9",
+    "C5H8+ 1,4-Pentadiene cation  CH2=CH-CH2-CH=CH2+ SIGMA=2  STATWT=2  IA=8.4389  IB=23.500  IC=26.2161  Nu=3273,3272,3215,3210,3199,3167,3166,3131,1590,1530,  1509,1454,1391,1312,1301,1215,1212,1118,1049,1001,933.5,980,972,951,933,855, 544,497,435.5,411,279.5,227.5,146  HF298=995.219+/-8. kJ thermal electron",
+    "REF=Burcat G3B3  Max Lst Sq Error Cp @ 1300 K 0.55%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C5H8+ 1,4-Pentadie",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 15882,
+    "header_line": 15885,
+    "end_line": 15888
+  },
+  "source_text": {
+    "header_line": "C5H8+ 1,4-PentadieT 1/21C  5.H  8.E -1.   0.G   298.150  6000.000  B  68.11647 1",
+    "coeff_lines": [
+      " 1.07505874E+01 2.27961792E-02-8.06130875E-06 1.28770164E-09-7.65206925E-14    2",
+      " 1.14417051E+05-3.28861822E+01-7.13586196E-01 4.70986332E-02-1.45131501E-05    3",
+      "-1.49373827E-08 9.76212462E-12 1.17969153E+05 2.81776903E+01 1.19696651E+05    4"
+    ]
+  }
+}

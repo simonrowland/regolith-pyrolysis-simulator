@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1357",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "T-C4H10O T-Butan",
+  "cas_as_published": "62958-68-3",
+  "formula": "C4H10O",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T04/10",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "74.12160",
+    "value": 74.1216
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.21731391E+01",
+          "value": 12.1731391
+        },
+        {
+          "as_published": "2.52590102E-02",
+          "value": 0.0252590102
+        },
+        {
+          "as_published": "-8.98242713E-06",
+          "value": -8.98242713e-06
+        },
+        {
+          "as_published": "1.44006810E-09",
+          "value": 1.4400681e-09
+        },
+        {
+          "as_published": "-8.57864665E-14",
+          "value": -8.57864665e-14
+        },
+        {
+          "as_published": "-4.38224452E+04",
+          "value": -43822.4452
+        },
+        {
+          "as_published": "-3.88900882E+01",
+          "value": -38.8900882
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.10485167E+00",
+          "value": 4.10485167
+        },
+        {
+          "as_published": "2.30241147E-02",
+          "value": 0.0230241147
+        },
+        {
+          "as_published": "5.30114070E-05",
+          "value": 5.3011407e-05
+        },
+        {
+          "as_published": "-8.79227908E-08",
+          "value": -8.79227908e-08
+        },
+        {
+          "as_published": "3.75864213E-11",
+          "value": 3.75864213e-11
+        },
+        {
+          "as_published": "-4.04950482E+04",
+          "value": -40495.0482
+        },
+        {
+          "as_published": "8.45121309E+00",
+          "value": 8.45121309
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-3.79354916E+04",
+    "value": -37935.4916,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "62958-68-3",
+    "C4H10O-T 2METHYL-2PROPANOL  (CH3)3COH  SIGMA=1 STATWT=1  IA=17.9133  IB=18.0111",
+    "IC=18.7766  NU=3643,2980(6),2910(2),2880,1472(5),1450,1395,1374(2),1330,1230,",
+    "1215,1140,1106(2),1013(3),919,748,462(2),424,356,344     INTERNAL ROTATIONS",
+    "THREE EQUIVALENT ROTATIONS + 1",
+    "CH3-COH(CH3)2  ROSYM=1 IR=0.5145 POTENTIAL BARRIER V(3)=1329.1 cm-1]x3",
+    "C4H9-OH        ROSYM=1 IR=0.1291 POTENTIAL BARRIER V(3)= 314.8 cm-1  REF=Chao",
+    "et. al, JCP 15,(1986),1369   HF298=-75.386+/-2. kcal  REF=Burcat G3B3",
+    "{HF298=-74.71+/-0.2 kcal  REF=Wiberg & Hao JOC 56,(1991),5108}    Max Lst Sq",
+    "Error Cp @ 6000 K 0.54%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 14723,
+    "header_line": 14733,
+    "end_line": 14736
+  },
+  "source_text": {
+    "header_line": "T-C4H10O T-Butan  T04/10C  4.H 10.O  1.   0.G   200.000  6000.000  B  74.12160 1",
+    "coeff_lines": [
+      " 1.21731391E+01 2.52590102E-02-8.98242713E-06 1.44006810E-09-8.57864665E-14    2",
+      "-4.38224452E+04-3.88900882E+01 4.10485167E+00 2.30241147E-02 5.30114070E-05    3",
+      "-8.79227908E-08 3.75864213E-11-4.04950482E+04 8.45121309E+00-3.79354916E+04    4"
+    ]
+  }
+}

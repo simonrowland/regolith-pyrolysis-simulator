@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2591",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "HgBr2",
+  "cas_as_published": "7789-47-1",
+  "formula": "HgBr2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "g12/00",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "HG",
+      "count_as_published": " 1.",
+      "element": "Hg",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "BR",
+      "count_as_published": " 2.",
+      "element": "Br",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "360.39800",
+    "value": 360.398
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "7.40216469E+00",
+          "value": 7.40216469
+        },
+        {
+          "as_published": "1.03880965E-04",
+          "value": 0.000103880965
+        },
+        {
+          "as_published": "-4.15586114E-08",
+          "value": -4.15586114e-08
+        },
+        {
+          "as_published": "7.19399468E-12",
+          "value": 7.19399468e-12
+        },
+        {
+          "as_published": "-4.51693853E-16",
+          "value": -4.51693853e-16
+        },
+        {
+          "as_published": "-1.32140416E+04",
+          "value": -13214.0416
+        },
+        {
+          "as_published": "-3.74283837E+00",
+          "value": -3.74283837
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "5.74772163E+00",
+          "value": 5.74772163
+        },
+        {
+          "as_published": "9.81241206E-03",
+          "value": 0.00981241206
+        },
+        {
+          "as_published": "-2.16406650E-05",
+          "value": -2.1640665e-05
+        },
+        {
+          "as_published": "2.11236889E-08",
+          "value": 2.11236889e-08
+        },
+        {
+          "as_published": "-7.57192821E-12",
+          "value": -7.57192821e-12
+        },
+        {
+          "as_published": "-1.29789904E+04",
+          "value": -12978.9904
+        },
+        {
+          "as_published": "3.63070899E+00",
+          "value": 3.63070899
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.09822005E+04",
+    "value": -10982.2005,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "7789-47-1",
+    "HgBr2 (Gas) SIGMA=2  STATWT=1  IB=154.12  Nu=225,41(2),293  HF298=-21.824 kcal",
+    "REF= Pankartz Bur Mines Bul 674 1984 p.304  {HF298=-20.424 kcal REF=JANAF 62}",
+    "Max Lst Sq Error Cp @ 400 K 0.17%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 28902,
+    "header_line": 28906,
+    "end_line": 28909
+  },
+  "source_text": {
+    "header_line": "HgBr2             g12/00HG 1.BR 2.   0.   0.G   200.000  6000.000  B 360.39800 1",
+    "coeff_lines": [
+      " 7.40216469E+00 1.03880965E-04-4.15586114E-08 7.19399468E-12-4.51693853E-16    2",
+      "-1.32140416E+04-3.74283837E+00 5.74772163E+00 9.81241206E-03-2.16406650E-05    3",
+      " 2.11236889E-08-7.57192821E-12-1.29789904E+04 3.63070899E+00-1.09822005E+04    4"
+    ]
+  }
+}

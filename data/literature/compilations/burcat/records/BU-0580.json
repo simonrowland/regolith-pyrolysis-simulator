@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0580",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CS2",
+  "cas_as_published": "75-15-0",
+  "formula": "CS2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "g 6/95",
+  "calc_quality_as_published": "A",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": " 2.",
+      "element": "S",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "76.14270",
+    "value": 76.1427
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.94905043E+00",
+          "value": 5.94905043
+        },
+        {
+          "as_published": "1.69288150E-03",
+          "value": 0.0016928815
+        },
+        {
+          "as_published": "-6.74333823E-07",
+          "value": -6.74333823e-07
+        },
+        {
+          "as_published": "1.16460519E-10",
+          "value": 1.16460519e-10
+        },
+        {
+          "as_published": "-6.37363519E-15",
+          "value": -6.37363519e-15
+        },
+        {
+          "as_published": "1.20171256E+04",
+          "value": 12017.1256
+        },
+        {
+          "as_published": "-6.17036834E+00",
+          "value": -6.17036834
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.17230835E+00",
+          "value": 2.17230835
+        },
+        {
+          "as_published": "1.81263444E-02",
+          "value": 0.0181263444
+        },
+        {
+          "as_published": "-3.08080090E-05",
+          "value": -3.0808009e-05
+        },
+        {
+          "as_published": "2.65150564E-08",
+          "value": 2.65150564e-08
+        },
+        {
+          "as_published": "-8.92801520E-12",
+          "value": -8.9280152e-12
+        },
+        {
+          "as_published": "1.28063739E+04",
+          "value": 12806.3739
+        },
+        {
+          "as_published": "1.19826948E+01",
+          "value": 11.9826948
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.40357038E+04",
+    "value": 14035.7038,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "75-15-0",
+    "CS2  CARBON DISULFIDE  SIGMA=2  B0=0.1090917 cm-1 D0=1.12E-8  g22=-0.779",
+    "NU=664.465,395.982(2),1535.353  x11=-0.957  x22=0.940  x33=-6.54  x12=-2.261",
+    "x23=-6.45 x13=-7.685 W0=30.13   ALFAB1=0.000152 ALFAB2=-0.0002229",
+    "ALFAB3=0.0007117  STATWT=1   T0=24000.  STATWT=3  T0=26187.  STATWT=3.",
+    "T0=26500   STATWT=3.  T0=28000.  STATWT=3.   T0=30200.  STATWT=2.",
+    "HF298=116.7+/-1. KJ  REF=Gurvich 91  {HF298=117.2 kJ  REF=Dorofeeva JCED 56,",
+    "(2011),682; HF298=116.9 kJ  REF=TRC 6/2001;  HF298=116.7+/-1.3 kJ  REF=Denis",
+    "J Sulfur Chem 29,(2008),327}   Max Lst Sq Error Cp @ 1200 K 0.25%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 5889,
+    "header_line": 5898,
+    "end_line": 5901
+  },
+  "source_text": {
+    "header_line": "CS2               g 6/95C  1.S  2.   0.   0.G   200.000  6000.000  A  76.14270 1",
+    "coeff_lines": [
+      " 5.94905043E+00 1.69288150E-03-6.74333823E-07 1.16460519E-10-6.37363519E-15    2",
+      " 1.20171256E+04-6.17036834E+00 2.17230835E+00 1.81263444E-02-3.08080090E-05    3",
+      " 2.65150564E-08-8.92801520E-12 1.28063739E+04 1.19826948E+01 1.40357038E+04    4"
+    ]
+  }
+}

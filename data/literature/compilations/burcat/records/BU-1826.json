@@ -1,0 +1,182 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1826",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C7H14O2 n Heptan",
+  "cas_as_published": "111-14-8",
+  "formula": "C7H14O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T07/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 7.",
+      "element": "C",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "14.",
+      "element": "H",
+      "count": 14.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "130.18486",
+    "value": 130.18486
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.67240869E+01",
+          "value": 16.7240869
+        },
+        {
+          "as_published": "4.31081158E-02",
+          "value": 0.0431081158
+        },
+        {
+          "as_published": "-1.55091657E-05",
+          "value": -1.55091657e-05
+        },
+        {
+          "as_published": "2.50534957E-09",
+          "value": 2.50534957e-09
+        },
+        {
+          "as_published": "-1.50023076E-13",
+          "value": -1.50023076e-13
+        },
+        {
+          "as_published": "-7.32103108E+04",
+          "value": -73210.3108
+        },
+        {
+          "as_published": "-5.84003493E+01",
+          "value": -58.4003493
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "9.72265862E+00",
+          "value": 9.72265862
+        },
+        {
+          "as_published": "-1.09813847E-03",
+          "value": -0.00109813847
+        },
+        {
+          "as_published": "1.72531374E-04",
+          "value": 0.000172531374
+        },
+        {
+          "as_published": "-2.21101285E-07",
+          "value": -2.21101285e-07
+        },
+        {
+          "as_published": "8.66237546E-11",
+          "value": 8.66237546e-11
+        },
+        {
+          "as_published": "-6.82390321E+04",
+          "value": -68239.0321
+        },
+        {
+          "as_published": "-7.00811129E+00",
+          "value": -7.00811129
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-6.42607682E+04",
+    "value": -64260.7682,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "111-14-8",
+    "C7H14O2 Heptanoic (Enanthic) Acid C6H13C(O)OH  SIGMA=1  STATWT=1  IA=12.8708",
+    "IB=194.1963  IC=203.9651  Ir(CH3)=0.51547  ROSYM=3  V(3)=411 cm-1 Ir(OH)=0.13967",
+    "ROSYM=1  V(3)=279.7  Ir(-COOH)=7.25838  ROSYM=1  V(3)=272. cm-1  Nu=3727,3113,",
+    "3108,3102,3069,3061,3048,3046,3043,3035,3029,3018(2),3011,1882,1544,1535,1530,",
+    "1524,1516(2),1496,1443,1430,1424,1393,1355,1348,1342,1337,1302,1293,1266,1236,",
+    "1164,1145,1134,1079,1070,1046,1022,1012,908(2),880,816,754,739,649,578,508,466,",
+    "449,349,251,247,191,158,129.8,95.55 REF=Burcat B3LYP/6-31G(d)  HF298=-534.297 kJ",
+    "REF=Osmont et al IJCK 39,(2007),481  {HF298=-536.5+/-1.7 kJ  REF=Webbook 2009",
+    "(Adrianse et al Rec Trav Chim Pays-Bas 84,(1965),287)  HF298=-539.5+/-1.6 kJ",
+    "REF=Webbook 2009 (Lebedeva Russ JPC 38,(1964),1435)}  Max Lst Sq Error Cp @",
+    "1300 K 0.61%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 20514,
+    "header_line": 20526,
+    "end_line": 20529
+  },
+  "source_text": {
+    "header_line": "C7H14O2 n Heptan  T07/09C  7.H 14.O  2.   0.G   200.000  6000.000  B 130.18486 1",
+    "coeff_lines": [
+      " 1.67240869E+01 4.31081158E-02-1.55091657E-05 2.50534957E-09-1.50023076E-13    2",
+      "-7.32103108E+04-5.84003493E+01 9.72265862E+00-1.09813847E-03 1.72531374E-04    3",
+      "-2.21101285E-07 8.66237546E-11-6.82390321E+04-7.00811129E+00-6.42607682E+04    4"
+    ]
+  }
+}

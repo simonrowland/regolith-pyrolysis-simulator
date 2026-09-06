@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2059",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C12H8 biphenylene",
+  "cas_as_published": "259-79-0",
+  "formula": "C12H8",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 8/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "12.",
+      "element": "C",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 8.",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "152.19192",
+    "value": 152.19192
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.14943346E+01",
+          "value": 21.4943346
+        },
+        {
+          "as_published": "3.31238854E-02",
+          "value": 0.0331238854
+        },
+        {
+          "as_published": "-1.20651081E-05",
+          "value": -1.20651081e-05
+        },
+        {
+          "as_published": "1.96677465E-09",
+          "value": 1.96677465e-09
+        },
+        {
+          "as_published": "-1.18566034E-13",
+          "value": -1.18566034e-13
+        },
+        {
+          "as_published": "3.97273863E+04",
+          "value": 39727.3863
+        },
+        {
+          "as_published": "-9.46644256E+01",
+          "value": -94.6644256
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-9.26510662E-01",
+          "value": -0.926510662
+        },
+        {
+          "as_published": "5.29144662E-02",
+          "value": 0.0529144662
+        },
+        {
+          "as_published": "7.56324038E-05",
+          "value": 7.56324038e-05
+        },
+        {
+          "as_published": "-1.51364316E-07",
+          "value": -1.51364316e-07
+        },
+        {
+          "as_published": "6.81452776E-11",
+          "value": 6.81452776e-11
+        },
+        {
+          "as_published": "4.77004412E+04",
+          "value": 47700.4412
+        },
+        {
+          "as_published": "3.06183525E+01",
+          "value": 30.6183525
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "5.01773406E+04",
+    "value": 50177.3406,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "259-79-0",
+    "C12H8 Biphenylene  SIGMA=4  STATWT=1  IA=29.826  IB=125.0277  IC=154.8542",
+    "Nu=3212(2),3205.5(2),3196.5(2),3184(2),1722,1657,1649,1643,1521,1496,1493,1478,",
+    "1450,1322,1318,1305,1201,1120,1192,1156,1143,1076,1057,1023,1001,999,971(2),924,",
+    "919,903,885,825,784,763,751,737,719,628,615,586,568,466,451,402,382,325,215,150,",
+    "108  REF=NIST CCCBDB  HF298=417.20+/-1.9 kJ  REF=Roux, Temprado et al JPCRD 37,",
+    "(2008),1855  Max Lst Sq Error Cp @ 200 K 0.90%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 23436,
+    "header_line": 23443,
+    "end_line": 23446
+  },
+  "source_text": {
+    "header_line": "C12H8 biphenylene T 8/14C 12.H  8.   0.   0.G   200.000  6000.000  B 152.19192 1",
+    "coeff_lines": [
+      " 2.14943346E+01 3.31238854E-02-1.20651081E-05 1.96677465E-09-1.18566034E-13    2",
+      " 3.97273863E+04-9.46644256E+01-9.26510662E-01 5.29144662E-02 7.56324038E-05    3",
+      "-1.51364316E-07 6.81452776E-11 4.77004412E+04 3.06183525E+01 5.01773406E+04    4"
+    ]
+  }
+}

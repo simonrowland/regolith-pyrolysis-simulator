@@ -22,8 +22,10 @@
   "cea_section": "products",
   "formula": "Ar",
   "phase": "gas",
+  "phase_as_published": "0",
   "phase_flag": 0,
   "phase_flag_as_published": " 0",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
   "n_intervals_declared": 3,
   "source_ref_code": "g 3/98",
   "composition": [

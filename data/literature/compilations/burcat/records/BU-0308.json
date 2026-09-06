@@ -1,0 +1,182 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0308",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "HNCO Isocyanic Aci",
+  "cas_as_published": "75-13-8",
+  "formula": "HNCO",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "A 5/05",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 1.",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "43.02478",
+    "value": 43.02478
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.30045051E+00",
+          "value": 5.30045051
+        },
+        {
+          "as_published": "4.02250821E-03",
+          "value": 0.00402250821
+        },
+        {
+          "as_published": "-1.40962280E-06",
+          "value": -1.4096228e-06
+        },
+        {
+          "as_published": "2.23855342E-10",
+          "value": 2.23855342e-10
+        },
+        {
+          "as_published": "-1.32499966E-14",
+          "value": -1.32499966e-14
+        },
+        {
+          "as_published": "-1.61995274E+04",
+          "value": -16199.5274
+        },
+        {
+          "as_published": "-3.11770684E+00",
+          "value": -3.11770684
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.24009031E+00",
+          "value": 2.24009031
+        },
+        {
+          "as_published": "1.45600497E-02",
+          "value": 0.0145600497
+        },
+        {
+          "as_published": "-1.54352330E-05",
+          "value": -1.5435233e-05
+        },
+        {
+          "as_published": "8.55535028E-09",
+          "value": 8.55535028e-09
+        },
+        {
+          "as_published": "-1.79631611E-12",
+          "value": -1.79631611e-12
+        },
+        {
+          "as_published": "-1.54589951E+04",
+          "value": -15458.9951
+        },
+        {
+          "as_published": "1.21663775E+01",
+          "value": 12.1663775
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.42642740E+04",
+    "value": -14264.274,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "75-13-8",
+    "HNCO HYDROGEN ISOCYANATE Isocyanic Acid  SIGMA=1 STATWT=1 A0=30.638 B0=0.369",
+    "C0=.364   NU=3538,2269,1327,777,656,577 REF=Jacox Webbook HF0=-27.63+/-1 kcal",
+    "REF=Shuurman et al JCP 120,(2004),11586  {HF298=-27.9 KCAL REF=East & Allen JCP",
+    "99,(1993), 4638; HF0=-27.89+/-3  kcal REF=Melius RJ5 1987;  HF298=-119.05+/-0.4",
+    "kJ  REF=ATcT C 2011}  Max Lst Sq Error Cp @ 6000 0.33%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "HNCO Isocyanic Aci",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 3051,
+    "header_line": 3057,
+    "end_line": 3060
+  },
+  "source_text": {
+    "header_line": "HNCO Isocyanic AciA 5/05H  1.N  1.C  1.O  1.G   200.000  6000.000  B  43.02478 1",
+    "coeff_lines": [
+      " 5.30045051E+00 4.02250821E-03-1.40962280E-06 2.23855342E-10-1.32499966E-14    2",
+      "-1.61995274E+04-3.11770684E+00 2.24009031E+00 1.45600497E-02-1.54352330E-05    3",
+      " 8.55535028E-09-1.79631611E-12-1.54589951E+04 1.21663775E+01-1.42642740E+04    4"
+    ]
+  }
+}

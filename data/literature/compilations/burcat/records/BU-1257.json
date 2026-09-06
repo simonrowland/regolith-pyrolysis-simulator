@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1257",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H6N8O8  BCHMX",
+  "cas_as_published": "473796-67-7",
+  "formula": "C4H6N8O8",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/13",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 8.",
+      "element": "N",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 8.",
+      "element": "O",
+      "count": 8.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "294.13956",
+    "value": 294.13956
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.55615335E+01",
+          "value": 35.5615335
+        },
+        {
+          "as_published": "3.63984576E-02",
+          "value": 0.0363984576
+        },
+        {
+          "as_published": "-1.38859138E-05",
+          "value": -1.38859138e-05
+        },
+        {
+          "as_published": "2.32255608E-09",
+          "value": 2.32255608e-09
+        },
+        {
+          "as_published": "-1.42243253E-13",
+          "value": -1.42243253e-13
+        },
+        {
+          "as_published": "1.21662195E+04",
+          "value": 12166.2195
+        },
+        {
+          "as_published": "-1.52236704E+02",
+          "value": -152.236704
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "6.33396784E+00",
+          "value": 6.33396784
+        },
+        {
+          "as_published": "6.13072080E-02",
+          "value": 0.061307208
+        },
+        {
+          "as_published": "9.79806912E-05",
+          "value": 9.79806912e-05
+        },
+        {
+          "as_published": "-1.89247092E-07",
+          "value": -1.89247092e-07
+        },
+        {
+          "as_published": "8.38796149E-11",
+          "value": 8.38796149e-11
+        },
+        {
+          "as_published": "2.27385819E+04",
+          "value": 22738.5819
+        },
+        {
+          "as_published": "1.16691985E+01",
+          "value": 11.6691985
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.78832355E+04",
+    "value": 27883.2355,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "473796-67-7",
+    "C4H6N8O8  BiCycloOctogen, BCHMX, cis-2,4,6,8-Tetranitro-1H,5H-2,4,6,8-tetraaza-",
+    "bicyclo [3,3,0] octane  SIGMA=8  STATWT=1  IA=192.1545  IB=244.6148  IC=374.7395",
+    "[Ir(NO2)=5.702  ROSYM=2  V(3)=150. cm-1]x4  Nu=3197(2),3183,3180,3063(2),",
+    "1712(2),1681,1678,1545,1534,1425,1411,1397,1384,1365,1340,1321(2),1309,1301,",
+    "1248,1240,1231,1224,1210,1190,1144,1117,1085.7(2),991,972,944,913,905,874(2),",
+    "837,784(2),773,768,756.5(2),730,646.7(2),590.5(2),582,484,452,380,377,354,319,",
+    "294,271,221,203,178,152,115,103,92,85   HF298=55.41 kcal  REF=Burcat PM3 MOPAC",
+    "2000  HF298(s)=172.3 kJ  REF=Kozyrev Sysolyatin Sakovich Combust Explo Shock",
+    "Waves 42,(2006),486   Max Lst Sq Error Cp @ 1300 K 0.57%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 13449,
+    "header_line": 13459,
+    "end_line": 13462
+  },
+  "source_text": {
+    "header_line": "C4H6N8O8  BCHMX   T12/13C  4.H  6.N  8.O  8.G   200.000  6000.000  C 294.13956 1",
+    "coeff_lines": [
+      " 3.55615335E+01 3.63984576E-02-1.38859138E-05 2.32255608E-09-1.42243253E-13    2",
+      " 1.21662195E+04-1.52236704E+02 6.33396784E+00 6.13072080E-02 9.79806912E-05    3",
+      "-1.89247092E-07 8.38796149E-11 2.27385819E+04 1.16691985E+01 2.78832355E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1638",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H6S  Phenyl-SH",
+  "cas_as_published": "108-98-5",
+  "formula": "C6H6S",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/18",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": " 1.",
+      "element": "S",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "110.17784",
+    "value": 110.17784
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.43179658E+01",
+          "value": 14.3179658
+        },
+        {
+          "as_published": "1.98530187E-02",
+          "value": 0.0198530187
+        },
+        {
+          "as_published": "-7.16525726E-06",
+          "value": -7.16525726e-06
+        },
+        {
+          "as_published": "1.16074736E-09",
+          "value": 1.16074736e-09
+        },
+        {
+          "as_published": "-6.96671738E-14",
+          "value": -6.96671738e-14
+        },
+        {
+          "as_published": "6.42533256E+03",
+          "value": 6425.33256
+        },
+        {
+          "as_published": "-5.04968959E+01",
+          "value": -50.4968959
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "7.58529133E-01",
+          "value": 0.758529133
+        },
+        {
+          "as_published": "3.85699530E-02",
+          "value": 0.038569953
+        },
+        {
+          "as_published": "2.50134625E-05",
+          "value": 2.50134625e-05
+        },
+        {
+          "as_published": "-6.96568183E-08",
+          "value": -6.96568183e-08
+        },
+        {
+          "as_published": "3.34116812E-11",
+          "value": 3.34116812e-11
+        },
+        {
+          "as_published": "1.09081840E+04",
+          "value": 10908.184
+        },
+        {
+          "as_published": "2.35975984E+01",
+          "value": 23.5975984
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.29477648E+04",
+    "value": 12947.7648,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "108-98-5",
+    "C6H6S  Benzene Thiol  C6H5-SH  SIGMA=1  STATWT=1  IA=15.0046  IB=53.7527",
+    "IC=68.7574  Ir(SH)==0.55764  ROSYM=2  V(3)=1200. cm-1  Nu=3211,3199,3193,3103,",
+    "3179,2700,1646,1634,1524,1487,1360,1305,1213,1188,1120,1111,1052,1013,993,965,",
+    "935,902,843,750,706,703,631,480,411(2),278,187,[108 internal rotation]",
+    "HF298=107.654+/-8. kJ  REF=Burcat G3B3  {HF298=112.4+/-0.88 kJ  REF=Cox & ",
+    "Pilcher Thermochemistry of Organic & Organometalic Compounds 1970}  Max Lst Sq ",
+    "Error Cp @ 6000. K 0.51%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 18122,
+    "header_line": 18130,
+    "end_line": 18133
+  },
+  "source_text": {
+    "header_line": "C6H6S  Phenyl-SH  T11/18C  6.H  6.S  1.   0.G   200.000  6000.000  B 110.17784 1",
+    "coeff_lines": [
+      " 1.43179658E+01 1.98530187E-02-7.16525726E-06 1.16074736E-09-6.96671738E-14    2",
+      " 6.42533256E+03-5.04968959E+01 7.58529133E-01 3.85699530E-02 2.50134625E-05    3",
+      "-6.96568183E-08 3.34116812E-11 1.09081840E+04 2.35975984E+01 1.29477648E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2209",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C22H44O2 Behenic",
+  "cas_as_published": "112-85-6",
+  "formula": "C22H44O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 4/11",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "22.",
+      "element": "C",
+      "count": 22.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "44.",
+      "element": "H",
+      "count": 44.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "340.58356",
+    "value": 340.58356
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.97861465E+01",
+          "value": 49.7861465
+        },
+        {
+          "as_published": "1.33691976E-01",
+          "value": 0.133691976
+        },
+        {
+          "as_published": "-4.81966184E-05",
+          "value": -4.81966184e-05
+        },
+        {
+          "as_published": "7.79580541E-09",
+          "value": 7.79580541e-09
+        },
+        {
+          "as_published": "-4.67232515E-13",
+          "value": -4.67232515e-13
+        },
+        {
+          "as_published": "-1.29226098E+05",
+          "value": -129226.098
+        },
+        {
+          "as_published": "-2.32470756E+02",
+          "value": -232.470756
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.51490265E+01",
+          "value": 25.1490265
+        },
+        {
+          "as_published": "-1.04151958E-02",
+          "value": -0.0104151958
+        },
+        {
+          "as_published": "5.84232343E-04",
+          "value": 0.000584232343
+        },
+        {
+          "as_published": "-7.54109047E-07",
+          "value": -7.54109047e-07
+        },
+        {
+          "as_published": "2.97752951E-10",
+          "value": 2.97752951e-10
+        },
+        {
+          "as_published": "-1.12512869E+05",
+          "value": -112512.869
+        },
+        {
+          "as_published": "-5.49776303E+01",
+          "value": -54.9776303
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.01665642E+05",
+    "value": -101665.642,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "112-85-6",
+    "C22H44O2 Behenic acid  n-C21H43COOH SIGMA=1  STATWT=1  IA=93.4875  IB=3710.7193",
+    "IC=3771.1664  Ir(OH)=0.14246  ROSYM=1  V(3)=280. cm-1  Ir(CH3)=0.52574  ROSYM=3",
+    "V(3)=340. cm-1  Ir(C2H5)=5.63081  ROSYM=1  V(3)=1500. cm-1 est  Ir(-COOH)=7.026",
+    "ROSYM=1  V(3)=1800. cm-1  Nu=26.46,31.76,35.52,37.18,45.44,50.95,74.14,82.73,",
+    "83.95,88.06,91.30,111,115,125.5,132.5,136,145,162,165,169,203,222.5,241,246,254,",
+    "259.5,276,293,337,344,376,393,428,461,485,495,538,564,589,628,726,731,734(2),",
+    "736.5,741,746,756,766,784,798,837,841,852,873,886,897,906,923,944,969,974,993.5,",
+    "1001(2),1012,1027,1035,1038,1043,1050.5,1055,1060,1063.5,1069.5(2),1081.5,",
+    "1089(2),1092.5,1097,1106,1125,1143,1190.5,1198,1211,1219,1229,1233,1241,1259,",
+    "1262,1275,1280,1287,1297,1301,1315,1321(2),1325,1329,1332,1336(2),1339,1343(2),",
+    "1345,1350,1359(2),1362.5,1367,1380.5,1390,1406(3),1415(3),1418,1419(2),1430,",
+    "1488,1497(6),1500(2),1501.5,1503,1508,1510(2),1513,1515(2),1518,1524,1525(2),",
+    "1529,1847.5,3007.5(2),3009(2),3010(2),3012(2),3013(2),3014.5,3017(2),3021,",
+    "3024.5(4),3031,3033.5,3036.5(2),3038,3040,3044(3),3050(2),3057(2),3060.5(2),",
+    "3070(2),3075,3078(3),3088,3105,3110,3129,3752  REF=Burcat B3LYP/6-31G(d)",
+    "HF298=202.0 kcal  REF=NIST 94  Max Lst Sq Error Cp @ 200 K 0.74%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 25479,
+    "header_line": 25496,
+    "end_line": 25499
+  },
+  "source_text": {
+    "header_line": "C22H44O2 Behenic  T 4/11C 22.H 44.O  2.   0.G   200.000  6000.000  B 340.58356 1",
+    "coeff_lines": [
+      " 4.97861465E+01 1.33691976E-01-4.81966184E-05 7.79580541E-09-4.67232515E-13    2",
+      "-1.29226098E+05-2.32470756E+02 2.51490265E+01-1.04151958E-02 5.84232343E-04    3",
+      "-7.54109047E-07 2.97752951E-10-1.12512869E+05-5.49776303E+01-1.01665642E+05    4"
+    ]
+  }
+}

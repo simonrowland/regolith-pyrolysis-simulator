@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0746",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CH3CD3",
+  "cas_as_published": "84658-62-8",
+  "formula": "C2H3D3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/03",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 2.",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 3.",
+      "element": "H",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "D ",
+      "count_as_published": " 3.",
+      "element": "D",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "33.08753",
+    "value": 33.08753
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.72054997E+00",
+          "value": 5.72054997
+        },
+        {
+          "as_published": "1.42190397E-02",
+          "value": 0.0142190397
+        },
+        {
+          "as_published": "-5.14923700E-06",
+          "value": -5.149237e-06
+        },
+        {
+          "as_published": "8.35625242E-10",
+          "value": 8.35625242e-10
+        },
+        {
+          "as_published": "-5.02013874E-14",
+          "value": -5.02013874e-14
+        },
+        {
+          "as_published": "-1.59059093E+04",
+          "value": -15905.9093
+        },
+        {
+          "as_published": "-9.00312825E+00",
+          "value": -9.00312825
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.37893166E+00",
+          "value": 3.37893166
+        },
+        {
+          "as_published": "2.96664746E-03",
+          "value": 0.00296664746
+        },
+        {
+          "as_published": "4.53525569E-05",
+          "value": 4.53525569e-05
+        },
+        {
+          "as_published": "-5.95543887E-08",
+          "value": -5.95543887e-08
+        },
+        {
+          "as_published": "2.34320292E-11",
+          "value": 2.34320292e-11
+        },
+        {
+          "as_published": "-1.43709688E+04",
+          "value": -14370.9688
+        },
+        {
+          "as_published": "7.43314023E+00",
+          "value": 7.43314023
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.29376235E+04",
+    "value": -12937.6235,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "84658-62-8",
+    "CH3CD3 1,1,1-Deutherated Ethane  SIGMA=3  STATWT=1  IA=1.5687   IB=IC=5.0989",
+    "Ir=0.34867   ROSYM=3  V(3)=1063.3 cm-1  NU=686.3(2),918.3,1105(2),1145(2),1158,",
+    "1443,1534(2),2191,2306,3049,3112(2) HF298=-107.57 kJ HF0=-92.313 kJ  REF=G3B3LYP",
+    "calc Ruscic & Burcat 2004    Max Lst Sq Error Cp @ 1300 K 0.64%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 7632,
+    "header_line": 7637,
+    "end_line": 7640
+  },
+  "source_text": {
+    "header_line": "CH3CD3            T11/03C  2.H  3.D  3.   0.G   200.000  6000.000  B  33.08753 1",
+    "coeff_lines": [
+      " 5.72054997E+00 1.42190397E-02-5.14923700E-06 8.35625242E-10-5.02013874E-14    2",
+      "-1.59059093E+04-9.00312825E+00 3.37893166E+00 2.96664746E-03 4.53525569E-05    3",
+      "-5.95543887E-08 2.34320292E-11-1.43709688E+04 7.43314023E+00-1.29376235E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1717",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H12O2 Caproic ac",
+  "cas_as_published": "142-62-1",
+  "formula": "C6H12O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T01/08",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "12.",
+      "element": "H",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "116.15828",
+    "value": 116.15828
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.46941620E+01",
+          "value": 14.694162
+        },
+        {
+          "as_published": "3.69222180E-02",
+          "value": 0.036922218
+        },
+        {
+          "as_published": "-1.32903968E-05",
+          "value": -1.32903968e-05
+        },
+        {
+          "as_published": "2.14753504E-09",
+          "value": 2.14753504e-09
+        },
+        {
+          "as_published": "-1.28618778E-13",
+          "value": -1.28618778e-13
+        },
+        {
+          "as_published": "-6.76910877E+04",
+          "value": -67691.0877
+        },
+        {
+          "as_published": "-4.76096538E+01",
+          "value": -47.6096538
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "8.60061113E+00",
+          "value": 8.60061113
+        },
+        {
+          "as_published": "6.85614684E-05",
+          "value": 6.85614684e-05
+        },
+        {
+          "as_published": "1.44867152E-04",
+          "value": 0.000144867152
+        },
+        {
+          "as_published": "-1.86132195E-07",
+          "value": -1.86132195e-07
+        },
+        {
+          "as_published": "7.29407696E-11",
+          "value": 7.29407696e-11
+        },
+        {
+          "as_published": "-6.34338368E+04",
+          "value": -63433.8368
+        },
+        {
+          "as_published": "-3.24945069E+00",
+          "value": -3.24945069
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-5.99200213E+04",
+    "value": -59920.0213,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "142-62-1",
+    "C6H12O2  Hexanoic (Caproic) acid  C5H11COOH  SIGMA=1  STATWT=1  IA=11.5515",
+    "IB=130.1663  IC=139.1324  Ir(CH3)=0.51547  ROSYM=3  V(3)=411.cm-1  Ir(OH)=.13967",
+    "ROSYM=1  V(3)=279.7 cm-1  Ir(COOH)=7.25838 ROSYM=1  V(3)=272.cm-1  Nu=3727,3114,",
+    "3107,3101,3064,3060,3048,3042,3036,3031,3019,3010,1882,1542,1530.3(2),1519,1514,",
+    "1497,1442,1430,1417,1366,1353,1345,1312(2),1275,1242,1167,1143,1130,1074,1066,",
+    "1024,987,922,872,868,774,739,648,577,512,465,406,303,248,227,141,122",
+    "HF298=-498.2+/-8. kJ  REF=Burcat G3B3 calc {HF298=-513.+/-2 kJ  REF=Cox &",
+    "Pilcher 1970; HF298=-123.0+/-0.5 kcal REF=Osmont et al IJCK 39,(2007),481;",
+    "HF298=-122.5+/-0.6 kcal  REF=Fenwick Harrop Head JCT 10,(1978),687}",
+    "HF298(liq)=-581.8+/-2. kJ  REF=Cox & Pilcher 1970.  Max Lst Sq Error Cp @",
+    "6000 K 0.61%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C6H12O2 Caproic ac",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 19095,
+    "header_line": 19107,
+    "end_line": 19110
+  },
+  "source_text": {
+    "header_line": "C6H12O2 Caproic acT01/08C  6.H 12.O  2.   0.G   200.000  6000.000  B 116.15828 1",
+    "coeff_lines": [
+      " 1.46941620E+01 3.69222180E-02-1.32903968E-05 2.14753504E-09-1.28618778E-13    2",
+      "-6.76910877E+04-4.76096538E+01 8.60061113E+00 6.85614684E-05 1.44867152E-04    3",
+      "-1.86132195E-07 7.29407696E-11-6.34338368E+04-3.24945069E+00-5.99200213E+04    4"
+    ]
+  }
+}

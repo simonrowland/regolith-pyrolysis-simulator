@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3333",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Si5H12 n-pentasi",
+  "cas_as_published": "14868-53-2",
+  "formula": "Si5H12",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/17",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SI",
+      "count_as_published": " 5.",
+      "element": "Si",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "12.",
+      "element": "H",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "152.52278",
+    "value": 152.52278
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.22778143E+01",
+          "value": 22.2778143
+        },
+        {
+          "as_published": "2.36584073E-02",
+          "value": 0.0236584073
+        },
+        {
+          "as_published": "-8.98656837E-06",
+          "value": -8.98656837e-06
+        },
+        {
+          "as_published": "1.49745056E-09",
+          "value": 1.49745056e-09
+        },
+        {
+          "as_published": "-9.14438975E-14",
+          "value": -9.14438975e-14
+        },
+        {
+          "as_published": "1.21706583E+04",
+          "value": 12170.6583
+        },
+        {
+          "as_published": "-7.83334718E+01",
+          "value": -78.3334718
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-5.30178546E-01",
+          "value": -0.530178546
+        },
+        {
+          "as_published": "1.07381404E-01",
+          "value": 0.107381404
+        },
+        {
+          "as_published": "-1.41507125E-04",
+          "value": -0.000141507125
+        },
+        {
+          "as_published": "1.05390914E-07",
+          "value": 1.05390914e-07
+        },
+        {
+          "as_published": "-3.23793545E-11",
+          "value": -3.23793545e-11
+        },
+        {
+          "as_published": "1.77748878E+04",
+          "value": 17774.8878
+        },
+        {
+          "as_published": "3.51966656E+01",
+          "value": 35.1966656
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.13323609E+04",
+    "value": 21332.3609,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "14868-53-2",
+    "Si5H12 n-PntaSilane (Si2H5)2SiH2  SIGMA=2  STATWT=1  IA=15.7243  IB=203.774",
+    "IC=214.664  [Ir(SiH3)=0.4818  ROSYM=3  V(3)=200. cm-1]x2   [Ir(Si2H5)=4.7  ",
+    "ROSYM=1  V(3)=1020. cm-1]x2  Nu=2243(2),2239(2),2226.5(2),2222,2215,2209(2),",
+    "2204.4(2),952.5(2),948(2),937,931.5(2),893,886,797,747,739,716,657,651.5,570,",
+    "529,492,471(2),450,403,380,370,321,300,120,104,44.39,[81.5(2),27.23,24  internal",
+    "rotation]  HF298=177.37+/-10. kJ  REF=Burcat G3B3  {HF298=200.60 kJ  REF=Hidding ",
+    "& Pfitzner J.Propuls. & Power 22(4),(2006),786;  HF298=182.4-195.8 kJ  ",
+    "REF=Broadbelt et al JPC A 108,(2004),874; HF298=199.6 kJ  Kratzer & Sax JPC A ",
+    "106,(2002),16502}  Max Lst Sq Error Cp @  1300 K 0.60%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 35367,
+    "header_line": 35377,
+    "end_line": 35380
+  },
+  "source_text": {
+    "header_line": "Si5H12 n-pentasi  T 7/17SI 5.H 12.   0.   0.G   200.000  6000.000  B 152.52278 1",
+    "coeff_lines": [
+      " 2.22778143E+01 2.36584073E-02-8.98656837E-06 1.49745056E-09-9.14438975E-14    2",
+      " 1.21706583E+04-7.83334718E+01-5.30178546E-01 1.07381404E-01-1.41507125E-04    3",
+      " 1.05390914E-07-3.23793545E-11 1.77748878E+04 3.51966656E+01 2.13323609E+04    4"
+    ]
+  }
+}

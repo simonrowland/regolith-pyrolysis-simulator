@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3206",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "SbCL5",
+  "cas_as_published": "7647-18-9",
+  "formula": "SbCl5",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T03/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SB",
+      "count_as_published": " 1.",
+      "element": "Sb",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 5.",
+      "element": "Cl",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "299.02350",
+    "value": 299.0235
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.54869771E+01",
+          "value": 15.4869771
+        },
+        {
+          "as_published": "5.43850014E-04",
+          "value": 0.000543850014
+        },
+        {
+          "as_published": "-2.17373802E-07",
+          "value": -2.17373802e-07
+        },
+        {
+          "as_published": "3.76055163E-11",
+          "value": 3.76055163e-11
+        },
+        {
+          "as_published": "-2.36017400E-15",
+          "value": -2.360174e-15
+        },
+        {
+          "as_published": "-5.68371308E+04",
+          "value": -56837.1308
+        },
+        {
+          "as_published": "-3.79009433E+01",
+          "value": -37.9009433
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "7.49842062E+00",
+          "value": 7.49842062
+        },
+        {
+          "as_published": "4.64325927E-02",
+          "value": 0.0464325927
+        },
+        {
+          "as_published": "-1.00842443E-04",
+          "value": -0.000100842443
+        },
+        {
+          "as_published": "9.74659896E-08",
+          "value": 9.74659896e-08
+        },
+        {
+          "as_published": "-3.47058612E-11",
+          "value": -3.47058612e-11
+        },
+        {
+          "as_published": "-5.56676517E+04",
+          "value": -55667.6517
+        },
+        {
+          "as_published": "-2.09441114E+00",
+          "value": -2.09441114
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-5.20829249E+04",
+    "value": -52082.9249,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "7647-18-9",
+    "SbCl5  Antimony Pentachloride  SIGMA=1  STATWT=1  IA=93.0916  IB=IC=111.4057",
+    "Nu=379.2(2),355.0,339.4,278,175.3,172.8(2),162.4(2),59.9(2)  HF298=-103.5+/-2.18",
+    "kcal   REF=Skulan, Nielsen, Melius, Allendorf MP4  JPC A 110,(2006),5919",
+    "{HF298=-92.93 kcal  REF=Barin 95.}  Max Lst Sq Error Cp @ 400 K 0.35%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 34086,
+    "header_line": 34091,
+    "end_line": 34094
+  },
+  "source_text": {
+    "header_line": "SbCL5             T03/09SB 1.CL 5.   0.   0.G   200.000  6000.000  B 299.02350 1",
+    "coeff_lines": [
+      " 1.54869771E+01 5.43850014E-04-2.17373802E-07 3.76055163E-11-2.36017400E-15    2",
+      "-5.68371308E+04-3.79009433E+01 7.49842062E+00 4.64325927E-02-1.00842443E-04    3",
+      " 9.74659896E-08-3.47058612E-11-5.56676517E+04-2.09441114E+00-5.20829249E+04    4"
+    ]
+  }
+}

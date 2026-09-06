@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1161",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3H8O3 Glycerol",
+  "cas_as_published": "56-81-5",
+  "formula": "C3H8O3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T06/06",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 8.",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "92.09382",
+    "value": 92.09382
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.43043899E+01",
+          "value": 14.3043899
+        },
+        {
+          "as_published": "1.98820797E-02",
+          "value": 0.0198820797
+        },
+        {
+          "as_published": "-7.05141811E-06",
+          "value": -7.05141811e-06
+        },
+        {
+          "as_published": "1.12196047E-09",
+          "value": 1.12196047e-09
+        },
+        {
+          "as_published": "-6.63290455E-14",
+          "value": -6.63290455e-14
+        },
+        {
+          "as_published": "-7.53417115E+04",
+          "value": -75341.7115
+        },
+        {
+          "as_published": "-4.07500023E+01",
+          "value": -40.7500023
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.29036739E+00",
+          "value": 1.29036739
+        },
+        {
+          "as_published": "6.87295831E-02",
+          "value": 0.0687295831
+        },
+        {
+          "as_published": "-8.24160146E-05",
+          "value": -8.24160146e-05
+        },
+        {
+          "as_published": "5.68196772E-08",
+          "value": 5.68196772e-08
+        },
+        {
+          "as_published": "-1.62329302E-11",
+          "value": -1.62329302e-11
+        },
+        {
+          "as_published": "-7.23210175E+04",
+          "value": -72321.0175
+        },
+        {
+          "as_published": "2.34582202E+01",
+          "value": 23.4582202
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-6.95049979E+04",
+    "value": -69504.9979,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "56-81-5",
+    "C3H8O3  Glycerol (Glicerin) HOCH2CH(OH)CH2OH  SIGMA=2  STATWT=1  IA=14.5951",
+    "IB=35.5951  IC=47.1811  [Ir(OH)=0.1411 ROSYM=1  V(3)=700 cm-1]x2  Ir(OH)=0.1472",
+    "ROSYM=2  V(3)=700. cm-1 [Ir(CH2OH)=4.4249 ROSYM=1  V(3)=700. cm-1]x2  Nu=[3632],",
+    "3626,3572,3079,3045,3013,[2945,2895],1555,1542,1498,[1465,1388],1247,1232,1220,",
+    "1192,1123,1092,1055,1037,[919,846,773,659,605,564,550],485,474,429,288  REF=[]",
+    "IR NIST Webbook + Burcat G3B3 calc.  HF298=-577.9+/-1.1 kJ  HF0=-552.153 kJ",
+    "REF=Da Silva et al JCT 20,(!988),1353  {HF298=-580.6 kJ  REF=Burcat G3B3 calc",
+    "HF298(liq)=-669.6+/-0.6 kJ REF= Da Silva JCT 20,(1988),1353}   Max Lst Sq Error",
+    "Cp @ 6000 K 0.44%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 12357,
+    "header_line": 12367,
+    "end_line": 12370
+  },
+  "source_text": {
+    "header_line": "C3H8O3 Glycerol   T06/06C  3.H  8.O  3.   0.G   200.000  6000.000  B  92.09382 1",
+    "coeff_lines": [
+      " 1.43043899E+01 1.98820797E-02-7.05141811E-06 1.12196047E-09-6.63290455E-14    2",
+      "-7.53417115E+04-4.07500023E+01 1.29036739E+00 6.87295831E-02-8.24160146E-05    3",
+      " 5.68196772E-08-1.62329302E-11-7.23210175E+04 2.34582202E+01-6.95049979E+04    4"
+    ]
+  }
+}

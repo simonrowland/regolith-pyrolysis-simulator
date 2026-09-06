@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2083",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C12H22O11 Cellobi",
+  "cas_as_published": "528-50-7 or 13299-27-9",
+  "formula": "C12H22O11",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/12",
+  "calc_quality_as_published": "E",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "12.",
+      "element": "C",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "22.",
+      "element": "H",
+      "count": 22.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "11.",
+      "element": "O",
+      "count": 11.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "342.29648",
+    "value": 342.29648
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.93030839E+01",
+          "value": 49.3030839
+        },
+        {
+          "as_published": "7.15899682E-02",
+          "value": 0.0715899682
+        },
+        {
+          "as_published": "-2.62906911E-05",
+          "value": -2.62906911e-05
+        },
+        {
+          "as_published": "4.31417499E-09",
+          "value": 4.31417499e-09
+        },
+        {
+          "as_published": "-2.61213735E-13",
+          "value": -2.61213735e-13
+        },
+        {
+          "as_published": "-2.82240912E+05",
+          "value": -282240.912
+        },
+        {
+          "as_published": "-2.18394782E+02",
+          "value": -218.394782
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.25206111E+01",
+          "value": 12.5206111
+        },
+        {
+          "as_published": "6.08450023E-02",
+          "value": 0.0608450023
+        },
+        {
+          "as_published": "2.78273456E-04",
+          "value": 0.000278273456
+        },
+        {
+          "as_published": "-4.34946535E-07",
+          "value": -4.34946535e-07
+        },
+        {
+          "as_published": "1.81962789E-10",
+          "value": 1.81962789e-10
+        },
+        {
+          "as_published": "-2.68236960E+05",
+          "value": -268236.96
+        },
+        {
+          "as_published": "-4.98333225E+00",
+          "value": -4.98333225
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-2.60114667E+05",
+    "value": -260114.667,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "528-50-7 or 13299-27-9",
+    "C12H22O11 Cellobiose/Maltose Approximated by adding twice the polynomials of",
+    "cellulose cell and adding the polynomial of H2O gas.  HF298=-2162.7+/-30. kJ",
+    "REF=Burcat estimate."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 23754,
+    "header_line": 23758,
+    "end_line": 23761
+  },
+  "source_text": {
+    "header_line": "C12H22O11 Cellobi T12/12C 12.H 22.O 11.   0.G   200.000  6000.000  E 342.29648 1",
+    "coeff_lines": [
+      " 4.93030839E+01 7.15899682E-02-2.62906911E-05 4.31417499E-09-2.61213735E-13    2",
+      "-2.82240912E+05-2.18394782E+02 1.25206111E+01 6.08450023E-02 2.78273456E-04    3",
+      "-4.34946535E-07 1.81962789E-10-2.68236960E+05-4.98333225E+00-2.60114667E+05    4"
+    ]
+  }
+}

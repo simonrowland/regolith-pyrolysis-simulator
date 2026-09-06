@@ -1,0 +1,184 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0130",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Bi2O3",
+  "cas_as_published": "1304-76-3",
+  "formula": "Bi2O3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T03/09",
+  "calc_quality_as_published": "E",
+  "composition": [
+    {
+      "element_as_published": "BI",
+      "count_as_published": " 2.",
+      "element": "Bi",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "465.95896",
+    "value": 465.95896
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.18017633E+01",
+          "value": 11.8017633
+        },
+        {
+          "as_published": "1.25887600E-03",
+          "value": 0.001258876
+        },
+        {
+          "as_published": "-5.00531986E-07",
+          "value": -5.00531986e-07
+        },
+        {
+          "as_published": "8.62904280E-11",
+          "value": 8.6290428e-11
+        },
+        {
+          "as_published": "-5.40270329E-15",
+          "value": -5.40270329e-15
+        },
+        {
+          "as_published": "4.14383493E+04",
+          "value": 41438.3493
+        },
+        {
+          "as_published": "-2.73217517E+01",
+          "value": -27.3217517
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.92391692E-01",
+          "value": 0.192391692
+        },
+        {
+          "as_published": "5.88477140E-02",
+          "value": 0.058847714
+        },
+        {
+          "as_published": "-1.13411599E-04",
+          "value": -0.000113411599
+        },
+        {
+          "as_published": "1.00869101E-07",
+          "value": 1.00869101e-07
+        },
+        {
+          "as_published": "-3.38566126E-11",
+          "value": -3.38566126e-11
+        },
+        {
+          "as_published": "4.34648636E+04",
+          "value": 43464.8636
+        },
+        {
+          "as_published": "2.66081738E+01",
+          "value": 26.6081738
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.53191897E+04",
+    "value": 45319.1897,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1304-76-3",
+    "Bi2O3 Bismuth(III)Oxide SIGMA=2  STATWT=1  IA=17.4289  IB=163.8037  IC=163.80473",
+    "Nu=591,580,562.8(2),529.9(2),265.4(2),187.5  HF298=90.059 kcal  REF=Burcat PM3",
+    "MOPAC 2000  Max Lst Sq Error Cp @ 700 K 0.29%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "duplicate_name_as_published",
+      "name_as_published": "Bi2O3",
+      "record_ids": [
+        "BU-0130",
+        "BU-0131"
+      ],
+      "note": "Distinct BURCAT.THR 4-line records; not merged."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 1293,
+    "header_line": 1297,
+    "end_line": 1300
+  },
+  "source_text": {
+    "header_line": "Bi2O3             T03/09BI 2.O  3.   0.   0.G   200.000  6000.000  E 465.95896 1",
+    "coeff_lines": [
+      " 1.18017633E+01 1.25887600E-03-5.00531986E-07 8.62904280E-11-5.40270329E-15    2",
+      " 4.14383493E+04-2.73217517E+01 1.92391692E-01 5.88477140E-02-1.13411599E-04    3",
+      " 1.00869101E-07-3.38566126E-11 4.34648636E+04 2.66081738E+01 4.53191897E+04    4"
+    ]
+  }
+}

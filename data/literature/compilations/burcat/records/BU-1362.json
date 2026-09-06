@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1362",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H10O3 DiEthyle",
+  "cas_as_published": "111-46-6",
+  "formula": "C4H10O3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 2/15",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "106.12040",
+    "value": 106.1204
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.57525805E+01",
+          "value": 15.7525805
+        },
+        {
+          "as_published": "2.92335816E-02",
+          "value": 0.0292335816
+        },
+        {
+          "as_published": "-1.04827309E-05",
+          "value": -1.04827309e-05
+        },
+        {
+          "as_published": "1.68296774E-09",
+          "value": 1.68296774e-09
+        },
+        {
+          "as_published": "-1.00203581E-13",
+          "value": -1.00203581e-13
+        },
+        {
+          "as_published": "-7.36718351E+04",
+          "value": -73671.8351
+        },
+        {
+          "as_published": "-4.95223169E+01",
+          "value": -49.5223169
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "9.20684777E+00",
+          "value": 9.20684777
+        },
+        {
+          "as_published": "8.63741878E-03",
+          "value": 0.00863741878
+        },
+        {
+          "as_published": "1.00412665E-04",
+          "value": 0.000100412665
+        },
+        {
+          "as_published": "-1.37447381E-07",
+          "value": -1.37447381e-07
+        },
+        {
+          "as_published": "5.52766446E-11",
+          "value": 5.52766446e-11
+        },
+        {
+          "as_published": "-7.00859355E+04",
+          "value": -70085.9355
+        },
+        {
+          "as_published": "-6.62496167E+00",
+          "value": -6.62496167
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-6.63153932E+04",
+    "value": -66315.3932,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "111-46-6",
+    "C4H10O3 DiethyleneGlycol  (HOCH2CH2)2O  SIGMA=2  STATWT=1  IA=10.0828",
+    "IB=87.5848  IC=93.2670  [Ir(OH)=0.1361  ROSYM=1  V(3)=380. cm-1]x2",
+    "[Ir(-CH2OH)=3.94  ROSYM=1  V(3)=1200. cm-1]x2  Nu=3767,3724,3105,3052,3034,3025,",
+    "3006,3001,3000,2990,1566,1534,1530,1498,1459,1434,1401,1384,1313,1279,1270,",
+    "1241.5(2),1181,1171,1144,1099,1094,1059,1037,915,878,843,571,465,420,394,295,",
+    "250,188,[147,120,70,56 int rot]  REF=Burcat G3B3  HF298=-551.38+/-0.79 kJ",
+    "REF=Steele et al J Chem Eng Data 47(4),(2002),667  {HF298=-556.35+/-8. kJ",
+    "REF=Burcat G3B3}  HF298=-629.94+/-0.52 kJ  REF=Steele et al ibid.  Max Lst Sq",
+    "Error Cp @ 6000 K 0.53%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 14793,
+    "header_line": 14803,
+    "end_line": 14806
+  },
+  "source_text": {
+    "header_line": "C4H10O3 DiEthyle  T 2/15C  4.H 10.O  3.   0.G   200.000  6000.000  B 106.12040 1",
+    "coeff_lines": [
+      " 1.57525805E+01 2.92335816E-02-1.04827309E-05 1.68296774E-09-1.00203581E-13    2",
+      "-7.36718351E+04-4.95223169E+01 9.20684777E+00 8.63741878E-03 1.00412665E-04    3",
+      "-1.37447381E-07 5.52766446E-11-7.00859355E+04-6.62496167E+00-6.63153932E+04    4"
+    ]
+  }
+}

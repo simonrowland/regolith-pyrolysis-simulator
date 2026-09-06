@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1549",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "TRICHLOROPHENOL",
+  "cas_as_published": "88-06-2",
+  "formula": "C6H3OCl3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/03",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 3.",
+      "element": "H",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 3.",
+      "element": "Cl",
+      "count": 3.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "197.44552",
+    "value": 197.44552
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.00548095E+01",
+          "value": 20.0548095
+        },
+        {
+          "as_published": "1.48689736E-02",
+          "value": 0.0148689736
+        },
+        {
+          "as_published": "-5.41339688E-06",
+          "value": -5.41339688e-06
+        },
+        {
+          "as_published": "8.82942340E-10",
+          "value": 8.8294234e-10
+        },
+        {
+          "as_published": "-5.32711832E-14",
+          "value": -5.32711832e-14
+        },
+        {
+          "as_published": "-3.07414767E+04",
+          "value": -30741.4767
+        },
+        {
+          "as_published": "-7.38666469E+01",
+          "value": -73.8666469
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.04736140E+00",
+          "value": 1.0473614
+        },
+        {
+          "as_published": "7.13669355E-02",
+          "value": 0.0713669355
+        },
+        {
+          "as_published": "-6.63730092E-05",
+          "value": -6.63730092e-05
+        },
+        {
+          "as_published": "2.75555456E-08",
+          "value": 2.75555456e-08
+        },
+        {
+          "as_published": "-3.25677598E-12",
+          "value": -3.25677598e-12
+        },
+        {
+          "as_published": "-2.56905886E+04",
+          "value": -25690.5886
+        },
+        {
+          "as_published": "2.33240058E+01",
+          "value": 23.3240058
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-2.27397646E+04",
+    "value": -22739.7646,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "88-06-2",
+    "C6H3Cl3O  2,4,6,Tri-Chloro-Phenol   SIGMA=2   IA=98.8686   IB=118.4291",
+    "IC=217.2977 Ir=0.14239  ROSYM=1  V(3)=1116.8 cm-1   Nu=3857,3569,3095,1724,1713,",
+    "1572,1468,1397,1321,1261,1223,1168,1109,1076,1067,918,847,809,733,564,[571,508,",
+    "433,417,383,374,350,301,213,198,188,141] REF=NIST Webbook 2000 IR data",
+    "+B3LYP/6-31G(d) calculation. HF298=-189.07 kJ   HF0=-176.92 kJ   REF=Janoschek",
+    " J. Mol.Struct 661-2,(2003),635   {HF298=-34.28 kcal REF=W.Shaub Thermochimica",
+    "Acta 58,(1982),11}    Max Lst Sq Error Cp @ 1300 K  0.43%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17076,
+    "header_line": 17084,
+    "end_line": 17087
+  },
+  "source_text": {
+    "header_line": "TRICHLOROPHENOL   T 6/03C  6.H  3.O  1.CL 3.G   200.000  6000.000  B 197.44552 1",
+    "coeff_lines": [
+      " 2.00548095E+01 1.48689736E-02-5.41339688E-06 8.82942340E-10-5.32711832E-14    2",
+      "-3.07414767E+04-7.38666469E+01 1.04736140E+00 7.13669355E-02-6.63730092E-05    3",
+      " 2.75555456E-08-3.25677598E-12-2.56905886E+04 2.33240058E+01-2.27397646E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,193 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1133",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "2-C3H7NO3+ IPN+",
+  "cas_as_published": "N/A",
+  "formula": "WIn",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 8/18",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "  ",
+      "count_as_published": "   ",
+      "element": null,
+      "count": null,
+      "filler": true
+    },
+    {
+      "element_as_published": " W",
+      "count_as_published": "ARN",
+      "element": "W",
+      "count": null,
+      "filler": false
+    },
+    {
+      "element_as_published": "IN",
+      "count_as_published": "G! ",
+      "element": "In",
+      "count": null,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "   ",
+      "element": null,
+      "count": null,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "105.09207",
+    "value": 105.09207
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.45836555E+01",
+          "value": 14.5836555
+        },
+        {
+          "as_published": "2.10567033E-02",
+          "value": 0.0210567033
+        },
+        {
+          "as_published": "-7.58469940E-06",
+          "value": -7.5846994e-06
+        },
+        {
+          "as_published": "1.22469682E-09",
+          "value": 1.22469682e-09
+        },
+        {
+          "as_published": "-7.32745925E-14",
+          "value": -7.32745925e-14
+        },
+        {
+          "as_published": "9.32636462E+04",
+          "value": 93263.6462
+        },
+        {
+          "as_published": "-4.54403001E+01",
+          "value": -45.4403001
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.28793888E+00",
+          "value": 4.28793888
+        },
+        {
+          "as_published": "4.83084335E-02",
+          "value": 0.0483084335
+        },
+        {
+          "as_published": "-3.31706102E-05",
+          "value": -3.31706102e-05
+        },
+        {
+          "as_published": "1.03463531E-08",
+          "value": 1.03463531e-08
+        },
+        {
+          "as_published": "-5.65033736E-13",
+          "value": -5.65033736e-13
+        },
+        {
+          "as_published": "9.62800723E+04",
+          "value": 96280.0723
+        },
+        {
+          "as_published": "8.30360332E+00",
+          "value": 8.30360332
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "9.94327988E+04",
+    "value": 99432.7988,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A",
+    "2-C3H7NO3+  IPN+ IsoPropylNitrate cation CH3-CH(O-NO2)-CH3  SIGMA=2  STATWT=2",
+    "IA=17.2448  IB=57.6645  IC=60.2055  [Ir(CH3)=0.51547  ROSYM=3  V(3)=800. cm-1]x2",
+    "Ir(NO2)=5.96  ROSYM=2  V(3)=600. cm-1  Nu=3221,3191,3174,3159,3074,3068,2996,",
+    "2081,1497,1478,1472,1439,1410,1376,1358,1344,1228,1101,1038,1005,945,931,864,",
+    "698,622,606,517,405,373,318,252,211,181,[155,64,54 internal rotation]  ",
+    "HF298=826.735+/-8. kJ thermal electron  REF=Burcat G3B3  Max Lst Sq Error Cp @ ",
+    "1300 K 0.51%.",
+    "WARNING! The electron is a fifth element. The header formula for 7 term ",
+    "polynomials is not correct except in files THERM.DAT and in NEWNASA.TXT.  "
+  ],
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "composition_count_unparsed",
+      "slot": 1,
+      "element_as_published": " W",
+      "count_as_published": "ARN"
+    },
+    {
+      "kind": "composition_count_unparsed",
+      "slot": 2,
+      "element_as_published": "IN",
+      "count_as_published": "G! "
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 11999,
+    "header_line": 12009,
+    "end_line": 12012
+  },
+  "source_text": {
+    "header_line": "2-C3H7NO3+ IPN+   T 8/18      WARNING!      G   298.150  6000.000  B 105.09207 1",
+    "coeff_lines": [
+      " 1.45836555E+01 2.10567033E-02-7.58469940E-06 1.22469682E-09-7.32745925E-14    2",
+      " 9.32636462E+04-4.54403001E+01 4.28793888E+00 4.83084335E-02-3.31706102E-05    3",
+      " 1.03463531E-08-5.65033736E-13 9.62800723E+04 8.30360332E+00 9.94327988E+04    4"
+    ]
+  }
+}

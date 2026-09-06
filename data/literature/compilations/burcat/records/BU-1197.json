@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1197",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4F6  CyButene",
+  "cas_as_published": "697-11-0",
+  "formula": "C4F6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/10",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": " 6.",
+      "element": "F",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "162.03322",
+    "value": 162.03322
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.94761995E+01",
+          "value": 19.4761995
+        },
+        {
+          "as_published": "8.60283974E-03",
+          "value": 0.00860283974
+        },
+        {
+          "as_published": "-3.33982956E-06",
+          "value": -3.33982956e-06
+        },
+        {
+          "as_published": "5.66997359E-10",
+          "value": 5.66997359e-10
+        },
+        {
+          "as_published": "-3.51291813E-14",
+          "value": -3.51291813e-14
+        },
+        {
+          "as_published": "-1.53043922E+05",
+          "value": -153043.922
+        },
+        {
+          "as_published": "-7.06668843E+01",
+          "value": -70.6668843
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.23810154E+00",
+          "value": 4.23810154
+        },
+        {
+          "as_published": "4.97999689E-02",
+          "value": 0.0497999689
+        },
+        {
+          "as_published": "-4.01138765E-05",
+          "value": -4.01138765e-05
+        },
+        {
+          "as_published": "9.85389233E-09",
+          "value": 9.85389233e-09
+        },
+        {
+          "as_published": "1.49299155E-12",
+          "value": 1.49299155e-12
+        },
+        {
+          "as_published": "-1.48773721E+05",
+          "value": -148773.721
+        },
+        {
+          "as_published": "8.30639953E+00",
+          "value": 8.30639953
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.45630903E+05",
+    "value": -145630.903,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "697-11-0",
+    "C4F6  PERFLUOROCYCLOBUTENE  SIGMA=2  IA=53.90  IB=64.95  IC=87.73  NU=1799,1418,",
+    "1387,1136,966,684,469.2,286,1182,493,337,174,98,1282,638,187,146,1259,1171,983,",
+    "579,429,238,217  REF=NIELSEN AND EL-SABEN  JCP 23,(1955),324   HF298=-289.4 kcal",
+    "REF=Atkinson & Stedmann J.Chem.Soc (1962),512. MAX LST SQ ERROR @ 1300 K 0.45 %"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 12777,
+    "header_line": 12782,
+    "end_line": 12785
+  },
+  "source_text": {
+    "header_line": "C4F6  CyButene    T 3/10C  4.F  6.   0.   0.G   200.000  6000.000  B 162.03322 1",
+    "coeff_lines": [
+      " 1.94761995E+01 8.60283974E-03-3.33982956E-06 5.66997359E-10-3.51291813E-14    2",
+      "-1.53043922E+05-7.06668843E+01 4.23810154E+00 4.97999689E-02-4.01138765E-05    3",
+      " 9.85389233E-09 1.49299155E-12-1.48773721E+05 8.30639953E+00-1.45630903E+05    4"
+    ]
+  }
+}

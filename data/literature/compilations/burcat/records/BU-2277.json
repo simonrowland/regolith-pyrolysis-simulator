@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2277",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "ClO Cloroxyl rad",
+  "cas_as_published": "14989-30-1",
+  "formula": "ClO",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T04/12",
+  "calc_quality_as_published": "A",
+  "composition": [
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 1.",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "51.45210",
+    "value": 51.4521
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.29004559E+00",
+          "value": 4.29004559
+        },
+        {
+          "as_published": "3.02501396E-04",
+          "value": 0.000302501396
+        },
+        {
+          "as_published": "-8.41631589E-08",
+          "value": -8.41631589e-08
+        },
+        {
+          "as_published": "1.43563929E-11",
+          "value": 1.43563929e-11
+        },
+        {
+          "as_published": "-8.51618756E-16",
+          "value": -8.51618756e-16
+        },
+        {
+          "as_published": "1.08865753E+04",
+          "value": 10886.5753
+        },
+        {
+          "as_published": "3.41741633E+00",
+          "value": 3.41741633
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.10619969E+00",
+          "value": 3.10619969
+        },
+        {
+          "as_published": "5.02117730E-03",
+          "value": 0.0050211773
+        },
+        {
+          "as_published": "-7.54975392E-06",
+          "value": -7.54975392e-06
+        },
+        {
+          "as_published": "5.50561641E-09",
+          "value": 5.50561641e-09
+        },
+        {
+          "as_published": "-1.56135088E-12",
+          "value": -1.56135088e-12
+        },
+        {
+          "as_published": "1.11388983E+04",
+          "value": 11138.8983
+        },
+        {
+          "as_published": "9.16895840E+00",
+          "value": 9.1689584
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.22316288E+04",
+    "value": 12231.6288,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "14989-30-1",
+    "ClO  T0=0  STATWT=2  T0=0  Be=0.62344  De=1.33E-6  WE=854  WEXE=5.5  WEYE=-0.002",
+    "ALFAE=0.0058  T0=318.5     Be=0.62344  De=1.33E-6  WE=854  WEXE=5.5  WEYE=-0.002",
+    "ALFAE=0.0058  T0=31650.    Be=0.445    De=1.33E-6  WE=519  WEXE=7.22 WEYE=-0.011",
+    "ALFAE=0.006   T0=32169.    Be=0.445    De=1.33E-6  WE=519  WEXE=7.22 WEYE=-0.011",
+    "ALFAE=0.006   STATWT=1  REF=Huber & Herzberg  Webbook 2009  HF298=101.669+/-.04",
+    "kJ  REF=ATcT A  {HF298=101.7+/-0.03 kJ  REF=ATcT C 2011;   HF298=101.22+/-2.1",
+    "kJ  REF=JANAF 92; HF298=101.62 kJ  REF=Gurvich 89}  Max Lst Sq Error Cp @ 1200 K",
+    "0.08%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 26185,
+    "header_line": 26194,
+    "end_line": 26197
+  },
+  "source_text": {
+    "header_line": "ClO Cloroxyl rad  T04/12CL 1.O  1.   0.   0.G   200.000  6000.000  A  51.45210 1",
+    "coeff_lines": [
+      " 4.29004559E+00 3.02501396E-04-8.41631589E-08 1.43563929E-11-8.51618756E-16    2",
+      " 1.08865753E+04 3.41741633E+00 3.10619969E+00 5.02117730E-03-7.54975392E-06    3",
+      " 5.50561641E-09-1.56135088E-12 1.11388983E+04 9.16895840E+00 1.22316288E+04    4"
+    ]
+  }
+}

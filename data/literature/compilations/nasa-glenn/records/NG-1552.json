@@ -22,8 +22,10 @@
   "cea_section": "products",
   "formula": "InI2",
   "phase": "condensed",
+  "phase_as_published": "crI",
   "phase_flag": 2,
   "phase_flag_as_published": " 2",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
   "n_intervals_declared": 1,
   "source_ref_code": "tpis96",
   "composition": [
@@ -174,8 +176,15 @@
   ],
   "coefficient_count": 9,
   "interval_count": 1,
-  "ambiguity_count": 0,
-  "ambiguities": [],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "phase_suffix_normalized_to_condensed",
+      "phase_as_published": "crI",
+      "phase_normalized": "condensed",
+      "note": "Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am', 'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged."
+    }
+  ],
   "source_locator": {
     "path": "data/literature/compilations/nasa-glenn/source/thermo.inp",
     "name_line": 12635,

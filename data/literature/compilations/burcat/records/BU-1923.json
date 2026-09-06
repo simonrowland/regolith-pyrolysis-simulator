@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1923",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C9H10 Phenyl-Cyc",
+  "cas_as_published": "837-49-4",
+  "formula": "C9H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 9.",
+      "element": "C",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "118.17570",
+    "value": 118.1757
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.72201524E+01",
+          "value": 17.2201524
+        },
+        {
+          "as_published": "3.31662575E-02",
+          "value": 0.0331662575
+        },
+        {
+          "as_published": "-1.19872130E-05",
+          "value": -1.1987213e-05
+        },
+        {
+          "as_published": "1.94128903E-09",
+          "value": 1.94128903e-09
+        },
+        {
+          "as_published": "-1.16426944E-13",
+          "value": -1.16426944e-13
+        },
+        {
+          "as_published": "9.40273095E+03",
+          "value": 9402.73095
+        },
+        {
+          "as_published": "-6.96977312E+01",
+          "value": -69.6977312
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.30468883E+00",
+          "value": 1.30468883
+        },
+        {
+          "as_published": "3.11643882E-02",
+          "value": 0.0311643882
+        },
+        {
+          "as_published": "1.06389572E-04",
+          "value": 0.000106389572
+        },
+        {
+          "as_published": "-1.73380620E-07",
+          "value": -1.7338062e-07
+        },
+        {
+          "as_published": "7.47460301E-11",
+          "value": 7.47460301e-11
+        },
+        {
+          "as_published": "1.57181867E+04",
+          "value": 15718.1867
+        },
+        {
+          "as_published": "2.27808951E+01",
+          "value": 22.7808951
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.81249406E+04",
+    "value": 18124.9406,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "837-49-4",
+    "C9H10 Phenyl-Cyclopropane C6H5-C3H5  SIGMA=2  STATWT=1  IA=19.7951  IB=76.5517",
+    "IC=89.7008  Ir(cyC3H5)=~5.5  ROSYM=2  V(3)=980. cm-1  Nu=3233,3219,3208,3195,",
+    "3188,3176,3173,3159,3147,3144,1667,1641,1551,1535,1501,1497,1425,1371,1344,1261,",
+    "1219,1215,1210,1193,1139,1117,1082,1076,1067,1057,1016,990,963,939,929,899,855,",
+    "828,806,769,746,712,635,545,540,418,378,341,191,154,(60.9 int rot)  REF=Burcat",
+    "B3LYP/6-31G(d)  HF298=150.7+/-1. kJ  REF=Fuchs Hallman Perlman Can J Chem 60,",
+    "(1982),1832  {HF298=150.4+/-08 kJ  REF=Kozina et al Dokl Acad Nauk SSSR 138,",
+    "(1961),843}  Max Lst Sq Error Cp @ 200 K ***1.05%***  @ 6000 K 0.58%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 21681,
+    "header_line": 21690,
+    "end_line": 21693
+  },
+  "source_text": {
+    "header_line": "C9H10 Phenyl-Cyc  T12/14C  9.H 10.   0.   0.G   200.000  6000.000  B 118.17570 1",
+    "coeff_lines": [
+      " 1.72201524E+01 3.31662575E-02-1.19872130E-05 1.94128903E-09-1.16426944E-13    2",
+      " 9.40273095E+03-6.96977312E+01 1.30468883E+00 3.11643882E-02 1.06389572E-04    3",
+      "-1.73380620E-07 7.47460301E-11 1.57181867E+04 2.27808951E+01 1.81249406E+04    4"
+    ]
+  }
+}

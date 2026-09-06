@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2534",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "HO2-",
+  "cas_as_published": "14691-59-9",
+  "formula": "HO2E",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 1.",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "33.00729",
+    "value": 33.00729
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.53529420E+00",
+          "value": 4.5352942
+        },
+        {
+          "as_published": "1.83607312E-03",
+          "value": 0.00183607312
+        },
+        {
+          "as_published": "-5.79594657E-07",
+          "value": -5.79594657e-07
+        },
+        {
+          "as_published": "8.51740254E-11",
+          "value": 8.51740254e-11
+        },
+        {
+          "as_published": "-4.75699028E-15",
+          "value": -4.75699028e-15
+        },
+        {
+          "as_published": "-1.32514473E+04",
+          "value": -13251.4473
+        },
+        {
+          "as_published": "7.06885661E-01",
+          "value": 0.706885661
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.60645624E+00",
+          "value": 2.60645624
+        },
+        {
+          "as_published": "9.25165669E-03",
+          "value": 0.00925165669
+        },
+        {
+          "as_published": "-1.11732930E-05",
+          "value": -1.1173293e-05
+        },
+        {
+          "as_published": "6.67131138E-09",
+          "value": 6.67131138e-09
+        },
+        {
+          "as_published": "-1.48394160E-12",
+          "value": -1.4839416e-12
+        },
+        {
+          "as_published": "-1.28498658E+04",
+          "value": -12849.8658
+        },
+        {
+          "as_published": "1.00865089E+01",
+          "value": 10.0865089
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.17477759E+04",
+    "value": -11747.7759,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "14691-59-9",
+    "HO2- anion  SIGMA=1  STATWT=1  A0=0.861  B0=0.825  C0=19.826  Nu=3747,1053,746",
+    "REF=B3LYP/CBSB7(5d,7f) NASA Vib scaled 0.99  HF298=-97.677+/-0.434 kJ Thermal",
+    "REF=ATcT A 2005  {HF298=-97.72+/-0.38 kJ thermal electron  REF=ATcT B;  ",
+    "HF298=-97.923 kJ  REF=B. McBride NASA 2002;  HF298=-95.37 kJ  REF=Burcat G3B3 ",
+    "calc}  Max Lst Sq  Error Cp @ 6000 K 0.12%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 28372,
+    "header_line": 28378,
+    "end_line": 28381
+  },
+  "source_text": {
+    "header_line": "HO2-              T 1/09H  1.O  2.E  1.   0.G   298.150  6000.000  B  33.00729 1",
+    "coeff_lines": [
+      " 4.53529420E+00 1.83607312E-03-5.79594657E-07 8.51740254E-11-4.75699028E-15    2",
+      "-1.32514473E+04 7.06885661E-01 2.60645624E+00 9.25165669E-03-1.11732930E-05    3",
+      " 6.67131138E-09-1.48394160E-12-1.28498658E+04 1.00865089E+01-1.17477759E+04    4"
+    ]
+  }
+}

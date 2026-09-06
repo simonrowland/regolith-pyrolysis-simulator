@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3330",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Si5H9- cy anion",
+  "cas_as_published": "286950-29-6",
+  "formula": "Si5H9E",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/17",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SI",
+      "count_as_published": " 5.",
+      "element": "Si",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "149.49951",
+    "value": 149.49951
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.22442285E+01",
+          "value": 22.2442285
+        },
+        {
+          "as_published": "1.70620343E-02",
+          "value": 0.0170620343
+        },
+        {
+          "as_published": "-6.43191200E-06",
+          "value": -6.431912e-06
+        },
+        {
+          "as_published": "1.07158183E-09",
+          "value": 1.07158183e-09
+        },
+        {
+          "as_published": "-6.55499684E-14",
+          "value": -6.55499684e-14
+        },
+        {
+          "as_published": "9.12587702E+02",
+          "value": 912.587702
+        },
+        {
+          "as_published": "-8.55162781E+01",
+          "value": -85.5162781
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-3.24344600E-01",
+          "value": -0.3243446
+        },
+        {
+          "as_published": "1.04624055E-01",
+          "value": 0.104624055
+        },
+        {
+          "as_published": "-1.50995914E-04",
+          "value": -0.000150995914
+        },
+        {
+          "as_published": "1.17244625E-07",
+          "value": 1.17244625e-07
+        },
+        {
+          "as_published": "-3.66680385E-11",
+          "value": -3.66680385e-11
+        },
+        {
+          "as_published": "6.16538805E+03",
+          "value": 6165.38805
+        },
+        {
+          "as_published": "2.55281566E+01",
+          "value": 25.5281566
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "9.59924277E+03",
+    "value": 9599.24277,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "286950-29-6",
+    "Si5H9-  CycloPentaSilane radical anion  SIGMA=2  STATWT=1  IA=51.0708",
+    "IB=59.48042  IC=102.1617  Nu=2152,2140,2131,2115(2),2108.5(2),2104.5,1967,956,",
+    "937.6(2),931.5786,774,735,699.6,678,654,639,619.5,574,498,439,416,397,388,363,",
+    "360,342.5,338,317,181,76.6,28.39  HF298=79.813+/-8 kJ  thermal electron",
+    "REF=Burcat G3B3  Max Lst Sq Error Cp @ 1300 K 0.53%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 35332,
+    "header_line": 35338,
+    "end_line": 35341
+  },
+  "source_text": {
+    "header_line": "Si5H9- cy anion   T 1/17SI 5.H  9.E  1.   0.G   298.150  6000.000  B 149.49951 1",
+    "coeff_lines": [
+      " 2.22442285E+01 1.70620343E-02-6.43191200E-06 1.07158183E-09-6.55499684E-14    2",
+      " 9.12587702E+02-8.55162781E+01-3.24344600E-01 1.04624055E-01-1.50995914E-04    3",
+      " 1.17244625E-07-3.66680385E-11 6.16538805E+03 2.55281566E+01 9.59924277E+03    4"
+    ]
+  }
+}

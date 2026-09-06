@@ -1,0 +1,181 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2228",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C32H13 OVALENYL",
+  "cas_as_published": "N/A",
+  "formula": "C32H13",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/07",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "32.",
+      "element": "C",
+      "count": 32.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "13.",
+      "element": "H",
+      "count": 13.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "397.44562",
+    "value": 397.44562
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.50810510E+01",
+          "value": 55.081051
+        },
+        {
+          "as_published": "7.25844873E-02",
+          "value": 0.0725844873
+        },
+        {
+          "as_published": "-2.68833630E-05",
+          "value": -2.6883363e-05
+        },
+        {
+          "as_published": "4.43083640E-09",
+          "value": 4.4308364e-09
+        },
+        {
+          "as_published": "-2.69142685E-13",
+          "value": -2.69142685e-13
+        },
+        {
+          "as_published": "5.35889526E+04",
+          "value": 53588.9526
+        },
+        {
+          "as_published": "-2.82732205E+02",
+          "value": -282.732205
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-9.14251709E+00",
+          "value": -9.14251709
+        },
+        {
+          "as_published": "1.78116819E-01",
+          "value": 0.178116819
+        },
+        {
+          "as_published": "4.87161878E-05",
+          "value": 4.87161878e-05
+        },
+        {
+          "as_published": "-2.22438290E-07",
+          "value": -2.2243829e-07
+        },
+        {
+          "as_published": "1.09691670E-10",
+          "value": 1.0969167e-10
+        },
+        {
+          "as_published": "7.45716239E+04",
+          "value": 74571.6239
+        },
+        {
+          "as_published": "6.57092183E+01",
+          "value": 65.7092183
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "7.98051310E+04",
+    "value": 79805.131,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A",
+    "C32H13 14-Ovalenyl  SIGMA=2  STATWT=2  IA=350.6026  IB=567.2969  IC=917.8637",
+    "Nu=3210,3197.5(3),3195,3186,3184,3180(2),3178(4),1678,1668,1665,1652,1645.5(2),",
+    "1632,1598,1572,1558,1539(2),1524,1508,1495,1480,1475,1464,1457,1454,1434,1426,",
+    "1422,1416,1411,1397,1382,1352,1345,1334,1313,1300,1285,1270,1256,1250,1244,",
+    "1227,1209,1201,1192,1182,1173,1166,1132,1092,1084,1067,995,977,972(2),958,953,",
+    "923,918,903,900.5(2),878,866,854,842,824,810,795.5(2),792,786,775(2),764,745,",
+    "717,713(2),685,665(2),646,644,636,614,588,585.5(2),574,558,545,541,525,501,497,",
+    "479(2),457,431,428,423,400,356,348(2),331,324,318,280,277,258,217,204,158,128,",
+    "111,64.73,62.14  REF=Burcat B3LYP/6-31G(d)  HF298=663.54+/-20 kJ  REF=THERM",
+    "from Ovalene data -466.5 kJ BDE  Max Lst Sq Error Cp @ 1300 K 0.62%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 25734,
+    "header_line": 25745,
+    "end_line": 25748
+  },
+  "source_text": {
+    "header_line": "C32H13 OVALENYL   T12/07C 32.H 13.   0.   0.G   200.000  6000.000  B 397.44562 1",
+    "coeff_lines": [
+      " 5.50810510E+01 7.25844873E-02-2.68833630E-05 4.43083640E-09-2.69142685E-13    2",
+      " 5.35889526E+04-2.82732205E+02-9.14251709E+00 1.78116819E-01 4.87161878E-05    3",
+      "-2.22438290E-07 1.09691670E-10 7.45716239E+04 6.57092183E+01 7.98051310E+04    4"
+    ]
+  }
+}

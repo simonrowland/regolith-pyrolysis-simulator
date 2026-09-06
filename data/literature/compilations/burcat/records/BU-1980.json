@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1980",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "JP-10 RADICAL ca",
+  "cas_as_published": "1245563-30-7",
+  "formula": "C10H15",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "S 4/01",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "10.",
+      "element": "C",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "15.",
+      "element": "H",
+      "count": 15.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "135.22910",
+    "value": 135.2291
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.71750303E+01",
+          "value": 17.1750303
+        },
+        {
+          "as_published": "5.00688372E-02",
+          "value": 0.0500688372
+        },
+        {
+          "as_published": "-1.80894713E-05",
+          "value": -1.80894713e-05
+        },
+        {
+          "as_published": "2.93199618E-09",
+          "value": 2.93199618e-09
+        },
+        {
+          "as_published": "-1.76025519E-13",
+          "value": -1.76025519e-13
+        },
+        {
+          "as_published": "1.10344712E+03",
+          "value": 1103.44712
+        },
+        {
+          "as_published": "-7.67084714E+01",
+          "value": -76.7084714
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.09401552E+00",
+          "value": 4.09401552
+        },
+        {
+          "as_published": "-1.32979467E-02",
+          "value": -0.0132979467
+        },
+        {
+          "as_published": "2.82520168E-04",
+          "value": 0.000282520168
+        },
+        {
+          "as_published": "-3.69512358E-07",
+          "value": -3.69512358e-07
+        },
+        {
+          "as_published": "1.48106488E-10",
+          "value": 1.48106488e-10
+        },
+        {
+          "as_published": "9.11922658E+03",
+          "value": 9119.22658
+        },
+        {
+          "as_published": "1.37914313E+01",
+          "value": 13.7914313
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.15845509E+04",
+    "value": 11584.5509,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1245563-30-7",
+    "C10H15 JP-10 RADICAL ON SIDE TERTIARI CARBON  STATWT=2  SIGMA=1  IA=31.92075",
+    "IB=72.2657    IC=79.747  NU=165.4,192.8,247,319,400,493,554,570,617,668,756,",
+    "796,841,863,924,957,973,988,996,1005,1017,1045,1052,1077,1106,1121,1140,1149,",
+    "1150,1152,1159,1172,1187,1202,1227,1247,1264,1265,1283,1291,1318,1337,1350,1358,",
+    "1406,1411,1419,1423,1429,1437,1458,1471,1496,1533,2951,2968,3048,3061,3064,3077,",
+    "3081,3103,3124,3130,3131,3132,3140,3162,3169  REF=AM1 calc HF298=23.021 kcal",
+    "REF=Dissoc React=95.87 kcal Max Lst Sq Error Cp @ 200 K ***1.68%***"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 22397,
+    "header_line": 22405,
+    "end_line": 22408
+  },
+  "source_text": {
+    "header_line": "JP-10 RADICAL ca  S 4/01C 10.H 15.   0.   0.G   200.000  6000.000  B 135.22910 1",
+    "coeff_lines": [
+      " 1.71750303E+01 5.00688372E-02-1.80894713E-05 2.93199618E-09-1.76025519E-13    2",
+      " 1.10344712E+03-7.67084714E+01 4.09401552E+00-1.32979467E-02 2.82520168E-04    3",
+      "-3.69512358E-07 1.48106488E-10 9.11922658E+03 1.37914313E+01 1.15845509E+04    4"
+    ]
+  }
+}

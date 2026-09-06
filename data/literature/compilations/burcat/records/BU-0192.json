@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0192",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CBR3CL  TriBromo",
+  "cas_as_published": "594-15-0",
+  "formula": "CBr3Cl",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T07/11",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "BR",
+      "count_as_published": " 3.",
+      "element": "Br",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 1.",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "287.17540",
+    "value": 287.1754
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.20556145E+01",
+          "value": 12.0556145
+        },
+        {
+          "as_published": "9.88123508E-04",
+          "value": 0.000988123508
+        },
+        {
+          "as_published": "-3.91913458E-07",
+          "value": -3.91913458e-07
+        },
+        {
+          "as_published": "6.74560817E-11",
+          "value": 6.74560817e-11
+        },
+        {
+          "as_published": "-4.21876873E-15",
+          "value": -4.21876873e-15
+        },
+        {
+          "as_published": "2.50679458E+03",
+          "value": 2506.79458
+        },
+        {
+          "as_published": "-2.65548046E+01",
+          "value": -26.5548046
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.24224713E+00",
+          "value": 4.24224713
+        },
+        {
+          "as_published": "3.84130925E-02",
+          "value": 0.0384130925
+        },
+        {
+          "as_published": "-7.18290877E-05",
+          "value": -7.18290877e-05
+        },
+        {
+          "as_published": "6.26374080E-08",
+          "value": 6.2637408e-08
+        },
+        {
+          "as_published": "-2.07485981E-11",
+          "value": -2.07485981e-11
+        },
+        {
+          "as_published": "3.92645675E+03",
+          "value": 3926.45675
+        },
+        {
+          "as_published": "1.00410875E+01",
+          "value": 10.0410875
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "6.37800664E+03",
+    "value": 6378.00664,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "594-15-0",
+    "CBr3Cl  TriBromoChloro Methan  SIGMA=3  STATWT=1  IA=97.3442  IB=97.3824",
+    "IC=133.6160  Nu=742,645.5,643.5,327,215.5(2),210,145(2)  REF=Burcat G3B3",
+    "HF298=53.03+/-1.5 kJ  REF=ATcT C 2011  {HF298=65.+/-15 kJ  REF=Gurvich 91}   Max",
+    "Lst Sq Error Cp @ 700  & 1200 K 0.17"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 1896,
+    "header_line": 1901,
+    "end_line": 1904
+  },
+  "source_text": {
+    "header_line": "CBR3CL  TriBromo  T07/11C  1.BR 3.CL 1.   0.G   200.000  6000.000  B 287.17540 1",
+    "coeff_lines": [
+      " 1.20556145E+01 9.88123508E-04-3.91913458E-07 6.74560817E-11-4.21876873E-15    2",
+      " 2.50679458E+03-2.65548046E+01 4.24224713E+00 3.84130925E-02-7.18290877E-05    3",
+      " 6.26374080E-08-2.07485981E-11 3.92645675E+03 1.00410875E+01 6.37800664E+03    4"
+    ]
+  }
+}

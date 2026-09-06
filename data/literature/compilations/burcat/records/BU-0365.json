@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0365",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "H2CNO H2C*N=O",
+  "cas_as_published": "2683-96-7?",
+  "formula": "H2CNO",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 9/96",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  2",
+      "element": "H",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  1",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": "  1",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  1",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "44.03302",
+    "value": 44.03302
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "0.54028152E+01",
+          "value": 5.4028152
+        },
+        {
+          "as_published": "0.69057001E-02",
+          "value": 0.0069057001
+        },
+        {
+          "as_published": "-0.25162977E-05",
+          "value": -2.5162977e-06
+        },
+        {
+          "as_published": "0.41014066E-09",
+          "value": 4.1014066e-10
+        },
+        {
+          "as_published": "-0.24718300E-13",
+          "value": -2.47183e-14
+        },
+        {
+          "as_published": "0.24528690E+05",
+          "value": 24528.69
+        },
+        {
+          "as_published": "-0.44574262E+01",
+          "value": -4.4574262
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "0.38781858E+01",
+          "value": 3.8781858
+        },
+        {
+          "as_published": "-0.66530886E-02",
+          "value": -0.0066530886
+        },
+        {
+          "as_published": "0.53947610E-04",
+          "value": 5.394761e-05
+        },
+        {
+          "as_published": "-0.68176813E-07",
+          "value": -6.8176813e-08
+        },
+        {
+          "as_published": "0.27181746E-10",
+          "value": 2.7181746e-11
+        },
+        {
+          "as_published": "0.25716857E+05",
+          "value": 25716.857
+        },
+        {
+          "as_published": "0.74618774E+01",
+          "value": 7.4618774
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "0.26932156E+05",
+    "value": 26932.156,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "2683-96-7?",
+    "CH2NO H2C*N=O RADICAL The G3B3 calculations show that this conformation is in",
+    "resonance with the former conformation H2C*N=O <=> H2C=M-O* therefore the former",
+    "polynomial should be used here. The present polynomial comes from the data of",
+    "C. Melius BAC/MP4 calculations of 1987.  STATWT=2  SIGMA=2  IA=2.596  IB=3.041",
+    "IC=5.0754   NU=3040,2952,1505,1304,1188,1111,983,897,846   HF298=53.52+/-2 kcal",
+    "REF=C. MELIUS DATABASE BAC/MP4 D93X  Max Lst Sq Error Cp @ 200 K 0.82%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 3642,
+    "header_line": 3649,
+    "end_line": 3652
+  },
+  "source_text": {
+    "header_line": "H2CNO H2C*N=O     T 9/96H   2C   1N   1O   1G   200.000  6000.000  C  44.03302 1",
+    "coeff_lines": [
+      " 0.54028152E+01 0.69057001E-02-0.25162977E-05 0.41014066E-09-0.24718300E-13    2",
+      " 0.24528690E+05-0.44574262E+01 0.38781858E+01-0.66530886E-02 0.53947610E-04    3",
+      "-0.68176813E-07 0.27181746E-10 0.25716857E+05 0.74618774E+01 0.26932156E+05    4"
+    ]
+  }
+}

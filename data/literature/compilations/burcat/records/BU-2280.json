@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2280",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "ClO2   OCLO   HF",
+  "cas_as_published": "10049-04-4",
+  "formula": "ClO2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T03/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 1.",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "67.45150",
+    "value": 67.4515
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.85461529E+00",
+          "value": 5.85461529
+        },
+        {
+          "as_published": "1.17335288E-03",
+          "value": 0.00117335288
+        },
+        {
+          "as_published": "-4.59511860E-07",
+          "value": -4.5951186e-07
+        },
+        {
+          "as_published": "7.84402168E-11",
+          "value": 7.84402168e-11
+        },
+        {
+          "as_published": "-4.87788804E-15",
+          "value": -4.87788804e-15
+        },
+        {
+          "as_published": "9.89135616E+03",
+          "value": 9891.35616
+        },
+        {
+          "as_published": "-3.23627349E+00",
+          "value": -3.23627349
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.26911630E+00",
+          "value": 3.2691163
+        },
+        {
+          "as_published": "6.37173558E-03",
+          "value": 0.00637173558
+        },
+        {
+          "as_published": "4.93743200E-07",
+          "value": 4.937432e-07
+        },
+        {
+          "as_published": "-7.70110927E-09",
+          "value": -7.70110927e-09
+        },
+        {
+          "as_published": "4.20853283E-12",
+          "value": 4.20853283e-12
+        },
+        {
+          "as_published": "1.06621173E+04",
+          "value": 10662.1173
+        },
+        {
+          "as_published": "1.04885411E+01",
+          "value": 10.4885411
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.19111385E+04",
+    "value": 11911.1385,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "10049-04-4",
+    "ClO2  Chlorine dioxide  O=Cl-O*  SIGMA=2  STATWT=2   IA=1.6006  IB=9.1485",
+    "IC=10.8095  REF=G3B3   NU=1107,948,451  REF=Jacox Webbook  HF298=23.67+/-0.16",
+    "kcal  REF=Karton Martin JPC A 113,(2009),4802 W4 {HF298=104.6+/-6.3 kJ REF=JANAF",
+    "92  HF298=27.437 kcal REF=Burcat G3B3; HF298=97.0 kJ exp?? from Webbook}  Max",
+    "Lst Sq Error Cp @ 400 K 0.24%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 26217,
+    "header_line": 26223,
+    "end_line": 26226
+  },
+  "source_text": {
+    "header_line": "ClO2   OCLO   HF  T03/09CL 1.O  2.   0.   0.G   200.000  6000.000  B  67.45150 1",
+    "coeff_lines": [
+      " 5.85461529E+00 1.17335288E-03-4.59511860E-07 7.84402168E-11-4.87788804E-15    2",
+      " 9.89135616E+03-3.23627349E+00 3.26911630E+00 6.37173558E-03 4.93743200E-07    3",
+      "-7.70110927E-09 4.20853283E-12 1.06621173E+04 1.04885411E+01 1.19111385E+04    4"
+    ]
+  }
+}

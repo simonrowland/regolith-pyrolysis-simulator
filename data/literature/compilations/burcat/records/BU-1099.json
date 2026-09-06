@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1099",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3H6O2 C2H5COOH",
+  "cas_as_published": "79-09-4",
+  "formula": "C3H6O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/07",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "74.07854",
+    "value": 74.07854
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "8.61036813E+00",
+          "value": 8.61036813
+        },
+        {
+          "as_published": "1.87894582E-02",
+          "value": 0.0187894582
+        },
+        {
+          "as_published": "-6.70711294E-06",
+          "value": -6.70711294e-06
+        },
+        {
+          "as_published": "1.07428300E-09",
+          "value": 1.074283e-09
+        },
+        {
+          "as_published": "-6.38870386E-14",
+          "value": -6.38870386e-14
+        },
+        {
+          "as_published": "-5.84807549E+04",
+          "value": -58480.7549
+        },
+        {
+          "as_published": "-1.63110488E+01",
+          "value": -16.3110488
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "5.51515351E+00",
+          "value": 5.51515351
+        },
+        {
+          "as_published": "-1.02654246E-05",
+          "value": -1.02654246e-05
+        },
+        {
+          "as_published": "7.54897239E-05",
+          "value": 7.54897239e-05
+        },
+        {
+          "as_published": "-9.81744541E-08",
+          "value": -9.81744541e-08
+        },
+        {
+          "as_published": "3.88829515E-11",
+          "value": 3.88829515e-11
+        },
+        {
+          "as_published": "-5.63618075E+04",
+          "value": -56361.8075
+        },
+        {
+          "as_published": "6.11744431E+00",
+          "value": 6.11744431
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-5.42266279E+04",
+    "value": -54226.6279,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "79-09-4",
+    "C3H6O2 Propanoic acid  C2H5COOH  SIGMA=1  STATWT=1  IA=9.4471  IB=21.5963",
+    "IC=27.4313 Ir(CH3)=0.51739  ROSYM=3  V(3)=272. cm-1  Ir(C2H5)=3.2989  ROSYM=1",
+    "V(3)=272 cm-1  Nu=3687,3150,3131,3126,3962(2),1851,1538,1529,1505,1442,1389,",
+    "1353,1294,1221,11091073,1000,827,813,731,624,561,437,250  HF298=-450.868 kJ",
+    "REF=Burcat G3B3 calc  HF298(liq)=-510.8+/-0.1 kJ  REF=Lebedeva RJPC 38,(1964),",
+    "1435  Max Lst Sq Error Cp @ 6000 K  0.55%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 11572,
+    "header_line": 11579,
+    "end_line": 11582
+  },
+  "source_text": {
+    "header_line": "C3H6O2 C2H5COOH   T11/07C  3.H  6.O  2.   0.G   200.000  6000.000  B  74.07854 1",
+    "coeff_lines": [
+      " 8.61036813E+00 1.87894582E-02-6.70711294E-06 1.07428300E-09-6.38870386E-14    2",
+      "-5.84807549E+04-1.63110488E+01 5.51515351E+00-1.02654246E-05 7.54897239E-05    3",
+      "-9.81744541E-08 3.88829515E-11-5.63618075E+04 6.11744431E+00-5.42266279E+04    4"
+    ]
+  }
+}

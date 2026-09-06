@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3212",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Sb(OH)3",
+  "cas_as_published": "13453-11-7",
+  "formula": "SbO3H3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T04/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SB",
+      "count_as_published": " 1.",
+      "element": "Sb",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 3.",
+      "element": "H",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "172.78202",
+    "value": 172.78202
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.25100388E+01",
+          "value": 12.5100388
+        },
+        {
+          "as_published": "3.31649932E-03",
+          "value": 0.00331649932
+        },
+        {
+          "as_published": "-9.35893962E-07",
+          "value": -9.35893962e-07
+        },
+        {
+          "as_published": "1.24008102E-10",
+          "value": 1.24008102e-10
+        },
+        {
+          "as_published": "-6.31276333E-15",
+          "value": -6.31276333e-15
+        },
+        {
+          "as_published": "-8.07781072E+04",
+          "value": -80778.1072
+        },
+        {
+          "as_published": "-3.24561052E+01",
+          "value": -32.4561052
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-3.21316932E-01",
+          "value": -0.321316932
+        },
+        {
+          "as_published": "7.09480588E-02",
+          "value": 0.0709480588
+        },
+        {
+          "as_published": "-1.33072410E-04",
+          "value": -0.00013307241
+        },
+        {
+          "as_published": "1.14056473E-07",
+          "value": 1.14056473e-07
+        },
+        {
+          "as_published": "-3.66024658E-11",
+          "value": -3.66024658e-11
+        },
+        {
+          "as_published": "-7.88809116E+04",
+          "value": -78880.9116
+        },
+        {
+          "as_published": "2.57880083E+01",
+          "value": 25.7880083
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-7.67908632E+04",
+    "value": -76790.8632,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "13453-11-7",
+    "Sb(OH)3 Antymonium TriHydroxide SIGMA=3  STATWT=1  IA=18.7645  IB=18.7667",
+    "IC=23.5008  [Ir(OH)=0.1176  ROSYM=2]x3  [V(3)=853.4 cm-1]x2 V(3)=1473. cm-1",
+    "Nu=3655(3),853,823.5(2),614.6,585(2),230,154(2)  HF298=-152.6+/-1.07 kcal",
+    "REF=Skulan, Nielsen, Melius, Allendorf MP4  JPC A 110,(2006),5919  Max Lst Sq",
+    "Error Cp @ 900 K 0.15%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 34149,
+    "header_line": 34155,
+    "end_line": 34158
+  },
+  "source_text": {
+    "header_line": "Sb(OH)3           T04/09SB 1.O  3.H  3.   0.G   200.000  6000.000  B 172.78202 1",
+    "coeff_lines": [
+      " 1.25100388E+01 3.31649932E-03-9.35893962E-07 1.24008102E-10-6.31276333E-15    2",
+      "-8.07781072E+04-3.24561052E+01-3.21316932E-01 7.09480588E-02-1.33072410E-04    3",
+      " 1.14056473E-07-3.66024658E-11-7.88809116E+04 2.57880083E+01-7.67908632E+04    4"
+    ]
+  }
+}

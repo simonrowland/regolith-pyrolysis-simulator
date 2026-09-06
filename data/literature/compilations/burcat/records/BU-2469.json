@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2469",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Fe3O4(S) Solid-A",
+  "cas_as_published": "1309-38-2",
+  "formula": "Fe3O4",
+  "phase": "cr",
+  "phase_as_published": "S",
+  "phase_card_as_published": "S",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "B  /89",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "FE",
+      "count_as_published": " 3.",
+      "element": "Fe",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 4.",
+      "element": "O",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "231.53260",
+    "value": 231.5326
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "850.000",
+    "value": 850.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        },
+        {
+          "as_published": "0.00000000E+00",
+          "value": 0.0
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.84450959E+00",
+          "value": 4.84450959
+        },
+        {
+          "as_published": "4.39051578E-02",
+          "value": 0.0439051578
+        },
+        {
+          "as_published": "5.24676763E-05",
+          "value": 5.24676763e-05
+        },
+        {
+          "as_published": "-2.20801809E-07",
+          "value": -2.20801809e-07
+        },
+        {
+          "as_published": "1.74856371E-10",
+          "value": 1.74856371e-10
+        },
+        {
+          "as_published": "-1.38015344E+05",
+          "value": -138015.344
+        },
+        {
+          "as_published": "-2.38418082E+01",
+          "value": -23.8418082
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.34509791E+05",
+    "value": -134509.791,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1309-38-2",
+    "Fe3O4  MAGNETITE  HF298(s)=-1118.383 kJ  Data from I Barin database 1989 to 850",
+    "K and from Pankratz Bur Mines Bul 672,(1983),160 and Westrum et al JCT 1,(1969),",
+    "543  Max Lst Sq Error Cp @ 1800 K 0.09%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 27798,
+    "header_line": 27802,
+    "end_line": 27805
+  },
+  "source_text": {
+    "header_line": "Fe3O4(S) Solid-A  B  /89FE 3.O  4.   0.   0.S   298.150   850.000  C 231.53260 1",
+    "coeff_lines": [
+      " 0.00000000E+00 0.00000000E+00 0.00000000E+00 0.00000000E+00 0.00000000E+00    2",
+      " 0.00000000E+00 0.00000000E+00 4.84450959E+00 4.39051578E-02 5.24676763E-05    3",
+      "-2.20801809E-07 1.74856371E-10-1.38015344E+05-2.38418082E+01-1.34509791E+05    4"
+    ]
+  }
+}

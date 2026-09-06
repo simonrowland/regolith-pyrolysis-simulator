@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1342",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H9O+ Tetrahydr",
+  "cas_as_published": "N/A",
+  "formula": "C4H9OE-1",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": "-1.",
+      "element": "E",
+      "count": -1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "73.11311",
+    "value": 73.11311
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.27420638E+00",
+          "value": 9.27420638
+        },
+        {
+          "as_published": "2.68100376E-02",
+          "value": 0.0268100376
+        },
+        {
+          "as_published": "-9.51325112E-06",
+          "value": -9.51325112e-06
+        },
+        {
+          "as_published": "1.52337781E-09",
+          "value": 1.52337781e-09
+        },
+        {
+          "as_published": "-9.06884102E-14",
+          "value": -9.06884102e-14
+        },
+        {
+          "as_published": "5.83840237E+04",
+          "value": 58384.0237
+        },
+        {
+          "as_published": "-2.82047764E+01",
+          "value": -28.2047764
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-2.08366085E+00",
+          "value": -2.08366085
+        },
+        {
+          "as_published": "4.20226784E-02",
+          "value": 0.0420226784
+        },
+        {
+          "as_published": "1.12339571E-05",
+          "value": 1.12339571e-05
+        },
+        {
+          "as_published": "-4.29010524E-08",
+          "value": -4.29010524e-08
+        },
+        {
+          "as_published": "1.97317600E-11",
+          "value": 1.973176e-11
+        },
+        {
+          "as_published": "6.23614523E+04",
+          "value": 62361.4523
+        },
+        {
+          "as_published": "3.45188773E+01",
+          "value": 34.5188773
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "6.36317714E+04",
+    "value": 63631.7714,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A",
+    "C4H9O+ Tetrahydrofuran protonated (Oxonium) cation  SIGMA=2  STATWT=1 IA=12.6482",
+    "IB=12.8351  IC=22.4090  Nu=3676,3216,3213,3158,3150,3140,3127,3102,3096,1543,",
+    "1526,1517,1512,1413,1398,1384,1346,1333,1274,1243,1209,1194,1138,1058,989,953,",
+    "917,901,845,781,738,683,559,521,262,125  HF298=529.067+/-8. kJ  REF=Burcat G3B3",
+    "Thermmal Electron {HF298=520. kJ (thermal Electron)  REF=Lias et al JPCRD 17,",
+    "(1988), soupl 1.(GIANT table)}"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 14517,
+    "header_line": 14524,
+    "end_line": 14527
+  },
+  "source_text": {
+    "header_line": "C4H9O+ Tetrahydr  T12/14C  4.H  9.O  1.E -1.G   298.150  6000.000  B  73.11311 1",
+    "coeff_lines": [
+      " 9.27420638E+00 2.68100376E-02-9.51325112E-06 1.52337781E-09-9.06884102E-14    2",
+      " 5.83840237E+04-2.82047764E+01-2.08366085E+00 4.20226784E-02 1.12339571E-05    3",
+      "-4.29010524E-08 1.97317600E-11 6.23614523E+04 3.45188773E+01 6.36317714E+04    4"
+    ]
+  }
+}

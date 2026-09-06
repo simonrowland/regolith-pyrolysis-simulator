@@ -1,0 +1,186 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1743",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H14O3 DEGDMEther",
+  "cas_as_published": "111-96-6",
+  "formula": "C6H14O3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/15",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "14.",
+      "element": "H",
+      "count": 14.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "134.17356",
+    "value": 134.17356
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.67935649E+01",
+          "value": 16.7935649
+        },
+        {
+          "as_published": "4.29669228E-02",
+          "value": 0.0429669228
+        },
+        {
+          "as_published": "-1.54358549E-05",
+          "value": -1.54358549e-05
+        },
+        {
+          "as_published": "2.48746245E-09",
+          "value": 2.48746245e-09
+        },
+        {
+          "as_published": "-1.48727147E-13",
+          "value": -1.48727147e-13
+        },
+        {
+          "as_published": "-7.14571950E+04",
+          "value": -71457.195
+        },
+        {
+          "as_published": "-5.80089693E+01",
+          "value": -58.0089693
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.25144766E+01",
+          "value": 12.5144766
+        },
+        {
+          "as_published": "-3.80564527E-03",
+          "value": -0.00380564527
+        },
+        {
+          "as_published": "1.57426499E-04",
+          "value": 0.000157426499
+        },
+        {
+          "as_published": "-1.92428184E-07",
+          "value": -1.92428184e-07
+        },
+        {
+          "as_published": "7.29562220E-11",
+          "value": 7.2956222e-11
+        },
+        {
+          "as_published": "-6.73046855E+04",
+          "value": -67304.6855
+        },
+        {
+          "as_published": "-2.14130387E+01",
+          "value": -21.4130387
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-6.26976214E+04",
+    "value": -62697.6214,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "111-96-6",
+    "C6H14O3 DiEthyleneGlycol-DiMethyl-Ether CH3O-(CH2)2-O-(CH2)2-OCH3  SIGMA=2",
+    "STATWT=1  IA=7.4864  IB=214.9409  IC=219.2491  [Ir(CH3)=0.51387  ROSYM=3",
+    "V(3)=640. cm-1]x2  [Ir(CH3O)=2.082  ROSYM=1  V(3)=900. cm-1]x2  Nu=108,140,143,",
+    "178,234(2),268.5,314,436,501,533,836.5,846,978,1001,1047,1071,1123,1157.5,",
+    "1169(2),180,1183,1189,1200,1232,1235,1238,1247,1298.8(2),1349,1382,1445,1473,",
+    "1492,1495,1498.2(2),1518.5(2),1531,1546.5,1550,1555,2974(2),2982,2987(2),2994,",
+    "3005.7(2),3027.6(2),3033.2(2),3129(2),[33.38,55.76,67.86,87.79 int rot]",
+    "REF=Burcat B3LYP/6-31G(d)  HF298=-521.3 kJ  REF=Stewart J Mol Model 10(1),",
+    "(2004),6-10  Max Lst Sq Error Cp @ 1300 K 0.63%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C6H14O3 DEGDMEther",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 19460,
+    "header_line": 19470,
+    "end_line": 19473
+  },
+  "source_text": {
+    "header_line": "C6H14O3 DEGDMEtherT10/15C  6.H 14.O  3.   0.G   200.000  6000.000  B 134.17356 1",
+    "coeff_lines": [
+      " 1.67935649E+01 4.29669228E-02-1.54358549E-05 2.48746245E-09-1.48727147E-13    2",
+      "-7.14571950E+04-5.80089693E+01 1.25144766E+01-3.80564527E-03 1.57426499E-04    3",
+      "-1.92428184E-07 7.29562220E-11-6.73046855E+04-2.14130387E+01-6.26976214E+04    4"
+    ]
+  }
+}

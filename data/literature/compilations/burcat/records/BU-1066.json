@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1066",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3H5N  Propionit",
+  "cas_as_published": "107-12-0",
+  "formula": "C3H5N",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "A 1/05",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 5.",
+      "element": "H",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "55.07854",
+    "value": 55.07854
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "7.04418234E+00",
+          "value": 7.04418234
+        },
+        {
+          "as_published": "1.53008159E-02",
+          "value": 0.0153008159
+        },
+        {
+          "as_published": "-5.44095595E-06",
+          "value": -5.44095595e-06
+        },
+        {
+          "as_published": "8.72156064E-10",
+          "value": 8.72156064e-10
+        },
+        {
+          "as_published": "-5.19455789E-14",
+          "value": -5.19455789e-14
+        },
+        {
+          "as_published": "3.05885503E+03",
+          "value": 3058.85503
+        },
+        {
+          "as_published": "-1.15133490E+01",
+          "value": -11.513349
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.62429314E+00",
+          "value": 3.62429314
+        },
+        {
+          "as_published": "1.26256761E-02",
+          "value": 0.0126256761
+        },
+        {
+          "as_published": "2.47719570E-05",
+          "value": 2.4771957e-05
+        },
+        {
+          "as_published": "-3.99054512E-08",
+          "value": -3.99054512e-08
+        },
+        {
+          "as_published": "1.66077777E-11",
+          "value": 1.66077777e-11
+        },
+        {
+          "as_published": "4.60780029E+03",
+          "value": 4607.80029
+        },
+        {
+          "as_published": "9.10669692E+00",
+          "value": 9.10669692
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "6.39739347E+03",
+    "value": 6397.39347,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "107-12-0",
+    "C3H5N  ETHYL-CYANIDE (PROPIONITRILE) C2H5CN   SIGMA=1  STATWT=1  IA=3.0049",
+    "IB=18.0447  Ir(CH3)=0.5117  ROSYM=3  [V(3)=1076 cm-1 REF=Ruscic & Burcat]",
+    "Nu=3148,3144,3094,3070,3059,2350,1534,1526,1501,1440,1366,1301,1127,1103,1021,",
+    "845,796,549,397,224  HF298=12.71 kcal  HF0=16.00 kcal  REF=Burcat G3B3 calc.",
+    "{HF298=12.1 kcal  REF=Stul Westrum & Sinke 1969; HF298=12.3 kcal REF=NIST",
+    "Webbook}   Max Lst Sq Error Cp @ 1300 K 0.57%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 11170,
+    "header_line": 11177,
+    "end_line": 11180
+  },
+  "source_text": {
+    "header_line": "C3H5N  Propionit  A 1/05C  3.H  5.N  1.   0.G   200.000  6000.000  B  55.07854 1",
+    "coeff_lines": [
+      " 7.04418234E+00 1.53008159E-02-5.44095595E-06 8.72156064E-10-5.19455789E-14    2",
+      " 3.05885503E+03-1.15133490E+01 3.62429314E+00 1.26256761E-02 2.47719570E-05    3",
+      "-3.99054512E-08 1.66077777E-11 4.60780029E+03 9.10669692E+00 6.39739347E+03    4"
+    ]
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1850",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C8H6  Pentalene",
+  "cas_as_published": "250-25-9",
+  "formula": "C8H6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/11",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 8.",
+      "element": "C",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "102.13324",
+    "value": 102.13324
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.48427411E+01",
+          "value": 14.8427411
+        },
+        {
+          "as_published": "2.25477791E-02",
+          "value": 0.0225477791
+        },
+        {
+          "as_published": "-8.14867367E-06",
+          "value": -8.14867367e-06
+        },
+        {
+          "as_published": "1.32148572E-09",
+          "value": 1.32148572e-09
+        },
+        {
+          "as_published": "-7.93819250E-14",
+          "value": -7.9381925e-14
+        },
+        {
+          "as_published": "3.79569346E+04",
+          "value": 37956.9346
+        },
+        {
+          "as_published": "-5.74754012E+01",
+          "value": -57.4754012
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-7.64086880E-01",
+          "value": -0.76408688
+        },
+        {
+          "as_published": "3.77083180E-02",
+          "value": 0.037708318
+        },
+        {
+          "as_published": "5.09846183E-05",
+          "value": 5.09846183e-05
+        },
+        {
+          "as_published": "-1.05932407E-07",
+          "value": -1.05932407e-07
+        },
+        {
+          "as_published": "4.84875074E-11",
+          "value": 4.84875074e-11
+        },
+        {
+          "as_published": "4.33724909E+04",
+          "value": 43372.4909
+        },
+        {
+          "as_published": "2.92151372E+01",
+          "value": 29.2151372
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.50846907E+04",
+    "value": 45084.6907,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "250-25-9",
+    "C8H6  Pentalene BicycloOctatetraene (fused two 2,4-C5H6) planar. SIGMA=2",
+    "STATWT=1  IA=16.0560  IB=38.8512  IC=54.9073  Nu=3255(2),3233.5(2),3220.4(2),",
+    "1665.5(2),1573,1556,1397,1357,1330,1282,1202,1134.5,1121,1058,958.5,951,920(2),",
+    "910,876,852,849,795.6,726,711,668.6,655,552,514,447,300,165  REF=Burcat G3B3",
+    "HF298=89.593+/-2 kcal  REF=Burcat G3B3  Max Lst Sq Error Cp @ 200 K ***1.0%***"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 20806,
+    "header_line": 20812,
+    "end_line": 20815
+  },
+  "source_text": {
+    "header_line": "C8H6  Pentalene   T10/11C  8.H  6.   0.   0.G   200.000  6000.000  B 102.13324 1",
+    "coeff_lines": [
+      " 1.48427411E+01 2.25477791E-02-8.14867367E-06 1.32148572E-09-7.93819250E-14    2",
+      " 3.79569346E+04-5.74754012E+01-7.64086880E-01 3.77083180E-02 5.09846183E-05    3",
+      "-1.05932407E-07 4.84875074E-11 4.33724909E+04 2.92151372E+01 4.50846907E+04    4"
+    ]
+  }
+}

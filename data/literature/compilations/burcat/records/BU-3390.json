@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3390",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "WF3     HF298=-1",
+  "cas_as_published": "51621-17-1",
+  "formula": "WF3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/13",
+  "calc_quality_as_published": "D",
+  "composition": [
+    {
+      "element_as_published": "W ",
+      "count_as_published": " 1.",
+      "element": "W",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": " 3.",
+      "element": "F",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "240.83521",
+    "value": 240.83521
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.12931044E+00",
+          "value": 9.12931044
+        },
+        {
+          "as_published": "9.10864289E-04",
+          "value": 0.000910864289
+        },
+        {
+          "as_published": "-3.61237592E-07",
+          "value": -3.61237592e-07
+        },
+        {
+          "as_published": "6.21719393E-11",
+          "value": 6.21719393e-11
+        },
+        {
+          "as_published": "-3.88810752E-15",
+          "value": -3.88810752e-15
+        },
+        {
+          "as_published": "-6.39712841E+04",
+          "value": -63971.2841
+        },
+        {
+          "as_published": "-1.59112954E+01",
+          "value": -15.9112954
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.20680668E+00",
+          "value": 2.20680668
+        },
+        {
+          "as_published": "3.32169719E-02",
+          "value": 0.0332169719
+        },
+        {
+          "as_published": "-6.04974367E-05",
+          "value": -6.04974367e-05
+        },
+        {
+          "as_published": "5.15983248E-08",
+          "value": 5.15983248e-08
+        },
+        {
+          "as_published": "-1.67874457E-11",
+          "value": -1.67874457e-11
+        },
+        {
+          "as_published": "-6.26837612E+04",
+          "value": -62683.7612
+        },
+        {
+          "as_published": "1.66868302E+01",
+          "value": 16.6868302
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-6.09898599E+04",
+    "value": -60989.8599,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "51621-17-1",
+    "WF3   TriFluoroTungsten  SIGMA=3  STATWT=2  IA=IB=17.6  IC=24.8  Nu=700,650(2),",
+    "300,250(2)  HF298=-121.2+/-2.8 kcal  REF=Hildebrand JCP 62,(1975),3074 all data",
+    "are estimated.  {HF298=-127.0 kcal  REF=Wolf  Adv. Inorg. Chem. Radiochem. 24,",
+    "(1981),1}  Max Lst Sq Error Cp @ 1200 K 0.18%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 35826,
+    "header_line": 35831,
+    "end_line": 35834
+  },
+  "source_text": {
+    "header_line": "WF3     HF298=-1  T11/13W  1.F  3.   0.   0.G   200.000  6000.000  D 240.83521 1",
+    "coeff_lines": [
+      " 9.12931044E+00 9.10864289E-04-3.61237592E-07 6.21719393E-11-3.88810752E-15    2",
+      "-6.39712841E+04-1.59112954E+01 2.20680668E+00 3.32169719E-02-6.04974367E-05    3",
+      " 5.15983248E-08-1.67874457E-11-6.26837612E+04 1.66868302E+01-6.09898599E+04    4"
+    ]
+  }
+}

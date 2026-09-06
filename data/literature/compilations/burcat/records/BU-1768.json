@@ -1,0 +1,186 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1768",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C7H5(NO2)3 (TNT)",
+  "cas_as_published": "118-96-7",
+  "formula": "C7H5N3O6",
+  "phase": "condensed",
+  "phase_as_published": "TNT",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "A 8/05",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 7.",
+      "element": "C",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 5.",
+      "element": "H",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 3.",
+      "element": "N",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 6.",
+      "element": "O",
+      "count": 6.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "227.13122",
+    "value": 227.13122
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.18243437E+01",
+          "value": 31.8243437
+        },
+        {
+          "as_published": "2.61420691E-02",
+          "value": 0.0261420691
+        },
+        {
+          "as_published": "-1.00880385E-05",
+          "value": -1.00880385e-05
+        },
+        {
+          "as_published": "1.69978925E-09",
+          "value": 1.69978925e-09
+        },
+        {
+          "as_published": "-1.04624131E-13",
+          "value": -1.04624131e-13
+        },
+        {
+          "as_published": "-1.04731295E+04",
+          "value": -10473.1295
+        },
+        {
+          "as_published": "-1.37140750E+02",
+          "value": -137.14075
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.19573446E+00",
+          "value": 3.19573446
+        },
+        {
+          "as_published": "8.62220253E-02",
+          "value": 0.0862220253
+        },
+        {
+          "as_published": "-2.31687328E-05",
+          "value": -2.31687328e-05
+        },
+        {
+          "as_published": "-4.31207526E-08",
+          "value": -4.31207526e-08
+        },
+        {
+          "as_published": "2.63452650E-11",
+          "value": 2.6345265e-11
+        },
+        {
+          "as_published": "-1.60910932E+03",
+          "value": -1609.10932
+        },
+        {
+          "as_published": "1.54067756E+01",
+          "value": 15.4067756
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.89852800E+03",
+    "value": 2898.528,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "118-96-7",
+    "C7H5(NO2)3   TNT  Tri-Nitro-Toluene  SIGMA=2  STATWT=1  IA = 151.9571",
+    "IB= 161.4057   IC=305.6182    Ir(NO2)para=5.96  ROSYM=2  V(2)=3.11 kcal",
+    "(Ir(NO2)meta=5.96  ROSYM=2  V(2)=7 kcal)x2  Ir(CH3)=0.51666  ROSYM=3  V(3)=3.5",
+    "kcal  NU=3273(2),3192,3160,3091,1678(2),1649,1635,1616,1517,1501,1486,1443,1434,",
+    "1407,1397,1394,1362,1225(2),1189,1105,1064,1056,959.5(2),950,918,836,803,783,",
+    "780,743,736,712,666,657,547,537,479,469,387,368,353,328,324,296,196,189,182,151,",
+    "122  REF=Burcat B3LYP calc  HF298=5.76 kcal  REF=Lenchitz et al J. Chem.",
+    "Thermodyn 3,(1971),689   Max Lst Sq Error  Cp @ 1300 K 0.57%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "phase_suffix_normalized_to_condensed",
+      "phase_as_published": "TNT",
+      "phase_normalized": "condensed",
+      "note": "Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am', 'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 19781,
+    "header_line": 19790,
+    "end_line": 19793
+  },
+  "source_text": {
+    "header_line": "C7H5(NO2)3 (TNT)  A 8/05C  7.H  5.N  3.O  6.G   200.000  6000.000  B 227.13122 1",
+    "coeff_lines": [
+      " 3.18243437E+01 2.61420691E-02-1.00880385E-05 1.69978925E-09-1.04624131E-13    2",
+      "-1.04731295E+04-1.37140750E+02 3.19573446E+00 8.62220253E-02-2.31687328E-05    3",
+      "-4.31207526E-08 2.63452650E-11-1.60910932E+03 1.54067756E+01 2.89852800E+03    4"
+    ]
+  }
+}

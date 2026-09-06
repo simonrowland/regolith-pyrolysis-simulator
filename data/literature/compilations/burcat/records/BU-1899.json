@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1899",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C9 linear biradi",
+  "cas_as_published": "129066-02-0",
+  "formula": "C9",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T03/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 9.",
+      "element": "C",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "108.09630",
+    "value": 108.0963
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.54084252E+01",
+          "value": 15.4084252
+        },
+        {
+          "as_published": "9.71207573E-03",
+          "value": 0.00971207573
+        },
+        {
+          "as_published": "-3.66424588E-06",
+          "value": -3.66424588e-06
+        },
+        {
+          "as_published": "6.10785941E-10",
+          "value": 6.10785941e-10
+        },
+        {
+          "as_published": "-3.73745499E-14",
+          "value": -3.73745499e-14
+        },
+        {
+          "as_published": "1.82980460E+05",
+          "value": 182980.46
+        },
+        {
+          "as_published": "-4.92743838E+01",
+          "value": -49.2743838
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.10628240E+00",
+          "value": 3.1062824
+        },
+        {
+          "as_published": "6.31968651E-02",
+          "value": 0.0631968651
+        },
+        {
+          "as_published": "-1.05721053E-04",
+          "value": -0.000105721053
+        },
+        {
+          "as_published": "9.44171385E-08",
+          "value": 9.44171385e-08
+        },
+        {
+          "as_published": "-3.29695670E-11",
+          "value": -3.2969567e-11
+        },
+        {
+          "as_published": "1.85693994E+05",
+          "value": 185693.994
+        },
+        {
+          "as_published": "1.02136857E+01",
+          "value": 10.2136857
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.88666016E+05",
+    "value": 188666.016,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "129066-02-0",
+    "C9 linear biradical Singlet Sigma+ SIGMA=2  STATWT=1  B0=0.0143214  Nu=2276,",
+    "1970,1958,484,2080,2014,1601,895,642(2),303(2).129(2),744(2),519(2),225(2),51(2)",
+    "REF=Van-Orden & Saykally Chem. Rev. 98,(1998),2313  HF0=371.29 kcal  REF=Karton",
+    "Tarnopolsky & Martin Molecular Phys 107,(2009),977  Max Lst Sq Error Cp @ 1300 K",
+    "0.51%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 21394,
+    "header_line": 21400,
+    "end_line": 21403
+  },
+  "source_text": {
+    "header_line": "C9 linear biradi  T03/09C  9.   0.   0.   0.G   200.000  6000.000  B 108.09630 1",
+    "coeff_lines": [
+      " 1.54084252E+01 9.71207573E-03-3.66424588E-06 6.10785941E-10-3.73745499E-14    2",
+      " 1.82980460E+05-4.92743838E+01 3.10628240E+00 6.31968651E-02-1.05721053E-04    3",
+      " 9.44171385E-08-3.29695670E-11 1.85693994E+05 1.02136857E+01 1.88666016E+05    4"
+    ]
+  }
+}

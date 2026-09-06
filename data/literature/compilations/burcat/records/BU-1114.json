@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1114",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "IB=C3H7+ n-propyl",
+  "cas_as_published": "19252-52-9",
+  "formula": "C3H7E-1",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 9/18",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 7.",
+      "element": "H",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": "-1.",
+      "element": "E",
+      "count": -1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "43.08713",
+    "value": 43.08713
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "6.71102269E+00",
+          "value": 6.71102269
+        },
+        {
+          "as_published": "1.81667406E-02",
+          "value": 0.0181667406
+        },
+        {
+          "as_published": "-6.53578159E-06",
+          "value": -6.53578159e-06
+        },
+        {
+          "as_published": "1.05484916E-09",
+          "value": 1.05484916e-09
+        },
+        {
+          "as_published": "-6.30972714E-14",
+          "value": -6.30972714e-14
+        },
+        {
+          "as_published": "9.80528086E+04",
+          "value": 98052.8086
+        },
+        {
+          "as_published": "-1.28536274E+01",
+          "value": -12.8536274
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-3.60562254E-01",
+          "value": -0.360562254
+        },
+        {
+          "as_published": "3.02948155E-02",
+          "value": 0.0302948155
+        },
+        {
+          "as_published": "-2.42956991E-06",
+          "value": -2.42956991e-06
+        },
+        {
+          "as_published": "-1.69204444E-08",
+          "value": -1.69204444e-08
+        },
+        {
+          "as_published": "8.74949470E-12",
+          "value": 8.7494947e-12
+        },
+        {
+          "as_published": "1.00422924E+05",
+          "value": 100422.924
+        },
+        {
+          "as_published": "2.56025867E+01",
+          "value": 25.6025867
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.01611159E+05",
+    "value": 101611.159,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "19252-52-9",
+    "n-C3H7+ n-Propylium cation SIGMA=1  STATWT=1  IA=4.0514  IB=5.7904  IC=8.1196",
+    "Ir(CH3)=0.4784  ROSYM=3  [V(3)=1253.9 cm-1 REF W. TSANG] Ir(CH2*)=0.278 ROSYM=2",
+    "V(3)=0  Nu=3280,3263,3246,3174,3161,3140,3013,1584,1495,1458,1441,1350,1320,",
+    "1235,1181,1157.5,1086,1038,880,864,806,495,[336,114.5  internal rotor] REF=G3B3",
+    "HF298=844.85+/-0.83 kJ  thermal electrom  HF0=856.87 kJ stationary electron REF=Ruscic ATcT 1.122  Max Lst Sq Error Cp @ 1300 K 0.64%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 11760,
+    "header_line": 11766,
+    "end_line": 11769
+  },
+  "source_text": {
+    "header_line": "IB=C3H7+ n-propyl T 9/18C  3.H  7.E -1.   0.G   298.150  6000.000  B  43.08713 1",
+    "coeff_lines": [
+      " 6.71102269E+00 1.81667406E-02-6.53578159E-06 1.05484916E-09-6.30972714E-14    2",
+      " 9.80528086E+04-1.28536274E+01-3.60562254E-01 3.02948155E-02-2.42956991E-06    3",
+      "-1.69204444E-08 8.74949470E-12 1.00422924E+05 2.56025867E+01 1.01611159E+05    4"
+    ]
+  }
+}

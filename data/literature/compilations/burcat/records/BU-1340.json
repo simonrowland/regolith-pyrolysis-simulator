@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1340",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H9O DiEthyl Et",
+  "cas_as_published": "3313-57-3",
+  "formula": "C4H9O",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/08",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "73.11366",
+    "value": 73.11366
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "5500.000",
+    "value": 5500.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.33292067E+01",
+          "value": 13.3292067
+        },
+        {
+          "as_published": "2.28925015E-02",
+          "value": 0.0228925015
+        },
+        {
+          "as_published": "-8.51539529E-06",
+          "value": -8.51539529e-06
+        },
+        {
+          "as_published": "1.39549269E-09",
+          "value": 1.39549269e-09
+        },
+        {
+          "as_published": "-8.42277527E-14",
+          "value": -8.42277527e-14
+        },
+        {
+          "as_published": "-1.17645208E+04",
+          "value": -11764.5208
+        },
+        {
+          "as_published": "-4.17555561E+01",
+          "value": -41.7555561
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "7.25385574E+00",
+          "value": 7.25385574
+        },
+        {
+          "as_published": "-7.50391483E-04",
+          "value": -0.000750391483
+        },
+        {
+          "as_published": "1.04998125E-04",
+          "value": 0.000104998125
+        },
+        {
+          "as_published": "-1.35170908E-07",
+          "value": -1.35170908e-07
+        },
+        {
+          "as_published": "5.26868970E-11",
+          "value": 5.2686897e-11
+        },
+        {
+          "as_published": "-8.11818812E+03",
+          "value": -8118.18812
+        },
+        {
+          "as_published": "-5.73033003E-01",
+          "value": -0.573033003
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-5.30340044E+03",
+    "value": -5303.40044,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "3313-57-3",
+    "C4H9O  Di Ethyl Ether alfa Radical (2-ethoxy ethyl)  C2H5-O-CH2CH2*  SIGMA=1",
+    "STATWT=2  IA=4.3385   IB=36.2003  IC=38.9054  Ir(CH3)=1.24636  ROSYM=3",
+    "V(3)=2400. cm-1  Ir(CH2*)=2.84139  ROSYM=2  V(3)=2000. cm-1  Ir(C2H4*)=4.12179",
+    "V(3)=2400. cm-1  ROSYM=1  Ir(C2H5)=4.1657  ROSYM=1  V(3)=2400. cm-1  Nu=3292,",
+    "3185,3136,3130,3060,2992,2970,2933,2868,1563,1532,1522,1515,1478,1455,1430.5,",
+    "1396,1310,1245,1200,1183,1171,1111,1076,988,939,842,832,457.5,441.4,402.5,258.8",
+    "HF298=-44.095+/-8. kJ  REF=Burcat G3B3  Max Lst Sq Error Cp @ 1300 K 0.62%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 14491,
+    "header_line": 14499,
+    "end_line": 14502
+  },
+  "source_text": {
+    "header_line": "C4H9O DiEthyl Et  T10/08C  4.H  9.O  1.   0.G   200.000  5500.000  B  73.11366 1",
+    "coeff_lines": [
+      " 1.33292067E+01 2.28925015E-02-8.51539529E-06 1.39549269E-09-8.42277527E-14    2",
+      "-1.17645208E+04-4.17555561E+01 7.25385574E+00-7.50391483E-04 1.04998125E-04    3",
+      "-1.35170908E-07 5.26868970E-11-8.11818812E+03-5.73033003E-01-5.30340044E+03    4"
+    ]
+  }
+}

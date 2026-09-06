@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1557",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "o-C6H4-",
+  "cas_as_published": "100569-88-8",
+  "formula": "C6H4E",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "76.09651",
+    "value": 76.09651
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.29088473E+01",
+          "value": 12.9088473
+        },
+        {
+          "as_published": "1.36134721E-02",
+          "value": 0.0136134721
+        },
+        {
+          "as_published": "-4.93630644E-06",
+          "value": -4.93630644e-06
+        },
+        {
+          "as_published": "8.01997862E-10",
+          "value": 8.01997862e-10
+        },
+        {
+          "as_published": "-4.82273418E-14",
+          "value": -4.82273418e-14
+        },
+        {
+          "as_published": "4.29553454E+04",
+          "value": 42955.3454
+        },
+        {
+          "as_published": "-3.86777991E+01",
+          "value": -38.6777991
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.55791942E+00",
+          "value": 2.55791942
+        },
+        {
+          "as_published": "4.59513254E-02",
+          "value": 0.0459513254
+        },
+        {
+          "as_published": "-4.56158751E-05",
+          "value": -4.56158751e-05
+        },
+        {
+          "as_published": "2.55933658E-08",
+          "value": 2.55933658e-08
+        },
+        {
+          "as_published": "-6.14695204E-12",
+          "value": -6.14695204e-12
+        },
+        {
+          "as_published": "4.57191058E+04",
+          "value": 45719.1058
+        },
+        {
+          "as_published": "1.40867005E+01",
+          "value": 14.0867005
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.81688037E+04",
+    "value": 48168.8037,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "100569-88-8",
+    "o-C6H4- o-Benzyne anion  SIGMA=2  STATWT=2  IA=5.6185  IB=49.2492  IC=54.8677",
+    "Nu=3400,2963,2857,2753,1947,1731,1488,1364,1309,1122,1053,983.6,871.5,840,651,",
+    "599,538,471,387,313,219,216.5,162,96  REF=Burcat B3LYP/6-31g(d)  HF298=400.5",
+    "+/-1.4 kJ  REF=Ruscic ATcT D 2013  Max Lst Sq Error Cp @ 1300 K 0.49%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17177,
+    "header_line": 17182,
+    "end_line": 17185
+  },
+  "source_text": {
+    "header_line": "o-C6H4-           T 3/14C  6.H  4.E  1.   0.G   298.150  6000.000  B  76.09651 1",
+    "coeff_lines": [
+      " 1.29088473E+01 1.36134721E-02-4.93630644E-06 8.01997862E-10-4.82273418E-14    2",
+      " 4.29553454E+04-3.86777991E+01 2.55791942E+00 4.59513254E-02-4.56158751E-05    3",
+      " 2.55933658E-08-6.14695204E-12 4.57191058E+04 1.40867005E+01 4.81688037E+04    4"
+    ]
+  }
+}

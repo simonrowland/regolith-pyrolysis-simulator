@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1871",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C8H9  DiMethylPh",
+  "cas_as_published": "38816-90-9",
+  "formula": "C8H9",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/10",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 8.",
+      "element": "C",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "105.15706",
+    "value": 105.15706
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.41702768E+01",
+          "value": 14.1702768
+        },
+        {
+          "as_published": "3.01879760E-02",
+          "value": 0.030187976
+        },
+        {
+          "as_published": "-1.08699580E-05",
+          "value": -1.0869958e-05
+        },
+        {
+          "as_published": "1.75781168E-09",
+          "value": 1.75781168e-09
+        },
+        {
+          "as_published": "-1.05362828E-13",
+          "value": -1.05362828e-13
+        },
+        {
+          "as_published": "2.48031639E+04",
+          "value": 24803.1639
+        },
+        {
+          "as_published": "-5.00024595E+01",
+          "value": -50.0024595
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.86784780E+00",
+          "value": 4.8678478
+        },
+        {
+          "as_published": "1.47313820E-02",
+          "value": 0.014731382
+        },
+        {
+          "as_published": "1.00528223E-04",
+          "value": 0.000100528223
+        },
+        {
+          "as_published": "-1.43461760E-07",
+          "value": -1.4346176e-07
+        },
+        {
+          "as_published": "5.84750509E-11",
+          "value": 5.84750509e-11
+        },
+        {
+          "as_published": "2.92899731E+04",
+          "value": 29289.9731
+        },
+        {
+          "as_published": "7.77536767E+00",
+          "value": 7.77536767
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.20283456E+04",
+    "value": 32028.3456,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "38816-90-9",
+    "C8H9  1,3-DimethylBenzene-5-yl Radical  SIGMA=2  STATWT=2  IA=21.7616 IB=48.1872",
+    "IC=48.1872  [Ir(CH3)=0.52372  ROSYM=3  V3=280. cm-1 est]x2  Nu=3182(2),3174,",
+    "3125(2),3098(2),3042.5(2),1660,1576,1526,1522,1515.5(2),1488,1455,1441,1439,",
+    "1325,1301,1265,1191,1110,1072.5(2),1037,1013,1001,935.5,893,859,834,724,672,544,",
+    "516.5,504,467,407.5,273,214,201  REF=Burcat B3LYP/6-31G(d)   HF298=266.3 kJ",
+    "REF=NIST 94  {HF298=264.88 kJ  REF=Thergas Benson}  Max Lst Sq Error Cp @ 200 K",
+    "& 1300 K 0.60%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 21066,
+    "header_line": 21074,
+    "end_line": 21077
+  },
+  "source_text": {
+    "header_line": "C8H9  DiMethylPh  T12/10C  8.H  9.   0.   0.G   200.000  6000.000  B 105.15706 1",
+    "coeff_lines": [
+      " 1.41702768E+01 3.01879760E-02-1.08699580E-05 1.75781168E-09-1.05362828E-13    2",
+      " 2.48031639E+04-5.00024595E+01 4.86784780E+00 1.47313820E-02 1.00528223E-04    3",
+      "-1.43461760E-07 5.84750509E-11 2.92899731E+04 7.77536767E+00 3.20283456E+04    4"
+    ]
+  }
+}

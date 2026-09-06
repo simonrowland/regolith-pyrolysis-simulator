@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1097",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3H6O  OXETANE",
+  "cas_as_published": "503-30-0",
+  "formula": "C3H6O",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "A11/04",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "58.07914",
+    "value": 58.07914
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "6.80716906E+00",
+          "value": 6.80716906
+        },
+        {
+          "as_published": "1.88824545E-02",
+          "value": 0.0188824545
+        },
+        {
+          "as_published": "-6.79082475E-06",
+          "value": -6.79082475e-06
+        },
+        {
+          "as_published": "1.09713919E-09",
+          "value": 1.09713919e-09
+        },
+        {
+          "as_published": "-6.57154952E-14",
+          "value": -6.57154952e-14
+        },
+        {
+          "as_published": "-1.36547629E+04",
+          "value": -13654.7629
+        },
+        {
+          "as_published": "-1.35382154E+01",
+          "value": -13.5382154
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "5.15283752E+00",
+          "value": 5.15283752
+        },
+        {
+          "as_published": "-1.86401716E-02",
+          "value": -0.0186401716
+        },
+        {
+          "as_published": "1.29980652E-04",
+          "value": 0.000129980652
+        },
+        {
+          "as_published": "-1.58629974E-07",
+          "value": -1.58629974e-07
+        },
+        {
+          "as_published": "6.20668783E-11",
+          "value": 6.20668783e-11
+        },
+        {
+          "as_published": "-1.13243512E+04",
+          "value": -11324.3512
+        },
+        {
+          "as_published": "4.73561224E+00",
+          "value": 4.73561224
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-9.75233898E+03",
+    "value": -9752.33898,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "503-30-0",
+    "C3H6O  TRIMETHYLENE OXIDE (CYCLO),OXETANE    SIGMA=2   STATWT=1   IA=6.9562",
+    "IB=7.1539  IC=12.5119  Nu=3146,3094,3070.6(2),3039,3028,1577,1546,1521,1399,",
+    "1323,1277,1247,1207,1171,1157,1056,1048,952,935,848,816,775,64.8  HF298=-81.086",
+    "kJ  HF0=-61.49 kJ  REF=Burcat G3B3 calc.    {HF298=-19.25+/-2 kcal  REF=NIST94;",
+    "HF298=-80.50 kJ  REF=Dorofeeva et al Thermochim. Acta 194,(1992),9-46}   Max Lst",
+    "Sq Error Cp @ 200 K *1.3%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 11548,
+    "header_line": 11555,
+    "end_line": 11558
+  },
+  "source_text": {
+    "header_line": "C3H6O  OXETANE    A11/04C  3.H  6.O  1.   0.G   200.000  6000.000  B  58.07914 1",
+    "coeff_lines": [
+      " 6.80716906E+00 1.88824545E-02-6.79082475E-06 1.09713919E-09-6.57154952E-14    2",
+      "-1.36547629E+04-1.35382154E+01 5.15283752E+00-1.86401716E-02 1.29980652E-04    3",
+      "-1.58629974E-07 6.20668783E-11-1.13243512E+04 4.73561224E+00-9.75233898E+03    4"
+    ]
+  }
+}

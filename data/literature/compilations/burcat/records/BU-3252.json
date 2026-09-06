@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3252",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "SiH3  radical",
+  "cas_as_published": "13765-44-1",
+  "formula": "SiH3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SI",
+      "count_as_published": " 1.",
+      "element": "Si",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 3.",
+      "element": "H",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "31.10932",
+    "value": 31.10932
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.34603809E+00",
+          "value": 4.34603809
+        },
+        {
+          "as_published": "5.30055406E-03",
+          "value": 0.00530055406
+        },
+        {
+          "as_published": "-1.96689029E-06",
+          "value": -1.96689029e-06
+        },
+        {
+          "as_published": "3.24260463E-10",
+          "value": 3.24260463e-10
+        },
+        {
+          "as_published": "-1.96902358E-14",
+          "value": -1.96902358e-14
+        },
+        {
+          "as_published": "2.17510741E+04",
+          "value": 21751.0741
+        },
+        {
+          "as_published": "-7.11212022E-01",
+          "value": -0.711212022
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.17103081E+00",
+          "value": 3.17103081
+        },
+        {
+          "as_published": "4.11386553E-03",
+          "value": 0.00411386553
+        },
+        {
+          "as_published": "7.87851317E-06",
+          "value": 7.87851317e-06
+        },
+        {
+          "as_published": "-1.18827793E-08",
+          "value": -1.18827793e-08
+        },
+        {
+          "as_published": "4.70364189E-12",
+          "value": 4.70364189e-12
+        },
+        {
+          "as_published": "2.23447180E+04",
+          "value": 22344.718
+        },
+        {
+          "as_published": "6.55761774E+00",
+          "value": 6.55761774
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.35213534E+04",
+    "value": 23521.3534,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "13765-44-1",
+    "SiH3 Silyl Radical SIGMA=3 STATWT=2  IA=0.5996  IB=0.6003  IC=1.006",
+    "Nu=2249.6(2),,2206,934(2),768  HF298=46.742+/-2 kcal  REF=Burcat G3B3",
+    "{HF298=198.45+/-4.2 kJ REF=Ho & Melius JPC 94(1990),5120;",
+    "HF298=209.38+/-10. kJ REF=Gurvich; HF298=47.26 kcal G4  46.30 kcal G4MP2;",
+    "REF=Sukkaew et al Material Science Forum 778-780,(2014),175;  HF298=47.8 kcal",
+    "REF=Ochterski et al JACS 117,(1995),11299; HF298=48.5 kcal  REF=Allendorf et al",
+    "JPC 96,(1992),428;  HF298=48.5 kcal  REF=Boo & Armertrout JACS 109(12),(1987),",
+    "3549;  HF298=31.10 kcal  REF=RMG Greene 2015}  Max Lst Sq Error Cp @ 1300 K 0.57%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 34530,
+    "header_line": 34539,
+    "end_line": 34542
+  },
+  "source_text": {
+    "header_line": "SiH3  radical     T12/16SI 1.H  3.   0.   0.G   200.000  6000.000  B  31.10932 1",
+    "coeff_lines": [
+      " 4.34603809E+00 5.30055406E-03-1.96689029E-06 3.24260463E-10-1.96902358E-14    2",
+      " 2.17510741E+04-7.11212022E-01 3.17103081E+00 4.11386553E-03 7.87851317E-06    3",
+      "-1.18827793E-08 4.70364189E-12 2.23447180E+04 6.55761774E+00 2.35213534E+04    4"
+    ]
+  }
+}

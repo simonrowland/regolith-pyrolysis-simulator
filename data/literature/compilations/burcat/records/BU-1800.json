@@ -1,0 +1,193 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1800",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C7H8O CRESOL",
+  "cas_as_published": "108-39-4 and 106-44-5 and 95-48-7",
+  "formula": "C7H8O",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "L 6/87",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  7",
+      "element": "C",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  8",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  1",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "108.13992",
+    "value": 108.13992
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "0.15932987E+02",
+          "value": 15.932987
+        },
+        {
+          "as_published": "0.27011160E-01",
+          "value": 0.02701116
+        },
+        {
+          "as_published": "-0.99448722E-05",
+          "value": -9.9448722e-06
+        },
+        {
+          "as_published": "0.16296689E-08",
+          "value": 1.6296689e-09
+        },
+        {
+          "as_published": "-0.98513298E-13",
+          "value": -9.8513298e-14
+        },
+        {
+          "as_published": "-0.23592065E+05",
+          "value": -23592.065
+        },
+        {
+          "as_published": "-0.59732841E+02",
+          "value": -59.732841
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "0.42258267E+00",
+          "value": 0.42258267
+        },
+        {
+          "as_published": "0.45551636E-01",
+          "value": 0.045551636
+        },
+        {
+          "as_published": "0.32012513E-04",
+          "value": 3.2012513e-05
+        },
+        {
+          "as_published": "-0.81121959E-07",
+          "value": -8.1121959e-08
+        },
+        {
+          "as_published": "0.37665658E-10",
+          "value": 3.7665658e-11
+        },
+        {
+          "as_published": "-0.18202621E+05",
+          "value": -18202.621
+        },
+        {
+          "as_published": "0.26032903E+02",
+          "value": 26.032903
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-0.15911701E+05",
+    "value": -15911.701,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "108-39-4 and 106-44-5 and 95-48-7",
+    "C7H8O  CRESOL REF=Kudchadker, Kudchadker, Wilhoit & Zwolinski, JPCRD 7 (1978)",
+    "417.  ISOMERS WERE COMBINED BY SETTING T0= DELTA E VALUES. BECAUSE OF SLIGHT",
+    "DIFFERENCES IN CIS AND TRANS M-CRESOL, THEY WERE COMBINED BY SETTING STATWT=2.",
+    "OTHER ISOMERS ARE O-CRESOL (CIS AND TRANS) AND P-CRESOL.  T0=0   STATWT=2.",
+    "IA=22.72866  IB=47.387225  IC=69.5757   Ir(OH)=.14289   ROSYM=2.  V2=1404.62",
+    "Ir(CH3)=0.52879   ROSYM=3.  V3=0.  Nu=3080,3060,3042,3028,1614,1600,1490,1462,",
+    "1306,1281,1268,1163,1151,1082,1000,930,733,536,518,443,297,962,880,848,771,685,",
+    "560,443,246,211,3614,1182,2980,2951,1439,1439,1380,1038,1008,2924.",
+    "T0=136.6   STATWT=1.  IA=25.5556   IB=38.47713  IC=63.49255  Ir(OH)=0.14374",
+    "ROSYM=2.  V2=1508.53  Ir(CH3)=0.52952  ROSYM=3.  V3=725.01   Nu=3073,3060,3049,",
+    "3028,1608,1587,1492,1462,1324,1300,1255,1207,1149,1102,1043,842,748,586,529,429,",
+    "275,967,928,844,749,711,542,442,315,191,3600,1164,2974,2944,2916,1441,1441,1381,",
+    "1039,986. T0=326.859   STATWT 1.   IA=26.4076  IB=37.83980  IC=63.7073",
+    "Ir(OH)=0.14146   ROSYM=2.  V2=1318.2  Ir(CH3)=0.52985   ROSYM=3.  V3=0. Nu=3073,",
+    "3060,3049,3028,1608,1587,1492,1462,1324,1300,1255,1207,1149,1102,1043,842,748,",
+    "586,529,429,275,967,928,844,749,711,542,442,315,191,3600,1164,2974,2944,2916,",
+    "1441,1441,1381,1039,986.",
+    "T0=567.4   STATWT=1.   IA=15.4939   IB=57.13607  IC=72.08980   Ir(OH)=0.142675",
+    "ROSYM=2.  V2=1295.1    Ir(CH3)=0.521235  ROSYM=3.   V3=0.     Nu=3062,3030,1615,",
+    "1515,1252,1213,1170,1018,843,738,462,949,810,407,922,817,699,507,320,178,3062,",
+    "3030,1598,1428,1328,1291,1102,643,426,282,3608,1170,2970,2945,2922,1458,1458,",
+    "1379,1043,985.   HF298=-132.298 kJ.   Max Lst Sq Error Cp @ 1300 K 0.6%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 20179,
+    "header_line": 20202,
+    "end_line": 20205
+  },
+  "source_text": {
+    "header_line": "C7H8O CRESOL      L 6/87C   7H   8O   1    0G   200.000  6000.000  B 108.13992 1",
+    "coeff_lines": [
+      " 0.15932987E+02 0.27011160E-01-0.99448722E-05 0.16296689E-08-0.98513298E-13    2",
+      "-0.23592065E+05-0.59732841E+02 0.42258267E+00 0.45551636E-01 0.32012513E-04    3",
+      "-0.81121959E-07 0.37665658E-10-0.18202621E+05 0.26032903E+02-0.15911701E+05    4"
+    ]
+  }
+}

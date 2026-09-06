@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1734",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H14 2-MePentan",
+  "cas_as_published": "107-83-5",
+  "formula": "C6H14",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/10",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "14.",
+      "element": "H",
+      "count": 14.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "86.17536",
+    "value": 86.17536
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.32461305E+01",
+          "value": 13.2461305
+        },
+        {
+          "as_published": "3.80066597E-02",
+          "value": 0.0380066597
+        },
+        {
+          "as_published": "-1.36577010E-05",
+          "value": -1.3657701e-05
+        },
+        {
+          "as_published": "2.19972944E-09",
+          "value": 2.19972944e-09
+        },
+        {
+          "as_published": "-1.31326304E-13",
+          "value": -1.31326304e-13
+        },
+        {
+          "as_published": "-2.76226987E+04",
+          "value": -27622.6987
+        },
+        {
+          "as_published": "-4.18371750E+01",
+          "value": -41.837175
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "6.71148500E+00",
+          "value": 6.711485
+        },
+        {
+          "as_published": "2.24792623E-02",
+          "value": 0.0224792623
+        },
+        {
+          "as_published": "7.64011760E-05",
+          "value": 7.6401176e-05
+        },
+        {
+          "as_published": "-1.10166070E-07",
+          "value": -1.1016607e-07
+        },
+        {
+          "as_published": "4.42376391E-11",
+          "value": 4.42376391e-11
+        },
+        {
+          "as_published": "-2.41263234E+04",
+          "value": -24126.3234
+        },
+        {
+          "as_published": "1.63540681E-01",
+          "value": 0.163540681
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-2.06479862E+04",
+    "value": -20647.9862,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "107-83-5",
+    "C6H14 2-METHYLPENTANE  SIGMA=2  STATWT=1  IA=15.3469  IB=43.3908  IC=47.9529",
+    "[Ir(CH3)=0.51728  ROSYM=3  V(3)=780. cm-1 as in C6H13]x3  Ir(C2H5)=5.2773",
+    "ROSYM=1  V(3)=1200. cm-1  Ir((CH3)2CH)=5.32464  ROSYM=1  V(3)=1200. cm-1",
+    "Nu=3115,3113,3107(2),3103,3096,3067,3048,3043,3040,3034.5(2),3019,3009.5,1545,",
+    "1536.6(2),1533,1527,1522,1517,1508,1449,1442,1428,1412,1403,1381,1355,1312,1286,",
+    "1207,1194,1181,1081,1063,1037,977,,954,938,900,854,827,738,487,424,381,332,287,",
+    "247  HF298=-41.032+/-2 kcal  REF=Burcat G3B3   {HF298=-174.55 KJ  REF=TRC 1985}",
+    "MAX LST SQ ERROR CP @ 60 K 0.61"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 19331,
+    "header_line": 19340,
+    "end_line": 19343
+  },
+  "source_text": {
+    "header_line": "C6H14 2-MePentan  T 3/10C  6.H 14.   0.   0.G   200.000  6000.000  B  86.17536 1",
+    "coeff_lines": [
+      " 1.32461305E+01 3.80066597E-02-1.36577010E-05 2.19972944E-09-1.31326304E-13    2",
+      "-2.76226987E+04-4.18371750E+01 6.71148500E+00 2.24792623E-02 7.64011760E-05    3",
+      "-1.10166070E-07 4.42376391E-11-2.41263234E+04 1.63540681E-01-2.06479862E+04    4"
+    ]
+  }
+}

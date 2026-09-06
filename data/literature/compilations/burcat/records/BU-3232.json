@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3232",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "SiF2- DiFluoroSi",
+  "cas_as_published": "145089-80-1",
+  "formula": "SiF2E",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/17",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SI",
+      "count_as_published": " 1.",
+      "element": "Si",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": " 2.",
+      "element": "F",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "66.08285",
+    "value": 66.08285
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "6.39543902E+00",
+          "value": 6.39543902
+        },
+        {
+          "as_published": "6.29869497E-04",
+          "value": 0.000629869497
+        },
+        {
+          "as_published": "-2.49181864E-07",
+          "value": -2.49181864e-07
+        },
+        {
+          "as_published": "4.28162441E-11",
+          "value": 4.28162441e-11
+        },
+        {
+          "as_published": "-2.67460827E-15",
+          "value": -2.67460827e-15
+        },
+        {
+          "as_published": "-8.15851762E+04",
+          "value": -81585.1762
+        },
+        {
+          "as_published": "-4.96958712E+00",
+          "value": -4.96958712
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.64115070E+00",
+          "value": 2.6411507
+        },
+        {
+          "as_published": "1.63307802E-02",
+          "value": 0.0163307802
+        },
+        {
+          "as_published": "-2.63947336E-05",
+          "value": -2.63947336e-05
+        },
+        {
+          "as_published": "2.02616422E-08",
+          "value": 2.02616422e-08
+        },
+        {
+          "as_published": "-6.02257120E-12",
+          "value": -6.0225712e-12
+        },
+        {
+          "as_published": "-8.08168865E+04",
+          "value": -80816.8865
+        },
+        {
+          "as_published": "1.31013485E+01",
+          "value": 13.1013485
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-7.94995736E+04",
+    "value": -79499.5736,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "145089-80-1",
+    "SIF2-  DiFluoroSilicate anion  SIGMA=2  STATWT=2  IA=3.2657  IB=10.3869",
+    "IC=13.6525  Nu=718.5(2),287.5  HF298=-661.0+/-8 kJ  thermal electron  REF=Burcat",
+    "G3B3  {HF298=-608.0+/-22 kJ  REF=Kawamata et al JCP 105(13),(1996),5369}  Max",
+    "Lst Sq Error Cp @ 1200 K 0.15%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 34331,
+    "header_line": 34336,
+    "end_line": 34339
+  },
+  "source_text": {
+    "header_line": "SiF2- DiFluoroSi  T 3/17SI 1.F  2.E  1.   0.G   298.150  6000.000  B  66.08285 1",
+    "coeff_lines": [
+      " 6.39543902E+00 6.29869497E-04-2.49181864E-07 4.28162441E-11-2.67460827E-15    2",
+      "-8.15851762E+04-4.96958712E+00 2.64115070E+00 1.63307802E-02-2.63947336E-05    3",
+      " 2.02616422E-08-6.02257120E-12-8.08168865E+04 1.31013485E+01-7.94995736E+04    4"
+    ]
+  }
+}

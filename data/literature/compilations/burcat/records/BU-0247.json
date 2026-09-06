@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0247",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CF2  singlet",
+  "cas_as_published": "2154-59-8",
+  "formula": "CF2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": " 2.",
+      "element": "F",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "50.00751",
+    "value": 50.00751
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.35787718E+00",
+          "value": 5.35787718
+        },
+        {
+          "as_published": "1.80622418E-03",
+          "value": 0.00180622418
+        },
+        {
+          "as_published": "-7.80465045E-07",
+          "value": -7.80465045e-07
+        },
+        {
+          "as_published": "1.47642691E-10",
+          "value": 1.47642691e-10
+        },
+        {
+          "as_published": "-9.44754424E-15",
+          "value": -9.44754424e-15
+        },
+        {
+          "as_published": "-2.51728166E+04",
+          "value": -25172.8166
+        },
+        {
+          "as_published": "-2.63410779E+00",
+          "value": -2.63410779
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.56435487E+00",
+          "value": 3.56435487
+        },
+        {
+          "as_published": "1.23021056E-03",
+          "value": 0.00123021056
+        },
+        {
+          "as_published": "1.39909866E-05",
+          "value": 1.39909866e-05
+        },
+        {
+          "as_published": "-2.13708286E-08",
+          "value": -2.13708286e-08
+        },
+        {
+          "as_published": "9.10710807E-12",
+          "value": 9.10710807e-12
+        },
+        {
+          "as_published": "-2.44587979E+04",
+          "value": -24458.7979
+        },
+        {
+          "as_published": "7.83907808E+00",
+          "value": 7.83907808
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-2.32557300E+04",
+    "value": -23255.73,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "2154-59-8",
+    "CF2  DIFLUOROMETHYLENE  SIGMA=2  STATWT=1 A0=2.947 B0=0.417 C0=0.365  NU=1225,",
+    "1114,666  T0=19828 SIGMA=2  STATWT=3  A0=4.577 B0=0.334  C0=0.311  Nu=1180,1011,",
+    "517       T0=37226 SIGMA=2  STATWT=1  A0=4.577 B0=0.334  C0=0.311  Nu=1180,1011,",
+    "496  REF=Gurvich 91  HF298=-193.36+/-0.57 kJ  REF=Ruscic ATcT D 2013",
+    "{HF298=-191.26+/-1.36 kJ  REF=ATcT A HF298=-193.4+/-0.4 kJ  REF=ATcT C 2011;",
+    "HF298=-182.00+/-6.3 kJ  REF=JANAF 6/70; HF298=-186.6 kJ  REF=TRC 6/88}   Max Lst",
+    "Sq Error Cp @ 400 K 0.34%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 2439,
+    "header_line": 2447,
+    "end_line": 2450
+  },
+  "source_text": {
+    "header_line": "CF2  singlet      T 3/14C  1.F  2.   0.   0.G   200.000  6000.000  B  50.00751 1",
+    "coeff_lines": [
+      " 5.35787718E+00 1.80622418E-03-7.80465045E-07 1.47642691E-10-9.44754424E-15    2",
+      "-2.51728166E+04-2.63410779E+00 3.56435487E+00 1.23021056E-03 1.39909866E-05    3",
+      "-2.13708286E-08 9.10710807E-12-2.44587979E+04 7.83907808E+00-2.32557300E+04    4"
+    ]
+  }
+}

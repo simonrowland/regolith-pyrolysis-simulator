@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2138",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C16H10 Pyrene",
+  "cas_as_published": "129-00-0   [F&W notation A4]",
+  "formula": "C16H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/12",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "16.",
+      "element": "C",
+      "count": 16.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "202.25060",
+    "value": 202.2506
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.99100370E+01",
+          "value": 29.910037
+        },
+        {
+          "as_published": "4.26680281E-02",
+          "value": 0.0426680281
+        },
+        {
+          "as_published": "-1.57338134E-05",
+          "value": -1.57338134e-05
+        },
+        {
+          "as_published": "2.58516829E-09",
+          "value": 2.58516829e-09
+        },
+        {
+          "as_published": "-1.56679506E-13",
+          "value": -1.56679506e-13
+        },
+        {
+          "as_published": "1.27624176E+04",
+          "value": 12762.4176
+        },
+        {
+          "as_published": "-1.41870304E+02",
+          "value": -141.870304
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-4.04244612E+00",
+          "value": -4.04244612
+        },
+        {
+          "as_published": "9.15520165E-02",
+          "value": 0.0915520165
+        },
+        {
+          "as_published": "5.14380972E-05",
+          "value": 5.14380972e-05
+        },
+        {
+          "as_published": "-1.52760613E-07",
+          "value": -1.52760613e-07
+        },
+        {
+          "as_published": "7.30856860E-11",
+          "value": 7.3085686e-11
+        },
+        {
+          "as_published": "2.40702419E+04",
+          "value": 24070.2419
+        },
+        {
+          "as_published": "4.36665325E+01",
+          "value": 43.6665325
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.71212615E+04",
+    "value": 27121.2615,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "129-00-0   [F&W notation A4]",
+    "C16H10    PYRENE  SIGMA=2   IA=82.22  IB=149.195  IC=231.42   NU=3020,3019,3014,",
+    "3013,3003,3002,2996,2994,2993,2992,1654,1621,1604,1603,1566,1499,1493,1432,1427,",
+    "1425,1394,1384,1296,1281,1230,1220,1217,1203,1183,1164,1151,1134,1074,1071,1049,",
+    "1028,999,992,988,982,975,922,916,911,850,822,807,800,778,777,756,715,704,671(2),",
+    "569,564,524,523,504,485,483(2),440,392,391,341,255,245,210,149.5,95.1",
+    "REF=C.MELIUS DATABASE BAC/MP22 #255 AA70  HF298=225.5+/-2.5 kJ  REF=NIST Webbook",
+    "2012  {HF298=225.7 KJ   REF=Smith et. al, JCT 12,(1980),919;  HF298=230.9 kJ",
+    "REF=Green RMG 2013}   Max Lst Sq Error Cp @ 200 K 0.80%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24445,
+    "header_line": 24454,
+    "end_line": 24457
+  },
+  "source_text": {
+    "header_line": "C16H10 Pyrene     T 6/12C 16.H 10.   0.   0.G   200.000  6000.000  B 202.25060 1",
+    "coeff_lines": [
+      " 2.99100370E+01 4.26680281E-02-1.57338134E-05 2.58516829E-09-1.56679506E-13    2",
+      " 1.27624176E+04-1.41870304E+02-4.04244612E+00 9.15520165E-02 5.14380972E-05    3",
+      "-1.52760613E-07 7.30856860E-11 2.40702419E+04 4.36665325E+01 2.71212615E+04    4"
+    ]
+  }
+}

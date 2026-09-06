@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0888",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CH2=SiHCH3  Meth",
+  "cas_as_published": "38063-40-0",
+  "formula": "C2H6Si",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 2.",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "SI",
+      "count_as_published": " 1.",
+      "element": "Si",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "58.15454",
+    "value": 58.15454
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.80931463E+00",
+          "value": 9.80931463
+        },
+        {
+          "as_published": "1.26385727E-02",
+          "value": 0.0126385727
+        },
+        {
+          "as_published": "-4.43900394E-06",
+          "value": -4.43900394e-06
+        },
+        {
+          "as_published": "7.05618606E-10",
+          "value": 7.05618606e-10
+        },
+        {
+          "as_published": "-4.17813472E-14",
+          "value": -4.17813472e-14
+        },
+        {
+          "as_published": "1.10449153E+04",
+          "value": 11044.9153
+        },
+        {
+          "as_published": "-2.64316818E+01",
+          "value": -26.4316818
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "6.92406988E-01",
+          "value": 0.692406988
+        },
+        {
+          "as_published": "3.76073536E-02",
+          "value": 0.0376073536
+        },
+        {
+          "as_published": "-2.18453892E-05",
+          "value": -2.18453892e-05
+        },
+        {
+          "as_published": "-4.99576246E-09",
+          "value": -4.99576246e-09
+        },
+        {
+          "as_published": "7.21411169E-12",
+          "value": 7.21411169e-12
+        },
+        {
+          "as_published": "1.34537276E+04",
+          "value": 13453.7276
+        },
+        {
+          "as_published": "2.03665839E+01",
+          "value": 20.3665839
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.51322284E+04",
+    "value": 15132.2284,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "38063-40-0",
+    "C2H6Si  Methyl Methylene Silane  CH2=SiH-CH3  SIGMA=1  STATWT=1  IA=3.007",
+    "IB=13.8982  IC=16.4595  Ir(CH3)=0.477  ROSYM=3  V(3)=1600. cm-1  Nu=3252,3164,",
+    "3143,3126,3051,2257,1476,1412,1312,1016,907,993,846,827,759,668,639,609,322,225,",
+    "[112 internal rotation]  HF298=30.071+/-2. kcal  REF=Burcat G3B3  Max Lst Sq",
+    "Error Cp @ 6000 K 0.43%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 9258,
+    "header_line": 9264,
+    "end_line": 9267
+  },
+  "source_text": {
+    "header_line": "CH2=SiHCH3  Meth  T12/16C  2.H  6.SI 1.   0.G   200.000  6000.000  B  58.15454 1",
+    "coeff_lines": [
+      " 9.80931463E+00 1.26385727E-02-4.43900394E-06 7.05618606E-10-4.17813472E-14    2",
+      " 1.10449153E+04-2.64316818E+01 6.92406988E-01 3.76073536E-02-2.18453892E-05    3",
+      "-4.99576246E-09 7.21411169E-12 1.34537276E+04 2.03665839E+01 1.51322284E+04    4"
+    ]
+  }
+}

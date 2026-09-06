@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2265",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "HCL",
+  "cas_as_published": "7647-01-0",
+  "formula": "HCl",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "RUS 89",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  1",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": "  1",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "36.46064",
+    "value": 36.46064
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "0.27575767E+01",
+          "value": 2.7575767
+        },
+        {
+          "as_published": "0.14538737E-02",
+          "value": 0.0014538737
+        },
+        {
+          "as_published": "-0.47964697E-06",
+          "value": -4.7964697e-07
+        },
+        {
+          "as_published": "0.77790943E-10",
+          "value": 7.7790943e-11
+        },
+        {
+          "as_published": "-0.47957377E-14",
+          "value": -4.7957377e-15
+        },
+        {
+          "as_published": "-0.11913766E+05",
+          "value": -11913.766
+        },
+        {
+          "as_published": "0.65219722E+01",
+          "value": 6.5219722
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "0.34637647E+01",
+          "value": 3.4637647
+        },
+        {
+          "as_published": "0.47648423E-03",
+          "value": 0.00047648423
+        },
+        {
+          "as_published": "-0.20030122E-05",
+          "value": -2.0030122e-06
+        },
+        {
+          "as_published": "0.33171437E-08",
+          "value": 3.3171437e-09
+        },
+        {
+          "as_published": "-0.14495818E-11",
+          "value": -1.4495818e-12
+        },
+        {
+          "as_published": "-0.12144352E+05",
+          "value": -12144.352
+        },
+        {
+          "as_published": "0.26642828E+01",
+          "value": 2.6642828
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-0.11102278E+05",
+    "value": -11102.278,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "7647-01-0",
+    "HCl HYDROCHLORIC ACID CALCULATED FROM ORIGINAL TABLES  REF=Gurvich 1989",
+    "HF298=-92.31 kJ {HF298=-92.17+/-0.006 kJ   REF=ATcT C}  Max Lst Sq Error Cp @",
+    "6000 K 0.17%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 26062,
+    "header_line": 26066,
+    "end_line": 26069
+  },
+  "source_text": {
+    "header_line": "HCL               RUS 89H   1CL  1    0    0G   200.000  6000.000  B  36.46064 1",
+    "coeff_lines": [
+      " 0.27575767E+01 0.14538737E-02-0.47964697E-06 0.77790943E-10-0.47957377E-14    2",
+      "-0.11913766E+05 0.65219722E+01 0.34637647E+01 0.47648423E-03-0.20030122E-05    3",
+      " 0.33171437E-08-0.14495818E-11-0.12144352E+05 0.26642828E+01-0.11102278E+05    4"
+    ]
+  }
+}

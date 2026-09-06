@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0194",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CBr4",
+  "cas_as_published": "558-13-4",
+  "formula": "CBr4",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T04/04",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "BR",
+      "count_as_published": " 4.",
+      "element": "Br",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "331.62670",
+    "value": 331.6267
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.21245741E+01",
+          "value": 12.1245741
+        },
+        {
+          "as_published": "9.15750324E-04",
+          "value": 0.000915750324
+        },
+        {
+          "as_published": "-3.63156485E-07",
+          "value": -3.63156485e-07
+        },
+        {
+          "as_published": "6.25001719E-11",
+          "value": 6.25001719e-11
+        },
+        {
+          "as_published": "-3.90854515E-15",
+          "value": -3.90854515e-15
+        },
+        {
+          "as_published": "1.04626368E+04",
+          "value": 10462.6368
+        },
+        {
+          "as_published": "-2.67954406E+01",
+          "value": -26.7954406
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "5.10358598E+00",
+          "value": 5.10358598
+        },
+        {
+          "as_published": "3.39593343E-02",
+          "value": 0.0339593343
+        },
+        {
+          "as_published": "-6.24045027E-05",
+          "value": -6.24045027e-05
+        },
+        {
+          "as_published": "5.36483603E-08",
+          "value": 5.36483603e-08
+        },
+        {
+          "as_published": "-1.75710183E-11",
+          "value": -1.75710183e-11
+        },
+        {
+          "as_published": "1.17592386E+04",
+          "value": 11759.2386
+        },
+        {
+          "as_published": "6.21074038E+00",
+          "value": 6.21074038
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.43366428E+04",
+    "value": 14336.6428,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "558-13-4",
+    "CBr4  TetraBromoMethane  SIGMA=12  STATWT=1  IA=IB=IC=133.1264    NU=122(2),",
+    "182(3),267,672(3)  REF=Martin & Burcat JPC 108 (2004),7752 + Shimanouchi",
+    "HF298=102.01+/-1.05 kJ  REF=ATcT C 2011  {HF298=28.49+/-1.5 kcal  HF0=148.90 kJ",
+    "REF=Martin & Burcat JPC 108 (2004),7752;  HF298=28.68+/-3.6 kcal REF=Gurvich 91;",
+    "HF298=35.1 kcal  REF=Dittmer & Niemann  Phylips J. Res 37,(1982),1;  HF298=19.0",
+    "kcal  Ref=Kudchadker & Kudchadker JPCRD 4,(1975),457;  HF298=25.23+/-0.8 kcal",
+    "REF=Paddison & Tschuikow-Roux JPC A 102, (1998),6191;  HF298=20.05 kcal",
+    "REF=Binkerton et al JCT 16,(1984},661;  HF298=18.9 kcal REF=NBS 1982; HF298=12.",
+    "kcal  REF=JANAF 1985}   Max Lst Sq Error Cp @ 1200 K 0.14%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 1916,
+    "header_line": 1926,
+    "end_line": 1929
+  },
+  "source_text": {
+    "header_line": "CBr4              T04/04C  1.BR 4.   0.   0.G   200.000  6000.000  B 331.62670 1",
+    "coeff_lines": [
+      " 1.21245741E+01 9.15750324E-04-3.63156485E-07 6.25001719E-11-3.90854515E-15    2",
+      " 1.04626368E+04-2.67954406E+01 5.10358598E+00 3.39593343E-02-6.24045027E-05    3",
+      " 5.36483603E-08-1.75710183E-11 1.17592386E+04 6.21074038E+00 1.43366428E+04    4"
+    ]
+  }
+}

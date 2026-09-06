@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1731",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H13N3O5 BuNENA",
+  "cas_as_published": "82486-82-6",
+  "formula": "C6H13N3O5",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 8/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "13.",
+      "element": "H",
+      "count": 13.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 3.",
+      "element": "N",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 5.",
+      "element": "O",
+      "count": 5.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "207.18464",
+    "value": 207.18464
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.56595667E+01",
+          "value": 25.6595667
+        },
+        {
+          "as_published": "4.63996120E-02",
+          "value": 0.046399612
+        },
+        {
+          "as_published": "-1.70503916E-05",
+          "value": -1.70503916e-05
+        },
+        {
+          "as_published": "2.78802258E-09",
+          "value": 2.78802258e-09
+        },
+        {
+          "as_published": "-1.68232291E-13",
+          "value": -1.68232291e-13
+        },
+        {
+          "as_published": "-3.34787909E+04",
+          "value": -33478.7909
+        },
+        {
+          "as_published": "-9.91110787E+01",
+          "value": -99.1110787
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.23194932E+01",
+          "value": 12.3194932
+        },
+        {
+          "as_published": "1.42599738E-02",
+          "value": 0.0142599738
+        },
+        {
+          "as_published": "1.72187099E-04",
+          "value": 0.000172187099
+        },
+        {
+          "as_published": "-2.35294602E-07",
+          "value": -2.35294602e-07
+        },
+        {
+          "as_published": "9.41566130E-11",
+          "value": 9.4156613e-11
+        },
+        {
+          "as_published": "-2.64923749E+04",
+          "value": -26492.3749
+        },
+        {
+          "as_published": "-1.36605595E+01",
+          "value": -13.6605595
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-2.10847783E+04",
+    "value": -21084.7783,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "82486-82-6",
+    "C6H13N3O5 Butyl-NENA Ethane,2-Buthylnitroamino-1-nitrate  SIGMA=1  STATWT=1",
+    "IA=99.2943  IB=271.4209  IC=336.6000  [Ir(NO2)=5.96  ROSYM=2  V(3)=280.]x2",
+    "Ir(CH3)=0.51462  ROSYM=3  V(3)=300. cm-1  Ir(C3H7)=5.325  ROSYM=1  V(3)=680.",
+    "Nu=3168,3150,3137,3128,3114,3104,3098,3091,3078,3059,3048,3037,3027,1764,1643,",
+    "1544,1541,1530,1527,1516(2),1492,1448,1443,1428,1407,1388,1376,1371,1354,1345,",
+    "1323,1309,1304,1290,1088,1070,1054,1026,1017,948,920,887,865,807,798,765,759,",
+    "747,710,660,656,595,435,416,393,371,297,266,247,190,166,150,125,119,94,79",
+    "REF=Burcat B3LYP/6-31G(d)  HF298=-41.9 kcal  REF=NIST 94  HF298(sol)=-192.47 kJ",
+    "REF=Simmons Int Annu Conf ICT 25th 1994 Max Lst Sq Error Cp @ 6000 K 0.61%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 19299,
+    "header_line": 19309,
+    "end_line": 19312
+  },
+  "source_text": {
+    "header_line": "C6H13N3O5 BuNENA  T 8/14C  6.H 13.N  3.O  5.G   200.000  6000.000  B 207.18464 1",
+    "coeff_lines": [
+      " 2.56595667E+01 4.63996120E-02-1.70503916E-05 2.78802258E-09-1.68232291E-13    2",
+      "-3.34787909E+04-9.91110787E+01 1.23194932E+01 1.42599738E-02 1.72187099E-04    3",
+      "-2.35294602E-07 9.41566130E-11-2.64923749E+04-1.36605595E+01-2.10847783E+04    4"
+    ]
+  }
+}

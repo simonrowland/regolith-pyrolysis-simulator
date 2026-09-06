@@ -1,0 +1,182 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1196",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4F6  1,3-Butadien",
+  "cas_as_published": "685-63-2",
+  "formula": "C4F6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/10",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": " 6.",
+      "element": "F",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "162.03322",
+    "value": 162.03322
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.00972957E+01",
+          "value": 20.0972957
+        },
+        {
+          "as_published": "7.55273478E-03",
+          "value": 0.00755273478
+        },
+        {
+          "as_published": "-3.05215313E-06",
+          "value": -3.05215313e-06
+        },
+        {
+          "as_published": "5.30089577E-10",
+          "value": 5.30089577e-10
+        },
+        {
+          "as_published": "-3.33123744E-14",
+          "value": -3.33123744e-14
+        },
+        {
+          "as_published": "-1.28330353E+05",
+          "value": -128330.353
+        },
+        {
+          "as_published": "-7.20589097E+01",
+          "value": -72.0589097
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.99557938E-01",
+          "value": 0.399557938
+        },
+        {
+          "as_published": "7.80739795E-02",
+          "value": 0.0780739795
+        },
+        {
+          "as_published": "-1.09045918E-04",
+          "value": -0.000109045918
+        },
+        {
+          "as_published": "7.94831747E-08",
+          "value": 7.94831747e-08
+        },
+        {
+          "as_published": "-2.38161391E-11",
+          "value": -2.38161391e-11
+        },
+        {
+          "as_published": "-1.23543688E+05",
+          "value": -123543.688
+        },
+        {
+          "as_published": "2.61118917E+01",
+          "value": 26.1118917
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.20772000E+05",
+    "value": -120772.0,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "685-63-2",
+    "C4F6  PERFLUORO 1-3 BUTADIENE  SIGMA=1 SIGMAR=2  IA=42.1018  IB=80.1264",
+    "IC=116.0475  IR=132.823  V(3)=2850.  NU=1796,1381,1138,933,702,660,529,464,396,",
+    "375,329,181,1765,1329,1189,972,633,547,520,422,293,259,204    REF=WURREY, BUCY",
+    "AND DURIG   HF298=-240. KCAL REF=Atkinson &  Stedman J. Chem. Soc (1962),512",
+    "MAX LST SQ ERROR @ 1200 K 0.50 % ."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C4F6  1,3-Butadien",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 12766,
+    "header_line": 12772,
+    "end_line": 12775
+  },
+  "source_text": {
+    "header_line": "C4F6  1,3-ButadienT 3/10C  4.F  6.   0.   0.G   200.000  6000.000  B 162.03322 1",
+    "coeff_lines": [
+      " 2.00972957E+01 7.55273478E-03-3.05215313E-06 5.30089577E-10-3.33123744E-14    2",
+      "-1.28330353E+05-7.20589097E+01 3.99557938E-01 7.80739795E-02-1.09045918E-04    3",
+      " 7.94831747E-08-2.38161391E-11-1.23543688E+05 2.61118917E+01-1.20772000E+05    4"
+    ]
+  }
+}

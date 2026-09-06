@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0582",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CT3  methyl T-3",
+  "cas_as_published": "83972-34-3",
+  "formula": "CT3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T09/12",
+  "calc_quality_as_published": "D",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "T ",
+      "count_as_published": " 3.",
+      "element": "T",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "21.05885",
+    "value": 21.05885
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.06959928E+00",
+          "value": 5.06959928
+        },
+        {
+          "as_published": "4.70749053E-03",
+          "value": 0.00470749053
+        },
+        {
+          "as_published": "-1.76693950E-06",
+          "value": -1.7669395e-06
+        },
+        {
+          "as_published": "2.93499834E-10",
+          "value": 2.93499834e-10
+        },
+        {
+          "as_published": "-1.79152689E-14",
+          "value": -1.79152689e-14
+        },
+        {
+          "as_published": "1.19489368E+04",
+          "value": 11948.9368
+        },
+        {
+          "as_published": "-4.23775974E+00",
+          "value": -4.23775974
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.64280735E+00",
+          "value": 3.64280735
+        },
+        {
+          "as_published": "5.78049604E-03",
+          "value": 0.00578049604
+        },
+        {
+          "as_published": "9.14283863E-07",
+          "value": 9.14283863e-07
+        },
+        {
+          "as_published": "-2.94222118E-09",
+          "value": -2.94222118e-09
+        },
+        {
+          "as_published": "8.90368798E-13",
+          "value": 8.90368798e-13
+        },
+        {
+          "as_published": "1.25727583E+04",
+          "value": 12572.7583
+        },
+        {
+          "as_published": "4.05605519E+00",
+          "value": 4.05605519
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.39184698E+04",
+    "value": 13918.4698,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "83972-34-3",
+    "CT3  Methyl T-3  SIGMA=3  STATWT=2  IA=IB=0.8806  IC=1.7613  Nu=2121(2),1817.5,",
+    "885.5(2),309  HF298=27.659+/-2 kcal  REF=Burcat G3B3  Approximate Polynomial",
+    "Calculation  Max Lst Sq Error Cp @ 1300 K 0.57%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 5914,
+    "header_line": 5918,
+    "end_line": 5921
+  },
+  "source_text": {
+    "header_line": "CT3  methyl T-3   T09/12C  1.T  3.   0.   0.G   200.000  6000.000  D  21.05885 1",
+    "coeff_lines": [
+      " 5.06959928E+00 4.70749053E-03-1.76693950E-06 2.93499834E-10-1.79152689E-14    2",
+      " 1.19489368E+04-4.23775974E+00 3.64280735E+00 5.78049604E-03 9.14283863E-07    3",
+      "-2.94222118E-09 8.90368798E-13 1.25727583E+04 4.05605519E+00 1.39184698E+04    4"
+    ]
+  }
+}

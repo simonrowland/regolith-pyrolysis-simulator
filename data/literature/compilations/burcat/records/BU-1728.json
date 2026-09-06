@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1728",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H13  2M-5yl",
+  "cas_as_published": "65596-90-9",
+  "formula": "C6H13",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "A07/05",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "13.",
+      "element": "H",
+      "count": 13.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "85.16742",
+    "value": 85.16742
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.30255399E+01",
+          "value": 13.0255399
+        },
+        {
+          "as_published": "3.46052579E-02",
+          "value": 0.0346052579
+        },
+        {
+          "as_published": "-1.24155454E-05",
+          "value": -1.24155454e-05
+        },
+        {
+          "as_published": "1.99658702E-09",
+          "value": 1.99658702e-09
+        },
+        {
+          "as_published": "-1.19050622E-13",
+          "value": -1.19050622e-13
+        },
+        {
+          "as_published": "-2.77515469E+03",
+          "value": -2775.15469
+        },
+        {
+          "as_published": "-3.72134757E+01",
+          "value": -37.2134757
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "6.60629923E+00",
+          "value": 6.60629923
+        },
+        {
+          "as_published": "1.98623693E-02",
+          "value": 0.0198623693
+        },
+        {
+          "as_published": "7.69757749E-05",
+          "value": 7.69757749e-05
+        },
+        {
+          "as_published": "-1.11917751E-07",
+          "value": -1.11917751e-07
+        },
+        {
+          "as_published": "4.55660959E-11",
+          "value": 4.55660959e-11
+        },
+        {
+          "as_published": "5.59978604E+02",
+          "value": 559.978604
+        },
+        {
+          "as_published": "3.72645563E+00",
+          "value": 3.72645563
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.89288413E+03",
+    "value": 3892.88413,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "65596-90-9",
+    "C6H13  2-METHYL-PENTANE-5YL RADICAL CH3CH(CH3)C2H4CH2*  SIGMA=1  STATWT=2",
+    "IA=12.2796  IB=48.6781  IC=55.8408  [Ir(CH3)=0.5191  ROSYM=3  V(3)=780 cm-1 est]",
+    "x2  Ir(CH2*)=0.32193  ROSYM=1  V(3)=257. cm-1 est.  Ir(*CH2CH2-)=4.4635  ROSYM=1",
+    "V(3)=1200. cm-1 est.  Ir(*CH2CH2CH2-)=5.6854  ROSYM=1  V(3)=1200. cm-1 est.",
+    "Nu=3258,3160,3117,3108,3104,3098,3063,3043,3041,3035,3019,3002,2923,1541,3019,",
+    "3002,2923,1541,1536,1528,1521,1516,1499,1488,1448,1429,1416,1389,1371,1326,1312,",
+    "1243,1207,1176,1129,1092,1059,999,975,940,936,896,818,750,477,445,434,379,323,",
+    "256  HF298=7.736+/-1.9 kcal HF0=16.115 kcal  REF=Burcat G3B3 calc  {HF298=7.8",
+    "kcal  REF=NIST 94}   Max Lst Sq Error Cp @ 6000 K 0.59%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 19255,
+    "header_line": 19265,
+    "end_line": 19268
+  },
+  "source_text": {
+    "header_line": "C6H13  2M-5yl     A07/05C  6.H 13.   0.   0.G   200.000  6000.000  B  85.16742 1",
+    "coeff_lines": [
+      " 1.30255399E+01 3.46052579E-02-1.24155454E-05 1.99658702E-09-1.19050622E-13    2",
+      "-2.77515469E+03-3.72134757E+01 6.60629923E+00 1.98623693E-02 7.69757749E-05    3",
+      "-1.11917751E-07 4.55660959E-11 5.59978604E+02 3.72645563E+00 3.89288413E+03    4"
+    ]
+  }
+}

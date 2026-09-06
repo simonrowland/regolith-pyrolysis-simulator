@@ -1,0 +1,184 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0543",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CNO  (NCO)",
+  "cas_as_published": "22400-26-6",
+  "formula": "NCO",
+  "phase": "condensed",
+  "phase_as_published": "NCO",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "A 5/05",
+  "calc_quality_as_published": "A",
+  "composition": [
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "42.01684",
+    "value": 42.01684
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.08064474E+00",
+          "value": 5.08064474
+        },
+        {
+          "as_published": "2.37443587E-03",
+          "value": 0.00237443587
+        },
+        {
+          "as_published": "-9.07098904E-07",
+          "value": -9.07098904e-07
+        },
+        {
+          "as_published": "1.52286713E-10",
+          "value": 1.52286713e-10
+        },
+        {
+          "as_published": "-9.31009234E-15",
+          "value": -9.31009234e-15
+        },
+        {
+          "as_published": "1.35781204E+04",
+          "value": 13578.1204
+        },
+        {
+          "as_published": "-2.15734434E+00",
+          "value": -2.15734434
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.77405177E+00",
+          "value": 2.77405177
+        },
+        {
+          "as_published": "9.24523481E-03",
+          "value": 0.00924523481
+        },
+        {
+          "as_published": "-9.91773586E-06",
+          "value": -9.91773586e-06
+        },
+        {
+          "as_published": "6.68461303E-09",
+          "value": 6.68461303e-09
+        },
+        {
+          "as_published": "-2.09520542E-12",
+          "value": -2.09520542e-12
+        },
+        {
+          "as_published": "1.42369570E+04",
+          "value": 14236.957
+        },
+        {
+          "as_published": "9.75458670E+00",
+          "value": 9.7545867
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.53995606E+04",
+    "value": 15399.5606,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "22400-26-6",
+    "NCO  SIGMA=1 STATWT=2 B0=0.390  NU=1363,534(2),218  T0=95.589  SIGMA=1 STATWT=2",
+    "B0=0.39  NU=1267,534(2),1921  T0=22754.02  STATWT=2  B0=0.402  Nu=2338,681(2),",
+    "1289  T0=31751.1  STATWT=4  B0=0.356  Nu=2303,681(2),1047  REF=Jacox  JPCRD 27,",
+    "(1998),115  HF0=30.49+/-1 kcal   REF=Allen & Schaefer JCP,120,(2004).11586.",
+    "{HF298=31.5 kcal  REF= East & Allen J.Phys.Chem. 99,(1993),4638;  HF298=127.36",
+    "+/-0.4 kJ  REF=ATcT C 2011}   Max Lst Sq Error Cp @ 1300 K 0.42"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "phase_suffix_normalized_to_condensed",
+      "phase_as_published": "NCO",
+      "phase_normalized": "condensed",
+      "note": "Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am', 'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 5521,
+    "header_line": 5528,
+    "end_line": 5531
+  },
+  "source_text": {
+    "header_line": "CNO  (NCO)        A 5/05N  1.C  1.O  1.   0.G   200.000  6000.000  A  42.01684 1",
+    "coeff_lines": [
+      " 5.08064474E+00 2.37443587E-03-9.07098904E-07 1.52286713E-10-9.31009234E-15    2",
+      " 1.35781204E+04-2.15734434E+00 2.77405177E+00 9.24523481E-03-9.91773586E-06    3",
+      " 6.68461303E-09-2.09520542E-12 1.42369570E+04 9.75458670E+00 1.53995606E+04    4"
+    ]
+  }
+}

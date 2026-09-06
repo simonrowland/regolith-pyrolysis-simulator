@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1979",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C10H15 JP10 RAD.",
+  "cas_as_published": "1245563-39-6 or 1245563-38-5",
+  "formula": "C10H15",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "S 4/01",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "10.",
+      "element": "C",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "15.",
+      "element": "H",
+      "count": 15.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "135.22910",
+    "value": 135.2291
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.77659083E+01",
+          "value": 17.7659083
+        },
+        {
+          "as_published": "4.93981255E-02",
+          "value": 0.0493981255
+        },
+        {
+          "as_published": "-1.78151191E-05",
+          "value": -1.78151191e-05
+        },
+        {
+          "as_published": "2.88413387E-09",
+          "value": 2.88413387e-09
+        },
+        {
+          "as_published": "-1.73012768E-13",
+          "value": -1.73012768e-13
+        },
+        {
+          "as_published": "2.12676000E+03",
+          "value": 2126.76
+        },
+        {
+          "as_published": "-7.93158625E+01",
+          "value": -79.3158625
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.06425019E+00",
+          "value": 4.06425019
+        },
+        {
+          "as_published": "-8.85014262E-03",
+          "value": -0.00885014262
+        },
+        {
+          "as_published": "2.70737895E-04",
+          "value": 0.000270737895
+        },
+        {
+          "as_published": "-3.58057275E-07",
+          "value": -3.58057275e-07
+        },
+        {
+          "as_published": "1.44165309E-10",
+          "value": 1.44165309e-10
+        },
+        {
+          "as_published": "1.01359022E+04",
+          "value": 10135.9022
+        },
+        {
+          "as_published": "1.35328228E+01",
+          "value": 13.5328228
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.27067240E+04",
+    "value": 12706.724,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1245563-39-6 or 1245563-38-5",
+    "C10H15 JP-10 RADICAL IN MIDAPEX POSITION  STATWT=2  SIGMA=1  IA=30.37695",
+    "IB=70.70838   IC=80.0308 NU=164.3,190.2,247.6,309,347,401,502,574,601,837,689,",
+    "766,797,857,864,918,969,979,1013,1017,1029,1040,1069,1077,1104,1120,1132,1141,",
+    "1150,1158,1162,1165,1186,1193,1199,1230,1246,1251,1263,1288,1293,1328,1342,1357,",
+    "1367,1406,1407,1416,1419,1424,1429,1451,1494,1505,2963,2980,3048,3057,3061,3077,",
+    "3079,3124,3127,3128,3131,3137,3163,3179,3332  REF=AM1 calc HF298=25.251 kcal",
+    "REF=Dissoc React=98.1 kcal Max Lst Sq Error Cp @ 200 K ***1.57%***"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 22384,
+    "header_line": 22392,
+    "end_line": 22395
+  },
+  "source_text": {
+    "header_line": "C10H15 JP10 RAD.  S 4/01C 10.H 15.   0.   0.G   200.000  6000.000  B 135.22910 1",
+    "coeff_lines": [
+      " 1.77659083E+01 4.93981255E-02-1.78151191E-05 2.88413387E-09-1.73012768E-13    2",
+      " 2.12676000E+03-7.93158625E+01 4.06425019E+00-8.85014262E-03 2.70737895E-04    3",
+      "-3.58057275E-07 1.44165309E-10 1.01359022E+04 1.35328228E+01 1.27067240E+04    4"
+    ]
+  }
+}

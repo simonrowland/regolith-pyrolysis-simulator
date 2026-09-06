@@ -1,0 +1,188 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2220",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C24H46O2 Nervoni",
+  "cas_as_published": "506-37-6",
+  "formula": "C24H46O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/11",
+  "calc_quality_as_published": "E",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "24.",
+      "element": "C",
+      "count": 24.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "46.",
+      "element": "H",
+      "count": 46.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "366.62084",
+    "value": 366.62084
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.33203380E+01",
+          "value": 53.320338
+        },
+        {
+          "as_published": "1.41463312E-01",
+          "value": 0.141463312
+        },
+        {
+          "as_published": "-5.11318212E-05",
+          "value": -5.11318212e-05
+        },
+        {
+          "as_published": "8.28415900E-09",
+          "value": 8.284159e-09
+        },
+        {
+          "as_published": "-4.97045069E-13",
+          "value": -4.97045069e-13
+        },
+        {
+          "as_published": "-1.22193296E+05",
+          "value": -122193.296
+        },
+        {
+          "as_published": "-2.45549548E+02",
+          "value": -245.549548
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.85650095E+01",
+          "value": 28.5650095
+        },
+        {
+          "as_published": "-1.42626176E-02",
+          "value": -0.0142626176
+        },
+        {
+          "as_published": "6.15395378E-04",
+          "value": 0.000615395378
+        },
+        {
+          "as_published": "-7.87487803E-07",
+          "value": -7.87487803e-07
+        },
+        {
+          "as_published": "3.09228976E-10",
+          "value": 3.09228976e-10
+        },
+        {
+          "as_published": "-1.04752950E+05",
+          "value": -104752.95
+        },
+        {
+          "as_published": "-6.42576515E+01",
+          "value": -64.2576515
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-9.28434748E+04",
+    "value": -92843.4748,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "506-37-6",
+    "C24H46O2 Nervonic (cis-Tetracos-15-enoic) acid C8H17CH=CHC13H26COOH SIGMA=1",
+    "STATWT=1 IA=201.9536  IB=4616.5774  IC=4778.997   Ir(-COOH)=7.258  ROSYM=1",
+    "V(3)=272. cm-1 Ir(CH3)=0.52574  ROSYM=3  V(3)=340. cm-1  Ir(C2H5)=5.63081",
+    "ROSYM=1  V(3)=550. cm-1 est Ir(C3H7)=7.0  ROSYM=1  V(3)=700. cm-1 est.",
+    "Nu=3752,3142,3118,3110,3105,3097,3090,3081,3076,3072.5(2),3070,3065,3063,3057,",
+    "3054(2),3049,3043,3041(2),3036.7(2),3034(2),3031.3(3),3026.5(2),3023.5(2),3020,",
+    "3016.2(2),3011(4),3009(2),3008(2),3005.3(2),1844.5,1742,1528.5(2),1526,1522(2),",
+    "1514(3),1508(2),1503,1501(2),1499.3(3),1497(2),1496(2),1490,1473(2),1447.5,1432,",
+    "1427,1418.5(2),1416(2),1414,1410.5,1398.5(2),1381,1368,1359,1347(2),1342,",
+    "1339.5(2),1338,1331(2),1328.5(2),1326(2),1315(2),1308,1298,1292(2),1281,",
+    "1268.5(2),1259,1243.5(2),1235,1222,1219(2),1185,1161,1141(2),1125,1114,1089,",
+    "1076,1071.5(2),1068.5(2),1066(2),1058,1054.5(2),1042.5(2),1030,1024.5,1017(2),",
+    "1011,1005,995,989,986,965,955,933,910,900,883,873,861,821,802,783,759,757,754,",
+    "742,737.5,735.2(3),734,673.5,635,584,535,528,521,505,481,476,449,433,399,381,",
+    "343,310,300,258,251,249,213.5,199,174,170,164,159,153,150,148,132,125,120.5,118,",
+    "105,96,90,87,79,60,54.6,52.8,44.93,37.2,33.1,29.66,20.35   HF298=-184.5 kcal",
+    "REF=NIST 94  Max Lst Sq Error Cp @ 200 K 0.68%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 25622,
+    "header_line": 25640,
+    "end_line": 25643
+  },
+  "source_text": {
+    "header_line": "C24H46O2 Nervoni  T 6/11C 24.H 46.O  2.   0.G   200.000  6000.000  E 366.62084 1",
+    "coeff_lines": [
+      " 5.33203380E+01 1.41463312E-01-5.11318212E-05 8.28415900E-09-4.97045069E-13    2",
+      "-1.22193296E+05-2.45549548E+02 2.85650095E+01-1.42626176E-02 6.15395378E-04    3",
+      "-7.87487803E-07 3.09228976E-10-1.04752950E+05-6.42576515E+01-9.28434748E+04    4"
+    ]
+  }
+}

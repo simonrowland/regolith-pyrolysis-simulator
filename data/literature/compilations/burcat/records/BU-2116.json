@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2116",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C14H10  5-VynylA",
+  "cas_as_published": "183581-99-9  [71087-10-0 no specific location]",
+  "formula": "C14H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/13",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "14.",
+      "element": "C",
+      "count": 14.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "178.22920",
+    "value": 178.2292
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.56512672E+01",
+          "value": 25.6512672
+        },
+        {
+          "as_published": "3.96753924E-02",
+          "value": 0.0396753924
+        },
+        {
+          "as_published": "-1.44367567E-05",
+          "value": -1.44367567e-05
+        },
+        {
+          "as_published": "2.34760346E-09",
+          "value": 2.34760346e-09
+        },
+        {
+          "as_published": "-1.41202449E-13",
+          "value": -1.41202449e-13
+        },
+        {
+          "as_published": "2.28034210E+04",
+          "value": 22803.421
+        },
+        {
+          "as_published": "-1.13947739E+02",
+          "value": -113.947739
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-1.43524611E+00",
+          "value": -1.43524611
+        },
+        {
+          "as_published": "7.41899561E-02",
+          "value": 0.0741899561
+        },
+        {
+          "as_published": "5.48045023E-05",
+          "value": 5.48045023e-05
+        },
+        {
+          "as_published": "-1.39956484E-07",
+          "value": -1.39956484e-07
+        },
+        {
+          "as_published": "6.54935754E-11",
+          "value": 6.54935754e-11
+        },
+        {
+          "as_published": "3.20012991E+04",
+          "value": 32001.2991
+        },
+        {
+          "as_published": "3.50500747E+01",
+          "value": 35.0500747
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.51094268E+04",
+    "value": 35109.4268,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "183581-99-9  [71087-10-0 no specific location]",
+    "C14H10  5-Vinyl-Acenaphthylene C12H7-CH=CH2  SIGMA=1  STATWT=1   IA=70.3028",
+    "IB=119.8965  IC=187.9859  Ir(CH2=CH-)=3.39278  ROSYM=1  V(3)=920. cm-1  Nu=3256,",
+    "3242,3225,3222,3195,3192,3180,3175,3170,3142,1700,1665,1651,1643,1554,1529,1496,",
+    "1477,1462,1446,1407,1389,1348,1329,1283,1249,1230,1206,1188,1141,1111,1088,1056,",
+    "1037,1031,983.5,958,944,939,935,924,866,852,835,792,786,759,727,687,674.5,633,",
+    "617.5,587,555,536,488,468,444,415,354,281,236,193,170,144.3  REF=Burcat B3LYP/",
+    "6-31G(d)  HF298=69.77+/-5. kcal Green RMG 2013  {HF298=90.22 kcal  MOPAC 2000}",
+    "Max Lst Sq Error Cp @ 200 K 0.71%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24169,
+    "header_line": 24178,
+    "end_line": 24181
+  },
+  "source_text": {
+    "header_line": "C14H10  5-VynylA  T12/13C 14.H 10.   0.   0.G   200.000  6000.000  B 178.22920 1",
+    "coeff_lines": [
+      " 2.56512672E+01 3.96753924E-02-1.44367567E-05 2.34760346E-09-1.41202449E-13    2",
+      " 2.28034210E+04-1.13947739E+02-1.43524611E+00 7.41899561E-02 5.48045023E-05    3",
+      "-1.39956484E-07 6.54935754E-11 3.20012991E+04 3.50500747E+01 3.51094268E+04    4"
+    ]
+  }
+}

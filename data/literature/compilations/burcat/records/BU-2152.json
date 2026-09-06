@@ -1,0 +1,195 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2152",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C17H33O2 Margarate",
+  "cas_as_published": "N/A  (646-26-4 radical anion)",
+  "formula": "C17H33O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/08",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "17.",
+      "element": "C",
+      "count": 17.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "33.",
+      "element": "H",
+      "count": 33.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "269.44272",
+    "value": 269.44272
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.78923815E+01",
+          "value": 37.8923815
+        },
+        {
+          "as_published": "1.04007606E-01",
+          "value": 0.104007606
+        },
+        {
+          "as_published": "-3.79436166E-05",
+          "value": -3.79436166e-05
+        },
+        {
+          "as_published": "6.18116159E-09",
+          "value": 6.18116159e-09
+        },
+        {
+          "as_published": "-3.72151772E-13",
+          "value": -3.72151772e-13
+        },
+        {
+          "as_published": "-8.06690682E+04",
+          "value": -80669.0682
+        },
+        {
+          "as_published": "-1.68433922E+02",
+          "value": -168.433922
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.17506399E+01",
+          "value": 21.7506399
+        },
+        {
+          "as_published": "-1.79120675E-02",
+          "value": -0.0179120675
+        },
+        {
+          "as_published": "4.60688346E-04",
+          "value": 0.000460688346
+        },
+        {
+          "as_published": "-5.82171854E-07",
+          "value": -5.82171854e-07
+        },
+        {
+          "as_published": "2.27410316E-10",
+          "value": 2.27410316e-10
+        },
+        {
+          "as_published": "-6.82463839E+04",
+          "value": -68246.3839
+        },
+        {
+          "as_published": "-4.51549750E+01",
+          "value": -45.154975
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-5.95305316E+04",
+    "value": -59530.5316,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A  (646-26-4 radical anion)",
+    "C17H33O2 Margarate Radical  C16H33COO*  SIGMA=1  STATWT=2  IA=22.6072",
+    "IB=2115.9916  IC=2129.9550  Ir(CH3)=0.52574  ROSYM=3  V(3)=340. Ir(C2H5)=5.63081",
+    "ROSYM=1  V(3)=3147.  cm-1   Ir(C3H7)=~7.0  ROSYM=1  V(3)=~3700. cm-1",
+    "Ir(-COO*)=7.258  ROSYM=1  V(3)-272. cm-1.  Nu=3107.5(2),3098,3078(2),3069(3),",
+    "3061(2),3051(2),3045,3040.5(2),3037(2),3035,3032(3),3027(2),3020(3),3013(3),",
+    "3011,3009(2),3008(2),1597,1530(2),1522(3),1514(2),1509,1504(2),1501(2),1499(2),",
+    "1497.5(2),1466,1427,1418.6(2),1416(2),1413,1405,1392.5,1375,1354,1350.5(2),",
+    "1345.5(2),1338(2),1332(2),1329,1324,1310,1308,1288(2),1267,1264,1245,1242,",
+    "1223(2),1213,1163,1147,1136,1113,1077,1072(2),1068.5(2),1066.3(2),1055,1043,",
+    "1039,1031,1018,1002.6(2),987,982,961,919,904,901,877,838,803.5,766(2),743,",
+    "737.3(2),736(2),622,542,515(2),496,448(2),386,357,313,262,249,231.6,188,176,162,",
+    "157,139.4,133(2),118.7,111,102.3,82.580.68,72.34,53.26,45.68,42.94",
+    "HF298=118.3+/-3. kcal  REF=Osmont, Catoire et al Comb & Flame 155,(2008),343-355",
+    "Max Lst Sq Error Cp @ 200 K @ 1300 K 0.68%."
+  ],
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C17H33O2 Margarate",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    },
+    {
+      "kind": "cas_identifier_nonstandard",
+      "cas_as_published": "N/A  (646-26-4 radical anion)"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24672,
+    "header_line": 24687,
+    "end_line": 24690
+  },
+  "source_text": {
+    "header_line": "C17H33O2 MargarateT10/08C 17.H 33.O  2.   0.G   200.000  6000.000  C 269.44272 1",
+    "coeff_lines": [
+      " 3.78923815E+01 1.04007606E-01-3.79436166E-05 6.18116159E-09-3.72151772E-13    2",
+      "-8.06690682E+04-1.68433922E+02 2.17506399E+01-1.79120675E-02 4.60688346E-04    3",
+      "-5.82171854E-07 2.27410316E-10-6.82463839E+04-4.51549750E+01-5.95305316E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1680",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H10 1,3-Hexadien",
+  "cas_as_published": "14596-92-0",
+  "formula": "C6H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "A09/05",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "82.14360",
+    "value": 82.1436
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.22036500E+01",
+          "value": 12.20365
+        },
+        {
+          "as_published": "2.83718594E-02",
+          "value": 0.0283718594
+        },
+        {
+          "as_published": "-1.01536016E-05",
+          "value": -1.01536016e-05
+        },
+        {
+          "as_published": "1.62760437E-09",
+          "value": 1.62760437e-09
+        },
+        {
+          "as_published": "-9.68053329E-14",
+          "value": -9.68053329e-14
+        },
+        {
+          "as_published": "9.92055464E+02",
+          "value": 992.055464
+        },
+        {
+          "as_published": "-3.55142375E+01",
+          "value": -35.5142375
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.33043903E+00",
+          "value": 4.33043903
+        },
+        {
+          "as_published": "2.50924406E-02",
+          "value": 0.0250924406
+        },
+        {
+          "as_published": "5.32462166E-05",
+          "value": 5.32462166e-05
+        },
+        {
+          "as_published": "-8.82977395E-08",
+          "value": -8.82977395e-08
+        },
+        {
+          "as_published": "3.75813502E-11",
+          "value": 3.75813502e-11
+        },
+        {
+          "as_published": "4.31740800E+03",
+          "value": 4317.408
+        },
+        {
+          "as_published": "1.10070626E+01",
+          "value": 11.0070626
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "7.03748507E+03",
+    "value": 7037.48507,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "14596-92-0",
+    "C6H10  1,3-HEXADIENE  SIGMA=1  STATWT=1  IA=5.4844  IB=65.1013  IC=65.7673",
+    "Ir(CH3)=0.52230  ROSYM=3  [V(3)=1025 cm-1 Bronstein 2002]  Ir(CH2=CH-)=2.98935",
+    "ROSYM=1  [V(3)=994 cm-1  REF=Xuedong IJQC 69,(1998)]  Ir(C2H5)=4.59592  ROSYM=1",
+    "V(3)=980. cm-1  Nu=3245,3163,3151,3139,3131,3122,3114,3069,3047,3016,1737,1689,",
+    "1537,1527,1510,1476,1436,1377,1345,1340,1318,1283,1222,1135,1098,1055,1038,990,",
+    "959,919,917,872,793,664,500,448,384,262,195  HF298=58.377+/-8 kJ  HF0=84.568 kJ.",
+    "REF=Burcat G3B3 calc.  {HF298=13.4 KCAL  REF=Weismann & Benson Prog Energy Comb.",
+    "Sci 15,(1989),273}    Max Lst Sq Error  Cp @ 6000 K 0.56%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C6H10 1,3-Hexadien",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 18628,
+    "header_line": 18637,
+    "end_line": 18640
+  },
+  "source_text": {
+    "header_line": "C6H10 1,3-HexadienA09/05C  6.H 10.   0.   0.G   200.000  6000.000  B  82.14360 1",
+    "coeff_lines": [
+      " 1.22036500E+01 2.83718594E-02-1.01536016E-05 1.62760437E-09-9.68053329E-14    2",
+      " 9.92055464E+02-3.55142375E+01 4.33043903E+00 2.50924406E-02 5.32462166E-05    3",
+      "-8.82977395E-08 3.75813502E-11 4.31740800E+03 1.10070626E+01 7.03748507E+03    4"
+    ]
+  }
+}

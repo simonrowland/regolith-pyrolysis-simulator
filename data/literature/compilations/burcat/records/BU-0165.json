@@ -1,0 +1,200 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0165",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "BrOBr",
+  "cas_as_published": "21308-80-5",
+  "formula": "Br2O",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "ATcT/C",
+  "calc_quality_as_published": "A",
+  "composition": [
+    {
+      "element_as_published": "BR",
+      "count_as_published": " 2.",
+      "element": "Br",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "175.80740",
+    "value": 175.8074
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "2500.000",
+    "value": 2500.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "-2.62634818E+01",
+          "value": -26.2634818
+        },
+        {
+          "as_published": "9.89180447E-02",
+          "value": 0.0989180447
+        },
+        {
+          "as_published": "-1.07473125E-04",
+          "value": -0.000107473125
+        },
+        {
+          "as_published": "4.95870096E-08",
+          "value": 4.95870096e-08
+        },
+        {
+          "as_published": "-7.88470019E-12",
+          "value": -7.88470019e-12
+        },
+        {
+          "as_published": "1.90588457E+04",
+          "value": 19058.8457
+        },
+        {
+          "as_published": "1.64572634E+02",
+          "value": 164.572634
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.06249629E+00",
+          "value": 3.06249629
+        },
+        {
+          "as_published": "1.72160432E-02",
+          "value": 0.0172160432
+        },
+        {
+          "as_published": "-3.18524669E-05",
+          "value": -3.18524669e-05
+        },
+        {
+          "as_published": "2.74089533E-08",
+          "value": 2.74089533e-08
+        },
+        {
+          "as_published": "-8.95127816E-12",
+          "value": -8.95127816e-12
+        },
+        {
+          "as_published": "1.11348122E+04",
+          "value": 11134.8122
+        },
+        {
+          "as_published": "1.35469565E+01",
+          "value": 13.5469565
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.25816194E+04",
+    "value": 12581.6194,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "21308-80-5",
+    "Br2O Br-O-Br            T0=      0.       SIGMA=    2.      STATW=   1.",
+    "      A0=     1.108     B0=     0.046     C0=     0.044",
+    "Nu=533,181,629          T0=   10050.      SIGMA=    1.      STATW=   3.",
+    "      A0=     0.894     B0=     0.030     C0=     0.029",
+    "Nu=94,202,656           T0=   10450.      SIGMA=    1.      STATW=   1.",
+    "      A0=     0.783     B0=     0.027     C0=     0.026",
+    "Nu=57,118,731           T0=   10650.      SIGMA=    2.      STATW=   3.",
+    "      B0=     0.019     Nu=36,55(2),742",
+    "      T0=   12700.      SIGMA=    2.      STATW=   3.",
+    "      A0=     0.730     B0=     0.040     C0-     0.038",
+    "Nu=434,150,701          T0=   22700.      SIGMA=    2.      STATW=   1.",
+    "      A0=     0.880     B0=     0.030     C0=     0.029",
+    "Nu=409,146,816          T0=   22950.      SIGMA=    2.      STATW=   3.",
+    "      A0=     0.442     B0=     0.055     C0=     0.049",
+    "NU=470,179,1039         REF=Jacox JPCRD 32,(2003),1 ;Grant et al. JPC A 114,",
+    "(2010),4254 ;Grein JPC A 114,(2010), 6157  HF298=104.6+/-1.2 kJ  REF=Ruscic",
+    "ATcT C   {HF298=26.56+/-2. kcal  REF=Burcat G3B3;  HF298=107.6+/-3.5 kJ",
+    "REF=M.W.Chase JPCRD 25 (1996),1069}  Max Lst Sq Error Cp @ 2500 K 0.47% and",
+    "Cp @ 5000 K ***2.09%***"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "duplicate_name_as_published",
+      "name_as_published": "BrOBr",
+      "record_ids": [
+        "BU-0165",
+        "BU-0166"
+      ],
+      "note": "Distinct BURCAT.THR 4-line records; not merged."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 1632,
+    "header_line": 1652,
+    "end_line": 1655
+  },
+  "source_text": {
+    "header_line": "BrOBr             ATcT/CBR 2.O  1.   0.   0.G   200.000  2500.000  A 175.80740 1",
+    "coeff_lines": [
+      "-2.62634818E+01 9.89180447E-02-1.07473125E-04 4.95870096E-08-7.88470019E-12    2",
+      " 1.90588457E+04 1.64572634E+02 3.06249629E+00 1.72160432E-02-3.18524669E-05    3",
+      " 2.74089533E-08-8.95127816E-12 1.11348122E+04 1.35469565E+01 1.25816194E+04    4"
+    ]
+  }
+}

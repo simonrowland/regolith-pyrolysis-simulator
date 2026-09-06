@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3320",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Si4H9- SiH3SiH2S",
+  "cas_as_published": "286950-09-2",
+  "formula": "Si4H9E",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/17",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SI",
+      "count_as_published": " 4.",
+      "element": "Si",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "121.41401",
+    "value": 121.41401
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.86752248E+01",
+          "value": 18.6752248
+        },
+        {
+          "as_published": "1.65933906E-02",
+          "value": 0.0165933906
+        },
+        {
+          "as_published": "-6.24180923E-06",
+          "value": -6.24180923e-06
+        },
+        {
+          "as_published": "1.03839217E-09",
+          "value": 1.03839217e-09
+        },
+        {
+          "as_published": "-6.34541607E-14",
+          "value": -6.34541607e-14
+        },
+        {
+          "as_published": "-1.66332524E+03",
+          "value": -1663.32524
+        },
+        {
+          "as_published": "-6.72343463E+01",
+          "value": -67.2343463
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.04957378E+00",
+          "value": 3.04957378
+        },
+        {
+          "as_published": "7.09021033E-02",
+          "value": 0.0709021033
+        },
+        {
+          "as_published": "-8.90086398E-05",
+          "value": -8.90086398e-05
+        },
+        {
+          "as_published": "6.52705728E-08",
+          "value": 6.52705728e-08
+        },
+        {
+          "as_published": "-2.02118659E-11",
+          "value": -2.02118659e-11
+        },
+        {
+          "as_published": "2.36855010E+03",
+          "value": 2368.5501
+        },
+        {
+          "as_published": "1.14049053E+01",
+          "value": 11.4049053
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "5.76221569E+03",
+    "value": 5762.21569,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "286950-09-2",
+    "Si4H9-  Tetrasilane anion  SiH3-SiH-SiH2-SiH3-  SIGMA=2  STATWT=1  IA=12.6871",
+    "IB=95.7751  IC=104.346  [Ir(SiH3)=0.418  ROSYM=3  V(3)=600.  cm-1]x2  Nu=2168,",
+    "2163,2139,2117,2109,2103,2094,2077,1976.5,974.1(2),967,962.5,953,922,908,752,",
+    "721,701,631,538,478,443,425,407,386,349,338,125,107,97.2,[70.3,29.4  internal",
+    "rotation]  HF298=47.9+/-8. kJ  thermal electron  REF=Burcat G3B3  Max Lst Sq",
+    "Error Cp @ 1300 K 0.57%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 35213,
+    "header_line": 35220,
+    "end_line": 35223
+  },
+  "source_text": {
+    "header_line": "Si4H9- SiH3SiH2S  T11/17SI 4.H  9.E  1.   0.G   298.150  6000.000  B 121.41401 1",
+    "coeff_lines": [
+      " 1.86752248E+01 1.65933906E-02-6.24180923E-06 1.03839217E-09-6.34541607E-14    2",
+      "-1.66332524E+03-6.72343463E+01 3.04957378E+00 7.09021033E-02-8.90086398E-05    3",
+      " 6.52705728E-08-2.02118659E-11 2.36855010E+03 1.14049053E+01 5.76221569E+03    4"
+    ]
+  }
+}

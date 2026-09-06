@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2257",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "DCL",
+  "cas_as_published": "7698-05-7",
+  "formula": "DCl",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "tpis89",
+  "calc_quality_as_published": "A",
+  "composition": [
+    {
+      "element_as_published": "D ",
+      "count_as_published": " 1.",
+      "element": "D",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 1.",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "37.46680",
+    "value": 37.4668
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.04100835E+00",
+          "value": 3.04100835
+        },
+        {
+          "as_published": "1.41957997E-03",
+          "value": 0.00141957997
+        },
+        {
+          "as_published": "-5.19510076E-07",
+          "value": -5.19510076e-07
+        },
+        {
+          "as_published": "8.99765574E-11",
+          "value": 8.99765574e-11
+        },
+        {
+          "as_published": "-5.76689180E-15",
+          "value": -5.7668918e-15
+        },
+        {
+          "as_published": "-1.22258903E+04",
+          "value": -12225.8903
+        },
+        {
+          "as_published": "5.44916833E+00",
+          "value": 5.44916833
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.59726566E+00",
+          "value": 3.59726566
+        },
+        {
+          "as_published": "-7.80561084E-04",
+          "value": -0.000780561084
+        },
+        {
+          "as_published": "1.58078911E-06",
+          "value": 1.58078911e-06
+        },
+        {
+          "as_published": "3.35717381E-10",
+          "value": 3.35717381e-10
+        },
+        {
+          "as_published": "-7.07923160E-13",
+          "value": -7.0792316e-13
+        },
+        {
+          "as_published": "-1.23031807E+04",
+          "value": -12303.1807
+        },
+        {
+          "as_published": "2.85029589E+00",
+          "value": 2.85029589
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.12510542E+04",
+    "value": -11251.0542,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "7698-05-7",
+    "DCl DEUTEROCHLORIC ACID  T0=0 STATWT=1 Be=5.444  WE=2144  WEXE=26.9 ALFAE=0.1121",
+    "T0=75160   STATWT=2    Be=5.1793   WE=2199   WEXE=26.9  ALFAE=0.1121",
+    "T0=76520   STATWT=1    Be=1.555    WE=684.6  WEXE=26.9  ALFAE=0.1121",
+    "T0=77525   STATWT=2    Be=4.9605   WE=2114.1 WEXE=26.9  ALFAE=0.1121",
+    "HF298=-93.345+/-0.21 kJ   REF=JANAF  Polynomial calculated from Gurvich's table",
+    "HF298=-93.547+/-0.21 kJ  Max Lst Sq Error Cp @ 1300 K 0.3%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 25984,
+    "header_line": 25991,
+    "end_line": 25994
+  },
+  "source_text": {
+    "header_line": "DCL               tpis89D  1.CL 1.   0.   0.G   200.000  6000.000  A  37.46680 1",
+    "coeff_lines": [
+      " 3.04100835E+00 1.41957997E-03-5.19510076E-07 8.99765574E-11-5.76689180E-15    2",
+      "-1.22258903E+04 5.44916833E+00 3.59726566E+00-7.80561084E-04 1.58078911E-06    3",
+      " 3.35717381E-10-7.07923160E-13-1.23031807E+04 2.85029589E+00-1.12510542E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2063",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C12H8O2",
+  "cas_as_published": "262-12-4",
+  "formula": "C12H8O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 8/03",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "12.",
+      "element": "C",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 8.",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "184.19432",
+    "value": 184.19432
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.60370044E+01",
+          "value": 26.0370044
+        },
+        {
+          "as_published": "3.50780491E-02",
+          "value": 0.0350780491
+        },
+        {
+          "as_published": "-1.29210307E-05",
+          "value": -1.29210307e-05
+        },
+        {
+          "as_published": "2.12161308E-09",
+          "value": 2.12161308e-09
+        },
+        {
+          "as_published": "-1.28529989E-13",
+          "value": -1.28529989e-13
+        },
+        {
+          "as_published": "-1.82365905E+04",
+          "value": -18236.5905
+        },
+        {
+          "as_published": "-1.17407370E+02",
+          "value": -117.40737
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-1.48214627E+00",
+          "value": -1.48214627
+        },
+        {
+          "as_published": "7.51205359E-02",
+          "value": 0.0751205359
+        },
+        {
+          "as_published": "3.87198163E-05",
+          "value": 3.87198163e-05
+        },
+        {
+          "as_published": "-1.19145352E-07",
+          "value": -1.19145352e-07
+        },
+        {
+          "as_published": "5.69742514E-11",
+          "value": 5.69742514e-11
+        },
+        {
+          "as_published": "-9.05611402E+03",
+          "value": -9056.11402
+        },
+        {
+          "as_published": "3.29719044E+01",
+          "value": 32.9719044
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-6.02561065E+03",
+    "value": -6025.61065,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "262-12-4",
+    "C12H8O2 Dibenzo-p-Dioxin  SIGMA=4   IA=39.2555  IB=176.1272  IC=215.3827",
+    "NU=3053(4),3051(4),1634,1593,1586,1572,1505,1502,1438,1429,1407,1399,1316,1310,",
+    "1293,1263,1245,1222,1172,1171,1136,1112,1031,1019,1008(2),954,953,873,859,847,",
+    "842,829,737,727(2),690,689,653,645,583,547,478,459,457,455,436,373,298,254.5,",
+    "246.5,219,114.7,50.96  REF=Dorofeeva unpublished results, {HF298=-59.2+/-3.8 kJ.",
+    "REF=Chirico et.al J.Chem.Termodynam 22,(1990),1075-1096  HF298(Solid)=-148.7",
+    "+/-4.4 kJ  NIST WEBBOOK 2000, Lukyanova, Kolesov et al Zh. Fiz. Khim,71 (1997),",
+    "406-408}  HF298=50.1+/-2.2 kJ  REF=Pimenova et al J.Chem. Thermo 34 (2002),385.",
+    "Max Lst Sq Error Cp @ 1300 K 0.56%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 23483,
+    "header_line": 23493,
+    "end_line": 23496
+  },
+  "source_text": {
+    "header_line": "C12H8O2           T 8/03C 12.H  8.O  2.   0.G   200.000  6000.000  B 184.19432 1",
+    "coeff_lines": [
+      " 2.60370044E+01 3.50780491E-02-1.29210307E-05 2.12161308E-09-1.28529989E-13    2",
+      "-1.82365905E+04-1.17407370E+02-1.48214627E+00 7.51205359E-02 3.87198163E-05    3",
+      "-1.19145352E-07 5.69742514E-11-9.05611402E+03 3.29719044E+01-6.02561065E+03    4"
+    ]
+  }
+}

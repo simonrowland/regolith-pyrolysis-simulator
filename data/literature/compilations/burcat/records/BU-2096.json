@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2096",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C13H10O  Benzoph",
+  "cas_as_published": "119-61-9",
+  "formula": "C13H10O",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/12",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "13.",
+      "element": "C",
+      "count": 13.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "182.21790",
+    "value": 182.2179
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.69509439E+01",
+          "value": 26.9509439
+        },
+        {
+          "as_published": "3.81873610E-02",
+          "value": 0.038187361
+        },
+        {
+          "as_published": "-1.40903729E-05",
+          "value": -1.40903729e-05
+        },
+        {
+          "as_published": "2.31407947E-09",
+          "value": 2.31407947e-09
+        },
+        {
+          "as_published": "-1.40154419E-13",
+          "value": -1.40154419e-13
+        },
+        {
+          "as_published": "-5.14739159E+03",
+          "value": -5147.39159
+        },
+        {
+          "as_published": "-1.18309988E+02",
+          "value": -118.309988
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.03306499E+00",
+          "value": 2.03306499
+        },
+        {
+          "as_published": "5.30784735E-02",
+          "value": 0.0530784735
+        },
+        {
+          "as_published": "1.04699494E-04",
+          "value": 0.000104699494
+        },
+        {
+          "as_published": "-1.89966945E-07",
+          "value": -1.89966945e-07
+        },
+        {
+          "as_published": "8.33777701E-11",
+          "value": 8.33777701e-11
+        },
+        {
+          "as_published": "4.09498015E+03",
+          "value": 4094.98015
+        },
+        {
+          "as_published": "2.27447694E+01",
+          "value": 22.7447694
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "7.64927819E+03",
+    "value": 7649.27819,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "119-61-9",
+    "C13H10O  Bezophenone (Diphenyl ketone)  SIGMA=2  STATWT=1  IA=48.8225",
+    "IB=206.0012  IC=241.6463  [Ir(C6H5)=7.166  ROSYM=2  V(3)=524.63 cm-1]",
+    "Nu=3219(2),3216,3213,3203,3192.4(2),3182(2),1739,1654.7(2),1632.5(2),1532(2),",
+    "1487(2),1364(2),1345(2),1297,1210,1204,1189,1172,1113,1108.5,1055(2),1017(2),",
+    "1008(2),990,985,961,955,939,872,868,830,780,733,718.6,713,696,652,633,630,573,",
+    "452,447,426,415,381,290,238,216,138,97.34  REF=Burcat B3LYP/6-31G(d)",
+    "HF298=63.6+/-12.5 kJ  REF=Catoire et al Energy & Fuels 22,(2008),4269  Max Lst",
+    "Sq Error Cp @ 200 K 0.74%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 23919,
+    "header_line": 23928,
+    "end_line": 23931
+  },
+  "source_text": {
+    "header_line": "C13H10O  Benzoph  T 6/12C 13.H 10.O  1.   0.G   200.000  6000.000  B 182.21790 1",
+    "coeff_lines": [
+      " 2.69509439E+01 3.81873610E-02-1.40903729E-05 2.31407947E-09-1.40154419E-13    2",
+      "-5.14739159E+03-1.18309988E+02 2.03306499E+00 5.30784735E-02 1.04699494E-04    3",
+      "-1.89966945E-07 8.33777701E-11 4.09498015E+03 2.27447694E+01 7.64927819E+03    4"
+    ]
+  }
+}

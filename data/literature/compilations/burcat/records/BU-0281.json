@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0281",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CHCLF2  HCFC-22",
+  "cas_as_published": "75-45-6",
+  "formula": "CHF2Cl",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 1.",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": " 2.",
+      "element": "F",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 1.",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "86.46815",
+    "value": 86.46815
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "7.76128170E+00",
+          "value": 7.7612817
+        },
+        {
+          "as_published": "4.91347187E-03",
+          "value": 0.00491347187
+        },
+        {
+          "as_published": "-1.82716472E-06",
+          "value": -1.82716472e-06
+        },
+        {
+          "as_published": "3.01909107E-10",
+          "value": 3.01909107e-10
+        },
+        {
+          "as_published": "-1.83696720E-14",
+          "value": -1.8369672e-14
+        },
+        {
+          "as_published": "-6.19252567E+04",
+          "value": -61925.2567
+        },
+        {
+          "as_published": "-1.29719847E+01",
+          "value": -12.9719847
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.58815578E+00",
+          "value": 2.58815578
+        },
+        {
+          "as_published": "1.48447979E-02",
+          "value": 0.0148447979
+        },
+        {
+          "as_published": "1.50136954E-07",
+          "value": 1.50136954e-07
+        },
+        {
+          "as_published": "-1.39370626E-08",
+          "value": -1.39370626e-08
+        },
+        {
+          "as_published": "7.48510026E-12",
+          "value": 7.48510026e-12
+        },
+        {
+          "as_published": "-6.03178454E+04",
+          "value": -60317.8454
+        },
+        {
+          "as_published": "1.47131828E+01",
+          "value": 14.7131828
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-5.89090638E+04",
+    "value": -58909.0638,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "75-45-6",
+    "CHClF2  CLORODIFLUOROMETHANE  (HCFC-22)   SIGMA=1   STATWT=1  IA=8.2004",
+    "IB=17.3858  IC=24.0489  NU=3026,1312,1178,806,598,419,1343,1115,369 REF=Chen",
+    "JPCRD 5,(1976),571  HF298=-489.8+/-2.0 kJ  REF=Ruscic ATcT D 2013 {HF298=-482.75",
+    "+/-1.1 kJ  REF=ATcT C 2011;  HF298=-481.9+/-8 kJ  REF=Burcat G3B3 calc 2008;",
+    "HF298=-475.+/-15. kJ  REF=TSIV 79}   Max Lst Sq Error Cp @ 1300 K 0.41%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 2778,
+    "header_line": 2784,
+    "end_line": 2787
+  },
+  "source_text": {
+    "header_line": "CHCLF2  HCFC-22   T 3/14C  1.H  1.F  2.CL 1.G   200.000  6000.000  B  86.46815 1",
+    "coeff_lines": [
+      " 7.76128170E+00 4.91347187E-03-1.82716472E-06 3.01909107E-10-1.83696720E-14    2",
+      "-6.19252567E+04-1.29719847E+01 2.58815578E+00 1.48447979E-02 1.50136954E-07    3",
+      "-1.39370626E-08 7.48510026E-12-6.03178454E+04 1.47131828E+01-5.89090638E+04    4"
+    ]
+  }
+}

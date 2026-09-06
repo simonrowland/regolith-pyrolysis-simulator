@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2094",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C13H10  Fluorene",
+  "cas_as_published": "86-73-7",
+  "formula": "C13H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/07",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "13.",
+      "element": "C",
+      "count": 13.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "166.21850",
+    "value": 166.2185
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.33961594E+01",
+          "value": 23.3961594
+        },
+        {
+          "as_published": "3.76272122E-02",
+          "value": 0.0376272122
+        },
+        {
+          "as_published": "-1.37117389E-05",
+          "value": -1.37117389e-05
+        },
+        {
+          "as_published": "2.24351896E-09",
+          "value": 2.24351896e-09
+        },
+        {
+          "as_published": "-1.35502173E-13",
+          "value": -1.35502173e-13
+        },
+        {
+          "as_published": "9.60546553E+03",
+          "value": 9605.46553
+        },
+        {
+          "as_published": "-1.04754427E+02",
+          "value": -104.754427
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-1.08010254E+00",
+          "value": -1.08010254
+        },
+        {
+          "as_published": "5.81364450E-02",
+          "value": 0.058136445
+        },
+        {
+          "as_published": "8.71414836E-05",
+          "value": 8.71414836e-05
+        },
+        {
+          "as_published": "-1.72419903E-07",
+          "value": -1.72419903e-07
+        },
+        {
+          "as_published": "7.76417263E-11",
+          "value": 7.76417263e-11
+        },
+        {
+          "as_published": "1.83197800E+04",
+          "value": 18319.78
+        },
+        {
+          "as_published": "3.21625902E+01",
+          "value": 32.1625902
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.10475422E+04",
+    "value": 21047.5422,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "86-73-7",
+    "C13H10  Fluorene (o-Biphenylenemethane)  Sigma=2  STATWT=1  IA=38.5514",
+    "IB=143.6548  IC=181.6888  Nu=3208(2),3195(2),3184(2),3177(2),3063,3036,",
+    "1665.5(2),1641,1637,1525.5(2),1501,1495,1481,1393,1363,1342,1331,1265,1233,1214,",
+    "1202,1191,1187,1169,1138,1123,1059,1055,1025,923,978.5(2),939,928,884,876,854,",
+    "816,802,760,757,746,712,644,636,577,552,497,483,443,426,420,280,245,217,139,",
+    "100.17  REF=B3LYP/6-31G(d) calc  HF298=175.0+/-1.5 kJ  REF=Rakus, Verevkin et al",
+    "Chem. Ber 127,(1994),1095  {HF298=166.9+/-4.1 kJ  REF Sabbah Bul Soc Chim Fr.",
+    "128,(1991),350;  HF298=177.5 kJ  REF=NIST 94}  Max Lst Sq Error Cp @ 200 K 0.94%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 23892,
+    "header_line": 23901,
+    "end_line": 23904
+  },
+  "source_text": {
+    "header_line": "C13H10  Fluorene  T11/07C 13.H 10.   0.   0.G   200.000  6000.000  B 166.21850 1",
+    "coeff_lines": [
+      " 2.33961594E+01 3.76272122E-02-1.37117389E-05 2.24351896E-09-1.35502173E-13    2",
+      " 9.60546553E+03-1.04754427E+02-1.08010254E+00 5.81364450E-02 8.71414836E-05    3",
+      "-1.72419903E-07 7.76417263E-11 1.83197800E+04 3.21625902E+01 2.10475422E+04    4"
+    ]
+  }
+}

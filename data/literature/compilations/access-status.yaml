@@ -78,6 +78,26 @@ sources:
     date: '2026-09-06'
     evidence: Byte-copied thermo.inp from docs-private/research/2026-08-01-cea-sweep/; fixed-column parse of every PRODUCTS and REACTANTS record; round-trip test in tests/test_nasa_glenn_compilation.py.
 
+  burcat:
+    citation: Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960; current electronic files (species last added 3 January 2023). Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.
+    identifier: ANL-05/20; TAE 960
+    doi: 10.2172/925269
+    access: open_non_commercial_with_citation
+    official_url: https://respecth.elte.hu/burcat.php
+    technion_url: http://burcat.technion.ac.il/dir
+    licence: Free for non-commercial use with citation. Commercial inclusion forbidden without written permission from the authors (quoted from BURCAT.THR.txt header). Printed 2005 report is US DOE ANL-05/20.
+    local_status: complete_harvest
+    harvested_path: data/literature/compilations/burcat/
+    harvested_record_count: 3446
+    harvested_polynomial_record_count: 3407
+    harvested_comment_only_record_count: 39
+    source_path: data/literature/compilations/burcat/source/BURCAT.THR.txt
+    source_sha256: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
+    xml_path: data/literature/compilations/burcat/source/BURCAT_THR.xml
+    xml_sha256: 0f4cfd21cfa19f620110bbe63bbb96beff112a2c5e8cf38c885c6d7b3d00a3af
+    date: '2026-09-06'
+    evidence: Byte-copied BURCAT.THR.txt, BURCAT_THR.xml, and sidecar.yaml from the corpus clone; NASA-7 4-line parse of every polynomial plus comment-only CAS stanzas; XML used only as a cross-check (2005 snapshot); round-trip test in tests/test_burcat_compilation.py. Archives.zip not committed.
+
   ivtanthermo_glushko:
     citation: IVTANTHERMO thermodynamic database, Institute for High Temperatures, Russian Academy of Sciences; Glushko thermodynamic-property compilation.
     access: current_open_bulk_distribution_not_located

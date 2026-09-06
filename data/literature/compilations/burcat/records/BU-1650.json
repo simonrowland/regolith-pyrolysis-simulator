@@ -1,0 +1,181 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1650",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H7N+ AnIline+",
+  "cas_as_published": "N/A (C6H5-NH2++ 64554-25-2)",
+  "formula": "C6H7NE-1",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/18",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 7.",
+      "element": "H",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": "-1.",
+      "element": "E",
+      "count": -1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "93.12597",
+    "value": 93.12597
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.39853007E+01",
+          "value": 13.9853007
+        },
+        {
+          "as_published": "2.24039770E-02",
+          "value": 0.022403977
+        },
+        {
+          "as_published": "-7.99257025E-06",
+          "value": -7.99257025e-06
+        },
+        {
+          "as_published": "1.28527708E-09",
+          "value": 1.28527708e-09
+        },
+        {
+          "as_published": "-7.67642839E-14",
+          "value": -7.67642839e-14
+        },
+        {
+          "as_published": "9.50373459E+04",
+          "value": 95037.3459
+        },
+        {
+          "as_published": "-5.19658422E+01",
+          "value": -51.9658422
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-5.24795687E+00",
+          "value": -5.24795687
+        },
+        {
+          "as_published": "7.37429343E-02",
+          "value": 0.0737429343
+        },
+        {
+          "as_published": "-5.14150402E-05",
+          "value": -5.14150402e-05
+        },
+        {
+          "as_published": "8.79637211E-09",
+          "value": 8.79637211e-09
+        },
+        {
+          "as_published": "3.72891087E-12",
+          "value": 3.72891087e-12
+        },
+        {
+          "as_published": "1.00436373E+05",
+          "value": 100436.373
+        },
+        {
+          "as_published": "4.78099546E+01",
+          "value": 47.8099546
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.01714232E+05",
+    "value": 101714.232,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A (C6H5-NH2++ 64554-25-2)",
+    "C6H7N+ Aniline cation C6H5-NH2+  SIGMA=2  STATWT=2  IA=15.6215  IB=31.3271",
+    "IC=46.0486  Ir(NH2)=0.2827  ROSYM=2  V(3)=1989 cm-1 Nu=3670,3550,3235,3230,3220,  3208.(2),1685.5,1642,1558,1524.5,1479,1406,1400,1371,1213,1190,1135,1032,1017,",
+    "1013,998,993,917,826,812,798,639,624,593,563,531,454,390,368,[186 internal ",
+    "rotation] HF298=845.704+/-8. kJ thermal electron  HF0=860.427+/-8. kJ stationary ",
+    "electron  REF=Burcat G3B3  Max Lst Sq Error Cp @ 1300 K 0.56%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "cas_identifier_nonstandard",
+      "cas_as_published": "N/A (C6H5-NH2++ 64554-25-2)"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 18269,
+    "header_line": 18275,
+    "end_line": 18278
+  },
+  "source_text": {
+    "header_line": "C6H7N+ AnIline+   T11/18C  6.H  7.N  1.E -1.G   298.150  6000.000  B  93.12597 1",
+    "coeff_lines": [
+      " 1.39853007E+01 2.24039770E-02-7.99257025E-06 1.28527708E-09-7.67642839E-14    2",
+      " 9.50373459E+04-5.19658422E+01-5.24795687E+00 7.37429343E-02-5.14150402E-05    3",
+      " 8.79637211E-09 3.72891087E-12 1.00436373E+05 4.78099546E+01 1.01714232E+05    4"
+    ]
+  }
+}

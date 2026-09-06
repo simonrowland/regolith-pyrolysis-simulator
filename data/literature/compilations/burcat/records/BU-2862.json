@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2862",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "N2H2O2  NitrAmide",
+  "cas_as_published": "7782-94-7",
+  "formula": "N2H2O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T05/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 2.",
+      "element": "N",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 2.",
+      "element": "H",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "62.02816",
+    "value": 62.02816
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "7.59908894E+00",
+          "value": 7.59908894
+        },
+        {
+          "as_published": "7.37836190E-03",
+          "value": 0.0073783619
+        },
+        {
+          "as_published": "-2.63297942E-06",
+          "value": -2.63297942e-06
+        },
+        {
+          "as_published": "4.23515801E-10",
+          "value": 4.23515801e-10
+        },
+        {
+          "as_published": "-2.53002701E-14",
+          "value": -2.53002701e-14
+        },
+        {
+          "as_published": "-2.60534598E+03",
+          "value": -2605.34598
+        },
+        {
+          "as_published": "-1.41498967E+01",
+          "value": -14.1498967
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.66061003E+00",
+          "value": 1.66061003
+        },
+        {
+          "as_published": "2.07895695E-02",
+          "value": 0.0207895695
+        },
+        {
+          "as_published": "-6.92956910E-06",
+          "value": -6.9295691e-06
+        },
+        {
+          "as_published": "-8.63794138E-09",
+          "value": -8.63794138e-09
+        },
+        {
+          "as_published": "5.86001794E-12",
+          "value": 5.86001794e-12
+        },
+        {
+          "as_published": "-8.51973632E+02",
+          "value": -851.973632
+        },
+        {
+          "as_published": "1.71579058E+01",
+          "value": 17.1579058
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.91642682E+02",
+    "value": 491.642682,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "7782-94-7",
+    "NH2NO2  NITRAMIDE  SIGMA=1  STATWT=1  IA=6.7086  IB=7.0645  IC=13.675  REF=G3B3",
+    "Nu=3359,1558,1350,951,798,692,628,3478,1613,1227,484,402  REF=Nonella Muller",
+    "Huber J Mol Spect 112(1),(1985),142  HF298=4.088+/-8 kJ  REF=Burcat G3B3",
+    "{HF298=-26.0+/-10 kJ  REF=Gurvich 1989;  HF298=-3. kJ  REF= Dorofeeva & Tolmach.",
+    "Thermochim. Acta 240,(1994),47-66}. Max Lst Sq Error Cp @ 6000 0.44 %."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 31133,
+    "header_line": 31139,
+    "end_line": 31142
+  },
+  "source_text": {
+    "header_line": "N2H2O2  NitrAmide T05/16N  2.H  2.O  2.   0.G   200.000  6000.000  B  62.02816 1",
+    "coeff_lines": [
+      " 7.59908894E+00 7.37836190E-03-2.63297942E-06 4.23515801E-10-2.53002701E-14    2",
+      "-2.60534598E+03-1.41498967E+01 1.66061003E+00 2.07895695E-02-6.92956910E-06    3",
+      "-8.63794138E-09 5.86001794E-12-8.51973632E+02 1.71579058E+01 4.91642682E+02    4"
+    ]
+  }
+}

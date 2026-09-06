@@ -1,0 +1,173 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2335",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6Cr23",
+  "cas_as_published": "12105-81-6",
+  "formula": "C6Cr23",
+  "phase": "cr",
+  "phase_as_published": "S",
+  "phase_card_as_published": "S",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "B  /89",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CR",
+      "count_as_published": "23.",
+      "element": "Cr",
+      "count": 23.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "1267.97630",
+    "value": 1267.9763
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "1793.000",
+    "value": 1793.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.01158896E+01",
+          "value": 90.1158896
+        },
+        {
+          "as_published": "-3.96673567E-03",
+          "value": -0.00396673567
+        },
+        {
+          "as_published": "2.71679400E-05",
+          "value": 2.716794e-05
+        },
+        {
+          "as_published": "-9.85562288E-09",
+          "value": -9.85562288e-09
+        },
+        {
+          "as_published": "1.44623799E-12",
+          "value": 1.44623799e-12
+        },
+        {
+          "as_published": "-6.83766452E+04",
+          "value": -68376.6452
+        },
+        {
+          "as_published": "-4.44799405E+02",
+          "value": -444.799405
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.38920966E+01",
+          "value": 13.8920966
+        },
+        {
+          "as_published": "3.31573484E-01",
+          "value": 0.331573484
+        },
+        {
+          "as_published": "-5.26586194E-04",
+          "value": -0.000526586194
+        },
+        {
+          "as_published": "3.94794929E-07",
+          "value": 3.94794929e-07
+        },
+        {
+          "as_published": "-1.08766607E-10",
+          "value": -1.08766607e-10
+        },
+        {
+          "as_published": "-5.44583198E+04",
+          "value": -54458.3198
+        },
+        {
+          "as_published": "-8.42575556E+01",
+          "value": -84.2575556
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-3.95025083E+04",
+    "value": -39502.5083,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "12105-81-6",
+    "Cr23C6  23-Chromium 6-Carbide Solid.  Data taken from I. Barin 1989.",
+    "HF298(S)=-328.444 kJ."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 26644,
+    "header_line": 26647,
+    "end_line": 26650
+  },
+  "source_text": {
+    "header_line": "C6Cr23            B  /89C  6.CR23.   0.   0.S   298.150  1793.000  C1267.97630 1",
+    "coeff_lines": [
+      " 9.01158896E+01-3.96673567E-03 2.71679400E-05-9.85562288E-09 1.44623799E-12    2",
+      "-6.83766452E+04-4.44799405E+02 1.38920966E+01 3.31573484E-01-5.26586194E-04    3",
+      " 3.94794929E-07-1.08766607E-10-5.44583198E+04-8.42575556E+01-3.95025083E+04    4"
+    ]
+  }
+}

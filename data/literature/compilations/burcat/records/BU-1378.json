@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1378",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4N8O6  DDFP",
+  "cas_as_published": "132029-05-1",
+  "formula": "C4N8O6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 8/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 8.",
+      "element": "N",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 6.",
+      "element": "O",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "256.09312",
+    "value": 256.09312
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.19751109E+01",
+          "value": 31.9751109
+        },
+        {
+          "as_published": "1.92588683E-02",
+          "value": 0.0192588683
+        },
+        {
+          "as_published": "-7.63147650E-06",
+          "value": -7.6314765e-06
+        },
+        {
+          "as_published": "1.30708449E-09",
+          "value": 1.30708449e-09
+        },
+        {
+          "as_published": "-8.13335936E-14",
+          "value": -8.13335936e-14
+        },
+        {
+          "as_published": "7.40398595E+04",
+          "value": 74039.8595
+        },
+        {
+          "as_published": "-1.34520868E+02",
+          "value": -134.520868
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.44726761E+00",
+          "value": 1.44726761
+        },
+        {
+          "as_published": "9.08547501E-02",
+          "value": 0.0908547501
+        },
+        {
+          "as_published": "-4.34912779E-05",
+          "value": -4.34912779e-05
+        },
+        {
+          "as_published": "-2.46037912E-08",
+          "value": -2.46037912e-08
+        },
+        {
+          "as_published": "2.06213050E-11",
+          "value": 2.0621305e-11
+        },
+        {
+          "as_published": "8.30602202E+04",
+          "value": 83060.2202
+        },
+        {
+          "as_published": "2.61533207E+01",
+          "value": 26.1533207
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "8.71068049E+04",
+    "value": 87106.8049,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "132029-05-1",
+    "C4N8O6  DDFP 1,4-DiNitro-DiFurazano-Piperazine  SIGMA=4  STATWT=1  IA=148.5664",
+    "IB=178.5578  IC=286.0760  [Ir(NO2)=5.96  ROSYM=2  V(3)=150. cm-1]  Nu=1772,1767,",
+    "1658,1635,1570,1556,1462,1402,1353,1333,1316,1249,1138,1059,996,949,945,912,904,",
+    "871,863,852,801,793,735,725,717,712,611,604,499,485,482,452,429,426,378,349,303,",
+    "280,249,174,160,120,64,62  REF=Burcat B3LYP/6-31(d)  HF298=173.1+/-3. kcal",
+    "REF=Osmont & Catoire C&F 151,(2007),262  {HF298=178.74 kcal  REF=Yong,Weihua,",
+    "Heming  Struct Chem  24(4),,(2013),1071}  Max Lst Sq Error Cp @ 1300 K 0.55%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 15002,
+    "header_line": 15010,
+    "end_line": 15013
+  },
+  "source_text": {
+    "header_line": "C4N8O6  DDFP      T 8/14C  4.N  8.O  6.   0.G   200.000  6000.000  B 256.09312 1",
+    "coeff_lines": [
+      " 3.19751109E+01 1.92588683E-02-7.63147650E-06 1.30708449E-09-8.13335936E-14    2",
+      " 7.40398595E+04-1.34520868E+02 1.44726761E+00 9.08547501E-02-4.34912779E-05    3",
+      "-2.46037912E-08 2.06213050E-11 8.30602202E+04 2.61533207E+01 8.71068049E+04    4"
+    ]
+  }
+}

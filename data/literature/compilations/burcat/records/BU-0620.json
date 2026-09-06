@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0620",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C2D6N2 Azomethan",
+  "cas_as_published": "65844-97-5 and 64919-23-9 or 1681-47-6",
+  "formula": "C2D6N2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 2.",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "D ",
+      "count_as_published": " 6.",
+      "element": "D",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 2.",
+      "element": "N",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "64.11949",
+    "value": 64.11949
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.37217032E+01",
+          "value": 13.7217032
+        },
+        {
+          "as_published": "1.34336059E-02",
+          "value": 0.0134336059
+        },
+        {
+          "as_published": "-5.10940228E-06",
+          "value": -5.10940228e-06
+        },
+        {
+          "as_published": "8.56194827E-10",
+          "value": 8.56194827e-10
+        },
+        {
+          "as_published": "-5.25856684E-14",
+          "value": -5.25856684e-14
+        },
+        {
+          "as_published": "8.27341216E+03",
+          "value": 8273.41216
+        },
+        {
+          "as_published": "-4.95773986E+01",
+          "value": -49.5773986
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.89020118E+00",
+          "value": 2.89020118
+        },
+        {
+          "as_published": "1.96281416E-02",
+          "value": 0.0196281416
+        },
+        {
+          "as_published": "4.62714140E-05",
+          "value": 4.6271414e-05
+        },
+        {
+          "as_published": "-8.14119563E-08",
+          "value": -8.14119563e-08
+        },
+        {
+          "as_published": "3.54717155E-11",
+          "value": 3.54717155e-11
+        },
+        {
+          "as_published": "1.23428851E+04",
+          "value": 12342.8851
+        },
+        {
+          "as_published": "1.19006646E+01",
+          "value": 11.9006646
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.43416750E+04",
+    "value": 14341.675,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "65844-97-5 and 64919-23-9 or 1681-47-6",
+    "C2D6N2 AZOMETHANE-D6 (CD3NNCD3)  STATWT=1  SIGMA=2  IA=3.147  IB=24.215",
+    "IC=25.133  IR=0.765  ROSYM=3  V(0)=1700.  NU=2234,2127,1569,1122,1044,1034,761,",
+    "523,2225,1027,803,2239,1049,896,261,2240,1115,1112,1051,921,900,304,(191,166",
+    "TORSIONAL FREQ)  HF298=28.5 kcal.   REF=PAMIDIMUKKALA,ROGERS &SKINNER  JPCRD 11,",
+    "(1982),82  MAX LST SQ ERROR  Cp @ 200 K  0.68 % ."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 6287,
+    "header_line": 6293,
+    "end_line": 6296
+  },
+  "source_text": {
+    "header_line": "C2D6N2 Azomethan  T11/09C  2.D  6.N  2.   0.G   200.000  6000.000  B  64.11949 1",
+    "coeff_lines": [
+      " 1.37217032E+01 1.34336059E-02-5.10940228E-06 8.56194827E-10-5.25856684E-14    2",
+      " 8.27341216E+03-4.95773986E+01 2.89020118E+00 1.96281416E-02 4.62714140E-05    3",
+      "-8.14119563E-08 3.54717155E-11 1.23428851E+04 1.19006646E+01 1.43416750E+04    4"
+    ]
+  }
+}

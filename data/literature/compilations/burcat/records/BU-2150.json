@@ -1,0 +1,191 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2150",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C17H32O2 Margarole",
+  "cas_as_published": "1981-50-6",
+  "formula": "C17H32O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/12",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "17.",
+      "element": "C",
+      "count": 17.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "32.",
+      "element": "H",
+      "count": 32.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "268.43478",
+    "value": 268.43478
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.63911169E+01",
+          "value": 36.3911169
+        },
+        {
+          "as_published": "1.00315988E-01",
+          "value": 0.100315988
+        },
+        {
+          "as_published": "-3.62200359E-05",
+          "value": -3.62200359e-05
+        },
+        {
+          "as_published": "5.86345740E-09",
+          "value": 5.8634574e-09
+        },
+        {
+          "as_published": "-3.51591059E-13",
+          "value": -3.51591059e-13
+        },
+        {
+          "as_published": "-9.29509509E+04",
+          "value": -92950.9509
+        },
+        {
+          "as_published": "-1.60055603E+02",
+          "value": -160.055603
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.10490927E+01",
+          "value": 21.0490927
+        },
+        {
+          "as_published": "-1.02708696E-02",
+          "value": -0.0102708696
+        },
+        {
+          "as_published": "4.19814816E-04",
+          "value": 0.000419814816
+        },
+        {
+          "as_published": "-5.32461771E-07",
+          "value": -5.32461771e-07
+        },
+        {
+          "as_published": "2.07867667E-10",
+          "value": 2.07867667e-10
+        },
+        {
+          "as_published": "-8.13896598E+04",
+          "value": -81389.6598
+        },
+        {
+          "as_published": "-4.41202950E+01",
+          "value": -44.120295
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-7.28154515E+04",
+    "value": -72815.4515,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1981-50-6",
+    "C17H32O2  Margaroleic (9-Heptadecenoic cis) acid C8H17CH=CHC6H12COOH  STATWT=1",
+    "IA=77.4801  IB=1444.6026  IC=1463.071  Ir(OH)=0.14246  ROSYM=1  V(3)=280. cm-1",
+    "Ir(CH3)=0.52574  ROSYM=3  V(3)=340. cm-1  Ir(C2H5)=5.63  ROSYM=1  V(3)=900. cm-1",
+    "Ir(-COOH)=7.026  ROSYM=1. V(3)=1800. cm-1  Nu=41.1,50.82,59.89,67.63,90.89,107,",
+    "110.5,117,122,132,146,157,169.5,205,216,230,256,265,276,313.5,318,356,372,426.5,",
+    "451,459,483,522,548,592.5,715,726,739,749,753,785,802,817,830,850,883,905,907,",
+    "935,971,980,1006,1015.5(2),1031,1034,1053,1057.5,1061,1073,1077,1086,1100,",
+    "1116.8(2),1134,1144,1178,1183,1201,1204,1231.5,1246,1255,1261,1280,1292.5,1304,",
+    "1317,1328.5(2),1343,1346(2),1350,1354.5(2),1361,1377,1389,1397,1407,1414,1418,",
+    "1426(2),1443,1504,1508(2),1515(2),1516.5,1518(2),1523,1526.5(2),1531(2),1535(2),",
+    "1543(2),1751,1845,3007,3013(2),3018(2),3024.9(2),3028.4(2),3032,3033,3037.5,",
+    "3042.4(2),3048,3052.5(2),3061,3066.2(2),3071,3078,3079(2),3087,3106,3111,3117,",
+    "3123,3127,3134,3160.  REF=Burcat G3B3  HF298=-144.7 kcal  REF=Osmont et al IJCK",
+    "39,(2007),481 Max Lst Sq Error Cp @ 1300 K 0.63%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C17H32O2 Margarole",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24640,
+    "header_line": 24655,
+    "end_line": 24658
+  },
+  "source_text": {
+    "header_line": "C17H32O2 MargaroleT 3/12C 17.H 32.O  2.   0.G   200.000  6000.000  B 268.43478 1",
+    "coeff_lines": [
+      " 3.63911169E+01 1.00315988E-01-3.62200359E-05 5.86345740E-09-3.51591059E-13    2",
+      "-9.29509509E+04-1.60055603E+02 2.10490927E+01-1.02708696E-02 4.19814816E-04    3",
+      "-5.32461771E-07 2.07867667E-10-8.13896598E+04-4.41202950E+01-7.28154515E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,185 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1976",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C10H12O3 Coniferyl",
+  "cas_as_published": "458-35-5",
+  "formula": "C10H12O3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/12",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "10.",
+      "element": "C",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "12.",
+      "element": "H",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "180.20048",
+    "value": 180.20048
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.44519893E+01",
+          "value": 24.4519893
+        },
+        {
+          "as_published": "4.17627677E-02",
+          "value": 0.0417627677
+        },
+        {
+          "as_published": "-1.49969478E-05",
+          "value": -1.49969478e-05
+        },
+        {
+          "as_published": "2.42161664E-09",
+          "value": 2.42161664e-09
+        },
+        {
+          "as_published": "-1.45027396E-13",
+          "value": -1.45027396e-13
+        },
+        {
+          "as_published": "-5.58781149E+04",
+          "value": -55878.1149
+        },
+        {
+          "as_published": "-9.98134750E+01",
+          "value": -99.813475
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.66638811E+00",
+          "value": 4.66638811
+        },
+        {
+          "as_published": "5.38319422E-02",
+          "value": 0.0538319422
+        },
+        {
+          "as_published": "7.40723187E-05",
+          "value": 7.40723187e-05
+        },
+        {
+          "as_published": "-1.40041177E-07",
+          "value": -1.40041177e-07
+        },
+        {
+          "as_published": "6.09649260E-11",
+          "value": 6.0964926e-11
+        },
+        {
+          "as_published": "-4.84231489E+04",
+          "value": -48423.1489
+        },
+        {
+          "as_published": "1.24669175E+01",
+          "value": 12.4669175
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-4.42327449E+04",
+    "value": -44232.7449,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "458-35-5",
+    "C10H12O3  Coniferol (Phenol,2-methoxy-4-(3-hydroxy-1-propenyl) SIGMA=1  STATWT=1",
+    "IA=50.21975  IB=250.7321  IC=295.5773  Ir(CH3)=0.54  ROSYM=3  V(3)=0. cm-1",
+    "[Ir(OH)=0.14  ROSYM=1  V(3)=100. cm-1]x2  Nu=3751,3743,3214(2),3174,3164,3157,",
+    "3137,3079,3022,3005,2961,1733,1660,1651,1578,1539,1534.5,1521,1506,1477,1456,",
+    "1409,1371,1345.5,1330.5,1324.5,1293,1261,1243.5,1230,1223,1201,1185,1152.5,1119,",
+    "1077,1057,1012,990,950,905,877,832,811,803.5,773,709,632,614,566,511,487.5,468,",
+    "400,367,352,320,306.5,290,269,234.5,207,170,119,92.4  REF=Burcat B3LYP/6-31G(d)",
+    "HF298=-87.9 kcal  REF=NIST 94 estim.  Max Lst Sq Error Cp @ 1300 K 0.55%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C10H12O3 Coniferyl",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 22346,
+    "header_line": 22355,
+    "end_line": 22358
+  },
+  "source_text": {
+    "header_line": "C10H12O3 ConiferylT10/12C 10.H 12.O  3.   0.G   200.000  6000.000  C 180.20048 1",
+    "coeff_lines": [
+      " 2.44519893E+01 4.17627677E-02-1.49969478E-05 2.42161664E-09-1.45027396E-13    2",
+      "-5.58781149E+04-9.98134750E+01 4.66638811E+00 5.38319422E-02 7.40723187E-05    3",
+      "-1.40041177E-07 6.09649260E-11-4.84231489E+04 1.24669175E+01-4.42327449E+04    4"
+    ]
+  }
+}

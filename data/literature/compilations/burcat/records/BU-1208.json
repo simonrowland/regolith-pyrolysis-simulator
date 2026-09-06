@@ -1,0 +1,192 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1208",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H3SNO2  2-Nitr",
+  "cas_as_published": "609-40-5",
+  "formula": "CRnN",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/18",
+  "calc_quality_as_published": "D",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " WA",
+      "element": "C",
+      "count": null,
+      "filler": false
+    },
+    {
+      "element_as_published": "RN",
+      "count_as_published": "ING",
+      "element": "Rn",
+      "count": null,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 1.",
+      "element": null,
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "129.13816",
+    "value": 129.13816
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.50465613E+01",
+          "value": 15.0465613
+        },
+        {
+          "as_published": "1.42301048E-02",
+          "value": 0.0142301048
+        },
+        {
+          "as_published": "-5.30592581E-06",
+          "value": -5.30592581e-06
+        },
+        {
+          "as_published": "8.76331310E-10",
+          "value": 8.7633131e-10
+        },
+        {
+          "as_published": "-5.32565149E-14",
+          "value": -5.32565149e-14
+        },
+        {
+          "as_published": "6.11815380E+03",
+          "value": 6118.1538
+        },
+        {
+          "as_published": "-5.01266347E+01",
+          "value": -50.1266347
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.22875495E+00",
+          "value": 1.22875495
+        },
+        {
+          "as_published": "3.87196766E-02",
+          "value": 0.0387196766
+        },
+        {
+          "as_published": "8.09494265E-06",
+          "value": 8.09494265e-06
+        },
+        {
+          "as_published": "-4.77726481E-08",
+          "value": -4.77726481e-08
+        },
+        {
+          "as_published": "2.45230891E-11",
+          "value": 2.45230891e-11
+        },
+        {
+          "as_published": "1.04711939E+04",
+          "value": 10471.1939
+        },
+        {
+          "as_published": "2.42056245E+01",
+          "value": 24.2056245
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.25472043E+04",
+    "value": 12547.2043,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "609-40-5",
+    "2-C4H3SNO2  2-Nitro Thiophene  SIGMA=1  STATWT=1  IA=22.2222  IB=55.6032  ",
+    "IC=77.8255  Ir(NO2)=5.96  ROSYM=2  V(3)=160.  Nu=3265,3262,3233,1625,1579,1462,",
+    "1405,1395,1262,1155,1113,1054,938,876,869,821,754,748,727,666,565,490,446,396,",
+    "205,189,[90 internal rotation]  HF298=104.324+/-8. kJ  REF=Burcat G3B3  Max",
+    "Lst Sq Error Cp @ 6000 K 0.50%.  WARNING  Compound has 5 elements and the NASA",
+    "7 term polynomial accomodates only 4 elements. Therefore only the 9 term",
+    "polynomial is correct or the polynomial listed in THERM.DAT and only for use",
+    "with the Chemkin program.  The ions could not be polynomialized."
+  ],
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "composition_count_unparsed",
+      "slot": 0,
+      "element_as_published": "C ",
+      "count_as_published": " WA"
+    },
+    {
+      "kind": "composition_count_unparsed",
+      "slot": 1,
+      "element_as_published": "RN",
+      "count_as_published": "ING"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 12885,
+    "header_line": 12894,
+    "end_line": 12897
+  },
+  "source_text": {
+    "header_line": "C4H3SNO2  2-Nitr  T 6/18C  WARNING   1.N  1.G   200.000  6000.000  D 129.13816 1",
+    "coeff_lines": [
+      " 1.50465613E+01 1.42301048E-02-5.30592581E-06 8.76331310E-10-5.32565149E-14    2",
+      " 6.11815380E+03-5.01266347E+01 1.22875495E+00 3.87196766E-02 8.09494265E-06    3",
+      "-4.77726481E-08 2.45230891E-11 1.04711939E+04 2.42056245E+01 1.25472043E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0716",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "O(CH)2O Glyoxal",
+  "cas_as_published": "107-22-2",
+  "formula": "C2H2O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "g 3/02",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 2.",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 2.",
+      "element": "H",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "58.03608",
+    "value": 58.03608
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "8.72506895E+00",
+          "value": 8.72506895
+        },
+        {
+          "as_published": "6.33096819E-03",
+          "value": 0.00633096819
+        },
+        {
+          "as_published": "-2.35574814E-06",
+          "value": -2.35574814e-06
+        },
+        {
+          "as_published": "3.89782853E-10",
+          "value": 3.89782853e-10
+        },
+        {
+          "as_published": "-2.37486912E-14",
+          "value": -2.37486912e-14
+        },
+        {
+          "as_published": "-2.91024131E+04",
+          "value": -29102.4131
+        },
+        {
+          "as_published": "-2.03903909E+01",
+          "value": -20.3903909
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.68412461E+00",
+          "value": 4.68412461
+        },
+        {
+          "as_published": "4.78012819E-04",
+          "value": 0.000478012819
+        },
+        {
+          "as_published": "4.26390768E-05",
+          "value": 4.26390768e-05
+        },
+        {
+          "as_published": "-5.79018239E-08",
+          "value": -5.79018239e-08
+        },
+        {
+          "as_published": "2.31669328E-11",
+          "value": 2.31669328e-11
+        },
+        {
+          "as_published": "-2.71985007E+04",
+          "value": -27198.5007
+        },
+        {
+          "as_published": "4.51187184E+00",
+          "value": 4.51187184
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-2.55074562E+04",
+    "value": -25507.4562,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "107-22-2",
+    "C2H2O2 (CHO-CHO) Trans-Cis-GLYOXAL   SIGMA=2   T0=0 (trans)  STATWT=1",
+    "IAIBIC=504.42  ROSYM=1  Brot1=4.213  Brot2=-1.117  Brot3=0.421  Brot4==0.126",
+    "Brot5=0.040  Brot6=-0.015 ROSYM=1  V(1)=1588.   V2=1140. V(3)=-59.0  V(4)-110.9",
+    "V(5)=40. V(6)=0  NEL=150   REF=Dorofeeva  JPCRD 30,(2001),475   NU=2843,1744,",
+    "1353,1066,551,801,1048,2835,1732,1312,339   REF= SCUSERIA  & SCHAEFER JACS 111,",
+    "(1989),7761",
+    "T0=1555. (Cis) SIGMA=2  STATWT=1  IAIBIC=710.17 (No internal rotation for the",
+    "cis exited state B. McBride and Zeleznik) Nu=2841,1746,1369,827,284.5,1050,750,",
+    "2810,1761,1360,825,10**10 (for the missing frequency or rotation!)",
+    "HF298=-212.082+/-0.8 kJ REF=Dorofeeva JPCRD 30,(2001),475 & ATcT A  HF0=-213.38",
+    "kJ  {HF298=-212.0+/-0.79 KJ  REF=Fletcher & Pilcher  Trans Faraday Soc 66(1970),",
+    "794}  HF298=-193.249+/-0.8 for Cis only  REF=ATcT A   Max Lst Sq Error Cp @",
+    "1300 K 0.48%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 7293,
+    "header_line": 7307,
+    "end_line": 7310
+  },
+  "source_text": {
+    "header_line": "O(CH)2O Glyoxal   g 3/02C  2.H  2.O  2.   0.G   200.000  6000.000  B  58.03608 1",
+    "coeff_lines": [
+      " 8.72506895E+00 6.33096819E-03-2.35574814E-06 3.89782853E-10-2.37486912E-14    2",
+      "-2.91024131E+04-2.03903909E+01 4.68412461E+00 4.78012819E-04 4.26390768E-05    3",
+      "-5.79018239E-08 2.31669328E-11-2.71985007E+04 4.51187184E+00-2.55074562E+04    4"
+    ]
+  }
+}

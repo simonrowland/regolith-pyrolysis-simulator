@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1948",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C10H6 1,3 diethy",
+  "cas_as_published": "1785-61-1",
+  "formula": "C10H6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/15",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "10.",
+      "element": "C",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "126.15464",
+    "value": 126.15464
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.94890277E+01",
+          "value": 19.4890277
+        },
+        {
+          "as_published": "2.35101034E-02",
+          "value": 0.0235101034
+        },
+        {
+          "as_published": "-8.43787249E-06",
+          "value": -8.43787249e-06
+        },
+        {
+          "as_published": "1.36207463E-09",
+          "value": 1.36207463e-09
+        },
+        {
+          "as_published": "-8.15578305E-14",
+          "value": -8.15578305e-14
+        },
+        {
+          "as_published": "5.80245053E+04",
+          "value": 58024.5053
+        },
+        {
+          "as_published": "-7.66298995E+01",
+          "value": -76.6298995
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-1.92263481E+00",
+          "value": -1.92263481
+        },
+        {
+          "as_published": "8.57578670E-02",
+          "value": 0.085757867
+        },
+        {
+          "as_published": "-7.03095425E-05",
+          "value": -7.03095425e-05
+        },
+        {
+          "as_published": "2.10427011E-08",
+          "value": 2.10427011e-08
+        },
+        {
+          "as_published": "1.27338464E-12",
+          "value": 1.27338464e-12
+        },
+        {
+          "as_published": "6.37450309E+04",
+          "value": 63745.0309
+        },
+        {
+          "as_published": "3.30657524E+01",
+          "value": 33.0657524
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "6.64044712E+04",
+    "value": 66404.4712,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1785-61-1",
+    "C10H6 1,3-diethynylBenzene 1,3-C6H4(CCH)2  SIGMA=2  STATWT=1  IA=31.252",
+    "IB=92.9373  IC=124.1894  Nu=115,126,162,186,368,388,465,469,500,505,561,572,576,",
+    "629.5(2),646,702,718,812,916,921,925,983,1014,1122,1175,1205,1273,1313.5,1355,",
+    "1446,1525,1623,1649,2227.6(2),3197,3216,3223,3228,3494.3(2)  HF298=131.96+/-2.",
+    "kcal  REF=Elke Goos G3B3  Max Lst Sq Error Cp @ 1300 K 0.47%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 21995,
+    "header_line": 22001,
+    "end_line": 22004
+  },
+  "source_text": {
+    "header_line": "C10H6 1,3 diethy  T10/15C 10.H  6.   0.   0.G   200.000  6000.000  B 126.15464 1",
+    "coeff_lines": [
+      " 1.94890277E+01 2.35101034E-02-8.43787249E-06 1.36207463E-09-8.15578305E-14    2",
+      " 5.80245053E+04-7.66298995E+01-1.92263481E+00 8.57578670E-02-7.03095425E-05    3",
+      " 2.10427011E-08 1.27338464E-12 6.37450309E+04 3.30657524E+01 6.64044712E+04    4"
+    ]
+  }
+}

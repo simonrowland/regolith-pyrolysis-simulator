@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1176",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3H9P- C3H7PH2-",
+  "cas_as_published": "N/A",
+  "formula": "C3H9PE",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "P ",
+      "count_as_published": " 1.",
+      "element": "P",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "76.07787",
+    "value": 76.07787
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.13819067E+01",
+          "value": 11.3819067
+        },
+        {
+          "as_published": "2.16707928E-02",
+          "value": 0.0216707928
+        },
+        {
+          "as_published": "-7.72582204E-06",
+          "value": -7.72582204e-06
+        },
+        {
+          "as_published": "1.23659297E-09",
+          "value": 1.23659297e-09
+        },
+        {
+          "as_published": "-7.35137510E-14",
+          "value": -7.3513751e-14
+        },
+        {
+          "as_published": "7.57286249E+03",
+          "value": 7572.86249
+        },
+        {
+          "as_published": "-2.57364869E+01",
+          "value": -25.7364869
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "7.89409782E+00",
+          "value": 7.89409782
+        },
+        {
+          "as_published": "2.04363629E-02",
+          "value": 0.0204363629
+        },
+        {
+          "as_published": "1.34111128E-05",
+          "value": 1.34111128e-05
+        },
+        {
+          "as_published": "-2.49397643E-08",
+          "value": -2.49397643e-08
+        },
+        {
+          "as_published": "9.68814751E-12",
+          "value": 9.68814751e-12
+        },
+        {
+          "as_published": "9.22399844E+03",
+          "value": 9223.99844
+        },
+        {
+          "as_published": "-4.69255728E+00",
+          "value": -4.69255728
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.25597299E+04",
+    "value": 12559.7299,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A",
+    "C3H9P-  Propyl Phosphine anion  C3H7PH2-  SIGMA=1  STATWT=2  IA=3.8243",
+    "IB=37.3964  IC=39.0549  Ir(CH3)=0.51547  ROSYM=3  V(3)=480. cm-1",
+    "Ir(C2H5)=2.859  ROSYM=1  V(3)=600. cm-1  Nu=3202,3115,3080,3050,3024,2992,2971,",
+    "2293,2202,1514,1501,1485,1473,1392,1324,1308,1205,1110,1106,1023,897.5,867,733,",
+    "480,366,326,269,261,246,87.2,56.6[54.54,46  internal rotation]  HF298=104.428",
+    "+/-8. kJ  thermal electron  REF=Burcat G3B3  Max Lst sq Error Cp @ 1300 K 0.53%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 12551,
+    "header_line": 12558,
+    "end_line": 12561
+  },
+  "source_text": {
+    "header_line": "C3H9P- C3H7PH2-   T 7/16C  3.H  9.P  1.E  1.G   298.150  6000.000  B  76.07787 1",
+    "coeff_lines": [
+      " 1.13819067E+01 2.16707928E-02-7.72582204E-06 1.23659297E-09-7.35137510E-14    2",
+      " 7.57286249E+03-2.57364869E+01 7.89409782E+00 2.04363629E-02 1.34111128E-05    3",
+      "-2.49397643E-08 9.68814751E-12 9.22399844E+03-4.69255728E+00 1.25597299E+04    4"
+    ]
+  }
+}

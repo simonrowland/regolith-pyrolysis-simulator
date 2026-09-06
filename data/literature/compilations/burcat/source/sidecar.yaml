@@ -1,0 +1,80 @@
+citation: "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with Updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution."
+doi: "10.2172/925269"
+report_number: ANL-05/20; TAE 960
+publisher: "Technion-IIT Aerospace Engineering / Argonne National Laboratory; mirrored at ELTE RESPECTH"
+licence: "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+access: open
+present: 'yes'
+sha256: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
+size: 2315627
+retrieved_at: '2026-09-06T21:54:29Z'
+retrieved_url: "https://respecth.elte.hu/burcat/BURCAT.THR.txt"
+pages: 418
+topic: "thermochemistry"
+attempts:
+- at: '2026-09-06T21:54:29Z'
+  url: "http://burcat.technion.ac.il/dir/"
+  status: 0
+  note: "CURL 7 connection failed; Technion host down"
+- at: '2026-09-06T21:54:29Z'
+  url: "https://www.anl.gov/argonne-scientific-publications/pub/53802"
+  status: 403
+  note: "Cloudflare JS challenge (cf-mitigated: challenge); stopped"
+- at: '2026-09-06T21:54:29Z'
+  url: "https://www.osti.gov/servlets/purl/925269"
+  status: 0
+  note: "CURL 52 empty reply from server on GET of the PDF servlet; bibliographic page 200"
+- at: '2026-09-06T21:54:29Z'
+  url: "https://respecth.elte.hu/burcat.php"
+  status: 200
+  final: "https://respecth.elte.hu/burcat.php"
+  note: "Official ELTE mirror named in the 2005 report (garfield.chem.elte.hu lineage); current files fetched from here"
+files:
+- name: BURCAT.THR.txt
+  sha256: 42a597ff852d1a2995f81d4fdca069f3cdcaef77ead5e3c66e02e80ed6699101
+  size: 2315627
+  retrieved_url: "https://respecth.elte.hu/burcat/BURCAT.THR.txt"
+  note: "current NASA-polynomial database; species last added 3 January 2023"
+- name: BURCAT_THR.xml
+  sha256: 0f4cfd21cfa19f620110bbe63bbb96beff112a2c5e8cf38c885c6d7b3d00a3af
+  size: 2674331
+  retrieved_url: "https://respecth.elte.hu/burcat/BURCAT_THR.xml"
+  note: "XML snapshot of BURCAT.THR"
+- name: THERM.DAT
+  sha256: 1bcc0261e5003a94496c07632a5727e312fc9055a18e61fdb7c2d5bdca8eacaa
+  size: 1100127
+  retrieved_url: "https://respecth.elte.hu/burcat/THERM.DAT"
+  note: "CHEMKIN-formatted copy of BURCAT.THR"
+- name: NEWNASA.TXT
+  sha256: 3e6717ed4e0e266eeb961c116a7589d8e8d71f63c9a935eebea7e263eb25c440
+  size: 1957990
+  retrieved_url: "https://respecth.elte.hu/burcat/NEWNASA.TXT"
+  note: "NASA 9-coefficient conversion of BURCAT.THR"
+- name: ELEMENTS.DAT
+  sha256: 7b3b1fc083e8a9b00df952f88e2c6cdf5e402767a5327d741c413b7ebdb9c8d0
+  size: 65602
+  retrieved_url: "https://respecth.elte.hu/burcat/ELEMENTS.DAT"
+  note: "element auxiliary file"
+- name: READ.ME.txt
+  sha256: cb86eb13a76cae2487ac3a662e8552e2ec76942106bee948f037cb17173dd3f5
+  size: 12765
+  retrieved_url: "https://respecth.elte.hu/burcat/READ.ME.txt"
+  note: "ftp README"
+- name: Introduction_2005.pdf
+  sha256: 153c71fa6493d19f864fe50e2b3aadc0a7abd7e7eded3aa3c15a52392ceee232
+  size: 490605
+  retrieved_url: "https://respecth.elte.hu/burcat/Introduction%202005_.pdf"
+  pages: 29
+  note: "introductory chapter of the last printed report"
+- name: burcat-third-millennium.pdf
+  sha256: c4ace06ec469b9c5f7e9e263a3aa205233d2f5182dae4c5b9ef26bb0627e1df8
+  size: 1494871
+  pages: 418
+  note: "ANL-05/20 / TAE 960 printed report extracted from Archives/2005_ revised.pdf"
+- name: Archives.zip
+  sha256: e89c07a8718f026e5c1f7e7d24bf636bcabf8558baea66ee86acf277178330c4
+  size: 146257939
+  retrieved_url: "https://respecth.elte.hu/burcat/Archives.zip"
+  note: "historical printed reports 1984/1990/1997/2001/2005 plus prior THR snapshots"
+worker: "thermo-db-vacuum"
+dispatch_id: "thermo-db-vacuum"

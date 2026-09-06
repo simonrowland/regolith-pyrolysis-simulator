@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1187",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3N3P- P(CN)3-",
+  "cas_as_published": "N/A",
+  "formula": "C3N3PE",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 9/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 3.",
+      "element": "N",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "P ",
+      "count_as_published": " 1.",
+      "element": "P",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "109.02663",
+    "value": 109.02663
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.37475898E+01",
+          "value": 13.7475898
+        },
+        {
+          "as_published": "4.94363652E-03",
+          "value": 0.00494363652
+        },
+        {
+          "as_published": "-1.83964325E-06",
+          "value": -1.83964325e-06
+        },
+        {
+          "as_published": "3.03902518E-10",
+          "value": 3.03902518e-10
+        },
+        {
+          "as_published": "-1.84819064E-14",
+          "value": -1.84819064e-14
+        },
+        {
+          "as_published": "3.34070538E+04",
+          "value": 33407.0538
+        },
+        {
+          "as_published": "-3.63717002E+01",
+          "value": -36.3717002
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "7.38011822E+00",
+          "value": 7.38011822
+        },
+        {
+          "as_published": "3.51258300E-02",
+          "value": 0.03512583
+        },
+        {
+          "as_published": "-6.06623556E-05",
+          "value": -6.06623556e-05
+        },
+        {
+          "as_published": "5.31045816E-08",
+          "value": 5.31045816e-08
+        },
+        {
+          "as_published": "-1.78111705E-11",
+          "value": -1.78111705e-11
+        },
+        {
+          "as_published": "3.46493673E+04",
+          "value": 34649.3673
+        },
+        {
+          "as_published": "-6.30965632E+00",
+          "value": -6.30965632
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.79715702E+04",
+    "value": 37971.5702,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A",
+    "C3N3P- Tricyanophosphorus anion P(CN)3-  SIGMA=3  STATWT=2  IA=29.3738",
+    "IB=51.2191  IC=74.5485  Nu=2260,2166.3,2151,613,492,464.5,439,360,319,285,238,",
+    "226,112,110,70  HF298=315.715+/-8. kJ  thermal electron  REF=Burcat G3B3  Max",
+    "Lst sq error Cp @ 6000 K 0.28%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 12674,
+    "header_line": 12679,
+    "end_line": 12682
+  },
+  "source_text": {
+    "header_line": "C3N3P- P(CN)3-    T 9/16C  3.N  3.P  1.E  1.G   298.150  6000.000  B 109.02663 1",
+    "coeff_lines": [
+      " 1.37475898E+01 4.94363652E-03-1.83964325E-06 3.03902518E-10-1.84819064E-14    2",
+      " 3.34070538E+04-3.63717002E+01 7.38011822E+00 3.51258300E-02-6.06623556E-05    3",
+      " 5.31045816E-08-1.78111705E-11 3.46493673E+04-6.30965632E+00 3.79715702E+04    4"
+    ]
+  }
+}

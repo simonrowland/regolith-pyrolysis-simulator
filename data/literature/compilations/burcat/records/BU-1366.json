@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1366",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H11O+ Oxonium",
+  "cas_as_published": "44209-06-5",
+  "formula": "C4H11OE-1",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "11.",
+      "element": "H",
+      "count": 11.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": "-1.",
+      "element": "E",
+      "count": -1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "75.12899",
+    "value": 75.12899
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.41866464E+00",
+          "value": 9.41866464
+        },
+        {
+          "as_published": "3.13815691E-02",
+          "value": 0.0313815691
+        },
+        {
+          "as_published": "-1.11039894E-05",
+          "value": -1.11039894e-05
+        },
+        {
+          "as_published": "1.77410334E-09",
+          "value": 1.77410334e-09
+        },
+        {
+          "as_published": "-1.05428724E-13",
+          "value": -1.05428724e-13
+        },
+        {
+          "as_published": "5.46000657E+04",
+          "value": 54600.0657
+        },
+        {
+          "as_published": "-2.53557791E+01",
+          "value": -25.3557791
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.76501693E+00",
+          "value": 4.76501693
+        },
+        {
+          "as_published": "1.78290766E-02",
+          "value": 0.0178290766
+        },
+        {
+          "as_published": "5.63814406E-05",
+          "value": 5.63814406e-05
+        },
+        {
+          "as_published": "-7.68147655E-08",
+          "value": -7.68147655e-08
+        },
+        {
+          "as_published": "2.92041503E-11",
+          "value": 2.92041503e-11
+        },
+        {
+          "as_published": "5.73201177E+04",
+          "value": 57320.1177
+        },
+        {
+          "as_published": "5.46915280E+00",
+          "value": 5.4691528
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "5.98933671E+04",
+    "value": 59893.3671,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "44209-06-5",
+    "C4H11O+ Oxonium-Ethyl-Dimethyl (CH3)2-O-C2H5+  SIGMA=2  STATWT=1  IA=10.9742",
+    "IB=23.9455  IC=31.2570  Ir(CH3)=0.52354  ROSYM=3  V(3)=411 cm-1  Nu=3247,3232,",
+    "3212,3210,3193,3163,3142,3110,3104,3100,3075,1533,1522(2),1516,1512,1501,",
+    "1496(2),1469,1445,1416,1329,1269,1231,1205,1151,1143,1115,984,955,857,820,687,",
+    "440,403,334,288,228,185,163   HF298=497.984+/-8 kJ  REF=Burcat G3B3 (thermal",
+    "electron)  {HF298=490.+/-15 kJ  REF=Tu Holmes JAS For Mass Spectr 10,(1999),386",
+    "(stationary electron)} Max Lst Sq Error Cp @ 1300 K 0.63%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 14848,
+    "header_line": 14856,
+    "end_line": 14859
+  },
+  "source_text": {
+    "header_line": "C4H11O+ Oxonium   T10/14C  4.H 11.O  1.E -1.G   298.150  6000.000  B  75.12899 1",
+    "coeff_lines": [
+      " 9.41866464E+00 3.13815691E-02-1.11039894E-05 1.77410334E-09-1.05428724E-13    2",
+      " 5.46000657E+04-2.53557791E+01 4.76501693E+00 1.78290766E-02 5.63814406E-05    3",
+      "-7.68147655E-08 2.92041503E-11 5.73201177E+04 5.46915280E+00 5.98933671E+04    4"
+    ]
+  }
+}

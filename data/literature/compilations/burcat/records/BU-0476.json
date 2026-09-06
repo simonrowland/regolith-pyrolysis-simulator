@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0476",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "*CH2NH2-  anion",
+  "cas_as_published": "74215-21-7",
+  "formula": "CH4NE",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "30.04975",
+    "value": 30.04975
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.50756422E+00",
+          "value": 4.50756422
+        },
+        {
+          "as_published": "1.00265718E-02",
+          "value": 0.0100265718
+        },
+        {
+          "as_published": "-3.55440561E-06",
+          "value": -3.55440561e-06
+        },
+        {
+          "as_published": "5.68553962E-10",
+          "value": 5.68553962e-10
+        },
+        {
+          "as_published": "-3.38127725E-14",
+          "value": -3.38127725e-14
+        },
+        {
+          "as_published": "2.13509684E+04",
+          "value": 21350.9684
+        },
+        {
+          "as_published": "1.15391569E-01",
+          "value": 0.115391569
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.10657557E+00",
+          "value": 3.10657557
+        },
+        {
+          "as_published": "7.44724340E-03",
+          "value": 0.0074472434
+        },
+        {
+          "as_published": "1.15736992E-05",
+          "value": 1.15736992e-05
+        },
+        {
+          "as_published": "-1.71555604E-08",
+          "value": -1.71555604e-08
+        },
+        {
+          "as_published": "6.54251380E-12",
+          "value": 6.5425138e-12
+        },
+        {
+          "as_published": "2.21146829E+04",
+          "value": 22114.6829
+        },
+        {
+          "as_published": "9.07231074E+00",
+          "value": 9.07231074
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.34433538E+04",
+    "value": 23443.3538,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "74215-21-7",
+    "*CH2NH2-  Aminomethyl Radical anion  SIGMA=1  STATWT=1  IA=0.6916  IB=3.7320",
+    "IC=3.9457  Nu=3356,3267,2676,2645,1671,1468,1353,1224,979,953.5,752,173",
+    "REF=Burcat G3B3  HF298=194.92+/-2.8 kJ  REF=Ruscic ATcT D 2013  Thermal electron",
+    "{HF298=208.8+/-8. kJ  REF=Burcat G3B3 Thermal electron}  Max Lst Sq Error Cp @",
+    "1300 K 0.56%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 4789,
+    "header_line": 4795,
+    "end_line": 4798
+  },
+  "source_text": {
+    "header_line": "*CH2NH2-  anion   T 3/16C  1.H  4.N  1.E  1.G   298.150  6000.000  B  30.04975 1",
+    "coeff_lines": [
+      " 4.50756422E+00 1.00265718E-02-3.55440561E-06 5.68553962E-10-3.38127725E-14    2",
+      " 2.13509684E+04 1.15391569E-01 3.10657557E+00 7.44724340E-03 1.15736992E-05    3",
+      "-1.71555604E-08 6.54251380E-12 2.21146829E+04 9.07231074E+00 2.34433538E+04    4"
+    ]
+  }
+}

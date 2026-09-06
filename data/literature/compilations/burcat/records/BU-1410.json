@@ -1,0 +1,183 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1410",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C5H5 1Yne3Ene5Yl",
+  "cas_as_published": "336800-69-2",
+  "formula": "C5H5",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "A 1/05",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 5.",
+      "element": "C",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 5.",
+      "element": "H",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "65.09320",
+    "value": 65.0932
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.08989728E+01",
+          "value": 10.8989728
+        },
+        {
+          "as_published": "1.42904648E-02",
+          "value": 0.0142904648
+        },
+        {
+          "as_published": "-5.02395287E-06",
+          "value": -5.02395287e-06
+        },
+        {
+          "as_published": "7.99341505E-10",
+          "value": 7.99341505e-10
+        },
+        {
+          "as_published": "-4.73687380E-14",
+          "value": -4.7368738e-14
+        },
+        {
+          "as_published": "4.17506605E+04",
+          "value": 41750.6605
+        },
+        {
+          "as_published": "-3.03965620E+01",
+          "value": -30.396562
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "9.57517375E-02",
+          "value": 0.0957517375
+        },
+        {
+          "as_published": "4.93848014E-02",
+          "value": 0.0493848014
+        },
+        {
+          "as_published": "-4.74598143E-05",
+          "value": -4.74598143e-05
+        },
+        {
+          "as_published": "2.22750663E-08",
+          "value": 2.22750663e-08
+        },
+        {
+          "as_published": "-3.37834761E-12",
+          "value": -3.37834761e-12
+        },
+        {
+          "as_published": "4.44492650E+04",
+          "value": 44449.265
+        },
+        {
+          "as_published": "2.40272094E+01",
+          "value": 24.0272094
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.62959333E+04",
+    "value": 46295.9333,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "336800-69-2",
+    "C5H5 1-PENTYNE-3-ENE-5-YL RADICAL  HCC-CH=CH-CH2*  SIGMA=1  STATWT=2 IA=2.0303",
+    "IB=35.1257  IC=37.1560  Ir(CH2*)=0.2863   ROSYM=2  V3=1049. cm-1 estim",
+    "Nu=3490,3261,3176,3170,3160,2106,1563,1484,1348,1301,1214,1109,1011,933,847,772,",
+    "615,587,555,470,443,398,173  HF298=384.93 kJ  HF0=393.17 kJ  REF=Burcat G3B3",
+    "calc.   {HF298=97.1+/-2.0 kcal  REF=NIST-94}  Max Lst Sq Error Cp @ 6000 K 0.44%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "xml_coefficient_mismatch",
+      "xml_formula": "C5H5 1Yne3Ene5Yl",
+      "xml_cas": "336800-69-2",
+      "note": "BURCAT_THR.xml (2005 snapshot) coefficients differ from this BURCAT.THR.txt record. THR tokens retained."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 15355,
+    "header_line": 15361,
+    "end_line": 15364
+  },
+  "source_text": {
+    "header_line": "C5H5 1Yne3Ene5Yl  A 1/05C  5.H  5.   0.   0.G   200.000  6000.000  B  65.09320 1",
+    "coeff_lines": [
+      " 1.08989728E+01 1.42904648E-02-5.02395287E-06 7.99341505E-10-4.73687380E-14    2",
+      " 4.17506605E+04-3.03965620E+01 9.57517375E-02 4.93848014E-02-4.74598143E-05    3",
+      " 2.22750663E-08-3.37834761E-12 4.44492650E+04 2.40272094E+01 4.62959333E+04    4"
+    ]
+  }
+}

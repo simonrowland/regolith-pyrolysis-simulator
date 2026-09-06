@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1812",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C7H10  Norbornen",
+  "cas_as_published": "498-66-8",
+  "formula": "C7H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/11",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 7.",
+      "element": "C",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "94.15430",
+    "value": 94.1543
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.28863777E+01",
+          "value": 12.8863777
+        },
+        {
+          "as_published": "3.21706053E-02",
+          "value": 0.0321706053
+        },
+        {
+          "as_published": "-1.15721535E-05",
+          "value": -1.15721535e-05
+        },
+        {
+          "as_published": "1.87019037E-09",
+          "value": 1.87019037e-09
+        },
+        {
+          "as_published": "-1.12052695E-13",
+          "value": -1.12052695e-13
+        },
+        {
+          "as_published": "2.30989115E+03",
+          "value": 2309.89115
+        },
+        {
+          "as_published": "-5.06062248E+01",
+          "value": -50.6062248
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "8.86065232E-01",
+          "value": 0.886065232
+        },
+        {
+          "as_published": "1.03178176E-02",
+          "value": 0.0103178176
+        },
+        {
+          "as_published": "1.46639388E-04",
+          "value": 0.000146639388
+        },
+        {
+          "as_published": "-2.09776305E-07",
+          "value": -2.09776305e-07
+        },
+        {
+          "as_published": "8.71760018E-11",
+          "value": 8.71760018e-11
+        },
+        {
+          "as_published": "7.95342999E+03",
+          "value": 7953.42999
+        },
+        {
+          "as_published": "2.37628319E+01",
+          "value": 23.7628319
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "9.59835468E+03",
+    "value": 9598.35468,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "498-66-8",
+    "C7H10 NORBORNENE SIGMA=1 STATWT=1  IA=21.3834  IB=24.5958  IC=28.006 613",
+    "NU=3224,3200,3121(2),3115.5(2),3103,3070,3056.5(2),1657,1543,1520(2),1382,1347,",
+    "1325,1318.5,1304,1297,1250,1204(2),1155(2),1124.5,1062,1049.5,980,969,950.5(2),",
+    "924,916,888,843,827,803,778,730,677,486,480.5,383,261  HF298=19.074 +/-2. kcal",
+    "REF=Burcat G3B3 {HF298=90+/-10. kJ  REF=NIST Webbook estim}  MAX Lst Sq Error Cp",
+    "@ 200 K **1.65%**"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 20347,
+    "header_line": 20354,
+    "end_line": 20357
+  },
+  "source_text": {
+    "header_line": "C7H10  Norbornen  T12/11C  7.H 10.   0.   0.G   200.000  6000.000  B  94.15430 1",
+    "coeff_lines": [
+      " 1.28863777E+01 3.21706053E-02-1.15721535E-05 1.87019037E-09-1.12052695E-13    2",
+      " 2.30989115E+03-5.06062248E+01 8.86065232E-01 1.03178176E-02 1.46639388E-04    3",
+      "-2.09776305E-07 8.71760018E-11 7.95342999E+03 2.37628319E+01 9.59835468E+03    4"
+    ]
+  }
+}

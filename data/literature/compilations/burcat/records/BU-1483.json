@@ -1,0 +1,186 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1483",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C5H9O2 MeButyratC4",
+  "cas_as_published": "54451-01-3",
+  "formula": "C5H9O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 4/08",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 5.",
+      "element": "C",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "101.12376",
+    "value": 101.12376
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.44196569E+01",
+          "value": 14.4196569
+        },
+        {
+          "as_published": "2.65986434E-02",
+          "value": 0.0265986434
+        },
+        {
+          "as_published": "-9.74050102E-06",
+          "value": -9.74050102e-06
+        },
+        {
+          "as_published": "1.58737165E-09",
+          "value": 1.58737165e-09
+        },
+        {
+          "as_published": "-9.55185841E-14",
+          "value": -9.55185841e-14
+        },
+        {
+          "as_published": "-3.70751667E+04",
+          "value": -37075.1667
+        },
+        {
+          "as_published": "-4.23733532E+01",
+          "value": -42.3733532
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "8.02752589E+00",
+          "value": 8.02752589
+        },
+        {
+          "as_published": "9.91523999E-03",
+          "value": 0.00991523999
+        },
+        {
+          "as_published": "8.45155734E-05",
+          "value": 8.45155734e-05
+        },
+        {
+          "as_published": "-1.16054484E-07",
+          "value": -1.16054484e-07
+        },
+        {
+          "as_published": "4.63657971E-11",
+          "value": 4.63657971e-11
+        },
+        {
+          "as_published": "-3.36418247E+04",
+          "value": -33641.8247
+        },
+        {
+          "as_published": "-1.06408721E+00",
+          "value": -1.06408721
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-3.02684824E+04",
+    "value": -30268.4824,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "54451-01-3",
+    "C5H9O2 Methyl Butyrate C4 Radical *CH2CH2CH2C(O)OCH3 SIGMA=1  STATWT=2 IA=9.7595",
+    "IB=68.1783  IC=76.2131 Ir(CH3)=.52926  ROSYM=3  V(3)=411 cm-1  Ir(*CH2)=.28943",
+    "ROSYM=1  V(3)=230 cm-1   Ir(*CH2CH2)=4.79342  ROSYM=1  V(3)=1049. cm-1",
+    "Ir(CH3OC(O)-)=5.74821  ROSYM=1  V(3)=2575. cm-1  Nu=3262,3180,3164,3148,3090,",
+    "3074,3061,3049,2970,1826,1526,1514,1500,1492(3),1421,1345,1309,1231,1213,",
+    "1185.7(2),1126,1098,1043,1002,915,891,763,705,582,473,430,347,308,180,153",
+    "HF298=-60.150 kcal  REF=Elke Goos DLR G3B3 calc.  {HF0=-247.9 kJ  REF=Pokidova &",
+    "Denisov Neftkhimia (Petroleum Chem) 47,(2007),83 (trans p.67)}  Max Lst Sq Error",
+    "Cp @ 6000 K 0.59%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C5H9O2 MeButyratC4",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 16248,
+    "header_line": 16258,
+    "end_line": 16261
+  },
+  "source_text": {
+    "header_line": "C5H9O2 MeButyratC4T 4/08C  5.H  9.O  2.   0.G   200.000  6000.000  B 101.12376 1",
+    "coeff_lines": [
+      " 1.44196569E+01 2.65986434E-02-9.74050102E-06 1.58737165E-09-9.55185841E-14    2",
+      "-3.70751667E+04-4.23733532E+01 8.02752589E+00 9.91523999E-03 8.45155734E-05    3",
+      "-1.16054484E-07 4.63657971E-11-3.36418247E+04-1.06408721E+00-3.02684824E+04    4"
+    ]
+  }
+}

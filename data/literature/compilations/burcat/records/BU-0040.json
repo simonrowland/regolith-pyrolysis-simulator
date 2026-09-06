@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0040",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "AL2O",
+  "cas_as_published": "12004-36-3",
+  "formula": "Al2O",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "tpis96",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "AL",
+      "count_as_published": " 2.",
+      "element": "Al",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "69.96248",
+    "value": 69.96248
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "6.83557723E+00",
+          "value": 6.83557723
+        },
+        {
+          "as_published": "6.85036558E-04",
+          "value": 0.000685036558
+        },
+        {
+          "as_published": "-2.69320700E-07",
+          "value": -2.693207e-07
+        },
+        {
+          "as_published": "4.60912632E-11",
+          "value": 4.60912632e-11
+        },
+        {
+          "as_published": "-2.87128689E-15",
+          "value": -2.87128689e-15
+        },
+        {
+          "as_published": "-2.00793927E+04",
+          "value": -20079.3927
+        },
+        {
+          "as_published": "-9.02360368E+00",
+          "value": -9.02360368
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.07405095E+00",
+          "value": 4.07405095
+        },
+        {
+          "as_published": "1.12981458E-02",
+          "value": 0.0112981458
+        },
+        {
+          "as_published": "-1.66855499E-05",
+          "value": -1.66855499e-05
+        },
+        {
+          "as_published": "1.20474407E-08",
+          "value": 1.20474407e-08
+        },
+        {
+          "as_published": "-3.43957451E-12",
+          "value": -3.43957451e-12
+        },
+        {
+          "as_published": "-1.94653414E+04",
+          "value": -19465.3414
+        },
+        {
+          "as_published": "4.50607534E+00",
+          "value": 4.50607534
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.78737275E+04",
+    "value": -17873.7275,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "12004-36-3",
+    "Al2O  ALUMINUM OXIDE  SIGMA=2  STATWT=1   IB=26.5  Nu=480,150(2),1008.5",
+    "HF298=-148.6 +/-20. kJ  REF=Gurvich 96  {HF298=-145.2+/-17 KJ   REF=JANAF 79}",
+    "Max Lst Sq Error Cp @ 1200 K 0.14%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 475,
+    "header_line": 479,
+    "end_line": 482
+  },
+  "source_text": {
+    "header_line": "AL2O              tpis96AL 2.O  1.   0.   0.G   200.000  6000.000  C  69.96248 1",
+    "coeff_lines": [
+      " 6.83557723E+00 6.85036558E-04-2.69320700E-07 4.60912632E-11-2.87128689E-15    2",
+      "-2.00793927E+04-9.02360368E+00 4.07405095E+00 1.12981458E-02-1.66855499E-05    3",
+      " 1.20474407E-08-3.43957451E-12-1.94653414E+04 4.50607534E+00-1.78737275E+04    4"
+    ]
+  }
+}

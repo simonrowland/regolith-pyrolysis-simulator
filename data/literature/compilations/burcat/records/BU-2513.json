@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2513",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "HNO2- trans",
+  "cas_as_published": "24388-53-2",
+  "formula": "NHO2E",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 9/11",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 1.",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "47.01403",
+    "value": 47.01403
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "6.66427899E+00",
+          "value": 6.66427899
+        },
+        {
+          "as_published": "2.71998052E-03",
+          "value": 0.00271998052
+        },
+        {
+          "as_published": "-9.22656612E-07",
+          "value": -9.22656612e-07
+        },
+        {
+          "as_published": "1.43322822E-10",
+          "value": 1.43322822e-10
+        },
+        {
+          "as_published": "-8.35348067E-15",
+          "value": -8.35348067e-15
+        },
+        {
+          "as_published": "-1.63040662E+04",
+          "value": -16304.0662
+        },
+        {
+          "as_published": "-6.42100983E+00",
+          "value": -6.42100983
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.97342750E+00",
+          "value": 3.9734275
+        },
+        {
+          "as_published": "1.26098417E-02",
+          "value": 0.0126098417
+        },
+        {
+          "as_published": "-1.53211438E-05",
+          "value": -1.53211438e-05
+        },
+        {
+          "as_published": "9.93126697E-09",
+          "value": 9.93126697e-09
+        },
+        {
+          "as_published": "-2.59682007E-12",
+          "value": -2.59682007e-12
+        },
+        {
+          "as_published": "-1.56879423E+04",
+          "value": -15687.9423
+        },
+        {
+          "as_published": "6.86058484E+00",
+          "value": 6.86058484
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.40597582E+04",
+    "value": -14059.7582,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "24388-53-2",
+    "HNO2- Nitrous acid anion trans  SIGMA=1  STATWT=2  IA=1.1766  IB=8.9280",
+    "IC=10.1046  Nu=3682,1565,944,552,290,182  REF=Burcat G3B3  HF298=-116.90+/-1.88",
+    "kJ  REF=ATcT C 2011  {HF298=-117.39+/-1.87 kJ  cis trans equil REF=ATcT C 2011;",
+    "HF298=-121.58+/-8 kJ  REF=Burcat G3B3}  Max Lst Sq Error Cp @ 6000 K 0.20%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 28162,
+    "header_line": 28167,
+    "end_line": 28170
+  },
+  "source_text": {
+    "header_line": "HNO2- trans       T 9/11N  1.H  1.O  2.E  1.G   298.150  6000.000  B  47.01403 1",
+    "coeff_lines": [
+      " 6.66427899E+00 2.71998052E-03-9.22656612E-07 1.43322822E-10-8.35348067E-15    2",
+      "-1.63040662E+04-6.42100983E+00 3.97342750E+00 1.26098417E-02-1.53211438E-05    3",
+      " 9.93126697E-09-2.59682007E-12-1.56879423E+04 6.86058484E+00-1.40597582E+04    4"
+    ]
+  }
+}

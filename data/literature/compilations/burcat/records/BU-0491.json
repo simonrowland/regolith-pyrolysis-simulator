@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0491",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CH4O2  HOCH2OH",
+  "cas_as_published": "110596-50-1",
+  "formula": "CH4O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T04/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "48.04126",
+    "value": 48.04126
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "6.00581256E+00",
+          "value": 6.00581256
+        },
+        {
+          "as_published": "1.09578849E-02",
+          "value": 0.0109578849
+        },
+        {
+          "as_published": "-3.80235410E-06",
+          "value": -3.8023541e-06
+        },
+        {
+          "as_published": "5.99829456E-10",
+          "value": 5.99829456e-10
+        },
+        {
+          "as_published": "-3.53395243E-14",
+          "value": -3.53395243e-14
+        },
+        {
+          "as_published": "-4.99726093E+04",
+          "value": -49972.6093
+        },
+        {
+          "as_published": "-7.88600388E+00",
+          "value": -7.88600388
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.37360148E+00",
+          "value": 3.37360148
+        },
+        {
+          "as_published": "5.10005756E-03",
+          "value": 0.00510005756
+        },
+        {
+          "as_published": "3.33806304E-05",
+          "value": 3.33806304e-05
+        },
+        {
+          "as_published": "-4.74929601E-08",
+          "value": -4.74929601e-08
+        },
+        {
+          "as_published": "1.93645039E-11",
+          "value": 1.93645039e-11
+        },
+        {
+          "as_published": "-4.86625840E+04",
+          "value": -48662.584
+        },
+        {
+          "as_published": "8.74397015E+00",
+          "value": 8.74397015
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-4.72198602E+04",
+    "value": -47219.8602,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "110596-50-1",
+    "CH4O2  Methane-diol  CH2(OH)2  SIGMA=2  STATWT=1  IA=2.0199  IB=8.2310",
+    "IC=9.3085  Nu=3722.2(2),3089,3043,1556,1473,1416,1392,1221,1089,1049,1024,577.5,",
+    "418,408  HF298=-392.61+/-1. kJ  REF=Ruscic  ATcT D 2013  {HF298=394.58+/-8. kJ",
+    "REF=Burcat G3B3}  Max Lst Sq Error Cp @ 6000 K 0.46%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 4952,
+    "header_line": 4957,
+    "end_line": 4960
+  },
+  "source_text": {
+    "header_line": "CH4O2  HOCH2OH    T04/14C  1.H  4.O  2.   0.G   200.000  6000.000  B  48.04126 1",
+    "coeff_lines": [
+      " 6.00581256E+00 1.09578849E-02-3.80235410E-06 5.99829456E-10-3.53395243E-14    2",
+      "-4.99726093E+04-7.88600388E+00 3.37360148E+00 5.10005756E-03 3.33806304E-05    3",
+      "-4.74929601E-08 1.93645039E-11-4.86625840E+04 8.74397015E+00-4.72198602E+04    4"
+    ]
+  }
+}

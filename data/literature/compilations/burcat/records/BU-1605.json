@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1605",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H5NO Nitrosobe",
+  "cas_as_published": "586-96-9",
+  "formula": "C6H5NO",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 2/06",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 5.",
+      "element": "H",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "107.11004",
+    "value": 107.11004
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.52437710E+01",
+          "value": 15.243771
+        },
+        {
+          "as_published": "1.94808510E-02",
+          "value": 0.019480851
+        },
+        {
+          "as_published": "-7.13914200E-06",
+          "value": -7.139142e-06
+        },
+        {
+          "as_published": "1.16501325E-09",
+          "value": 1.16501325e-09
+        },
+        {
+          "as_published": "-7.02443744E-14",
+          "value": -7.02443744e-14
+        },
+        {
+          "as_published": "1.67865880E+04",
+          "value": 16786.588
+        },
+        {
+          "as_published": "-5.61775611E+01",
+          "value": -56.1775611
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.68039494E+00",
+          "value": 1.68039494
+        },
+        {
+          "as_published": "2.92539015E-02",
+          "value": 0.0292539015
+        },
+        {
+          "as_published": "5.20478105E-05",
+          "value": 5.20478105e-05
+        },
+        {
+          "as_published": "-9.72306912E-08",
+          "value": -9.72306912e-08
+        },
+        {
+          "as_published": "4.29288331E-11",
+          "value": 4.29288331e-11
+        },
+        {
+          "as_published": "2.17335652E+04",
+          "value": 21733.5652
+        },
+        {
+          "as_published": "2.01971932E+01",
+          "value": 20.1971932
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.38227802E+04",
+    "value": 23822.7802,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "586-96-9",
+    "C6H5NO NITROSO-PHENYL or NITROSO-BENZENE  SIGMA=1  STATWT=1  IA=16.0027",
+    "IB=51.1698  IC=67.1724  Ir=2.6829  ROSYM=2  V(3)=2257.3 cm-1 calcd.  Nu=3228,",
+    "3219,3209,3202,3190,1664,1651,1599,1516,1499,1378,1345,1206,1193,1139,1104,1043,",
+    "1018,1014,993,962,870,836,780,695,682,625,475,449,422,258,250   HF298=198.07 kJ",
+    "HF0=215.59 kJ   REF=Burcat G3B3    {HF298=198.6+/-1.4 kJ  REF=ATcT B;",
+    "HF298=48.0 kcal  REF=Choo, Golden & Benson, Int. J. Chem Kinet 7,(1975),713.}",
+    "Max Lst Sq Error Cp @ 200 K 0.65%; @ 1300 K 0.54%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17732,
+    "header_line": 17740,
+    "end_line": 17743
+  },
+  "source_text": {
+    "header_line": "C6H5NO Nitrosobe  T 2/06C  6.H  5.N  1.O  1.G   200.000  6000.000  B 107.11004 1",
+    "coeff_lines": [
+      " 1.52437710E+01 1.94808510E-02-7.13914200E-06 1.16501325E-09-7.02443744E-14    2",
+      " 1.67865880E+04-5.61775611E+01 1.68039494E+00 2.92539015E-02 5.20478105E-05    3",
+      "-9.72306912E-08 4.29288331E-11 2.17335652E+04 2.01971932E+01 2.38227802E+04    4"
+    ]
+  }
+}

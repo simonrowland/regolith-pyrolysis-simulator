@@ -1,0 +1,181 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2216",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C24H12 CORONENE",
+  "cas_as_published": "191-07-1   [F&W notation A7]",
+  "formula": "C24H12",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 8/03",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "24.",
+      "element": "C",
+      "count": 24.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "12.",
+      "element": "H",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "300.35208",
+    "value": 300.35208
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.66362791E+01",
+          "value": 36.6362791
+        },
+        {
+          "as_published": "6.40568636E-02",
+          "value": 0.0640568636
+        },
+        {
+          "as_published": "-2.35898765E-05",
+          "value": -2.35898765e-05
+        },
+        {
+          "as_published": "3.87302887E-09",
+          "value": 3.87302887e-09
+        },
+        {
+          "as_published": "-2.34622400E-13",
+          "value": -2.346224e-13
+        },
+        {
+          "as_published": "1.83581667E+04",
+          "value": 18358.1667
+        },
+        {
+          "as_published": "-1.83103895E+02",
+          "value": -183.103895
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-3.43656045E+00",
+          "value": -3.43656045
+        },
+        {
+          "as_published": "1.04563338E-01",
+          "value": 0.104563338
+        },
+        {
+          "as_published": "9.86369010E-05",
+          "value": 9.8636901e-05
+        },
+        {
+          "as_published": "-2.14123810E-07",
+          "value": -2.1412381e-07
+        },
+        {
+          "as_published": "9.51018040E-11",
+          "value": 9.5101804e-11
+        },
+        {
+          "as_published": "3.28674342E+04",
+          "value": 32867.4342
+        },
+        {
+          "as_published": "4.09211169E+01",
+          "value": 40.9211169
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.69835384E+04",
+    "value": 36983.5384,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "191-07-1   [F&W notation A7]",
+    "C24H12 CORONENE  (6 benzene ring around a 7TH) SIGMA=12  STATWT=1 IA=250.945567",
+    "IB=251.1146  IC=501.808336  NU=79.8,83.5,130.8,146,211,278,280,297(2),388(2),",
+    "417(2),424(2),462,512,542(2),553(2),578,609,631,638,664(2),685,731,739(2),",
+    "805.5(2),822(2),829,861(2),893,900(2),922,971,973,983(2),995(2),1000(3),1146(2),",
+    "1153,1203(2),1211,1220.5(2),1253,1267,1280(2),1330,1360(3),1457,1468(2),",
+    "1529.5(2),1538,1598,1602,1614(2),1631,1672(2),1689,1693,1715,1734,1761,1787,",
+    "1792,1800,1803.5(2),3178(6),3189(6)   REF=MOPAC AM1  HF298=352.8+/-10. kJ",
+    "REF=Welsh et al Thermochim Acta 290 (1996), 55. {HF298=322.7 kJ REF=Fereira",
+    "Chemosphere 44,(2001),125} HF298=307.5+/-10. kJ Chicos et al J Chem Thermo 34",
+    "(2002),1195  Max Lst Sq Error Cp @ 1300 K 0.67%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 25561,
+    "header_line": 25572,
+    "end_line": 25575
+  },
+  "source_text": {
+    "header_line": "C24H12 CORONENE   T 8/03C 24.H 12.   0.   0.G   200.000  6000.000  C 300.35208 1",
+    "coeff_lines": [
+      " 3.66362791E+01 6.40568636E-02-2.35898765E-05 3.87302887E-09-2.34622400E-13    2",
+      " 1.83581667E+04-1.83103895E+02-3.43656045E+00 1.04563338E-01 9.86369010E-05    3",
+      "-2.14123810E-07 9.51018040E-11 3.28674342E+04 4.09211169E+01 3.69835384E+04    4"
+    ]
+  }
+}

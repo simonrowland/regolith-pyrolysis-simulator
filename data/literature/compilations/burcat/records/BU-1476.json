@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1476",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C5H9N  Cy",
+  "cas_as_published": "694-05-3",
+  "formula": "C5H9N",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/10",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 5.",
+      "element": "C",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "83.13170",
+    "value": 83.1317
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.12367534E+01",
+          "value": 11.2367534
+        },
+        {
+          "as_published": "2.81358484E-02",
+          "value": 0.0281358484
+        },
+        {
+          "as_published": "-1.00829960E-05",
+          "value": -1.0082996e-05
+        },
+        {
+          "as_published": "1.62539969E-09",
+          "value": 1.62539969e-09
+        },
+        {
+          "as_published": "-9.72128103E-14",
+          "value": -9.72128103e-14
+        },
+        {
+          "as_published": "2.67226504E+04",
+          "value": 26722.6504
+        },
+        {
+          "as_published": "-3.93936045E+01",
+          "value": -39.3936045
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.17138805E+00",
+          "value": 1.17138805
+        },
+        {
+          "as_published": "1.85245607E-02",
+          "value": 0.0185245607
+        },
+        {
+          "as_published": "9.02356757E-05",
+          "value": 9.02356757e-05
+        },
+        {
+          "as_published": "-1.35938670E-07",
+          "value": -1.3593867e-07
+        },
+        {
+          "as_published": "5.68248384E-11",
+          "value": 5.68248384e-11
+        },
+        {
+          "as_published": "3.11607096E+04",
+          "value": 31160.7096
+        },
+        {
+          "as_published": "2.12116050E+01",
+          "value": 21.211605
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.28887316E+04",
+    "value": 32888.7316,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "694-05-3",
+    "C5H9N 1,2,3,6-TERAHYDRO-PYRIDINE SIGMA=1. IA=15.4764  IB=18.9630  IC=29.4017",
+    "NU=3501,3128,3116,3102,3073,3066.5(2),3061,3044,1586,1522,1511,1510,1503,1373,",
+    "1357,1353,1330,1295,1206.7,1187,1129,1078,1060,1041,983,931,893,853,797,730,694,",
+    "593,573,516,445,320,293  HF298=65.357+/-2 kcal  {HF298=18.+/-2 kcal ESTIMATED",
+    "USING BENSON'S GROUP ADDITIVITY} Max Lst Sq Error Cp @ 200 K 0.97%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 16154,
+    "header_line": 16160,
+    "end_line": 16163
+  },
+  "source_text": {
+    "header_line": "C5H9N  Cy         T11/10C  5.H  9.N  1.   0.G   200.000  6000.000  B  83.13170 1",
+    "coeff_lines": [
+      " 1.12367534E+01 2.81358484E-02-1.00829960E-05 1.62539969E-09-9.72128103E-14    2",
+      " 2.67226504E+04-3.93936045E+01 1.17138805E+00 1.85245607E-02 9.02356757E-05    3",
+      "-1.35938670E-07 5.68248384E-11 3.11607096E+04 2.12116050E+01 3.28887316E+04    4"
+    ]
+  }
+}

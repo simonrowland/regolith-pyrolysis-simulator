@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2455",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "FeS(c)",
+  "cas_as_published": "1317-96-0",
+  "formula": "FeS",
+  "phase": "c",
+  "phase_as_published": "c",
+  "phase_card_as_published": "S",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "g11/00",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "FE",
+      "count_as_published": " 1.",
+      "element": "Fe",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": " 1.",
+      "element": "S",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "87.91100",
+    "value": 87.911
+  },
+  "T_min_K": {
+    "as_published": "598.000",
+    "value": 598.0
+  },
+  "T_max_K": {
+    "as_published": "1465.000",
+    "value": 1465.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.03621730E+01",
+          "value": 10.362173
+        },
+        {
+          "as_published": "-7.76171777E-03",
+          "value": -0.00776171777
+        },
+        {
+          "as_published": "4.75023831E-06",
+          "value": 4.75023831e-06
+        },
+        {
+          "as_published": "-2.74497850E-10",
+          "value": -2.7449785e-10
+        },
+        {
+          "as_published": "6.44425590E-14",
+          "value": 6.4442559e-14
+        },
+        {
+          "as_published": "-1.43283763E+04",
+          "value": -14328.3763
+        },
+        {
+          "as_published": "-4.88159394E+01",
+          "value": -48.8159394
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.03771967E+01",
+          "value": 10.3771967
+        },
+        {
+          "as_published": "-7.92718896E-03",
+          "value": -0.00792718896
+        },
+        {
+          "as_published": "5.21202025E-06",
+          "value": 5.21202025e-06
+        },
+        {
+          "as_published": "-7.65447343E-10",
+          "value": -7.65447343e-10
+        },
+        {
+          "as_published": "2.44057681E-13",
+          "value": 2.44057681e-13
+        },
+        {
+          "as_published": "-1.43277773E+04",
+          "value": -14327.7773
+        },
+        {
+          "as_published": "-4.88663926E+01",
+          "value": -48.8663926
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.19815888E+04",
+    "value": -11981.5888,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1317-96-0",
+    "FeS Ferrum Monosulfide CONDENSED   HF298=-99.62 kJ  REF=Pankratz et al Bur Mines",
+    "Bull 689 1987  {HF298(S)=-101.67 +/- 0.8 kJ  REF=JANAF 77}  Max Lst Sq Error Cp",
+    "@ 400 K 0.24%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 27695,
+    "header_line": 27707,
+    "end_line": 27710
+  },
+  "source_text": {
+    "header_line": "FeS(c)            g11/00FE 1.S  1.   0.   0.S   598.000  1465.000  C  87.91100 1",
+    "coeff_lines": [
+      " 1.03621730E+01-7.76171777E-03 4.75023831E-06-2.74497850E-10 6.44425590E-14    2",
+      "-1.43283763E+04-4.88159394E+01 1.03771967E+01-7.92718896E-03 5.21202025E-06    3",
+      "-7.65447343E-10 2.44057681E-13-1.43277773E+04-4.88663926E+01-1.19815888E+04    4"
+    ]
+  }
+}

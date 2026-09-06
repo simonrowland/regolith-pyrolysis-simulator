@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3401",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "W5O15  (WO3)5",
+  "cas_as_published": "885600-50-0",
+  "formula": "W5O15",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "tpis82",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "W ",
+      "count_as_published": " 5.",
+      "element": "W",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "15.",
+      "element": "O",
+      "count": 15.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "1159.19100",
+    "value": 1159.191
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.96872520E+01",
+          "value": 49.687252
+        },
+        {
+          "as_published": "8.58124560E-03",
+          "value": 0.0085812456
+        },
+        {
+          "as_published": "-3.37608774E-06",
+          "value": -3.37608774e-06
+        },
+        {
+          "as_published": "5.78029809E-10",
+          "value": 5.78029809e-10
+        },
+        {
+          "as_published": "-3.60190648E-14",
+          "value": -3.60190648e-14
+        },
+        {
+          "as_published": "-4.44134067E+05",
+          "value": -444134.067
+        },
+        {
+          "as_published": "-2.03475527E+02",
+          "value": -203.475527
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.60879183E+01",
+          "value": 16.0879183
+        },
+        {
+          "as_published": "1.29387970E-01",
+          "value": 0.12938797
+        },
+        {
+          "as_published": "-1.72454091E-04",
+          "value": -0.000172454091
+        },
+        {
+          "as_published": "1.08931241E-07",
+          "value": 1.08931241e-07
+        },
+        {
+          "as_published": "-2.65186173E-11",
+          "value": -2.65186173e-11
+        },
+        {
+          "as_published": "-4.36370544E+05",
+          "value": -436370.544
+        },
+        {
+          "as_published": "-3.71443620E+01",
+          "value": -37.144362
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-4.27143912E+05",
+    "value": -427143.912,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "885600-50-0",
+    "W5O15  (WO3)5  PentaTungsten PentaDecaOxide  SIGMA=5  STATWT=1",
+    "IAIBIC=1500000000.E-117  Nu=960(10),900(5),600(5),200(24),100(10)  HF298=-3551.5",
+    "+/-100. kJ  REF=Gurvich 1982  Max Lst Sq Error Cp @ 1300 K 0.22%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 35928,
+    "header_line": 35932,
+    "end_line": 35935
+  },
+  "source_text": {
+    "header_line": "W5O15  (WO3)5     tpis82W  5.O 15.   0.   0.G   200.000  6000.000  C1159.19100 1",
+    "coeff_lines": [
+      " 4.96872520E+01 8.58124560E-03-3.37608774E-06 5.78029809E-10-3.60190648E-14    2",
+      "-4.44134067E+05-2.03475527E+02 1.60879183E+01 1.29387970E-01-1.72454091E-04    3",
+      " 1.08931241E-07-2.65186173E-11-4.36370544E+05-3.71443620E+01-4.27143912E+05    4"
+    ]
+  }
+}

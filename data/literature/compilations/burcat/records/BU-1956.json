@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1956",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C10H8 Naphthalene",
+  "cas_as_published": "91-20-3  [F&W notation A2]",
+  "formula": "C10H8",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/98",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "10.",
+      "element": "C",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 8.",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "128.17352",
+    "value": 128.17352
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.86129884E+01",
+          "value": 18.6129884
+        },
+        {
+          "as_published": "3.04494175E-02",
+          "value": 0.0304494175
+        },
+        {
+          "as_published": "-1.11224825E-05",
+          "value": -1.11224825e-05
+        },
+        {
+          "as_published": "1.81615474E-09",
+          "value": 1.81615474e-09
+        },
+        {
+          "as_published": "-1.09601281E-13",
+          "value": -1.09601281e-13
+        },
+        {
+          "as_published": "8.91578988E+03",
+          "value": 8915.78988
+        },
+        {
+          "as_published": "-8.00230396E+01",
+          "value": -80.0230396
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-1.04919475E+00",
+          "value": -1.04919475
+        },
+        {
+          "as_published": "4.62970781E-02",
+          "value": 0.0462970781
+        },
+        {
+          "as_published": "7.07591636E-05",
+          "value": 7.07591636e-05
+        },
+        {
+          "as_published": "-1.38408111E-07",
+          "value": -1.38408111e-07
+        },
+        {
+          "as_published": "6.20475407E-11",
+          "value": 6.20475407e-11
+        },
+        {
+          "as_published": "1.59848987E+04",
+          "value": 15984.8987
+        },
+        {
+          "as_published": "3.02121626E+01",
+          "value": 30.2121626
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.81107678E+04",
+    "value": 18110.7678,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "91-20-3  [F&W notation A2]",
+    "C10H8 Naphthalene SIGMA = 4  Ia = 26.8532  Ib = 67.4189  Ic = 94.2721",
+    "Nu= 3092,3090,3065,3060(2),3058,3030,3027,1628,1595,1577,1509,1463,1443,1389,",
+    "1380,1361,1265,1242,1209,1168,1145,1144,1125,1025,1008,980,970,958,950,936,",
+    "877,876,841,782,778,761,725,617,581,512,506,472,466,386,359,191,176.",
+    "REF = CHEN,KUDCHAKER  & WILHOIT  JPCRD 8,(1979),527.     Hf(298)= 35.99 kcal",
+    "REF = Colomina et al, J. Chem. Thermo. 14,(1982),779.  {HF298=36.08 kcal",
+    "REF=Stull Westrum & Sinke 1969 also RMG 2013} Max Lst Sq Error Cp @ 200 K 0.96%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 22092,
+    "header_line": 22100,
+    "end_line": 22103
+  },
+  "source_text": {
+    "header_line": "C10H8 Naphthalene T 7/98C 10.H  8.   0.   0.G   200.000  6000.000  B 128.17352 1",
+    "coeff_lines": [
+      " 1.86129884E+01 3.04494175E-02-1.11224825E-05 1.81615474E-09-1.09601281E-13    2",
+      " 8.91578988E+03-8.00230396E+01-1.04919475E+00 4.62970781E-02 7.07591636E-05    3",
+      "-1.38408111E-07 6.20475407E-11 1.59848987E+04 3.02121626E+01 1.81107678E+04    4"
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 schema_version: literature_compilation_manifest.v1
 source_id: nasa-glenn
-generated_at: '2026-09-06T22:10:50.680260+00:00'
+generated_at: '2026-09-06T22:39:13.433132+00:00'
 compilation_role:
   kind: assessed_thermodynamic_functions
   engine_reference_input: true
@@ -34,8 +34,8 @@ summary:
   product_record_count: 2030
   reactant_record_count: 81
   coefficient_count: 34380
-  parse_ambiguity_count: 212
-  records_with_ambiguity_count: 100
+  parse_ambiguity_count: 228
+  records_with_ambiguity_count: 116
   formula_count: 1365
   source_schema_version: literature_compilation.v1
 feedstock_element_coverage:
@@ -3106,12 +3106,12 @@ held_extract_missing_records:
   formula: IC10IH16
 - record_id: NG-2081
   name_as_published: JP-10(g)
-  phase: g
+  phase: gas
   cea_section: reactants
   formula: C10H16
 - record_id: NG-2082
   name_as_published: InertJP-10(g)
-  phase: g
+  phase: gas
   cea_section: reactants
   formula: IC10IH16
 - record_id: NG-2083
@@ -3126,12 +3126,12 @@ held_extract_missing_records:
   formula: IC12IH23
 - record_id: NG-2085
   name_as_published: Jet-A(g)
-  phase: g
+  phase: gas
   cea_section: reactants
   formula: C12H23
 - record_id: NG-2086
   name_as_published: InertJet-A(g)
-  phase: g
+  phase: gas
   cea_section: reactants
   formula: IC12IH23
 - record_id: NG-2087
@@ -36869,8 +36869,14 @@ entries:
   coefficient_count: 27
   interval_count: 3
   n_intervals_declared: 3
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: an
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1291.json
 - record_id: NG-1292
@@ -39816,8 +39822,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: I'
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1403.json
 - record_id: NG-1404
@@ -43498,8 +43510,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: crII
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1542.json
 - record_id: NG-1543
@@ -43524,8 +43542,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: crI
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1543.json
 - record_id: NG-1544
@@ -43732,8 +43756,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: crII
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1551.json
 - record_id: NG-1552
@@ -43758,8 +43788,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: crI
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1552.json
 - record_id: NG-1553
@@ -48302,8 +48338,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: I'
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1726.json
 - record_id: NG-1727
@@ -49014,8 +49056,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: V
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1753.json
 - record_id: NG-1754
@@ -50220,8 +50268,14 @@ entries:
   coefficient_count: 18
   interval_count: 2
   n_intervals_declared: 2
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: II-r
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1799.json
 - record_id: NG-1800
@@ -50246,8 +50300,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: I-y
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1800.json
 - record_id: NG-1801
@@ -51863,8 +51923,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: a-qz
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1862.json
 - record_id: NG-1863
@@ -51889,8 +51955,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: b-qz
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1863.json
 - record_id: NG-1864
@@ -51915,8 +51987,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: b-crt
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1864.json
 - record_id: NG-1865
@@ -54317,8 +54395,14 @@ entries:
   coefficient_count: 18
   interval_count: 2
   n_intervals_declared: 2
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: I'
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-1956.json
 - record_id: NG-1957
@@ -55757,8 +55841,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: III,II
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-2011.json
 - record_id: NG-2012
@@ -55913,8 +56003,14 @@ entries:
   coefficient_count: 9
   interval_count: 1
   n_intervals_declared: 1
-  ambiguity_count: 0
-  ambiguities: []
+  ambiguity_count: 1
+  ambiguities:
+  - kind: phase_suffix_normalized_to_condensed
+    phase_as_published: a'
+    phase_normalized: condensed
+    note: Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because
+      the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am',
+      'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged.
   sha256_source_file: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
   path: data/literature/compilations/nasa-glenn/records/NG-2017.json
 - record_id: NG-2018
@@ -57986,7 +58082,7 @@ entries:
   path: data/literature/compilations/nasa-glenn/records/NG-2080.json
 - record_id: NG-2081
   formula: C10H16
-  phase: g
+  phase: gas
   name_as_published: JP-10(g)
   source:
     database: NASA Glenn / CEA thermo.inp
@@ -58012,7 +58108,7 @@ entries:
   path: data/literature/compilations/nasa-glenn/records/NG-2081.json
 - record_id: NG-2082
   formula: IC10IH16
-  phase: g
+  phase: gas
   name_as_published: InertJP-10(g)
   source:
     database: NASA Glenn / CEA thermo.inp
@@ -58106,7 +58202,7 @@ entries:
   path: data/literature/compilations/nasa-glenn/records/NG-2084.json
 - record_id: NG-2085
   formula: C12H23
-  phase: g
+  phase: gas
   name_as_published: Jet-A(g)
   source:
     database: NASA Glenn / CEA thermo.inp
@@ -58132,7 +58228,7 @@ entries:
   path: data/literature/compilations/nasa-glenn/records/NG-2085.json
 - record_id: NG-2086
   formula: IC12IH23
-  phase: g
+  phase: gas
   name_as_published: InertJet-A(g)
   source:
     database: NASA Glenn / CEA thermo.inp

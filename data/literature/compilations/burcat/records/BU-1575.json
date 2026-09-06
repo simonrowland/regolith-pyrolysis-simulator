@@ -1,0 +1,182 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1575",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "2,4-C6H4Cl2O trans",
+  "cas_as_published": "120-83-2",
+  "formula": "C6H4Cl2O",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/06",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 2.",
+      "element": "Cl",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "163.00076",
+    "value": 163.00076
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.80137926E+01",
+          "value": 18.0137926
+        },
+        {
+          "as_published": "1.65922573E-02",
+          "value": 0.0165922573
+        },
+        {
+          "as_published": "-6.00696030E-06",
+          "value": -6.0069603e-06
+        },
+        {
+          "as_published": "9.75704442E-10",
+          "value": 9.75704442e-10
+        },
+        {
+          "as_published": "-5.86873641E-14",
+          "value": -5.86873641e-14
+        },
+        {
+          "as_published": "-2.49228999E+04",
+          "value": -24922.8999
+        },
+        {
+          "as_published": "-6.61396801E+01",
+          "value": -66.1396801
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.46996801E-01",
+          "value": 0.146996801
+        },
+        {
+          "as_published": "6.70772919E-02",
+          "value": 0.0670772919
+        },
+        {
+          "as_published": "-5.41186297E-05",
+          "value": -5.41186297e-05
+        },
+        {
+          "as_published": "1.50692892E-08",
+          "value": 1.50692892e-08
+        },
+        {
+          "as_published": "1.34115845E-12",
+          "value": 1.34115845e-12
+        },
+        {
+          "as_published": "-2.00647636E+04",
+          "value": -20064.7636
+        },
+        {
+          "as_published": "2.58027499E+01",
+          "value": 25.8027499
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.74872824E+04",
+    "value": -17487.2824,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "120-83-2",
+    "C6H4CL2O trans(E) 2,4-Dichloro-Phenol STATWT=1 SIGMA=1  IA=38.9554   IB=115.1809",
+    "IC=154.1634    Ir=0.13923 ROSYM=1  V(3)=731.+/-70. cm-1 (TS calc)  Nu=3755,3239,",
+    "3230,3180,1652,1633,1538,1442,1369,1327,1298,1205,1168,1123,1077,925,886,",
+    "866,806,735,702,659,566,516,450,403,380,360,337,270.6,195,172.2  HF298=-145.4 kJ",
+    "HF0=-131.20 kJ   REF=Burcat G3B3 calc   Max Lst Sq Error Cp @ 1300 K 0.45%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "2,4-C6H4Cl2O trans",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17382,
+    "header_line": 17388,
+    "end_line": 17391
+  },
+  "source_text": {
+    "header_line": "2,4-C6H4Cl2O transT 1/06C  6.H  4.CL 2.O  1.G   200.000  6000.000  C 163.00076 1",
+    "coeff_lines": [
+      " 1.80137926E+01 1.65922573E-02-6.00696030E-06 9.75704442E-10-5.86873641E-14    2",
+      "-2.49228999E+04-6.61396801E+01 1.46996801E-01 6.70772919E-02-5.41186297E-05    3",
+      " 1.50692892E-08 1.34115845E-12-2.00647636E+04 2.58027499E+01-1.74872824E+04    4"
+    ]
+  }
+}

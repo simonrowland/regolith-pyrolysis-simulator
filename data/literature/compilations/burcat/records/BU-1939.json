@@ -1,0 +1,181 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1939",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C9H20 n-Nonane",
+  "cas_as_published": "111-84-2",
+  "formula": "C9H20",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 9.",
+      "element": "C",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "20.",
+      "element": "H",
+      "count": 20.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "128.25510",
+    "value": 128.2551
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.70759001E+01",
+          "value": 17.0759001
+        },
+        {
+          "as_published": "5.78286054E-02",
+          "value": 0.0578286054
+        },
+        {
+          "as_published": "-2.08777777E-05",
+          "value": -2.08777777e-05
+        },
+        {
+          "as_published": "3.37461855E-09",
+          "value": 3.37461855e-09
+        },
+        {
+          "as_published": "-2.02015485E-13",
+          "value": -2.02015485e-13
+        },
+        {
+          "as_published": "-3.75571343E+04",
+          "value": -37557.1343
+        },
+        {
+          "as_published": "-6.13872337E+01",
+          "value": -61.3872337
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.32780866E+01",
+          "value": 13.2780866
+        },
+        {
+          "as_published": "-2.28957001E-02",
+          "value": -0.0228957001
+        },
+        {
+          "as_published": "2.65866920E-04",
+          "value": 0.00026586692
+        },
+        {
+          "as_published": "-3.23971613E-07",
+          "value": -3.23971613e-07
+        },
+        {
+          "as_published": "1.24921637E-10",
+          "value": 1.24921637e-10
+        },
+        {
+          "as_published": "-3.21669067E+04",
+          "value": -32166.9067
+        },
+        {
+          "as_published": "-1.99664136E+01",
+          "value": -19.9664136
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-2.74580222E+04",
+    "value": -27458.0222,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "111-84-2",
+    "N-C9H20 N-NONANE  SIGMA=2  STATWT=1  IA=8.9910  IB=244.5782  IC=248.9068",
+    "[Ir(CH3)=0.52574  ROSYM=3  V(3)=340. cm-1]x2  [Ir(C2H5)=4.80  ROSYM=1  V(3)=1100",
+    "cm-1]x2  Ir(C4H9)=9.3  ROSYM=1  V(3)=270. cm-1  Nu=3110(2),3106(2),3076,3068,",
+    "3058,3047,3041(2),3035(2),3030.5(2),3028,3022,3014(2),3010.5(2),1545(2),1538,",
+    "1531,1529(2),1524,1518.5(2),1515(2),1441(2),1427(2),1416,1389,1358.5,1355,1350,",
+    "1346,1342,1322,1304,1285,1257,1245,1221,1162,1118,1077,1074,1067,1056,1041,1028,",
+    "1001,993,919,907,902,846,788,753,740.5(2),497,456,396,291,246.5(2),240,166,",
+    "160.2(2)  REF=Burcat B3LYP/6-31G(d)  HF298=-228.3 kJ  REF=Good  JCP 60,(1974),",
+    "3144  {HF298=-54.71 kcal Scott Bur of Mines Bull 666 1974}  HF298(liq)=-274+/-1",
+    "kJ  REF=Good, J Chem Eng Data 14,(1969),231  Max Lst Sq Error Cp @ 200 K 0.71%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 21883,
+    "header_line": 21894,
+    "end_line": 21897
+  },
+  "source_text": {
+    "header_line": "C9H20 n-Nonane    T12/14C  9.H 20.   0.   0.G   200.000  6000.000  B 128.25510 1",
+    "coeff_lines": [
+      " 1.70759001E+01 5.78286054E-02-2.08777777E-05 3.37461855E-09-2.02015485E-13    2",
+      "-3.75571343E+04-6.13872337E+01 1.32780866E+01-2.28957001E-02 2.65866920E-04    3",
+      "-3.23971613E-07 1.24921637E-10-3.21669067E+04-1.99664136E+01-2.74580222E+04    4"
+    ]
+  }
+}

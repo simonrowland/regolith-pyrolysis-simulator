@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0522",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CH3SiH3  MethylS",
+  "cas_as_published": "992-94-9",
+  "formula": "CH6Si",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "SI",
+      "count_as_published": " 1.",
+      "element": "Si",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "46.14384",
+    "value": 46.14384
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "7.09740155E+00",
+          "value": 7.09740155
+        },
+        {
+          "as_published": "1.30829744E-02",
+          "value": 0.0130829744
+        },
+        {
+          "as_published": "-4.76168300E-06",
+          "value": -4.761683e-06
+        },
+        {
+          "as_published": "7.75272040E-10",
+          "value": 7.7527204e-10
+        },
+        {
+          "as_published": "-4.66803210E-14",
+          "value": -4.6680321e-14
+        },
+        {
+          "as_published": "-6.59974911E+03",
+          "value": -6599.74911
+        },
+        {
+          "as_published": "-1.34207637E+01",
+          "value": -13.4207637
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.52854097E+00",
+          "value": 2.52854097
+        },
+        {
+          "as_published": "1.68736130E-02",
+          "value": 0.016873613
+        },
+        {
+          "as_published": "1.08342022E-05",
+          "value": 1.08342022e-05
+        },
+        {
+          "as_published": "-2.53818759E-08",
+          "value": -2.53818759e-08
+        },
+        {
+          "as_published": "1.12928043E-11",
+          "value": 1.12928043e-11
+        },
+        {
+          "as_published": "-4.85344621E+03",
+          "value": -4853.44621
+        },
+        {
+          "as_published": "1.24354040E+01",
+          "value": 12.435404
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-3.29869108E+03",
+    "value": -3298.69108,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "992-94-9",
+    "CH3SiH3  MethylSilane  SIGMA=3  STATWT=1  IA=1.4973  IB=IC=7.7915  Ir(CH3)=0.514",
+    "V(3)=591.41  V(6)=2.9197  V(9)=0.2658  REF=NIST CCCBDB  Nu=2898,2166,1260,940,",
+    "700,2982(2),2169(2)1403(2),980(2),868(2),540(2),[195 int rot] REF=Shimanouchi",
+    "HF298=-27.427+/-8 kJ  REF=Burcat G3B3  {HF298=-29.10+/-4 kJ  REF=Rappaport &",
+    "Apeloig The Chemistry of Organo Silicon compounds Vol 2 Part 1 Chapt 4 Wiley",
+    "1998;  HF298=-26.6 kJ  G4  REF=Sukkaew et al Material Science Forum 778-780,",
+    "(2014),175;  HF298=-25.1 kJ  REF=Ochterski et al JACS 117,(1995),11299;",
+    "HF298=31.1 kcal  REF=Allendorf et al JPC 96,(1992),428 HF298=-29+/-1 kJ",
+    "REF=Lias et al JPCRD 17,(1988),Suppl 1}  Max Lst Sq Error Cp @ 1300 K 0.60%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 5296,
+    "header_line": 5306,
+    "end_line": 5309
+  },
+  "source_text": {
+    "header_line": "CH3SiH3  MethylS  T12/16C  1.H  6.SI 1.   0.G   200.000  6000.000  B  46.14384 1",
+    "coeff_lines": [
+      " 7.09740155E+00 1.30829744E-02-4.76168300E-06 7.75272040E-10-4.66803210E-14    2",
+      "-6.59974911E+03-1.34207637E+01 2.52854097E+00 1.68736130E-02 1.08342022E-05    3",
+      "-2.53818759E-08 1.12928043E-11-4.85344621E+03 1.24354040E+01-3.29869108E+03    4"
+    ]
+  }
+}

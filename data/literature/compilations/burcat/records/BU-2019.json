@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2019",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C11H10 Phenyl-CPD",
+  "cas_as_published": "1961-98-4",
+  "formula": "C11H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/13",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "11.",
+      "element": "C",
+      "count": 11.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "142.19710",
+    "value": 142.1971
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.04611603E+01",
+          "value": 20.4611603
+        },
+        {
+          "as_published": "3.59493258E-02",
+          "value": 0.0359493258
+        },
+        {
+          "as_published": "-1.30564286E-05",
+          "value": -1.30564286e-05
+        },
+        {
+          "as_published": "2.12114153E-09",
+          "value": 2.12114153e-09
+        },
+        {
+          "as_published": "-1.27492472E-13",
+          "value": -1.27492472e-13
+        },
+        {
+          "as_published": "1.84334173E+04",
+          "value": 18433.4173
+        },
+        {
+          "as_published": "-8.57209274E+01",
+          "value": -85.7209274
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.59197480E+00",
+          "value": 1.5919748
+        },
+        {
+          "as_published": "3.44021032E-02",
+          "value": 0.0344021032
+        },
+        {
+          "as_published": "1.24037934E-04",
+          "value": 0.000124037934
+        },
+        {
+          "as_published": "-2.01415890E-07",
+          "value": -2.0141589e-07
+        },
+        {
+          "as_published": "8.67315853E-11",
+          "value": 8.67315853e-11
+        },
+        {
+          "as_published": "2.58905358E+04",
+          "value": 25890.5358
+        },
+        {
+          "as_published": "2.37537377E+01",
+          "value": 23.7537377
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.86330283E+04",
+    "value": 28633.0283,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1961-98-4",
+    "C11H10 Phenyl-1-Cyclopentadiene  C6H5-1-C5H5  SIGMA=1  STATWT=1  IA=27.5177",
+    "IB=121.5673  IC=129.1708  Ir(C5H5)=4.9592  ROSYM=2  V(3)=524.6 cm-1  Nu=3247,",
+    "3242,3221,3209(2),3199,3191,3181,3173,3005,1662(2),1643,1576,1545,1501,1415,",
+    "1371,1360,1322,1261,1232,1214,1210,1192,1133,1122.5,1108,1060,1039,1020,1015,",
+    "993,965,953.3(2),945,922,869,859,840,811,776.5,729,721,712,639.5,634,579,507,",
+    "417,361,299,288,117,99.4  REF=Burcat B3LYP/6-31G(d)  HF298=56.9 kcal  NIST 94",
+    "Max Lst Sq Error Cp @ 200 K ***1.05%***"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 22907,
+    "header_line": 22915,
+    "end_line": 22918
+  },
+  "source_text": {
+    "header_line": "C11H10 Phenyl-CPD T10/13C 11.H 10.   0.   0.G   200.000  6000.000  B 142.19710 1",
+    "coeff_lines": [
+      " 2.04611603E+01 3.59493258E-02-1.30564286E-05 2.12114153E-09-1.27492472E-13    2",
+      " 1.84334173E+04-8.57209274E+01 1.59197480E+00 3.44021032E-02 1.24037934E-04    3",
+      "-2.01415890E-07 8.67315853E-11 2.58905358E+04 2.37537377E+01 2.86330283E+04    4"
+    ]
+  }
+}

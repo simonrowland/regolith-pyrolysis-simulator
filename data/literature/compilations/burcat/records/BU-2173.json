@@ -1,0 +1,191 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2173",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C18H34O3 RicinOlei",
+  "cas_as_published": "141-22-0",
+  "formula": "C18H34O3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T03/12",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "18.",
+      "element": "C",
+      "count": 18.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "34.",
+      "element": "H",
+      "count": 34.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "298.46076",
+    "value": 298.46076
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.17394683E+01",
+          "value": 41.7394683
+        },
+        {
+          "as_published": "1.05372336E-01",
+          "value": 0.105372336
+        },
+        {
+          "as_published": "-3.79491362E-05",
+          "value": -3.79491362e-05
+        },
+        {
+          "as_published": "6.13391513E-09",
+          "value": 6.13391513e-09
+        },
+        {
+          "as_published": "-3.67443620E-13",
+          "value": -3.6744362e-13
+        },
+        {
+          "as_published": "-1.20678427E+05",
+          "value": -120678.427
+        },
+        {
+          "as_published": "-1.86692622E+02",
+          "value": -186.692622
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.04298222E+01",
+          "value": 20.4298222
+        },
+        {
+          "as_published": "4.15960829E-03",
+          "value": 0.00415960829
+        },
+        {
+          "as_published": "4.32105278E-04",
+          "value": 0.000432105278
+        },
+        {
+          "as_published": "-5.66520203E-07",
+          "value": -5.66520203e-07
+        },
+        {
+          "as_published": "2.24754634E-10",
+          "value": 2.24754634e-10
+        },
+        {
+          "as_published": "-1.07308108E+05",
+          "value": -107308.108
+        },
+        {
+          "as_published": "-3.87010945E+01",
+          "value": -38.7010945
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-9.82278932E+04",
+    "value": -98227.8932,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "141-22-0",
+    "C18H34O3 RicinOleic  (12-Hydroxy-9-octadecenoic cis) acid  SIGMA=1  STATWT=1",
+    "IA=320.5175  IB=1203.9830  IC=1447.4456  [Ir(OH)=0.14246  ROSYM=1  V(3)=240.]x2",
+    "Ir(CH3)=0.52574  ROSYM=3  V(3)=270. cm-1  Ir(C2H5)=5.63  ROSYM=1  V(3)=370. cm-1",
+    "Ir(COOH)=7.026  ROSYM=1  V(3)=340. cm-1  Nu=42.98,45.23,50.9,62.37,78.55,93,102,",
+    "111,117,133,147,153,160,171,187,203,232.5,250,251,283,302,314,367,392,407,411,",
+    "439,459,514,521,545,581,635,660,673,734.5,736.5(2),744,750,776,798,838,874,882,",
+    "885,899,910,931,950,982,1003,1008.4(2),1012,1017.5,1036,1039.5,1050,1057.5,1067,",
+    "1071,1076(2),1093,1105,1135,1140,1147,1163(2),1216,1231,1236.5,1244,1252,1275,",
+    "1283,1286,1302.2(2),1309,1314,1324(2),1331(2),1338,1342(2),1345(2),1374,1380,",
+    "1392,1406,1416(2),1421,1429(2),1439,1443,1472.5,1487,1494,1498(2),1501(3),",
+    "1510.8(3),1517,1521,1527(2),1743,1845,2971,3005,3008,3009.3(2),3012.2(2),3018,",
+    "3024(2),3034.3(3),3037.6(2),3041.8(2),3046.2(2),3053,3065(2),3071,3080,3086,",
+    "3094,3097,3105.7(2),3110,3122,3146,3753,3815  REF=Burcat B3LYP/6-31G(d,p)",
+    "HF298=-195.2  kcal  REF=NIST 94  Max Lst Sq Error Cp @ 200 K 0.67%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C18H34O3 RicinOlei",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 25009,
+    "header_line": 25024,
+    "end_line": 25027
+  },
+  "source_text": {
+    "header_line": "C18H34O3 RicinOleiT03/12C 18.H 34.O  3.   0.G   200.000  6000.000  C 298.46076 1",
+    "coeff_lines": [
+      " 4.17394683E+01 1.05372336E-01-3.79491362E-05 6.13391513E-09-3.67443620E-13    2",
+      "-1.20678427E+05-1.86692622E+02 2.04298222E+01 4.15960829E-03 4.32105278E-04    3",
+      "-5.66520203E-07 2.24754634E-10-1.07308108E+05-3.87010945E+01-9.82278932E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2816",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "NH4CLO4(II)",
+  "cas_as_published": "7790-98-9",
+  "formula": "NH4ClO4",
+  "phase": "II",
+  "phase_as_published": "II",
+  "phase_card_as_published": "C",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/13",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 1.",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 4.",
+      "element": "O",
+      "count": 4.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "117.48880",
+    "value": 117.4888
+  },
+  "T_min_K": {
+    "as_published": "513.150",
+    "value": 513.15
+  },
+  "T_max_K": {
+    "as_published": "1500.000",
+    "value": 1500.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "-8.25771739E+00",
+          "value": -8.25771739
+        },
+        {
+          "as_published": "5.60560513E-02",
+          "value": 0.0560560513
+        },
+        {
+          "as_published": "-1.34068019E-05",
+          "value": -1.34068019e-05
+        },
+        {
+          "as_published": "-1.09899273E-09",
+          "value": -1.09899273e-09
+        },
+        {
+          "as_published": "2.11964074E-13",
+          "value": 2.11964074e-13
+        },
+        {
+          "as_published": "-3.21818377E+04",
+          "value": -32181.8377
+        },
+        {
+          "as_published": "6.00314568E+01",
+          "value": 60.0314568
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "6.88881884E+00",
+          "value": 6.88881884
+        },
+        {
+          "as_published": "3.77872084E-02",
+          "value": 0.0377872084
+        },
+        {
+          "as_published": "-2.92937713E-05",
+          "value": -2.92937713e-05
+        },
+        {
+          "as_published": "2.77606267E-08",
+          "value": 2.77606267e-08
+        },
+        {
+          "as_published": "-9.63837933E-12",
+          "value": -9.63837933e-12
+        },
+        {
+          "as_published": "-3.81431322E+04",
+          "value": -38143.1322
+        },
+        {
+          "as_published": "-2.55420685E+01",
+          "value": -25.5420685
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-3.55723909E+04",
+    "value": -35572.3909,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "7790-98-9",
+    "NH4ClO4(I) and (II) Amonium Perchlorate crystal  From values listed by B.McBride",
+    "HF298=-295.767+/-0.17 kJ  {HF298=-283. kJ  REF=Agrawal High Energy Materials",
+    "Wiley-VCH 2010}  Max Lst Sq Error Cp @ 200 K 0.11%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 30685,
+    "header_line": 30693,
+    "end_line": 30696
+  },
+  "source_text": {
+    "header_line": "NH4CLO4(II)       T 7/13N  1.H  4.CL 1.O  4.C   513.150  1500.000  C 117.48880 1",
+    "coeff_lines": [
+      "-8.25771739E+00 5.60560513E-02-1.34068019E-05-1.09899273E-09 2.11964074E-13    2",
+      "-3.21818377E+04 6.00314568E+01 6.88881884E+00 3.77872084E-02-2.92937713E-05    3",
+      " 2.77606267E-08-9.63837933E-12-3.81431322E+04-2.55420685E+01-3.55723909E+04    4"
+    ]
+  }
+}

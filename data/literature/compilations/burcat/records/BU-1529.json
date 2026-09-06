@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1529",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6D6",
+  "cas_as_published": "1076-43-3",
+  "formula": "C6D6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "g 1/01",
+  "calc_quality_as_published": "",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "D ",
+      "count_as_published": " 6.",
+      "element": "D",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "84.14881",
+    "value": 84.14881
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.50193819E+01",
+          "value": 15.0193819
+        },
+        {
+          "as_published": "1.83076516E-02",
+          "value": 0.0183076516
+        },
+        {
+          "as_published": "-6.91803026E-06",
+          "value": -6.91803026e-06
+        },
+        {
+          "as_published": "1.15439700E-09",
+          "value": 1.154397e-09
+        },
+        {
+          "as_published": "-7.06932850E-14",
+          "value": -7.0693285e-14
+        },
+        {
+          "as_published": "5.68508041E+01",
+          "value": 56.8508041
+        },
+        {
+          "as_published": "-6.06326386E+01",
+          "value": -60.6326386
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-3.34953012E+00",
+          "value": -3.34953012
+        },
+        {
+          "as_published": "6.11862705E-02",
+          "value": 0.0611862705
+        },
+        {
+          "as_published": "-2.85161854E-05",
+          "value": -2.85161854e-05
+        },
+        {
+          "as_published": "-1.44495003E-08",
+          "value": -1.44495003e-08
+        },
+        {
+          "as_published": "1.26216522E-11",
+          "value": 1.26216522e-11
+        },
+        {
+          "as_published": "5.54834364E+03",
+          "value": 5548.34364
+        },
+        {
+          "as_published": "3.62039818E+01",
+          "value": 36.2039818
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "6.99468495E+03",
+    "value": 6994.68495,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1076-43-3",
+    "C6D6  BENZENE-D6  IA=35.71  IB=IC=17.85  SIGMA=12  NU=2293,943,1037,497,",
+    "2292,969,827,601,1286,824,662(2),2287(2),1335(2),814(2),2265(2),1552(2),867(2),",
+    "577(2),795(2),352(2)  REF=SHIMANOUCHI  HF298=58.18 kJ    REF=BURCAT, ZELEZNIK &",
+    "McBRIDE  NASA TM 83800 1985.   MAX LST SQ ERROR CP @ 1300 K 0.66 %."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 16840,
+    "header_line": 16845,
+    "end_line": 16848
+  },
+  "source_text": {
+    "header_line": "C6D6              g 1/01C  6.D  6.   0.   0.G   200.000  6000.000     84.14881 1",
+    "coeff_lines": [
+      " 1.50193819E+01 1.83076516E-02-6.91803026E-06 1.15439700E-09-7.06932850E-14    2",
+      " 5.68508041E+01-6.06326386E+01-3.34953012E+00 6.11862705E-02-2.85161854E-05    3",
+      "-1.44495003E-08 1.26216522E-11 5.54834364E+03 3.62039818E+01 6.99468495E+03    4"
+    ]
+  }
+}

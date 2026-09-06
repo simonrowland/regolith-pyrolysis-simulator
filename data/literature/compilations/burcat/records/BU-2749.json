@@ -1,0 +1,172 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2749",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Mn3O4  Solid-A",
+  "cas_as_published": "1317-35-7",
+  "formula": "Mn3O4",
+  "phase": "cr",
+  "phase_as_published": "S",
+  "phase_card_as_published": "S",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "B  /89",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "MN",
+      "count_as_published": " 3.",
+      "element": "Mn",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 4.",
+      "element": "O",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "228.81175",
+    "value": 228.81175
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "1445.000",
+    "value": 1445.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.24690980E+00",
+          "value": 9.2469098
+        },
+        {
+          "as_published": "3.03097632E-02",
+          "value": 0.0303097632
+        },
+        {
+          "as_published": "-2.77876351E-05",
+          "value": -2.77876351e-05
+        },
+        {
+          "as_published": "1.42175100E-08",
+          "value": 1.421751e-08
+        },
+        {
+          "as_published": "-2.74343370E-12",
+          "value": -2.7434337e-12
+        },
+        {
+          "as_published": "-1.70540047E+05",
+          "value": -170540.047
+        },
+        {
+          "as_published": "-4.13240828E+01",
+          "value": -41.3240828
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "5.30992963E+00",
+          "value": 5.30992963
+        },
+        {
+          "as_published": "6.45031044E-02",
+          "value": 0.0645031044
+        },
+        {
+          "as_published": "-1.12103682E-04",
+          "value": -0.000112103682
+        },
+        {
+          "as_published": "9.70819405E-08",
+          "value": 9.70819405e-08
+        },
+        {
+          "as_published": "-3.15481785E-11",
+          "value": -3.15481785e-11
+        },
+        {
+          "as_published": "-1.70549547E+05",
+          "value": -170549.547
+        },
+        {
+          "as_published": "-2.65839957E+01",
+          "value": -26.5839957
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.66912903E+05",
+    "value": -166912.903,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1317-35-7",
+    "Mn3O4  Trimanganese Tetraoxide  Data from Barin 1989. HF298(S)=-1434.191 kJ"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 30088,
+    "header_line": 30090,
+    "end_line": 30093
+  },
+  "source_text": {
+    "header_line": "Mn3O4  Solid-A    B  /89MN 3.O  4.   0.   0.S   298.150  1445.000  C 228.81175 1",
+    "coeff_lines": [
+      " 9.24690980E+00 3.03097632E-02-2.77876351E-05 1.42175100E-08-2.74343370E-12    2",
+      "-1.70540047E+05-4.13240828E+01 5.30992963E+00 6.45031044E-02-1.12103682E-04    3",
+      " 9.70819405E-08-3.15481785E-11-1.70549547E+05-2.65839957E+01-1.66912903E+05    4"
+    ]
+  }
+}

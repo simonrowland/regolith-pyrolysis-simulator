@@ -1,0 +1,191 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2169",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C18H33O2 Oleatoxy",
+  "cas_as_published": "N/A (24317-77-9 for anion undefined)",
+  "formula": "C18H33O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/08",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "18.",
+      "element": "C",
+      "count": 18.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "33.",
+      "element": "H",
+      "count": 33.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "281.45342",
+    "value": 281.45342
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.09567856E+01",
+          "value": 40.9567856
+        },
+        {
+          "as_published": "1.02057550E-01",
+          "value": 0.10205755
+        },
+        {
+          "as_published": "-3.70567256E-05",
+          "value": -3.70567256e-05
+        },
+        {
+          "as_published": "6.02118523E-09",
+          "value": 6.02118523e-09
+        },
+        {
+          "as_published": "-3.61971995E-13",
+          "value": -3.61971995e-13
+        },
+        {
+          "as_published": "-6.88592154E+04",
+          "value": -68859.2154
+        },
+        {
+          "as_published": "-1.81686869E+02",
+          "value": -181.686869
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.11233483E+01",
+          "value": 21.1233483
+        },
+        {
+          "as_published": "-9.03456675E-03",
+          "value": -0.00903456675
+        },
+        {
+          "as_published": "4.53235782E-04",
+          "value": 0.000453235782
+        },
+        {
+          "as_published": "-5.83634839E-07",
+          "value": -5.83634839e-07
+        },
+        {
+          "as_published": "2.29927099E-10",
+          "value": 2.29927099e-10
+        },
+        {
+          "as_published": "-5.55543636E+04",
+          "value": -55554.3636
+        },
+        {
+          "as_published": "-3.97567336E+01",
+          "value": -39.7567336
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-4.66985066E+04",
+    "value": -46698.5066,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A (24317-77-9 for anion undefined)",
+    "C18H33O2  Oleic acid (Oleateoxy) Radical C7H15CH=CHC8H16C(O)O*  SIGMA=1 STATWT=2",
+    "IA=151.1695  IB=1858.2867  IC=1978.7839   Ir(-C(O)O*)=7.258  ROSYM=1  V(3)=272.",
+    "cm-1  Ir(CH3)=0.52574  ROSYM=3  V(3)=340. cm-1  Ir(C2H5-)=5.63081  ROSYM=1",
+    "V(3)=3147. cm-1  Ir(C7H15-)=80.42  ROSYM=1  V(3)=2000. cm-1 est.  Nu=3145,3121,",
+    "3107.5(2),3097,3086(2),3073(3),3064,3055(3),3043(2),3041,3037(2),3033(2),",
+    "3027.5(2),3022(2),3018,3013(2),3009(5),1740,1597,1528(2),1524,1518(2),1514,1510,",
+    "1507,1502.5(2),1500(2),1498(2),1491(2),1466,1447,1427,1418(2),1414(2),1399,1394,",
+    "1370,1362,1344(2),1341,1331(2),1327,1321(2),1308,1299,1285,1282,1276,1261,1241,",
+    "1234.5(2),1221,1188,1161,1142,1137,1112,1100,1073.5(2),1069,1064(2),1056,",
+    "1045(2),1029,1019(2),1012,1003,996(2),957,936,911,903,900,872,832,802,771,761,",
+    "757,740(2),735.7(2),620,583,535.6,530,513,485,451,433.6412,372,318.6,298,261,",
+    "250,222,217,174,162,160,157,152.7136.9,114.9,106.6,101.5,97.15,93.16,64.62,55.",
+    "87,45.09,43.03,39.51  HF298=92.8 kcal  REF=Osmont, Catoire Comb & Flame 155,",
+    "(2008),343-355  from B3LYP/6-31G(d,p)  Max Lst Sq Error Cp @ 200 K 0.70% and @",
+    "1300 K 0.64%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "cas_identifier_nonstandard",
+      "cas_as_published": "N/A (24317-77-9 for anion undefined)"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24947,
+    "header_line": 24963,
+    "end_line": 24966
+  },
+  "source_text": {
+    "header_line": "C18H33O2 Oleatoxy T 7/08C 18.H 33.O  2.   0.G   200.000  6000.000  C 281.45342 1",
+    "coeff_lines": [
+      " 4.09567856E+01 1.02057550E-01-3.70567256E-05 6.02118523E-09-3.61971995E-13    2",
+      "-6.88592154E+04-1.81686869E+02 2.11233483E+01-9.03456675E-03 4.53235782E-04    3",
+      "-5.83634839E-07 2.29927099E-10-5.55543636E+04-3.97567336E+01-4.66985066E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0959",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3Cl3 triClallene",
+  "cas_as_published": "N/A",
+  "formula": "C3Cl3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T01/08",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 3.",
+      "element": "Cl",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "142.39020",
+    "value": 142.3902
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.25879625E+01",
+          "value": 12.5879625
+        },
+        {
+          "as_published": "3.35556135E-03",
+          "value": 0.00335556135
+        },
+        {
+          "as_published": "-1.28320856E-06",
+          "value": -1.28320856e-06
+        },
+        {
+          "as_published": "2.15800351E-10",
+          "value": 2.15800351e-10
+        },
+        {
+          "as_published": "-1.32861533E-14",
+          "value": -1.32861533e-14
+        },
+        {
+          "as_published": "3.31647393E+04",
+          "value": 33164.7393
+        },
+        {
+          "as_published": "-2.87807624E+01",
+          "value": -28.7807624
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.42852756E+00",
+          "value": 4.42852756
+        },
+        {
+          "as_published": "3.85066763E-02",
+          "value": 0.0385066763
+        },
+        {
+          "as_published": "-6.47738496E-05",
+          "value": -6.47738496e-05
+        },
+        {
+          "as_published": "5.48501326E-08",
+          "value": 5.48501326e-08
+        },
+        {
+          "as_published": "-1.81486574E-11",
+          "value": -1.81486574e-11
+        },
+        {
+          "as_published": "3.48806549E+04",
+          "value": 34880.6549
+        },
+        {
+          "as_published": "1.04992217E+01",
+          "value": 10.4992217
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.74400748E+04",
+    "value": 37440.0748,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A",
+    "C3Cl3  TriChloroAllenyl Rad. Cl2-C=C=CCl*  SIGMA=1  STATWT=2  IA=25.2203",
+    "IB=110.1465  IC=135.3403  Nu=2152,1326,891,757,500,428,385,277,249,178,82.5,53.5",
+    "HF298=74.401 kcal  REF=Burcat G3B3 calc {HF298=88.76 kcal REF=Thergas up to 1000",
+    "K. Unreliable above 1000 K.}.  Max Lst Sq Error Cp @ 1200 K 0.30 %."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 10015,
+    "header_line": 10020,
+    "end_line": 10023
+  },
+  "source_text": {
+    "header_line": "C3Cl3 triClallene T01/08C  3.CL 3.   0.   0.G   200.000  6000.000  B 142.39020 1",
+    "coeff_lines": [
+      " 1.25879625E+01 3.35556135E-03-1.28320856E-06 2.15800351E-10-1.32861533E-14    2",
+      " 3.31647393E+04-2.87807624E+01 4.42852756E+00 3.85066763E-02-6.47738496E-05    3",
+      " 5.48501326E-08-1.81486574E-11 3.48806549E+04 1.04992217E+01 3.74400748E+04    4"
+    ]
+  }
+}

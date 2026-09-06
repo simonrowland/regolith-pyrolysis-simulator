@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1389",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C5H3",
+  "cas_as_published": "115236-82-3",
+  "formula": "C5H3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 2/92",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "  5",
+      "element": "C",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "  3",
+      "element": "H",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "63.07882",
+    "value": 63.07882
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "0.10296658E+02",
+          "value": 10.296658
+        },
+        {
+          "as_published": "0.10470124E-01",
+          "value": 0.010470124
+        },
+        {
+          "as_published": "-0.37746103E-05",
+          "value": -3.7746103e-06
+        },
+        {
+          "as_published": "0.61077326E-09",
+          "value": 6.1077326e-10
+        },
+        {
+          "as_published": "-0.36621089E-13",
+          "value": -3.6621089e-14
+        },
+        {
+          "as_published": "0.68439389E+05",
+          "value": 68439.389
+        },
+        {
+          "as_published": "-0.27338507E+02",
+          "value": -27.338507
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "0.15946538E+01",
+          "value": 1.5946538
+        },
+        {
+          "as_published": "0.43378369E-01",
+          "value": 0.043378369
+        },
+        {
+          "as_published": "-0.56253789E-04",
+          "value": -5.6253789e-05
+        },
+        {
+          "as_published": "0.41304029E-07",
+          "value": 4.1304029e-08
+        },
+        {
+          "as_published": "-0.12456939E-10",
+          "value": -1.2456939e-11
+        },
+        {
+          "as_published": "0.70491079E+05",
+          "value": 70491.079
+        },
+        {
+          "as_published": "0.15644812E+02",
+          "value": 15.644812
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "0.72473303E+05",
+    "value": 72473.303,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "115236-82-3",
+    "C5H3 1,3PENTADIYNE-5-YL RAD  SIGMA=2  STATWT=2  IA=.2813  IB=39.0398  IC=39.3211",
+    "NU=3012,3102,1410,1090,935,3005,615,629,870,1950,2100,1200,480,220,530,350,200,",
+    "300  REF=DUFF & BAUER  MAX LST SQ ERROR CP @ 1300 K 0.47 %.  HF298=602.58 KJ",
+    "ESTIMATED BY USING BOZZELLI & RITTER'S PROGRAM FROM 1,3 PENTADIYINE"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 15122,
+    "header_line": 15127,
+    "end_line": 15130
+  },
+  "source_text": {
+    "header_line": "C5H3              T 2/92C   5H   3    0    0G   200.000  6000.000  C  63.07882 1",
+    "coeff_lines": [
+      " 0.10296658E+02 0.10470124E-01-0.37746103E-05 0.61077326E-09-0.36621089E-13    2",
+      " 0.68439389E+05-0.27338507E+02 0.15946538E+01 0.43378369E-01-0.56253789E-04    3",
+      " 0.41304029E-07-0.12456939E-10 0.70491079E+05 0.15644812E+02 0.72473303E+05    4"
+    ]
+  }
+}

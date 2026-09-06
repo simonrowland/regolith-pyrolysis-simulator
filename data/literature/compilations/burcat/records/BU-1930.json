@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1930",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C9H12 IsoPropBenz",
+  "cas_as_published": "98-82-8",
+  "formula": "C9H12",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/13",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 9.",
+      "element": "C",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "12.",
+      "element": "H",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "120.19158",
+    "value": 120.19158
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.74504411E+01",
+          "value": 17.4504411
+        },
+        {
+          "as_published": "3.72761329E-02",
+          "value": 0.0372761329
+        },
+        {
+          "as_published": "-1.34434367E-05",
+          "value": -1.34434367e-05
+        },
+        {
+          "as_published": "2.17471023E-09",
+          "value": 2.17471023e-09
+        },
+        {
+          "as_published": "-1.30341032E-13",
+          "value": -1.30341032e-13
+        },
+        {
+          "as_published": "-8.43040977E+03",
+          "value": -8430.40977
+        },
+        {
+          "as_published": "-6.95112803E+01",
+          "value": -69.5112803
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.90268728E+00",
+          "value": 3.90268728
+        },
+        {
+          "as_published": "2.93958318E-02",
+          "value": 0.0293958318
+        },
+        {
+          "as_published": "1.02606924E-04",
+          "value": 0.000102606924
+        },
+        {
+          "as_published": "-1.59371420E-07",
+          "value": -1.5937142e-07
+        },
+        {
+          "as_published": "6.67934836E-11",
+          "value": 6.67934836e-11
+        },
+        {
+          "as_published": "-2.62419129E+03",
+          "value": -2624.19129
+        },
+        {
+          "as_published": "1.10461622E+01",
+          "value": 11.0461622
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.69059512E+02",
+    "value": 469.059512,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "98-82-8",
+    "C9H12 Isopropyl-Benzene (Cumene)  C6H5-CH(CH3)2  SIGMA=2  STATWT=1  IA=25.0995",
+    "IB=78.2506  IC=85.0767  [Ir(CH3)=0.52574  ROSYM=3  V(3)=~650. cm-1]x2",
+    "Ir(-CH(CH3)2)=~6.5  ROSYM=2.  V(3)=~1450. cm-1  Nu=3204,3192,3184,3173,3169,",
+    "3119(2),3111.5,3105,3042,3037,3030,1661.5,1640,1541,1521,1516,1504,1501.5,1495,",
+    "1432,1411.5,1390,1361.5,1350,1319,1237,1210,1187,1177,1127,1113,1076,1053,1016,",
+    "996,971,965,934,923,900,859,779,752,716,635,567,550,463.5,417,319,306,265,232",
+    "REF=Burcat B3LYP/6-31G(d,p)  HF298=3.9+/-1.1 kJ  REF=Prosen Johnson Rossini JRes",
+    "NBS 36,(1946),455  HF298(liq)=-41.2+/-1.1 kJ  REF=Prosen Johnson Rossini ibid.",
+    "Max Lst Sq Erroe Cp @ 200 K 0."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 21771,
+    "header_line": 21781,
+    "end_line": 21784
+  },
+  "source_text": {
+    "header_line": "C9H12 IsoPropBenz T11/13C  9.H 12.   0.   0.G   200.000  6000.000  B 120.19158 1",
+    "coeff_lines": [
+      " 1.74504411E+01 3.72761329E-02-1.34434367E-05 2.17471023E-09-1.30341032E-13    2",
+      "-8.43040977E+03-6.95112803E+01 3.90268728E+00 2.93958318E-02 1.02606924E-04    3",
+      "-1.59371420E-07 6.67934836E-11-2.62419129E+03 1.10461622E+01 4.69059512E+02    4"
+    ]
+  }
+}

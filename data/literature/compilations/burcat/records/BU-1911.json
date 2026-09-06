@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1911",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C9H7N ISOQUINOLI",
+  "cas_as_published": "119-65-3",
+  "formula": "C9H7N",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 5/99",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 9.",
+      "element": "C",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 7.",
+      "element": "H",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "129.15862",
+    "value": 129.15862
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.85146411E+01",
+          "value": 18.5146411
+        },
+        {
+          "as_published": "2.79810705E-02",
+          "value": 0.0279810705
+        },
+        {
+          "as_published": "-1.02625548E-05",
+          "value": -1.02625548e-05
+        },
+        {
+          "as_published": "1.68026025E-09",
+          "value": 1.68026025e-09
+        },
+        {
+          "as_published": "-1.01589164E-13",
+          "value": -1.01589164e-13
+        },
+        {
+          "as_published": "1.56389099E+04",
+          "value": 15638.9099
+        },
+        {
+          "as_published": "-7.71926472E+01",
+          "value": -77.1926472
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-8.22485356E-01",
+          "value": -0.822485356
+        },
+        {
+          "as_published": "4.62854760E-02",
+          "value": 0.046285476
+        },
+        {
+          "as_published": "6.07470671E-05",
+          "value": 6.07470671e-05
+        },
+        {
+          "as_published": "-1.24938487E-07",
+          "value": -1.24938487e-07
+        },
+        {
+          "as_published": "5.65402573E-11",
+          "value": 5.65402573e-11
+        },
+        {
+          "as_published": "2.24802772E+04",
+          "value": 22480.2772
+        },
+        {
+          "as_published": "3.06200613E+01",
+          "value": 30.6200613
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.46087863E+04",
+    "value": 24608.7863,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "119-65-3",
+    "C9H7N ISO-QUINOLINE BENZO[C]PYRIDINE 2-BENZAZINE SIGMA=1 IAIBIC=160900.4 E-117",
+    "NU=3089,3060,3055(2),3025,3008,2990,1627,1587,1552,1497,1460,1432,1381,1377,",
+    "1315,1273,1255,1179,1140,1118,1095,1034,1013,985,970,959,942,930,831,823,800,",
+    "778,765,740,637,610,522,504,479,460,375,354,180,169.   HF298=204.61+/-1.33 kJ",
+    "REF= Das et al JPCRD 22 (1993),659     Max Lst Sq Error Cp @ 200 K 0.88%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 21533,
+    "header_line": 21539,
+    "end_line": 21542
+  },
+  "source_text": {
+    "header_line": "C9H7N ISOQUINOLI  T 5/99C  9.H  7.N  1.   0.G   200.000  6000.000  B 129.15862 1",
+    "coeff_lines": [
+      " 1.85146411E+01 2.79810705E-02-1.02625548E-05 1.68026025E-09-1.01589164E-13    2",
+      " 1.56389099E+04-7.71926472E+01-8.22485356E-01 4.62854760E-02 6.07470671E-05    3",
+      "-1.24938487E-07 5.65402573E-11 2.24802772E+04 3.06200613E+01 2.46087863E+04    4"
+    ]
+  }
+}

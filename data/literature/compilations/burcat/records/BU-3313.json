@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3313",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Si4H8 cyclo",
+  "cas_as_published": "287-69-4",
+  "formula": "Si4H8",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/17",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SI",
+      "count_as_published": " 4.",
+      "element": "Si",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 8.",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "120.40552",
+    "value": 120.40552
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.76961647E+01",
+          "value": 17.6961647
+        },
+        {
+          "as_published": "1.54731332E-02",
+          "value": 0.0154731332
+        },
+        {
+          "as_published": "-5.78804560E-06",
+          "value": -5.7880456e-06
+        },
+        {
+          "as_published": "9.59458103E-10",
+          "value": 9.59458103e-10
+        },
+        {
+          "as_published": "-5.84880730E-14",
+          "value": -5.8488073e-14
+        },
+        {
+          "as_published": "1.72140296E+04",
+          "value": 17214.0296
+        },
+        {
+          "as_published": "-6.64560334E+01",
+          "value": -66.4560334
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-3.89990114E+00",
+          "value": -3.89990114
+        },
+        {
+          "as_published": "1.10833127E-01",
+          "value": 0.110833127
+        },
+        {
+          "as_published": "-1.83860873E-04",
+          "value": -0.000183860873
+        },
+        {
+          "as_published": "1.58385021E-07",
+          "value": 1.58385021e-07
+        },
+        {
+          "as_published": "-5.31751521E-11",
+          "value": -5.31751521e-11
+        },
+        {
+          "as_published": "2.17546494E+04",
+          "value": 21754.6494
+        },
+        {
+          "as_published": "3.72047019E+01",
+          "value": 37.2047019
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.41815737E+04",
+    "value": 24181.5737,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "287-69-4",
+    "Si4H8  CycloTetraSilane  SIGMA=8  STATWT=1  IA=32.3459  IB=32.3787  IC=58.3204",
+    "Nu=2236,2229(3),2214,2209,2208(2),947,925,917.5(2),739,729.6(2),661(2),631,562,",
+    "536,459,432.5,415(2),403.5,385,300.4(2),197,84  HF298=48.054+/-2 kcal",
+    "REF=Burcat  G3B3   {HF298=49.0 kcal G3/B3LYP  REF=Wong et al  JPC A 108,(2004),",
+    "874;HF298=-45.40 kcal REF=Greene RMG GA 2015}  Max Lst Sq Error Cp @ 1300 K",
+    "0.57%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 35130,
+    "header_line": 35137,
+    "end_line": 35140
+  },
+  "source_text": {
+    "header_line": "Si4H8 cyclo       T 1/17SI 4.H  8.   0.   0.G   200.000  6000.000  B 120.40552 1",
+    "coeff_lines": [
+      " 1.76961647E+01 1.54731332E-02-5.78804560E-06 9.59458103E-10-5.84880730E-14    2",
+      " 1.72140296E+04-6.64560334E+01-3.89990114E+00 1.10833127E-01-1.83860873E-04    3",
+      " 1.58385021E-07-5.31751521E-11 2.17546494E+04 3.72047019E+01 2.41815737E+04    4"
+    ]
+  }
+}

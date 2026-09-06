@@ -1,0 +1,204 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0795",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "1,2-C2H4N2O4+",
+  "cas_as_published": "N/A",
+  "formula": "WANG",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/18",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "  ",
+      "count_as_published": "   ",
+      "element": null,
+      "count": null,
+      "filler": true
+    },
+    {
+      "element_as_published": "WA",
+      "count_as_published": "RNI",
+      "element": "WA",
+      "count": null,
+      "filler": false
+    },
+    {
+      "element_as_published": "NG",
+      "count_as_published": "!  ",
+      "element": "NG",
+      "count": null,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "   ",
+      "element": null,
+      "count": null,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "120.06369",
+    "value": 120.06369
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.44284119E+01",
+          "value": 14.4284119
+        },
+        {
+          "as_published": "1.66326814E-02",
+          "value": 0.0166326814
+        },
+        {
+          "as_published": "-6.26350641E-06",
+          "value": -6.26350641e-06
+        },
+        {
+          "as_published": "1.03492522E-09",
+          "value": 1.03492522e-09
+        },
+        {
+          "as_published": "-6.27861725E-14",
+          "value": -6.27861725e-14
+        },
+        {
+          "as_published": "1.14376230E+05",
+          "value": 114376.23
+        },
+        {
+          "as_published": "-3.96706234E+01",
+          "value": -39.6706234
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.15866091E+00",
+          "value": 2.15866091
+        },
+        {
+          "as_published": "4.31470493E-02",
+          "value": 0.0431470493
+        },
+        {
+          "as_published": "-1.65566043E-05",
+          "value": -1.65566043e-05
+        },
+        {
+          "as_published": "-1.07822501E-08",
+          "value": -1.07822501e-08
+        },
+        {
+          "as_published": "7.80287020E-12",
+          "value": 7.8028702e-12
+        },
+        {
+          "as_published": "1.18200992E+05",
+          "value": 118200.992
+        },
+        {
+          "as_published": "2.56906394E+01",
+          "value": 25.6906394
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.20598448E+05",
+    "value": 120598.448,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A",
+    "1,2-C2H4(NO2)2+ 1,2 DinitroEthane cation  SIGMA=2  STATWT=2  IA=14.4902 ",
+    "IB=82.9396  IC=96.3626  Ir(CH2NO2)=3.222   ROSYM=1  V(3)=90. cm-1  [Ir(NO2)=5.97",
+    "ROSYM=2  V(3)=188.]x2  Nu=3190,3175,3116,3111,1633,1557,1462.3(2),1366,1291,",
+    "1287,1277,1254,1211,1088,1024,811,710,675,645,580,566,563,412,339,251,148.5,",
+    "[82,45.3,25.1 internal rotation]  HF298=1002.717+/-8. kJ  thermal electron",
+    "REF=Burcat G3B3  Max Lst Sq Error Cp @ 1300. K 0.58%.",
+    "WARNING! The electron is a fifth element. The header formula for 7 term ",
+    "polynomials is not correct except in files THERM.DAT and in NEWNASA.TXT.  "
+  ],
+  "ambiguity_count": 4,
+  "ambiguities": [
+    {
+      "kind": "composition_count_unparsed",
+      "slot": 1,
+      "element_as_published": "WA",
+      "count_as_published": "RNI"
+    },
+    {
+      "kind": "nonstandard_element_token",
+      "slot": 1,
+      "element_as_published": "WA",
+      "normalized": "WA"
+    },
+    {
+      "kind": "composition_count_unparsed",
+      "slot": 2,
+      "element_as_published": "NG",
+      "count_as_published": "!  "
+    },
+    {
+      "kind": "nonstandard_element_token",
+      "slot": 2,
+      "element_as_published": "NG",
+      "normalized": "NG"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 8170,
+    "header_line": 8179,
+    "end_line": 8182
+  },
+  "source_text": {
+    "header_line": "1,2-C2H4N2O4+     T 6/18     WARNING!       G   298.150  6000.000  B 120.06369 1",
+    "coeff_lines": [
+      " 1.44284119E+01 1.66326814E-02-6.26350641E-06 1.03492522E-09-6.27861725E-14    2",
+      " 1.14376230E+05-3.96706234E+01 2.15866091E+00 4.31470493E-02-1.65566043E-05    3",
+      "-1.07822501E-08 7.80287020E-12 1.18200992E+05 2.56906394E+01 1.20598448E+05    4"
+    ]
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1181",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3H9Si (CH3)3Si",
+  "cas_as_published": "16571-41-8",
+  "formula": "C3H9Si",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "SI",
+      "count_as_published": " 1.",
+      "element": "Si",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "73.18906",
+    "value": 73.18906
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.29515643E+01",
+          "value": 12.9515643
+        },
+        {
+          "as_published": "1.94125926E-02",
+          "value": 0.0194125926
+        },
+        {
+          "as_published": "-6.82129961E-06",
+          "value": -6.82129961e-06
+        },
+        {
+          "as_published": "1.08463232E-09",
+          "value": 1.08463232e-09
+        },
+        {
+          "as_published": "-6.42372179E-14",
+          "value": -6.42372179e-14
+        },
+        {
+          "as_published": "-2.71011693E+03",
+          "value": -2710.11693
+        },
+        {
+          "as_published": "-4.25033336E+01",
+          "value": -42.5033336
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.25569719E+00",
+          "value": 2.25569719
+        },
+        {
+          "as_published": "4.11615885E-02",
+          "value": 0.0411615885
+        },
+        {
+          "as_published": "-3.74186755E-06",
+          "value": -3.74186755e-06
+        },
+        {
+          "as_published": "-3.05031228E-08",
+          "value": -3.05031228e-08
+        },
+        {
+          "as_published": "1.73909570E-11",
+          "value": 1.7390957e-11
+        },
+        {
+          "as_published": "4.90674794E+02",
+          "value": 490.674794
+        },
+        {
+          "as_published": "1.42578401E+01",
+          "value": 14.2578401
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.90758590E+03",
+    "value": 2907.5859,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "16571-41-8",
+    "C3H9Si TrimethylSilyl  Si(CH3)3 radical  SIGMA=3  STATWT=2  IA=15.5667",
+    "IB=15.5800  IC=27.4406  [Ir(CH3)3=0.51547  ROSYM=3  V(3)=1700. cm-1]x3",
+    "Nu=3129(3),3104(3),3026.3(3),1489,1476.3(2),1470.5(2),1463,1310,1296.6(2),890,",
+    "879(2),726(2),703,686,683,587,223,198(2),[154,143,138 internal rotation]",
+    "HF298=5.778+/-2 kcal  REF=Burcat G3B3  {HF298=3.12 kcal  REF=Chemkin database;",
+    "HF298=16.4+/-6. kJ  REF=Kelinivsky, Gutman et al JPC 98(38),(1994),9551:",
+    "HF298=32.60 kcal REF=Greene RMG 2015;  HF298=11.2+/-20.8 kJ REF=H Jarbazi et al ",
+    "JPC Sept 2021}  Max Lst Sq Error Cp @ 6000 K 0.46%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 12611,
+    "header_line": 12620,
+    "end_line": 12623
+  },
+  "source_text": {
+    "header_line": "C3H9Si (CH3)3Si   T 1/16C  3.H  9.SI 1.   0.G   200.000  6000.000  B  73.18906 1",
+    "coeff_lines": [
+      " 1.29515643E+01 1.94125926E-02-6.82129961E-06 1.08463232E-09-6.42372179E-14    2",
+      "-2.71011693E+03-4.25033336E+01 2.25569719E+00 4.11615885E-02-3.74186755E-06    3",
+      "-3.05031228E-08 1.73909570E-11 4.90674794E+02 1.42578401E+01 2.90758590E+03    4"
+    ]
+  }
+}

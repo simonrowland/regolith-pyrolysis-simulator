@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1614",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H6 Fulvene",
+  "cas_as_published": "497-20-1",
+  "formula": "C6H6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/10",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "78.11184",
+    "value": 78.11184
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.14345282E+01",
+          "value": 11.4345282
+        },
+        {
+          "as_published": "1.99371432E-02",
+          "value": 0.0199371432
+        },
+        {
+          "as_published": "-7.13567060E-06",
+          "value": -7.1356706e-06
+        },
+        {
+          "as_published": "1.14951842E-09",
+          "value": 1.14951842e-09
+        },
+        {
+          "as_published": "-6.87263886E-14",
+          "value": -6.87263886e-14
+        },
+        {
+          "as_published": "2.04411455E+04",
+          "value": 20441.1455
+        },
+        {
+          "as_published": "-3.86799524E+01",
+          "value": -38.6799524
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "5.09714763E-01",
+          "value": 0.509714763
+        },
+        {
+          "as_published": "2.58195980E-02",
+          "value": 0.025819598
+        },
+        {
+          "as_published": "5.06504954E-05",
+          "value": 5.06504954e-05
+        },
+        {
+          "as_published": "-9.32593825E-08",
+          "value": -9.32593825e-08
+        },
+        {
+          "as_published": "4.15963672E-11",
+          "value": 4.15963672e-11
+        },
+        {
+          "as_published": "2.44318827E+04",
+          "value": 24431.8827
+        },
+        {
+          "as_published": "2.30638077E+01",
+          "value": 23.0638077
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.60142888E+04",
+    "value": 26014.2888,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "497-20-1",
+    "C6H6  FULVENE (5-METHYLENE-1,3-CYCLOPENTADIENE)  SIGMA=2  IA=10.2364  IB=22.0845",
+    "IC=32.3209  NU=3253,3247(2),3230,3220,3165,1720,1638,1553,1477,1389,1352,1268,",
+    "1117.5(2),1009,973,961,940,926,914,805,801,784,694,678,644,493,341,210.5",
+    "HF298=51.696+/-2. kcal  REF=Burcat G3B3  {HF298=56.60+/-2.3 kcal   REF=C.MELIUS",
+    "DATABASE A70D;  HF298=53.54 kcal  REF=Roth et al Chem Ber. 124,(1991),2499}  Max",
+    "Lst Sq Error Cp @ 200 K 0.99%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17838,
+    "header_line": 17845,
+    "end_line": 17848
+  },
+  "source_text": {
+    "header_line": "C6H6 Fulvene      T12/10C  6.H  6.   0.   0.G   200.000  6000.000  B  78.11184 1",
+    "coeff_lines": [
+      " 1.14345282E+01 1.99371432E-02-7.13567060E-06 1.14951842E-09-6.87263886E-14    2",
+      " 2.04411455E+04-3.86799524E+01 5.09714763E-01 2.58195980E-02 5.06504954E-05    3",
+      "-9.32593825E-08 4.15963672E-11 2.44318827E+04 2.30638077E+01 2.60142888E+04    4"
+    ]
+  }
+}

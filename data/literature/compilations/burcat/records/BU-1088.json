@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1088",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "RDX 135 Triazine",
+  "cas_as_published": "121-82-4",
+  "formula": "C3H6N6O6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/98",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 6.",
+      "element": "N",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 6.",
+      "element": "O",
+      "count": 6.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "222.11748",
+    "value": 222.11748
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.27884812E+01",
+          "value": 32.7884812
+        },
+        {
+          "as_published": "2.84393334E-02",
+          "value": 0.0284393334
+        },
+        {
+          "as_published": "-1.11821531E-05",
+          "value": -1.11821531e-05
+        },
+        {
+          "as_published": "1.88280824E-09",
+          "value": 1.88280824e-09
+        },
+        {
+          "as_published": "-1.15260232E-13",
+          "value": -1.15260232e-13
+        },
+        {
+          "as_published": "9.54327013E+03",
+          "value": 9543.27013
+        },
+        {
+          "as_published": "-1.42802148E+02",
+          "value": -142.802148
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.46580269E+00",
+          "value": 1.46580269
+        },
+        {
+          "as_published": "1.05297168E-01",
+          "value": 0.105297168
+        },
+        {
+          "as_published": "-5.23365036E-05",
+          "value": -5.23365036e-05
+        },
+        {
+          "as_published": "-2.70780427E-08",
+          "value": -2.70780427e-08
+        },
+        {
+          "as_published": "2.44647856E-11",
+          "value": 2.44647856e-11
+        },
+        {
+          "as_published": "1.84793520E+04",
+          "value": 18479.352
+        },
+        {
+          "as_published": "2.07951964E+01",
+          "value": 20.7951964
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.30921606E+04",
+    "value": 23092.1606,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "121-82-4",
+    "C3H6N6O6  RDX  1,3,5-Triazine     STATWT = 1    SYMNO = 6    IA = 137.8906",
+    "IB = 137.8906  IC = 245.5315 (Ir(NO2) = 5.97 ROSYM = 2 V(2)= 16.7 kcal)x3",
+    "NU = 2770,2767(2),2688,2684(2),1337,1332(2),1295(2),1280,1218(2),1207,1181,1180,",
+    "1104(2),1097,1081,1042,1027,1012(2),907(2),818,807,806,762,702(2),638,590,583,",
+    "581,554(2),528,501(2),320,307, 303,302,273,266(2),154,152,91.3,90.2,79.03",
+    "REF = Wu & Fried J Chem Phys 101,(1997),8675   HF298=  45.89 kcal",
+    "REF =Pepekin et al, Bull Acad Sci USSR Chem Sci (1974),1707  Max Lst Sq Error",
+    "Cp @ 6000 K 0.54%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 11444,
+    "header_line": 11453,
+    "end_line": 11456
+  },
+  "source_text": {
+    "header_line": "RDX 135 Triazine  T 6/98C  3.H  6.N  6.O  6.G   200.000  6000.000  B 222.11748 1",
+    "coeff_lines": [
+      " 3.27884812E+01 2.84393334E-02-1.11821531E-05 1.88280824E-09-1.15260232E-13    2",
+      " 9.54327013E+03-1.42802148E+02 1.46580269E+00 1.05297168E-01-5.23365036E-05    3",
+      "-2.70780427E-08 2.44647856E-11 1.84793520E+04 2.07951964E+01 2.30921606E+04    4"
+    ]
+  }
+}

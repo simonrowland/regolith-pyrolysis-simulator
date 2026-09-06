@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2887",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "N2O3+",
+  "cas_as_published": "10544-73-7",
+  "formula": "N2O3E-1",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "ATcT/A",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 2.",
+      "element": "N",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": "-1.",
+      "element": "E",
+      "count": -1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "76.01113",
+    "value": 76.01113
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.25815628E+00",
+          "value": 9.25815628
+        },
+        {
+          "as_published": "3.58625676E-03",
+          "value": 0.00358625676
+        },
+        {
+          "as_published": "-1.34956361E-06",
+          "value": -1.34956361e-06
+        },
+        {
+          "as_published": "2.24572549E-10",
+          "value": 2.24572549e-10
+        },
+        {
+          "as_published": "-1.37255559E-14",
+          "value": -1.37255559e-14
+        },
+        {
+          "as_published": "1.21553684E+05",
+          "value": 121553.684
+        },
+        {
+          "as_published": "-1.57010434E+01",
+          "value": -15.7010434
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "7.20942869E+00",
+          "value": 7.20942869
+        },
+        {
+          "as_published": "8.16248467E-03",
+          "value": 0.00816248467
+        },
+        {
+          "as_published": "-4.97073757E-06",
+          "value": -4.97073757e-06
+        },
+        {
+          "as_published": "1.63966869E-09",
+          "value": 1.63966869e-09
+        },
+        {
+          "as_published": "-3.35148057E-13",
+          "value": -3.35148057e-13
+        },
+        {
+          "as_published": "1.22231866E+05",
+          "value": 122231.866
+        },
+        {
+          "as_published": "-4.70591859E+00",
+          "value": -4.70591859
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.24703320E+05",
+    "value": 124703.32,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "10544-73-7",
+    "N2O3+  STATWT=2  SIGMA=2  IA=1.6321  IB=41.8543  IC=43.4864  Nu=2285,1764,1231,",
+    "675,321.6,186,137.4,103,72.91  REF=Burcat G3B3 for [ONONO]+  HF298=1036.847 +/-",
+    "8.99 kJ  REF=ATcT A 2005 for undefined structure {HF298=990.23+/-8. kJ for",
+    "ONONO+ structure}  Max Lst Sq Error Cp @ 1300 K 0.32%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 31353,
+    "header_line": 31358,
+    "end_line": 31361
+  },
+  "source_text": {
+    "header_line": "N2O3+             ATcT/AN  2.O  3.E -1.   0.G   298.150  6000.000  C  76.01113 1",
+    "coeff_lines": [
+      " 9.25815628E+00 3.58625676E-03-1.34956361E-06 2.24572549E-10-1.37255559E-14    2",
+      " 1.21553684E+05-1.57010434E+01 7.20942869E+00 8.16248467E-03-4.97073757E-06    3",
+      " 1.63966869E-09-3.35148057E-13 1.22231866E+05-4.70591859E+00 1.24703320E+05    4"
+    ]
+  }
+}

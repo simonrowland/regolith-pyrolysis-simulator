@@ -1,0 +1,183 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1999",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C10H20O2 cis-acid",
+  "cas_as_published": "334-48-5",
+  "formula": "C10H20O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "10.",
+      "element": "C",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "20.",
+      "element": "H",
+      "count": 20.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "172.26460",
+    "value": 172.2646
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.43930564E+01",
+          "value": 24.3930564
+        },
+        {
+          "as_published": "6.01826195E-02",
+          "value": 0.0601826195
+        },
+        {
+          "as_published": "-2.17409003E-05",
+          "value": -2.17409003e-05
+        },
+        {
+          "as_published": "3.51755289E-09",
+          "value": 3.51755289e-09
+        },
+        {
+          "as_published": "-2.10770638E-13",
+          "value": -2.10770638e-13
+        },
+        {
+          "as_published": "-8.44161123E+04",
+          "value": -84416.1123
+        },
+        {
+          "as_published": "-1.00176079E+02",
+          "value": -100.176079
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.10285300E+01",
+          "value": 11.02853
+        },
+        {
+          "as_published": "8.14097577E-03",
+          "value": 0.00814097577
+        },
+        {
+          "as_published": "2.36101586E-04",
+          "value": 0.000236101586
+        },
+        {
+          "as_published": "-3.14707361E-07",
+          "value": -3.14707361e-07
+        },
+        {
+          "as_published": "1.25577827E-10",
+          "value": 1.25577827e-10
+        },
+        {
+          "as_published": "-7.65797505E+04",
+          "value": -76579.7505
+        },
+        {
+          "as_published": "-1.01089783E+01",
+          "value": -10.1089783
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-7.14064449E+04",
+    "value": -71406.4449,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "334-48-5",
+    "C10H20O2 Capric (cis-n-Decanoic) acid C9H19C(O)OH  SIGMA=1  STATWT=1  IA=80.4851",
+    "IB=247.9458  IC=303.0885  Ir(CH3)=0.52574  ROSYM=3  V(3)=340. cm-1",
+    "Ir(OH)=0.13901  ROSYM=1  V(3)=280. cm-1  Ir(COOH)=4.40586  ROSYM=1 V(3)=1200.",
+    "cm-1  Ir(C2H5)=5.6081  ROSYM=1  V(3)=2100. cm-1  Nu=3754,3129,3116,3107,3100.5,",
+    "3078,3066,3060(2),3053,3051,3048,3043,3040,3028,3023,3021,3018,3014,3010,1847,",
+    "1523(2),1520,1517,1505(2),1503,1497,1494,1489,1432,1418,1406,1396,1392,",
+    "1385.5(2),1361,1346,1337(2),1321,1304,1299.5,1279,1249,1227,1214,1190,1138,1112,",
+    "1097,1087,1076,1046,1043,1013,984,980,944,891,874,863,835,808,767,748,743,727,",
+    "624,588,475,457,434,362,318,311,262,253,187,142.7,122,118.5,106.4,90.43",
+    "REF=Burcat B3LYP/6-31G(d,p)  HF298=-141.9+/-3 kcal  REF=Osmont et al IJCK 39,",
+    "(2007),481  {HF298=-624.2+/-5.1 kJ  REF=Webbook 2009; HF298=-598.3 kJ  REF=NIST",
+    "94}  HF298(liq)=-714.1 kJ  REF=Webbook 2009 Max Lst Sq Errpr Cp @ 200 K 0.66%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 22654,
+    "header_line": 22667,
+    "end_line": 22670
+  },
+  "source_text": {
+    "header_line": "C10H20O2 cis-acid T 7/09C 10.H 20.O  2.   0.G   200.000  6000.000  B 172.26460 1",
+    "coeff_lines": [
+      " 2.43930564E+01 6.01826195E-02-2.17409003E-05 3.51755289E-09-2.10770638E-13    2",
+      "-8.44161123E+04-1.00176079E+02 1.10285300E+01 8.14097577E-03 2.36101586E-04    3",
+      "-3.14707361E-07 1.25577827E-10-7.65797505E+04-1.01089783E+01-7.14064449E+04    4"
+    ]
+  }
+}

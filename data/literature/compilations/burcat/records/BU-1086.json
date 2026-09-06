@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1086",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C3H6N5O4 RDX Lin",
+  "cas_as_published": "N/A",
+  "formula": "C3H6N5O4",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/13",
+  "calc_quality_as_published": "D",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 3.",
+      "element": "C",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 5.",
+      "element": "N",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 4.",
+      "element": "O",
+      "count": 4.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "176.11104",
+    "value": 176.11104
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.37254821E+01",
+          "value": 23.7254821
+        },
+        {
+          "as_published": "2.48883497E-02",
+          "value": 0.0248883497
+        },
+        {
+          "as_published": "-9.24055633E-06",
+          "value": -9.24055633e-06
+        },
+        {
+          "as_published": "1.52107595E-09",
+          "value": 1.52107595e-09
+        },
+        {
+          "as_published": "-9.22022341E-14",
+          "value": -9.22022341e-14
+        },
+        {
+          "as_published": "2.46838172E+04",
+          "value": 24683.8172
+        },
+        {
+          "as_published": "-8.67651577E+01",
+          "value": -86.7651577
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "6.72820182E+00",
+          "value": 6.72820182
+        },
+        {
+          "as_published": "5.17246937E-02",
+          "value": 0.0517246937
+        },
+        {
+          "as_published": "1.31604695E-05",
+          "value": 1.31604695e-05
+        },
+        {
+          "as_published": "-6.03096267E-08",
+          "value": -6.03096267e-08
+        },
+        {
+          "as_published": "2.94984108E-11",
+          "value": 2.94984108e-11
+        },
+        {
+          "as_published": "3.03354699E+04",
+          "value": 30335.4699
+        },
+        {
+          "as_published": "5.82361861E+00",
+          "value": 5.82361861
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.46514996E+04",
+    "value": 34651.4996,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A",
+    "C3H6N5O4 RDX Radical linear (Less NO2 group open ring) *CHN(NO2)CH2N(NO2)CH2-NH*",
+    "SIGMA=1  STATWT=2  IA=61.8974  IB=124.3751  IC=161.3676 [Ir(NO2)=5.97  ROSYM=2",
+    "V(3)=220. cm-1 est]x2  Nu=3387,3190,3139,3129,3094,3020,1888,1681,1673,1487,",
+    "1447,1440,1418,1381,1359,1326.5(2),1252,1178,1106,1040,985,945,888.5,873,856,",
+    "840,801,767.5,654,649,531.5,456,436,425,407,366,346,277,243,195,138,112.6,101,",
+    "93.3,66.3  REF=Burcat B3LYP/6-31G(d)  HF298=68.86+/-12 kcal  REF=Burcat MOPAC",
+    "2000 PM3  Max Lst Sq Error Cp @ 1300 K 0.51%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 11420,
+    "header_line": 11428,
+    "end_line": 11431
+  },
+  "source_text": {
+    "header_line": "C3H6N5O4 RDX Lin  T 3/13C  3.H  6.N  5.O  4.G   200.000  6000.000  D 176.11104 1",
+    "coeff_lines": [
+      " 2.37254821E+01 2.48883497E-02-9.24055633E-06 1.52107595E-09-9.22022341E-14    2",
+      " 2.46838172E+04-8.67651577E+01 6.72820182E+00 5.17246937E-02 1.31604695E-05    3",
+      "-6.03096267E-08 2.94984108E-11 3.03354699E+04 5.82361861E+00 3.46514996E+04    4"
+    ]
+  }
+}

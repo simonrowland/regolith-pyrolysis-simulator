@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2576",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "H3PO3  O=PH(OH)2",
+  "cas_as_published": "13598-36-2",
+  "formula": "H3PO3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T06/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 3.",
+      "element": "H",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "P ",
+      "count_as_published": " 1.",
+      "element": "P",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "81.99578",
+    "value": 81.99578
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.05803110E+01",
+          "value": 10.580311
+        },
+        {
+          "as_published": "6.05423208E-03",
+          "value": 0.00605423208
+        },
+        {
+          "as_published": "-2.05553954E-06",
+          "value": -2.05553954e-06
+        },
+        {
+          "as_published": "3.19580910E-10",
+          "value": 3.1958091e-10
+        },
+        {
+          "as_published": "-1.86409762E-14",
+          "value": -1.86409762e-14
+        },
+        {
+          "as_published": "-1.02634486E+05",
+          "value": -102634.486
+        },
+        {
+          "as_published": "-2.62335976E+01",
+          "value": -26.2335976
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-7.86111042E-02",
+          "value": -0.0786111042
+        },
+        {
+          "as_published": "4.35623489E-02",
+          "value": 0.0435623489
+        },
+        {
+          "as_published": "-4.91766682E-05",
+          "value": -4.91766682e-05
+        },
+        {
+          "as_published": "2.35179063E-08",
+          "value": 2.35179063e-08
+        },
+        {
+          "as_published": "-2.94503237E-12",
+          "value": -2.94503237e-12
+        },
+        {
+          "as_published": "-1.00236882E+05",
+          "value": -100236.882
+        },
+        {
+          "as_published": "2.64468983E+01",
+          "value": 26.4468983
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-9.87134972E+04",
+    "value": -98713.4972,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "13598-36-2",
+    "H3PO3 Phosphonic acid O=PH(OH)2  SIGMA=1  STATWT=1  IA=10.6138  IB=11.2519",
+    "IC=19.1269  [Ir(OH)=0.135251  ROSYM=1  V(3)=1200. cm-1]x2  Nu=3753,3743,2582,",
+    "1312,1109,1066,1004,978,905,845,460,418,370  HF298=-196.165 kcal  REF+Elke Goos",
+    "G3B3 Stuttgart  Max Lst Sq Error Cp @ 200 K 0.34%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 28794,
+    "header_line": 28799,
+    "end_line": 28802
+  },
+  "source_text": {
+    "header_line": "H3PO3  O=PH(OH)2  T06/09H  3.P  1.O  3.   0.G   200.000  6000.000  B  81.99578 1",
+    "coeff_lines": [
+      " 1.05803110E+01 6.05423208E-03-2.05553954E-06 3.19580910E-10-1.86409762E-14    2",
+      "-1.02634486E+05-2.62335976E+01-7.86111042E-02 4.35623489E-02-4.91766682E-05    3",
+      " 2.35179063E-08-2.94503237E-12-1.00236882E+05 2.64468983E+01-9.87134972E+04    4"
+    ]
+  }
+}

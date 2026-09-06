@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2877",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "N2O",
+  "cas_as_published": "10024-97-2",
+  "formula": "N2O",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "L 7/88",
+  "calc_quality_as_published": "A",
+  "composition": [
+    {
+      "element_as_published": "N ",
+      "count_as_published": "  2",
+      "element": "N",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "  1",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "  0",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "44.01288",
+    "value": 44.01288
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "0.48230729E+01",
+          "value": 4.8230729
+        },
+        {
+          "as_published": "0.26270251E-02",
+          "value": 0.0026270251
+        },
+        {
+          "as_published": "-0.95850872E-06",
+          "value": -9.5850872e-07
+        },
+        {
+          "as_published": "0.16000712E-09",
+          "value": 1.6000712e-10
+        },
+        {
+          "as_published": "-0.97752302E-14",
+          "value": -9.7752302e-15
+        },
+        {
+          "as_published": "0.80734047E+04",
+          "value": 8073.4047
+        },
+        {
+          "as_published": "-0.22017208E+01",
+          "value": -2.2017208
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "0.22571502E+01",
+          "value": 2.2571502
+        },
+        {
+          "as_published": "0.11304728E-01",
+          "value": 0.011304728
+        },
+        {
+          "as_published": "-0.13671319E-04",
+          "value": -1.3671319e-05
+        },
+        {
+          "as_published": "0.96819803E-08",
+          "value": 9.6819803e-09
+        },
+        {
+          "as_published": "-0.29307182E-11",
+          "value": -2.9307182e-12
+        },
+        {
+          "as_published": "0.87417746E+04",
+          "value": 8741.7746
+        },
+        {
+          "as_published": "0.10757992E+02",
+          "value": 10.757992
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "0.98141682E+04",
+    "value": 9814.1682,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "10024-97-2",
+    "N2O NNO  STATWT=1  B0=.4190113  NU=1277,589,2224  X11=-3.842  X12=.182",
+    "X13=-27.352   X22=-.271 X23=-14.672  X33=-15.155  G22=.366  Y111=-.021",
+    "Y112=-.152  Y122=-.030  Y222=-.007  Y113=-.338  Y133=.124  Y123=.390",
+    "Y223=.059  Y233=.029  Y333=-.002   W0=29.55  ALFAB1=.001917  ALFAB2=-.000577",
+    "ALFAB3=.003481  D0=17.59E-8   HF298= 81.6 KJ REF= Gurvich 1989.",
+    "{HF298=82.58+/-0.1 kJ  REF=ATcT A}"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 31258,
+    "header_line": 31265,
+    "end_line": 31268
+  },
+  "source_text": {
+    "header_line": "N2O               L 7/88N   2O   1    0    0G   200.000  6000.000  A  44.01288 1",
+    "coeff_lines": [
+      " 0.48230729E+01 0.26270251E-02-0.95850872E-06 0.16000712E-09-0.97752302E-14    2",
+      " 0.80734047E+04-0.22017208E+01 0.22571502E+01 0.11304728E-01-0.13671319E-04    3",
+      " 0.96819803E-08-0.29307182E-11 0.87417746E+04 0.10757992E+02 0.98141682E+04    4"
+    ]
+  }
+}

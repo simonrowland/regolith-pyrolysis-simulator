@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1607",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H5NO2   Picoli",
+  "cas_as_published": "98-98-6",
+  "formula": "C6H5NO2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 9/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 5.",
+      "element": "H",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "123.10944",
+    "value": 123.10944
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.64954964E+01",
+          "value": 16.4954964
+        },
+        {
+          "as_published": "2.02948800E-02",
+          "value": 0.02029488
+        },
+        {
+          "as_published": "-7.43584361E-06",
+          "value": -7.43584361e-06
+        },
+        {
+          "as_published": "1.21496119E-09",
+          "value": 1.21496119e-09
+        },
+        {
+          "as_published": "-7.33140037E-14",
+          "value": -7.33140037e-14
+        },
+        {
+          "as_published": "-3.55448088E+04",
+          "value": -35544.8088
+        },
+        {
+          "as_published": "-6.01338430E+01",
+          "value": -60.133843
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.36044746E+00",
+          "value": 1.36044746
+        },
+        {
+          "as_published": "3.72282004E-02",
+          "value": 0.0372282004
+        },
+        {
+          "as_published": "4.05125004E-05",
+          "value": 4.05125004e-05
+        },
+        {
+          "as_published": "-9.00658190E-08",
+          "value": -9.0065819e-08
+        },
+        {
+          "as_published": "4.14608507E-11",
+          "value": 4.14608507e-11
+        },
+        {
+          "as_published": "-3.03458393E+04",
+          "value": -30345.8393
+        },
+        {
+          "as_published": "2.35512644E+01",
+          "value": 23.5512644
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-2.80860318E+04",
+    "value": -28086.0318,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "98-98-6",
+    "C6H5NO2  Picolinic acid (2-Pyridyne carboxylic acid)  SIGMA=1  STATWT=1",
+    "IA=21.1319  IB=66.4729  IC=87.6898  Ir(OH)=0.13901  ROSYM=1  V(3)=280. cm-1",
+    "Ir(-COOH)=5.7259  ROSYM=2  V(3)=1400. cm-1  Nu=3692,3241,3217,3200,3178,1817,",
+    "1642,1632,1518,1484,1416,1337,1322,1236,1183,1146,1121,1071,1019,1014,988,932,",
+    "837,796,762,735,658,628.4(2),503,438,414,386,216  HF298=55.813+/-8. kJ",
+    "REF=Burcat G3B3  HF298(solid)=-343.8+/-1.8 kJ  REF=Gubareva et al J Appl Chem",
+    "USSR 63,(1990),448  Max Lst Sq Error Cp @ 200 K 0.66%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17757,
+    "header_line": 17765,
+    "end_line": 17768
+  },
+  "source_text": {
+    "header_line": "C6H5NO2   Picoli  T 9/14C  6.H  5.N  1.O  2.G   200.000  6000.000  B 123.10944 1",
+    "coeff_lines": [
+      " 1.64954964E+01 2.02948800E-02-7.43584361E-06 1.21496119E-09-7.33140037E-14    2",
+      "-3.55448088E+04-6.01338430E+01 1.36044746E+00 3.72282004E-02 4.05125004E-05    3",
+      "-9.00658190E-08 4.14608507E-11-3.03458393E+04 2.35512644E+01-2.80860318E+04    4"
+    ]
+  }
+}

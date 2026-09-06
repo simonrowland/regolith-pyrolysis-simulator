@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2115",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C14H10  Phenanth",
+  "cas_as_published": "85-01-8  [F&W notation A3]",
+  "formula": "C14H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/12",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "14.",
+      "element": "C",
+      "count": 14.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "178.22920",
+    "value": 178.2292
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.66042825E+01",
+          "value": 26.6042825
+        },
+        {
+          "as_published": "3.97675990E-02",
+          "value": 0.039767599
+        },
+        {
+          "as_published": "-1.45710303E-05",
+          "value": -1.45710303e-05
+        },
+        {
+          "as_published": "2.38414417E-09",
+          "value": 2.38414417e-09
+        },
+        {
+          "as_published": "-1.44083321E-13",
+          "value": -1.44083321e-13
+        },
+        {
+          "as_published": "1.15427370E+04",
+          "value": 11542.737
+        },
+        {
+          "as_published": "-1.22473909E+02",
+          "value": -122.473909
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-3.36413181E+00",
+          "value": -3.36413181
+        },
+        {
+          "as_published": "8.50677802E-02",
+          "value": 0.0850677802
+        },
+        {
+          "as_published": "3.75500017E-05",
+          "value": 3.75500017e-05
+        },
+        {
+          "as_published": "-1.26667049E-07",
+          "value": -1.26667049e-07
+        },
+        {
+          "as_published": "6.14543114E-11",
+          "value": 6.14543114e-11
+        },
+        {
+          "as_published": "2.14305029E+04",
+          "value": 21430.5029
+        },
+        {
+          "as_published": "4.07973319E+01",
+          "value": 40.7973319
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.43189316E+04",
+    "value": 24318.9316,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "85-01-8  [F&W notation A3]",
+    "C14H10 PHENANTHRENE  SIGMA=2  IA=51.7329  IB=147.737 IC=199.470  NU=247,408,548,",
+    "711,832,1038,1094,1144,1163,1203,1247,1304,1352,1431,1443,1526,1602,1626,3002,",
+    "3037,3057,3072,3082,123,279,395,513,594,726,763,791,880,946,969,108,234,426,441,",
+    "494,713,735,819,874,951,441,536,619,712,876,1001,1040,1095,1173,1227,1282,1340,",
+    "1430,1458,1502,1572,1616,3019,3034,3047,3064,3094  HF298=202.2+/-2.3 kJ REF=NIST",
+    "Webbook 2012 average {HF298=207.1 kJ REF=KUDCHADKER KUDCHADKER & ZWOLINSKI JCT",
+    "11,(1979),1051;  HF298=209. kJ  REF=NIST 94/Webbook 2007}  MAX LST SQ ERROR @",
+    "200 K 0.73%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24155,
+    "header_line": 24164,
+    "end_line": 24167
+  },
+  "source_text": {
+    "header_line": "C14H10  Phenanth  T 6/12C 14.H 10.   0.   0.G   200.000  6000.000  B 178.22920 1",
+    "coeff_lines": [
+      " 2.66042825E+01 3.97675990E-02-1.45710303E-05 2.38414417E-09-1.44083321E-13    2",
+      " 1.15427370E+04-1.22473909E+02-3.36413181E+00 8.50677802E-02 3.75500017E-05    3",
+      "-1.26667049E-07 6.14543114E-11 2.14305029E+04 4.07973319E+01 2.43189316E+04    4"
+    ]
+  }
+}

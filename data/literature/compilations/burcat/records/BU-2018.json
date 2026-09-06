@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2018",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "1-C10H7-CH3",
+  "cas_as_published": "90-12-0  [F&W notation A2CH3A]",
+  "formula": "C11H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/98",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "11.",
+      "element": "C",
+      "count": 11.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "142.20040",
+    "value": 142.2004
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.17939213E+01",
+          "value": 21.7939213
+        },
+        {
+          "as_published": "3.60214098E-02",
+          "value": 0.0360214098
+        },
+        {
+          "as_published": "-1.33228698E-05",
+          "value": -1.33228698e-05
+        },
+        {
+          "as_published": "2.19304403E-09",
+          "value": 2.19304403e-09
+        },
+        {
+          "as_published": "-1.33071380E-13",
+          "value": -1.3307138e-13
+        },
+        {
+          "as_published": "3.16261439E+03",
+          "value": 3162.61439
+        },
+        {
+          "as_published": "-9.48675403E+01",
+          "value": -94.8675403
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-1.03043715E+00",
+          "value": -1.03043715
+        },
+        {
+          "as_published": "6.03358177E-02",
+          "value": 0.0603358177
+        },
+        {
+          "as_published": "5.45655719E-05",
+          "value": 5.45655719e-05
+        },
+        {
+          "as_published": "-1.22769251E-07",
+          "value": -1.22769251e-07
+        },
+        {
+          "as_published": "5.54507327E-11",
+          "value": 5.54507327e-11
+        },
+        {
+          "as_published": "1.13241014E+04",
+          "value": 11324.1014
+        },
+        {
+          "as_published": "3.22970611E+01",
+          "value": 32.2970611
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.39642625E+04",
+    "value": 13964.2625,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "90-12-0  [F&W notation A2CH3A]",
+    "1-C10H7CH3 1-Methyl-Naphthalene  Ia= 43.9442164  Ib= 74.3379622  Ic= 117.7309994",
+    "Ir = 0.51387   ROSYM = 3    V(3) = 0.01 kcal/mole   Nu= 3107,3074,3016,2982,",
+    "2956,2978,2749,2321,1924,1856,1820,1795,1744,1680,1601,1512,1470,1447,1398,",
+    "(1360),1261,(1252),1211,1166,1109,1102,1084,1077,1049,(1026,1022),960,(948,934,",
+    "914,874),858,(846,840),787(2),771,711,699,(616),537,532,490,(462),460,(427,404,",
+    "269,241,179,161).   REF = NIST Webbook 1997 spectrum    HF(298)= 27.75 kcal",
+    "REF = Speros & Rossini J. Phys. Chem. 64,(1960),1723.    Max Lst Sq Error Cp @",
+    "200 K 0.68%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 22893,
+    "header_line": 22902,
+    "end_line": 22905
+  },
+  "source_text": {
+    "header_line": "1-C10H7-CH3       T 7/98C 11.H 10.   0.   0.G   200.000  6000.000  B 142.20040 1",
+    "coeff_lines": [
+      " 2.17939213E+01 3.60214098E-02-1.33228698E-05 2.19304403E-09-1.33071380E-13    2",
+      " 3.16261439E+03-9.48675403E+01-1.03043715E+00 6.03358177E-02 5.45655719E-05    3",
+      "-1.22769251E-07 5.54507327E-11 1.13241014E+04 3.22970611E+01 1.39642625E+04    4"
+    ]
+  }
+}

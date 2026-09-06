@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0125",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "BiH3  Bismuthine",
+  "cas_as_published": "18288-22-7",
+  "formula": "BiH3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 8/17",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "BI",
+      "count_as_published": " 1.",
+      "element": "Bi",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 3.",
+      "element": "H",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "212.00420",
+    "value": 212.0042
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.67927074E+00",
+          "value": 5.67927074
+        },
+        {
+          "as_published": "4.25312513E-03",
+          "value": 0.00425312513
+        },
+        {
+          "as_published": "-1.62657766E-06",
+          "value": -1.62657766e-06
+        },
+        {
+          "as_published": "2.73494340E-10",
+          "value": 2.7349434e-10
+        },
+        {
+          "as_published": "-1.68340428E-14",
+          "value": -1.68340428e-14
+        },
+        {
+          "as_published": "3.11705347E+04",
+          "value": 31170.5347
+        },
+        {
+          "as_published": "-5.39581601E+00",
+          "value": -5.39581601
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.87403447E+00",
+          "value": 2.87403447
+        },
+        {
+          "as_published": "7.02489872E-03",
+          "value": 0.00702489872
+        },
+        {
+          "as_published": "5.40796516E-06",
+          "value": 5.40796516e-06
+        },
+        {
+          "as_published": "-1.16066201E-08",
+          "value": -1.16066201e-08
+        },
+        {
+          "as_published": "4.86220023E-12",
+          "value": 4.86220023e-12
+        },
+        {
+          "as_published": "3.22392583E+04",
+          "value": 32239.2583
+        },
+        {
+          "as_published": "1.04333042E+01",
+          "value": 10.4333042
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.34355242E+04",
+    "value": 33435.5242,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "18288-22-7",
+    "BiH3  Bismuthine  SIGMA=3  STATWT=1  A0=B0=2.6416  C0=2.6010  Nu=1733,1734.5(2),",
+    "726.7,751.2(2)  REF=Jerzembeck et al Angew. Chem. Int. Ed 41,(2002),2550",
+    "HF298=278. kJ  REF=Liebman Martinho-Simoes Slayden  Chap 4 Wiley 1994 Ed Patai",
+    "{HF298=13.965 kcal  REF=Burcat PM3 MOPAC 2000;  HF298=230.1 kJ  REF=Gunn JPC 68,",
+    "(1964),949}  Max Lst Sq Error Cp @ 1300 K 0.57%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 1241,
+    "header_line": 1247,
+    "end_line": 1250
+  },
+  "source_text": {
+    "header_line": "BiH3  Bismuthine  T 8/17BI 1.H  3.   0.   0.G   200.000  6000.000  B 212.00420 1",
+    "coeff_lines": [
+      " 5.67927074E+00 4.25312513E-03-1.62657766E-06 2.73494340E-10-1.68340428E-14    2",
+      " 3.11705347E+04-5.39581601E+00 2.87403447E+00 7.02489872E-03 5.40796516E-06    3",
+      "-1.16066201E-08 4.86220023E-12 3.22392583E+04 1.04333042E+01 3.34355242E+04    4"
+    ]
+  }
+}

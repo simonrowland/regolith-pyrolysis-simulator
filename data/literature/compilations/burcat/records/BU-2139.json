@@ -1,0 +1,185 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2139",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C16H10 1-EthynylAn",
+  "cas_as_published": "72307-77-8",
+  "formula": "C16H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/13",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "16.",
+      "element": "C",
+      "count": 16.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "202.25060",
+    "value": 202.2506
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.95846429E+01",
+          "value": 29.5846429
+        },
+        {
+          "as_published": "4.20092595E-02",
+          "value": 0.0420092595
+        },
+        {
+          "as_published": "-1.52774140E-05",
+          "value": -1.5277414e-05
+        },
+        {
+          "as_published": "2.48787937E-09",
+          "value": 2.48787937e-09
+        },
+        {
+          "as_published": "-1.49876435E-13",
+          "value": -1.49876435e-13
+        },
+        {
+          "as_published": "3.95990996E+04",
+          "value": 39599.0996
+        },
+        {
+          "as_published": "-1.35013595E+02",
+          "value": -135.013595
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-2.82878381E+00",
+          "value": -2.82878381
+        },
+        {
+          "as_published": "9.87968092E-02",
+          "value": 0.0987968092
+        },
+        {
+          "as_published": "1.49976876E-05",
+          "value": 1.49976876e-05
+        },
+        {
+          "as_published": "-1.07218770E-07",
+          "value": -1.0721877e-07
+        },
+        {
+          "as_published": "5.49075483E-11",
+          "value": 5.49075483e-11
+        },
+        {
+          "as_published": "4.99422283E+04",
+          "value": 49942.2283
+        },
+        {
+          "as_published": "3.97698510E+01",
+          "value": 39.769851
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "5.34365777E+04",
+    "value": 53436.5777,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "72307-77-8",
+    "C16H10 1-Ethynyl Anthracene  1-C14H9-CCH  SIGMA=1  STATWT=1  IA=77.6675",
+    "IB=217.1101  IC=294.7776  No Internal Rotor  Nu=3489,3213,3206,3198(2),3194,",
+    "3181.3(2),3174.4(2),2215.5,1684,1666,1632,1607,1593,1522.5,1498,1470,1439,1428,",
+    "1412,1382,1344,1303.5,1300,1280,1222,1201,1193,1177,1162,1089,1037,1024,995,982,",
+    "967,924.6(2),921,897,869,863,811,799,777,767,749,723,662,645,636,631,578,575,",
+    "571,536,508,485,482,448,388,374,364,275,245,241,164,119.5,93.3,79  REF=Burcat",
+    "B3LYP/6-31G(d)  HF298=106.19 kcal  REF=Green et al RMG Thermo Estimator 2013",
+    "Max Lst Sq Error Cp @ 200 and 1300 K 0.58%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C16H10 1-EthynylAn",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24459,
+    "header_line": 24468,
+    "end_line": 24471
+  },
+  "source_text": {
+    "header_line": "C16H10 1-EthynylAnT11/13C 16.H 10.   0.   0.G   200.000  6000.000  B 202.25060 1",
+    "coeff_lines": [
+      " 2.95846429E+01 4.20092595E-02-1.52774140E-05 2.48787937E-09-1.49876435E-13    2",
+      " 3.95990996E+04-1.35013595E+02-2.82878381E+00 9.87968092E-02 1.49976876E-05    3",
+      "-1.07218770E-07 5.49075483E-11 4.99422283E+04 3.97698510E+01 5.34365777E+04    4"
+    ]
+  }
+}

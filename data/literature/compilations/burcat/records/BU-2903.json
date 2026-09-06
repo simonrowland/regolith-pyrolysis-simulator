@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2903",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "N4 tetrahedral",
+  "cas_as_published": "12596-63-3",
+  "formula": "N4",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/11",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 4.",
+      "element": "N",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "56.02696",
+    "value": 56.02696
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "7.15691220E+00",
+          "value": 7.1569122
+        },
+        {
+          "as_published": "2.89928446E-03",
+          "value": 0.00289928446
+        },
+        {
+          "as_published": "-1.13238242E-06",
+          "value": -1.13238242e-06
+        },
+        {
+          "as_published": "1.92969207E-10",
+          "value": 1.92969207e-10
+        },
+        {
+          "as_published": "-1.19859634E-14",
+          "value": -1.19859634e-14
+        },
+        {
+          "as_published": "8.85495471E+04",
+          "value": 88549.5471
+        },
+        {
+          "as_published": "-1.48667043E+01",
+          "value": -14.8667043
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.77366606E+00",
+          "value": 2.77366606
+        },
+        {
+          "as_published": "4.12793650E-03",
+          "value": 0.0041279365
+        },
+        {
+          "as_published": "2.67193178E-05",
+          "value": 2.67193178e-05
+        },
+        {
+          "as_published": "-4.36895566E-08",
+          "value": -4.36895566e-08
+        },
+        {
+          "as_published": "1.91734338E-11",
+          "value": 1.91734338e-11
+        },
+        {
+          "as_published": "9.01681146E+04",
+          "value": 90168.1146
+        },
+        {
+          "as_published": "1.00883389E+01",
+          "value": 10.0883389
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "9.13373341E+04",
+    "value": 91337.3341,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "12596-63-3",
+    "N4 Terahedral  SIGMA=12  STATWT=1  IA=AB=IC=4.90485  Nu=1372,82(3),765(2)",
+    "REF=Elke Goos G3B3  HF0=183.09+/-0.5 kcal  REF=average of 6 ab initio calc by",
+    "Ruscic.  {HF0=182.22+/-0.5 kcal  REF=Lee & Martin Chem Phys Letters 357,(2002),",
+    "319;  HF298=757.40+/-1.62 kJ  REF=ATcT C 2011;  HF0=184.2+/-2. kcal",
+    "REF=Elke Goos G3B3;  HF298=732.5+/-8. kJ  REF=Glukhovtsev Laiter JPC 100(5),",
+    "(1996),1569}  Max Lst Sq Error Cp @ 200 K 0.75%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 31510,
+    "header_line": 31517,
+    "end_line": 31520
+  },
+  "source_text": {
+    "header_line": "N4 tetrahedral    T 1/11N  4.   0.   0.   0.G   200.000  6000.000  B  56.02696 1",
+    "coeff_lines": [
+      " 7.15691220E+00 2.89928446E-03-1.13238242E-06 1.92969207E-10-1.19859634E-14    2",
+      " 8.85495471E+04-1.48667043E+01 2.77366606E+00 4.12793650E-03 2.67193178E-05    3",
+      "-4.36895566E-08 1.91734338E-11 9.01681146E+04 1.00883389E+01 9.13373341E+04    4"
+    ]
+  }
+}

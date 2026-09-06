@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2270",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "HOCl+ Hypochloro",
+  "cas_as_published": "71606-47-8",
+  "formula": "ClHOE-1",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/12",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 1.",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 1.",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": "-1.",
+      "element": "E",
+      "count": -1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "52.45949",
+    "value": 52.45949
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.15049457E+00",
+          "value": 4.15049457
+        },
+        {
+          "as_published": "2.34393856E-03",
+          "value": 0.00234393856
+        },
+        {
+          "as_published": "-7.98092775E-07",
+          "value": -7.98092775e-07
+        },
+        {
+          "as_published": "1.24144321E-10",
+          "value": 1.24144321e-10
+        },
+        {
+          "as_published": "-7.23769439E-15",
+          "value": -7.23769439e-15
+        },
+        {
+          "as_published": "1.18473663E+05",
+          "value": 118473.663
+        },
+        {
+          "as_published": "4.45253726E+00",
+          "value": 4.45253726
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.14821831E+00",
+          "value": 3.14821831
+        },
+        {
+          "as_published": "4.31052654E-03",
+          "value": 0.00431052654
+        },
+        {
+          "as_published": "-4.37446158E-07",
+          "value": -4.37446158e-07
+        },
+        {
+          "as_published": "-2.69312719E-09",
+          "value": -2.69312719e-09
+        },
+        {
+          "as_published": "1.48507548E-12",
+          "value": 1.48507548e-12
+        },
+        {
+          "as_published": "1.18778285E+05",
+          "value": 118778.285
+        },
+        {
+          "as_published": "9.79511728E+00",
+          "value": 9.79511728
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.19900030E+05",
+    "value": 119900.03,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "71606-47-8",
+    "HOCL+ Hypochlorous acid cation  SIGMA=1  STATWT=2  IA=0.1357  IB=5.0591",
+    "IC=5.1948  Nu=3405,1286,892.5  REF=Burcat G3B3  HF298=996.91+/-3.13 kJ",
+    "REF=ATcT C 2011  {HF298=993.6+/-8. kJ  REF=Burcat G3B3}  Max Lst Sq Error Cp @",
+    "6000 K 0.24%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 26113,
+    "header_line": 26118,
+    "end_line": 26121
+  },
+  "source_text": {
+    "header_line": "HOCl+ Hypochloro  T 1/12CL 1.H  1.O  1.E -1.G   298.150  6000.000  B  52.45949 1",
+    "coeff_lines": [
+      " 4.15049457E+00 2.34393856E-03-7.98092775E-07 1.24144321E-10-7.23769439E-15    2",
+      " 1.18473663E+05 4.45253726E+00 3.14821831E+00 4.31052654E-03-4.37446158E-07    3",
+      "-2.69312719E-09 1.48507548E-12 1.18778285E+05 9.79511728E+00 1.19900030E+05    4"
+    ]
+  }
+}

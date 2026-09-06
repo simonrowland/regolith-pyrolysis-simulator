@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0747",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C2H3I Iodoethyle",
+  "cas_as_published": "593-66-8",
+  "formula": "C2H3I",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/11",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 2.",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 3.",
+      "element": "H",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "I ",
+      "count_as_published": " 1.",
+      "element": "I",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "153.94969",
+    "value": 153.94969
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "6.44273647E+00",
+          "value": 6.44273647
+        },
+        {
+          "as_published": "8.41887780E-03",
+          "value": 0.0084188778
+        },
+        {
+          "as_published": "-3.00447900E-06",
+          "value": -3.004479e-06
+        },
+        {
+          "as_published": "4.82844717E-10",
+          "value": 4.82844717e-10
+        },
+        {
+          "as_published": "-2.88126081E-14",
+          "value": -2.88126081e-14
+        },
+        {
+          "as_published": "1.30010205E+04",
+          "value": 13001.0205
+        },
+        {
+          "as_published": "-4.03486413E+00",
+          "value": -4.03486413
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.74108792E+00",
+          "value": 2.74108792
+        },
+        {
+          "as_published": "1.25141822E-02",
+          "value": 0.0125141822
+        },
+        {
+          "as_published": "8.60970302E-06",
+          "value": 8.60970302e-06
+        },
+        {
+          "as_published": "-2.16359126E-08",
+          "value": -2.16359126e-08
+        },
+        {
+          "as_published": "1.00821068E-11",
+          "value": 1.00821068e-11
+        },
+        {
+          "as_published": "1.42911282E+04",
+          "value": 14291.1282
+        },
+        {
+          "as_published": "1.64780120E+01",
+          "value": 16.478012
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.57026692E+04",
+    "value": 15702.6692,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "593-66-8",
+    "C2H3I Ethylene Iodide  SIGMA=1  STATWT=1  IA=5.56149  IB=94.8920  IC=100.45348",
+    "Nu=3115,3067,3011,1598,1353,1251,1084,980,946,553,[531,311]  REF=IR Webbook",
+    "+ [] B3LYP/6-31G* calc.  HF298=130.56+/-1.12  kJ  REF=ATcT C 2011",
+    "{HF298=128.876 kJ  HF0=137.906 kJ  REF=NIST 94 est.}  Max Lst Sq Error Cp @",
+    "6000 K 0.47%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 7642,
+    "header_line": 7648,
+    "end_line": 7651
+  },
+  "source_text": {
+    "header_line": "C2H3I Iodoethyle  T 6/11C  2.H  3.I  1.   0.G   200.000  6000.000  B 153.94969 1",
+    "coeff_lines": [
+      " 6.44273647E+00 8.41887780E-03-3.00447900E-06 4.82844717E-10-2.88126081E-14    2",
+      " 1.30010205E+04-4.03486413E+00 2.74108792E+00 1.25141822E-02 8.60970302E-06    3",
+      "-2.16359126E-08 1.00821068E-11 1.42911282E+04 1.64780120E+01 1.57026692E+04    4"
+    ]
+  }
+}

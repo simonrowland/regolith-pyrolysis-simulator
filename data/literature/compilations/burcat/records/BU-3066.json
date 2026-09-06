@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3066",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "P2O4",
+  "cas_as_published": "12137-38-1",
+  "formula": "P2O4",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "tpis89",
+  "calc_quality_as_published": "D",
+  "composition": [
+    {
+      "element_as_published": "P ",
+      "count_as_published": " 2.",
+      "element": "P",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 4.",
+      "element": "O",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "125.94512",
+    "value": 125.94512
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.22628422E+01",
+          "value": 12.2628422
+        },
+        {
+          "as_published": "3.79641696E-03",
+          "value": 0.00379641696
+        },
+        {
+          "as_published": "-1.47957553E-06",
+          "value": -1.47957553e-06
+        },
+        {
+          "as_published": "2.51809765E-10",
+          "value": 2.51809765e-10
+        },
+        {
+          "as_published": "-1.56276730E-14",
+          "value": -1.5627673e-14
+        },
+        {
+          "as_published": "-1.16718443E+05",
+          "value": -116718.443
+        },
+        {
+          "as_published": "-3.47022885E+01",
+          "value": -34.7022885
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.79393161E+00",
+          "value": 2.79393161
+        },
+        {
+          "as_published": "3.65928671E-02",
+          "value": 0.0365928671
+        },
+        {
+          "as_published": "-4.77255818E-05",
+          "value": -4.77255818e-05
+        },
+        {
+          "as_published": "3.19497174E-08",
+          "value": 3.19497174e-08
+        },
+        {
+          "as_published": "-8.79506861E-12",
+          "value": -8.79506861e-12
+        },
+        {
+          "as_published": "-1.14401011E+05",
+          "value": -114401.011
+        },
+        {
+          "as_published": "1.26620725E+01",
+          "value": 12.6620725
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.12304228E+05",
+    "value": -112304.228,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "12137-38-1",
+    "P2O4   SIGMA=4  STATWT=1  IAIBIC=44000.  Nu=1500,1300,1100(2),650(2),500,400,",
+    "300,250(2),200  HF0=-923.+/-25. kJ  REF=Gurvich's 89 estimate  Max Lst Sq Error",
+    "Cp @ 1300 K 0.36%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 32876,
+    "header_line": 32880,
+    "end_line": 32883
+  },
+  "source_text": {
+    "header_line": "P2O4              tpis89P  2.O  4.   0.   0.G   200.000  6000.000  D 125.94512 1",
+    "coeff_lines": [
+      " 1.22628422E+01 3.79641696E-03-1.47957553E-06 2.51809765E-10-1.56276730E-14    2",
+      "-1.16718443E+05-3.47022885E+01 2.79393161E+00 3.65928671E-02-4.77255818E-05    3",
+      " 3.19497174E-08-8.79506861E-12-1.14401011E+05 1.26620725E+01-1.12304228E+05    4"
+    ]
+  }
+}

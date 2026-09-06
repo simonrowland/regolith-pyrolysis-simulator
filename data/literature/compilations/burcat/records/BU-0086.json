@@ -1,0 +1,173 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0086",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "NaBH4 (S)",
+  "cas_as_published": "16940-66-2",
+  "formula": "NaBH4",
+  "phase": "S",
+  "phase_as_published": "S",
+  "phase_card_as_published": "S",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "J12/64",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "NA",
+      "count_as_published": " 1.",
+      "element": "Na",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "B ",
+      "count_as_published": " 1.",
+      "element": "B",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "37.83253",
+    "value": 37.83253
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "2000.000",
+    "value": 2000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.47693897E+00",
+          "value": 4.47693897
+        },
+        {
+          "as_published": "2.09918720E-02",
+          "value": 0.020991872
+        },
+        {
+          "as_published": "-1.27640591E-05",
+          "value": -1.27640591e-05
+        },
+        {
+          "as_published": "2.67504624E-09",
+          "value": 2.67504624e-09
+        },
+        {
+          "as_published": "-4.30580203E-14",
+          "value": -4.30580203e-14
+        },
+        {
+          "as_published": "-2.51438951E+04",
+          "value": -25143.8951
+        },
+        {
+          "as_published": "-1.87968748E+01",
+          "value": -18.7968748
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "8.91505248E+00",
+          "value": 8.91505248
+        },
+        {
+          "as_published": "-9.79537530E-04",
+          "value": -0.00097953753
+        },
+        {
+          "as_published": "2.88744559E-05",
+          "value": 2.88744559e-05
+        },
+        {
+          "as_published": "-3.27582945E-08",
+          "value": -3.27582945e-08
+        },
+        {
+          "as_published": "1.12850637E-11",
+          "value": 1.12850637e-11
+        },
+        {
+          "as_published": "-2.58830980E+04",
+          "value": -25883.098
+        },
+        {
+          "as_published": "-3.93230417E+01",
+          "value": -39.3230417
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-2.30729171E+04",
+    "value": -23072.9171,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "16940-66-2",
+    "BH4Na Solid  Sodium Tetrahydroborate HF298=-191.84 kJ REF=JANAF 1964  Max Lst Sq ",
+    "Error @ 1200 K 0.03%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 865,
+    "header_line": 868,
+    "end_line": 871
+  },
+  "source_text": {
+    "header_line": "NaBH4 (S)         J12/64NA 1.B  1.H  4.   0.S   298.150  2000.000  C  37.83253 1",
+    "coeff_lines": [
+      " 4.47693897E+00 2.09918720E-02-1.27640591E-05 2.67504624E-09-4.30580203E-14    2",
+      "-2.51438951E+04-1.87968748E+01 8.91505248E+00-9.79537530E-04 2.88744559E-05    3",
+      "-3.27582945E-08 1.12850637E-11-2.58830980E+04-3.93230417E+01-2.30729171E+04    4"
+    ]
+  }
+}

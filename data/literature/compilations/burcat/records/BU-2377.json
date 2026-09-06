@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2377",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "D2O2",
+  "cas_as_published": "6909-54-2",
+  "formula": "D2O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "g 6/99",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "D ",
+      "count_as_published": " 2.",
+      "element": "D",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "36.02700",
+    "value": 36.027
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.14099412E+00",
+          "value": 5.14099412
+        },
+        {
+          "as_published": "4.24770619E-03",
+          "value": 0.00424770619
+        },
+        {
+          "as_published": "-1.51625265E-06",
+          "value": -1.51625265e-06
+        },
+        {
+          "as_published": "2.48828911E-10",
+          "value": 2.48828911e-10
+        },
+        {
+          "as_published": "-1.50545304E-14",
+          "value": -1.50545304e-14
+        },
+        {
+          "as_published": "-1.92648912E+04",
+          "value": -19264.8912
+        },
+        {
+          "as_published": "-1.82579388E+00",
+          "value": -1.82579388
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.99335958E+00",
+          "value": 3.99335958
+        },
+        {
+          "as_published": "3.03682596E-03",
+          "value": 0.00303682596
+        },
+        {
+          "as_published": "1.02967795E-05",
+          "value": 1.02967795e-05
+        },
+        {
+          "as_published": "-1.60576667E-08",
+          "value": -1.60576667e-08
+        },
+        {
+          "as_published": "6.83692371E-12",
+          "value": 6.83692371e-12
+        },
+        {
+          "as_published": "-1.87432656E+04",
+          "value": -18743.2656
+        },
+        {
+          "as_published": "5.12865282E+00",
+          "value": 5.12865282
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.73552019E+04",
+    "value": -17355.2019,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "6909-54-2",
+    "D2O2  DEUTERIUM PEROXIDE   SIGMA=2  A0=4.92  B0=0.788  C0=0.733  BROT1=21.492",
+    "BROT2=0.549  BROT3=0.0869  V(1)=-2058 V(2)=-1302  V(3)=-102 1/CM NU=2667,1028,",
+    "869,2661,947 X11=-48  X12=-6  X13=-8  X15=-88  X16=-2  X22=-5  X23=-5  X25=-6",
+    "X26=-2  X33=-10  X35=-8  X36=-1  X55=-47  X56=-2  X66=-2  ALFA1A=-0.09",
+    "ALFA2A=.04  ALFA3A=.03  ALFA5A=-.09   ALFA6A=.07  ALFA1B=-0.001  ALFA2B=-.002",
+    "ALFA3B=-.006  ALFA5B=-0.001  ALFA6B=-0.001    ALFA1C=.0005  ALFA2C=-.002",
+    "ALFA3C=-.001  ALFA5C=.0005   ALFA6C=-0.003    REF = TSIV 1978  HF298=-144.3 KJ",
+    "Max Lst Sq Error Cp @ 6000 K 0.40 %."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 27030,
+    "header_line": 27039,
+    "end_line": 27042
+  },
+  "source_text": {
+    "header_line": "D2O2              g 6/99D  2.O  2.   0.   0.G   200.000  6000.000  B  36.02700 1",
+    "coeff_lines": [
+      " 5.14099412E+00 4.24770619E-03-1.51625265E-06 2.48828911E-10-1.50545304E-14    2",
+      "-1.92648912E+04-1.82579388E+00 3.99335958E+00 3.03682596E-03 1.02967795E-05    3",
+      "-1.60576667E-08 6.83692371E-12-1.87432656E+04 5.12865282E+00-1.73552019E+04    4"
+    ]
+  }
+}

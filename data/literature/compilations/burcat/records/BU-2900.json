@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2900",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "HN3O4  HN(NO2)2",
+  "cas_as_published": "114045-20-4",
+  "formula": "N3O4H",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/13",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 3.",
+      "element": "N",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 4.",
+      "element": "O",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 1.",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "107.02576",
+    "value": 107.02576
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.40915474E+01",
+          "value": 14.0915474
+        },
+        {
+          "as_published": "6.67859014E-03",
+          "value": 0.00667859014
+        },
+        {
+          "as_published": "-2.54948809E-06",
+          "value": -2.54948809e-06
+        },
+        {
+          "as_published": "4.20455024E-10",
+          "value": 4.20455024e-10
+        },
+        {
+          "as_published": "-2.54161104E-14",
+          "value": -2.54161104e-14
+        },
+        {
+          "as_published": "7.73444686E+03",
+          "value": 7734.44686
+        },
+        {
+          "as_published": "-4.44298370E+01",
+          "value": -44.429837
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.59966322E+00",
+          "value": 2.59966322
+        },
+        {
+          "as_published": "3.23887035E-02",
+          "value": 0.0323887035
+        },
+        {
+          "as_published": "-7.78882150E-06",
+          "value": -7.7888215e-06
+        },
+        {
+          "as_published": "-2.25246926E-08",
+          "value": -2.25246926e-08
+        },
+        {
+          "as_published": "1.39408358E-11",
+          "value": 1.39408358e-11
+        },
+        {
+          "as_published": "1.10607554E+04",
+          "value": 11060.7554
+        },
+        {
+          "as_published": "1.60196596E+01",
+          "value": 16.0196596
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.31686769E+04",
+    "value": 13168.6769,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "114045-20-4",
+    "HN3O4  Dinitramin  HN(NO2)2  SIGMA=2  STATWT=1  IA=13.4731  IB=40.9517",
+    "IC=52.9082  [Ir(NO2)=3.22  ROSYM=2  V(3)=1600. cm-1]x2  Nu=3537,1773,1744,1391,",
+    "1372,1310,1051.5,853.5,841.5,794,740,716,656,423,402,239  HF298=26.169+/-2. kcal",
+    "REF=Burcat G3B3  {HF298=19. kcal  REF=Politzer, Seminario, Concha J Mol Struct",
+    "(THEOCEM) 427,(1998),123}  Max Lst Sq Error Cp @ 200 & 6000 K 0.34%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 31480,
+    "header_line": 31486,
+    "end_line": 31489
+  },
+  "source_text": {
+    "header_line": "HN3O4  HN(NO2)2   T 3/13N  3.O  4.H  1.   0.G   200.000  6000.000  B 107.02576 1",
+    "coeff_lines": [
+      " 1.40915474E+01 6.67859014E-03-2.54948809E-06 4.20455024E-10-2.54161104E-14    2",
+      " 7.73444686E+03-4.44298370E+01 2.59966322E+00 3.23887035E-02-7.78882150E-06    3",
+      "-2.25246926E-08 1.39408358E-11 1.10607554E+04 1.60196596E+01 1.31686769E+04    4"
+    ]
+  }
+}

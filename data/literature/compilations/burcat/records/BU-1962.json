@@ -1,0 +1,185 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1962",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C10H9 fenylbutadie",
+  "cas_as_published": "126738-27-0 or 182180-84-3",
+  "formula": "C10H9",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T05/06",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "10.",
+      "element": "C",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "129.17846",
+    "value": 129.17846
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.97227364E+01",
+          "value": 19.7227364
+        },
+        {
+          "as_published": "3.05121625E-02",
+          "value": 0.0305121625
+        },
+        {
+          "as_published": "-1.10537483E-05",
+          "value": -1.10537483e-05
+        },
+        {
+          "as_published": "1.79050874E-09",
+          "value": 1.79050874e-09
+        },
+        {
+          "as_published": "-1.07387763E-13",
+          "value": -1.07387763e-13
+        },
+        {
+          "as_published": "4.42281159E+04",
+          "value": 44228.1159
+        },
+        {
+          "as_published": "-7.53736816E+01",
+          "value": -75.3736816
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.29508183E+00",
+          "value": 2.29508183
+        },
+        {
+          "as_published": "4.52323197E-02",
+          "value": 0.0452323197
+        },
+        {
+          "as_published": "5.98076375E-05",
+          "value": 5.98076375e-05
+        },
+        {
+          "as_published": "-1.21133405E-07",
+          "value": -1.21133405e-07
+        },
+        {
+          "as_published": "5.46626377E-11",
+          "value": 5.46626377e-11
+        },
+        {
+          "as_published": "5.04522033E+04",
+          "value": 50452.2033
+        },
+        {
+          "as_published": "2.21435730E+01",
+          "value": 22.143573
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "5.34617386E+04",
+    "value": 53461.7386,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "126738-27-0 or 182180-84-3",
+    "C10H9 phenyl-butadienyl radical C6H5-CH=CH-CH=CH*  SIGMA=1  STATWT=2  IA=17.2514",
+    "IB=140.1877  IC=157.4391  Ir(-CH=CH-CH=CH*)=7.03118  ROSYM=1  V(3)=1224. cm-1",
+    "est.  Ir(-CH=CH*)=2.59427  ROSYM=1  V(3)524. cm-1 as in butadiene.  Nu=3268,",
+    "3212,3204,3195,3186,3183,3176,3144,3040,1693,1661,1645,1631,1546,1497,1380,1372,",
+    "1343,1321,1253,1249,1218,1193,1162,1112,1060,1015,1013,991,964,927,889,859,852,",
+    "832(2),768,705,639,635,621,513,510,414,343,313,297,174.8,124.54   HF298=106.24",
+    "kcal  REF=Thergas   c(#1)&ch&ch&ch&ch&ch&1,1/ch//ch//ch//ch(.)   {HF298=106.5",
+    "kcal  REF=NIST 94}  Max Lst Sq Error Cp @ 200 K 0.66%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C10H9 fenylbutadie",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 22168,
+    "header_line": 22177,
+    "end_line": 22180
+  },
+  "source_text": {
+    "header_line": "C10H9 fenylbutadieT05/06C 10.H  9.   0.   0.G   200.000  6000.000  B 129.17846 1",
+    "coeff_lines": [
+      " 1.97227364E+01 3.05121625E-02-1.10537483E-05 1.79050874E-09-1.07387763E-13    2",
+      " 4.42281159E+04-7.53736816E+01 2.29508183E+00 4.52323197E-02 5.98076375E-05    3",
+      "-1.21133405E-07 5.46626377E-11 5.04522033E+04 2.21435730E+01 5.34617386E+04    4"
+    ]
+  }
+}

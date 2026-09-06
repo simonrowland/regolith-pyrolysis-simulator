@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1845",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C8H4O4 3-Hydroxy",
+  "cas_as_published": "37418-88-5",
+  "formula": "C8H4O4",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T03/20",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 8.",
+      "element": "C",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 4.",
+      "element": "O",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "164.11496",
+    "value": 164.11496
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.15858166E+01",
+          "value": 21.5858166
+        },
+        {
+          "as_published": "2.25057580E-02",
+          "value": 0.022505758
+        },
+        {
+          "as_published": "-8.28439145E-06",
+          "value": -8.28439145e-06
+        },
+        {
+          "as_published": "1.36018819E-09",
+          "value": 1.36018819e-09
+        },
+        {
+          "as_published": "-8.24135349E-14",
+          "value": -8.24135349e-14
+        },
+        {
+          "as_published": "-7.87354264E+04",
+          "value": -78735.4264
+        },
+        {
+          "as_published": "-8.80104645E+01",
+          "value": -88.0104645
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-5.58057232E-01",
+          "value": -0.558057232
+        },
+        {
+          "as_published": "7.12479049E-02",
+          "value": 0.0712479049
+        },
+        {
+          "as_published": "-2.24936379E-05",
+          "value": -2.24936379e-05
+        },
+        {
+          "as_published": "-3.21556700E-08",
+          "value": -3.215567e-08
+        },
+        {
+          "as_published": "2.10444180E-11",
+          "value": 2.1044418e-11
+        },
+        {
+          "as_published": "-7.20726123E+04",
+          "value": -72072.6123
+        },
+        {
+          "as_published": "2.92067177E+01",
+          "value": 29.2067177
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-6.93245904E+04",
+    "value": -69324.5904,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "37418-88-5",
+    "C8H4O4 3-Hydroxy Phthalic anhydride  SIGMA=1  STATWT=1  IA=59.7337  IB=80.6063",
+    "IC=140.3799  Nu=3600,3235,3225,3204,1916,1834,1682,1663,1540,1511,1433,1390,",
+    "1338,1292,1217,1194,1157,1063,994,993,915.5,915,840,817,754,743,702.5,678,656,",
+    "638(2),566,554,492,447,418,339,244,200,194.5,160,112  REF=B3LYP/6-31G(d)",
+    "HF298=-576.4+/-8.  REF=Salas-Lopez Revista Mexicana de Ingeneria Chimica 2020  ",
+    "Max Lst Sq Error Cp @ 1300 K 0.53%.  "
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 20747,
+    "header_line": 20754,
+    "end_line": 20757
+  },
+  "source_text": {
+    "header_line": "C8H4O4 3-Hydroxy  T03/20C  8.H  4.O  4.   0.G   200.000  6000.000  B 164.11496 1",
+    "coeff_lines": [
+      " 2.15858166E+01 2.25057580E-02-8.28439145E-06 1.36018819E-09-8.24135349E-14    2",
+      "-7.87354264E+04-8.80104645E+01-5.58057232E-01 7.12479049E-02-2.24936379E-05    3",
+      "-3.21556700E-08 2.10444180E-11-7.20726123E+04 2.92067177E+01-6.93245904E+04    4"
+    ]
+  }
+}

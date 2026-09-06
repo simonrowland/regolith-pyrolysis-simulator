@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1666",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H8O7 Citric ac",
+  "cas_as_published": "77-92-9",
+  "formula": "C6H8O7",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 2/13",
+  "calc_quality_as_published": "D",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 8.",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 7.",
+      "element": "O",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "192.12352",
+    "value": 192.12352
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.38817298E+01",
+          "value": 23.8817298
+        },
+        {
+          "as_published": "2.98015858E-02",
+          "value": 0.0298015858
+        },
+        {
+          "as_published": "-1.08219987E-05",
+          "value": -1.08219987e-05
+        },
+        {
+          "as_published": "1.75086113E-09",
+          "value": 1.75086113e-09
+        },
+        {
+          "as_published": "-1.04776917E-13",
+          "value": -1.04776917e-13
+        },
+        {
+          "as_published": "-1.78611531E+05",
+          "value": -178611.531
+        },
+        {
+          "as_published": "-8.54447236E+01",
+          "value": -85.4447236
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "6.07489427E+00",
+          "value": 6.07489427
+        },
+        {
+          "as_published": "5.28055026E-02",
+          "value": 0.0528055026
+        },
+        {
+          "as_published": "3.30742221E-05",
+          "value": 3.30742221e-05
+        },
+        {
+          "as_published": "-8.92609815E-08",
+          "value": -8.92609815e-08
+        },
+        {
+          "as_published": "4.18137636E-11",
+          "value": 4.18137636e-11
+        },
+        {
+          "as_published": "-1.72569475E+05",
+          "value": -172569.475
+        },
+        {
+          "as_published": "1.24661568E+01",
+          "value": 12.4661568
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.68275653E+05",
+    "value": -168275.653,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "77-92-9",
+    "C6H8O7 Citric acid anhydrous HOOC-CH2-C(COOH)(OH)-CH2-COOH  SIGMA=4 REF=NIST94",
+    "STATWT=1  IA=71.2285  IB=141.2713  IC=166.3747  [Ir(OH)=0.13901  ROSYM=1",
+    "V(3)=279.2 cm-1]x4  [Ir(-COOH)=4.40586  ROSYM=1 V(3)=300. cm-1]x3  Nu=3741,3693,",
+    "3687,3682,3160,3147,3108,3090,1863,1860,1848,1501,1479.5,1429,1396,1386,1379,",
+    "1354,1328,1271,1256,1202,1187,1160,1136,1071,1050,958,915.5,902,882,794,762,731,",
+    "696,648,629,603,600,569.5,537,507.5,450,402,382,344.6,310,294,243,208",
+    "REF=Burcat B3LYP/6-31G(d)  HF298=-334.4 kcal  REF=NIST 94  HF298(solid)=-1544+/-",
+    "4.6 kJ  REF=NIST Webbook (Wilhoit & Shiao JCEng 9,(1964),595).  Max Lst Sq Error",
+    "Cp @ 6000 K 0.49%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 18471,
+    "header_line": 18481,
+    "end_line": 18484
+  },
+  "source_text": {
+    "header_line": "C6H8O7 Citric ac  T 2/13C  6.H  8.O  7.   0.G   200.000  6000.000  D 192.12352 1",
+    "coeff_lines": [
+      " 2.38817298E+01 2.98015858E-02-1.08219987E-05 1.75086113E-09-1.04776917E-13    2",
+      "-1.78611531E+05-8.54447236E+01 6.07489427E+00 5.28055026E-02 3.30742221E-05    3",
+      "-8.92609815E-08 4.18137636E-11-1.72569475E+05 1.24661568E+01-1.68275653E+05    4"
+    ]
+  }
+}

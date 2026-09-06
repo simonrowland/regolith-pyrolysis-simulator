@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0373",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CH2N2 cyc(-CH2-N",
+  "cas_as_published": "157-22-2",
+  "formula": "CH2N2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T01/07",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 2.",
+      "element": "H",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 2.",
+      "element": "N",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "42.04006",
+    "value": 42.04006
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.94940376E+00",
+          "value": 4.94940376
+        },
+        {
+          "as_published": "7.16065133E-03",
+          "value": 0.00716065133
+        },
+        {
+          "as_published": "-2.57368274E-06",
+          "value": -2.57368274e-06
+        },
+        {
+          "as_published": "4.15744420E-10",
+          "value": 4.1574442e-10
+        },
+        {
+          "as_published": "-2.49024289E-14",
+          "value": -2.49024289e-14
+        },
+        {
+          "as_published": "3.57035482E+04",
+          "value": 35703.5482
+        },
+        {
+          "as_published": "-2.67320066E+00",
+          "value": -2.67320066
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.01289485E+00",
+          "value": 4.01289485
+        },
+        {
+          "as_published": "-7.29541097E-03",
+          "value": -0.00729541097
+        },
+        {
+          "as_published": "5.24659402E-05",
+          "value": 5.24659402e-05
+        },
+        {
+          "as_published": "-6.47584660E-08",
+          "value": -6.4758466e-08
+        },
+        {
+          "as_published": "2.55022563E-11",
+          "value": 2.55022563e-11
+        },
+        {
+          "as_published": "3.67096681E+04",
+          "value": 36709.6681
+        },
+        {
+          "as_published": "6.07517169E+00",
+          "value": 6.07517169
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.79294530E+04",
+    "value": 37929.453,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "157-22-2",
+    "CH2N2 CYCLO DIAZIRINE H2(CN=N)  STATWT=1  SIGMA=2  IA=2.0465   IB=3.5255",
+    "IC=4.9876   NU=849,996,1014,1066,1160,1521,1743,3155,3268  HF298=75.374 kcal",
+    "REF=Burcat G3B3 calc  {HF298=75.1 kcal  REF=G3X calc;  HF298=76.516+/-4.54 KCAL",
+    "REF=MELIUS BAC/MP4 Database N62;  HF298=74.10 kcal   REF=G2 calc Catoire &",
+    "Swihart J. Prop & Power 18,(2002),1242}   MAX LST SQ ERROR CP @ 200 K 0.73%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 3731,
+    "header_line": 3737,
+    "end_line": 3740
+  },
+  "source_text": {
+    "header_line": "CH2N2 cyc(-CH2-N  T01/07C  1.H  2.N  2.   0.G   200.000  6000.000  B  42.04006 1",
+    "coeff_lines": [
+      " 4.94940376E+00 7.16065133E-03-2.57368274E-06 4.15744420E-10-2.49024289E-14    2",
+      " 3.57035482E+04-2.67320066E+00 4.01289485E+00-7.29541097E-03 5.24659402E-05    3",
+      "-6.47584660E-08 2.55022563E-11 3.67096681E+04 6.07517169E+00 3.79294530E+04    4"
+    ]
+  }
+}

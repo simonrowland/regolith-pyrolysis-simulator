@@ -76,6 +76,10 @@ Air, InertAir, B2H6(L), B5H9(L), (CH2)x(cr), CH3NO2(L), CH4(L), CH3OH(L), CH6N2(
 
 ## Known gaps and recorded ambiguities
 
+- 16 published name suffixes outside the closed allow-list (`an`, `I'`,
+  `crI`, `crII`, `V`, `II-r`, `I-y`, `a-qz`, `b-qz`, `b-crt`, `III,II`,
+  `a'`, …) are stored verbatim in `phase_as_published` and listed as
+  `phase_suffix_normalized_to_condensed`. They are not rewritten away.
 - 11 inverted or zero-width polynomial T intervals (Snyder 2021 floor
   artifact), including `Br2(cr)` whose only interval is inverted. Kept.
 - 54 `nint=0` assigned-enthalpy dummy T-lines (`T_max=0`, no coefficients).

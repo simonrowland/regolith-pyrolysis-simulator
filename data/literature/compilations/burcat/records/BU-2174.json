@@ -1,0 +1,184 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2174",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C18H35O2 Stearyl",
+  "cas_as_published": "109643-69-8",
+  "formula": "C18H35O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 8/08",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "18.",
+      "element": "C",
+      "count": 18.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "35.",
+      "element": "H",
+      "count": 35.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "283.46930",
+    "value": 283.4693
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.18146414E+01",
+          "value": 41.8146414
+        },
+        {
+          "as_published": "1.07476609E-01",
+          "value": 0.107476609
+        },
+        {
+          "as_published": "-3.91510609E-05",
+          "value": -3.91510609e-05
+        },
+        {
+          "as_published": "6.37176251E-09",
+          "value": 6.37176251e-09
+        },
+        {
+          "as_published": "-3.83377394E-13",
+          "value": -3.83377394e-13
+        },
+        {
+          "as_published": "-8.43852608E+04",
+          "value": -84385.2608
+        },
+        {
+          "as_published": "-1.80808009E+02",
+          "value": -180.808009
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.52171727E+01",
+          "value": 25.2171727
+        },
+        {
+          "as_published": "-1.24844493E-02",
+          "value": -0.0124844493
+        },
+        {
+          "as_published": "4.55629252E-04",
+          "value": 0.000455629252
+        },
+        {
+          "as_published": "-5.78454214E-07",
+          "value": -5.78454214e-07
+        },
+        {
+          "as_published": "2.26220813E-10",
+          "value": 2.26220813e-10
+        },
+        {
+          "as_published": "-7.18483779E+04",
+          "value": -71848.3779
+        },
+        {
+          "as_published": "-5.52949102E+01",
+          "value": -55.2949102
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-6.18956499E+04",
+    "value": -61895.6499,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "109643-69-8",
+    "C18H35O2 Stearyl rad  C17H35C(O)O*  SIGMA=1  STATWT=2  IA=35.8070 IB=2568.7244",
+    "Ic=2592.5358  Ir(CH3)=0.52574  ROSYM=3  V(3)=340. cm-1  Ir(C2H5)=5.63081 ROSYM=1",
+    "V(3)=3147. cm-1  Ir(C3H7)=~7.0  estim  ROSYM=1  V(3)=~3700. cm-1",
+    "Ir(-COO*)=7.258  ROSYM=1  V(3)=272. cm-1  Nu=3250,3149,3110,3105,3082,3076,3073,",
+    "3068,3062,3055(2),3048,3043,3036(4),3031(2),3030(2),3024(3),3016(3),3011(2),",
+    "3009.5(2),3008(2),3007(2),2431,1528(3),1520(2),1514,1509(3),1502(2),1500(2),",
+    "1498(2),1496.5(2),1480,1429,1419(2),1415.5(2),1410,1400,1385,1369(2),1351,",
+    "1346.5(2),1342(2),1334(3),1327(3),1310(2),1294,1285,1274,1257(2),1238,1231,1217,",
+    "1214,1204,1147,1113,1082,1072(2),1067.5(4),1060,1047(2),1033,1022,1009.5(2)988,",
+    "985,972,963,932,901,892,853,817,789,766,750,741,735(4),639,623,578,516(2),",
+    "464(2),410,377,344,287,254(2),217,174(2),163,155(2),144,137(2),123(2),101.6,",
+    "97.64,88.59,72.86,70.15,57.73,56.28,45.34,43.52,31.58,24.73   HF298=123. kcal",
+    "REF=Catoire et al C&F 155,(2008),334-342   Max Lst Sq Error Cp @ 1300 K 0.65%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 25029,
+    "header_line": 25043,
+    "end_line": 25046
+  },
+  "source_text": {
+    "header_line": "C18H35O2 Stearyl  T 8/08C 18.H 35.O  2.   0.G   200.000  6000.000  B 283.46930 1",
+    "coeff_lines": [
+      " 4.18146414E+01 1.07476609E-01-3.91510609E-05 6.37176251E-09-3.83377394E-13    2",
+      "-8.43852608E+04-1.80808009E+02 2.52171727E+01-1.24844493E-02 4.55629252E-04    3",
+      "-5.78454214E-07 2.26220813E-10-7.18483779E+04-5.52949102E+01-6.18956499E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0679",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C2H2- Vinylidene",
+  "cas_as_published": "66295-36-1",
+  "formula": "C2H2E",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/11",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 2.",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 2.",
+      "element": "H",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "26.03783",
+    "value": 26.03783
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.23406282E+00",
+          "value": 4.23406282
+        },
+        {
+          "as_published": "5.23166129E-03",
+          "value": 0.00523166129
+        },
+        {
+          "as_published": "-1.90207794E-06",
+          "value": -1.90207794e-06
+        },
+        {
+          "as_published": "3.09415962E-10",
+          "value": 3.09415962e-10
+        },
+        {
+          "as_published": "-1.86174915E-14",
+          "value": -1.86174915e-14
+        },
+        {
+          "as_published": "4.14694210E+04",
+          "value": 41469.421
+        },
+        {
+          "as_published": "8.80206279E-01",
+          "value": 0.880206279
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.71198095E+00",
+          "value": 2.71198095
+        },
+        {
+          "as_published": "6.76920203E-03",
+          "value": 0.00676920203
+        },
+        {
+          "as_published": "1.34829762E-06",
+          "value": 1.34829762e-06
+        },
+        {
+          "as_published": "-5.17293129E-09",
+          "value": -5.17293129e-09
+        },
+        {
+          "as_published": "2.19789533E-12",
+          "value": 2.19789533e-12
+        },
+        {
+          "as_published": "4.20665582E+04",
+          "value": 42066.5582
+        },
+        {
+          "as_published": "9.50496771E+00",
+          "value": 9.50496771
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.31787321E+04",
+    "value": 43178.7321,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "66295-36-1",
+    "CCH2-  Vinylidene anion SIGMA=2  STATWT=2  IA=0.2799  IB=2.3390  IC=2.6189",
+    "Nu=2779,2688,[1485,1305],894,761  REF=Burcat G3B3 [] Jacox Webbook  HF298=359.01",
+    "+/-1.87 kJ  REF=ATcT A 2005 {HF298=357.947+/-0.8 kJ  REF=ATcT C 2011;",
+    "HF298=354.58+/-8 kJ REF=Burcat G3B3  HF298=385+/-15 kJ  REF=Ervin Gronert et al",
+    "JACS 112,(1990),5750}  Thermal Electron Convention.   Max Lst Sq Error Cp @ 1300",
+    "K 0.53%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 6905,
+    "header_line": 6912,
+    "end_line": 6915
+  },
+  "source_text": {
+    "header_line": "C2H2- Vinylidene  T 1/11C  2.H  2.E  1.   0.G   298.150  6000.000  B  26.03783 1",
+    "coeff_lines": [
+      " 4.23406282E+00 5.23166129E-03-1.90207794E-06 3.09415962E-10-1.86174915E-14    2",
+      " 4.14694210E+04 8.80206279E-01 2.71198095E+00 6.76920203E-03 1.34829762E-06    3",
+      "-5.17293129E-09 2.19789533E-12 4.20665582E+04 9.50496771E+00 4.31787321E+04    4"
+    ]
+  }
+}

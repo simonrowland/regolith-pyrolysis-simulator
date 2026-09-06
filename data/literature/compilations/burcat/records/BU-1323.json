@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1323",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H9 isobutyl rad",
+  "cas_as_published": "4630-45-9",
+  "formula": "C4H9",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/04",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "57.11426",
+    "value": 57.11426
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.61250942E+00",
+          "value": 9.61250942
+        },
+        {
+          "as_published": "2.28581786E-02",
+          "value": 0.0228581786
+        },
+        {
+          "as_published": "-8.06391309E-06",
+          "value": -8.06391309e-06
+        },
+        {
+          "as_published": "1.28556553E-09",
+          "value": 1.28556553e-09
+        },
+        {
+          "as_published": "-7.62730799E-14",
+          "value": -7.62730799e-14
+        },
+        {
+          "as_published": "4.15218608E+03",
+          "value": 4152.18608
+        },
+        {
+          "as_published": "-2.66485099E+01",
+          "value": -26.6485099
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.34476784E+00",
+          "value": 3.34476784
+        },
+        {
+          "as_published": "2.31869650E-02",
+          "value": 0.023186965
+        },
+        {
+          "as_published": "3.28261040E-05",
+          "value": 3.2826104e-05
+        },
+        {
+          "as_published": "-5.96398514E-08",
+          "value": -5.96398514e-08
+        },
+        {
+          "as_published": "2.58980820E-11",
+          "value": 2.5898082e-11
+        },
+        {
+          "as_published": "6.66201200E+03",
+          "value": 6662.012
+        },
+        {
+          "as_published": "9.68860372E+00",
+          "value": 9.68860372
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "8.87422590E+03",
+    "value": 8874.2259,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "4630-45-9",
+    "C4H9  iso-BUTYL RADICAL CH3CH(CH3)CH2* STATWT=2  SIGMA=2  Ia=10.0033  Ib=10.6623",
+    "Ic=18.2551   FIRST ROTOR = SECOND ROTOR  ROSYM=3  V(3)=1254. cm-1  IR=0.49",
+    "NU=3255,3157,3114,3112,3110,3109,3045,3040,2913,1541,1532,1522,1518,1489,1439,",
+    "1424,1347,1338,1217,1191,1104,991,976,953,913,818,515,399,372,357,260",
+    " HF298=73.78 kJ+/-3.  REF=Burcat G3B3 calc   {HF298=70+/-4.2 kJ  HF0=94.26 kJ",
+    "REF=Wing Tsang JPCRD 19 (1990), 1-68}  Max Lst Sq Error Cp @ 6000 K 0.55%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 14262,
+    "header_line": 14269,
+    "end_line": 14272
+  },
+  "source_text": {
+    "header_line": "C4H9 isobutyl rad T 6/04C  4.H  9.   0.   0.G   200.000  6000.000  B  57.11426 1",
+    "coeff_lines": [
+      " 9.61250942E+00 2.28581786E-02-8.06391309E-06 1.28556553E-09-7.62730799E-14    2",
+      " 4.15218608E+03-2.66485099E+01 3.34476784E+00 2.31869650E-02 3.28261040E-05    3",
+      "-5.96398514E-08 2.58980820E-11 6.66201200E+03 9.68860372E+00 8.87422590E+03    4"
+    ]
+  }
+}

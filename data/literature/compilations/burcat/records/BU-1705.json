@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1705",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H12 2Me-2-Pente",
+  "cas_as_published": "625-27-4",
+  "formula": "C6H12",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/10",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "12.",
+      "element": "H",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "84.15948",
+    "value": 84.15948
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.07253352E+01",
+          "value": 10.7253352
+        },
+        {
+          "as_published": "3.46133915E-02",
+          "value": 0.0346133915
+        },
+        {
+          "as_published": "-1.23985588E-05",
+          "value": -1.23985588e-05
+        },
+        {
+          "as_published": "1.99405975E-09",
+          "value": 1.99405975e-09
+        },
+        {
+          "as_published": "-1.18968236E-13",
+          "value": -1.18968236e-13
+        },
+        {
+          "as_published": "-1.32194553E+04",
+          "value": -13219.4553
+        },
+        {
+          "as_published": "-2.81050813E+01",
+          "value": -28.1050813
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "8.96524961E+00",
+          "value": 8.96524961
+        },
+        {
+          "as_published": "-7.30015904E-03",
+          "value": -0.00730015904
+        },
+        {
+          "as_published": "1.33400236E-04",
+          "value": 0.000133400236
+        },
+        {
+          "as_published": "-1.62499260E-07",
+          "value": -1.6249926e-07
+        },
+        {
+          "as_published": "6.22491935E-11",
+          "value": 6.22491935e-11
+        },
+        {
+          "as_published": "-1.04524950E+04",
+          "value": -10452.495
+        },
+        {
+          "as_published": "-7.69362144E+00",
+          "value": -7.69362144
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-7.21713342E+03",
+    "value": -7217.13342,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "625-27-4",
+    "C6H12 2-METHYL-2-PENTEN  SIGMA=1  STATWT=1  IA=12.9587  IB=45.4263  IC=52.8319",
+    "[Ir(CH3)=0.52172  ROSYM=3  V(3)=340. cm-1]x3  Ir(C2H5)=4.5959  ROSYM=1 V(3)=994.",
+    "cm-1   Nu=3145,3126,3120,3117,3111,3085.6,3070,3065,3045,3030,3022,3017.5,1756,",
+    "1538,1529,1527,1521.5,1520,1509,1502,1451,1441,1434,1409,1354,1306,1244,1154,",
+    "1119,1104,1093,1033,1025,975,925,867,830.5,757,514,484,411,361,312,216.8",
+    "HF298=-14.342+/-2. kcal  {HF298=-15.98 kcal  REF=STULL WESTRUM & SINKE 1987",
+    "CORRECTION}  Max Lst Sq Error Cp @ 6000 K 0.62%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 18949,
+    "header_line": 18957,
+    "end_line": 18960
+  },
+  "source_text": {
+    "header_line": "C6H12 2Me-2-Pente T10/10C  6.H 12.   0.   0.G   200.000  6000.000  B  84.15948 1",
+    "coeff_lines": [
+      " 1.07253352E+01 3.46133915E-02-1.23985588E-05 1.99405975E-09-1.18968236E-13    2",
+      "-1.32194553E+04-2.81050813E+01 8.96524961E+00-7.30015904E-03 1.33400236E-04    3",
+      "-1.62499260E-07 6.22491935E-11-1.04524950E+04-7.69362144E+00-7.21713342E+03    4"
+    ]
+  }
+}

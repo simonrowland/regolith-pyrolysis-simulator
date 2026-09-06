@@ -1,0 +1,184 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2142",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C16H31O2 palmita",
+  "cas_as_published": "876656-60-9",
+  "formula": "C16H31O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/08",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "16.",
+      "element": "C",
+      "count": 16.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "31.",
+      "element": "H",
+      "count": 31.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "255.41614",
+    "value": 255.41614
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.65257026E+01",
+          "value": 36.5257026
+        },
+        {
+          "as_published": "9.65119167E-02",
+          "value": 0.0965119167
+        },
+        {
+          "as_published": "-3.52961909E-05",
+          "value": -3.52961909e-05
+        },
+        {
+          "as_published": "5.75884438E-09",
+          "value": 5.75884438e-09
+        },
+        {
+          "as_published": "-3.47087232E-13",
+          "value": -3.47087232e-13
+        },
+        {
+          "as_published": "-7.73378659E+04",
+          "value": -77337.8659
+        },
+        {
+          "as_published": "-1.61211214E+02",
+          "value": -161.211214
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.06532067E+01",
+          "value": 20.6532067
+        },
+        {
+          "as_published": "-1.71726209E-02",
+          "value": -0.0171726209
+        },
+        {
+          "as_published": "4.34603807E-04",
+          "value": 0.000434603807
+        },
+        {
+          "as_published": "-5.49704527E-07",
+          "value": -5.49704527e-07
+        },
+        {
+          "as_published": "2.14773320E-10",
+          "value": 2.1477332e-10
+        },
+        {
+          "as_published": "-6.54146724E+04",
+          "value": -65414.6724
+        },
+        {
+          "as_published": "-4.14590025E+01",
+          "value": -41.4590025
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-5.71654132E+04",
+    "value": -57165.4132,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "876656-60-9",
+    "C16H31O2 Palmytat-oxy Radical C15H31C(O)O*  SIGMA=1  STATWT=2  Ia=21.2683",
+    "Ib=1790.1072  Ic=1803.1849  Ir(-COO*)=7.258  ROSYM=1 V(3)=272. cm-1",
+    "Ir(CH3)=0.52574  ROSYM=3  V(3)=340. cm-1  Ir(C2H5-)=5.63081  ROSYM=1 V(3)=3147.",
+    "cm-1  Ir(C3H7)~7.0 (estim)  ROSYM=1  V(3)~3700. cm-1  Nu=3107.5(2),3098,3078(2),",
+    "3073,3065(2),3053(2),3048,3041.5(2),3038(2),3034(2),3031.5(2),3027(2),3021(2),",
+    "3015,3014,3011.5(2),3010(2),3007.5(2),1597,1531,1527(2),1521,1517,1513(2),1507,",
+    "1502(3),1499(2),1497(2),1467,1427,1418(2),1415.5(2),1411,1400,1384,1364,1350(2),",
+    "1344(2),1341,1336(2),1329(2),1317,1314,1294(2),1272,1269,1249,1245,1228,1221,",
+    "1213,1164,1146,1135,1110,1074,1071(2),1078(2),1065,1060,1050,1033.5(2)1020,1009,",
+    "993,987,984,949,904(2),901,860,821,787,762,746,738,736(3),622,543,517,514,486,",
+    "454,424,367,349,277,255,248,203,175(2),159,153,150,134,124(2),104,92.15,89.84,",
+    "72.14,59.3,48.21,42.36   HF298=113.6 kcal  REF=Osmont,Catoire et al Comb & Flame",
+    "2008   from B3LYP/6-31G(d,p)  Max Lst Sq Error Cp @ 200 K and 1300 K 0.68%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24514,
+    "header_line": 24528,
+    "end_line": 24531
+  },
+  "source_text": {
+    "header_line": "C16H31O2 palmita  T 7/08C 16.H 31.O  2.   0.G   200.000  6000.000  C 255.41614 1",
+    "coeff_lines": [
+      " 3.65257026E+01 9.65119167E-02-3.52961909E-05 5.75884438E-09-3.47087232E-13    2",
+      "-7.73378659E+04-1.61211214E+02 2.06532067E+01-1.71726209E-02 4.34603807E-04    3",
+      "-5.49704527E-07 2.14773320E-10-6.54146724E+04-4.14590025E+01-5.71654132E+04    4"
+    ]
+  }
+}

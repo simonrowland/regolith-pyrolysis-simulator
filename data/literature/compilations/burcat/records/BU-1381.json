@@ -1,0 +1,175 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1381",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C5F6   CycloPerF",
+  "cas_as_published": "699-39-8",
+  "formula": "C5F6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T10/08",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 5.",
+      "element": "C",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": " 6.",
+      "element": "F",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "174.04392",
+    "value": 174.04392
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.11652976E+01",
+          "value": 21.1652976
+        },
+        {
+          "as_published": "9.87525990E-03",
+          "value": 0.0098752599
+        },
+        {
+          "as_published": "-3.82244442E-06",
+          "value": -3.82244442e-06
+        },
+        {
+          "as_published": "6.47724073E-10",
+          "value": 6.47724073e-10
+        },
+        {
+          "as_published": "-4.00808323E-14",
+          "value": -4.00808323e-14
+        },
+        {
+          "as_published": "-1.20271707E+05",
+          "value": -120271.707
+        },
+        {
+          "as_published": "-7.91397136E+01",
+          "value": -79.1397136
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.04486174E+00",
+          "value": 3.04486174
+        },
+        {
+          "as_published": "6.62763483E-02",
+          "value": 0.0662763483
+        },
+        {
+          "as_published": "-7.30154024E-05",
+          "value": -7.30154024e-05
+        },
+        {
+          "as_published": "4.11912388E-08",
+          "value": 4.11912388e-08
+        },
+        {
+          "as_published": "-9.67129009E-12",
+          "value": -9.67129009e-12
+        },
+        {
+          "as_published": "-1.15497133E+05",
+          "value": -115497.133
+        },
+        {
+          "as_published": "1.31205110E+01",
+          "value": 13.120511
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.12211781E+05",
+    "value": -112211.781,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "699-39-8",
+    "C5F6  PerfluoroCycloPentadiene  SIGMA=2  STATWT-1  IA=65.8686  IB=71.9124",
+    "IC=122.6624  Nu=1835,1815,1430,1409,1361,1201.5,1167,1151,1016,1005.5,809,649.5,",
+    "646.5,627,547,482.5,450,439,401.6,319,256,236,233.4,187.7,172.1,102.4,94.35",
+    "HF298=-222.989+/-2. kcal  REF=Burcat G3B3.  Max Lst Sq Error Cp @ 1300 K 0.47%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 15038,
+    "header_line": 15043,
+    "end_line": 15046
+  },
+  "source_text": {
+    "header_line": "C5F6   CycloPerF  T10/08C  5.F  6.   0.   0.G   200.000  6000.000  B 174.04392 1",
+    "coeff_lines": [
+      " 2.11652976E+01 9.87525990E-03-3.82244442E-06 6.47724073E-10-4.00808323E-14    2",
+      "-1.20271707E+05-7.91397136E+01 3.04486174E+00 6.62763483E-02-7.30154024E-05    3",
+      " 4.11912388E-08-9.67129009E-12-1.15497133E+05 1.31205110E+01-1.12211781E+05    4"
+    ]
+  }
+}

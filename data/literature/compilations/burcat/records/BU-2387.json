@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2387",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "SiD3- anion",
+  "cas_as_published": "54637-68-2",
+  "formula": "SiD3E",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/18",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SI",
+      "count_as_published": " 1.",
+      "element": "Si",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "D ",
+      "count_as_published": " 3.",
+      "element": "D",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "34.12835",
+    "value": 34.12835
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "6.75038166E+00",
+          "value": 6.75038166
+        },
+        {
+          "as_published": "3.28299100E-03",
+          "value": 0.003282991
+        },
+        {
+          "as_published": "-1.27512834E-06",
+          "value": -1.27512834e-06
+        },
+        {
+          "as_published": "2.16528719E-10",
+          "value": 2.16528719e-10
+        },
+        {
+          "as_published": "-1.34171665E-14",
+          "value": -1.34171665e-14
+        },
+        {
+          "as_published": "1.88383008E+03",
+          "value": 1883.83008
+        },
+        {
+          "as_published": "-1.35096665E+01",
+          "value": -13.5096665
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.78361340E+00",
+          "value": 1.7836134
+        },
+        {
+          "as_published": "1.45318127E-02",
+          "value": 0.0145318127
+        },
+        {
+          "as_published": "-6.68151537E-06",
+          "value": -6.68151537e-06
+        },
+        {
+          "as_published": "-3.49065997E-09",
+          "value": -3.49065997e-09
+        },
+        {
+          "as_published": "2.81810509E-12",
+          "value": 2.81810509e-12
+        },
+        {
+          "as_published": "3.38880921E+03",
+          "value": 3388.80921
+        },
+        {
+          "as_published": "1.27817739E+01",
+          "value": 12.7817739
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.50188887E+03",
+    "value": 4501.88887,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "54637-68-2",
+    "SiD3-  Silane d3 anion  SIGMA=3  STATWT=1  A=1.9507  B=1.9490  C=1.6367",
+    "Nu=1365(2),1364,703.8(2),672  HF298=37.431+/-8. kJ  thermal electron  REF=Burcat",
+    "based on HF0(SiH3-)=64.053+/-8 kJ G3B3  Max Lst Sq Error @ 1300 K 0.49%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 27132,
+    "header_line": 27136,
+    "end_line": 27139
+  },
+  "source_text": {
+    "header_line": "SiD3- anion       T 3/18SI 1.D  3.E  1.   0.G   298.150  6000.000  B  34.12835 1",
+    "coeff_lines": [
+      " 6.75038166E+00 3.28299100E-03-1.27512834E-06 2.16528719E-10-1.34171665E-14    2",
+      " 1.88383008E+03-1.35096665E+01 1.78361340E+00 1.45318127E-02-6.68151537E-06    3",
+      "-3.49065997E-09 2.81810509E-12 3.38880921E+03 1.27817739E+01 4.50188887E+03    4"
+    ]
+  }
+}

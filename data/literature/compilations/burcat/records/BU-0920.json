@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0920",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CNC  Radical",
+  "cas_as_published": "53590-27-5",
+  "formula": "C2N",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "ATcT/A",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 2.",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "38.02814",
+    "value": 38.02814
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.93219820E+00",
+          "value": 5.9321982
+        },
+        {
+          "as_published": "1.57955995E-03",
+          "value": 0.00157955995
+        },
+        {
+          "as_published": "-6.12495852E-07",
+          "value": -6.12495852e-07
+        },
+        {
+          "as_published": "1.03897382E-10",
+          "value": 1.03897382e-10
+        },
+        {
+          "as_published": "-6.43334740E-15",
+          "value": -6.4333474e-15
+        },
+        {
+          "as_published": "7.92421706E+04",
+          "value": 79242.1706
+        },
+        {
+          "as_published": "-6.60234593E+00",
+          "value": -6.60234593
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.98662721E+00",
+          "value": 3.98662721
+        },
+        {
+          "as_published": "5.23128299E-03",
+          "value": 0.00523128299
+        },
+        {
+          "as_published": "-6.00388565E-07",
+          "value": -6.00388565e-07
+        },
+        {
+          "as_published": "-3.37882585E-09",
+          "value": -3.37882585e-09
+        },
+        {
+          "as_published": "1.75803055E-12",
+          "value": 1.75803055e-12
+        },
+        {
+          "as_published": "7.98756324E+04",
+          "value": 79875.6324
+        },
+        {
+          "as_published": "3.89919746E+00",
+          "value": 3.89919746
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "8.12856079E+04",
+    "value": 81285.6079,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "53590-27-5",
+    "CNC RADICAL  SIGMA=2 STATWT=2  IB=6.173  NU=1100,157.4,1453,275.9",
+    "T0=26.41     SIGMA=2 STATWT=2  IB=6.173  NU=1100,270.4,1453,484.6 REF=Gurvich 91",
+    "HF298=675.85+/-5.89 kJ  REF=ATcT A  {HF298=674.70+/-3.9 kJ  REF=ATcT C 2011;",
+    "HF298=654.94+/-40 kJ  REF=Gurvich 91;  HF298=472.79 kJ  REF=JANAF 70}  Max Lst",
+    "Sq Error Cp @ 1300 K 0.30%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 9626,
+    "header_line": 9632,
+    "end_line": 9635
+  },
+  "source_text": {
+    "header_line": "CNC  Radical      ATcT/AC  2.N  1.   0.   0.G   200.000  6000.000  B  38.02814 1",
+    "coeff_lines": [
+      " 5.93219820E+00 1.57955995E-03-6.12495852E-07 1.03897382E-10-6.43334740E-15    2",
+      " 7.92421706E+04-6.60234593E+00 3.98662721E+00 5.23128299E-03-6.00388565E-07    3",
+      "-3.37882585E-09 1.75803055E-12 7.98756324E+04 3.89919746E+00 8.12856079E+04    4"
+    ]
+  }
+}

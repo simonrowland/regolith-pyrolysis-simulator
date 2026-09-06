@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1573",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H4Cl2 p-Dichlo",
+  "cas_as_published": "106-46-7",
+  "formula": "C6H4Cl2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/05",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 2.",
+      "element": "Cl",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "147.00136",
+    "value": 147.00136
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.56102383E+01",
+          "value": 15.6102383
+        },
+        {
+          "as_published": "1.66825121E-02",
+          "value": 0.0166825121
+        },
+        {
+          "as_published": "-6.07673267E-06",
+          "value": -6.07673267e-06
+        },
+        {
+          "as_published": "9.90708114E-10",
+          "value": 9.90708114e-10
+        },
+        {
+          "as_published": "-5.97321375E-14",
+          "value": -5.97321375e-14
+        },
+        {
+          "as_published": "-3.95782009E+03",
+          "value": -3957.82009
+        },
+        {
+          "as_published": "-5.62355474E+01",
+          "value": -56.2355474
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.28623807E+00",
+          "value": 1.28623807
+        },
+        {
+          "as_published": "4.35301026E-02",
+          "value": 0.0435301026
+        },
+        {
+          "as_published": "1.98096846E-06",
+          "value": 1.98096846e-06
+        },
+        {
+          "as_published": "-4.18589946E-08",
+          "value": -4.18589946e-08
+        },
+        {
+          "as_published": "2.22086792E-11",
+          "value": 2.22086792e-11
+        },
+        {
+          "as_published": "5.15227899E+02",
+          "value": 515.227899
+        },
+        {
+          "as_published": "2.05508309E+01",
+          "value": 20.5508309
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.77876243E+03",
+    "value": 2778.76243,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "106-46-7",
+    "C6H4Cl2 p-Dichlorobenzene  SIGMA=4  STATWT=1 IA=14.4842 IB=127.0766  IC=141.9161",
+    "Nu=3234,3232,3221,3219,1635,1628,1523,1437,1329,1327,1208,1135,1111,1109,1026,",
+    "960,955,830,828,756,697,641,543,495,421,357,329,297,221,103.1  HF298=23.1 kJ",
+    "HF0=35.49 kJ  REF=Burcat G3B3  {HF298=22.5+/-1.5 kJ  REF=Pedley Naylor & Kirby",
+    "1986  HF298=23.0  kJ  REF=Stull Westrum & Sinke 1969  HF298=24.6 kJ experiment.",
+    "REF=Platonov Simulin Rus JPC (Eng)58,(1984),1630;  HF298=21.2 kJ G3X atomiz to",
+    "24.8 kJ G3X isod.  REF=Wang & Pilling JPC A 112,(2008),1832}  Max Lst Sq Error",
+    "Cp @ 1300 K 0.49%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17354,
+    "header_line": 17363,
+    "end_line": 17366
+  },
+  "source_text": {
+    "header_line": "C6H4Cl2 p-Dichlo  T12/05C  6.H  4.CL 2.   0.G   200.000  6000.000  B 147.00136 1",
+    "coeff_lines": [
+      " 1.56102383E+01 1.66825121E-02-6.07673267E-06 9.90708114E-10-5.97321375E-14    2",
+      "-3.95782009E+03-5.62355474E+01 1.28623807E+00 4.35301026E-02 1.98096846E-06    3",
+      "-4.18589946E-08 2.22086792E-11 5.15227899E+02 2.05508309E+01 2.77876243E+03    4"
+    ]
+  }
+}

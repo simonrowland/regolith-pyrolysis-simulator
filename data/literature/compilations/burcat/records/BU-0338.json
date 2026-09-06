@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0338",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CH2 TRIPLET RAD",
+  "cas_as_published": "2465-56-7",
+  "formula": "CH2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "IU3/03",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 2.",
+      "element": "H",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "14.02658",
+    "value": 14.02658
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.14631886E+00",
+          "value": 3.14631886
+        },
+        {
+          "as_published": "3.03671259E-03",
+          "value": 0.00303671259
+        },
+        {
+          "as_published": "-9.96474439E-07",
+          "value": -9.96474439e-07
+        },
+        {
+          "as_published": "1.50483580E-10",
+          "value": 1.5048358e-10
+        },
+        {
+          "as_published": "-8.57335515E-15",
+          "value": -8.57335515e-15
+        },
+        {
+          "as_published": "4.60412605E+04",
+          "value": 46041.2605
+        },
+        {
+          "as_published": "4.72341711E+00",
+          "value": 4.72341711
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.71757846E+00",
+          "value": 3.71757846
+        },
+        {
+          "as_published": "1.27391260E-03",
+          "value": 0.0012739126
+        },
+        {
+          "as_published": "2.17347251E-06",
+          "value": 2.17347251e-06
+        },
+        {
+          "as_published": "-3.48858500E-09",
+          "value": -3.488585e-09
+        },
+        {
+          "as_published": "1.65208866E-12",
+          "value": 1.65208866e-12
+        },
+        {
+          "as_published": "4.58723866E+04",
+          "value": 45872.3866
+        },
+        {
+          "as_published": "1.75297945E+00",
+          "value": 1.75297945
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.70504920E+04",
+    "value": 47050.492,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "2465-56-7",
+    "CH2 METHYLENE RAD TRIPLET This is for applications where triplet methylene is",
+    "not equilibrated with single methylene. Only HF0 is identical to the one given",
+    "for the equilibrium Singlet and Triplet. HF298 is o,oo5 kJ lower than given for",
+    "the equilibrium HF1000=1.1 kJ lower and HF3000 is 6.8 kJ lower than the",
+    "equilibrium    STATWT=3 SIGMA=2   A0=73.811  B0=8.450  C0=7.184   NU=3031,963,",
+    "3190  T0=3500  SIGMA=2   HF298=391.2+/-1.6   HF0=390.7 +/-1.6 kJ  REF=Ruscic et",
+    "al JPCRD 2003 IUPAC Task Group {HF298=391.46+/-0.13  REF=ATcT C}  Max Lst Sq",
+    "Error Cp @ 6000 K 0.27%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 3362,
+    "header_line": 3371,
+    "end_line": 3374
+  },
+  "source_text": {
+    "header_line": "CH2 TRIPLET RAD   IU3/03C  1.H  2.   0.   0.G   200.000  6000.000  B  14.02658 1",
+    "coeff_lines": [
+      " 3.14631886E+00 3.03671259E-03-9.96474439E-07 1.50483580E-10-8.57335515E-15    2",
+      " 4.60412605E+04 4.72341711E+00 3.71757846E+00 1.27391260E-03 2.17347251E-06    3",
+      "-3.48858500E-09 1.65208866E-12 4.58723866E+04 1.75297945E+00 4.70504920E+04    4"
+    ]
+  }
+}

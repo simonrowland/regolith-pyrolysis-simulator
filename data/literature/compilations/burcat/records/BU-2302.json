@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2302",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Cr",
+  "cas_as_published": "7440-47-3",
+  "formula": "Cr",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "g 7/97",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "CR",
+      "count_as_published": " 1.",
+      "element": "Cr",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "51.99610",
+    "value": 51.9961
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.92666560E+00",
+          "value": 2.9266656
+        },
+        {
+          "as_published": "-1.15686880E-03",
+          "value": -0.0011568688
+        },
+        {
+          "as_published": "9.15715739E-07",
+          "value": 9.15715739e-07
+        },
+        {
+          "as_published": "-1.94664197E-10",
+          "value": -1.94664197e-10
+        },
+        {
+          "as_published": "1.50118710E-14",
+          "value": 1.5011871e-14
+        },
+        {
+          "as_published": "4.69529384E+04",
+          "value": 46952.9384
+        },
+        {
+          "as_published": "4.53441621E+00",
+          "value": 4.53441621
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.50263130E+00",
+          "value": 2.5026313
+        },
+        {
+          "as_published": "-2.83283701E-05",
+          "value": -2.83283701e-05
+        },
+        {
+          "as_published": "1.06886461E-07",
+          "value": 1.06886461e-07
+        },
+        {
+          "as_published": "-1.66193236E-10",
+          "value": -1.66193236e-10
+        },
+        {
+          "as_published": "9.08640563E-14",
+          "value": 9.08640563e-14
+        },
+        {
+          "as_published": "4.70600240E+04",
+          "value": 47060.024
+        },
+        {
+          "as_published": "6.71096221E+00",
+          "value": 6.71096221
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.78055833E+04",
+    "value": 47805.5833,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "7440-47-3",
+    "Cr Gaseous Atomic levels from NIST 97  HF298=397.48 +/- 4.2 kJ  REF=JANAF 79",
+    "Transition from Liquid to Gas at 2952 K  Max Lst Sq Error Cp @ 1600 K ***2.0%***"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "xml_coefficient_mismatch",
+      "xml_formula": "Cr",
+      "xml_cas": "7440-47-3",
+      "note": "BURCAT_THR.xml (2005 snapshot) coefficients differ from this BURCAT.THR.txt record. THR tokens retained."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 26406,
+    "header_line": 26409,
+    "end_line": 26412
+  },
+  "source_text": {
+    "header_line": "Cr                g 7/97CR 1.   0.   0.   0.G   200.000  6000.000  B  51.99610 1",
+    "coeff_lines": [
+      " 2.92666560E+00-1.15686880E-03 9.15715739E-07-1.94664197E-10 1.50118710E-14    2",
+      " 4.69529384E+04 4.53441621E+00 2.50263130E+00-2.83283701E-05 1.06886461E-07    3",
+      "-1.66193236E-10 9.08640563E-14 4.70600240E+04 6.71096221E+00 4.78055833E+04    4"
+    ]
+  }
+}

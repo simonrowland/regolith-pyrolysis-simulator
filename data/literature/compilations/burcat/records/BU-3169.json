@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3169",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "SO2+ Sulfur diox",
+  "cas_as_published": "12439-77-9",
+  "formula": "SO2E-1",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "S ",
+      "count_as_published": " 1.",
+      "element": "S",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": "-1.",
+      "element": "E",
+      "count": -1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "64.06425",
+    "value": 64.06425
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.73559238E+00",
+          "value": 5.73559238
+        },
+        {
+          "as_published": "1.28999577E-03",
+          "value": 0.00128999577
+        },
+        {
+          "as_published": "-5.03917200E-07",
+          "value": -5.039172e-07
+        },
+        {
+          "as_published": "8.58794176E-11",
+          "value": 8.58794176e-11
+        },
+        {
+          "as_published": "-5.33444132E-15",
+          "value": -5.33444132e-15
+        },
+        {
+          "as_published": "1.08005985E+05",
+          "value": 108005.985
+        },
+        {
+          "as_published": "-2.87994056E+00",
+          "value": -2.87994056
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.08118569E+00",
+          "value": 3.08118569
+        },
+        {
+          "as_published": "8.12102170E-03",
+          "value": 0.0081210217
+        },
+        {
+          "as_published": "-5.59557414E-06",
+          "value": -5.59557414e-06
+        },
+        {
+          "as_published": "1.00283191E-10",
+          "value": 1.00283191e-10
+        },
+        {
+          "as_published": "8.95299492E-13",
+          "value": 8.95299492e-13
+        },
+        {
+          "as_published": "1.08758370E+05",
+          "value": 108758.37
+        },
+        {
+          "as_published": "1.09408941E+01",
+          "value": 10.9408941
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.09989164E+05",
+    "value": 109989.164,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "12439-77-9",
+    "SO2+ Sulfur sioxide cation  SIGMA=2  STATWT=2  IA=0.996  IB=9.2667  IC=10.2627",
+    "Nu=1134,1067,407  HF298-914.506+/-8 kJ  Thermal electron  REF=Burcat G3B3",
+    "Max Lst Sq Error Cp @ 1300 K 0.28%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 33739,
+    "header_line": 33743,
+    "end_line": 33746
+  },
+  "source_text": {
+    "header_line": "SO2+ Sulfur diox  T 1/16S  1.O  2.E -1.   0.G   298.150  6000.000  B  64.06425 1",
+    "coeff_lines": [
+      " 5.73559238E+00 1.28999577E-03-5.03917200E-07 8.58794176E-11-5.33444132E-15    2",
+      " 1.08005985E+05-2.87994056E+00 3.08118569E+00 8.12102170E-03-5.59557414E-06    3",
+      " 1.00283191E-10 8.95299492E-13 1.08758370E+05 1.09408941E+01 1.09989164E+05    4"
+    ]
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1271",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H6S 2,5-dihydro",
+  "cas_as_published": "1708-32-3",
+  "formula": "C4H6S",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/08",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": " 1.",
+      "element": "S",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "86.15644",
+    "value": 86.15644
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.89336841E+00",
+          "value": 9.89336841
+        },
+        {
+          "as_published": "1.87378997E-02",
+          "value": 0.0187378997
+        },
+        {
+          "as_published": "-6.72430231E-06",
+          "value": -6.72430231e-06
+        },
+        {
+          "as_published": "1.08492918E-09",
+          "value": 1.08492918e-09
+        },
+        {
+          "as_published": "-6.49267637E-14",
+          "value": -6.49267637e-14
+        },
+        {
+          "as_published": "5.44631693E+03",
+          "value": 5446.31693
+        },
+        {
+          "as_published": "-2.87652992E+01",
+          "value": -28.7652992
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.98862196E+00",
+          "value": 1.98862196
+        },
+        {
+          "as_published": "1.54518509E-02",
+          "value": 0.0154518509
+        },
+        {
+          "as_published": "5.98446831E-05",
+          "value": 5.98446831e-05
+        },
+        {
+          "as_published": "-9.50791936E-08",
+          "value": -9.50791936e-08
+        },
+        {
+          "as_published": "4.07210059E-11",
+          "value": 4.07210059e-11
+        },
+        {
+          "as_published": "8.68827016E+03",
+          "value": 8688.27016
+        },
+        {
+          "as_published": "1.76985354E+01",
+          "value": 17.6985354
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.03280188E+04",
+    "value": 10328.0188,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1708-32-3",
+    "C4H6S  2,5-DIHYDROTHIOPHEN  SIGMA=2 STATWT=1  IA=12.7833  IB=17.7847  IC=29.5201",
+    "Nu=3205,3183,3084(2),3051(2),1727,1519,1515,1378,1308,1269,1157,1153,1145,",
+    "978(2),962,956,917,825,709,684,634,515,379,107.6  HF298=85.872 kJ  REF=Burcat",
+    "G3B3  {HF298=86.9 kJ  REF=DOROFEEVA & GURVICH JPCRD 24,(1995),1351;  HF298=87.3",
+    "+/-1.2 kJ  REF=Davies @ Sunner Acta Chem. Scand. 16,(1962),1870}   Max Lst Sq",
+    "Error Cp @ 200 K 0.92%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 13629,
+    "header_line": 13636,
+    "end_line": 13639
+  },
+  "source_text": {
+    "header_line": "C4H6S 2,5-dihydro T11/08C  4.H  6.S  1.   0.G   200.000  6000.000  B  86.15644 1",
+    "coeff_lines": [
+      " 9.89336841E+00 1.87378997E-02-6.72430231E-06 1.08492918E-09-6.49267637E-14    2",
+      " 5.44631693E+03-2.87652992E+01 1.98862196E+00 1.54518509E-02 5.98446831E-05    3",
+      "-9.50791936E-08 4.07210059E-11 8.68827016E+03 1.76985354E+01 1.03280188E+04    4"
+    ]
+  }
+}

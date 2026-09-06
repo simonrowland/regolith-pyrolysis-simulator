@@ -1,0 +1,184 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1227",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H4S Thiophene",
+  "cas_as_published": "110-02-1",
+  "formula": "C4H4S",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/08",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": " 1.",
+      "element": "S",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "84.14056",
+    "value": 84.14056
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.03361826E+01",
+          "value": 10.3361826
+        },
+        {
+          "as_published": "1.31485053E-02",
+          "value": 0.0131485053
+        },
+        {
+          "as_published": "-4.75133341E-06",
+          "value": -4.75133341e-06
+        },
+        {
+          "as_published": "7.70340569E-10",
+          "value": 7.70340569e-10
+        },
+        {
+          "as_published": "-4.62622484E-14",
+          "value": -4.62622484e-14
+        },
+        {
+          "as_published": "9.27498508E+03",
+          "value": 9274.98508
+        },
+        {
+          "as_published": "-3.14802901E+01",
+          "value": -31.4802901
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-5.33957207E-01",
+          "value": -0.533957207
+        },
+        {
+          "as_published": "3.04279352E-02",
+          "value": 0.0304279352
+        },
+        {
+          "as_published": "1.57128978E-05",
+          "value": 1.57128978e-05
+        },
+        {
+          "as_published": "-5.21636551E-08",
+          "value": -5.21636551e-08
+        },
+        {
+          "as_published": "2.60142121E-11",
+          "value": 2.60142121e-11
+        },
+        {
+          "as_published": "1.27054036E+04",
+          "value": 12705.4036
+        },
+        {
+          "as_published": "2.72259765E+01",
+          "value": 27.2259765
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.39466499E+04",
+    "value": 13946.6499,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "110-02-1",
+    "C4H4S THIOPHENE (CY)  SIGMA=2 IA=10.5311  IB=15.6737  IC=26.2048   NU=3126,3125,",
+    "3098(2),1507,1409,1360,1256,1085,1083,1036,898,872,867,839,751,712,683,608,565,",
+    "452  HF298=115.96 kJ  REF=Burcat G3B3  {HF298=114.9 kJ  REF=Dorofeeva & Gurvich",
+    "JPCRD 24,(1995),1351;  HF298=116.4 kJ REF=Sunner Acta Chem Scand 17,(1963),728 ;",
+    "HF298=115.0+/-1 kJ  REF=Hubbard Scott et al JACS 77,(1955),5855}  Max Lst Sq",
+    "Error Cp @ 200 K 0.99%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "xml_coefficient_mismatch",
+      "xml_formula": "C4H4S Thiophene",
+      "xml_cas": "110-02-1",
+      "note": "BURCAT_THR.xml (2005 snapshot) coefficients differ from this BURCAT.THR.txt record. THR tokens retained."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 13109,
+    "header_line": 13116,
+    "end_line": 13119
+  },
+  "source_text": {
+    "header_line": "C4H4S Thiophene   T11/08C  4.H  4.S  1.   0.G   200.000  6000.000  B  84.14056 1",
+    "coeff_lines": [
+      " 1.03361826E+01 1.31485053E-02-4.75133341E-06 7.70340569E-10-4.62622484E-14    2",
+      " 9.27498508E+03-3.14802901E+01-5.33957207E-01 3.04279352E-02 1.57128978E-05    3",
+      "-5.21636551E-08 2.60142121E-11 1.27054036E+04 2.72259765E+01 1.39466499E+04    4"
+    ]
+  }
+}

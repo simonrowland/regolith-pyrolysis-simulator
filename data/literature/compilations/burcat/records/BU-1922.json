@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1922",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C9H10 2-MeStyrene",
+  "cas_as_published": "611-15-4",
+  "formula": "C9H10",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/13",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 9.",
+      "element": "C",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "10.",
+      "element": "H",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "118.17570",
+    "value": 118.1757
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.70142685E+01",
+          "value": 17.0142685
+        },
+        {
+          "as_published": "3.33123226E-02",
+          "value": 0.0333123226
+        },
+        {
+          "as_published": "-1.19644494E-05",
+          "value": -1.19644494e-05
+        },
+        {
+          "as_published": "1.93164844E-09",
+          "value": 1.93164844e-09
+        },
+        {
+          "as_published": "-1.15655512E-13",
+          "value": -1.15655512e-13
+        },
+        {
+          "as_published": "2.49641437E+04",
+          "value": 24964.1437
+        },
+        {
+          "as_published": "-6.68703478E+01",
+          "value": -66.8703478
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.37082224E+00",
+          "value": 2.37082224
+        },
+        {
+          "as_published": "3.86312672E-02",
+          "value": 0.0386312672
+        },
+        {
+          "as_published": "6.77432382E-05",
+          "value": 6.77432382e-05
+        },
+        {
+          "as_published": "-1.21070857E-07",
+          "value": -1.21070857e-07
+        },
+        {
+          "as_published": "5.25036636E-11",
+          "value": 5.25036636e-11
+        },
+        {
+          "as_published": "3.06056509E+04",
+          "value": 30605.6509
+        },
+        {
+          "as_published": "1.69562120E+01",
+          "value": 16.956212
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.34135866E+04",
+    "value": 33413.5866,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "611-15-4",
+    "C9H10 1-Ethynyl-2-Methyl Benzene  (2-Methyl-Styrene)  SIGMA=1  STATWT=1",
+    "IA=33.5947  IB=54.7866  IC=87.1211  Ir(CH3)=0.5214  ROSYM=3  V(3)=~700. cm-1",
+    "Nu=3245,3207,3196,3184,3173,3168,3158,3126,3091.5,3036,1705,1658.5,1625,1530,",
+    "1512.5,1500,1485.5,1462,1429,1356,1334,1319,1249,1211,1191.5.1127,1089,1063,",
+    "1047,1034,1012,987,952,933,884.5,832,793,750(2),663,601,528,497,480,435,344.5,",
+    "257,225,161.5,153  REF=Burcat B3LYP/6-31G(d,p)  {HF298=66.4 kcal  REF=NIST 94",
+    "{HF298=66.94 kcal  REF=Green RMG 2013;  HF298=65.0 kcal REF=Liebmann 1988}",
+    "Max Lst Sq Error Cp @ 200 & 6000 K 0.56%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 21667,
+    "header_line": 21676,
+    "end_line": 21679
+  },
+  "source_text": {
+    "header_line": "C9H10 2-MeStyrene T11/13C  9.H 10.   0.   0.G   200.000  6000.000  B 118.17570 1",
+    "coeff_lines": [
+      " 1.70142685E+01 3.33123226E-02-1.19644494E-05 1.93164844E-09-1.15655512E-13    2",
+      " 2.49641437E+04-6.68703478E+01 2.37082224E+00 3.86312672E-02 6.77432382E-05    3",
+      "-1.21070857E-07 5.25036636E-11 3.06056509E+04 1.69562120E+01 3.34135866E+04    4"
+    ]
+  }
+}

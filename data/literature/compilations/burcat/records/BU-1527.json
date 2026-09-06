@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1527",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6CL6- Hexachlor",
+  "cas_as_published": "63730-01-8",
+  "formula": "C6Cl6E",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/21",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 6.",
+      "element": "Cl",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "284.78095",
+    "value": 284.78095
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.67740404E+01",
+          "value": 26.7740404
+        },
+        {
+          "as_published": "7.34112615E-03",
+          "value": 0.00734112615
+        },
+        {
+          "as_published": "-2.86148784E-06",
+          "value": -2.86148784e-06
+        },
+        {
+          "as_published": "4.87067398E-10",
+          "value": 4.87067398e-10
+        },
+        {
+          "as_published": "-3.02317859E-14",
+          "value": -3.02317859e-14
+        },
+        {
+          "as_published": "-2.54674125E+04",
+          "value": -25467.4125
+        },
+        {
+          "as_published": "-9.89417102E+01",
+          "value": -98.9417102
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "6.76335253E+00",
+          "value": 6.76335253
+        },
+        {
+          "as_published": "7.89424557E-02",
+          "value": 0.0789424557
+        },
+        {
+          "as_published": "-1.06393942E-04",
+          "value": -0.000106393942
+        },
+        {
+          "as_published": "7.20791483E-08",
+          "value": 7.20791483e-08
+        },
+        {
+          "as_published": "-1.96805006E-11",
+          "value": -1.96805006e-11
+        },
+        {
+          "as_published": "-2.07145379E+04",
+          "value": -20714.5379
+        },
+        {
+          "as_published": "5.00662148E-01",
+          "value": 0.500662148
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.59961321E+04",
+    "value": -15996.1321,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "63730-01-8",
+    "C6Cl6- Hexachlorobenzene anion  SIGMA=12  STATWT=2  IA=191.1364  IB=193.9028",
+    "IC=369.7114  Nu=1562,1478,1409,1255,1232,1067,919,781,700,660,612.5,533,526,487,",
+    "479,345,328,307,291,286,285,209,199,190,187,180,133,62,58,9,4 REF=Burcat B3LYP/ ",
+    "6-31G(d)  HF298=-133.+/-9.6 kJ  REF=Knighton, Bognar, Grimsrud, J Mass Spectrom",
+    "30(4),(1995),557 thermal electron? {G3B3 calc failed}. Reported by Webbook.",
+    "Max Lst Sq Error Cp @ 1300 K  0.32%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 16818,
+    "header_line": 16825,
+    "end_line": 16828
+  },
+  "source_text": {
+    "header_line": "C6CL6- Hexachlor  T 3/21C  6.CL 6.E  1.   0.G   298.150  6000.000  C 284.78095 1",
+    "coeff_lines": [
+      " 2.67740404E+01 7.34112615E-03-2.86148784E-06 4.87067398E-10-3.02317859E-14    2",
+      "-2.54674125E+04-9.89417102E+01 6.76335253E+00 7.89424557E-02-1.06393942E-04    3",
+      " 7.20791483E-08-1.96805006E-11-2.07145379E+04 5.00662148E-01-1.59961321E+04    4"
+    ]
+  }
+}

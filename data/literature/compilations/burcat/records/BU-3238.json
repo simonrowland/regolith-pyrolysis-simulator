@@ -1,0 +1,174 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3238",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "SiF3H+  TriFluor",
+  "cas_as_published": "80003-38-9",
+  "formula": "SiF3HE-1",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/17",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SI",
+      "count_as_published": " 1.",
+      "element": "Si",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": " 3.",
+      "element": "F",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 1.",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": "-1.",
+      "element": "E",
+      "count": -1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "86.08810",
+    "value": 86.0881
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.07291262E+01",
+          "value": 10.7291262
+        },
+        {
+          "as_published": "2.33065477E-03",
+          "value": 0.00233065477
+        },
+        {
+          "as_published": "-9.13794870E-07",
+          "value": -9.1379487e-07
+        },
+        {
+          "as_published": "1.56111074E-10",
+          "value": 1.56111074e-10
+        },
+        {
+          "as_published": "-9.71334357E-15",
+          "value": -9.71334357e-15
+        },
+        {
+          "as_published": "5.06716845E+03",
+          "value": 5067.16845
+        },
+        {
+          "as_published": "-2.77837000E+01",
+          "value": -27.7837
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.15574206E+00",
+          "value": 3.15574206
+        },
+        {
+          "as_published": "2.90373802E-02",
+          "value": 0.0290373802
+        },
+        {
+          "as_published": "-3.82126606E-05",
+          "value": -3.82126606e-05
+        },
+        {
+          "as_published": "2.46103930E-08",
+          "value": 2.4610393e-08
+        },
+        {
+          "as_published": "-6.29847085E-12",
+          "value": -6.29847085e-12
+        },
+        {
+          "as_published": "6.86432611E+03",
+          "value": 6864.32611
+        },
+        {
+          "as_published": "9.89485357E+00",
+          "value": 9.89485357
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "8.80388622E+03",
+    "value": 8803.88622,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "80003-38-9",
+    "SiF3H+  TriFluoroSilane cation  SIGMA=3  STATWT=2  IA=11.9503  IB=11.9629",
+    "IC=22.4721  Nu=1141(2),910,797,349,316.8(2),264.1(2)  HF298=73.2+/-8. kJ thermal",
+    "electron  REF=Burcat G3B3  Max Lst Sq Error Cp @ 1300 K 0.28%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 34388,
+    "header_line": 34392,
+    "end_line": 34395
+  },
+  "source_text": {
+    "header_line": "SiF3H+  TriFluor  T12/17SI 1.F  3.H  1.E -1.G   298.150  6000.000  B  86.08810 1",
+    "coeff_lines": [
+      " 1.07291262E+01 2.33065477E-03-9.13794870E-07 1.56111074E-10-9.71334357E-15    2",
+      " 5.06716845E+03-2.77837000E+01 3.15574206E+00 2.90373802E-02-3.82126606E-05    3",
+      " 2.46103930E-08-6.29847085E-12 6.86432611E+03 9.89485357E+00 8.80388622E+03    4"
+    ]
+  }
+}

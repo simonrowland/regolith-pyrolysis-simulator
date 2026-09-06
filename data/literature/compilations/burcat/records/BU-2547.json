@@ -1,0 +1,182 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2547",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "HS2  RRHO",
+  "cas_as_published": "14541-24-3",
+  "formula": "HS2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 4/02",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 1.",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": " 2.",
+      "element": "S",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "65.13994",
+    "value": 65.13994
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.00284875E+00",
+          "value": 5.00284875
+        },
+        {
+          "as_published": "1.53333839E-03",
+          "value": 0.00153333839
+        },
+        {
+          "as_published": "-3.71725630E-07",
+          "value": -3.7172563e-07
+        },
+        {
+          "as_published": "4.12310396E-11",
+          "value": 4.12310396e-11
+        },
+        {
+          "as_published": "-1.83712860E-15",
+          "value": -1.8371286e-15
+        },
+        {
+          "as_published": "1.08986002E+04",
+          "value": 10898.6002
+        },
+        {
+          "as_published": "1.36789719E+00",
+          "value": 1.36789719
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.96323558E+00",
+          "value": 2.96323558
+        },
+        {
+          "as_published": "8.55501824E-03",
+          "value": 0.00855501824
+        },
+        {
+          "as_published": "-1.00388287E-05",
+          "value": -1.00388287e-05
+        },
+        {
+          "as_published": "6.25269399E-09",
+          "value": 6.25269399e-09
+        },
+        {
+          "as_published": "-1.52826367E-12",
+          "value": -1.52826367e-12
+        },
+        {
+          "as_published": "1.14021607E+04",
+          "value": 11402.1607
+        },
+        {
+          "as_published": "1.15800366E+01",
+          "value": 11.5800366
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.25888357E+04",
+    "value": 12588.8357,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "14541-24-3",
+    "HS2 HYDROTHIOSULFENO RADICAL RRHO SIGMA=1  STATWT=2  A0=9.9261912 B0=0.2643802",
+    "C0=0.2571927   Nu=2463,903,595. HF298=25+/-2.5 kcal exper. REF=Decker et, al",
+    "Int. J. Mass. Spec,185-187,(1999),727-747.  {HF298=25.0+/-0.5 kcal  REF=Denis",
+    "J Sulfur Chem 29,(2008),327}  Max Lst Sq Error Cp @ 6000 K 0.29%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "xml_coefficient_mismatch",
+      "xml_formula": "HS2  RRHO",
+      "xml_cas": "14541-24-3",
+      "note": "BURCAT_THR.xml (2005 snapshot) coefficients differ from this BURCAT.THR.txt record. THR tokens retained."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 28511,
+    "header_line": 28516,
+    "end_line": 28519
+  },
+  "source_text": {
+    "header_line": "HS2  RRHO         T 4/02H  1.S  2.   0.   0.G   200.000  6000.000  B  65.13994 1",
+    "coeff_lines": [
+      " 5.00284875E+00 1.53333839E-03-3.71725630E-07 4.12310396E-11-1.83712860E-15    2",
+      " 1.08986002E+04 1.36789719E+00 2.96323558E+00 8.55501824E-03-1.00388287E-05    3",
+      " 6.25269399E-09-1.52826367E-12 1.14021607E+04 1.15800366E+01 1.25888357E+04    4"
+    ]
+  }
+}

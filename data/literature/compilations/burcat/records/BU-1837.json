@@ -1,0 +1,190 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1837",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C7H16FO2P Soman",
+  "cas_as_published": "96-64-0",
+  "formula": "Ni",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/16",
+  "calc_quality_as_published": "F",
+  "composition": [
+    {
+      "element_as_published": "  ",
+      "count_as_published": "WAR",
+      "element": null,
+      "count": null,
+      "filler": true
+    },
+    {
+      "element_as_published": "NI",
+      "count_as_published": "NG!",
+      "element": "Ni",
+      "count": null,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "   ",
+      "element": null,
+      "count": null,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "   ",
+      "element": null,
+      "count": null,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "182.17290",
+    "value": 182.1729
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "5000.000",
+    "value": 5000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.92893822E+01",
+          "value": 29.2893822
+        },
+        {
+          "as_published": "4.15789366E-02",
+          "value": 0.0415789366
+        },
+        {
+          "as_published": "-1.57973111E-05",
+          "value": -1.57973111e-05
+        },
+        {
+          "as_published": "2.81446793E-09",
+          "value": 2.81446793e-09
+        },
+        {
+          "as_published": "-1.90204312E-13",
+          "value": -1.90204312e-13
+        },
+        {
+          "as_published": "-1.42787327E+05",
+          "value": -142787.327
+        },
+        {
+          "as_published": "-1.22676240E+02",
+          "value": -122.67624
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-1.17341390E+01",
+          "value": -11.734139
+        },
+        {
+          "as_published": "1.95866617E-01",
+          "value": 0.195866617
+        },
+        {
+          "as_published": "-2.70630998E-04",
+          "value": -0.000270630998
+        },
+        {
+          "as_published": "2.12065392E-07",
+          "value": 2.12065392e-07
+        },
+        {
+          "as_published": "-6.81659600E-11",
+          "value": -6.816596e-11
+        },
+        {
+          "as_published": "-1.32680663E+05",
+          "value": -132680.663
+        },
+        {
+          "as_published": "8.10769996E+01",
+          "value": 81.0769996
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.29477648E+05",
+    "value": -129477.648,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "96-64-0",
+    "C7H16FO2P Soman CH3C(CH3)2CH(CH3)OP(=O)F(CH3)  Calculated from Group Additivity",
+    "HF298=-257.30 Kcal REF=Glaude et al JPC A 119(42),(2015),10527 300-1000 K extra-",
+    "polated with Wilhoit polynomials to 5000. K  Max Lst Sq Error @ 1000 K 0.51%.",
+    "WARNING! This compound contain 5 elements but the polynomial can accomodate only",
+    "four. For use with the enhanced CHEMKIN program Use the polynomial from",
+    "THERM.DAT or use the 9 term polynomial (NewNASA)."
+  ],
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "composition_count_unparsed",
+      "slot": 0,
+      "element_as_published": "  ",
+      "count_as_published": "WAR"
+    },
+    {
+      "kind": "composition_count_unparsed",
+      "slot": 1,
+      "element_as_published": "NI",
+      "count_as_published": "NG!"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 20651,
+    "header_line": 20658,
+    "end_line": 20661
+  },
+  "source_text": {
+    "header_line": "C7H16FO2P Soman   T 7/16  WARNING!          G   298.150  5000.000  F 182.17290 1",
+    "coeff_lines": [
+      " 2.92893822E+01 4.15789366E-02-1.57973111E-05 2.81446793E-09-1.90204312E-13    2",
+      "-1.42787327E+05-1.22676240E+02-1.17341390E+01 1.95866617E-01-2.70630998E-04    3",
+      " 2.12065392E-07-6.81659600E-11-1.32680663E+05 8.10769996E+01-1.29477648E+05    4"
+    ]
+  }
+}

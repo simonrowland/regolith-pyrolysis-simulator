@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3205",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "SbCl3",
+  "cas_as_published": "10025-91-9",
+  "formula": "SbCl3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T02/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SB",
+      "count_as_published": " 1.",
+      "element": "Sb",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 3.",
+      "element": "Cl",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "228.11810",
+    "value": 228.1181
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.72981943E+00",
+          "value": 9.72981943
+        },
+        {
+          "as_published": "2.86438114E-04",
+          "value": 0.000286438114
+        },
+        {
+          "as_published": "-1.14493259E-07",
+          "value": -1.14493259e-07
+        },
+        {
+          "as_published": "1.98078808E-11",
+          "value": 1.98078808e-11
+        },
+        {
+          "as_published": "-1.24319722E-15",
+          "value": -1.24319722e-15
+        },
+        {
+          "as_published": "-4.06639954E+04",
+          "value": -40663.9954
+        },
+        {
+          "as_published": "-1.46490216E+01",
+          "value": -14.6490216
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "5.51759463E+00",
+          "value": 5.51759463
+        },
+        {
+          "as_published": "2.44777531E-02",
+          "value": 0.0244777531
+        },
+        {
+          "as_published": "-5.31507818E-05",
+          "value": -5.31507818e-05
+        },
+        {
+          "as_published": "5.13625769E-08",
+          "value": 5.13625769e-08
+        },
+        {
+          "as_published": "-1.82868138E-11",
+          "value": -1.82868138e-11
+        },
+        {
+          "as_published": "-4.00472434E+04",
+          "value": -40047.2434
+        },
+        {
+          "as_published": "4.23196216E+00",
+          "value": 4.23196216
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-3.76909283E+04",
+    "value": -37690.9283,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "10025-91-9",
+    "SbCl3  Antimony Trichloride  SIGMA=3  STATWT=1  IA=IB=49.06607  IC=72.40579",
+    "Nu=353.9,336.0(2),147.6,118.6(2)  HF298=-74.9+/-1.07 kcal  REF=Skulan, Nielsen,",
+    "Melius, Allendorf MP4  JPC A 110,(2006),5919  {HF298=-75.0 kcal REF=Wagman Evans",
+    "et al JPCRD 11,(1982), Suppl. 2; HF298=-50. kcal REF=Takhistov and Golovin J Mol",
+    "Struct 784,(2006),47.;  HF298=-74.6 kcal REF=Glushko ed. Thermic Constants of",
+    "Substances Ref. Books Vol 1-10 Inst. Sci Inf. Moscow 1965 also Barin 1995}  Max",
+    "Lst Sq Error Cp @ 400 K 0.29%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 34073,
+    "header_line": 34081,
+    "end_line": 34084
+  },
+  "source_text": {
+    "header_line": "SbCl3             T02/09SB 1.CL 3.   0.   0.G   200.000  6000.000  B 228.11810 1",
+    "coeff_lines": [
+      " 9.72981943E+00 2.86438114E-04-1.14493259E-07 1.98078808E-11-1.24319722E-15    2",
+      "-4.06639954E+04-1.46490216E+01 5.51759463E+00 2.44777531E-02-5.31507818E-05    3",
+      " 5.13625769E-08-1.82868138E-11-4.00472434E+04 4.23196216E+00-3.76909283E+04    4"
+    ]
+  }
+}

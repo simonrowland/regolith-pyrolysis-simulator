@@ -1,0 +1,195 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2165",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C18H29O2 Linolenat",
+  "cas_as_published": "N/A  10367-09-6 for the anion",
+  "formula": "C18H29O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 9/08",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "18.",
+      "element": "C",
+      "count": 18.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "29.",
+      "element": "H",
+      "count": 29.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "277.42166",
+    "value": 277.42166
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.07061418E+01",
+          "value": 40.7061418
+        },
+        {
+          "as_published": "9.45824823E-02",
+          "value": 0.0945824823
+        },
+        {
+          "as_published": "-3.44341897E-05",
+          "value": -3.44341897e-05
+        },
+        {
+          "as_published": "5.60407385E-09",
+          "value": 5.60407385e-09
+        },
+        {
+          "as_published": "-3.37249951E-13",
+          "value": -3.37249951e-13
+        },
+        {
+          "as_published": "-3.74249165E+04",
+          "value": -37424.9165
+        },
+        {
+          "as_published": "-1.80056976E+02",
+          "value": -180.056976
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.72871613E+01",
+          "value": 17.2871613
+        },
+        {
+          "as_published": "1.85703669E-02",
+          "value": 0.0185703669
+        },
+        {
+          "as_published": "3.63455319E-04",
+          "value": 0.000363455319
+        },
+        {
+          "as_published": "-4.87744342E-07",
+          "value": -4.87744342e-07
+        },
+        {
+          "as_published": "1.94552753E-10",
+          "value": 1.94552753e-10
+        },
+        {
+          "as_published": "-2.42706113E+04",
+          "value": -24270.6113
+        },
+        {
+          "as_published": "-2.54900578E+01",
+          "value": -25.4900578
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.59519683E+04",
+    "value": -15951.9683,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A  10367-09-6 for the anion",
+    "C18H29O2  9,12,15-Linolenate Radical  C2H5CH=CHCH2CH=CHCH2CH=CHC7H14C(O)O*",
+    "SIGMA=1  STATWT=2  IA=104.8256  IB=1735.6820  IC=1807.4570  Ir(-C(O)O*)=7.258",
+    "ROSYM=1  V(3)=272. cm-1  Ir(CH3)=0.52574  ROSYM=3  V(3)=340. cm-1",
+    "Ir(C2H5-)=5.63081  ROSYM=1 V(3)=3147. cm-1  Ir(C2H5CH-CH-)=~8.  ROSYM=1",
+    "V(3)=2000. cm-1 est.  Nu=3156(2),3153,3135,3126(2),3116(2),3092(2),3085,",
+    "3077.5(2),3071(2),3058,3051,3044,3042(2),3040,3036(2),3028,3019(2),3011(3),1744,",
+    "1777,2989,1744,1736,1723,1598,1527,1522,1518,1513,1507,1502,1499(3),1484(2),",
+    "1466,1443,1440.1432,1422,1416(2),1395,1363,1347,1343(2),1331,1324(2),1318,",
+    "1310(2),1295(2),1284(2),1275,1241(2),1233,1219,1165,1159,1145,1134,1102,1093(2),",
+    "1069,1064,1056,1064,1035,1017(3),1015,1005(3),967,955,949,919,904,901,877.5,831,",
+    "803,771,742.5(2),739,735,733,621,598,575,570,548,536,521,503,456,414,408,340,",
+    "313,294.5,283,242,234,207,183,162.5(2),154,136,112,102,91.26,76.08,53.6,47.01,",
+    "41.73,36.8,24.24   HF298=-31.7 kcal  REF=Osmont & Catoire Comb & Flame 155,2008,",
+    "343-355.    Max Lst Sq Error @ 200 K and 1300 K 0.63%"
+  ],
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C18H29O2 Linolenat",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    },
+    {
+      "kind": "cas_identifier_nonstandard",
+      "cas_as_published": "N/A  10367-09-6 for the anion"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24861,
+    "header_line": 24876,
+    "end_line": 24879
+  },
+  "source_text": {
+    "header_line": "C18H29O2 LinolenatT 9/08C 18.H 29.O  2.   0.G   200.000  6000.000  C 277.42166 1",
+    "coeff_lines": [
+      " 4.07061418E+01 9.45824823E-02-3.44341897E-05 5.60407385E-09-3.37249951E-13    2",
+      "-3.74249165E+04-1.80056976E+02 1.72871613E+01 1.85703669E-02 3.63455319E-04    3",
+      "-4.87744342E-07 1.94552753E-10-2.42706113E+04-2.54900578E+01-1.59519683E+04    4"
+    ]
+  }
+}

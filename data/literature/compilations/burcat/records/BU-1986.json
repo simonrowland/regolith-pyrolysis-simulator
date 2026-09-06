@@ -1,0 +1,181 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1986",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C10H16  Limonene",
+  "cas_as_published": "5989-27-5",
+  "formula": "C10H16",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/15",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "10.",
+      "element": "C",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "16.",
+      "element": "H",
+      "count": 16.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "136.23404",
+    "value": 136.23404
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.98788385E+01",
+          "value": 19.8788385
+        },
+        {
+          "as_published": "4.85686819E-02",
+          "value": 0.0485686819
+        },
+        {
+          "as_published": "-1.75196619E-05",
+          "value": -1.75196619e-05
+        },
+        {
+          "as_published": "2.83448106E-09",
+          "value": 2.83448106e-09
+        },
+        {
+          "as_published": "-1.69897959E-13",
+          "value": -1.69897959e-13
+        },
+        {
+          "as_published": "-1.01634545E+04",
+          "value": -10163.4545
+        },
+        {
+          "as_published": "-8.23198279E+01",
+          "value": -82.3198279
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "5.00966823E+00",
+          "value": 5.00966823
+        },
+        {
+          "as_published": "3.45229254E-02",
+          "value": 0.0345229254
+        },
+        {
+          "as_published": "1.23380996E-04",
+          "value": 0.000123380996
+        },
+        {
+          "as_published": "-1.85676248E-07",
+          "value": -1.85676248e-07
+        },
+        {
+          "as_published": "7.63551003E-11",
+          "value": 7.63551003e-11
+        },
+        {
+          "as_published": "-3.41560918E+03",
+          "value": -3415.60918
+        },
+        {
+          "as_published": "7.69384943E+00",
+          "value": 7.69384943
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.71639459E+02",
+    "value": 371.639459,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "5989-27-5",
+    "C10H16  +Limonene (Cyclohexene, 1-methyl-4-(1-methylethenyl)-)  SIGMA=1 STATWT=1",
+    "IA=27.4944  IB=118.2965  IC=124.9320  [Ir(CH3)=0.5214  ROSYM=3]x2  V(3)=700 cm-1",
+    "V(3)=800 cm-1  Ir(C3H5)=~6.2  ROSYM=1  V(3)=1800 cm-1  Nu=3229,3154,3145,3126,",
+    "3119,3088,3082,3067,3053,3047,3041,3032,3024(2),3007,3002,1753,1729,1528.2(2),",
+    "1522,1514,1510(2),1506,1480,1444,1442,1416,1405,1385,1357,1344,1329,1311,1285,",
+    "1247,1187,1180,1127,1111,1090,1072,1063,1042,1034,1010,980,940.5,932,924,896,",
+    "825,806,768,738,647,553,530,497,476,437,340,326,289,255,204,185,181  REF=Burcat",
+    "B3LYP/6-31G(d)  HF298=3.09+/-1.09 kJ  REF=Steele et al JCEngData 47,(2002),667",
+    "HF298(solid)=-46.48+/-1.02 kJ  REF=Steele et al. ibid.  Max Lst Sq Error Cp @",
+    "1300 K 0.62%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 22473,
+    "header_line": 22484,
+    "end_line": 22487
+  },
+  "source_text": {
+    "header_line": "C10H16  Limonene  T 1/15C 10.H 16.   0.   0.G   200.000  6000.000  B 136.23404 1",
+    "coeff_lines": [
+      " 1.98788385E+01 4.85686819E-02-1.75196619E-05 2.83448106E-09-1.69897959E-13    2",
+      "-1.01634545E+04-8.23198279E+01 5.00966823E+00 3.45229254E-02 1.23380996E-04    3",
+      "-1.85676248E-07 7.63551003E-11-3.41560918E+03 7.69384943E+00 3.71639459E+02    4"
+    ]
+  }
+}

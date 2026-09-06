@@ -39,6 +39,10 @@ NASA Glenn / CEA `thermo.inp` now lives at `./nasa-glenn/` (complete 2111-record
 harvest). The 1615-species extract `../extracts/nasa-cea-thermo.yaml` is left in
 place this round and is superseded by that compilation.
 
+Burcat / Ruscic Third Millennium (`BURCAT.THR.txt`) now lives at `./burcat/`
+(complete 3446-record harvest: 3407 NASA-7 polynomials + 39 comment-only CAS
+stanzas). See `burcat/README.md`.
+
 ## Status of what we actually hold
 
 `janaf/` is a target-first partial harvest of NIST-JANAF 4th edition HTML tables (380 species).
@@ -54,3 +58,7 @@ phosphorus carriers, pointing at `janaf.nist.gov` table URLs. The full NIST-JANA
 
 `nasa-glenn/` is the complete CEA `thermo.inp` compilation (products + reactants,
 ions and condensed phases included). See `nasa-glenn/README.md`.
+
+`burcat/` is the complete Third Millennium NASA-7 polynomial compilation
+(ions, condensed phases, and comment-only CAS notes included). See
+`burcat/README.md`.

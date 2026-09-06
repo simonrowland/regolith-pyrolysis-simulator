@@ -1,0 +1,188 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2221",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C24H48O2 Lignoce",
+  "cas_as_published": "557-59-5",
+  "formula": "C24H48O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 5/11",
+  "calc_quality_as_published": "D",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "24.",
+      "element": "C",
+      "count": 24.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "48.",
+      "element": "H",
+      "count": 48.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "368.63672",
+    "value": 368.63672
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.09287869E+01",
+          "value": 50.9287869
+        },
+        {
+          "as_published": "1.48446542E-01",
+          "value": 0.148446542
+        },
+        {
+          "as_published": "-5.35205153E-05",
+          "value": -5.35205153e-05
+        },
+        {
+          "as_published": "8.65623375E-09",
+          "value": 8.65623375e-09
+        },
+        {
+          "as_published": "-5.18736075E-13",
+          "value": -5.18736075e-13
+        },
+        {
+          "as_published": "-1.35438846E+05",
+          "value": -135438.846
+        },
+        {
+          "as_published": "-2.35187872E+02",
+          "value": -235.187872
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.05625100E+01",
+          "value": 30.56251
+        },
+        {
+          "as_published": "-2.67304236E-02",
+          "value": -0.0267304236
+        },
+        {
+          "as_published": "6.46474166E-04",
+          "value": 0.000646474166
+        },
+        {
+          "as_published": "-8.13667663E-07",
+          "value": -8.13667663e-07
+        },
+        {
+          "as_published": "3.17353722E-10",
+          "value": 3.17353722e-10
+        },
+        {
+          "as_published": "-1.18809164E+05",
+          "value": -118809.164
+        },
+        {
+          "as_published": "-7.46831385E+01",
+          "value": -74.6831385
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.06631611E+05",
+    "value": -106631.611,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "557-59-5",
+    "C24H48O2 Lignoceric (n-Tetracosanoic) acid  C23H47COOH  SIGMA=1  STATWT=1",
+    "IA=29.9275  IB=5576.9416  IC=5595.012  Ir(-COOH)=7.258  ROSYM=1  V(3)=272. cm-1",
+    "Ir(CH3)=0.52574  ROSYM=3  V(3)=340. cm-1  Ir(C2H5)=5.63081  ROSYM=1  V(3)=550.",
+    "cm-1 est Ir(C3H7)=7.0  ROSYM=1  V(3)=700. cm-1 est.  Nu=3753,3110,3105,3098,",
+    "3078(2),3072(3),3067,3063,3059,3053.9(2),3050,3046,3042(2),3039,3037(2),",
+    "3034(2),3032(2),3031(3),3027.5(2),3023.4(3),3017.3(2),3013(3),3011(3),3010(2),",
+    "3008(6),1845,1531(2),1527(3),1522,1519,1514(2),1512,1509,1506,1503(3),1501(2),",
+    "1499(4),1498(2),1474,1432,1427,1417.5(7),1409,1400,1390,1377,1364,1352(2),",
+    "1349.3(3),1345(2),1340(2),1334.2(3),1328.5(3),1318(2),1305(2),1290.5(2),",
+    "1275(2),1260(2),1245(2),1230(2),1218.5,1215,1212,1161,1148,1142,1128,1104,1080,",
+    "1073(3),1071(2),1069(3),1062,1058(2),1046.5,1039(2),1030,1017,1012(2),994(2),",
+    "986,979(2),957,928,899.5(2),882.5,842.6,817.5,795,776,761.5,750.5,743,738(3),",
+    "736.5(3),671,635,532,526.5,520,513,500,477,459,431,405,381,339,330,281,262,246,",
+    "231,191,182,181,175,173,172,163,158,148,145,141,130.5,121,110,106,101,89.4,88.4,",
+    "82,72,68.68,64.5,51.6,48.79,44.38,32.04,28.75   REF=Burcat B3LYP/6-31G(d)",
+    "HF298=-211.9.+/-9.5 kcal  REF=NIST 94  {HF298=-247.  kcal  REF=Burcat Catoire's",
+    "method}  Max Lst Sq Error Cp @ 200 K 0.68%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 25645,
+    "header_line": 25663,
+    "end_line": 25666
+  },
+  "source_text": {
+    "header_line": "C24H48O2 Lignoce  T 5/11C 24.H 48.O  2.   0.G   200.000  6000.000  D 368.63672 1",
+    "coeff_lines": [
+      " 5.09287869E+01 1.48446542E-01-5.35205153E-05 8.65623375E-09-5.18736075E-13    2",
+      "-1.35438846E+05-2.35187872E+02 3.05625100E+01-2.67304236E-02 6.46474166E-04    3",
+      "-8.13667663E-07 3.17353722E-10-1.18809164E+05-7.46831385E+01-1.06631611E+05    4"
+    ]
+  }
+}

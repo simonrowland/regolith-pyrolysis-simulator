@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1861",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C8H7N  o-ToluoNi",
+  "cas_as_published": "529-19-1",
+  "formula": "C8H7N",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 2/12",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 8.",
+      "element": "C",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 7.",
+      "element": "H",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "117.14792",
+    "value": 117.14792
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.56410891E+01",
+          "value": 15.6410891
+        },
+        {
+          "as_published": "2.68075370E-02",
+          "value": 0.026807537
+        },
+        {
+          "as_published": "-9.69324025E-06",
+          "value": -9.69324025e-06
+        },
+        {
+          "as_published": "1.57209013E-09",
+          "value": 1.57209013e-09
+        },
+        {
+          "as_published": "-9.44270053E-14",
+          "value": -9.44270053e-14
+        },
+        {
+          "as_published": "1.50940877E+04",
+          "value": 15094.0877
+        },
+        {
+          "as_published": "-5.68164460E+01",
+          "value": -56.816446
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.05214105E+00",
+          "value": 2.05214105
+        },
+        {
+          "as_published": "3.81680462E-02",
+          "value": 0.0381680462
+        },
+        {
+          "as_published": "4.22551191E-05",
+          "value": 4.22551191e-05
+        },
+        {
+          "as_published": "-8.69955154E-08",
+          "value": -8.69955154e-08
+        },
+        {
+          "as_published": "3.87532580E-11",
+          "value": 3.8753258e-11
+        },
+        {
+          "as_published": "2.00590257E+04",
+          "value": 20059.0257
+        },
+        {
+          "as_published": "1.95286065E+01",
+          "value": 19.5286065
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.25870196E+04",
+    "value": 22587.0196,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "529-19-1",
+    "C8H7N  o-ToluoNitrile  ortho-C6H4(CH3)CN  SIGMA=1  STATWT=1  IA=29.2438",
+    "IB=56.0981  IC=84.8241  Ir(CH3)=0.5214  ROSYM=3.  V(3)=4.9 cm-1  Nu=3222,3210,",
+    "3200,3188,3138,3107,3053,2343,1660,1627,1534,1521,1511.5,1487,1448,1344,1319.5,",
+    "1246,1213,1200,1137,1076(2),1022,997,957,890,831,779,735,731,603,584,553,474,",
+    "458,398,343,219,147,134  REF=Burcat G3B3  HF298=187.8 kJ  REF=NIST 94",
+    "{HF298=179.9 kJ  REF=Liebmann 1988}  Max Lst Sq Error Cp @ 1300 K 0.57%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 20938,
+    "header_line": 20945,
+    "end_line": 20948
+  },
+  "source_text": {
+    "header_line": "C8H7N  o-ToluoNi  T 2/12C  8.H  7.N  1.   0.G   200.000  6000.000  B 117.14792 1",
+    "coeff_lines": [
+      " 1.56410891E+01 2.68075370E-02-9.69324025E-06 1.57209013E-09-9.44270053E-14    2",
+      " 1.50940877E+04-5.68164460E+01 2.05214105E+00 3.81680462E-02 4.22551191E-05    3",
+      "-8.69955154E-08 3.87532580E-11 2.00590257E+04 1.95286065E+01 2.25870196E+04    4"
+    ]
+  }
+}

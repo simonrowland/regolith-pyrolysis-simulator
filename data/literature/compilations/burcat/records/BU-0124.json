@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0124",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "BiF3",
+  "cas_as_published": "7787-61-3",
+  "formula": "BiF3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T03/09",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "BI",
+      "count_as_published": " 1.",
+      "element": "Bi",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "F ",
+      "count_as_published": " 3.",
+      "element": "F",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "265.97559",
+    "value": 265.97559
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.21496532E+00",
+          "value": 9.21496532
+        },
+        {
+          "as_published": "8.20516621E-04",
+          "value": 0.000820516621
+        },
+        {
+          "as_published": "-3.25231533E-07",
+          "value": -3.25231533e-07
+        },
+        {
+          "as_published": "5.59548056E-11",
+          "value": 5.59548056e-11
+        },
+        {
+          "as_published": "-3.49842258E-15",
+          "value": -3.49842258e-15
+        },
+        {
+          "as_published": "-8.81278923E+04",
+          "value": -88127.8923
+        },
+        {
+          "as_published": "-1.55992387E+01",
+          "value": -15.5992387
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.40454174E+00",
+          "value": 3.40454174
+        },
+        {
+          "as_published": "2.69570568E-02",
+          "value": 0.0269570568
+        },
+        {
+          "as_published": "-4.72411686E-05",
+          "value": -4.72411686e-05
+        },
+        {
+          "as_published": "3.89816435E-08",
+          "value": 3.89816435e-08
+        },
+        {
+          "as_published": "-1.23393667E-11",
+          "value": -1.23393667e-11
+        },
+        {
+          "as_published": "-8.70113416E+04",
+          "value": -87011.3416
+        },
+        {
+          "as_published": "1.19679113E+01",
+          "value": 11.9679113
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-8.51442839E+04",
+    "value": -85144.2839,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "7787-61-3",
+    "BiF3  Trifluorobismuth  SIGMA=2  STATWT=1  IA=22.1333  IB=22.1386  IC=25.5421",
+    "Nu=675,655(2),190,179.3(2)  REF=Burcat MOPAC 2000 PM3  HF298=-707.933 kJ",
+    "REF=Barin 95   {HF298=-83.528 kcal  REF=Burcat PM3 MOPAC 2000;  HF298=-168. kcal",
+    "REF=Takhistov Golovin J Mol Struct 784,(2006),47-68}    Max Lst Sq Error Cp @",
+    "1200 K 0.15%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 1230,
+    "header_line": 1236,
+    "end_line": 1239
+  },
+  "source_text": {
+    "header_line": "BiF3              T03/09BI 1.F  3.   0.   0.G   200.000  6000.000  C 265.97559 1",
+    "coeff_lines": [
+      " 9.21496532E+00 8.20516621E-04-3.25231533E-07 5.59548056E-11-3.49842258E-15    2",
+      "-8.81278923E+04-1.55992387E+01 3.40454174E+00 2.69570568E-02-4.72411686E-05    3",
+      " 3.89816435E-08-1.23393667E-11-8.70113416E+04 1.19679113E+01-8.51442839E+04    4"
+    ]
+  }
+}

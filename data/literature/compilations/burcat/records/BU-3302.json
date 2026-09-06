@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-3302",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Si3H7-",
+  "cas_as_published": "286949-99-3",
+  "formula": "Si3H7E",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/17",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SI",
+      "count_as_published": " 3.",
+      "element": "Si",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 7.",
+      "element": "H",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "91.31263",
+    "value": 91.31263
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.47321386E+01",
+          "value": 14.7321386
+        },
+        {
+          "as_published": "1.17692422E-02",
+          "value": 0.0117692422
+        },
+        {
+          "as_published": "-4.43179548E-06",
+          "value": -4.43179548e-06
+        },
+        {
+          "as_published": "7.37796927E-10",
+          "value": 7.37796927e-10
+        },
+        {
+          "as_published": "-4.51077447E-14",
+          "value": -4.51077447e-14
+        },
+        {
+          "as_published": "9.96678803E+02",
+          "value": 996.678803
+        },
+        {
+          "as_published": "-4.76312832E+01",
+          "value": -47.6312832
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "7.33944574E-01",
+          "value": 0.733944574
+        },
+        {
+          "as_published": "6.52174009E-02",
+          "value": 0.0652174009
+        },
+        {
+          "as_published": "-9.20902049E-05",
+          "value": -9.20902049e-05
+        },
+        {
+          "as_published": "7.12805224E-08",
+          "value": 7.12805224e-08
+        },
+        {
+          "as_published": "-2.23793885E-11",
+          "value": -2.23793885e-11
+        },
+        {
+          "as_published": "4.32143805E+03",
+          "value": 4321.43805
+        },
+        {
+          "as_published": "2.15151898E+01",
+          "value": 21.5151898
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "6.75565968E+03",
+    "value": 6755.65968,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "286949-99-3",
+    "Si3H7- Trisilane anion  SiH3-SiH2-SiH2*-  SIGMA=1  STATWT=1  IA=8.2729  ",
+    "IB=44.1373  IC=49.8341  Ir(SiH3)=0.4818  ROSYM=3  V(3)=1000. cm-1  ",
+    "Ir(SiH2)=0.414  ROSYM=1. V(3)=1000. cm-1.  Nu=2159,2154,2122.5,2088,2052,1951,",
+    "1937,977,969,962,951,915,753,729,633,629,447,427,422,338.5(2),122,[95.4,83.5",
+    "internal rotation]  HF298=56.170+/-8 kJ thermal electron  REG=Burcat  G3B3  Max",
+    "Lst Sq Error  Cp @ 1300 K 0.54%. "
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 35017,
+    "header_line": 35024,
+    "end_line": 35027
+  },
+  "source_text": {
+    "header_line": "Si3H7-            T11/17SI 3.H  7.E  1.   0.G   298.150  6000.000  B  91.31263 1",
+    "coeff_lines": [
+      " 1.47321386E+01 1.17692422E-02-4.43179548E-06 7.37796927E-10-4.51077447E-14    2",
+      " 9.96678803E+02-4.76312832E+01 7.33944574E-01 6.52174009E-02-9.20902049E-05    3",
+      " 7.12805224E-08-2.23793885E-11 4.32143805E+03 2.15151898E+01 6.75565968E+03    4"
+    ]
+  }
+}

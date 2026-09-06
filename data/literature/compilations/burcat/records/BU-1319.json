@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1319",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "nC4H9- n-butyl an",
+  "cas_as_published": "79431-01-9",
+  "formula": "C4H9E",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 9/18",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "E ",
+      "count_as_published": " 1.",
+      "element": "E",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "57.11481",
+    "value": 57.11481
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.00012471E+00",
+          "value": 9.00012471
+        },
+        {
+          "as_published": "2.44988683E-02",
+          "value": 0.0244988683
+        },
+        {
+          "as_published": "-8.80476769E-06",
+          "value": -8.80476769e-06
+        },
+        {
+          "as_published": "1.42148440E-09",
+          "value": 1.4214844e-09
+        },
+        {
+          "as_published": "-8.50873201E-14",
+          "value": -8.50873201e-14
+        },
+        {
+          "as_published": "4.56524080E+03",
+          "value": 4565.2408
+        },
+        {
+          "as_published": "-2.45623612E+01",
+          "value": -24.5623612
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "6.33863296E-01",
+          "value": 0.633863296
+        },
+        {
+          "as_published": "3.59583652E-02",
+          "value": 0.0359583652
+        },
+        {
+          "as_published": "2.85409600E-06",
+          "value": 2.854096e-06
+        },
+        {
+          "as_published": "-2.49849016E-08",
+          "value": -2.49849016e-08
+        },
+        {
+          "as_published": "1.15691995E-11",
+          "value": 1.15691995e-11
+        },
+        {
+          "as_published": "7.58620500E+03",
+          "value": 7586.205
+        },
+        {
+          "as_published": "2.18293534E+01",
+          "value": 21.8293534
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "9.35473047E+03",
+    "value": 9354.73047,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "79431-01-9",
+    "n-C4H9-  N-Butyl anion  SIGMA=1  STATWT=1  IA=3.4163  IB=23.1644  IC=24.5061",
+    "Ir(CH3)=0.49   ROSYM=3  V(3)=1254 cm-1  Nu=3061,3038,3020,2993,2980,2862,2840,",
+    "2804,2779,1531,1524.5,1511,1489,1463,1405,1333(2),1291,1286,1238,1110,1015,988,",
+    "978,847,817,806,716,416,339,251,220,[138  internal rotation]  HF298=77.78+/-8.",
+    "kJ  thermal electron  HF0=108.353+/-8 kJ  stationary electron  Max Lst Sq Error",
+    "Cp @ 1300 K 0.67%. "
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 14211,
+    "header_line": 14218,
+    "end_line": 14221
+  },
+  "source_text": {
+    "header_line": "nC4H9- n-butyl an T 9/18C  4.H  9.E  1.   0.G   298.150  6000.000  B  57.11481 1",
+    "coeff_lines": [
+      " 9.00012471E+00 2.44988683E-02-8.80476769E-06 1.42148440E-09-8.50873201E-14    2",
+      " 4.56524080E+03-2.45623612E+01 6.33863296E-01 3.59583652E-02 2.85409600E-06    3",
+      "-2.49849016E-08 1.15691995E-11 7.58620500E+03 2.18293534E+01 9.35473047E+03    4"
+    ]
+  }
+}

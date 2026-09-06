@@ -1,0 +1,181 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2120",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C14H14 Bibenzyl",
+  "cas_as_published": "103-29-7",
+  "formula": "C14H14",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 5/04",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "14.",
+      "element": "C",
+      "count": 14.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "14.",
+      "element": "H",
+      "count": 14.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "182.26096",
+    "value": 182.26096
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.65979897E+01",
+          "value": 26.5979897
+        },
+        {
+          "as_published": "4.68689340E-02",
+          "value": 0.046868934
+        },
+        {
+          "as_published": "-1.69056103E-05",
+          "value": -1.69056103e-05
+        },
+        {
+          "as_published": "2.73737090E-09",
+          "value": 2.7373709e-09
+        },
+        {
+          "as_published": "-1.64235887E-13",
+          "value": -1.64235887e-13
+        },
+        {
+          "as_published": "3.18810786E+03",
+          "value": 3188.10786
+        },
+        {
+          "as_published": "-1.14827874E+02",
+          "value": -114.827874
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.30521842E+00",
+          "value": 1.30521842
+        },
+        {
+          "as_published": "5.76220698E-02",
+          "value": 0.0576220698
+        },
+        {
+          "as_published": "1.22418244E-04",
+          "value": 0.000122418244
+        },
+        {
+          "as_published": "-2.18120750E-07",
+          "value": -2.1812075e-07
+        },
+        {
+          "as_published": "9.59096665E-11",
+          "value": 9.59096665e-11
+        },
+        {
+          "as_published": "1.26627763E+04",
+          "value": 12662.7763
+        },
+        {
+          "as_published": "2.90742354E+01",
+          "value": 29.0742354
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.63088384E+04",
+    "value": 16308.8384,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "103-29-7",
+    "C14H14 BIBENZYL C6H5C2H4C6H5  SIGMA(Exter)=2  STATWT=1  IA=33.8630  IB=314.7877",
+    "IC=340.5755  (Ir(C6H5)=15.115526 ROSYM=2 V(3)=1035 cm-1)x2  Ir(C6H5CH2)=61.97503",
+    "ROSYM=2  V(3)=980. cm-1  Nu=3208(2),3195(2),3186(2),3171.5(4),3098,3076,3052,",
+    "3042,1665(2),1644(2),1546(2),1531,1514,1501(2),1388,1374,1359,1361(2),1312,1311,",
+    "1234(2),1213(2),1192(2),1177,1121,1098,1058(2),1020,1018(2),1010,993,992,964(2),",
+    "865,860(2),807,780,775,758,716(2),637,636,625,538,532,483,418(2),374,317,295,",
+    "237,120.8,61.4   REF=Burcat G3B3 calc. HF298=135+/-1.3 kJ  REF=Coleman & Pilcher",
+    "Trans Faraday Soc. 62,(1966),821-827. {HF298=143.51 KJ  REF=Benson;  HF298=179.6",
+    "kJ  REF=Green RMG 2013}  Max Lst. Sq. Error Cp @ 200 K 0.9%. HF298(Liq)=52.62 kJ",
+    "HF298(solid)=51.5+/-1.3  kJ"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24216,
+    "header_line": 24227,
+    "end_line": 24230
+  },
+  "source_text": {
+    "header_line": "C14H14 Bibenzyl   T 5/04C 14.H 14.   0.   0.G   200.000  6000.000  B 182.26096 1",
+    "coeff_lines": [
+      " 2.65979897E+01 4.68689340E-02-1.69056103E-05 2.73737090E-09-1.64235887E-13    2",
+      " 3.18810786E+03-1.14827874E+02 1.30521842E+00 5.76220698E-02 1.22418244E-04    3",
+      "-2.18120750E-07 9.59096665E-11 1.26627763E+04 2.90742354E+01 1.63088384E+04    4"
+    ]
+  }
+}

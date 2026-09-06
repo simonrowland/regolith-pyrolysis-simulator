@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1315",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H8S2 1,4 Dithi",
+  "cas_as_published": "505-29-3",
+  "formula": "C4H8S2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/08",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 8.",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": " 2.",
+      "element": "S",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "120.23832",
+    "value": 120.23832
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.36035994E+01",
+          "value": 13.6035994
+        },
+        {
+          "as_published": "2.38171528E-02",
+          "value": 0.0238171528
+        },
+        {
+          "as_published": "-8.63455910E-06",
+          "value": -8.6345591e-06
+        },
+        {
+          "as_published": "1.40243604E-09",
+          "value": 1.40243604e-09
+        },
+        {
+          "as_published": "-8.43096962E-14",
+          "value": -8.43096962e-14
+        },
+        {
+          "as_published": "-4.06698772E+03",
+          "value": -4066.98772
+        },
+        {
+          "as_published": "-4.84024339E+01",
+          "value": -48.4024339
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.50684735E+00",
+          "value": 1.50684735
+        },
+        {
+          "as_published": "3.27456206E-02",
+          "value": 0.0327456206
+        },
+        {
+          "as_published": "4.42732257E-05",
+          "value": 4.42732257e-05
+        },
+        {
+          "as_published": "-8.78680591E-08",
+          "value": -8.78680591e-08
+        },
+        {
+          "as_published": "3.94466849E-11",
+          "value": 3.94466849e-11
+        },
+        {
+          "as_published": "3.41027027E+02",
+          "value": 341.027027
+        },
+        {
+          "as_published": "1.96506917E+01",
+          "value": 19.6506917
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.48186460E+03",
+    "value": 2481.8646,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "505-29-3",
+    "C4H8S2 1,4 DITHIANE  SIGMA=2 IA=22.4069  IB=41.8145  IC=58.2926   NU=2944,2936,",
+    "2905(2),2955(2),2919(2),1418,1410,1408,1404,1297,1283,1275,1206(2),1156,1152,",
+    "1110,999,994,944,904,894,821,694,669,653,628,480,374,333,253,277,169",
+    "REF=Dorofeeva & Gurvich JPCRD 24,(1995),1351   HF298=20.635 kJ  REF-Burcat G3B3",
+    "{HF298=0.0 kJ  REF=Dorofeeva & Gurvich JPCRD 24,(1995),1351  GA}  Max Lst Sq",
+    "Error Cp @ 200 K 0.70%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 14163,
+    "header_line": 14170,
+    "end_line": 14173
+  },
+  "source_text": {
+    "header_line": "C4H8S2 1,4 Dithi  T11/08C  4.H  8.S  2.   0.G   200.000  6000.000  B 120.23832 1",
+    "coeff_lines": [
+      " 1.36035994E+01 2.38171528E-02-8.63455910E-06 1.40243604E-09-8.43096962E-14    2",
+      "-4.06698772E+03-4.84024339E+01 1.50684735E+00 3.27456206E-02 4.42732257E-05    3",
+      "-8.78680591E-08 3.94466849E-11 3.41027027E+02 1.96506917E+01 2.48186460E+03    4"
+    ]
+  }
+}

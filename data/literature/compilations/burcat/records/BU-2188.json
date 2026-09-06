@@ -1,0 +1,191 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2188",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C20H12 Perylene",
+  "cas_as_published": "198-55-0   [F&W notation A5]",
+  "formula": "C20H12",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/05",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "20.",
+      "element": "C",
+      "count": 20.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "12.",
+      "element": "H",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "252.30928",
+    "value": 252.30928
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.76638387E+01",
+          "value": 37.6638387
+        },
+        {
+          "as_published": "5.21705496E-02",
+          "value": 0.0521705496
+        },
+        {
+          "as_published": "-1.92428529E-05",
+          "value": -1.92428529e-05
+        },
+        {
+          "as_published": "3.16234274E-09",
+          "value": 3.16234274e-09
+        },
+        {
+          "as_published": "-1.91688461E-13",
+          "value": -1.91688461e-13
+        },
+        {
+          "as_published": "1.88622735E+04",
+          "value": 18862.2735
+        },
+        {
+          "as_published": "-1.82570533E+02",
+          "value": -182.570533
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-4.32109609E+00",
+          "value": -4.32109609
+        },
+        {
+          "as_published": "1.11780773E-01",
+          "value": 0.111780773
+        },
+        {
+          "as_published": "6.68921546E-05",
+          "value": 6.68921546e-05
+        },
+        {
+          "as_published": "-1.92620044E-07",
+          "value": -1.92620044e-07
+        },
+        {
+          "as_published": "9.18304028E-11",
+          "value": 9.18304028e-11
+        },
+        {
+          "as_published": "3.28716061E+04",
+          "value": 32871.6061
+        },
+        {
+          "as_published": "4.70286681E+01",
+          "value": 47.0286681
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.68052669E+04",
+    "value": 36805.2669,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "198-55-0   [F&W notation A5]",
+    "C20H12  PERYLENE   SIGMA=4   STATWT=1   IA=123.9686  IB=252.2375   IC=384.9360",
+    "Nu=3059(2),3034(2),3018(2),3015(2),3000(2),2997(2),1642,1624,1609,1598,1594,",
+    "1508,1495,1472,1448,1435,1427,1367,1345,1318,1310,1301,1291,1285,1250,1197,",
+    "1185,1173(3),1131,1113,1099,1086,1078,1063,1001,993(2),986,983,970,949,927,922,",
+    "914,907,898,837,819,793,775,770,765,765,762(2),754,750,644,633,616,604,567,545,",
+    "523(2),518(2),463,446,443,416(2),345,338,292,243,236,204,173,118,93.6,9.4",
+    "REF=Melius BAC/MP2 database  AA0P 1996   HF298=306.0+/-0.8 kJ  HF0=340.0 kJ",
+    "REF=Naas et al Angew Chem Int ed. 35,(1995),1735  {HF298=196.7+/-20.75 kJ",
+    "REF=Melius MP2 database AA0P 1996; HF298=309.6+/-4.2 kJ REF=Pedley & Rylance",
+    "1977; HF298=280.3 REF=NIST 94 est.;  HF298=304.6 (PM6) & 295.2 (PM3)  REF=Rayne",
+    "& Forest G4MP2 & MOPAC 9 study of PAH species. Free Internet Article 2013  }",
+    "{HF298(sol)=182.7+/-0.46 kJ  REF=Westrum Wong, Mol. Cryst. Liq. Cryst 61,(1980),",
+    "207}   Max Lst Sq Error Cp @ 200 K 0.79%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "xml_coefficient_mismatch",
+      "xml_formula": "C20H12 Perylene",
+      "xml_cas": "198-55-0",
+      "note": "BURCAT_THR.xml (2005 snapshot) coefficients differ from this BURCAT.THR.txt record. THR tokens retained."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 25210,
+    "header_line": 25224,
+    "end_line": 25227
+  },
+  "source_text": {
+    "header_line": "C20H12 Perylene   T11/05C 20.H 12.   0.   0.G   200.000  6000.000  B 252.30928 1",
+    "coeff_lines": [
+      " 3.76638387E+01 5.21705496E-02-1.92428529E-05 3.16234274E-09-1.91688461E-13    2",
+      " 1.88622735E+04-1.82570533E+02-4.32109609E+00 1.11780773E-01 6.68921546E-05    3",
+      "-1.92620044E-07 9.18304028E-11 3.28716061E+04 4.70286681E+01 3.68052669E+04    4"
+    ]
+  }
+}

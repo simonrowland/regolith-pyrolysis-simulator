@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0529",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CH3SnH3",
+  "cas_as_published": "1631-78-3",
+  "formula": "SnCH6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "A 6/05",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "SN",
+      "count_as_published": " 1.",
+      "element": "Sn",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "136.76834",
+    "value": 136.76834
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "8.60498921E+00",
+          "value": 8.60498921
+        },
+        {
+          "as_published": "1.18186923E-02",
+          "value": 0.0118186923
+        },
+        {
+          "as_published": "-4.32757434E-06",
+          "value": -4.32757434e-06
+        },
+        {
+          "as_published": "7.07531801E-10",
+          "value": 7.07531801e-10
+        },
+        {
+          "as_published": "-4.27280043E-14",
+          "value": -4.27280043e-14
+        },
+        {
+          "as_published": "1.05182949E+04",
+          "value": 10518.2949
+        },
+        {
+          "as_published": "-1.95089930E+01",
+          "value": -19.508993
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.58461850E+00",
+          "value": 1.5846185
+        },
+        {
+          "as_published": "3.06017263E-02",
+          "value": 0.0306017263
+        },
+        {
+          "as_published": "-2.34105881E-05",
+          "value": -2.34105881e-05
+        },
+        {
+          "as_published": "9.64970928E-09",
+          "value": 9.64970928e-09
+        },
+        {
+          "as_published": "-1.66455492E-12",
+          "value": -1.66455492e-12
+        },
+        {
+          "as_published": "1.25969742E+04",
+          "value": 12596.9742
+        },
+        {
+          "as_published": "1.71692137E+01",
+          "value": 17.1692137
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.42410316E+04",
+    "value": 14241.0316,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1631-78-3",
+    "CH6Sn  Methyl Stanum TriHydrid  CH3SnH3  SIGMA(external)=3  STATWT=1  IA=1.82075",
+    "IB=IC=12.3944  Ir=0.3706  ROSYM=3  V(3)=182 cm-1 Nu=2945.4(2),2870,1792.5,",
+    "1780(2),1438(2),1250,778(2),710(2),685,480.5,395(2)  HF298=118.407 +/-4.2 kJ",
+    "HF0=136.091 kJ  REF=Allendorf & Melius JPC A 109,(2005),4939   Max Lst Sq Error",
+    "Cp @ 1300 K 0.59%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 5378,
+    "header_line": 5384,
+    "end_line": 5387
+  },
+  "source_text": {
+    "header_line": "CH3SnH3           A 6/05SN 1.C  1.H  6.   0.G   200.000  6000.000  B 136.76834 1",
+    "coeff_lines": [
+      " 8.60498921E+00 1.18186923E-02-4.32757434E-06 7.07531801E-10-4.27280043E-14    2",
+      " 1.05182949E+04-1.95089930E+01 1.58461850E+00 3.06017263E-02-2.34105881E-05    3",
+      " 9.64970928E-09-1.66455492E-12 1.25969742E+04 1.71692137E+01 1.42410316E+04    4"
+    ]
+  }
+}

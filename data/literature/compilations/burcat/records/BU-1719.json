@@ -1,0 +1,188 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1719",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H12O2 EtButyrate",
+  "cas_as_published": "105-54-4",
+  "formula": "C6H12O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T04/08",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "12.",
+      "element": "H",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "116.15828",
+    "value": 116.15828
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.48730879E+01",
+          "value": 14.8730879
+        },
+        {
+          "as_published": "3.76656586E-02",
+          "value": 0.0376656586
+        },
+        {
+          "as_published": "-1.39006716E-05",
+          "value": -1.39006716e-05
+        },
+        {
+          "as_published": "2.27853312E-09",
+          "value": 2.27853312e-09
+        },
+        {
+          "as_published": "-1.37692123E-13",
+          "value": -1.37692123e-13
+        },
+        {
+          "as_published": "-6.36313780E+04",
+          "value": -63631.378
+        },
+        {
+          "as_published": "-4.63993258E+01",
+          "value": -46.3993258
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.04671462E+01",
+          "value": 10.4671462
+        },
+        {
+          "as_published": "-9.87189569E-03",
+          "value": -0.00987189569
+        },
+        {
+          "as_published": "1.64412784E-04",
+          "value": 0.000164412784
+        },
+        {
+          "as_published": "-2.01280378E-07",
+          "value": -2.01280378e-07
+        },
+        {
+          "as_published": "7.70512593E-11",
+          "value": 7.70512593e-11
+        },
+        {
+          "as_published": "-5.94425403E+04",
+          "value": -59442.5403
+        },
+        {
+          "as_published": "-9.02759989E+00",
+          "value": -9.02759989
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-5.56693501E+04",
+    "value": -55669.3501,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "105-54-4",
+    "C6H12O2 EthylButyrate  Ethyl Butanoate CH3CH2C(O)OC2H5  SIGMA=1  STATWT=1",
+    "IA=21.2933  IB=89.4868  IC=108.1781 [Ir(CH3)=0.52172  ROSYM=3  V(3)=340. aver]x2",
+    "Ir(C2H5-C)=5.1599  ROSYM=1  V(3)=3147.  cm-1  Ir(C2H5-O)=6.158  ROSYM=1",
+    "V(3)=272 cm-1  Ir(C2H5-OC(O)-)=9.3889  ROSYM=1  V(3)=2575. cm-1   Nu=3146,3135,",
+    "3117(2),3086(2),3070,3064,3060,3041,3040.5(2),3029,1843.5,1548,1537,1529(2),",
+    "1516(2),1488,1450,1440,1420(2),1346(2),1317,1267,1208,1187,1149,1131,1130,1076,",
+    "1057,978,923,899,833,831,757,617,551,531,367,325,267,247,240   HF298=-462.863 kJ",
+    "REF=Burcat G3B3 calc   {HF298=-485+/-1 kJ REF=Wiberg & Waldron JACS 113,",
+    "(1991),7697; HF298=-500. kJ  REF=Osmont et al  IJCK 39,(2007),481}",
+    "HF298(liq)=-528.4+/-0.79 kJ REF=Wiberg & Waldron JACS 113, (1991),7697.  Max Lst",
+    "Sq Error Cp @ 1300 K 0.70%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C6H12O2 EtButyrate",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 19128,
+    "header_line": 19140,
+    "end_line": 19143
+  },
+  "source_text": {
+    "header_line": "C6H12O2 EtButyrateT04/08C  6.H 12.O  2.   0.G   200.000  6000.000  B 116.15828 1",
+    "coeff_lines": [
+      " 1.48730879E+01 3.76656586E-02-1.39006716E-05 2.27853312E-09-1.37692123E-13    2",
+      "-6.36313780E+04-4.63993258E+01 1.04671462E+01-9.87189569E-03 1.64412784E-04    3",
+      "-2.01280378E-07 7.70512593E-11-5.94425403E+04-9.02759989E+00-5.56693501E+04    4"
+    ]
+  }
+}

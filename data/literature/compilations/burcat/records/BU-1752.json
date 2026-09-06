@@ -1,0 +1,190 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1752",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "BENZOTRIFUROXAN",
+  "cas_as_published": "3470-17-5",
+  "formula": "C6N6O6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 8/99",
+  "calc_quality_as_published": "D",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 6.",
+      "element": "N",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 6.",
+      "element": "O",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "252.10284",
+    "value": 252.10284
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.25028258E+01",
+          "value": 32.5028258
+        },
+        {
+          "as_published": "1.96519737E-02",
+          "value": 0.0196519737
+        },
+        {
+          "as_published": "-7.62353333E-06",
+          "value": -7.62353333e-06
+        },
+        {
+          "as_published": "1.29360949E-09",
+          "value": 1.29360949e-09
+        },
+        {
+          "as_published": "-8.01216134E-14",
+          "value": -8.01216134e-14
+        },
+        {
+          "as_published": "-1.33442030E+04",
+          "value": -13344.203
+        },
+        {
+          "as_published": "-1.47193860E+02",
+          "value": -147.19386
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-8.43434844E-01",
+          "value": -0.843434844
+        },
+        {
+          "as_published": "1.03343605E-01",
+          "value": 0.103343605
+        },
+        {
+          "as_published": "-6.42039528E-05",
+          "value": -6.42039528e-05
+        },
+        {
+          "as_published": "-7.99732470E-09",
+          "value": -7.9973247e-09
+        },
+        {
+          "as_published": "1.54458617E-11",
+          "value": 1.54458617e-11
+        },
+        {
+          "as_published": "-3.76608113E+03",
+          "value": -3766.08113
+        },
+        {
+          "as_published": "2.69680087E+01",
+          "value": 26.9680087
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "     N/A       ",
+    "value": null,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "3470-17-5",
+    "C6N6O6 BENZOTRIFUROXAN (BTF) SIGMA=3  A=B=0.15716  C=0.07858  NU=86(2),104,164,",
+    "183(2),276(2),312,372(2),[420],428(2),509,[570(2)],642(2),649,[651],740(2),",
+    "[736(2),810],785,886,931,[935(2),965(2)],1099,[1082(2)],1290,[1304(2),1415(2)],",
+    "1487,[1570(2)],1602,1659,[1656(2)] REF=Gong, Xiao & Dong Chineese J. Struct.",
+    "Chem. 18,(1999),124-130  NO GASEOUS HEAT OF FORMATION AVAILABLE  HF298(Solid)=",
+    "144.9 +/-0.8 kcal REF=Rouse J. Chem. Eng. Data, 21,(1976),16-20.  Max Lst Sq",
+    "Error Cp @ 1300 K 0.53 %."
+  ],
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "nasa7_coefficient_unparsed",
+      "line_index": 2,
+      "token_as_published": "     N/A       "
+    },
+    {
+      "kind": "xml_coefficient_mismatch",
+      "xml_formula": "BENZOTRIFUROXAN",
+      "xml_cas": "3470-17-5",
+      "note": "BURCAT_THR.xml (2005 snapshot) coefficients differ from this BURCAT.THR.txt record. THR tokens retained."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 19587,
+    "header_line": 19595,
+    "end_line": 19598
+  },
+  "source_text": {
+    "header_line": "BENZOTRIFUROXAN   T 8/99C  6.N  6.O  6.   0.G   200.000  6000.000  D 252.10284 1",
+    "coeff_lines": [
+      " 3.25028258E+01 1.96519737E-02-7.62353333E-06 1.29360949E-09-8.01216134E-14    2",
+      "-1.33442030E+04-1.47193860E+02-8.43434844E-01 1.03343605E-01-6.42039528E-05    3",
+      "-7.99732470E-09 1.54458617E-11-3.76608113E+03 2.69680087E+01     N/A           4"
+    ]
+  }
+}

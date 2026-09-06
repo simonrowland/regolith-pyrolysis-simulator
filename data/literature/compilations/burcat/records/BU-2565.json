@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2565",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "H2S anharmonic",
+  "cas_as_published": "7783-06-4",
+  "formula": "H2S",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "g 4/01",
+  "calc_quality_as_published": "A",
+  "composition": [
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 2.",
+      "element": "H",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": " 1.",
+      "element": "S",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "34.08188",
+    "value": 34.08188
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.97879430E+00",
+          "value": 2.9787943
+        },
+        {
+          "as_published": "3.59760372E-03",
+          "value": 0.00359760372
+        },
+        {
+          "as_published": "-1.22803151E-06",
+          "value": -1.22803151e-06
+        },
+        {
+          "as_published": "1.96833209E-10",
+          "value": 1.96833209e-10
+        },
+        {
+          "as_published": "-1.16716162E-14",
+          "value": -1.16716162e-14
+        },
+        {
+          "as_published": "-3.51607638E+03",
+          "value": -3516.07638
+        },
+        {
+          "as_published": "6.77921228E+00",
+          "value": 6.77921228
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.12024455E+00",
+          "value": 4.12024455
+        },
+        {
+          "as_published": "-1.87907426E-03",
+          "value": -0.00187907426
+        },
+        {
+          "as_published": "8.21426650E-06",
+          "value": 8.2142665e-06
+        },
+        {
+          "as_published": "-7.06425730E-09",
+          "value": -7.0642573e-09
+        },
+        {
+          "as_published": "2.14234860E-12",
+          "value": 2.1423486e-12
+        },
+        {
+          "as_published": "-3.68215173E+03",
+          "value": -3682.15173
+        },
+        {
+          "as_published": "1.53174068E+00",
+          "value": 1.53174068
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-2.47759639E+03",
+    "value": -2477.59639,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "7783-06-4",
+    "H2S  anharmonic  SIGMA=2  STATWT=1  A0=10.3613  B0=9.0162  C0=4.7314",
+    "Nu=2614.56,1182.68,2627.9  X11=-24.69  X22=-5.72  X33=-24.28  X12=-19.58",
+    "X23=-21.3  X13=-95.10  DARD=47.1 B000=9.0162  ALFAB1=0.185  ALFAB2=-0.2703",
+    "ALFAB3=0.1392  ALFAA1=0.1057  ALFAA2=-0.2975  ALFAA3=.1703  ALFAC1=0.0697",
+    "ALFAC2=0.0619  ALFAC3=0.0541  TAAA=-0.00504   TBBB=-0.00825  TCCC=-0.00027",
+    "TAAB=0.00412   TBBC=-0.00059  TAAC=-0.00053   TABA=-0.00073  HF298=-20.60+/-0.5",
+    "kJ  REF=Gurvich 1989 {HF298=-20.6+/-0.5 kJ  REF=Cox Wagman 1984  HF298=-20.5 kJ",
+    "REF=JANAF 77;  HF298=20.5+/-2.1 kJ  REF=Denis  J Sulfur Chem 29,(2008),327}  Max",
+    "Lst Sq Error Cp @ 6000 K 0.37%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 28683,
+    "header_line": 28693,
+    "end_line": 28696
+  },
+  "source_text": {
+    "header_line": "H2S anharmonic    g 4/01H  2.S  1.   0.   0.G   200.000  6000.000  A  34.08188 1",
+    "coeff_lines": [
+      " 2.97879430E+00 3.59760372E-03-1.22803151E-06 1.96833209E-10-1.16716162E-14    2",
+      "-3.51607638E+03 6.77921228E+00 4.12024455E+00-1.87907426E-03 8.21426650E-06    3",
+      "-7.06425730E-09 2.14234860E-12-3.68215173E+03 1.53174068E+00-2.47759639E+03    4"
+    ]
+  }
+}

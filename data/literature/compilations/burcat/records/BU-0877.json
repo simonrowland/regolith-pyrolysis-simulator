@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0877",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C2H6O2 1,2-diOl",
+  "cas_as_published": "107-21-1",
+  "formula": "C2H6O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T05/07",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 2.",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "62.06784",
+    "value": 62.06784
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "7.91471937E+00",
+          "value": 7.91471937
+        },
+        {
+          "as_published": "1.58415156E-02",
+          "value": 0.0158415156
+        },
+        {
+          "as_published": "-5.53486929E-06",
+          "value": -5.53486929e-06
+        },
+        {
+          "as_published": "8.73346629E-10",
+          "value": 8.73346629e-10
+        },
+        {
+          "as_published": "-5.14003705E-14",
+          "value": -5.14003705e-14
+        },
+        {
+          "as_published": "-5.06036554E+04",
+          "value": -50603.6554
+        },
+        {
+          "as_published": "-1.23696999E+01",
+          "value": -12.3696999
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "6.12883088E+00",
+          "value": 6.12883088
+        },
+        {
+          "as_published": "-7.72943096E-03",
+          "value": -0.00772943096
+        },
+        {
+          "as_published": "8.65891028E-05",
+          "value": 8.65891028e-05
+        },
+        {
+          "as_published": "-1.09211943E-07",
+          "value": -1.09211943e-07
+        },
+        {
+          "as_published": "4.32667518E-11",
+          "value": 4.32667518e-11
+        },
+        {
+          "as_published": "-4.88825925E+04",
+          "value": -48882.5925
+        },
+        {
+          "as_published": "3.34129960E+00",
+          "value": 3.3412996
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-4.68292178E+04",
+    "value": -46829.2178,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "107-21-1",
+    "C2H6O2  1,2 EthaneDiOl HO-CH2-CH2-OH (Ethylene Glycol)  SIGMA=2  STATWT=1",
+    "IA=5.7128  IB=14.7075  IC=18.3044  [Ir(OH)=0.14418 ROSYM=1  V(3)=258.8 cm-1]x2",
+    "Ir(-CH2-OH)=2.835945  ROSYM=1  V(3)=1400 cm-1  Nu=3749(2),3104,3101,3027,3020,",
+    "1526,1520,1433,1419,1413,1408,1260,1210,1121,1061,1051,886,878,538,523",
+    "HF298=-389.362+/-0.614 kJ  REF=ATcT A  {HF298=389.42+/-0.47 kJ  REF=ATcT C 2011;",
+    "HF298=-387.36 kJ  REF=Burcat G3B3 calc  HF298=-394.4+/-2.8 kJ  REF=Knauth &",
+    "Sabbah   Stuct. Chem 1,(1990),43; HF298=388.+/-2. kJ  REF=Gardner & Hussain",
+    "J Chem Thermod. 4,(1972),819} HF298(liq)=-455.169+/-0.375 kJ  REF=ATcT  Max Lst",
+    "Sq Error Cp @ 200 K 0.65%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 9127,
+    "header_line": 9137,
+    "end_line": 9140
+  },
+  "source_text": {
+    "header_line": "C2H6O2 1,2-diOl   T05/07C  2.H  6.O  2.   0.G   200.000  6000.000  B  62.06784 1",
+    "coeff_lines": [
+      " 7.91471937E+00 1.58415156E-02-5.53486929E-06 8.73346629E-10-5.14003705E-14    2",
+      "-5.06036554E+04-1.23696999E+01 6.12883088E+00-7.72943096E-03 8.65891028E-05    3",
+      "-1.09211943E-07 4.32667518E-11-4.88825925E+04 3.34129960E+00-4.68292178E+04    4"
+    ]
+  }
+}

@@ -1,0 +1,179 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1465",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C5H8O2 MeCrotanat",
+  "cas_as_published": "623-43-8",
+  "formula": "C5H8O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/11",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 5.",
+      "element": "C",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 8.",
+      "element": "H",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "100.11582",
+    "value": 100.11582
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.29099789E+01",
+          "value": 12.9099789
+        },
+        {
+          "as_published": "2.48663528E-02",
+          "value": 0.0248663528
+        },
+        {
+          "as_published": "-8.93563177E-06",
+          "value": -8.93563177e-06
+        },
+        {
+          "as_published": "1.43905652E-09",
+          "value": 1.43905652e-09
+        },
+        {
+          "as_published": "-8.59166729E-14",
+          "value": -8.59166729e-14
+        },
+        {
+          "as_published": "-4.76142831E+04",
+          "value": -47614.2831
+        },
+        {
+          "as_published": "-3.71057355E+01",
+          "value": -37.1057355
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "5.79381377E+00",
+          "value": 5.79381377
+        },
+        {
+          "as_published": "2.45643667E-02",
+          "value": 0.0245643667
+        },
+        {
+          "as_published": "3.60443257E-05",
+          "value": 3.60443257e-05
+        },
+        {
+          "as_published": "-6.23879461E-08",
+          "value": -6.23879461e-08
+        },
+        {
+          "as_published": "2.61792798E-11",
+          "value": 2.61792798e-11
+        },
+        {
+          "as_published": "-4.46367327E+04",
+          "value": -44636.7327
+        },
+        {
+          "as_published": "4.57236786E+00",
+          "value": 4.57236786
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-4.16099797E+04",
+    "value": -41609.9797,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "623-43-8",
+    "C5H8O2 Methyl trans Crotonate (2-Butenoic acid Methyl Ester trans) SIGMA=1",
+    "STATWT=1  IA=9.2305  IB=67.9780  IC=76.1622  [Ir(CH3)=0.5119  ROSYM=3.",
+    "V(3)=919.2 cm-1]x2  Ir(OH)=0.1390  ROSYM=1  V(3)=280 cm-1  Ir(CH3O)=4.0917",
+    "ROSYM=1  V(3)=900. cm-1  Nu=3201,3176.5(2),3144,3128,3084,3072,3037,1805,1732,",
+    "1525,1513.3(2),1507,1492.5,1439,1358,1336,1232,1215,1186,1137,1089,1061,1016,",
+    "959,923,855.5,733,701,449,386,312,245,216  HF298=-345.967+/-8. kJ  REF=Burcat",
+    "G3B3  {HF298=-342+/-2 kJ  REF=Cox & Pilcher 1970;  HF298=-342.67 kJ  REF=NIST94}",
+    "Max Lst Sq Error Cp @ 6000 K 0.55%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 16002,
+    "header_line": 16011,
+    "end_line": 16014
+  },
+  "source_text": {
+    "header_line": "C5H8O2 MeCrotanat T12/11C  5.H  8.O  2.   0.G   200.000  6000.000  B 100.11582 1",
+    "coeff_lines": [
+      " 1.29099789E+01 2.48663528E-02-8.93563177E-06 1.43905652E-09-8.59166729E-14    2",
+      "-4.76142831E+04-3.71057355E+01 5.79381377E+00 2.45643667E-02 3.60443257E-05    3",
+      "-6.23879461E-08 2.61792798E-11-4.46367327E+04 4.57236786E+00-4.16099797E+04    4"
+    ]
+  }
+}

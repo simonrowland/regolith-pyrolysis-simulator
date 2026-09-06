@@ -1,0 +1,187 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0374",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CH2N2 cy(-CH=N-NH)",
+  "cas_as_published": "157-23-3",
+  "formula": "CH2N2",
+  "phase": "condensed",
+  "phase_as_published": "-CH=N-NH",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T01/07",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 1.",
+      "element": "C",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 2.",
+      "element": "H",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 2.",
+      "element": "N",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "42.04006",
+    "value": 42.04006
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.40396178E+00",
+          "value": 5.40396178
+        },
+        {
+          "as_published": "6.65046537E-03",
+          "value": 0.00665046537
+        },
+        {
+          "as_published": "-2.36583723E-06",
+          "value": -2.36583723e-06
+        },
+        {
+          "as_published": "3.79549499E-10",
+          "value": 3.79549499e-10
+        },
+        {
+          "as_published": "-2.26261233E-14",
+          "value": -2.26261233e-14
+        },
+        {
+          "as_published": "4.55934055E+04",
+          "value": 45593.4055
+        },
+        {
+          "as_published": "-3.95349763E+00",
+          "value": -3.95349763
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.17248184E+00",
+          "value": 3.17248184
+        },
+        {
+          "as_published": "2.53366513E-03",
+          "value": 0.00253366513
+        },
+        {
+          "as_published": "2.71935843E-05",
+          "value": 2.71935843e-05
+        },
+        {
+          "as_published": "-3.91007449E-08",
+          "value": -3.91007449e-08
+        },
+        {
+          "as_published": "1.62465269E-11",
+          "value": 1.62465269e-11
+        },
+        {
+          "as_published": "4.66463880E+04",
+          "value": 46646.388
+        },
+        {
+          "as_published": "9.89091905E+00",
+          "value": 9.89091905
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.78755304E+04",
+    "value": 47875.5304,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "157-23-3",
+    "CH2N2 1H-Diazirine Cyclo H(-C=N-NH-)  SIGMA=1  STATWT=1  IA=2.1104  IB=3.7455",
+    "IC=5.5668  Nu=3324,3234,1804,1372,1194,1045,978,805,554  HF298=95.139 kcal",
+    "REF=Burcat G3B3 calc  {HF298=94.36 kcal REF=G2 calc Catoire & Swihart J. Prop &",
+    "Power 18,(2002),1242}  Max Lst Sq Error Cp @ 200 K 0.51%."
+  ],
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "CH2N2 cy(-CH=N-NH)",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    },
+    {
+      "kind": "phase_suffix_normalized_to_condensed",
+      "phase_as_published": "-CH=N-NH",
+      "phase_normalized": "condensed",
+      "note": "Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am', 'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 3742,
+    "header_line": 3747,
+    "end_line": 3750
+  },
+  "source_text": {
+    "header_line": "CH2N2 cy(-CH=N-NH)T01/07C  1.H  2.N  2.   0.G   200.000  6000.000  B  42.04006 1",
+    "coeff_lines": [
+      " 5.40396178E+00 6.65046537E-03-2.36583723E-06 3.79549499E-10-2.26261233E-14    2",
+      " 4.55934055E+04-3.95349763E+00 3.17248184E+00 2.53366513E-03 2.71935843E-05    3",
+      "-3.91007449E-08 1.62465269E-11 4.66463880E+04 9.89091905E+00 4.78755304E+04    4"
+    ]
+  }
+}

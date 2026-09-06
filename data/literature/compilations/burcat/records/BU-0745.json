@@ -1,0 +1,191 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0745",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CF3CH2OH- anion",
+  "cas_as_published": "N/A",
+  "formula": "Ni",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/22",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "  ",
+      "count_as_published": "WAR",
+      "element": null,
+      "count": null,
+      "filler": true
+    },
+    {
+      "element_as_published": "NI",
+      "count_as_published": "NG!",
+      "element": "Ni",
+      "count": null,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "   ",
+      "element": null,
+      "count": null,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "   ",
+      "element": null,
+      "count": null,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "100.04038",
+    "value": 100.04038
+  },
+  "T_min_K": {
+    "as_published": "298.150",
+    "value": 298.15
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.45373976E+01",
+          "value": 14.5373976
+        },
+        {
+          "as_published": "1.00568182E-02",
+          "value": 0.0100568182
+        },
+        {
+          "as_published": "-3.79387126E-06",
+          "value": -3.79387126e-06
+        },
+        {
+          "as_published": "6.32518638E-10",
+          "value": 6.32518638e-10
+        },
+        {
+          "as_published": "-3.87149640E-14",
+          "value": -3.8714964e-14
+        },
+        {
+          "as_published": "-9.32395043E+04",
+          "value": -93239.5043
+        },
+        {
+          "as_published": "-4.67245131E+01",
+          "value": -46.7245131
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.01185524E+00",
+          "value": 2.01185524
+        },
+        {
+          "as_published": "4.56385784E-02",
+          "value": 0.0456385784
+        },
+        {
+          "as_published": "-4.06913080E-05",
+          "value": -4.0691308e-05
+        },
+        {
+          "as_published": "1.65568288E-08",
+          "value": 1.65568288e-08
+        },
+        {
+          "as_published": "-2.12180625E-12",
+          "value": -2.12180625e-12
+        },
+        {
+          "as_published": "-8.97701558E+04",
+          "value": -89770.1558
+        },
+        {
+          "as_published": "1.78784957E+01",
+          "value": 17.8784957
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-8.74696164E+04",
+    "value": -87469.6164,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A",
+    "C2H3F3O-  CF3CH2OH-  2,2,2-TrifluoroEthanol anion SIGMA=3  STATWT=2  IA=16.0201",
+    "IB=31.3450  IC=31.9535  Nu=2682,2640.4,1508.7,1420,1278.7,1267.7,1221.5,1192,      ",
+    "1110.5,984,799,676.5,647,529.5,516.3,405.4,367,344.5,212.3,128.5,20.67     ",
+    "HF298=-727.267+/-8. kJ thermal electron  REF=Burcat G3B3  Max Lst Sq Error Cp @      ",
+    "1300. K 0.51%.         ",
+    "WARNING! The electron is a fifth element. The header formula for 7 term ",
+    "polynomials is not correct except in files THERM.DAT and in NEWNASA.TXT."
+  ],
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "composition_count_unparsed",
+      "slot": 0,
+      "element_as_published": "  ",
+      "count_as_published": "WAR"
+    },
+    {
+      "kind": "composition_count_unparsed",
+      "slot": 1,
+      "element_as_published": "NI",
+      "count_as_published": "NG!"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 7619,
+    "header_line": 7627,
+    "end_line": 7630
+  },
+  "source_text": {
+    "header_line": "CF3CH2OH- anion   T 1/22  WARNING!          G   298.150  6000.000  B 100.04038 1",
+    "coeff_lines": [
+      " 1.45373976E+01 1.00568182E-02-3.79387126E-06 6.32518638E-10-3.87149640E-14    2",
+      "-9.32395043E+04-4.67245131E+01 2.01185524E+00 4.56385784E-02-4.06913080E-05    3",
+      " 1.65568288E-08-2.12180625E-12-8.97701558E+04 1.78784957E+01-8.74696164E+04    4"
+    ]
+  }
+}

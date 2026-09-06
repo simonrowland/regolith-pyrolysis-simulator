@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1860",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C8H7N  Indole",
+  "cas_as_published": "120-72-9",
+  "formula": "C8H7N",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/10",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 8.",
+      "element": "C",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 7.",
+      "element": "H",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "117.14792",
+    "value": 117.14792
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.79667062E+01",
+          "value": 17.9667062
+        },
+        {
+          "as_published": "2.56335693E-02",
+          "value": 0.0256335693
+        },
+        {
+          "as_published": "-9.38382114E-06",
+          "value": -9.38382114e-06
+        },
+        {
+          "as_published": "1.53483749E-09",
+          "value": 1.53483749e-09
+        },
+        {
+          "as_published": "-9.27435295E-14",
+          "value": -9.27435295e-14
+        },
+        {
+          "as_published": "1.01937381E+04",
+          "value": 10193.7381
+        },
+        {
+          "as_published": "-7.46934397E+01",
+          "value": -74.6934397
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-1.09397131E+00",
+          "value": -1.09397131
+        },
+        {
+          "as_published": "4.49933456E-02",
+          "value": 0.0449933456
+        },
+        {
+          "as_published": "5.66022573E-05",
+          "value": 5.66022573e-05
+        },
+        {
+          "as_published": "-1.18906081E-07",
+          "value": -1.18906081e-07
+        },
+        {
+          "as_published": "5.40629979E-11",
+          "value": 5.40629979e-11
+        },
+        {
+          "as_published": "1.68582493E+04",
+          "value": 16858.2493
+        },
+        {
+          "as_published": "3.12282780E+01",
+          "value": 31.228278
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.88225163E+04",
+    "value": 18822.5163,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "120-72-9",
+    "C8H7N INDOLE (1-BENZAZOLE, 2,3-BENZAPYRROLE) IAIBIC=80998.5  NU=3520,3140,",
+    "3083(2),3068(2),1617,1578,1510,1489,1458,1410,1348,1300,1275,1245,1205,1150,",
+    "1122,1082,1068,1015,968,930,900,869,860,800,762,761,738,715,625,608,575,544,428,",
+    "400(2),240,208  HF298=156.5+/-1.25 KJ  REF=Das, Frenkel, Gadalla, Kudchadker,",
+    "Marsh,Rodgers & Wilhoit JPCRD 22 (1993), 658  HF298(solid)=86.65+/-0.75 kJ",
+    "REF=Good, JCED 17,(1972),28   Max Lst Sq Error Cp @ 200 K 0.89%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 20926,
+    "header_line": 20933,
+    "end_line": 20936
+  },
+  "source_text": {
+    "header_line": "C8H7N  Indole     T12/10C  8.H  7.N  1.   0.G   200.000  6000.000  B 117.14792 1",
+    "coeff_lines": [
+      " 1.79667062E+01 2.56335693E-02-9.38382114E-06 1.53483749E-09-9.27435295E-14    2",
+      " 1.01937381E+04-7.46934397E+01-1.09397131E+00 4.49933456E-02 5.66022573E-05    3",
+      "-1.18906081E-07 5.40629979E-11 1.68582493E+04 3.12282780E+01 1.88225163E+04    4"
+    ]
+  }
+}

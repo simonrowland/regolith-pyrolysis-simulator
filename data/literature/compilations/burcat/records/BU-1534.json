@@ -1,0 +1,178 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1534",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6HCl5 pentachlo",
+  "cas_as_published": "608-93-5",
+  "formula": "C6HCl5",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 5/12",
+  "calc_quality_as_published": "",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 1.",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 5.",
+      "element": "Cl",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "250.33564",
+    "value": 250.33564
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.30430396E+01",
+          "value": 23.0430396
+        },
+        {
+          "as_published": "1.06114134E-02",
+          "value": 0.0106114134
+        },
+        {
+          "as_published": "-4.02524943E-06",
+          "value": -4.02524943e-06
+        },
+        {
+          "as_published": "6.73772104E-10",
+          "value": 6.73772104e-10
+        },
+        {
+          "as_published": "-4.13606119E-14",
+          "value": -4.13606119e-14
+        },
+        {
+          "as_published": "-1.30216102E+04",
+          "value": -13021.6102
+        },
+        {
+          "as_published": "-8.60266902E+01",
+          "value": -86.0266902
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.09763746E+00",
+          "value": 3.09763746
+        },
+        {
+          "as_published": "7.59244428E-02",
+          "value": 0.0759244428
+        },
+        {
+          "as_published": "-8.84095852E-05",
+          "value": -8.84095852e-05
+        },
+        {
+          "as_published": "5.21154774E-08",
+          "value": 5.21154774e-08
+        },
+        {
+          "as_published": "-1.24663574E-11",
+          "value": -1.24663574e-11
+        },
+        {
+          "as_published": "-7.98003787E+03",
+          "value": -7980.03787
+        },
+        {
+          "as_published": "1.45894192E+01",
+          "value": 14.5894192
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-4.36586161E+03",
+    "value": -4365.86161,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "608-93-5",
+    "C6HCl5 PentaChloroBenzen SIGMA=2 STATWT=1  IA=121.6307  IB=181.8590  IC=303.4897",
+    "Nu=3250,1595,1569,1430,1358,1289,1202.2(2),1080,875.5(2),822,699,677,606,564,",
+    "560,537,380,347.5(2),321,273,231,220,214,200,146,81.78,68.62   HF298=-36.3+/-3.7",
+    "kJ  REF=Dorofeeva et al Struct Chem 22,(2011),1303  {HF298=-31.59 kJ  REF=Burcat",
+    "G3B3;  HF298=-36. kJ  REF=WANG, Pilling et al JPC 112,(2008),1832  G3X atomiz;",
+    "HF298=-40+/-8.7 kJ  Platonov Simulin Rozenberg Russ JPC 59,(1985),814.}  Max Lst",
+    "Sq Error Cp @ 1300 K 0.41%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 16893,
+    "header_line": 16901,
+    "end_line": 16904
+  },
+  "source_text": {
+    "header_line": "C6HCl5 pentachlo  T 5/12C  6.H  1.CL 5.   0.G   200.000  6000.000    250.33564 1",
+    "coeff_lines": [
+      " 2.30430396E+01 1.06114134E-02-4.02524943E-06 6.73772104E-10-4.13606119E-14    2",
+      "-1.30216102E+04-8.60266902E+01 3.09763746E+00 7.59244428E-02-8.84095852E-05    3",
+      " 5.21154774E-08-1.24663574E-11-7.98003787E+03 1.45894192E+01-4.36586161E+03    4"
+    ]
+  }
+}

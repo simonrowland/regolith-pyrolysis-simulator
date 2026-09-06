@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0615",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C2D2 Acetylene-D",
+  "cas_as_published": "1070-74-2",
+  "formula": "C2D2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/09",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 2.",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "D ",
+      "count_as_published": " 2.",
+      "element": "D",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "28.04960",
+    "value": 28.0496
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.43109302E+00",
+          "value": 5.43109302
+        },
+        {
+          "as_published": "4.61451102E-03",
+          "value": 0.00461451102
+        },
+        {
+          "as_published": "-1.68086913E-06",
+          "value": -1.68086913e-06
+        },
+        {
+          "as_published": "2.73749047E-10",
+          "value": 2.73749047e-10
+        },
+        {
+          "as_published": "-1.64839294E-14",
+          "value": -1.64839294e-14
+        },
+        {
+          "as_published": "2.48261107E+04",
+          "value": 24826.1107
+        },
+        {
+          "as_published": "-7.45454677E+00",
+          "value": -7.45454677
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "7.69115398E-01",
+          "value": 0.769115398
+        },
+        {
+          "as_published": "3.02646864E-02",
+          "value": 0.0302646864
+        },
+        {
+          "as_published": "-5.82300963E-05",
+          "value": -5.82300963e-05
+        },
+        {
+          "as_published": "5.58802967E-08",
+          "value": 5.58802967e-08
+        },
+        {
+          "as_published": "-2.00620022E-11",
+          "value": -2.00620022e-11
+        },
+        {
+          "as_published": "2.56202097E+04",
+          "value": 25620.2097
+        },
+        {
+          "as_published": "1.38495556E+01",
+          "value": 13.8495556
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.67811910E+04",
+    "value": 26781.191,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1070-74-2",
+    "C2D2  ACETYLENE-D2  STATWT=1.  SIGMA=2.  IB=3.2838  NU=2701,1762,2439,505(2),",
+    "537(2) X11=15.43,X12=12.1,X13=58.78,X14=10.87,X15=6.92,X22=6.31,X23=.91,X24=",
+    "8.34,X25=.56,X34=5.54,X35=3.13,X44=-3.66,X45=7.7,X55=1.24,X33=14.3,G44=-0.75,",
+    "G55=-1.36  REF=SHIMANOUCHI   HF0=53.22 KCAL  derived from HF0 of C2H2 in JANAF",
+    "1971. MAX LST SQ ERROR CP @ 1300K 0.55% ."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 6237,
+    "header_line": 6243,
+    "end_line": 6246
+  },
+  "source_text": {
+    "header_line": "C2D2 Acetylene-D  T11/09C  2.D  2.   0.   0.G   200.000  6000.000  B  28.04960 1",
+    "coeff_lines": [
+      " 5.43109302E+00 4.61451102E-03-1.68086913E-06 2.73749047E-10-1.64839294E-14    2",
+      " 2.48261107E+04-7.45454677E+00 7.69115398E-01 3.02646864E-02-5.82300963E-05    3",
+      " 5.58802967E-08-2.00620022E-11 2.56202097E+04 1.38495556E+01 2.67811910E+04    4"
+    ]
+  }
+}

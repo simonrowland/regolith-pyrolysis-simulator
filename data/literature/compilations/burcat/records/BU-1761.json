@@ -1,0 +1,183 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1761",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C7H5ON Benzoxazole",
+  "cas_as_published": "273-53-0",
+  "formula": "C7H5NO",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 5/12",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 7.",
+      "element": "C",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 5.",
+      "element": "H",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 1.",
+      "element": "N",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "119.12074",
+    "value": 119.12074
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.56706689E+01",
+          "value": 15.6706689
+        },
+        {
+          "as_published": "2.21809321E-02",
+          "value": 0.0221809321
+        },
+        {
+          "as_published": "-8.10530700E-06",
+          "value": -8.105307e-06
+        },
+        {
+          "as_published": "1.32420349E-09",
+          "value": 1.32420349e-09
+        },
+        {
+          "as_published": "-7.99544490E-14",
+          "value": -7.9954449e-14
+        },
+        {
+          "as_published": "-4.05294621E+03",
+          "value": -4052.94621
+        },
+        {
+          "as_published": "-6.09943719E+01",
+          "value": -60.9943719
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-2.49438279E-01",
+          "value": -0.249438279
+        },
+        {
+          "as_published": "3.55982584E-02",
+          "value": 0.0355982584
+        },
+        {
+          "as_published": "5.64044592E-05",
+          "value": 5.64044592e-05
+        },
+        {
+          "as_published": "-1.10125566E-07",
+          "value": -1.10125566e-07
+        },
+        {
+          "as_published": "4.93628298E-11",
+          "value": 4.93628298e-11
+        },
+        {
+          "as_published": "1.62912796E+03",
+          "value": 1629.12796
+        },
+        {
+          "as_published": "2.80948503E+01",
+          "value": 28.0948503
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.44099556E+03",
+    "value": 3440.99556,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "273-53-0",
+    "C7H5NO Benzoxazole  SIGMA=1  STATWT=1  IA=21.1655  IB=49.4024  IC=70.5679",
+    "Nu=3291,3228,3223,3208,3194,1673.5,1655,1580.5,1524,1496,1399,1340,1314,1272,",
+    "1190,1179.5,1133,1100.5,1033,980.5,942,936,882,876,858,799,776,764,635,633,587,",
+    "549,432,421,263,229  HF298=28.61+/-8 kJ  REF=Burcat G3B3  {HF298=29.3 kJ",
+    "REF=Dorofeeva et al G4 calc;  HF298=45.1+/-0.5 kJ  REF=Steele et al JCT 24,",
+    "(1992),449 error? HF0?}  Max Lst Sq Error Cp @ 200 K 0.89%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C7H5ON Benzoxazole",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 19693,
+    "header_line": 19700,
+    "end_line": 19703
+  },
+  "source_text": {
+    "header_line": "C7H5ON BenzoxazoleT 5/12C  7.H  5.N  1.O  1.G   200.000  6000.000  B 119.12074 1",
+    "coeff_lines": [
+      " 1.56706689E+01 2.21809321E-02-8.10530700E-06 1.32420349E-09-7.99544490E-14    2",
+      "-4.05294621E+03-6.09943719E+01-2.49438279E-01 3.55982584E-02 5.64044592E-05    3",
+      "-1.10125566E-07 4.93628298E-11 1.62912796E+03 2.80948503E+01 3.44099556E+03    4"
+    ]
+  }
+}

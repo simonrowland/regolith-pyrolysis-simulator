@@ -1,0 +1,180 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1256",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C4H6N4O12 ETN",
+  "cas_as_published": "643-97-0",
+  "formula": "C4H6N4O12",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 4.",
+      "element": "C",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 4.",
+      "element": "N",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": "12.",
+      "element": "O",
+      "count": 12.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "302.11020",
+    "value": 302.1102
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "3.86742320E+01",
+          "value": 38.674232
+        },
+        {
+          "as_published": "3.17026390E-02",
+          "value": 0.031702639
+        },
+        {
+          "as_published": "-1.18819264E-05",
+          "value": -1.18819264e-05
+        },
+        {
+          "as_published": "1.97266532E-09",
+          "value": 1.97266532e-09
+        },
+        {
+          "as_published": "-1.20401404E-13",
+          "value": -1.20401404e-13
+        },
+        {
+          "as_published": "-6.99988876E+04",
+          "value": -69998.8876
+        },
+        {
+          "as_published": "-1.54986670E+02",
+          "value": -154.98667
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "8.23613940E+00",
+          "value": 8.2361394
+        },
+        {
+          "as_published": "7.55533325E-02",
+          "value": 0.0755533325
+        },
+        {
+          "as_published": "4.64314511E-05",
+          "value": 4.64314511e-05
+        },
+        {
+          "as_published": "-1.32897268E-07",
+          "value": -1.32897268e-07
+        },
+        {
+          "as_published": "6.30235532E-11",
+          "value": 6.30235532e-11
+        },
+        {
+          "as_published": "-5.98352419E+04",
+          "value": -59835.2419
+        },
+        {
+          "as_published": "1.14354988E+01",
+          "value": 11.4354988
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-5.38441832E+04",
+    "value": -53844.1832,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "643-97-0",
+    "C4H6N4O12 1,2,3,4-Erythritol Tetra Nitrate (ETN)  SIGMA=4  STATWT=1  IA=211.6817",
+    "IB=352.7107  IC=494.6690  [Ir(-ONO2)=12.28  ROSYM=1  V(3)=150. cm-1]x4  Nu=3160,",
+    "3154,3136,3101,3097,3093,1793,1783,1777(2),1516,1467,1429,1416,1403,1390,1376,",
+    "1349,1340,1331,1322,1307,1269.5,1246,1156,1112,1098,1072,1063,1030,961.5,929,",
+    "909,872,852,842,832,761,758,753(2),747,711,696,653,621,614,593,559.5,545,484,",
+    "434.5,370,329,302,282,240,223,192,172,144,112,95.4,78.8,67.4,65.5,61.32,46.62,",
+    "[44.88,32.81,27.20,20.25  int rot]  REF=Burcat B3LYP/6-31G(d)  HF298=-107.00",
+    "kcal  REF=Green RMG 2013  {HF298=-108.1 kcal  REF=NIST94;  HF298=101.8  kcal",
+    "REF=Thergas (Yoneda's method)}  Max Lst Sq Error Cp @ 1300 K 0.50%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 13434,
+    "header_line": 13444,
+    "end_line": 13447
+  },
+  "source_text": {
+    "header_line": "C4H6N4O12 ETN     T 1/16C  4.H  6.N  4.O 12.G   200.000  6000.000  B 302.11020 1",
+    "coeff_lines": [
+      " 3.86742320E+01 3.17026390E-02-1.18819264E-05 1.97266532E-09-1.20401404E-13    2",
+      "-6.99988876E+04-1.54986670E+02 8.23613940E+00 7.55533325E-02 4.64314511E-05    3",
+      "-1.32897268E-07 6.30235532E-11-5.98352419E+04 1.14354988E+01-5.38441832E+04    4"
+    ]
+  }
+}

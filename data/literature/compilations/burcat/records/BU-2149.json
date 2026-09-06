@@ -1,0 +1,195 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2149",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C17H31O2 Palmitole",
+  "cas_as_published": "N/A  anion  646-26-4",
+  "formula": "C17H31O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 7/08",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "17.",
+      "element": "C",
+      "count": 17.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "31.",
+      "element": "H",
+      "count": 31.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "267.42684",
+    "value": 267.42684
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.05283789E+01",
+          "value": 40.5283789
+        },
+        {
+          "as_published": "9.42778840E-02",
+          "value": 0.094277884
+        },
+        {
+          "as_published": "-3.42669905E-05",
+          "value": -3.42669905e-05
+        },
+        {
+          "as_published": "5.56849552E-09",
+          "value": 5.56849552e-09
+        },
+        {
+          "as_published": "-3.34719360E-13",
+          "value": -3.3471936e-13
+        },
+        {
+          "as_published": "-6.68106030E+04",
+          "value": -66810.603
+        },
+        {
+          "as_published": "-1.80351369E+02",
+          "value": -180.351369
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.70418995E+01",
+          "value": 17.0418995
+        },
+        {
+          "as_published": "2.56960319E-02",
+          "value": 0.0256960319
+        },
+        {
+          "as_published": "3.37808175E-04",
+          "value": 0.000337808175
+        },
+        {
+          "as_published": "-4.57062458E-07",
+          "value": -4.57062458e-07
+        },
+        {
+          "as_published": "1.82289400E-10",
+          "value": 1.822894e-10
+        },
+        {
+          "as_published": "-5.39253382E+04",
+          "value": -53925.3382
+        },
+        {
+          "as_published": "-2.70139587E+01",
+          "value": -27.0139587
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-4.55348541E+04",
+    "value": -45534.8541,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A  anion  646-26-4",
+    "C17H31O2 cis-MethynylPalmitoleate-C0 Radical C6H13CH=CHC7H14COOCH2*   SIGMA=1",
+    "STATWT=2   IA=76.9638  IB=1426.3124  IC=1442.8158  Ir(C6H13-)=80.42  ROSYM=1",
+    "V3=2000. cm-1  Ir(-C(O)OCH2*)=12.1547  ROSYM=1  V(3)=2575. cm-1  Ir(C2H5)=5.6308",
+    "ROSYM=1  V(3)=3147. cm-1  Ir(-OCH2*)=3.8239  ROSYM=1  V(3)=900 cm-1   Nu=3301,",
+    "3165,3135,3129,3122,3111,3106,3088,3078.5(2),3069(2),3065,3061(2),3053,3050,",
+    "3044(2),3041,3034(3),3027(2),3025,3016(4),3006,1854,1752,1540(3),1529.5(2),",
+    "1525.5(2),1521(2),1517(2),1515,1508(2),1492,1441,1427.5(2),1414(3),1389.5(3),",
+    "1362,1353(3),1347(2),1341,1330(2),1317,1301,1286(2),1263(2),1248,1233,1209,1201,",
+    "1187,1178,1143,1132,1118,1103,1065,1075(2),1061,1057,1052,1032.5(2),1015(2),",
+    "1005,980,971,937,905.5(2),882,849,824,804(2),764,751(2),740,726,704,602,594,548,",
+    "525,479,455(2),426,375,349,332,314,279,266,247,230(2),218,169,152(2),138.1,",
+    "121.6,119.49,111.19,107.07,91.11,73.77,57.94,51.31,48.07    HF298=-378.6+/-8. kJ",
+    "REF=Osmont et al Energy & Fuels 21,(2007),2027  {HF298=-381.63 kJ  REF=Thergas}",
+    "Max Lst Sq Error Cp @ 1300 K 0.63%."
+  ],
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C17H31O2 Palmitole",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    },
+    {
+      "kind": "cas_identifier_nonstandard",
+      "cas_as_published": "N/A  anion  646-26-4"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 24620,
+    "header_line": 24635,
+    "end_line": 24638
+  },
+  "source_text": {
+    "header_line": "C17H31O2 PalmitoleT 7/08C 17.H 31.O  2.   0.G   200.000  6000.000  B 267.42684 1",
+    "coeff_lines": [
+      " 4.05283789E+01 9.42778840E-02-3.42669905E-05 5.56849552E-09-3.34719360E-13    2",
+      "-6.68106030E+04-1.80351369E+02 1.70418995E+01 2.56960319E-02 3.37808175E-04    3",
+      "-4.57062458E-07 1.82289400E-10-5.39253382E+04-2.70139587E+01-4.55348541E+04    4"
+    ]
+  }
+}

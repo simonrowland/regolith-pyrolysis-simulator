@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0818",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C2H4S4 (HS)2C=C(",
+  "cas_as_published": "95241-02-4",
+  "formula": "C2H4S4",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 5/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 2.",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": " 4.",
+      "element": "S",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "156.31716",
+    "value": 156.31716
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.76798784E+01",
+          "value": 17.6798784
+        },
+        {
+          "as_published": "7.46105440E-03",
+          "value": 0.0074610544
+        },
+        {
+          "as_published": "-2.69247596E-06",
+          "value": -2.69247596e-06
+        },
+        {
+          "as_published": "4.35870239E-10",
+          "value": 4.35870239e-10
+        },
+        {
+          "as_published": "-2.61404906E-14",
+          "value": -2.61404906e-14
+        },
+        {
+          "as_published": "1.31166685E+04",
+          "value": 13116.6685
+        },
+        {
+          "as_published": "-5.50858759E+01",
+          "value": -55.0858759
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "6.56698976E-01",
+          "value": 0.656698976
+        },
+        {
+          "as_published": "9.02111376E-02",
+          "value": 0.0902111376
+        },
+        {
+          "as_published": "-1.60455728E-04",
+          "value": -0.000160455728
+        },
+        {
+          "as_published": "1.36722432E-07",
+          "value": 1.36722432e-07
+        },
+        {
+          "as_published": "-4.42763533E-11",
+          "value": -4.42763533e-11
+        },
+        {
+          "as_published": "1.61309593E+04",
+          "value": 16130.9593
+        },
+        {
+          "as_published": "2.42713239E+01",
+          "value": 24.2713239
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.91680260E+04",
+    "value": 19168.026,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "95241-02-4",
+    "C2H4S4 Ethylenetetrathiol  2(HS)C=C(SH)2  SIGMA=4  STATWT=1  IA=50.7592",
+    "IB=61.5320  IC=111.3179  [Ir(SH)=0.55764  ROSYM=1  V(3)=1100. cm-1]x4",
+    "Nu=2664.5(2),2659,1581.5,1033,1000,975,927,905.5,848,685,523,421.5,362,326,301,",
+    "277,240,228  HF298=38.091+/-2. kcal  REF=Burcat G3B3  Max Lst Sq Error Cp @",
+    "6000 K 0.27%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 8435,
+    "header_line": 8441,
+    "end_line": 8444
+  },
+  "source_text": {
+    "header_line": "C2H4S4 (HS)2C=C(  T 5/14C  2.H  4.S  4.   0.G   200.000  6000.000  B 156.31716 1",
+    "coeff_lines": [
+      " 1.76798784E+01 7.46105440E-03-2.69247596E-06 4.35870239E-10-2.61404906E-14    2",
+      " 1.31166685E+04-5.50858759E+01 6.56698976E-01 9.02111376E-02-1.60455728E-04    3",
+      " 1.36722432E-07-4.42763533E-11 1.61309593E+04 2.42713239E+01 1.91680260E+04    4"
+    ]
+  }
+}

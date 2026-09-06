@@ -1,0 +1,190 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2027",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C11H22O2 MeDecanoa",
+  "cas_as_published": "110-42-9",
+  "formula": "C11H22O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 9/15",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "11.",
+      "element": "C",
+      "count": 11.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "22.",
+      "element": "H",
+      "count": 22.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "186.29118",
+    "value": 186.29118
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.56955245E+01",
+          "value": 25.6955245
+        },
+        {
+          "as_published": "6.60112903E-02",
+          "value": 0.0660112903
+        },
+        {
+          "as_published": "-2.36865362E-05",
+          "value": -2.36865362e-05
+        },
+        {
+          "as_published": "3.81439655E-09",
+          "value": 3.81439655e-09
+        },
+        {
+          "as_published": "-2.27872656E-13",
+          "value": -2.27872656e-13
+        },
+        {
+          "as_published": "-8.38134569E+04",
+          "value": -83813.4569
+        },
+        {
+          "as_published": "-1.03948341E+02",
+          "value": -103.948341
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.35951758E+01",
+          "value": 13.5951758
+        },
+        {
+          "as_published": "1.51436946E-02",
+          "value": 0.0151436946
+        },
+        {
+          "as_published": "2.16662053E-04",
+          "value": 0.000216662053
+        },
+        {
+          "as_published": "-2.87020812E-07",
+          "value": -2.87020812e-07
+        },
+        {
+          "as_published": "1.13226691E-10",
+          "value": 1.13226691e-10
+        },
+        {
+          "as_published": "-7.63776173E+04",
+          "value": -76377.6173
+        },
+        {
+          "as_published": "-2.10873640E+01",
+          "value": -21.087364
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-7.02506822E+04",
+    "value": -70250.6822,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "110-42-9",
+    "C11H22O2 Methyl-Decanoate  C10H19(O)OCH3  SIGMA=1  STATWT=1  IA=16.1139",
+    "IB=611.7382  IC=622.6777  [Ir(CH3)=0.51387  ROSYM=3  V3=640. cm-1]x2",
+    "Ir(C2H5)=3.1546  ROSYM=1  V(3)=920. cm-1  Ir(CH3O-)=2.082  ROSYM=1  V(3)=900.",
+    "cm-1  Ir(-COOCH3)=13.2174  ROSYM=1  V(3)=1200. cm-1  Nu=98.34,111,124,136,160,",
+    "167,179,183,187,246,279,339,357.5,426,486,513,582,705,739.5(2),752,786,841,902,",
+    "904.5,908,981,999,1006,1031,1050(2),1069,1073.5(2),1099,1149.5(2),1185.5,1206,",
+    "1224,1227,1254,1260,1297(2),1330,1337,1341,1346,1356.5(2),1375,1407,1425,1428,",
+    "1432,1441,1493.2(2),1514(2),1517.3(3),1526(2),1529,1534,1541,1546,1826.5,3011,",
+    "3014(3),3025,3032(3),3039.5,3043.2(3),3055,3064,3071,3074.5(2),3098,3106,3110,",
+    "3147,3179,[25.35,32.53,36.62,60.96,73.38 int rot]  REF=Burcat B3LYP/6-31G(d)",
+    "HF298=-584.1+/-12.5 kJ  REF=Osmont Catoire Golckap IJCK  39,(2007),481",
+    "{HF298=-607.1+/-0.5 kJ  REF=Freedman Bagby et al  M.O.JAOCS 66(11),(1984),1601}",
+    "Max Lst Sq Error Cp @ 1300 K 0.61%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C11H22O2 MeDecanoa",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 23022,
+    "header_line": 23036,
+    "end_line": 23039
+  },
+  "source_text": {
+    "header_line": "C11H22O2 MeDecanoaT 9/15C 11.H 22.O  2.   0.G   200.000  6000.000  B 186.29118 1",
+    "coeff_lines": [
+      " 2.56955245E+01 6.60112903E-02-2.36865362E-05 3.81439655E-09-2.27872656E-13    2",
+      "-8.38134569E+04-1.03948341E+02 1.35951758E+01 1.51436946E-02 2.16662053E-04    3",
+      "-2.87020812E-07 1.13226691E-10-7.63776173E+04-2.10873640E+01-7.02506822E+04    4"
+    ]
+  }
+}

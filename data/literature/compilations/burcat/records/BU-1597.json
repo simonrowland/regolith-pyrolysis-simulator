@@ -1,0 +1,184 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1597",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "o-C6H5ClO cis(Z)",
+  "cas_as_published": "95-57-8",
+  "formula": "C6H5ClO",
+  "phase": "condensed",
+  "phase_as_published": "Z",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/06",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 5.",
+      "element": "H",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "CL",
+      "count_as_published": " 1.",
+      "element": "Cl",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "128.55600",
+    "value": 128.556
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.61735184E+01",
+          "value": 16.1735184
+        },
+        {
+          "as_published": "1.81755630E-02",
+          "value": 0.018175563
+        },
+        {
+          "as_published": "-6.56338083E-06",
+          "value": -6.56338083e-06
+        },
+        {
+          "as_published": "1.06421495E-09",
+          "value": 1.06421495e-09
+        },
+        {
+          "as_published": "-6.39319940E-14",
+          "value": -6.3931994e-14
+        },
+        {
+          "as_published": "-2.28772126E+04",
+          "value": -22877.2126
+        },
+        {
+          "as_published": "-5.98103172E+01",
+          "value": -59.8103172
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "-1.07354055E+00",
+          "value": -1.07354055
+        },
+        {
+          "as_published": "5.44049418E-02",
+          "value": 0.0544049418
+        },
+        {
+          "as_published": "-8.68621952E-06",
+          "value": -8.68621952e-06
+        },
+        {
+          "as_published": "-3.81399101E-08",
+          "value": -3.81399101e-08
+        },
+        {
+          "as_published": "2.22807120E-11",
+          "value": 2.2280712e-11
+        },
+        {
+          "as_published": "-1.77051276E+04",
+          "value": -17705.1276
+        },
+        {
+          "as_published": "3.16420669E+01",
+          "value": 31.6420669
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.57486688E+04",
+    "value": -15748.6688,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "95-57-8",
+    "C6H5ClO (Z) o-CHLOROPHENOL 2-ClC6H4OH SIGMA=1  STATWT=1  IA=28.3481  IB=54.8559",
+    "IC=83.1977   Ir=0.14166  ROSYM=1 V(3)=1766.3 cm-1  Nu=3700,3225,3220,3210,3196,",
+    "1657,1643,1531,1508,1389,1344,1293,1228,1190,1150,1069,1048,975.5,936,859.847,",
+    "763,708,686,564,550,496,448,411,376,266,256  HF298=-130.94 kJ  HF0=-113.25 kJ",
+    "REF=Burcat G3B3 calc {HF298=-138.34 kJ  REF=Janoshek J. Mol. Struct.661-2,(2003)",
+    ",635   Max Lst Sq Error Cp @ 1300 K 0.48%"
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "phase_suffix_normalized_to_condensed",
+      "phase_as_published": "Z",
+      "phase_normalized": "condensed",
+      "note": "Parenthetical suffix kept verbatim in phase_as_published. Normalized phase is 'condensed' because the suffix is outside the closed allow-list ['I', 'II', 'III', 'IV', 'L', 'S', 'a', 'alpha', 'am', 'b', 'beta', 'c', 'cr', 'd', 'g', 'gamma', 'gr', 'l', 'liq', 'ref', 's']. Records are not merged."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17641,
+    "header_line": 17648,
+    "end_line": 17651
+  },
+  "source_text": {
+    "header_line": "o-C6H5ClO cis(Z)  T 1/06C  6.H  5.CL 1.O  1.G   200.000  6000.000  C 128.55600 1",
+    "coeff_lines": [
+      " 1.61735184E+01 1.81755630E-02-6.56338083E-06 1.06421495E-09-6.39319940E-14    2",
+      "-2.28772126E+04-5.98103172E+01-1.07354055E+00 5.44049418E-02-8.68621952E-06    3",
+      "-3.81399101E-08 2.22807120E-11-1.77051276E+04 3.16420669E+01-1.57486688E+04    4"
+    ]
+  }
+}

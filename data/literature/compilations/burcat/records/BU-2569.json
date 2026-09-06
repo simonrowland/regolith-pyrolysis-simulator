@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-2569",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "Disulfane H-S-S-",
+  "cas_as_published": "63344-86-5",
+  "formula": "H2S2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 3/03",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 2.",
+      "element": "H",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "S ",
+      "count_as_published": " 2.",
+      "element": "S",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "66.14788",
+    "value": 66.14788
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "5.69402902E+00",
+          "value": 5.69402902
+        },
+        {
+          "as_published": "3.90495326E-03",
+          "value": 0.00390495326
+        },
+        {
+          "as_published": "-1.41886468E-06",
+          "value": -1.41886468e-06
+        },
+        {
+          "as_published": "2.30688658E-10",
+          "value": 2.30688658e-10
+        },
+        {
+          "as_published": "-1.38745854E-14",
+          "value": -1.38745854e-14
+        },
+        {
+          "as_published": "-1.65807167E+02",
+          "value": -165.807167
+        },
+        {
+          "as_published": "-3.74138641E+00",
+          "value": -3.74138641
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.09117166E+00",
+          "value": 2.09117166
+        },
+        {
+          "as_published": "1.94220358E-02",
+          "value": 0.0194220358
+        },
+        {
+          "as_published": "-2.89395611E-05",
+          "value": -2.89395611e-05
+        },
+        {
+          "as_published": "2.30251562E-08",
+          "value": 2.30251562e-08
+        },
+        {
+          "as_published": "-7.20187083E-12",
+          "value": -7.20187083e-12
+        },
+        {
+          "as_published": "5.91056782E+02",
+          "value": 591.056782
+        },
+        {
+          "as_published": "1.35883795E+01",
+          "value": 13.5883795
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "1.86421088E+03",
+    "value": 1864.21088,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "63344-86-5",
+    "H2S2 HS-SH  DISULFANE  SIGMA=2  STATWT=1  Ia=0.5381381  Ib=10.4557619 Ic=10.9939",
+    "REF=MOPAC AM1-UHF  NU=2557,2556,883,882,516,416   REF= Jacox+Shimanouchi NIST",
+    "Webbook 2000   HF298=15.5 kcal  REF=Kerr CRC Handbook of Chem and Phys 2002.",
+    "{HF298=15.48+/-2.1 kJ  REF=Denis  J. Sulfur Chem 29,(2008),327}  Max Lst Sq",
+    "Error Cp @ 6000 0.37%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 28725,
+    "header_line": 28731,
+    "end_line": 28734
+  },
+  "source_text": {
+    "header_line": "Disulfane H-S-S-  T 3/03H  2.S  2.   0.   0.G   200.000  6000.000  B  66.14788 1",
+    "coeff_lines": [
+      " 5.69402902E+00 3.90495326E-03-1.41886468E-06 2.30688658E-10-1.38745854E-14    2",
+      "-1.65807167E+02-3.74138641E+00 2.09117166E+00 1.94220358E-02-2.89395611E-05    3",
+      " 2.30251562E-08-7.20187083E-12 5.91056782E+02 1.35883795E+01 1.86421088E+03    4"
+    ]
+  }
+}

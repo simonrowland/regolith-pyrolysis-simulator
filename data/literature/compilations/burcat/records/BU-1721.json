@@ -1,0 +1,185 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1721",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H12O6  Glucose",
+  "cas_as_published": "61-60-9 or 50-99-7",
+  "formula": "C6H12O6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/10",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "12.",
+      "element": "H",
+      "count": 12.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 6.",
+      "element": "O",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "180.15588",
+    "value": 180.15588
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.71159614E+01",
+          "value": 27.1159614
+        },
+        {
+          "as_published": "3.55978773E-02",
+          "value": 0.0355978773
+        },
+        {
+          "as_published": "-1.26796327E-05",
+          "value": -1.26796327e-05
+        },
+        {
+          "as_published": "2.03397537E-09",
+          "value": 2.03397537e-09
+        },
+        {
+          "as_published": "-1.21203313E-13",
+          "value": -1.21203313e-13
+        },
+        {
+          "as_published": "-1.37163924E+05",
+          "value": -137163.924
+        },
+        {
+          "as_published": "-1.12300444E+02",
+          "value": -112.300444
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.56615747E+00",
+          "value": 1.56615747
+        },
+        {
+          "as_published": "7.90442097E-02",
+          "value": 0.0790442097
+        },
+        {
+          "as_published": "1.94257492E-05",
+          "value": 1.94257492e-05
+        },
+        {
+          "as_published": "-9.70843789E-08",
+          "value": -9.70843789e-08
+        },
+        {
+          "as_published": "4.89952405E-11",
+          "value": 4.89952405e-11
+        },
+        {
+          "as_published": "-1.29082781E+05",
+          "value": -129082.781
+        },
+        {
+          "as_published": "2.54526657E+01",
+          "value": 25.4526657
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.25099663E+05",
+    "value": -125099.663,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "61-60-9 or 50-99-7",
+    "C6H12O6  Cy Glucose alfa/beta Glucopyranose  SIGMA=1  STATWT=1  IA=65.4264",
+    "IB=110.0843  IC=157.2695  [Ir(OH)=0.1336  ROSYM=1  V(3)=1213. cm-1]x3",
+    "Ir(-CH2OH)=4.7176  ROSYM=1  V(3)=1700. cm-1  Nu=3754(2),3726,3714,3608,3120,",
+    "3079,3053,3016,3006,2996,2965,1547,1526,1472(2),1447.4(2),1430,1411,1377,1369,",
+    "1356,1348,1332,1297.5,1272(2),1233,1205,1195,1145,1120,1112,1098,1077.5,1073,",
+    "1055,1039,1009,995,932,845,718,682,634,581,553,524,466,444,425,391,379,326,(322-",
+    "OH rot, not included),318,(285-OH rot not incl),267.5,255,238,(217 OH rot not",
+    "incl),173.65,(129 -CH2OH rot not incl),90.86,37,22   REF=B3LYP/6-31G(d) calc",
+    "Burcat  HF298=-248.6+/-3  kcal   REF=average of alfa+beta Osmont, Catoire et al",
+    "Comb Flame 157,(2010),1230   {HF298=-1126. kJ  REF=NIST 94;  HF298=-1271. kJ",
+    "REF=Wikipedia no reference given;  HF298=-264.3 kcal REF=Vasiliu,Guynn,Dixon",
+    "JPC C 115,(2002),15686; HF298=-266.6/268.9 kcal REF=Assary,Redfern et al JPC B",
+    "114,(2010),9002;  HF298=-1134+/-7 kJ exper  REF=Kabo et al JCT 59,(2013),87}",
+    "Max Lst Sq Error Cp @ 6000 K 0.47%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 19153,
+    "header_line": 19168,
+    "end_line": 19171
+  },
+  "source_text": {
+    "header_line": "C6H12O6  Glucose  T 6/10C  6.H 12.O  6.   0.G   200.000  6000.000  B 180.15588 1",
+    "coeff_lines": [
+      " 2.71159614E+01 3.55978773E-02-1.26796327E-05 2.03397537E-09-1.21203313E-13    2",
+      "-1.37163924E+05-1.12300444E+02 1.56615747E+00 7.90442097E-02 1.94257492E-05    3",
+      "-9.70843789E-08 4.89952405E-11-1.29082781E+05 2.54526657E+01-1.25099663E+05    4"
+    ]
+  }
+}

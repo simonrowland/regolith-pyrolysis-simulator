@@ -1,0 +1,173 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1822",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C7H14,1-heptene",
+  "cas_as_published": "592-76-7",
+  "formula": "C7H14",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "P 4/87",
+  "calc_quality_as_published": "C",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 7.",
+      "element": "C",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": "14.",
+      "element": "H",
+      "count": 14.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "98.18606",
+    "value": 98.18606
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "2.00329343E+01",
+          "value": 20.0329343
+        },
+        {
+          "as_published": "3.01875580E-02",
+          "value": 0.030187558
+        },
+        {
+          "as_published": "-9.96912897E-06",
+          "value": -9.96912897e-06
+        },
+        {
+          "as_published": "1.59376458E-09",
+          "value": 1.59376458e-09
+        },
+        {
+          "as_published": "-9.64314031E-14",
+          "value": -9.64314031e-14
+        },
+        {
+          "as_published": "-1.70512608E+04",
+          "value": -17051.2608
+        },
+        {
+          "as_published": "-7.66778730E+01",
+          "value": -76.677873
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "8.70539860E+00",
+          "value": 8.7053986
+        },
+        {
+          "as_published": "2.80074488E-03",
+          "value": 0.00280074488
+        },
+        {
+          "as_published": "1.55206000E-04",
+          "value": 0.000155206
+        },
+        {
+          "as_published": "-2.09014025E-07",
+          "value": -2.09014025e-07
+        },
+        {
+          "as_published": "8.40505778E-11",
+          "value": 8.40505778e-11
+        },
+        {
+          "as_published": "-1.12661494E+04",
+          "value": -11266.1494
+        },
+        {
+          "as_published": "-4.46493550E+00",
+          "value": -4.4649355
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-7.54824999E+03",
+    "value": -7548.24999,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "592-76-7",
+    "C7H14 1-HEPTENE   TRC 4/87 DATA EXTRAPOLATED THROUGH WILHOIT'S POLYNOMIALS.",
+    "HF298=-62.76 kJ  HF0=-26.90 kJ  MAX LST SQ ERROR Cp @ 200 K 0.71%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 20469,
+    "header_line": 20472,
+    "end_line": 20475
+  },
+  "source_text": {
+    "header_line": "C7H14,1-heptene   P 4/87C  7.H 14.   0.   0.G   200.000  6000.000  C  98.18606 1",
+    "coeff_lines": [
+      " 2.00329343E+01 3.01875580E-02-9.96912897E-06 1.59376458E-09-9.64314031E-14    2",
+      "-1.70512608E+04-7.66778730E+01 8.70539860E+00 2.80074488E-03 1.55206000E-04    3",
+      "-2.09014025E-07 8.40505778E-11-1.12661494E+04-4.46493550E+00-7.54824999E+03    4"
+    ]
+  }
+}

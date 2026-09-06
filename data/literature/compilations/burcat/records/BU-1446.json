@@ -1,0 +1,193 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1446",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C5H7  CYCLO-1-pe",
+  "cas_as_published": "690994-72-0",
+  "formula": "C5H7",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "A 9/04",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 5.",
+      "element": "C",
+      "count": 5.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 7.",
+      "element": "H",
+      "count": 7.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "67.10908",
+    "value": 67.10908
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "9.74013709E+00",
+          "value": 9.74013709
+        },
+        {
+          "as_published": "2.15079576E-02",
+          "value": 0.0215079576
+        },
+        {
+          "as_published": "-7.71169114E-06",
+          "value": -7.71169114e-06
+        },
+        {
+          "as_published": "1.24352828E-09",
+          "value": 1.24352828e-09
+        },
+        {
+          "as_published": "-7.43887470E-14",
+          "value": -7.4388747e-14
+        },
+        {
+          "as_published": "1.56355223E+04",
+          "value": 15635.5223
+        },
+        {
+          "as_published": "-2.89664925E+01",
+          "value": -28.9664925
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.31203194E+00",
+          "value": 2.31203194
+        },
+        {
+          "as_published": "7.01023600E-03",
+          "value": 0.007010236
+        },
+        {
+          "as_published": "9.35725543E-05",
+          "value": 9.35725543e-05
+        },
+        {
+          "as_published": "-1.33744658E-07",
+          "value": -1.33744658e-07
+        },
+        {
+          "as_published": "5.55553794E-11",
+          "value": 5.55553794e-11
+        },
+        {
+          "as_published": "1.91721662E+04",
+          "value": 19172.1662
+        },
+        {
+          "as_published": "1.72892593E+01",
+          "value": 17.2892593
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "2.07617132E+04",
+    "value": 20761.7132,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "690994-72-0",
+    "C5H7 CYCLO-1-PENTEN-3-YL RADICAL SIGMA=1  STATWT=2  IA=10.7046  IB=11.1602",
+    "IC=20.8356  Nu=3236,3225,3202,3050,3030,3027,3014,1522,1502,1499,1420,1337,",
+    "1315,1295,1235,1153,1115,1086,1036,1005,949,920,912,815,809,725,634,598,448,129",
+    "HF298=172.623 kJ HF0=192.745 kJ REF=Burcat G3B3 IJCK 39,(2007),620 Remark! In",
+    "the publication this compound is wrongly identified as Cyclo-1-Penten-1-yl.",
+    "{HF298=166.88 kJ REF=Therm} Max Lst Sq Error Cp @ 200 K **1.2%**,@ 6000 K 0.59%."
+  ],
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "duplicate_name_as_published",
+      "name_as_published": "C5H7  CYCLO-1-pe",
+      "record_ids": [
+        "BU-1446",
+        "BU-1447"
+      ],
+      "note": "Distinct BURCAT.THR 4-line records; not merged."
+    },
+    {
+      "kind": "xml_coefficient_mismatch",
+      "xml_formula": "C5H7  CYCLO-1-pe",
+      "xml_cas": "10577-65-8",
+      "note": "BURCAT_THR.xml (2005 snapshot) coefficients differ from this BURCAT.THR.txt record. THR tokens retained."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 15769,
+    "header_line": 15776,
+    "end_line": 15779
+  },
+  "source_text": {
+    "header_line": "C5H7  CYCLO-1-pe  A 9/04C  5.H  7.   0.   0.G   200.000  6000.000  B  67.10908 1",
+    "coeff_lines": [
+      " 9.74013709E+00 2.15079576E-02-7.71169114E-06 1.24352828E-09-7.43887470E-14    2",
+      " 1.56355223E+04-2.89664925E+01 2.31203194E+00 7.01023600E-03 9.35725543E-05    3",
+      "-1.33744658E-07 5.55553794E-11 1.91721662E+04 1.72892593E+01 2.07617132E+04    4"
+    ]
+  }
+}

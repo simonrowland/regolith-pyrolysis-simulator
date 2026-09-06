@@ -1,0 +1,192 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0420",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "CH3PF2=O",
+  "cas_as_published": "676-99-3",
+  "formula": "Ni",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T07/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "  ",
+      "count_as_published": "WAR",
+      "element": null,
+      "count": null,
+      "filler": true
+    },
+    {
+      "element_as_published": "NI",
+      "count_as_published": "NG!",
+      "element": "Ni",
+      "count": null,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "   ",
+      "element": null,
+      "count": null,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": "   ",
+      "element": null,
+      "count": null,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "100.00449",
+    "value": 100.00449
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.16080642E+01",
+          "value": 11.6080642
+        },
+        {
+          "as_published": "8.82574038E-03",
+          "value": 0.00882574038
+        },
+        {
+          "as_published": "-3.18001822E-06",
+          "value": -3.18001822e-06
+        },
+        {
+          "as_published": "5.14672477E-10",
+          "value": 5.14672477e-10
+        },
+        {
+          "as_published": "-3.08733688E-14",
+          "value": -3.08733688e-14
+        },
+        {
+          "as_published": "-1.22988811E+05",
+          "value": -122988.811
+        },
+        {
+          "as_published": "-3.35644639E+01",
+          "value": -33.5644639
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "2.24079908E+00",
+          "value": 2.24079908
+        },
+        {
+          "as_published": "3.46369619E-02",
+          "value": 0.0346369619
+        },
+        {
+          "as_published": "-2.47519762E-05",
+          "value": -2.47519762e-05
+        },
+        {
+          "as_published": "2.31769065E-09",
+          "value": 2.31769065e-09
+        },
+        {
+          "as_published": "3.29411001E-12",
+          "value": 3.29411001e-12
+        },
+        {
+          "as_published": "-1.20452255E+05",
+          "value": -120452.255
+        },
+        {
+          "as_published": "1.46848166E+01",
+          "value": 14.6848166
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.18457203E+05",
+    "value": -118457.203,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "676-99-3",
+    "CH3PF2=O  MethylPhosphonylDiFluoride  SIGMA=2  STATWT=1  IA=19.4543  IB=20.32235",
+    "IC=21.0387  Ir(CH3)=0.51926  ROSYM=3  V(3)=1700. cm-1  Nu=3172,3169,3082,",
+    "1490.5(2),1390.5,1354.5,983,954,881.5,874,729,444.5,397,382,262,256.6,[177 inter",
+    "rotation]  HF298=-235.4+/-2. kcal  REF=Burcat G3B3  Max Lst Sq Error Cp @ 6000.",
+    "K 0.39%.",
+    "*** WARNING ***This compound contains 5 elements but the formula line",
+    "No 1 can accomodate only four. For enhanced CHEMKIN II or SENKIN use polynomial",
+    "from THERM.DAT or use the 9 therm polynomial ***."
+  ],
+  "ambiguity_count": 2,
+  "ambiguities": [
+    {
+      "kind": "composition_count_unparsed",
+      "slot": 0,
+      "element_as_published": "  ",
+      "count_as_published": "WAR"
+    },
+    {
+      "kind": "composition_count_unparsed",
+      "slot": 1,
+      "element_as_published": "NI",
+      "count_as_published": "NG!"
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 4206,
+    "header_line": 4215,
+    "end_line": 4218
+  },
+  "source_text": {
+    "header_line": "CH3PF2=O          T07/16  WARNING!          G   200.000  6000.000  B 100.00449 1",
+    "coeff_lines": [
+      " 1.16080642E+01 8.82574038E-03-3.18001822E-06 5.14672477E-10-3.08733688E-14    2",
+      "-1.22988811E+05-3.35644639E+01 2.24079908E+00 3.46369619E-02-2.47519762E-05    3",
+      " 2.31769065E-09 3.29411001E-12-1.20452255E+05 1.46848166E+01-1.18457203E+05    4"
+    ]
+  }
+}

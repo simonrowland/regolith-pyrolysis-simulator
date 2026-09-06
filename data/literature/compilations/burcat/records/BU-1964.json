@@ -1,0 +1,184 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1964",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C10H9 7-Me-1Indeny",
+  "cas_as_published": "N/A",
+  "formula": "C10H9",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 1/14",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": "10.",
+      "element": "C",
+      "count": 10.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 9.",
+      "element": "H",
+      "count": 9.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "129.17846",
+    "value": 129.17846
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.85117250E+01",
+          "value": 18.511725
+        },
+        {
+          "as_published": "3.22522579E-02",
+          "value": 0.0322522579
+        },
+        {
+          "as_published": "-1.16509462E-05",
+          "value": -1.16509462e-05
+        },
+        {
+          "as_published": "1.88860574E-09",
+          "value": 1.88860574e-09
+        },
+        {
+          "as_published": "-1.13403375E-13",
+          "value": -1.13403375e-13
+        },
+        {
+          "as_published": "2.24059588E+04",
+          "value": 22405.9588
+        },
+        {
+          "as_published": "-7.51447730E+01",
+          "value": -75.144773
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "1.12520003E+00",
+          "value": 1.12520003
+        },
+        {
+          "as_published": "3.99547394E-02",
+          "value": 0.0399547394
+        },
+        {
+          "as_published": "8.14423315E-05",
+          "value": 8.14423315e-05
+        },
+        {
+          "as_published": "-1.45223029E-07",
+          "value": -1.45223029e-07
+        },
+        {
+          "as_published": "6.35889967E-11",
+          "value": 6.35889967e-11
+        },
+        {
+          "as_published": "2.89475790E+04",
+          "value": 28947.579
+        },
+        {
+          "as_published": "2.38195774E+01",
+          "value": 23.8195774
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.15214919E+04",
+    "value": 31521.4919,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "N/A",
+    "C10H9 7-methyl-1-indenyl Radical  SIGMA=1 STATWT=2 IA=38.7666  IB=56.7866",
+    "IC=95.0325  Ir(CH3)=0.5214  ROSYM=3  V(3)=280. cm-1  Nu=3251,3234,3226,3204,",
+    "3187,3177,3126,3092,3042,1649,1619,1531,1518,1513,1488,1466,1440,1403,1384,1316,",
+    "1254,1225,1205,1191,1109,1089,1069,1042,1028,957,954,904.5,892,871,829,827,776,",
+    "745,726,657,576,571,544.5,500,494,456,268,260,207.5,170    REF=Burcat B3LYP/",
+    "6-31G(d)  HF298=62.64 kcal  REF=Burcat MOPAC 2000 PM3   Max Lst Sq Error @ 200 K",
+    "0.80%."
+  ],
+  "ambiguity_count": 1,
+  "ambiguities": [
+    {
+      "kind": "name_occupies_full_18_column_field",
+      "name_as_published": "C10H9 7-Me-1Indeny",
+      "note": "NASA-7 name field is cols 1-18; no trailing pad in this record."
+    }
+  ],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 22195,
+    "header_line": 22203,
+    "end_line": 22206
+  },
+  "source_text": {
+    "header_line": "C10H9 7-Me-1IndenyT 1/14C 10.H  9.   0.   0.G   200.000  6000.000  B 129.17846 1",
+    "coeff_lines": [
+      " 1.85117250E+01 3.22522579E-02-1.16509462E-05 1.88860574E-09-1.13403375E-13    2",
+      " 2.24059588E+04-7.51447730E+01 1.12520003E+00 3.99547394E-02 8.14423315E-05    3",
+      "-1.45223029E-07 6.35889967E-11 2.89475790E+04 2.38195774E+01 3.15214919E+04    4"
+    ]
+  }
+}

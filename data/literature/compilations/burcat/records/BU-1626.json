@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1626",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H6N2 3-HexeneD",
+  "cas_as_published": "18715-38-3",
+  "formula": "C6H6N2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T 6/16",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 2.",
+      "element": "N",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "106.12532",
+    "value": 106.12532
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.44560570E+01",
+          "value": 14.456057
+        },
+        {
+          "as_published": "2.28460347E-02",
+          "value": 0.0228460347
+        },
+        {
+          "as_published": "-8.23654366E-06",
+          "value": -8.23654366e-06
+        },
+        {
+          "as_published": "1.33291479E-09",
+          "value": 1.33291479e-09
+        },
+        {
+          "as_published": "-7.99298078E-14",
+          "value": -7.99298078e-14
+        },
+        {
+          "as_published": "2.83825743E+04",
+          "value": 28382.5743
+        },
+        {
+          "as_published": "-4.58584395E+01",
+          "value": -45.8584395
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "4.49058668E+00",
+          "value": 4.49058668
+        },
+        {
+          "as_published": "3.34409770E-02",
+          "value": 0.033440977
+        },
+        {
+          "as_published": "2.11181790E-05",
+          "value": 2.1118179e-05
+        },
+        {
+          "as_published": "-5.27802283E-08",
+          "value": -5.27802283e-08
+        },
+        {
+          "as_published": "2.40490187E-11",
+          "value": 2.40490187e-11
+        },
+        {
+          "as_published": "3.19681621E+04",
+          "value": 31968.1621
+        },
+        {
+          "as_published": "9.71376454E+00",
+          "value": 9.71376454
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "3.48870050E+04",
+    "value": 34887.005,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "18715-38-3",
+    "C6H6N2 3-HexeneDiNitrile  NC-CH2CH=CHCH2-CN cis  SIGMA=2  STATWT=1  IA=17.893",
+    "IB=99.1974  IC=107.9799  Nu=3196,3177,3110,3101,3039.5(2),2373.6(2),1750,1494,",
+    "1481,1443,1354,1330,1306,1251,1243,1098,1017,990,972,937,933(2),715,604,545,505,",
+    "392,372,365,245,179,152,55.37,26.88  HF298=68.328+/-2. kcal  REF=Burcat G3B3",
+    "{HF298=279.81 kJ trans  REF=Wikipedia Joback Method 3/2016}   Max Lst Sq Error",
+    "Cp @ 1300 K 0.54%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17984,
+    "header_line": 17991,
+    "end_line": 17994
+  },
+  "source_text": {
+    "header_line": "C6H6N2 3-HexeneD  T 6/16C  6.H  6.N  2.   0.G   200.000  6000.000  B 106.12532 1",
+    "coeff_lines": [
+      " 1.44560570E+01 2.28460347E-02-8.23654366E-06 1.33291479E-09-7.99298078E-14    2",
+      " 2.83825743E+04-4.58584395E+01 4.49058668E+00 3.34409770E-02 2.11181790E-05    3",
+      "-5.27802283E-08 2.40490187E-11 3.19681621E+04 9.71376454E+00 3.48870050E+04    4"
+    ]
+  }
+}

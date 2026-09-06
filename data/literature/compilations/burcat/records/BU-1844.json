@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1844",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C8H4O3 Phthalic",
+  "cas_as_published": "85-44-9",
+  "formula": "C8H4O3",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T03/20",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 8.",
+      "element": "C",
+      "count": 8.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 4.",
+      "element": "H",
+      "count": 4.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 3.",
+      "element": "O",
+      "count": 3.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "148.11556",
+    "value": 148.11556
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.92717280E+01",
+          "value": 19.271728
+        },
+        {
+          "as_published": "2.19646279E-02",
+          "value": 0.0219646279
+        },
+        {
+          "as_published": "-8.10291570E-06",
+          "value": -8.1029157e-06
+        },
+        {
+          "as_published": "1.33203492E-09",
+          "value": 1.33203492e-09
+        },
+        {
+          "as_published": "-8.07679319E-14",
+          "value": -8.07679319e-14
+        },
+        {
+          "as_published": "-5.32450683E+04",
+          "value": -53245.0683
+        },
+        {
+          "as_published": "-7.67086934E+01",
+          "value": -76.7086934
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "9.62626405E-02",
+          "value": 0.0962626405
+        },
+        {
+          "as_published": "5.50143999E-02",
+          "value": 0.0550143999
+        },
+        {
+          "as_published": "1.06881490E-05",
+          "value": 1.0688149e-05
+        },
+        {
+          "as_published": "-6.35969830E-08",
+          "value": -6.3596983e-08
+        },
+        {
+          "as_published": "3.21828786E-11",
+          "value": 3.21828786e-11
+        },
+        {
+          "as_published": "-4.70786521E+04",
+          "value": -47078.6521
+        },
+        {
+          "as_published": "2.68825185E+01",
+          "value": 26.8825185
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-4.46207894E+04",
+    "value": -44620.7894,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "85-44-9",
+    "C8H4O3 Phthalic anhydride  SIGMA=1  STATWT=1 IA=46.8589  IB=70.6076  IC=117.4665",
+    "Nu=3229,3224,3213,3201,1924,1867,1665,1660,1514(2),1404,1314,1284,1197,1196,",
+    "1134,1109,1038,1012,976,930,910,847,801,779,750,717,685,675,639,541(2),454,421,",
+    "353,248,192,162,130  REF=B3LYP/6-31G(d) HF298=-371.0+/-5. kJ  REF=Salas-Lopez",
+    "Revista Mexicana de Ingeneria Chimica 2020  Max Lst Sq Error Cp @ 1300 K 0.55%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 20736,
+    "header_line": 20742,
+    "end_line": 20745
+  },
+  "source_text": {
+    "header_line": "C8H4O3 Phthalic   T03/20C  8.H  4.O  3.   0.G   200.000  6000.000  B 148.11556 1",
+    "coeff_lines": [
+      " 1.92717280E+01 2.19646279E-02-8.10291570E-06 1.33203492E-09-8.07679319E-14    2",
+      "-5.32450683E+04-7.67086934E+01 9.62626405E-02 5.50143999E-02 1.06881490E-05    3",
+      "-6.35969830E-08 3.21828786E-11-4.70786521E+04 2.68825185E+01-4.46207894E+04    4"
+    ]
+  }
+}

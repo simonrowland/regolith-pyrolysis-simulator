@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1621",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H6 3,4-Dimethy",
+  "cas_as_published": "1517-14-2 & 5291-90-7",
+  "formula": "C6H6",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T06/11",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "78.11184",
+    "value": 78.11184
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.18846230E+01",
+          "value": 11.884623
+        },
+        {
+          "as_published": "1.94000819E-02",
+          "value": 0.0194000819
+        },
+        {
+          "as_published": "-6.91019620E-06",
+          "value": -6.9101962e-06
+        },
+        {
+          "as_published": "1.10955461E-09",
+          "value": 1.10955461e-09
+        },
+        {
+          "as_published": "-6.61840646E-14",
+          "value": -6.61840646e-14
+        },
+        {
+          "as_published": "3.53276495E+04",
+          "value": 35327.6495
+        },
+        {
+          "as_published": "-3.95844044E+01",
+          "value": -39.5844044
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "8.75438580E-01",
+          "value": 0.87543858
+        },
+        {
+          "as_published": "3.19344033E-02",
+          "value": 0.0319344033
+        },
+        {
+          "as_published": "2.88422272E-05",
+          "value": 2.88422272e-05
+        },
+        {
+          "as_published": "-6.81200940E-08",
+          "value": -6.8120094e-08
+        },
+        {
+          "as_published": "3.18859041E-11",
+          "value": 3.18859041e-11
+        },
+        {
+          "as_published": "3.90691932E+04",
+          "value": 39069.1932
+        },
+        {
+          "as_published": "2.11423417E+01",
+          "value": 21.1423417
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "4.08848444E+04",
+    "value": 40884.8444,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "1517-14-2 & 5291-90-7",
+    "C6H6  3,4-DiMethylene-1-Cyclobutene  SIGMA=2  STATWT=1  IA=15.0234  IB=19.8019",
+    "IC=34.8253  Nu=3254,3246.5(2),3226,3267.5(2),1783,1741,1561.5,1478,1461,1308,",
+    "1205,1166,1086,934,924,916,888,885,829,782,772,723.5,702.5,699,414.6,305,241,211",
+    "HF298=81.247+/-2. kcal  REF=Elke Goos G3B3  {HF298=336. kJ  REF=Roth et al Chem.",
+    "Ber. 119,(1986),837}  Max Lst Sq Error Cp @ 200 K 0.75%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17927,
+    "header_line": 17933,
+    "end_line": 17936
+  },
+  "source_text": {
+    "header_line": "C6H6 3,4-Dimethy  T06/11C  6.H  6.   0.   0.G   200.000  6000.000  B  78.11184 1",
+    "coeff_lines": [
+      " 1.18846230E+01 1.94000819E-02-6.91019620E-06 1.10955461E-09-6.61840646E-14    2",
+      " 3.53276495E+04-3.95844044E+01 8.75438580E-01 3.19344033E-02 2.88422272E-05    3",
+      "-6.81200940E-08 3.18859041E-11 3.90691932E+04 2.11423417E+01 4.08848444E+04    4"
+    ]
+  }
+}

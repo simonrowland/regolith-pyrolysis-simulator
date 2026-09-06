@@ -1,0 +1,181 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-1627",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C6H6N2O2 NitroAm",
+  "cas_as_published": "88-74-4",
+  "formula": "C6H6N2O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T11/15",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 6.",
+      "element": "C",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "N ",
+      "count_as_published": " 2.",
+      "element": "N",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "138.12412",
+    "value": 138.12412
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.88262088E+01",
+          "value": 18.8262088
+        },
+        {
+          "as_published": "2.33069222E-02",
+          "value": 0.0233069222
+        },
+        {
+          "as_published": "-8.46503648E-06",
+          "value": -8.46503648e-06
+        },
+        {
+          "as_published": "1.37578859E-09",
+          "value": 1.37578859e-09
+        },
+        {
+          "as_published": "-8.27306360E-14",
+          "value": -8.2730636e-14
+        },
+        {
+          "as_published": "-4.30698890E+02",
+          "value": -430.69889
+        },
+        {
+          "as_published": "-7.16914084E+01",
+          "value": -71.6914084
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "8.78997101E-01",
+          "value": 0.878997101
+        },
+        {
+          "as_published": "5.68978356E-02",
+          "value": 0.0568978356
+        },
+        {
+          "as_published": "1.03799016E-06",
+          "value": 1.03799016e-06
+        },
+        {
+          "as_published": "-5.09349482E-08",
+          "value": -5.09349482e-08
+        },
+        {
+          "as_published": "2.70812777E-11",
+          "value": 2.70812777e-11
+        },
+        {
+          "as_published": "5.19826303E+03",
+          "value": 5198.26303
+        },
+        {
+          "as_published": "2.45870211E+01",
+          "value": 24.5870211
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "7.91056599E+03",
+    "value": 7910.56599,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "88-74-4",
+    "C6H6N2O2  o-NitroAminoBenzen  C6H4-1-NH2-2-NO2  SIGMA=1  STATWT=1  IA=36.0684",
+    "IB=66.1652  IC=102.2336  Ir(NH2)=0.3  ROSYM=2  V(3)=270.  Ir(NO2)=5.96  ROSYM=2",
+    "V(3)=900.  Nu=3741,3580,3247,3217,3198,3180,1685,1631,1622,1582,1525,1490,1403,",
+    "1395,1315,1306,1196,1185,1116,1078,1031,987,972,884,853,832,784,753,704,683,605,",
+    "570,546,538,436,406,389,302,247,176,[82.8,37.84 inter rotors]  REF=Burcat B3LYP/",
+    "6-31G(d)  HF298=15.72+/-3. kcal  REF=Keshawarz & Tehrani Propel. Explos. Pyrotec",
+    "32(2),(2007),155  \"exper\"  based on  HF298(solid)=-6.2+/-0.1 kcal  REF=Lebedeva",
+    "et al Russ JPC 45,(1971),561  [HF298=14.1 kcal  REF=Keshvarz Tehrani ibid,",
+    "formula;  HF298=15.0+/-1. kcal  Pedley Rylance 1977;  HF298=17.1  REF=NIST 94;",
+    "HF298=32.00 kcal REF=RMG Green]  Max Lst Sq Error Cp @ 6000 K 0.50%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 17996,
+    "header_line": 18007,
+    "end_line": 18010
+  },
+  "source_text": {
+    "header_line": "C6H6N2O2 NitroAm  T11/15C  6.H  6.N  2.O  2.G   200.000  6000.000  B 138.12412 1",
+    "coeff_lines": [
+      " 1.88262088E+01 2.33069222E-02-8.46503648E-06 1.37578859E-09-8.27306360E-14    2",
+      "-4.30698890E+02-7.16914084E+01 8.78997101E-01 5.68978356E-02 1.03799016E-06    3",
+      "-5.09349482E-08 2.70812777E-11 5.19826303E+03 2.45870211E+01 7.91056599E+03    4"
+    ]
+  }
+}

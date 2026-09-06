@@ -1,0 +1,177 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0879",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "C2H6O2 Di Methyl",
+  "cas_as_published": "690-02-8",
+  "formula": "C2H6O2",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "T12/10",
+  "calc_quality_as_published": "",
+  "composition": [
+    {
+      "element_as_published": "C ",
+      "count_as_published": " 2.",
+      "element": "C",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 6.",
+      "element": "H",
+      "count": 6.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 2.",
+      "element": "O",
+      "count": 2.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "62.06784",
+    "value": 62.06784
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "1.04078451E+01",
+          "value": 10.4078451
+        },
+        {
+          "as_published": "1.56960067E-02",
+          "value": 0.0156960067
+        },
+        {
+          "as_published": "-5.77179854E-06",
+          "value": -5.77179854e-06
+        },
+        {
+          "as_published": "9.47186201E-10",
+          "value": 9.47186201e-10
+        },
+        {
+          "as_published": "-5.74289209E-14",
+          "value": -5.74289209e-14
+        },
+        {
+          "as_published": "-1.99986102E+04",
+          "value": -19998.6102
+        },
+        {
+          "as_published": "-2.96876016E+01",
+          "value": -29.6876016
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "5.86458153E+00",
+          "value": 5.86458153
+        },
+        {
+          "as_published": "2.81675280E-03",
+          "value": 0.0028167528
+        },
+        {
+          "as_published": "5.83992747E-05",
+          "value": 5.83992747e-05
+        },
+        {
+          "as_published": "-7.31378593E-08",
+          "value": -7.31378593e-08
+        },
+        {
+          "as_published": "2.72790608E-11",
+          "value": 2.72790608e-11
+        },
+        {
+          "as_published": "-1.73521140E+04",
+          "value": -17352.114
+        },
+        {
+          "as_published": "3.50761136E-01",
+          "value": 0.350761136
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-1.50940945E+04",
+    "value": -15094.0945,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "690-02-8",
+    "C2H6O2 Dimethyl Peroxide CH3-O-O-CH3 SIGMA=2   STATWT=1  IAIBIC=1123.E-117",
+    "(Ir(CH3)=0.4910 ROSYM=3 V(3)=900 cm-1)x2  Ir(CH3O-)=1.5928 ROSYM=1 V(0)=1341.3",
+    "V(1)=2081  V(2)=1052.2  V(3)=225.5 cm-1   NU=2945,2917,2900,1487,1474,1433(2),",
+    "1198,1165,1020,786,448,3000,2965,2818,1483,1430,1119,1112,1032,376  HF298=-125.5",
+    "+/-5.0 kJ  HF0=-106.5 kJ  REF=Dorofeeva et al JPCRD 30,(2001),475  Max Lst Sq",
+    "Error Cp @ 1300 K 0.68%."
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 9155,
+    "header_line": 9162,
+    "end_line": 9165
+  },
+  "source_text": {
+    "header_line": "C2H6O2 Di Methyl  T12/10C  2.H  6.O  2.   0.G   200.000  6000.000     62.06784 1",
+    "coeff_lines": [
+      " 1.04078451E+01 1.56960067E-02-5.77179854E-06 9.47186201E-10-5.74289209E-14    2",
+      "-1.99986102E+04-2.96876016E+01 5.86458153E+00 2.81675280E-03 5.83992747E-05    3",
+      "-7.31378593E-08 2.72790608E-11-1.73521140E+04 3.50761136E-01-1.50940945E+04    4"
+    ]
+  }
+}

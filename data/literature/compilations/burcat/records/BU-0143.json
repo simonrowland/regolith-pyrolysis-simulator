@@ -1,0 +1,176 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "burcat",
+  "source": {
+    "database": "Burcat and Ruscic, Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables",
+    "citation": "Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September 2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution. Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.",
+    "version": "BURCAT.THR.txt, species last added 3 January 2023",
+    "official_url": "https://respecth.elte.hu/burcat.php",
+    "technion_url": "http://burcat.technion.ac.il/dir",
+    "licence": "Quoted from BURCAT.THR.txt header: 'This database is provided free of charge for non commercial use, on condition that proper quotation will be included in the pertinent publications. IT IS STRICTLY FORBIDDEN TO INCLUDE THIS DATABASE AS IS OR PARTS OF IT IN ANY COMMERCIAL DATABASE, SOFTWARE, FIRMWARE OR HARDWARE AND ANY OTHER TYPE OF COMMERCIAL USE WITHOUT WRITTEN PERMISSION FROM THE AUTHORS.' Printed 2005 report is a US DOE technical report (ANL-05/20)."
+  },
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "BU-0143",
+  "record_kind": "nasa7_polynomial",
+  "name_as_published": "HOBr Hypobromous",
+  "cas_as_published": "13517-11-8",
+  "formula": "BrHO",
+  "phase": "gas",
+  "phase_as_published": "G",
+  "phase_card_as_published": "G",
+  "phase_normalization_rule": "phase_as_published is the parenthetical name suffix when present, else the native phase token (CEA I2 flag, or NASA-7 G/S/L/C). phase is a derived label: gas suffixes {g, G, gas} and CEA flag 0 / NASA-7 G map to 'gas'; any other suffix that is in the closed allow-list is kept as that suffix; a suffix outside the allow-list maps to 'condensed' and is listed as phase_suffix_normalized_to_condensed (never silently rewritten); no suffix + condensed CEA flag maps to 'condensed'; NASA-7 S/L/C without a name suffix map to cr/L/condensed.",
+  "date_as_published": "ATcT/C",
+  "calc_quality_as_published": "B",
+  "composition": [
+    {
+      "element_as_published": "BR",
+      "count_as_published": " 1.",
+      "element": "Br",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "H ",
+      "count_as_published": " 1.",
+      "element": "H",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "O ",
+      "count_as_published": " 1.",
+      "element": "O",
+      "count": 1.0,
+      "filler": false
+    },
+    {
+      "element_as_published": "  ",
+      "count_as_published": " 0.",
+      "element": null,
+      "count": 0.0,
+      "filler": true
+    }
+  ],
+  "molecular_weight": {
+    "as_published": "96.91134",
+    "value": 96.91134
+  },
+  "T_min_K": {
+    "as_published": "200.000",
+    "value": 200.0
+  },
+  "T_max_K": {
+    "as_published": "6000.000",
+    "value": 6000.0
+  },
+  "intervals": [
+    {
+      "range_as_published": "high_T_first",
+      "xml_range_tag": "range_1000_to_Tmax",
+      "a_coefficients": [
+        {
+          "as_published": "4.52559122E+00",
+          "value": 4.52559122
+        },
+        {
+          "as_published": "1.88368072E-03",
+          "value": 0.00188368072
+        },
+        {
+          "as_published": "-6.04303745E-07",
+          "value": -6.04303745e-07
+        },
+        {
+          "as_published": "8.98998654E-11",
+          "value": 8.98998654e-11
+        },
+        {
+          "as_published": "-5.06961671E-15",
+          "value": -5.06961671e-15
+        },
+        {
+          "as_published": "-8.92977368E+03",
+          "value": -8929.77368
+        },
+        {
+          "as_published": "3.31036380E+00",
+          "value": 3.3103638
+        }
+      ],
+      "coefficient_count": 7
+    },
+    {
+      "range_as_published": "low_T_second",
+      "xml_range_tag": "range_Tmin_to_1000",
+      "a_coefficients": [
+        {
+          "as_published": "3.31731799E+00",
+          "value": 3.31731799
+        },
+        {
+          "as_published": "5.05328752E-03",
+          "value": 0.00505328752
+        },
+        {
+          "as_published": "-1.73682519E-06",
+          "value": -1.73682519e-06
+        },
+        {
+          "as_published": "-2.67712334E-09",
+          "value": -2.67712334e-09
+        },
+        {
+          "as_published": "1.93314146E-12",
+          "value": 1.93314146e-12
+        },
+        {
+          "as_published": "-8.62468312E+03",
+          "value": -8624.68312
+        },
+        {
+          "as_published": "9.49126178E+00",
+          "value": 9.49126178
+        }
+      ],
+      "coefficient_count": 7
+    }
+  ],
+  "hf298_div_r": {
+    "as_published": "-7.43074457E+03",
+    "value": -7430.74457,
+    "units_as_published": "H298/R (dimensionless, as printed)"
+  },
+  "coefficient_count": 15,
+  "interval_count": 2,
+  "comment_block": [
+    "13517-11-8",
+    "HOBr  Hypobromic acid   T0=0  SIGMA=1  STATWT=1  A0=20.470  B0=0.353  C0=0.346",
+    "Nu=3615,1163,620 T0=21900.  REF=Jacox JPCRD 32,(2003),1  HF298=-61.78+/-0.54 kJ",
+    "REF=Ruscic ATcT C  {HF298=-62.71+/-0.69 kJ  REF=Ruscic ATcT D 2013;",
+    "HF298=-13.93+/-2. kcal  REF=Burcat G3B3;  HF298=-14.8+/-1  kcal  REF=Lock et al",
+    "JPC 100,(1996),7972}  Max Lst Sq Error Cp @ 200 K 0.27%"
+  ],
+  "ambiguity_count": 0,
+  "ambiguities": [],
+  "source_locator": {
+    "path": "data/literature/compilations/burcat/source/BURCAT.THR.txt",
+    "cas_line": 1409,
+    "header_line": 1415,
+    "end_line": 1418
+  },
+  "source_text": {
+    "header_line": "HOBr Hypobromous  ATcT/CBR 1.H  1.O  1.   0.G   200.000  6000.000  B  96.91134 1",
+    "coeff_lines": [
+      " 4.52559122E+00 1.88368072E-03-6.04303745E-07 8.98998654E-11-5.06961671E-15    2",
+      "-8.92977368E+03 3.31036380E+00 3.31731799E+00 5.05328752E-03-1.73682519E-06    3",
+      "-2.67712334E-09 1.93314146E-12-8.62468312E+03 9.49126178E+00-7.43074457E+03    4"
+    ]
+  }
+}
