@@ -1,0 +1,288 @@
+schema_version: literature_compilation.v1
+source_id: sgte-unary-5.0
+record_id: TC-LIQUID
+formula: Tc
+phase: LIQUID
+name_as_published: TC LIQUID
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source:
+  database: SGTE Pure Element Database (UNARY)
+  version: '5.0'
+  date: '2009-06-02'
+  official_url: https://www.sgte.net/en/free-pure-elements-database
+  licence: This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure
+    elements.
+  citation: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425; SGTE Unary v5.0 (2 June 2009).
+  path: data/literature/compilations/sgte-unary/source/unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  lines:
+  - 135
+  - 2996
+coefficient_count: 17
+interval_count: 5
+ambiguity_count: 0
+ambiguities: []
+element:
+  symbol_as_published: TC
+  reference_phase_as_published: HCP_A3
+  mass:
+    value: 97.907
+    as_published: '9.7907E+01'
+  H298_minus_H0:
+    value: 0.0
+    as_published: '0.0000E+00'
+  S298:
+    value: 0.0
+    as_published: '0.0000E+00'
+  source_lines:
+  - 135
+  - 135
+phase_declaration:
+  name_as_published: LIQUID:L
+  parameter_name: LIQUID
+  type_code_as_published: '%'
+  n_sublattices: 1
+  sites_as_published:
+  - '1'
+  constituents:
+  - - L
+  - - AG
+    - AL
+    - AM
+    - AS
+    - AU
+    - B
+    - BA
+    - BE
+    - BI
+    - C
+    - CA
+    - CD
+    - CE
+    - CO
+    - CR
+    - CS
+    - CU
+    - DY
+    - ER
+    - EU
+    - FE
+    - GA
+    - GD
+    - GE
+    - HF
+    - HG
+    - HO
+    - IN
+    - IR
+    - K
+    - LA
+    - LI
+    - LU
+    - MG
+    - MN
+    - MO
+    - N
+    - NA
+    - NB
+    - ND
+    - NI
+    - NP
+    - O
+    - OS
+    - P
+    - PA
+    - PB
+    - PD
+    - PR
+    - PT
+    - PU
+    - RB
+    - RE
+    - RH
+    - RU
+    - S
+    - SB
+    - SC
+    - SE
+    - SI
+    - SM
+    - SN
+    - SR
+    - TA
+    - TB
+    - TC
+    - TE
+    - TH
+    - TI
+    - TL
+    - TM
+    - U
+    - V
+    - W
+    - Y
+    - YB
+    - ZN
+    - ZR
+  source_lines:
+  - 231
+  - 231
+  constituent_source_lines:
+  - 232
+  - 235
+g_parameter:
+  kind: G
+  identifier: G(LIQUID,TC;0)
+  phase: LIQUID
+  constituent_as_published: TC
+  order: 0
+  source_lines:
+  - 2996
+  - 2996
+  interval_count: 1
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 4000.0
+      as_published: '4000'
+    continuation: N
+    expression_as_published: GLIQTC
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      terms:
+      - coefficient: 1.0
+        t_exponent: 0
+        lnT_power: 0
+        function: GLIQTC
+functions:
+- name: GLIQTC
+  source_lines:
+  - 1674
+  - 1675
+  interval_count: 2
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 2430.0
+      as_published: '2430'
+    continuation: Y
+    expression_as_published: 30402.134-12.313*T-962.385E-24*T**7+GHSERTC
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      - 7
+      terms:
+      - coefficient: 30402.134
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: -12.313
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -9.62385e-22
+        t_exponent: 7
+        lnT_power: 0
+      - coefficient: 1.0
+        t_exponent: 0
+        lnT_power: 0
+        function: GHSERTC
+  - T_low:
+      value: 2430.0
+      as_published: '2430'
+    T_high:
+      value: 4000.0
+      as_published: '4000.00'
+    continuation: N
+    expression_as_published: -12221.9+303.7538*T-47*T*LN(T)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      terms:
+      - coefficient: -12221.9
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 303.7538
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -47.0
+        t_exponent: 1
+        lnT_power: 1
+- name: GHSERTC
+  source_lines:
+  - 1666
+  - 1668
+  interval_count: 2
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 2430.0
+      as_published: '2430.00'
+    continuation: Y
+    expression_as_published: -7947.794+132.5101*T-24.3394*T*LN(T)-2.954747E-3*T**2+63855*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      terms:
+      - coefficient: -7947.794
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 132.5101
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -24.3394
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: -0.002954747
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: 63855.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 2430.0
+      as_published: '2430.00'
+    T_high:
+      value: 4000.0
+      as_published: '4000.00'
+    continuation: N
+    expression_as_published: -47759.99+318.286*T-47*T*LN(T)+663.829E30*T**(-9)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -9
+      - 0
+      - 1
+      terms:
+      - coefficient: -47759.99
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 318.286
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -47.0
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 6.63829e+32
+        t_exponent: -9
+        lnT_power: 0

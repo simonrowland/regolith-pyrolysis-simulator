@@ -1,0 +1,242 @@
+schema_version: literature_compilation.v1
+source_id: sgte-unary-5.0
+record_id: BI-TETRAGONAL_A6
+formula: Bi
+phase: TETRAGONAL_A6
+name_as_published: BI TETRAGONAL_A6
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source:
+  database: SGTE Pure Element Database (UNARY)
+  version: '5.0'
+  date: '2009-06-02'
+  official_url: https://www.sgte.net/en/free-pure-elements-database
+  licence: This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure
+    elements.
+  citation: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425; SGTE Unary v5.0 (2 June 2009).
+  path: data/literature/compilations/sgte-unary/source/unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  lines:
+  - 78
+  - 2081
+coefficient_count: 25
+interval_count: 5
+ambiguity_count: 0
+ambiguities: []
+element:
+  symbol_as_published: BI
+  reference_phase_as_published: RHOMBOHEDRAL_A7
+  mass:
+    value: 208.98
+    as_published: '2.0898E+02'
+  H298_minus_H0:
+    value: 6426.6
+    as_published: '6.4266E+03'
+  S298:
+    value: 56.735
+    as_published: '5.6735E+01'
+  source_lines:
+  - 78
+  - 78
+phase_declaration:
+  name_as_published: TETRAGONAL_A6
+  parameter_name: TETRAGONAL_A6
+  type_code_as_published: '%'
+  n_sublattices: 1
+  sites_as_published:
+  - '1'
+  constituents:
+  - - BI
+    - CD
+    - GA
+    - HG
+    - IN
+    - PB
+    - PU
+    - SN
+    - ZN
+  source_lines:
+  - 270
+  - 270
+  constituent_source_lines:
+  - 271
+  - 271
+g_parameter:
+  kind: G
+  identifier: G(TETRAGONAL_A6,BI;0)
+  phase: TETRAGONAL_A6
+  constituent_as_published: BI
+  order: 0
+  source_lines:
+  - 2081
+  - 2081
+  interval_count: 1
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 3000.0
+      as_published: '3000'
+    continuation: N
+    expression_as_published: 4184.07+GHSERBI
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      terms:
+      - coefficient: 4184.07
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 1.0
+        t_exponent: 0
+        lnT_power: 0
+        function: GHSERBI
+functions:
+- name: GHSERBI
+  source_lines:
+  - 443
+  - 450
+  interval_count: 4
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 544.55
+      as_published: '544.55'
+    continuation: Y
+    expression_as_published: -7817.776+128.418925*T-28.4096529*T*LN(T)+12.338888E-3*T**2-8.381598E-6*T**3
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -7817.776
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 128.418925
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -28.4096529
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 0.012338888
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: -8.381598e-06
+        t_exponent: 3
+        lnT_power: 0
+  - T_low:
+      value: 544.55
+      as_published: '544.55'
+    T_high:
+      value: 800.0
+      as_published: '800'
+    continuation: Y
+    expression_as_published: 29293.369-379.605174*T+49.678*T*LN(T)-73.0245E-3*T**2+13.052833E-6*T**3 -3544705*T**(-1)+166.309E23*T**(-9)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -9
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: 29293.369
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: -379.605174
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: 49.678
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: -0.0730245
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: 1.3052833e-05
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: -3544705.0
+        t_exponent: -1
+        lnT_power: 0
+      - coefficient: 1.66309e+25
+        t_exponent: -9
+        lnT_power: 0
+  - T_low:
+      value: 800.0
+      as_published: '800'
+    T_high:
+      value: 1200.0
+      as_published: '1200'
+    continuation: Y
+    expression_as_published: -11085.609+182.955328*T-36.041*T*LN(T)+7.4641E-3*T**2-1.05047E-6*T**3 +5175*T**(-1)+166.309E23*T**(-9)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -9
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -11085.609
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 182.955328
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -36.041
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 0.0074641
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: -1.05047e-06
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: 5175.0
+        t_exponent: -1
+        lnT_power: 0
+      - coefficient: 1.66309e+25
+        t_exponent: -9
+        lnT_power: 0
+  - T_low:
+      value: 1200.0
+      as_published: '1200'
+    T_high:
+      value: 3000.0
+      as_published: '3000'
+    continuation: N
+    expression_as_published: -7580.864+124.770814*T-27.196*T*LN(T)+166.309E23*T**(-9)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -9
+      - 0
+      - 1
+      terms:
+      - coefficient: -7580.864
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 124.770814
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -27.196
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 1.66309e+25
+        t_exponent: -9
+        lnT_power: 0

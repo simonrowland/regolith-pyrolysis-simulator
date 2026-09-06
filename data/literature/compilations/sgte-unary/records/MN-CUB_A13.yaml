@@ -1,0 +1,144 @@
+schema_version: literature_compilation.v1
+source_id: sgte-unary-5.0
+record_id: MN-CUB_A13
+formula: Mn
+phase: CUB_A13
+name_as_published: MN CUB_A13
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source:
+  database: SGTE Pure Element Database (UNARY)
+  version: '5.0'
+  date: '2009-06-02'
+  official_url: https://www.sgte.net/en/free-pure-elements-database
+  licence: This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure
+    elements.
+  citation: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425; SGTE Unary v5.0 (2 June 2009).
+  path: data/literature/compilations/sgte-unary/source/unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  lines:
+  - 104
+  - 2513
+coefficient_count: 9
+interval_count: 2
+ambiguity_count: 0
+ambiguities: []
+element:
+  symbol_as_published: MN
+  reference_phase_as_published: CBCC_A12
+  mass:
+    value: 54.938
+    as_published: '5.4938E+01'
+  H298_minus_H0:
+    value: 4996.0
+    as_published: '4.9960E+03'
+  S298:
+    value: 32.008
+    as_published: '3.2008E+01'
+  source_lines:
+  - 104
+  - 104
+phase_declaration:
+  name_as_published: CUB_A13
+  parameter_name: CUB_A13
+  type_code_as_published: '%'
+  n_sublattices: 2
+  sites_as_published:
+  - '1'
+  - '1'
+  constituents:
+  - - AG
+    - AL
+    - CO
+    - CR
+    - FE
+    - MG
+    - MN
+    - NI
+    - SI
+    - SN
+    - TI
+    - V
+    - ZN
+    - ZR
+  - - VA
+  source_lines:
+  - 186
+  - 186
+  constituent_source_lines:
+  - 187
+  - 187
+g_parameter:
+  kind: G
+  identifier: G(CUB_A13,MN:VA;0)
+  phase: CUB_A13
+  constituent_as_published: MN:VA
+  order: 0
+  source_lines:
+  - 2511
+  - 2513
+  interval_count: 2
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 1519.0
+      as_published: '1519.00'
+    continuation: Y
+    expression_as_published: -5800.4+135.995*T-24.8785*T*LN(T)-5.83359E-3*T**2+70269*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      terms:
+      - coefficient: -5800.4
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 135.995
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -24.8785
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: -0.00583359
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: 70269.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 1519.0
+      as_published: '1519.00'
+    T_high:
+      value: 2000.0
+      as_published: '2000.00'
+    continuation: N
+    expression_as_published: -28290.76+311.2933*T-48*T*LN(T)+396.757E28*T**(-9)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -9
+      - 0
+      - 1
+      terms:
+      - coefficient: -28290.76
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 311.2933
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -48.0
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 3.96757e+30
+        t_exponent: -9
+        lnT_power: 0

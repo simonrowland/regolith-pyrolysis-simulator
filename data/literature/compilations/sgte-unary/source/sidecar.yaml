@@ -1,0 +1,35 @@
+citation: "SGTE Pure Element Database (UNARY) version 5.0 (2 June 2009). Official free distribution at https://www.sgte.net/en/free-pure-elements-database . Reference: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425."
+doi: "10.1016/0364-5916(91)90011-S"
+report_number: "SGTE UNARY v5.0 (2009); Dinsdale 1991 CALPHAD 15:317"
+publisher: "Scientific Group Thermodata Europe (SGTE)"
+licence: "Quoted from the official SGTE free-pure-elements page: 'This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure elements.' Offered as 'Free download' of unary50.tdb (115.4 KiB) from sgte.net without login. The 1991 CALPHAD paper itself is Elsevier-paywalled and was not downloaded."
+access: open
+present: 'yes'
+sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+size: 118145
+retrieved_at: '2026-09-06T21:54:29Z'
+retrieved_url: "https://www.sgte.net/en/free-pure-elements-database?file=files/sgte/members-area/databases/unary50.tdb&cid=243"
+pages: null
+topic: "thermochemistry"
+attempts:
+- at: '2026-09-06T21:54:29Z'
+  url: "https://www.sgte.net/en/free-pure-elements-database"
+  status: 200
+  final: "https://www.sgte.net/en/free-pure-elements-database"
+- at: '2026-09-06T21:54:29Z'
+  url: "https://www.sgte.net/en/free-pure-elements-database?file=files/sgte/members-area/databases/unary50.tdb&cid=243"
+  status: 200
+  final: "https://www.sgte.net/en/free-pure-elements-database?file=files/sgte/members-area/databases/unary50.tdb&cid=243"
+  ctype: "application/octet-stream"
+- at: '2026-09-06T21:54:29Z'
+  url: "https://doi.org/10.1016/0364-5916(91)90011-S"
+  status: 404
+  note: "doi.org returned HTML 'DOI Not Found' for the 1991 CALPHAD paper in this pass; paper remains catalogued as Elsevier CALPHAD paywalled. TDB fetched from SGTE official free page instead."
+files:
+- name: unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  size: 118145
+  retrieved_url: "https://www.sgte.net/en/free-pure-elements-database?file=files/sgte/members-area/databases/unary50.tdb&cid=243"
+  note: "SGTE Unary v5.0 TDB; 78+ elements"
+worker: "thermo-db-vacuum"
+dispatch_id: "thermo-db-vacuum"

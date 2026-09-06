@@ -1,0 +1,184 @@
+schema_version: literature_compilation.v1
+source_id: sgte-unary-5.0
+record_id: S-ORTHORHOMBIC_S
+formula: S
+phase: ORTHORHOMBIC_S
+name_as_published: S ORTHORHOMBIC_S
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source:
+  database: SGTE Pure Element Database (UNARY)
+  version: '5.0'
+  date: '2009-06-02'
+  official_url: https://www.sgte.net/en/free-pure-elements-database
+  licence: This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure
+    elements.
+  citation: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425; SGTE Unary v5.0 (2 June 2009).
+  path: data/literature/compilations/sgte-unary/source/unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  lines:
+  - 125
+  - 2823
+coefficient_count: 15
+interval_count: 4
+ambiguity_count: 0
+ambiguities: []
+element:
+  symbol_as_published: S
+  reference_phase_as_published: ORTHORHOMBIC_S
+  mass:
+    value: 32.066
+    as_published: '3.2066E+01'
+  H298_minus_H0:
+    value: 0.0
+    as_published: '0.0000E+00'
+  S298:
+    value: 0.0
+    as_published: '0.0000E+00'
+  source_lines:
+  - 125
+  - 125
+phase_declaration:
+  name_as_published: ORTHORHOMBIC_S
+  parameter_name: ORTHORHOMBIC_S
+  type_code_as_published: '%'
+  n_sublattices: 1
+  sites_as_published:
+  - '1'
+  constituents:
+  - - S
+  source_lines:
+  - 246
+  - 246
+  constituent_source_lines:
+  - 247
+  - 247
+g_parameter:
+  kind: G
+  identifier: G(ORTHORHOMBIC_S,S;0)
+  phase: ORTHORHOMBIC_S
+  constituent_as_published: S
+  order: 0
+  source_lines:
+  - 2823
+  - 2823
+  interval_count: 1
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 1301.0
+      as_published: '1301'
+    continuation: N
+    expression_as_published: GHSERS
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      terms:
+      - coefficient: 1.0
+        t_exponent: 0
+        lnT_power: 0
+        function: GHSERS
+functions:
+- name: GHSERS
+  source_lines:
+  - 1434
+  - 1439
+  interval_count: 3
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 368.3
+      as_published: '368.3'
+    continuation: Y
+    expression_as_published: -5198.294+53.913855*T-10.726*T*LN(T) -27.3801E-3*T**2+8.179537E-6*T**3
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -5198.294
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 53.913855
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -10.726
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: -0.0273801
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: 8.179537e-06
+        t_exponent: 3
+        lnT_power: 0
+  - T_low:
+      value: 368.3
+      as_published: '368.3'
+    T_high:
+      value: 1300.0
+      as_published: '1300'
+    continuation: Y
+    expression_as_published: -6475.706+94.182332*T-17.8693298*T*LN(T)-10.936877E-3*T**2+1.406467E-6*T**3 +36871*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -6475.706
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 94.182332
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -17.8693298
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: -0.010936877
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: 1.406467e-06
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: 36871.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 1300.0
+      as_published: '1300'
+    T_high:
+      value: 1301.0
+      as_published: '1301'
+    continuation: N
+    expression_as_published: -12485.546+188.304687*T-32*T*LN(T)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      terms:
+      - coefficient: -12485.546
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 188.304687
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -32.0
+        t_exponent: 1
+        lnT_power: 1

@@ -1,0 +1,184 @@
+schema_version: literature_compilation.v1
+source_id: sgte-unary-5.0
+record_id: IN-DHCP
+formula: In
+phase: DHCP
+name_as_published: IN DHCP
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source:
+  database: SGTE Pure Element Database (UNARY)
+  version: '5.0'
+  date: '2009-06-02'
+  official_url: https://www.sgte.net/en/free-pure-elements-database
+  licence: This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure
+    elements.
+  citation: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425; SGTE Unary v5.0 (2 June 2009).
+  path: data/literature/compilations/sgte-unary/source/unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  lines:
+  - 97
+  - 2431
+coefficient_count: 16
+interval_count: 3
+ambiguity_count: 0
+ambiguities: []
+element:
+  symbol_as_published: IN
+  reference_phase_as_published: TETRAGONAL_A6
+  mass:
+    value: 114.82
+    as_published: '1.1482E+02'
+  H298_minus_H0:
+    value: 6610.0
+    as_published: '6.6100E+03'
+  S298:
+    value: 57.65
+    as_published: '5.7650E+01'
+  source_lines:
+  - 97
+  - 97
+phase_declaration:
+  name_as_published: DHCP
+  parameter_name: DHCP
+  type_code_as_published: '%'
+  n_sublattices: 1
+  sites_as_published:
+  - '1'
+  constituents:
+  - - AM
+    - AU
+    - CE
+    - IN
+    - LA
+    - ND
+    - PR
+    - SC
+    - SN
+  source_lines:
+  - 198
+  - 198
+  constituent_source_lines:
+  - 199
+  - 199
+g_parameter:
+  kind: G
+  identifier: G(DHCP,IN;0)
+  phase: DHCP
+  constituent_as_published: IN
+  order: 0
+  source_lines:
+  - 2431
+  - 2431
+  interval_count: 1
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 3800.0
+      as_published: '3800'
+    continuation: N
+    expression_as_published: 520-0.384*T+GHSERIN
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      terms:
+      - coefficient: 520.0
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: -0.384
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: 1.0
+        t_exponent: 0
+        lnT_power: 0
+        function: GHSERIN
+functions:
+- name: GHSERIN
+  source_lines:
+  - 834
+  - 838
+  interval_count: 2
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 429.7485
+      as_published: '429.7485'
+    continuation: Y
+    expression_as_published: -6978.89+92.338115*T-21.8386*T*LN(T)-5.72566E-3*T**2-2.120321E-6*T**3 -22906*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -6978.89
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 92.338115
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -21.8386
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: -0.00572566
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: -2.120321e-06
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: -22906.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 429.7485
+      as_published: '429.7485'
+    T_high:
+      value: 3800.0
+      as_published: '3800.00'
+    continuation: N
+    expression_as_published: -7033.514+124.476588*T-27.4562*T*LN(T)+0.54607E-3*T**2-0.08367E-6*T**3 -211708*T**(-1)+353.332E20*T**(-9)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -9
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -7033.514
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 124.476588
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -27.4562
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 0.00054607
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: -8.367e-08
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: -211708.0
+        t_exponent: -1
+        lnT_power: 0
+      - coefficient: 3.53332e+22
+        t_exponent: -9
+        lnT_power: 0

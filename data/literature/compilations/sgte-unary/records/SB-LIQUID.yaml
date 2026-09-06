@@ -1,0 +1,292 @@
+schema_version: literature_compilation.v1
+source_id: sgte-unary-5.0
+record_id: SB-LIQUID
+formula: Sb
+phase: LIQUID
+name_as_published: SB LIQUID
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source:
+  database: SGTE Pure Element Database (UNARY)
+  version: '5.0'
+  date: '2009-06-02'
+  official_url: https://www.sgte.net/en/free-pure-elements-database
+  licence: This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure
+    elements.
+  citation: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425; SGTE Unary v5.0 (2 June 2009).
+  path: data/literature/compilations/sgte-unary/source/unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  lines:
+  - 126
+  - 2844
+coefficient_count: 18
+interval_count: 5
+ambiguity_count: 0
+ambiguities: []
+element:
+  symbol_as_published: SB
+  reference_phase_as_published: RHOMBOHEDRAL_A7
+  mass:
+    value: 121.75
+    as_published: '1.2175E+02'
+  H298_minus_H0:
+    value: 5870.2
+    as_published: '5.8702E+03'
+  S298:
+    value: 45.522
+    as_published: '4.5522E+01'
+  source_lines:
+  - 126
+  - 126
+phase_declaration:
+  name_as_published: LIQUID:L
+  parameter_name: LIQUID
+  type_code_as_published: '%'
+  n_sublattices: 1
+  sites_as_published:
+  - '1'
+  constituents:
+  - - L
+  - - AG
+    - AL
+    - AM
+    - AS
+    - AU
+    - B
+    - BA
+    - BE
+    - BI
+    - C
+    - CA
+    - CD
+    - CE
+    - CO
+    - CR
+    - CS
+    - CU
+    - DY
+    - ER
+    - EU
+    - FE
+    - GA
+    - GD
+    - GE
+    - HF
+    - HG
+    - HO
+    - IN
+    - IR
+    - K
+    - LA
+    - LI
+    - LU
+    - MG
+    - MN
+    - MO
+    - N
+    - NA
+    - NB
+    - ND
+    - NI
+    - NP
+    - O
+    - OS
+    - P
+    - PA
+    - PB
+    - PD
+    - PR
+    - PT
+    - PU
+    - RB
+    - RE
+    - RH
+    - RU
+    - S
+    - SB
+    - SC
+    - SE
+    - SI
+    - SM
+    - SN
+    - SR
+    - TA
+    - TB
+    - TC
+    - TE
+    - TH
+    - TI
+    - TL
+    - TM
+    - U
+    - V
+    - W
+    - Y
+    - YB
+    - ZN
+    - ZR
+  source_lines:
+  - 231
+  - 231
+  constituent_source_lines:
+  - 232
+  - 235
+g_parameter:
+  kind: G
+  identifier: G(LIQUID,SB;0)
+  phase: LIQUID
+  constituent_as_published: SB
+  order: 0
+  source_lines:
+  - 2844
+  - 2844
+  interval_count: 1
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 2000.0
+      as_published: '2000'
+    continuation: N
+    expression_as_published: GLIQSB
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      terms:
+      - coefficient: 1.0
+        t_exponent: 0
+        lnT_power: 0
+        function: GLIQSB
+functions:
+- name: GLIQSB
+  source_lines:
+  - 1470
+  - 1471
+  interval_count: 2
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 903.78
+      as_published: '903.78'
+    continuation: Y
+    expression_as_published: 19822.328-21.923164*T-174.847E-22*T**7+GHSERSB
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      - 7
+      terms:
+      - coefficient: 19822.328
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: -21.923164
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -1.74847e-20
+        t_exponent: 7
+        lnT_power: 0
+      - coefficient: 1.0
+        t_exponent: 0
+        lnT_power: 0
+        function: GHSERSB
+  - T_low:
+      value: 903.78
+      as_published: '903.78'
+    T_high:
+      value: 2000.0
+      as_published: '2000.00'
+    continuation: N
+    expression_as_published: 8175.359+147.455986*T-31.38*T*LN(T)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      terms:
+      - coefficient: 8175.359
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 147.455986
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -31.38
+        t_exponent: 1
+        lnT_power: 1
+- name: GHSERSB
+  source_lines:
+  - 1465
+  - 1468
+  interval_count: 2
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 903.78
+      as_published: '903.78'
+    continuation: Y
+    expression_as_published: -9242.858+156.154689*T-30.5130752*T*LN(T)+7.748768E-3*T**2-3.003415E-6*T**3 +100625*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -9242.858
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 156.154689
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -30.5130752
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 0.007748768
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: -3.003415e-06
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: 100625.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 903.78
+      as_published: '903.78'
+    T_high:
+      value: 2000.0
+      as_published: '2000.00'
+    continuation: N
+    expression_as_published: -11738.83+169.485872*T-31.38*T*LN(T)+1616.849E24*T**(-9)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -9
+      - 0
+      - 1
+      terms:
+      - coefficient: -11738.83
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 169.485872
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -31.38
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 1.616849e+27
+        t_exponent: -9
+        lnT_power: 0

@@ -1,0 +1,187 @@
+schema_version: literature_compilation.v1
+source_id: sgte-unary-5.0
+record_id: SI-CBCC_A12
+formula: Si
+phase: CBCC_A12
+name_as_published: SI CBCC_A12
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source:
+  database: SGTE Pure Element Database (UNARY)
+  version: '5.0'
+  date: '2009-06-02'
+  official_url: https://www.sgte.net/en/free-pure-elements-database
+  licence: This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure
+    elements.
+  citation: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425; SGTE Unary v5.0 (2 June 2009).
+  path: data/literature/compilations/sgte-unary/source/unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  lines:
+  - 129
+  - 2891
+coefficient_count: 13
+interval_count: 3
+ambiguity_count: 0
+ambiguities: []
+element:
+  symbol_as_published: SI
+  reference_phase_as_published: DIAMOND_A4
+  mass:
+    value: 28.085
+    as_published: '2.8085E+01'
+  H298_minus_H0:
+    value: 3217.5
+    as_published: '3.2175E+03'
+  S298:
+    value: 18.82
+    as_published: '1.8820E+01'
+  source_lines:
+  - 129
+  - 129
+phase_declaration:
+  name_as_published: CBCC_A12
+  parameter_name: CBCC_A12
+  type_code_as_published: I'
+  n_sublattices: 2
+  sites_as_published:
+  - '1'
+  - '1'
+  constituents:
+  - - AL
+    - CO
+    - CR
+    - FE
+    - MG
+    - MN
+    - NI
+    - SI
+    - SN
+    - TI
+    - V
+    - ZN
+    - ZR
+  - - VA
+  source_lines:
+  - 183
+  - 183
+  constituent_source_lines:
+  - 184
+  - 184
+  magnetic_type_definition:
+    AF_as_published: '-3.0'
+    p_as_published: '0.28'
+    AF: -3.0
+    p: 0.28
+    source_lines:
+    - 182
+    - 182
+    text_as_published: ''' GES A_P_D CBCC_A12 MAGNETIC -3.0 0.28'
+g_parameter:
+  kind: G
+  identifier: G(CBCC_A12,SI:VA;0)
+  phase: CBCC_A12
+  constituent_as_published: SI:VA
+  order: 0
+  source_lines:
+  - 2891
+  - 2891
+  interval_count: 1
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 3600.0
+      as_published: '3600'
+    continuation: N
+    expression_as_published: 50208-20.377*T+GHSERSI
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      terms:
+      - coefficient: 50208.0
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: -20.377
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: 1.0
+        t_exponent: 0
+        lnT_power: 0
+        function: GHSERSI
+functions:
+- name: GHSERSI
+  source_lines:
+  - 1525
+  - 1528
+  interval_count: 2
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 1687.0
+      as_published: '1687.00'
+    continuation: Y
+    expression_as_published: -8162.609+137.236859*T-22.8317533*T*LN(T)-1.912904E-3*T**2-0.003552E-6*T**3 +176667*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -8162.609
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 137.236859
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -22.8317533
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: -0.001912904
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: -3.552e-09
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: 176667.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 1687.0
+      as_published: '1687.00'
+    T_high:
+      value: 3600.0
+      as_published: '3600.00'
+    continuation: N
+    expression_as_published: -9457.642+167.281367*T-27.196*T*LN(T)-420.369E28*T**(-9)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -9
+      - 0
+      - 1
+      terms:
+      - coefficient: -9457.642
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 167.281367
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -27.196
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: -4.20369e+30
+        t_exponent: -9
+        lnT_power: 0

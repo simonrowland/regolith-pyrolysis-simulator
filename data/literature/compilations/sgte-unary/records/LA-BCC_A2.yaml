@@ -1,0 +1,323 @@
+schema_version: literature_compilation.v1
+source_id: sgte-unary-5.0
+record_id: LA-BCC_A2
+formula: La
+phase: BCC_A2
+name_as_published: LA BCC_A2
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source:
+  database: SGTE Pure Element Database (UNARY)
+  version: '5.0'
+  date: '2009-06-02'
+  official_url: https://www.sgte.net/en/free-pure-elements-database
+  licence: This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure
+    elements.
+  citation: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425; SGTE Unary v5.0 (2 June 2009).
+  path: data/literature/compilations/sgte-unary/source/unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  lines:
+  - 100
+  - 2462
+coefficient_count: 24
+interval_count: 6
+ambiguity_count: 0
+ambiguities: []
+element:
+  symbol_as_published: LA
+  reference_phase_as_published: DHCP
+  mass:
+    value: 138.91
+    as_published: '1.3891E+02'
+  H298_minus_H0:
+    value: 0.0
+    as_published: '0.0000E+00'
+  S298:
+    value: 0.0
+    as_published: '0.0000E+00'
+  source_lines:
+  - 100
+  - 100
+phase_declaration:
+  name_as_published: BCC_A2
+  parameter_name: BCC_A2
+  type_code_as_published: I&
+  n_sublattices: 2
+  sites_as_published:
+  - '1'
+  - '3'
+  constituents:
+  - - AG
+    - AL
+    - AM
+    - AS
+    - AU
+    - B
+    - BA
+    - BE
+    - BI
+    - CA
+    - CD
+    - CE
+    - CO
+    - CR
+    - CS
+    - CU
+    - DY
+    - ER
+    - EU
+    - FE
+    - GA
+    - GD
+    - GE
+    - HF
+    - HO
+    - IN
+    - IR
+    - K
+    - LA
+    - LI
+    - MG
+    - MN
+    - MO
+    - NA
+    - NB
+    - ND
+    - NI
+    - NP
+    - O
+    - OS
+    - P
+    - PA
+    - PB
+    - PD
+    - PR
+    - PT
+    - PU
+    - RB
+    - RE
+    - RH
+    - RU
+    - S
+    - SB
+    - SC
+    - SI
+    - SM
+    - SN
+    - SR
+    - TA
+    - TB
+    - TC
+    - TH
+    - TI
+    - TL
+    - U
+    - V
+    - W
+    - Y
+    - YB
+    - ZN
+    - ZR
+  - - VA
+  source_lines:
+  - 190
+  - 190
+  constituent_source_lines:
+  - 191
+  - 193
+  magnetic_type_definition:
+    AF_as_published: '-1.0'
+    p_as_published: '0.4'
+    AF: -1.0
+    p: 0.4
+    source_lines:
+    - 189
+    - 189
+    text_as_published: '& GES A_P_D BCC_A2 MAGNETIC -1.0 0.4'
+g_parameter:
+  kind: G
+  identifier: G(BCC_A2,LA:VA;0)
+  phase: BCC_A2
+  constituent_as_published: LA:VA
+  order: 0
+  source_lines:
+  - 2462
+  - 2462
+  interval_count: 1
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 4000.0
+      as_published: '4000'
+    continuation: N
+    expression_as_published: GBCCLA
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      terms:
+      - coefficient: 1.0
+        t_exponent: 0
+        lnT_power: 0
+        function: GBCCLA
+functions:
+- name: GBCCLA
+  source_lines:
+  - 901
+  - 909
+  interval_count: 5
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 800.0
+      as_published: '800.00'
+    continuation: Y
+    expression_as_published: -3952.161+88.072353*T-21.7919*T*LN(T)-4.045175E-3*T**2-0.525865E-6*T**3
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -3952.161
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 88.072353
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -21.7919
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: -0.004045175
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: -5.25865e-07
+        t_exponent: 3
+        lnT_power: 0
+  - T_low:
+      value: 800.0
+      as_published: '800.00'
+    T_high:
+      value: 1134.0
+      as_published: '1134.00'
+    continuation: Y
+    expression_as_published: 321682.673-3565.082518*T+513.4407077*T*LN(T)-387.295093E-3*T**2 +49.547989E-6*T**3-36581228*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: 321682.673
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: -3565.082518
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: 513.4407077
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: -0.387295093
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: 4.9547989e-05
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: -36581228.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 1134.0
+      as_published: '1134.00'
+    T_high:
+      value: 1193.0
+      as_published: '1193.00'
+    continuation: Y
+    expression_as_published: -16377.894+218.492988*T-39.5388*T*LN(T)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      terms:
+      - coefficient: -16377.894
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 218.492988
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -39.5388
+        t_exponent: 1
+        lnT_power: 1
+  - T_low:
+      value: 1193.0
+      as_published: '1193.00'
+    T_high:
+      value: 2000.0
+      as_published: '2000.00'
+    continuation: Y
+    expression_as_published: -136609.91+1123.343974*T-163.4130738*T*LN(T)+53.968535E-3*T**2 -4.056395E-6*T**3+21167204*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -136609.91
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 1123.343974
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -163.4130738
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 0.053968535
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: -4.056395e-06
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: 21167204.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 2000.0
+      as_published: '2000.00'
+    T_high:
+      value: 4000.0
+      as_published: '4000.00'
+    continuation: N
+    expression_as_published: -8205.988+174.836315*T-34.3088*T*LN(T)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      terms:
+      - coefficient: -8205.988
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 174.836315
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -34.3088
+        t_exponent: 1
+        lnT_power: 1

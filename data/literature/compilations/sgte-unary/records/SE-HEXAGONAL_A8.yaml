@@ -1,0 +1,189 @@
+schema_version: literature_compilation.v1
+source_id: sgte-unary-5.0
+record_id: SE-HEXAGONAL_A8
+formula: Se
+phase: HEXAGONAL_A8
+name_as_published: SE HEXAGONAL_A8
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source:
+  database: SGTE Pure Element Database (UNARY)
+  version: '5.0'
+  date: '2009-06-02'
+  official_url: https://www.sgte.net/en/free-pure-elements-database
+  licence: This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure
+    elements.
+  citation: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425; SGTE Unary v5.0 (2 June 2009).
+  path: data/literature/compilations/sgte-unary/source/unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  lines:
+  - 128
+  - 2876
+coefficient_count: 16
+interval_count: 4
+ambiguity_count: 0
+ambiguities: []
+element:
+  symbol_as_published: SE
+  reference_phase_as_published: HEXAGONAL_A8
+  mass:
+    value: 78.96
+    as_published: '7.8960E+01'
+  H298_minus_H0:
+    value: 5514.5
+    as_published: '5.5145E+03'
+  S298:
+    value: 41.966
+    as_published: '4.1966E+01'
+  source_lines:
+  - 128
+  - 128
+phase_declaration:
+  name_as_published: HEXAGONAL_A8
+  parameter_name: HEXAGONAL_A8
+  type_code_as_published: '%'
+  n_sublattices: 1
+  sites_as_published:
+  - '1'
+  constituents:
+  - - SE
+    - TE
+  source_lines:
+  - 228
+  - 228
+  constituent_source_lines:
+  - 229
+  - 229
+g_parameter:
+  kind: G
+  identifier: G(HEXAGONAL_A8,SE;0)
+  phase: HEXAGONAL_A8
+  constituent_as_published: SE
+  order: 0
+  source_lines:
+  - 2876
+  - 2876
+  interval_count: 1
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 1000.0
+      as_published: '1000'
+    continuation: N
+    expression_as_published: GHSERSE
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      terms:
+      - coefficient: 1.0
+        t_exponent: 0
+        lnT_power: 0
+        function: GHSERSE
+functions:
+- name: GHSERSE
+  source_lines:
+  - 1510
+  - 1515
+  interval_count: 3
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 494.0
+      as_published: '494.00'
+    continuation: Y
+    expression_as_published: -9376.371+174.205877*T-33.6527*T*LN(T)+24.24314E-3*T**2-15.318461E-6*T**3 +102249*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -9376.371
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 174.205877
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -33.6527
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 0.02424314
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: -1.5318461e-05
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: 102249.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 494.0
+      as_published: '494.00'
+    T_high:
+      value: 800.0
+      as_published: '800.00'
+    continuation: Y
+    expression_as_published: -37546.134+507.111538*T-81.2006585*T*LN(T)+37.144892E-3*T**2-5.611026E-6*T**3 +2614263*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -37546.134
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 507.111538
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -81.2006585
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 0.037144892
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: -5.611026e-06
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: 2614263.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 800.0
+      as_published: '800.00'
+    T_high:
+      value: 1000.0
+      as_published: '1000.00'
+    continuation: N
+    expression_as_published: -12193.47+197.770166*T-35.1456*T*LN(T)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      terms:
+      - coefficient: -12193.47
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 197.770166
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -35.1456
+        t_exponent: 1
+        lnT_power: 1

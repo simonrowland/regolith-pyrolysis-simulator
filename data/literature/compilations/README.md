@@ -37,6 +37,13 @@ directly. Migration is a code change, not a file move.
 
 ## Status of what we actually hold
 
-`janaf-4th.yaml` is **not JANAF**. It is a `review_status: draft` manual transcription of a few
+`janaf/` is a target-first partial harvest of NIST-JANAF 4th edition HTML tables (380 species).
+See `janaf/manifest.yaml`.
+
+`sgte-unary/` is a complete ingest of the SGTE free pure-elements database unary50.tdb v5.0
+(Thermo-Calc TDB: ELEMENT / FUNCTION / PHASE / PARAMETER G, TC, BM, BMAGN). Licence quote
+and coverage are in `sgte-unary/README.md`. Compilations still produce no scoring rows.
+
+`janaf-4th.yaml` (still under `../extracts/`) is **not JANAF**. It is a `review_status: draft` manual transcription of a few
 phosphorus carriers, pointing at `janaf.nist.gov` table URLs. The full NIST-JANAF 4th edition is
-~1,800 species tables and is freely available. Harvesting it properly is an open task.
+~1,800 species tables and is freely available. Completing the JANAF harvest is an open task.

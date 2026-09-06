@@ -1,0 +1,164 @@
+schema_version: literature_compilation.v1
+source_id: sgte-unary-5.0
+record_id: B-ALPHA_RHOMBO_B
+formula: B
+phase: ALPHA_RHOMBO_B
+name_as_published: B ALPHA_RHOMBO_B
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source:
+  database: SGTE Pure Element Database (UNARY)
+  version: '5.0'
+  date: '2009-06-02'
+  official_url: https://www.sgte.net/en/free-pure-elements-database
+  licence: This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure
+    elements.
+  citation: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425; SGTE Unary v5.0 (2 June 2009).
+  path: data/literature/compilations/sgte-unary/source/unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  lines:
+  - 75
+  - 2041
+coefficient_count: 15
+interval_count: 3
+ambiguity_count: 0
+ambiguities: []
+element:
+  symbol_as_published: B
+  reference_phase_as_published: BETA_RHOMBO_B
+  mass:
+    value: 10.811
+    as_published: '1.0811E+01'
+  H298_minus_H0:
+    value: 1222.0
+    as_published: '1.2220E+03'
+  S298:
+    value: 5.9
+    as_published: '5.9000E+00'
+  source_lines:
+  - 75
+  - 75
+phase_declaration:
+  name_as_published: ALPHA_RHOMBO_B
+  parameter_name: ALPHA_RHOMBO_B
+  type_code_as_published: '%'
+  n_sublattices: 1
+  sites_as_published:
+  - '1'
+  constituents:
+  - - B
+  source_lines:
+  - 170
+  - 170
+  constituent_source_lines:
+  - 171
+  - 171
+g_parameter:
+  kind: G
+  identifier: G(ALPHA_RHOMBO_B,B;0)
+  phase: ALPHA_RHOMBO_B
+  constituent_as_published: B
+  order: 0
+  source_lines:
+  - 2037
+  - 2041
+  interval_count: 3
+  intervals:
+  - T_low:
+      value: 298.15
+      as_published: '298.15'
+    T_high:
+      value: 1400.0
+      as_published: '1400'
+    continuation: Y
+    expression_as_published: -6076.24+86.648762*T-12.942464*T*LN(T) -7.089468E-3*T**2+0.659896E-6*T**3-45*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -6076.24
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 86.648762
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -12.942464
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: -0.007089468
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: 6.59896e-07
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: -45.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 1400.0
+      as_published: '1400'
+    T_high:
+      value: 3000.0
+      as_published: '3000'
+    continuation: Y
+    expression_as_published: 28477.506-106.789208*T+12.1072478*T*LN(T)-13.316875E-3*T**2+0.706895E-6*T**3 -8002403*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: 28477.506
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: -106.789208
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: 12.1072478
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: -0.013316875
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: 7.06895e-07
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: -8002403.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 3000.0
+      as_published: '3000'
+    T_high:
+      value: 6000.0
+      as_published: '6000'
+    continuation: N
+    expression_as_published: -25699.64+225.127135*T-31.4*T*LN(T)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - 0
+      - 1
+      terms:
+      - coefficient: -25699.64
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 225.127135
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -31.4
+        t_exponent: 1
+        lnT_power: 1

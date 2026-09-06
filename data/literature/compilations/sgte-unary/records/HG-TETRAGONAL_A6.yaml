@@ -1,0 +1,149 @@
+schema_version: literature_compilation.v1
+source_id: sgte-unary-5.0
+record_id: HG-TETRAGONAL_A6
+formula: Hg
+phase: TETRAGONAL_A6
+name_as_published: HG TETRAGONAL_A6
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source:
+  database: SGTE Pure Element Database (UNARY)
+  version: '5.0'
+  date: '2009-06-02'
+  official_url: https://www.sgte.net/en/free-pure-elements-database
+  licence: This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure
+    elements.
+  citation: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425; SGTE Unary v5.0 (2 June 2009).
+  path: data/literature/compilations/sgte-unary/source/unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  lines:
+  - 95
+  - 2380
+coefficient_count: 12
+interval_count: 2
+ambiguity_count: 0
+ambiguities: []
+element:
+  symbol_as_published: HG
+  reference_phase_as_published: LIQUID
+  mass:
+    value: 200.59
+    as_published: '2.0059E+02'
+  H298_minus_H0:
+    value: 0.0
+    as_published: '0.0000E+00'
+  S298:
+    value: 0.0
+    as_published: '0.0000E+00'
+  source_lines:
+  - 95
+  - 95
+phase_declaration:
+  name_as_published: TETRAGONAL_A6
+  parameter_name: TETRAGONAL_A6
+  type_code_as_published: '%'
+  n_sublattices: 1
+  sites_as_published:
+  - '1'
+  constituents:
+  - - BI
+    - CD
+    - GA
+    - HG
+    - IN
+    - PB
+    - PU
+    - SN
+    - ZN
+  source_lines:
+  - 270
+  - 270
+  constituent_source_lines:
+  - 271
+  - 271
+g_parameter:
+  kind: G
+  identifier: G(TETRAGONAL_A6,HG;0)
+  phase: TETRAGONAL_A6
+  constituent_as_published: HG
+  order: 0
+  source_lines:
+  - 2377
+  - 2380
+  interval_count: 2
+  intervals:
+  - T_low:
+      value: 200.0
+      as_published: '200'
+    T_high:
+      value: 234.32
+      as_published: '234.32'
+    continuation: Y
+    expression_as_published: -10459.721+125.04019*T-28.847*T*LN(T) +16.99705E-3*T**2-24.555667E-6*T**3+13330*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -10459.721
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 125.04019
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -28.847
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 0.01699705
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: -2.4555667e-05
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: 13330.0
+        t_exponent: -1
+        lnT_power: 0
+  - T_low:
+      value: 234.32
+      as_published: '234.32'
+    T_high:
+      value: 2000.0
+      as_published: '2000'
+    continuation: N
+    expression_as_published: -11216.714+137.69375*T-30.2091*T*LN(T)+1.07555E-3*T**2-0.228298E-6*T**3 +35545*T**(-1)
+    polynomial:
+      form: a + b*T + c*T*LN(T) + sum k_n*T**n + sum f_i*FUNCTION_i
+      exponents:
+      - -1
+      - 0
+      - 1
+      - 2
+      - 3
+      terms:
+      - coefficient: -11216.714
+        t_exponent: 0
+        lnT_power: 0
+      - coefficient: 137.69375
+        t_exponent: 1
+        lnT_power: 0
+      - coefficient: -30.2091
+        t_exponent: 1
+        lnT_power: 1
+      - coefficient: 0.00107555
+        t_exponent: 2
+        lnT_power: 0
+      - coefficient: -2.28298e-07
+        t_exponent: 3
+        lnT_power: 0
+      - coefficient: 35545.0
+        t_exponent: -1
+        lnT_power: 0

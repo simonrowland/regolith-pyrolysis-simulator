@@ -134,7 +134,22 @@ sources:
     access: mixed; selected publications/data are open, production databases are licensed through compatible software vendors
     official_url: https://www.sgte.net/
     local_status: production_database_not_obtained
-    note: Open SGTE publications must not be conflated with licensed production database releases.
+    note: Open SGTE publications must not be conflated with licensed production database releases. The free unary TDB is a separate row (sgte_unary_50).
+
+  sgte_unary_50:
+    citation: SGTE Pure Element Database (UNARY) version 5.0 (2 June 2009). Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425.
+    doi: 10.1016/0364-5916(91)90011-S
+    access: open_public_web
+    official_url: https://www.sgte.net/en/free-pure-elements-database
+    licence: "This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure elements."
+    licence_basis: Verbatim quote from the official SGTE free-pure-elements page; unary50.tdb offered as a free download without login.
+    local_status: complete_ingest
+    harvested_path: data/literature/compilations/sgte-unary/
+    harvested_source: data/literature/compilations/sgte-unary/source/unary50.tdb
+    harvested_source_sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+    evidence: Copied from the read-only corpus clone at raw/sgte-unary-5.0/unary50.tdb (118145 bytes) matching the sidecar sha256; SPECIES, ELEMENT, FUNCTION, PHASE, PARAMETER G/TC/BM/BMAGN ingested without curation.
+    access_date: '2026-09-06'
+    remaining_action: none for unary50.tdb; licensed SGTE solution databases remain unobtained.
 
   factsage:
     citation: FactSage thermochemical software and databases, Thermfact/CRCT and GTT-Technologies.

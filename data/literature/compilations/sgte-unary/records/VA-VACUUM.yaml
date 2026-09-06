@@ -1,0 +1,50 @@
+schema_version: literature_compilation.v1
+source_id: sgte-unary-5.0
+record_id: VA-VACUUM
+formula: VA
+phase: VACUUM
+name_as_published: VA VACUUM
+compilation_role:
+  kind: assessed_thermodynamic_functions
+  engine_reference_input: true
+  validation_measurement: false
+  scoring_eligible: false
+  battery_refusal: gibbs_table_not_runtime_observable
+  circularity_warning: Do not validate an engine against a compilation it consumes.
+source:
+  database: SGTE Pure Element Database (UNARY)
+  version: '5.0'
+  date: '2009-06-02'
+  official_url: https://www.sgte.net/en/free-pure-elements-database
+  licence: This database can only be used for extracting data for assessment work or to tabulate or plot data for the pure
+    elements.
+  citation: Dinsdale, A. T. (1991). SGTE data for pure elements. CALPHAD 15, 317-425; SGTE Unary v5.0 (2 June 2009).
+  path: data/literature/compilations/sgte-unary/source/unary50.tdb
+  sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+  lines:
+  - 69
+  - 69
+coefficient_count: 0
+interval_count: 0
+ambiguity_count: 1
+ambiguities:
+- code: element_without_g_parameter
+  text: ELEMENT is declared but no PARAMETER G was published for it
+  locator:
+    symbol: VA
+    line: 69
+element:
+  symbol_as_published: VA
+  reference_phase_as_published: VACUUM
+  mass:
+    value: 0.0
+    as_published: '0.0000E+00'
+  H298_minus_H0:
+    value: 0.0
+    as_published: '0.0000E+00'
+  S298:
+    value: 0.0
+    as_published: '0.0000E+00'
+  source_lines:
+  - 69
+  - 69
