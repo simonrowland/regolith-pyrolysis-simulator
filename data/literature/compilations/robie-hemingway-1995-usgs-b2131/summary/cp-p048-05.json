@@ -1,0 +1,187 @@
+{
+  "record_id": "cp-p048-05",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 54,
+  "page": 48,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR OXIDE AND HYDROXIDE MINERALS",
+  "name_as_published": "FERROUS OXIDE",
+  "formula_as_published": "Feo (fictive)",
+  "phase_as_published": [],
+  "header_and_units_raw": "NAME AND FORMULA             ENTROPY              A1           A2           A3            A4             A5     T range   T...    A._H•\n                            J •IIIOL\"'·IC'                    (T)          n·2>        (T-o.&)         (T2)       IC       IC     kJ·•l\"'\n\n",
+  "source_text": "FERROUS OXIDE                    60.6         3.908E+01    8.574E-03    -7.325E+05    2.466£+02                   298\nFeo (fictive)                     1.7                                                                            1800",
+  "rows": [
+    {
+      "label_raw": "FERROUS OXIDE",
+      "cells": {
+        "entropy": {
+          "raw": "60.6",
+          "value": 60.6,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 33,
+          "end_offset": 37
+        },
+        "A1": {
+          "raw": "3.908E+01",
+          "value": 39.08,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 46,
+          "end_offset": 55
+        },
+        "A2": {
+          "raw": "8.574E-03",
+          "value": 0.008574,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 59,
+          "end_offset": 68
+        },
+        "A3": {
+          "raw": "-7.325E+05",
+          "value": -732500.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 72,
+          "end_offset": 82
+        },
+        "A4": {
+          "raw": "2.466£+02",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 86,
+          "end_offset": 95
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 114,
+          "end_offset": 117
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        }
+      },
+      "source_line_index": 0
+    },
+    {
+      "label_raw": "Feo (fictive)",
+      "cells": {
+        "entropy": {
+          "raw": "1.7",
+          "value": 1.7,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 34,
+          "end_offset": 37
+        },
+        "A1": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A2": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
+          "raw": "1800",
+          "value": 1800.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 113,
+          "end_offset": 117
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        }
+      },
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [],
+  "ambiguities": [
+    "A4: unparsed printed OCR token '2.466£+02'",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 24,
+  "source_line_end": 25
+}
