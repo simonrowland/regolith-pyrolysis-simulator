@@ -1,0 +1,587 @@
+schema_version: literature_extract.v1
+source_id: kems-133-costa-2017
+source:
+  citation: 'Costa, G. C. C., Jacobson, N. S. & Fegley Jr., B. (2017), "Vaporization and thermodynamics of forsterite-rich olivine and some implications for silicate atmospheres of hot rocky exoplanets", Icarus 289:42–55, DOI 10.1016/j.icarus.2017.02.006'
+  doi: 10.1016/j.icarus.2017.02.006
+  url: https://www.sciencedirect.com/science/article/am/pii/S0019103516301798
+  year: 2017
+  related_sources:
+    - source_id: kems-007-costa-2015
+      document: NTRS 20150002321
+      relation: same_campaign_prior_report
+      note: >
+        2015 NTRS olivine KEMS is a different document (no DOI on this 2017
+        Icarus paper). Cross-reference only; do not remint kems-007 alpha rows
+        and do not mint a second id for NTRS 20150002321.
+      characterisation_as_published:
+        kems_007: Fo93Fa7; solidus ~2069 K
+        this_work_as_received: "Table 1 mole %: Mg, forsterite 93(5); Fe, fayalite 6.7(3)"
+        this_work_solidus: "We measured the solidus temperature (~ 2050 K)"
+extraction:
+  method: 'Official Elsevier accepted-manuscript HTML (bronze OA URL). Direct GET HTTP 403 Cloudflare JS challenge; not bypassed. No PDF on disk. Tables 1–5 transcribed from the AM HTML text of that official URL. Figures 6–9 listed figure-only (not digitised). Figures 1–5 captions unseen this round. No MinerU. No unit conversion. Measured vs author-derived vs literature-model vs exoplanet-model kept distinct. r2 (wave-W2-costa-2017-r2): Table 5 retyped as MAGMA/HRE model_derived (not KEMS rate); Table 1 composition and Table 2 appearance potentials moved off the rate_series dump; kems-007-costa-2015 cross-referenced, not duplicated.'
+  date: '2026-09-06'
+  worker: wave-W2-costa-2017-r2
+  provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-133-costa-2017/kems-133-costa-2017/
+review_status: draft
+fidelity_samples:
+  - species: Fe
+    observable: gibbs_table
+    observation_id: costa_2017_t1_olivine_composition
+    field: before_kems_FeO_wt_pct
+    value: 5.1
+    locator:
+      page: 33
+      table: "1"
+      note: "Table 1 Before KEMS FeO 5.1(4) wt%"
+  - species: SiO
+    observable: gibbs_table
+    observation_id: costa_2017_t2_sio_appearance_potential
+    field: SiO_plus_eV
+    value: 10.6
+    locator:
+      page: 33
+      table: "2"
+      note: "Table 2 SiO+ appearance potential 10.60 ± 1.83 eV this work"
+  - species: Mg
+    observable: gibbs_table
+    observation_id: costa_2017_t3_mgo_partial_molar_enthalpy
+    field: MgO_this_study
+    value: -97.4
+    locator:
+      page: 34
+      table: "3"
+      note: "Table 3 This Study MgO -97.4 ± 4.8"
+  - species: Mg
+    observable: gibbs_table
+    observation_id: costa_2017_t4_forsterite_delta_h_vap
+    field: delta_H_vap_kJ_mol
+    value: 585
+    locator:
+      page: 34
+      table: "4"
+      note: "Table 4 Forsterite (solid) regular Fo95Fa5 ΔHvap 585 ± 4 kJ/mol this work"
+  - species: Fe
+    observable: rate_series
+    observation_id: costa_2017_t5_hre_fe_mg_model
+    field: CoRoT_7b_Fe_Mg
+    value: 5.1
+    locator:
+      page: 35
+      table: "5"
+      note: "Table 5 CoRoT-7b Fe/Mg atomic ratio 5.1 (model, not measured)"
+  - species: Fe
+    observable: transition_point
+    observation_id: costa_2017_solidus
+    field: T_K
+    value: 2050.0
+    locator:
+      page: 3
+      paragraph: abstract
+      note: "Abstract: solidus temperature (~ 2050 K)"
+species:
+  Fe:
+    observations:
+    - observation_id: costa_2017_t1_olivine_composition
+      type: gibbs_table
+      locator:
+        page: 33
+        table: "1"
+        note: 'AM HTML caption: "Table 1. Chemical composition of the olivine powder samples before and after KEMS." Icarus 289:42-55 pagination not recovered without PDF'
+      T_range_K: [1750.0, 2250.0]
+      phase: solid_solution_olivine_Fo95Fa5
+      condensed_form:
+        state: crystalline
+        polymorph_name: olivine
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo95Fa5 before KEMS; Fo96Fa4 after KEMS below melting (Table 1 mole %)
+      standard_state: natural forsterite-rich olivine powder as characterized
+      regime: analytical_composition
+      units: wt_pct and mol_pct as printed
+      values:
+        quantity: sample_composition_before_after_kems
+        method_class: measured_direct
+        system_class: solid_solution_silicate
+        before_kems_FeO_wt_pct: 5.1
+        before_kems_Fe_wt_pct: 3.6
+        before_kems_Fa_mol_pct: 4.9
+        before_kems_Fo_mol_pct: 95
+        as_received_Fo_mol_pct: 93
+        as_received_Fa_mol_pct: 6.7
+        after_below_melting_Fa_mol_pct: 3.9
+        after_above_melting_epma_Fa_mol_pct: 0.21
+        Fe_Mg_molar_before: 0.05
+        Fe_Mg_molar_after: 0.04
+        Fe_Mg_molar_source: abstract (~ 0.05 before, ~ 0.04 after)
+        table_csv: tables/kems-133-costa-2017/t1.csv
+        footnote_Fa_formula_as_printed: Weight% Mg/(55.845·total mol)·100
+        footnote_note: Fa formula uses Weight% Mg as printed; likely typesetting slip for Fe
+        related_source:
+          source_id: kems-007-costa-2015
+          document: NTRS 20150002321
+          relation: same_campaign_characterisation
+          page_quote: "Mg, forsterite 93(5) … Fe, fayalite 6.7(3)"
+          kems_007_as_published: Fo93Fa7
+          note: Cross-reference only; 2015 alpha rows are not reminted here.
+      uncertainty:
+        note: Table 1 parentheses; Before KEMS FeO 5.1(4) wt%; Fa 4.9(2) mol%
+    - observation_id: costa_2017_t2_fe_appearance_potentials
+      type: gibbs_table
+      locator:
+        page: 33
+        table: "2"
+        section: "3.2. Vapor Composition"
+        note: 'AM HTML caption: "Table 2. Vapor species of the olivine sample detected by KEMS and their appearance potentials (eV)."'
+      T_range_K: [1751.0, 2225.0]
+      phase: vapor_over_Fo95Fa5_olivine
+      standard_state: KEMS appearance potentials of ions from olivine vapor
+      regime: kems_appearance_potential
+      units: eV
+      values:
+        quantity: appearance_potentials_eV
+        method_class: measured_direct
+        Fe_plus_eV: 7.18
+        FeO_plus_eV: 8.25
+        Levin_1982_Fe_plus_eV: 7.7
+        Levin_1982_FeO_plus_eV: 8.71
+        Levin_column_class: literature_comparison
+        table_csv: tables/kems-133-costa-2017/t2.csv
+        species_detected_1751_2225_K:
+        - Fe+
+        - FeO+
+        - Mg+
+        - SiO+
+        - O+
+        - O2
+      uncertainty:
+        Fe_plus_eV: 1.81
+        FeO_plus_eV: 1.5
+        note: this-work ± as printed; Levin column is not this experiment
+    - observation_id: costa_2017_t3_feo_partial_molar_enthalpy
+      type: gibbs_table
+      locator:
+        page: 34
+        table: "3"
+        figure: "7"
+        note: slope of Fig. 7 activity vs inverse T
+      T_range_K: [1750.0, 2050.0]
+      phase: solid_solution_olivine_Fo95Fa5
+      standard_state: partial molar enthalpy of 'FeO' in Fo95Fa5 olivine from activity vs 1/T
+      regime: kems_effusion
+      units: as_printed_caption_silent
+      values:
+        quantity: partial_molar_enthalpy_FeO
+        method_class: author_derived
+        evidence_class: activity_slope
+        FeO_this_study: -47.7
+        Fabrichnaya_database: -35.7
+        Fabrichnaya_class: model_comparison
+        caption_unit: not_printed
+        note: caption silent on unit; number stored verbatim; do not convert
+      uncertainty:
+        FeO_this_study: 4.1
+        note: This Study ± as printed
+    - observation_id: costa_2017_t4_fayalite_delta_h_vap
+      type: gibbs_table
+      locator:
+        page: 34
+        table: "4"
+      T_range_K: [1750.0, 2050.0]
+      phase: Fo95Fa5_olivine_pseudo_binary
+      standard_state: partial molar enthalpy/entropy of vaporization of fayalite (liquid) from measured Fe partial pressure
+      regime: kems_effusion
+      units: kJ/mol and J/K·mol as printed
+      values:
+        quantity: enthalpy_entropy_of_vaporization_fayalite
+        method_class: author_derived
+        condensed_label_as_printed: Fayalite (liquid)
+        regular_Fo95Fa5_delta_H_vap_kJ_mol: 431
+        regular_Fo95Fa5_delta_S_vap_J_K_mol: 156
+        ideal_Fo95Fa5_delta_H_vap_kJ_mol: 428
+        ideal_Fo95Fa5_delta_S_vap_J_K_mol: 153
+        literature_not_this_work:
+        - {composition: Fo90Fa10, delta_H_vap_kJ_mol: 410, reference: Piacente et al. 1975}
+        - {composition: Fa100, delta_H_vap_kJ_mol: 412, reference: Nagahara et al. 1994}
+        table_csv: tables/kems-133-costa-2017/t4.csv
+      uncertainty:
+        regular_delta_H_vap_kJ_mol: 3
+        regular_delta_S_vap_J_K_mol: 2
+        ideal_delta_H_vap_kJ_mol: 3
+        ideal_delta_S_vap_J_K_mol: 2
+    - observation_id: costa_2017_fig6_fe_psat_figure_only
+      type: psat_series
+      locator:
+        page: 43
+        figure: "6"
+        note: AM HTML caption only; no numeric table
+      T_range_K: [1750.0, 2250.0]
+      phase: vapor_over_Fo95Fa5_olivine
+      standard_state: partial pressures of Fe, SiO, Mg, O2, O over Fo95Fa5
+      regime: kems_effusion
+      units: as plotted (not tabulated)
+      values:
+        quantity: partial_pressure_series
+        gas_species_order_decreasing_P:
+        - Fe
+        - SiO
+        - Mg
+        - O2
+        - O
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: P(T) exists only as Fig. 6; no numeric table or printed A,B in recovered AM HTML. Not digitised this round.
+        semantics: bound_not_point_ordering
+        ionizing_electron_energy_eV: 16.5
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: costa_2017_fig8_fe_mg_ratio_figure_only
+      type: psat_series
+      locator:
+        page: 45
+        figure: "8"
+      T_range_K: [1750.0, 2250.0]
+      phase: vapor_over_Fo95Fa5_olivine
+      standard_state: P(Fe)/P(Mg) vs inverse T
+      regime: kems_effusion
+      units: as plotted (not tabulated)
+      values:
+        quantity: Fe_to_Mg_pressure_ratio
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Fig. 8 pressure-ratio plot; no numeric table. Not digitised this round.
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: costa_2017_solidus
+      type: transition_point
+      locator:
+        page: 3
+        paragraph: abstract
+      T_range_K: [2050.0, 2050.0]
+      phase: Fo95Fa5_olivine
+      standard_state: measured solidus of Fo95Fa5 olivine
+      regime: kems_effusion
+      units: K
+      values:
+        quantity: solidus
+        method_class: measured_direct
+        T_K: 2050.0
+        as_printed: "~ 2050 K"
+        page_quote: "We measured the solidus temperature (~ 2050 K)"
+        related_source:
+          source_id: kems-007-costa-2015
+          document: NTRS 20150002321
+          relation: same_campaign_characterisation
+          kems_007_as_published: solidus ~2069 K for Fo93Fa7
+          note: Cross-reference only; 2015 solidus is not reminted as a second observation here.
+      uncertainty:
+        note: tilde as printed; no numeric sigma in abstract
+    - observation_id: costa_2017_gamma_fa_regular_solution
+      type: activity_coefficient
+      locator:
+        page: 12
+        paragraph: regular solution model 1750-2050 K
+        note: AM HTML eq. 23-24; γ 1.26 to 1.22
+      T_range_K: [1750.0, 2050.0]
+      phase: Fo95Fa5_olivine
+      standard_state: fayalite activity coefficient in Fo95Fa5 olivine
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        quantity: activity_coefficient_fayalite
+        method_class: author_derived
+        gamma_regular_1750_2050_K: [1.26, 1.22]
+        gamma_abstract_Nafziger_Muan_1967: 1.17
+        abstract_gamma_class: literature_comparison
+        note: "As printed: Fo95Fa5 olivine is ideal within 26%"
+      uncertainty:
+        note: range 1.26 to 1.22 as printed; no extra sigma
+    - observation_id: costa_2017_t5_hre_fe_mg_model
+      type: rate_series
+      locator:
+        page: 35
+        table: "5"
+        note: 'AM HTML caption: "Table 5. (Fe/Mg) Atomic ratio in silicate vapor atmospheres of HRE"'
+      T_range_K: [1476.0, 3500.0]
+      phase: MAGMA_HRE_silicate_vapor_atmosphere
+      standard_state: modelled Fe/Mg atomic ratio in hot-rocky-exoplanet silicate vapor
+      regime: thermochemical_equilibrium_model
+      units: atomic ratio as printed
+      values:
+        quantity: Fe_Mg_atomic_ratio_HRE_atmospheres
+        method_class: model_derived
+        model: MAGMA silicate-atmosphere application (Fegley and Cameron 1987; Schaefer and Fegley 2009; Ito et al. 2015)
+        CoRoT_7b_Fe_Mg: 5.1
+        CoRoT_7b_T_K: 2425
+        Kepler_10b_Fe_Mg: 1.1
+        Kepler_10b_T_K: 3007
+        table_csv: tables/kems-133-costa-2017/t5.csv
+        T_source: Kite et al. (2016) sub-stellar temperatures
+        semantics: bound_not_point_ordering
+        note: >
+          Application/model table; not a laboratory measurement. Caption is
+          HRE silicate-vapor Fe/Mg, not a KEMS ion-current or flux series.
+          Battery must refuse as typed-refusal:model_output_not_measurement.
+      uncertainty:
+        note: none printed on Table 5; model table
+  Mg:
+    observations:
+    - observation_id: costa_2017_t2_mg_appearance_potential
+      type: gibbs_table
+      locator:
+        page: 33
+        table: "2"
+        note: 'AM HTML caption: "Table 2. Vapor species of the olivine sample detected by KEMS and their appearance potentials (eV)."'
+      T_range_K: [1751.0, 2225.0]
+      phase: vapor_over_Fo95Fa5_olivine
+      standard_state: KEMS appearance potential of Mg+
+      regime: kems_appearance_potential
+      units: eV
+      values:
+        quantity: appearance_potential_eV
+        method_class: measured_direct
+        Mg_plus_eV: 7.46
+        Levin_1982_Mg_plus_eV: 7.63
+        Levin_column_class: literature_comparison
+      uncertainty:
+        Mg_plus_eV: 1.81
+        note: this-work ± as printed
+    - observation_id: costa_2017_t3_mgo_partial_molar_enthalpy
+      type: gibbs_table
+      locator:
+        page: 34
+        table: "3"
+        figure: "7"
+      T_range_K: [1750.0, 2050.0]
+      phase: solid_solution_olivine_Fo95Fa5
+      standard_state: partial molar enthalpy of MgO in Fo95Fa5 olivine from activity vs 1/T
+      regime: kems_effusion
+      units: as_printed_caption_silent
+      values:
+        quantity: partial_molar_enthalpy_MgO
+        method_class: author_derived
+        MgO_this_study: -97.4
+        Fabrichnaya_database: -48.0
+        Fabrichnaya_class: model_comparison
+        caption_unit: not_printed
+      uncertainty:
+        MgO_this_study: 4.8
+    - observation_id: costa_2017_t4_forsterite_delta_h_vap
+      type: gibbs_table
+      locator:
+        page: 34
+        table: "4"
+      T_range_K: [1750.0, 2050.0]
+      phase: Fo95Fa5_olivine_pseudo_binary
+      standard_state: partial molar enthalpy/entropy of vaporization of forsterite (solid) from measured Mg partial pressure
+      regime: kems_effusion
+      units: kJ/mol and J/K·mol as printed
+      values:
+        quantity: enthalpy_entropy_of_vaporization_forsterite
+        method_class: author_derived
+        condensed_label_as_printed: Forsterite (solid)
+        delta_H_vap_kJ_mol: 585
+        delta_S_vap_J_K_mol: 183
+        regular_and_ideal_identical: true
+        literature_not_this_work:
+        - {composition: Fo90Fa10, delta_H_vap_kJ_mol: 548, reference: Piacente et al. 1975}
+        - {composition: Fo100, delta_H_vap_kJ_mol: 543, reference: Nagahara et al. 1994}
+        - {composition: Fo100, delta_H_vap_kJ_mol: 640, reference: Mysen & Kushiro 1988}
+        table_csv: tables/kems-133-costa-2017/t4.csv
+      uncertainty:
+        delta_H_vap_kJ_mol: 4
+        delta_S_vap_J_K_mol: 2
+    - observation_id: costa_2017_fig6_mg_psat_figure_only
+      type: psat_series
+      locator:
+        page: 43
+        figure: "6"
+      T_range_K: [1750.0, 2250.0]
+      phase: vapor_over_Fo95Fa5_olivine
+      standard_state: P(Mg) over Fo95Fa5
+      regime: kems_effusion
+      units: as plotted (not tabulated)
+      values:
+        quantity: partial_pressure_Mg
+        gas_species: Mg
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Fig. 6 only; no numeric table. Not digitised this round.
+        semantics: bound_not_point_ordering
+        ionizing_electron_energy_eV: 16.5
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: costa_2017_fig7_activities_figure_only
+      type: activity_coefficient
+      locator:
+        page: 44
+        figure: "7"
+      T_range_K: [1750.0, 2050.0]
+      phase: Fo95Fa5_olivine
+      standard_state: thermodynamic activities of FeO, MgO, SiO2 vs inverse T
+      regime: kems_effusion
+      units: as plotted (not tabulated)
+      values:
+        quantity: oxide_activities_vs_inverse_T
+        method_class: author_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Fig. 7 activity plot; slope numbers are Table 3. Scatter not digitised this round.
+        semantics: bound_not_point_ordering
+        components:
+        - FeO
+        - MgO
+        - SiO2
+      uncertainty:
+        note: not applicable; figure not digitised
+  SiO:
+    observations:
+    - observation_id: costa_2017_t2_sio_appearance_potential
+      type: gibbs_table
+      locator:
+        page: 33
+        table: "2"
+        note: 'AM HTML caption: "Table 2. Vapor species of the olivine sample detected by KEMS and their appearance potentials (eV)."'
+      T_range_K: [1751.0, 2225.0]
+      phase: vapor_over_Fo95Fa5_olivine
+      standard_state: KEMS appearance potential of SiO+
+      regime: kems_appearance_potential
+      units: eV
+      values:
+        quantity: appearance_potential_eV
+        method_class: measured_direct
+        SiO_plus_eV: 10.6
+        Levin_1982_SiO_plus_eV: 10.53
+        Levin_column_class: literature_comparison
+        as_printed: 10.60 ± 1.83
+      uncertainty:
+        SiO_plus_eV: 1.83
+    - observation_id: costa_2017_t3_sio2_partial_molar_enthalpy
+      type: gibbs_table
+      locator:
+        page: 34
+        table: "3"
+        figure: "7"
+      T_range_K: [1750.0, 2050.0]
+      phase: solid_solution_olivine_Fo95Fa5
+      standard_state: partial molar enthalpy of SiO2 in Fo95Fa5 olivine from activity vs 1/T
+      regime: kems_effusion
+      units: as_printed_caption_silent
+      values:
+        quantity: partial_molar_enthalpy_SiO2
+        method_class: author_derived
+        SiO2_this_study: 98.0
+        Fabrichnaya_database: 70.73
+        Fabrichnaya_class: model_comparison
+        caption_unit: not_printed
+      uncertainty:
+        SiO2_this_study: 3.6
+    - observation_id: costa_2017_fig6_sio_psat_figure_only
+      type: psat_series
+      locator:
+        page: 43
+        figure: "6"
+      T_range_K: [1750.0, 2250.0]
+      phase: vapor_over_Fo95Fa5_olivine
+      standard_state: P(SiO) over Fo95Fa5
+      regime: kems_effusion
+      units: as plotted (not tabulated)
+      values:
+        quantity: partial_pressure_SiO
+        gas_species: SiO
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Fig. 6 only; no numeric table. Not digitised this round.
+        semantics: bound_not_point_ordering
+        ionizing_electron_energy_eV: 16.5
+      uncertainty:
+        note: not applicable; figure not digitised
+  O2:
+    observations:
+    - observation_id: costa_2017_t2_o2_appearance_potential
+      type: gibbs_table
+      locator:
+        page: 33
+        table: "2"
+        note: 'AM HTML caption: "Table 2. Vapor species of the olivine sample detected by KEMS and their appearance potentials (eV)."'
+      T_range_K: [1751.0, 2225.0]
+      phase: vapor_over_Fo95Fa5_olivine
+      standard_state: KEMS appearance potential of O2
+      regime: kems_appearance_potential
+      units: eV
+      values:
+        quantity: appearance_potential_eV
+        method_class: measured_direct
+        O2_eV: 17.22
+        Levin_1982_O2_eV: 18.69
+        Levin_column_class: literature_comparison
+      uncertainty:
+        O2_eV: 2.88
+    - observation_id: costa_2017_fig6_o2_psat_figure_only
+      type: psat_series
+      locator:
+        page: 43
+        figure: "6"
+      T_range_K: [1750.0, 2250.0]
+      phase: vapor_over_Fo95Fa5_olivine
+      standard_state: P(O2) over Fo95Fa5
+      regime: kems_effusion
+      units: as plotted (not tabulated)
+      values:
+        quantity: partial_pressure_O2
+        gas_species: O2
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Fig. 6 only; no numeric table. Not digitised this round.
+        semantics: bound_not_point_ordering
+        ionizing_electron_energy_eV: 16.5
+      uncertainty:
+        note: not applicable; figure not digitised
+  O:
+    observations:
+    - observation_id: costa_2017_t2_o_appearance_potential
+      type: gibbs_table
+      locator:
+        page: 33
+        table: "2"
+        note: 'AM HTML caption: "Table 2. Vapor species of the olivine sample detected by KEMS and their appearance potentials (eV)."'
+      T_range_K: [1751.0, 2225.0]
+      phase: vapor_over_Fo95Fa5_olivine
+      standard_state: KEMS appearance potential of O+
+      regime: kems_appearance_potential
+      units: eV
+      values:
+        quantity: appearance_potential_eV
+        method_class: measured_direct
+        O_plus_eV: 14.9
+        Levin_1982_O_plus_eV: 14.0
+        Levin_column_class: literature_comparison
+      uncertainty:
+        O_plus_eV: 1.93
+    - observation_id: costa_2017_fig6_o_psat_figure_only
+      type: psat_series
+      locator:
+        page: 43
+        figure: "6"
+      T_range_K: [1750.0, 2250.0]
+      phase: vapor_over_Fo95Fa5_olivine
+      standard_state: P(O) over Fo95Fa5
+      regime: kems_effusion
+      units: as plotted (not tabulated)
+      values:
+        quantity: partial_pressure_O
+        gas_species: O
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Fig. 6 only; no numeric table. Not digitised this round.
+        semantics: bound_not_point_ordering
+        ionizing_electron_energy_eV: 16.5
+      uncertainty:
+        note: not applicable; figure not digitised
