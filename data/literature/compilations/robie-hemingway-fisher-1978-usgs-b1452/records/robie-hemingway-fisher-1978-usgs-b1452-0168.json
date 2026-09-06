@@ -1,0 +1,156 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0168",
+  "census_id": "high-temperature-printed-page-194",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "SODIUB HYDROXIDE",
+  "formula_as_published": "HaOH",
+  "phase_state_as_published": [
+    "Crystals 298.15 to aeltinq point 596 K.                          Liquid 596 to 1800 K.",
+    "___________________________________________________________________________ ____                              ,..",
+    "                                                                         FO.IUIATIOH FROB THE ELEIIEHTS",
+    "                                                                                         GIBBS",
+    "                                   T",
+    "  K          J/llol•K         J/IIOl•K       J/llol•K        J/llol•K         kJ/1101         kJ/1101"
+  ],
+  "description_lines_as_published": [
+    "HaOH:    Crystals 298.15 to aeltinq point 596 K.                          Liquid 596 to 1800 K.",
+    "___________________________________________________________________________ ____                              ,..",
+    "                                                                         FO.IUIATIOH FROB THE ELEIIEHTS",
+    "                                                                                         GIBBS",
+    "                                   T",
+    "  K          J/llol•K         J/IIOl•K       J/llol•K        J/llol•K         kJ/1101         kJ/1101"
+  ],
+  "formation_basis_header_as_published": "FO.IUIATIOH FROB THE ELEIIEHTS",
+  "formula_weight": {
+    "as_published": "39.997",
+    "value": 39.997,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      200
+    ],
+    "printed_pages": [
+      194
+    ],
+    "pdftotext_layout_page_file": "page-200.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "3 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26, 39"
+  ],
+  "title_line_as_published": "SODIUB HYDROXIDE                                                                        FORilULl WEIGHT     39.997",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "HaOH:    Crystals 298.15 to aeltinq point 596 K.                          Liquid 596 to 1800 K.",
+    "___________________________________________________________________________ ____                              ,..",
+    "                                                                         FO.IUIATIOH FROB THE ELEIIEHTS",
+    "                                                                                         GIBBS",
+    "TEIIP.    (H;-H; 98 )/T           so       -( G;-a~ 98 )/T      cop     EJTHlLPY      FREE EIIERGY   Loq Kf",
+    "                                   T",
+    "  K          J/llol•K         J/IIOl•K       J/llol•K        J/llol•K         kJ/1101         kJ/1101",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/llol•K",
+    "entropy": "J/IIOl•K",
+    "negative_gibbs_function": "J/llol•K",
+    "heat_capacity": "J/llol•K",
+    "formation_enthalpy": "kJ/1101",
+    "formation_gibbs_energy": "kJ/1101",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 19,
+  "uncertainty_line_as_published": "UNCEllTAIBTY                     0.81f             0.84                         0.085           0.125        0.022",
+  "uncertainty_values": [
+    {
+      "as_published": "0.81f",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.085",
+      "value": 0.085,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.125",
+      "value": 0.125,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.022",
+      "value": 0.022,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "HaOH:    Crystals 298.15 to aeltinq point 596 K.                          Liquid 596 to 1800 K.",
+    "___________________________________________________________________________ ____                              ,..",
+    "                                                                         FO.IUIATIOH FROB THE ELEIIEHTS",
+    "                                                                                         GIBBS",
+    "                                   T",
+    "  K          J/llol•K         J/IIOl•K       J/llol•K        J/llol•K         kJ/1101         kJ/1101"
+  ],
+  "auxiliary_lines_as_published": [
+    "BELTING POINT                      596        K              BOILING POI NT                                  K",
+    "ENTHALPY OF !ELTING                    6.611 ltJ             ENTHALPY OF VAPORIZATION                        kJ",
+    "                                   10.489 kJ                 llOLAR VOLUIIE                        1.8780 Jjbar",
+    "                                                                                                  18.780 CIIJ",
+    "TRANSITIOMS IB REFERENCE STATE ELE!EHTS",
+    "   SODIUI! •••••      1!.    P. 370.98, B. P. 1175 K.",
+    "HEAT CAPACITY EQUATION",
+    "         88.445-            5.5178x10-3 T              25.993 T-o·s",
+    "             (EQUATION VALID FROI!                 5 96 - 1800 K)",
+    "REFER !ICE       32                32                                            215                      CO !PILED",
+    "                                                                                  32                       5-24-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "3 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26, 39",
+      "detector_only": false
+    }
+  ]
+}

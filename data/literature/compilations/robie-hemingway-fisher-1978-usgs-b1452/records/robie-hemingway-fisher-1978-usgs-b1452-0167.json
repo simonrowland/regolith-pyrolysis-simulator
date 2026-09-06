@@ -1,0 +1,130 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0167",
+  "census_id": "high-temperature-printed-page-193",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "DISODIOft KOMOXIDE",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "61.979",
+    "value": 61.979,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      199
+    ],
+    "printed_pages": [
+      193
+    ],
+    "pdftotext_layout_page_file": "page-199.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24"
+  ],
+  "title_line_as_published": "DISODIOft KOMOXIDE                                                              FORKDLA IIEIGHT     61.979",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "          Crystals 298.15 to aelting point 1193 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORUTION FROft THE ELEKEMTS",
+    "                                                                                      GIBBS",
+    "TEftP.    ( H;-H; 98 )/T      so     -(G;-H~ 98 )/T      cop      ENTHALPY         FREE EMEBGY      Loq Kf",
+    "                               T",
+    "  K         Jjaol•K        J/aol•K     J;aol•K        J/aol•JI:        kJ/aol         kJ/1101",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "Jjaol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J;aol•K",
+    "heat_capacity": "J/aol•JI:",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/1101",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 9,
+  "uncertainty_line_as_published": "UWCEBT llMTY                  0.84           0.84                        0.280          0.290        0.051",
+  "uncertainty_values": [
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.280",
+      "value": 0.28,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.290",
+      "value": 0.29,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.051",
+      "value": 0.051,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY EQDATIOW",
+    "c;       1.1397x1oz +  7.11857x1o-~ T - 8.1335x10Z T-o·s",
+    "            (EQUATIOH VALID FBOS 298- 1000 K)",
+    "RBlBBENCE      247           247                                         183                      COIIPILBD",
+    "                63                                                       265                       6- 9-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24",
+      "detector_only": false
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0170",
+  "census_id": "high-temperature-printed-page-196",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "NIOBIUft DIOXIDE",
+  "formula_as_published": "Nb0 2",
+  "phase_state_as_published": [
+    "llpha crystals 298.15 to 1150 K.                  Beta crystals 1150 to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "Nb0 2 :   llpha crystals 298.15 to 1150 K.                  Beta crystals 1150 to 1800 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "124.905",
+    "value": 124.905,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      202
+    ],
+    "printed_pages": [
+      196
+    ],
+    "pdftotext_layout_page_file": "page-202.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 18"
+  ],
+  "title_line_as_published": "NIOBIUft DIOXIDE                                                                   FOBBULA WEIGHT    124.905",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Nb0 2 :   llpha crystals 298.15 to 1150 K.                  Beta crystals 1150 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOBftATIOtl PRO! THE ELEBENTS",
+    "                                                                                         GIBBS",
+    "TEBP.      ( H;-H~ 98 )/T       so       -(G;-a~ 98 )/T      cop    ENTHALPY          FREE ENERGY     Log Kf",
+    "                                 T",
+    "   K        J/•ol•K         J/•ol•K        J/•ol•K        J/•ol•K         kJ/•ol         kJ/•ol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/•ol•K",
+    "entropy": "J/•ol•K",
+    "negative_gibbs_function": "J/•ol•K",
+    "heat_capacity": "J/•ol•K",
+    "formation_enthalpy": "kJ/•ol",
+    "formation_gibbs_energy": "kJ/•ol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 18,
+  "uncertainty_line_as_published": "URCEBTllRTY                     0.30             0.30                       8.370          8.370       1. 466",
+  "uncertainty_values": [
+    {
+      "as_published": "0.30",
+      "value": 0.3,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.30",
+      "value": 0.3,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "8.370",
+      "value": 8.37,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "8.370",
+      "value": 8.37,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1. 466",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Nb0 2 :   llpha crystals 298.15 to 1150 K.                  Beta crystals 1150 to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "IIELTING POINT                 2175                       BOUIRG POINT                                 K",
+    "ENTHALPY OP IIELTING                        kJ            ENTHALPY OF VlPORIZlTION                     kJ",
+    "                                            kJ            BOLAR VOLUIIE                       14.5020 Jjbar",
+    "                                                                                             45.020 c• 3",
+    "TRAHSITIONS IN REFEREHCE STATE ELEBENTS",
+    "      NIOBIUft •••• 11. P. 2740 K.",
+    "HEAT CAPACITY EyUATIONS",
+    " c;       69.650 +      2.8178x1o-z T            - 3.5572x10Z T-o·s",
+    "             (EQUATION VlLID FROft               298- 1150 K)",
+    "BEFEREMCE       1JO              33                                          33                     CO!PILED",
+    "                189                                                                                  8-11-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 18",
+      "detector_only": false
+    }
+  ]
+}
