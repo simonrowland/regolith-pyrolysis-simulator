@@ -1,14 +1,15 @@
 schema_version: literature_extract.v1
 source_id: kems-014-drowart-2005
 source:
-  citation: "Drowart, J., Chatillon, C., Hastie, J. & Bonnell, D. (2005), \"High-temperature mass spectrometry: instrumental techniques, ionization cross-sections, pressure measurements, and thermodynamic data\" (IUPAC Technical Report), Pure Appl. Chem. 77:683–737, DOI 10.1351/pac200577040683"
+  citation: "Drowart, J., Chatillon, C., Hastie, J. & Bonnell, D. (2005), \"High-temperature mass spectrometry: instrumental techniques, ionization cross-sections, pressure measurements, and thermodynamic data\" (IUPAC Technical Report), Pure Appl. Chem. 77:683–737, DOI 10.1351/pac200577040683. PDF not on disk (De Gruyter WAF / IUPAC Cloudflare; see sidecar docs/references/pdfs/99-kems-langmuir/kems-014-drowart-2005.md)"
   doi: 10.1351/pac200577040683
+  url: https://doi.org/10.1351/pac200577040683
   year: 2005
 extraction:
-  method: pdftotext -layout of born-digital PAC PDF; Table 2 atomic σm rows for O/Na/Mg/Al/Si/Ar/K/Ca/Fe certified; Table 1 coefficient grid not evaluated; Studio-2 MinerU not ready
-  date: '2026-08-27'
-  worker: tail-close
-  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-014-drowart-2005/
+  method: RH-46 official De Gruyter PDF URL text (byte fetch WAF-blocked) plus prior Table 2 subset; Table 1 H-row and Tables 3–5 captions from publisher PDF snippets; no pdftotext (PDF absent); historical ocr-repair pointer still missing
+  date: '2026-09-06'
+  worker: hunt-RH-46
+  provenance_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/
 review_status: draft
 fidelity_samples:
   - species: Na
@@ -20,6 +21,24 @@ fidelity_samples:
       page: 706
       table: '2'
       note: Table 2 Ar experimental σm 2.62 Å² (Straub/Lindsay-class [146]); prose p. 701 quotes 2.62e-16 cm²
+  - species: Na
+    observable: gibbs_table
+    observation_id: drowart_2005_table1_mann_fit_coefficients
+    field: H_Ei_eV
+    value: 13.598
+    locator:
+      page: 702
+      table: '1'
+      note: Table 1 H row first ionization energy 13.5980 eV as printed
+  - species: SiO
+    observable: gibbs_table
+    observation_id: drowart_2005_table4_sio_relative_sigma_vs_ag
+    field: sigma_SiO_over_sigma_Ag
+    value: 1.4
+    locator:
+      page: 714
+      table: '4'
+      note: Table 4 SiO vs Ag relative ionization cross-section 1.4 ± 0.2 at 30 eV [204]
 species:
   Na:
     observations:
@@ -134,3 +153,154 @@ species:
         note: "The six-criteria screen tests simulator comparability. Drowart tests KEMS measurement quality. A row can pass all six and still be an uncalibrated ion current. Recommendation (not implemented) — add an orthogonal KEMS-quality gate before a p(T) row may score."
       uncertainty:
         note: not applicable
+    - observation_id: drowart_2005_table1_mann_fit_coefficients
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+        table: '1'
+        page: 702
+        note: remainder of coefficient grid unseen without PDF bytes
+      T_range_K: null
+      phase: gas_phase_atoms
+      regime: ionization_cross_section_compilation
+      units: as_published
+      values:
+        quantity: mann_fit_atomic_ionization_cross_section_coefficients
+        method_class: secondary_compilation
+        equation_gives: 1.0e20 * sigma_j(E) / m2
+        H_Z: 1
+        H_Ei_eV: 13.598
+        H_Aj_1e20_m2_eV2: 110.838256
+        H_Bj1_1e20_m2_eV2: 0.000384082575
+        H_Bj2_1e20_m2_eV2: -0.00080973937
+        H_Bj3_1e20_m2_eV2: 0.00756348278
+        H_Bj4_1e20_m2_eV2: -0.01350935746
+        H_Bj5_1e20_m2_eV2: 0.00794102397
+        printed_mantissa_spaces: grouped as 110.838 256 and 3.840 825 75E-4 in the PDF
+        remainder_of_grid: unseen_without_pdf
+        note: Fit of Mann calculated atomic σ(E), not a melt p(T) or α series. Na row of this grid was not retrieved.
+      uncertainty:
+        note: not restated on the H row; compilation/model coefficients
+    - observation_id: drowart_2005_table3_relative_atomic_sigma
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+        table: '3'
+        page: 708
+      T_range_K: null
+      phase: gas_phase_atoms
+      regime: ionization_cross_section_compilation
+      units: dimensionless_ratio
+      values:
+        quantity: relative_atomic_ionization_cross_section
+        method_class: secondary_compilation
+        Al_vs_Ag_E_eV: 37
+        Al_vs_Ag_ratio: 2.66
+        Al_vs_Ag_ref: '[267]'
+        Si_vs_Ag_E_eV: 37
+        Si_vs_Ag_ratio: 1.64
+        Si_vs_Ag_ref: '[267]'
+        note: Compiled HTMS relative atomic σ, not melt p(T). Remainder of Table 3 not fully retrieved.
+      uncertainty:
+        note: not restated on the Al/Si rows in the retrieved text
+    - observation_id: drowart_2005_table5_polyatomic_sigma_unseen_body
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+        table: '5'
+        page: 715
+        note: caption and header only from official PDF URL text
+      T_range_K: null
+      phase: gas_phase_molecules
+      regime: ionization_cross_section_compilation
+      units: as_published
+      values:
+        quantity: relative_polyatomic_ionization_cross_section
+        method_class: secondary_compilation
+        status: typed_refusal
+        reason: Table 5 body was not retrieved from the official PDF (WAF-blocked bytes). Caption confirms compiled polyatomic ionization cross-section ratios, not melt p(T). Not a true absence of the table.
+        semantics: bound_not_point_ordering
+        body: unseen_without_pdf
+      uncertainty:
+        note: not applicable; body unseen
+    - observation_id: drowart_2005_fig1_fig2_sigma_E_figure_only
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+        figure: '1'
+        page: 701
+        note: also Fig. 2 p. 709; Ag σ(E) calculated and experimental curves
+      T_range_K: null
+      phase: gas_phase_atoms
+      regime: ionization_cross_section_compilation
+      units: as_published
+      values:
+        quantity: Ag_ionization_cross_section_vs_electron_energy
+        status: typed_refusal
+        reason: Figs 1 and 2 are σ(E) curves for Ag. Figure digitization is forbidden. Not melt p(T).
+        method_class: secondary_compilation
+        admission_status: rejected_no_figure_reading
+        semantics: bound_not_point_ordering
+        fig1: Mann vs Program Sigma calculated Ag σ(E)
+        fig2: Freund-class experimental Ag σ(E) vs Gryzinski/Lotz/Mann
+      uncertainty:
+        note: not applicable; no tabulated points
+    - observation_id: drowart_2005_hunt_targets_true_absence
+      type: rate_series
+      locator:
+        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/completeness-ledger.md
+        page: 683
+        note: full paper 683–737; Tables 1–5 and Figs 1–2 from official PDF text
+      T_range_K: null
+      phase: methodology_standard
+      regime: kems_effusion
+      units: none
+      values:
+        quantity: hunt_target_observables
+        status: typed_refusal
+        reason: IUPAC HTMS methods/cross-section compilation. Tables 1–5 are ionization-cross-section compilations or fits. No silicate-melt p(T), γ, α, residue, or time/mass-loss series are tabulated.
+        semantics: bound_not_point_ordering
+        species_resolved_partial_pressure_Pa: true_absence
+        activity_gamma: true_absence
+        kinetic_alpha: true_absence
+        residue_composition: true_absence
+        time_mass_loss_series: true_absence
+        tables_that_are_compilation_proxy:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+        figures_that_are_sigma_E_curves:
+        - '1'
+        - '2'
+        later_figures_and_table_1_remainder_and_table_5_body: unseen_without_pdf
+        improves_empirical_pT_alpha_gamma_battery: false
+      uncertainty:
+        note: not applicable
+  SiO:
+    observations:
+    - observation_id: drowart_2005_table4_sio_relative_sigma_vs_ag
+      type: gibbs_table
+      locator:
+        source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+        table: '4'
+        page: 714
+      T_range_K: null
+      phase: gas_phase_molecules
+      standard_state: relative ionization cross-section σ(SiO+/SiO)/σ(Ag+/Ag) at stated electron energy, not a condensed-phase activity
+      regime: ionization_cross_section_compilation
+      units: dimensionless_ratio
+      values:
+        quantity: relative_molecular_ionization_cross_section
+        method_class: secondary_compilation
+        molecule: SiO
+        reference_atom: Ag
+        reference_Ei_eV: 7.58
+        E_eV: 30
+        sigma_SiO_over_sigma_Ag: 1.4
+        sigma_SiO_over_sigma_Ag_uncertainty: 0.2
+        ref: '[204]'
+        note: Compiled HTMS ionization-cross-section ratio, not p_SiO(T) and not kinetic α.
+      uncertainty:
+        note: '±0.2 as printed on the 1.4 ratio'
