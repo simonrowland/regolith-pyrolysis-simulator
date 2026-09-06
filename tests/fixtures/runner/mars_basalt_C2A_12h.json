@@ -5122,7 +5122,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P2",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -5130,7 +5142,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "P2O5_gas": {
           "species_id": "P2O5_gas",
@@ -5163,7 +5175,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "declared applicability predicate 'not_applicable' is inactive",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "not_applicable",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P2O5_gas",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -5171,7 +5195,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "P4": {
           "species_id": "P4",
@@ -5204,7 +5228,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P4",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -5212,7 +5248,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "P4O10": {
           "species_id": "P4O10",
@@ -5245,7 +5281,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P4O10",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -5253,7 +5301,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "P4O6": {
           "species_id": "P4O6",
@@ -5286,7 +5334,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P4O6",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -5294,7 +5354,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "PO": {
           "species_id": "PO",
@@ -5327,7 +5387,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "PO",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -5335,7 +5407,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "PO2": {
           "species_id": "PO2",
@@ -5368,7 +5440,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "PO2",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -5376,7 +5460,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "Si": {
           "species_id": "Si",
@@ -6252,7 +6336,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P2",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -6260,7 +6356,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "P2O5_gas": {
           "species_id": "P2O5_gas",
@@ -6293,7 +6389,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "declared applicability predicate 'not_applicable' is inactive",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "not_applicable",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P2O5_gas",
+              "detail": "declared applicability predicate 'not_applicable' is inactive",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -6301,7 +6409,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "P4": {
           "species_id": "P4",
@@ -6334,7 +6442,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P4",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -6342,7 +6462,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "P4O10": {
           "species_id": "P4O10",
@@ -6375,7 +6495,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P4O10",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -6383,7 +6515,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "P4O6": {
           "species_id": "P4O6",
@@ -6416,7 +6548,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "P4O6",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -6424,7 +6568,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "PO": {
           "species_id": "PO",
@@ -6457,7 +6601,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "PO",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -6465,7 +6621,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         },
         "PO2": {
           "species_id": "PO2",
@@ -6498,7 +6654,19 @@
           "is_union_flux_eligible": false,
           "extra": {
             "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-            "origin": "catalog"
+            "origin": "catalog",
+            "applicability_evidence": {
+              "predicate": "stage0_only",
+              "active": false,
+              "process_phase": "hot_train",
+              "stage": "evaporation",
+              "parent_species_ids": [
+                "P2O5"
+              ],
+              "species_id": "PO2",
+              "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+              "flux_dormant": true
+            }
           },
           "out_of_range": false,
           "acquisition_flag": null,
@@ -6506,7 +6674,7 @@
           "source_boundary": null,
           "source_reaction_activity": null,
           "is_flux_active": false,
-          "is_flux_dormant_by_epoch": false
+          "is_flux_dormant_by_epoch": true
         }
       },
       "metadata": {
@@ -6579,13 +6747,13 @@
         "Na": "dormant_by_epoch",
         "Na2": "eligible",
         "Na2O_gas": "eligible",
-        "P2": "refusal",
-        "P2O5_gas": "refusal",
-        "P4": "refusal",
-        "P4O10": "refusal",
-        "P4O6": "refusal",
-        "PO": "refusal",
-        "PO2": "refusal",
+        "P2": "dormant_by_epoch",
+        "P2O5_gas": "dormant_by_epoch",
+        "P4": "dormant_by_epoch",
+        "P4O10": "dormant_by_epoch",
+        "P4O6": "dormant_by_epoch",
+        "PO": "dormant_by_epoch",
+        "PO2": "dormant_by_epoch",
         "Si": "eligible",
         "Si2": "eligible",
         "Si3": "eligible",
@@ -12033,7 +12201,19 @@
             "is_union_flux_eligible": false,
             "extra": {
               "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-              "origin": "catalog"
+              "origin": "catalog",
+              "applicability_evidence": {
+                "predicate": "stage0_only",
+                "active": false,
+                "process_phase": "hot_train",
+                "stage": "evaporation",
+                "parent_species_ids": [
+                  "P2O5"
+                ],
+                "species_id": "P2",
+                "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+                "flux_dormant": true
+              }
             },
             "out_of_range": false,
             "acquisition_flag": null,
@@ -12041,7 +12221,7 @@
             "source_boundary": null,
             "source_reaction_activity": null,
             "is_flux_active": false,
-            "is_flux_dormant_by_epoch": false
+            "is_flux_dormant_by_epoch": true
           },
           "input_mass_kg_hr": 0.0,
           "remaining_mass_kg_hr": 0.0,
@@ -12086,7 +12266,19 @@
             "is_union_flux_eligible": false,
             "extra": {
               "detail": "declared applicability predicate 'not_applicable' is inactive",
-              "origin": "catalog"
+              "origin": "catalog",
+              "applicability_evidence": {
+                "predicate": "not_applicable",
+                "active": false,
+                "process_phase": "hot_train",
+                "stage": "evaporation",
+                "parent_species_ids": [
+                  "P2O5"
+                ],
+                "species_id": "P2O5_gas",
+                "detail": "declared applicability predicate 'not_applicable' is inactive",
+                "flux_dormant": true
+              }
             },
             "out_of_range": false,
             "acquisition_flag": null,
@@ -12094,7 +12286,7 @@
             "source_boundary": null,
             "source_reaction_activity": null,
             "is_flux_active": false,
-            "is_flux_dormant_by_epoch": false
+            "is_flux_dormant_by_epoch": true
           },
           "input_mass_kg_hr": 0.0,
           "remaining_mass_kg_hr": 0.0,
@@ -12139,7 +12331,19 @@
             "is_union_flux_eligible": false,
             "extra": {
               "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-              "origin": "catalog"
+              "origin": "catalog",
+              "applicability_evidence": {
+                "predicate": "stage0_only",
+                "active": false,
+                "process_phase": "hot_train",
+                "stage": "evaporation",
+                "parent_species_ids": [
+                  "P2O5"
+                ],
+                "species_id": "P4",
+                "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+                "flux_dormant": true
+              }
             },
             "out_of_range": false,
             "acquisition_flag": null,
@@ -12147,7 +12351,7 @@
             "source_boundary": null,
             "source_reaction_activity": null,
             "is_flux_active": false,
-            "is_flux_dormant_by_epoch": false
+            "is_flux_dormant_by_epoch": true
           },
           "input_mass_kg_hr": 0.0,
           "remaining_mass_kg_hr": 0.0,
@@ -12192,7 +12396,19 @@
             "is_union_flux_eligible": false,
             "extra": {
               "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-              "origin": "catalog"
+              "origin": "catalog",
+              "applicability_evidence": {
+                "predicate": "stage0_only",
+                "active": false,
+                "process_phase": "hot_train",
+                "stage": "evaporation",
+                "parent_species_ids": [
+                  "P2O5"
+                ],
+                "species_id": "P4O10",
+                "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+                "flux_dormant": true
+              }
             },
             "out_of_range": false,
             "acquisition_flag": null,
@@ -12200,7 +12416,7 @@
             "source_boundary": null,
             "source_reaction_activity": null,
             "is_flux_active": false,
-            "is_flux_dormant_by_epoch": false
+            "is_flux_dormant_by_epoch": true
           },
           "input_mass_kg_hr": 0.0,
           "remaining_mass_kg_hr": 0.0,
@@ -12245,7 +12461,19 @@
             "is_union_flux_eligible": false,
             "extra": {
               "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-              "origin": "catalog"
+              "origin": "catalog",
+              "applicability_evidence": {
+                "predicate": "stage0_only",
+                "active": false,
+                "process_phase": "hot_train",
+                "stage": "evaporation",
+                "parent_species_ids": [
+                  "P2O5"
+                ],
+                "species_id": "P4O6",
+                "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+                "flux_dormant": true
+              }
             },
             "out_of_range": false,
             "acquisition_flag": null,
@@ -12253,7 +12481,7 @@
             "source_boundary": null,
             "source_reaction_activity": null,
             "is_flux_active": false,
-            "is_flux_dormant_by_epoch": false
+            "is_flux_dormant_by_epoch": true
           },
           "input_mass_kg_hr": 0.0,
           "remaining_mass_kg_hr": 0.0,
@@ -12298,7 +12526,19 @@
             "is_union_flux_eligible": false,
             "extra": {
               "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-              "origin": "catalog"
+              "origin": "catalog",
+              "applicability_evidence": {
+                "predicate": "stage0_only",
+                "active": false,
+                "process_phase": "hot_train",
+                "stage": "evaporation",
+                "parent_species_ids": [
+                  "P2O5"
+                ],
+                "species_id": "PO",
+                "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+                "flux_dormant": true
+              }
             },
             "out_of_range": false,
             "acquisition_flag": null,
@@ -12306,7 +12546,7 @@
             "source_boundary": null,
             "source_reaction_activity": null,
             "is_flux_active": false,
-            "is_flux_dormant_by_epoch": false
+            "is_flux_dormant_by_epoch": true
           },
           "input_mass_kg_hr": 0.0,
           "remaining_mass_kg_hr": 0.0,
@@ -12351,7 +12591,19 @@
             "is_union_flux_eligible": false,
             "extra": {
               "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
-              "origin": "catalog"
+              "origin": "catalog",
+              "applicability_evidence": {
+                "predicate": "stage0_only",
+                "active": false,
+                "process_phase": "hot_train",
+                "stage": "evaporation",
+                "parent_species_ids": [
+                  "P2O5"
+                ],
+                "species_id": "PO2",
+                "detail": "stage0_only predicate inactive outside stage0 (process_phase='hot_train', stage='evaporation')",
+                "flux_dormant": true
+              }
             },
             "out_of_range": false,
             "acquisition_flag": null,
@@ -12359,7 +12611,7 @@
             "source_boundary": null,
             "source_reaction_activity": null,
             "is_flux_active": false,
-            "is_flux_dormant_by_epoch": false
+            "is_flux_dormant_by_epoch": true
           },
           "input_mass_kg_hr": 0.0,
           "remaining_mass_kg_hr": 0.0,
@@ -13348,13 +13600,13 @@
     "shadow_outcome": "missing_keys",
     "silent_zero": {
       "schema": "silent_zero.v1",
-      "count": 17,
+      "count": 10,
       "counts_by_reason": {
         "proven_below_threshold": 9,
-        "refused_upstream": 8
+        "refused_upstream": 1
       },
       "counts_by_doctrine_category": {
-        "1": 8,
+        "1": 1,
         "2": 0,
         "3": 9
       },
@@ -13436,62 +13688,6 @@
           "site": "evaporation.partial_channel_refusal",
           "doctrine_category": 1,
           "species": "Mg",
-          "field": "batch_channel_state",
-          "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
-        },
-        {
-          "zero_because": "refused_upstream",
-          "site": "evaporation.partial_channel_refusal",
-          "doctrine_category": 1,
-          "species": "P2",
-          "field": "batch_channel_state",
-          "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
-        },
-        {
-          "zero_because": "refused_upstream",
-          "site": "evaporation.partial_channel_refusal",
-          "doctrine_category": 1,
-          "species": "P2O5_gas",
-          "field": "batch_channel_state",
-          "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
-        },
-        {
-          "zero_because": "refused_upstream",
-          "site": "evaporation.partial_channel_refusal",
-          "doctrine_category": 1,
-          "species": "P4",
-          "field": "batch_channel_state",
-          "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
-        },
-        {
-          "zero_because": "refused_upstream",
-          "site": "evaporation.partial_channel_refusal",
-          "doctrine_category": 1,
-          "species": "P4O10",
-          "field": "batch_channel_state",
-          "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
-        },
-        {
-          "zero_because": "refused_upstream",
-          "site": "evaporation.partial_channel_refusal",
-          "doctrine_category": 1,
-          "species": "P4O6",
-          "field": "batch_channel_state",
-          "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
-        },
-        {
-          "zero_because": "refused_upstream",
-          "site": "evaporation.partial_channel_refusal",
-          "doctrine_category": 1,
-          "species": "PO",
-          "field": "batch_channel_state",
-          "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
-        },
-        {
-          "zero_because": "refused_upstream",
-          "site": "evaporation.partial_channel_refusal",
-          "doctrine_category": 1,
-          "species": "PO2",
           "field": "batch_channel_state",
           "detail": "channel state=refusal while peer channels still debit; species omitted from flux (silent zero residual of b-126 F3). Counted as category-1 missing input; hard raise deferred pending blast-radius rebaseline."
         }
@@ -17013,13 +17209,13 @@
           "Na": "refusal",
           "Na2": "refusal",
           "Na2O_gas": "refusal",
-          "P2": "refusal",
-          "P2O5_gas": "refusal",
-          "P4": "refusal",
-          "P4O10": "refusal",
-          "P4O6": "refusal",
-          "PO": "refusal",
-          "PO2": "refusal",
+          "P2": "dormant_by_epoch",
+          "P2O5_gas": "dormant_by_epoch",
+          "P4": "dormant_by_epoch",
+          "P4O10": "dormant_by_epoch",
+          "P4O6": "dormant_by_epoch",
+          "PO": "dormant_by_epoch",
+          "PO2": "dormant_by_epoch",
           "Si": "refusal",
           "Si2": "refusal",
           "Si3": "refusal",
@@ -17360,13 +17556,13 @@
           "Na": "refusal",
           "Na2": "refusal",
           "Na2O_gas": "refusal",
-          "P2": "refusal",
-          "P2O5_gas": "refusal",
-          "P4": "refusal",
-          "P4O10": "refusal",
-          "P4O6": "refusal",
-          "PO": "refusal",
-          "PO2": "refusal",
+          "P2": "dormant_by_epoch",
+          "P2O5_gas": "dormant_by_epoch",
+          "P4": "dormant_by_epoch",
+          "P4O10": "dormant_by_epoch",
+          "P4O6": "dormant_by_epoch",
+          "PO": "dormant_by_epoch",
+          "PO2": "dormant_by_epoch",
           "Si": "refusal",
           "Si2": "refusal",
           "Si3": "refusal",
@@ -17707,13 +17903,13 @@
           "Na": "refusal",
           "Na2": "refusal",
           "Na2O_gas": "refusal",
-          "P2": "refusal",
-          "P2O5_gas": "refusal",
-          "P4": "refusal",
-          "P4O10": "refusal",
-          "P4O6": "refusal",
-          "PO": "refusal",
-          "PO2": "refusal",
+          "P2": "dormant_by_epoch",
+          "P2O5_gas": "dormant_by_epoch",
+          "P4": "dormant_by_epoch",
+          "P4O10": "dormant_by_epoch",
+          "P4O6": "dormant_by_epoch",
+          "PO": "dormant_by_epoch",
+          "PO2": "dormant_by_epoch",
           "Si": "refusal",
           "Si2": "refusal",
           "Si3": "refusal",
@@ -18054,13 +18250,13 @@
           "Na": "refusal",
           "Na2": "refusal",
           "Na2O_gas": "refusal",
-          "P2": "refusal",
-          "P2O5_gas": "refusal",
-          "P4": "refusal",
-          "P4O10": "refusal",
-          "P4O6": "refusal",
-          "PO": "refusal",
-          "PO2": "refusal",
+          "P2": "dormant_by_epoch",
+          "P2O5_gas": "dormant_by_epoch",
+          "P4": "dormant_by_epoch",
+          "P4O10": "dormant_by_epoch",
+          "P4O6": "dormant_by_epoch",
+          "PO": "dormant_by_epoch",
+          "PO2": "dormant_by_epoch",
           "Si": "refusal",
           "Si2": "refusal",
           "Si3": "refusal",
@@ -18401,13 +18597,13 @@
           "Na": "refusal",
           "Na2": "refusal",
           "Na2O_gas": "refusal",
-          "P2": "refusal",
-          "P2O5_gas": "refusal",
-          "P4": "refusal",
-          "P4O10": "refusal",
-          "P4O6": "refusal",
-          "PO": "refusal",
-          "PO2": "refusal",
+          "P2": "dormant_by_epoch",
+          "P2O5_gas": "dormant_by_epoch",
+          "P4": "dormant_by_epoch",
+          "P4O10": "dormant_by_epoch",
+          "P4O6": "dormant_by_epoch",
+          "PO": "dormant_by_epoch",
+          "PO2": "dormant_by_epoch",
           "Si": "refusal",
           "Si2": "refusal",
           "Si3": "refusal",
@@ -18748,13 +18944,13 @@
           "Na": "refusal",
           "Na2": "refusal",
           "Na2O_gas": "refusal",
-          "P2": "refusal",
-          "P2O5_gas": "refusal",
-          "P4": "refusal",
-          "P4O10": "refusal",
-          "P4O6": "refusal",
-          "PO": "refusal",
-          "PO2": "refusal",
+          "P2": "dormant_by_epoch",
+          "P2O5_gas": "dormant_by_epoch",
+          "P4": "dormant_by_epoch",
+          "P4O10": "dormant_by_epoch",
+          "P4O6": "dormant_by_epoch",
+          "PO": "dormant_by_epoch",
+          "PO2": "dormant_by_epoch",
           "Si": "refusal",
           "Si2": "refusal",
           "Si3": "refusal",
@@ -22103,13 +22299,13 @@
           "Na": "dormant_by_epoch",
           "Na2": "eligible",
           "Na2O_gas": "eligible",
-          "P2": "refusal",
-          "P2O5_gas": "refusal",
-          "P4": "refusal",
-          "P4O10": "refusal",
-          "P4O6": "refusal",
-          "PO": "refusal",
-          "PO2": "refusal",
+          "P2": "dormant_by_epoch",
+          "P2O5_gas": "dormant_by_epoch",
+          "P4": "dormant_by_epoch",
+          "P4O10": "dormant_by_epoch",
+          "P4O6": "dormant_by_epoch",
+          "PO": "dormant_by_epoch",
+          "PO2": "dormant_by_epoch",
           "Si": "eligible",
           "Si2": "eligible",
           "Si3": "eligible",
@@ -25576,13 +25772,13 @@
           "Na": "dormant_by_epoch",
           "Na2": "eligible",
           "Na2O_gas": "eligible",
-          "P2": "refusal",
-          "P2O5_gas": "refusal",
-          "P4": "refusal",
-          "P4O10": "refusal",
-          "P4O6": "refusal",
-          "PO": "refusal",
-          "PO2": "refusal",
+          "P2": "dormant_by_epoch",
+          "P2O5_gas": "dormant_by_epoch",
+          "P4": "dormant_by_epoch",
+          "P4O10": "dormant_by_epoch",
+          "P4O6": "dormant_by_epoch",
+          "PO": "dormant_by_epoch",
+          "PO2": "dormant_by_epoch",
           "Si": "eligible",
           "Si2": "eligible",
           "Si3": "eligible",
@@ -29049,13 +29245,13 @@
           "Na": "dormant_by_epoch",
           "Na2": "eligible",
           "Na2O_gas": "eligible",
-          "P2": "refusal",
-          "P2O5_gas": "refusal",
-          "P4": "refusal",
-          "P4O10": "refusal",
-          "P4O6": "refusal",
-          "PO": "refusal",
-          "PO2": "refusal",
+          "P2": "dormant_by_epoch",
+          "P2O5_gas": "dormant_by_epoch",
+          "P4": "dormant_by_epoch",
+          "P4O10": "dormant_by_epoch",
+          "P4O6": "dormant_by_epoch",
+          "PO": "dormant_by_epoch",
+          "PO2": "dormant_by_epoch",
           "Si": "eligible",
           "Si2": "eligible",
           "Si3": "eligible",
@@ -32522,13 +32718,13 @@
           "Na": "dormant_by_epoch",
           "Na2": "eligible",
           "Na2O_gas": "eligible",
-          "P2": "refusal",
-          "P2O5_gas": "refusal",
-          "P4": "refusal",
-          "P4O10": "refusal",
-          "P4O6": "refusal",
-          "PO": "refusal",
-          "PO2": "refusal",
+          "P2": "dormant_by_epoch",
+          "P2O5_gas": "dormant_by_epoch",
+          "P4": "dormant_by_epoch",
+          "P4O10": "dormant_by_epoch",
+          "P4O6": "dormant_by_epoch",
+          "PO": "dormant_by_epoch",
+          "PO2": "dormant_by_epoch",
           "Si": "eligible",
           "Si2": "eligible",
           "Si3": "eligible",
@@ -35995,13 +36191,13 @@
           "Na": "dormant_by_epoch",
           "Na2": "eligible",
           "Na2O_gas": "eligible",
-          "P2": "refusal",
-          "P2O5_gas": "refusal",
-          "P4": "refusal",
-          "P4O10": "refusal",
-          "P4O6": "refusal",
-          "PO": "refusal",
-          "PO2": "refusal",
+          "P2": "dormant_by_epoch",
+          "P2O5_gas": "dormant_by_epoch",
+          "P4": "dormant_by_epoch",
+          "P4O10": "dormant_by_epoch",
+          "P4O6": "dormant_by_epoch",
+          "PO": "dormant_by_epoch",
+          "PO2": "dormant_by_epoch",
           "Si": "eligible",
           "Si2": "eligible",
           "Si3": "eligible",
@@ -39468,13 +39664,13 @@
           "Na": "dormant_by_epoch",
           "Na2": "eligible",
           "Na2O_gas": "eligible",
-          "P2": "refusal",
-          "P2O5_gas": "refusal",
-          "P4": "refusal",
-          "P4O10": "refusal",
-          "P4O6": "refusal",
-          "PO": "refusal",
-          "PO2": "refusal",
+          "P2": "dormant_by_epoch",
+          "P2O5_gas": "dormant_by_epoch",
+          "P4": "dormant_by_epoch",
+          "P4O10": "dormant_by_epoch",
+          "P4O6": "dormant_by_epoch",
+          "PO": "dormant_by_epoch",
+          "PO2": "dormant_by_epoch",
           "Si": "eligible",
           "Si2": "eligible",
           "Si3": "eligible",
