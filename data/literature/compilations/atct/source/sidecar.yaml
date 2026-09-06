@@ -1,0 +1,36 @@
+citation: Ruscic, B. and Bross, D. H., Active Thermochemical Tables (ATcT) values based on version 1.222 of the Thermochemical Network, Argonne National Laboratory, https://atct.anl.gov/ (DOE SC PuRe Data Resource).
+doi: 10.17038/CSE/2440256
+report_number: ATcT TN 1.222
+publisher: Argonne National Laboratory, Chemical Sciences and Engineering Division
+licence: U.S. Department of Energy Office of Science Public Reusable (DOE SC PuRe) Data Resource. Official host atct.anl.gov. Access model is a public web query (Find + provenance pages) plus a bulk HTML species enthalpy table for the current Thermochemical Network version; no separate CSV/TDB bulk dump is offered on the home page.
+access: open
+present: 'yes'
+sha256: 9f6f7d9197b2fb35f178fb231aa71e23e99d88a1c75623e94bb0ab80b6248731
+size: 4276402
+retrieved_at: '2026-09-06T21:54:29Z'
+retrieved_url: https://atct.anl.gov/Thermochemical%20Data/version%201.222/index.php
+pages: null
+topic: thermochemistry
+attempts:
+- at: '2026-09-06T21:54:29Z'
+  url: https://atct.anl.gov/
+  status: 200
+  final: https://atct.anl.gov/
+- at: '2026-09-06T21:54:29Z'
+  url: https://atct.anl.gov/Thermochemical%20Data/version%201.222/index.php
+  status: 200
+  final: https://atct.anl.gov/Thermochemical%20Data/version%201.222/index.php
+  ctype: text/html
+files:
+- name: atct-anl-1.222.html
+  sha256: 9f6f7d9197b2fb35f178fb231aa71e23e99d88a1c75623e94bb0ab80b6248731
+  size: 4276402
+  retrieved_url: https://atct.anl.gov/Thermochemical%20Data/version%201.222/index.php
+  note: bulk HTML table of 0 K and 298.15 K enthalpies of formation for 3444 species
+- name: atct-home.html
+  sha256: 2e7d8efffd25e6aae7493fc9a904850778127b49a2925837ffdf99497fa780fd
+  size: 4999
+  retrieved_url: https://atct.anl.gov/
+  note: access-model landing page (web query + TN 1.222 link)
+worker: thermo-db-vacuum
+dispatch_id: thermo-db-vacuum

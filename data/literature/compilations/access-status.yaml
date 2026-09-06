@@ -1,5 +1,5 @@
 schema_version: literature_compilation_access.v1
-updated: '2026-08-27'
+updated: '2026-09-06'
 compilation_role:
   engine_reference_input: true
   validation_measurement: false
@@ -8,6 +8,22 @@ compilation_role:
   circularity_warning: Compilations consumed by an engine cannot validate that engine.
 
 sources:
+  atct_anl_1_222:
+    citation: Ruscic, B. and Bross, D. H., Active Thermochemical Tables, ANL, Thermochemical Network version 1.222 (2026).
+    doi: 10.17038/CSE/2440256
+    access: open_public_reusable_data
+    official_url: https://atct.anl.gov/Thermochemical%20Data/version%201.222/index.php
+    evidence: data/literature/compilations/atct/source/sidecar.yaml
+    licence_basis: DOE Office of Science Public Reusable Data Resource; see unchanged corpus sidecar.
+    retrieved_at: '2026-09-06T21:54:29Z'
+    verified_date: '2026-09-06'
+    local_status: complete_supplied_html_snapshot
+    harvested_path: data/literature/compilations/atct/
+    harvested_record_count: 3442
+    source_claimed_record_count: 3444
+    known_gap: Page and sidecar claim 3444 species; supplied HTML contains 3442 species rows. Discrepancy preserved in manifest.
+    note: Formation enthalpies only; no Cp, entropy or Gibbs functions; no battery scoring rows.
+
   nist_janaf_4th:
     citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, Fourth Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998).
     identifier: NIST Standard Reference Database 13
