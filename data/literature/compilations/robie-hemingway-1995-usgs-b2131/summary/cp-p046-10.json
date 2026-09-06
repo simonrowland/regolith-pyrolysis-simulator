@@ -1,0 +1,136 @@
+{
+  "record_id": "cp-p046-10",
+  "table_kind": "heat_capacity_coefficients",
+  "pdf_page": 52,
+  "page": 46,
+  "table_number": null,
+  "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR SULFIDE AND SULFOSALT MINERALS",
+  "name_as_published": null,
+  "formula_as_published": null,
+  "phase_as_published": null,
+  "name_candidate": "BERNDTITE",
+  "formula_candidate": "SnS2",
+  "header_and_units_raw": "NAME AND FORJIJLA         ENTROPY           A1            A2           A3           A4           A5      Tr.,..\n                                                                                                                  ,_    A....H•\n                         J ·mor' ·lr\n                                    1\n                                                         (T)         (T\"2)       (T-0.&)        (T2)       IC     IC   kJ•110l\"1\n\n\n",
+  "source_text": "BERNDTITE                    87.5       2.004E+01    3.823E-02 · -9.602E+05    8.544E+02                   298\nSnS2                          0.2                                                                         1000",
+  "rows": [
+    {
+      "raw": "BERNDTITE                    87.5       2.004E+01    3.823E-02 · -9.602E+05    8.544E+02                   298",
+      "tokens": [
+        {
+          "raw": "BERNDTITE",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 9
+        },
+        {
+          "raw": "87.5",
+          "value": 87.5,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 29,
+          "end_offset": 33
+        },
+        {
+          "raw": "2.004E+01",
+          "value": 20.04,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 40,
+          "end_offset": 49
+        },
+        {
+          "raw": "3.823E-02",
+          "value": 0.03823,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 53,
+          "end_offset": 62
+        },
+        {
+          "raw": "·",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 63,
+          "end_offset": 64
+        },
+        {
+          "raw": "-9.602E+05",
+          "value": -960200.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 65,
+          "end_offset": 75
+        },
+        {
+          "raw": "8.544E+02",
+          "value": 854.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 79,
+          "end_offset": 88
+        },
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 107,
+          "end_offset": 110
+        }
+      ],
+      "source_line_index": 0
+    },
+    {
+      "raw": "SnS2                          0.2                                                                         1000",
+      "tokens": [
+        {
+          "raw": "SnS2",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 0,
+          "end_offset": 4
+        },
+        {
+          "raw": "0.2",
+          "value": 0.2,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 30,
+          "end_offset": 33
+        },
+        {
+          "raw": "1000",
+          "value": 1000.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 106,
+          "end_offset": 110
+        }
+      ],
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "untranscribed",
+  "identity_checks": [],
+  "ambiguities": [
+    "A2: unparsed printed OCR token '3.823E-02 ·'",
+    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A2', '3.823E-02 ·')]",
+    "Body label or prose enters numeric region: []",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
+    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+  ],
+  "temperature_grid": [],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 43,
+  "source_line_end": 44
+}
