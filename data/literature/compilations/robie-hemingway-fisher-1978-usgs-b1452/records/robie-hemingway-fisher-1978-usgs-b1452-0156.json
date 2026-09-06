@@ -1,0 +1,142 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0156",
+  "census_id": "high-temperature-printed-page-182",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "LITHIUS HYDROXIDE",
+  "formula_as_published": "LiOH",
+  "phase_state_as_published": [
+    "crystals 298.15 to melting point 744.3 K.                  Liquid 744.3 to 1000 K."
+  ],
+  "description_lines_as_published": [
+    "LiOH:       crystals 298.15 to melting point 744.3 K.                  Liquid 744.3 to 1000 K."
+  ],
+  "formation_basis_header_as_published": "FOBSATIOII FRO!! THE ELE.IIENTS",
+  "formula_weight": {
+    "as_published": "23.947",
+    "value": 23.947,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      188
+    ],
+    "printed_pages": [
+      182
+    ],
+    "pdftotext_layout_page_file": "page-188.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26"
+  ],
+  "title_line_as_published": "LITHIUS HYDROXIDE                                                                   FORftULA IIEIGHT     23.947",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "LiOH:       crystals 298.15 to melting point 744.3 K.                  Liquid 744.3 to 1000 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOBSATIOII FRO!! THE ELE.IIENTS",
+    "                                                                                          GIBBS",
+    "TE.IIP.      ( u;-u~ 98 )/T      so      -(G;-u~ 98 )/T      co",
+    "                                                              p     EITHALPY           FREE EIIEBGY      Log Kf",
+    "                                  T",
+    "   K          J/aol•K         J/aol•K      J/aol•K        Jjaol•K          kJjaol         kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "Jjaol•K",
+    "formation_enthalpy": "kJjaol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 11,
+  "uncertainty_line_as_published": "UJCEBTAI NTY                     0.21            0.21                       o. 159           0.159        0.028",
+  "uncertainty_values": [
+    {
+      "as_published": "0.21",
+      "value": 0.21,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.21",
+      "value": 0.21,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "o. 159",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.159",
+      "value": 0.159,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.028",
+      "value": 0.028,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "LiOH:       crystals 298.15 to melting point 744.3 K.                  Liquid 744.3 to 1000 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "I!ELTI NG POINT                  744.30 K                 BOILING POINT                                   K",
+    "ENTHALPY OF !ELTING               20.878 kJ               ENTHALPY OF VAPORIZATION                        kJ",
+    "                                      7.414 kJ            ftOLAB VOLUIIE                        1.6440 Jjbar",
+    "                                                                                               16.440 Cllj",
+    "TRANSITIONS IN REFERENCE STATE ELEftENTS",
+    "    LITHIUII •••• .II. P. 453.69, B. P. 1618 K.",
+    "HEAT CAPACITY EQUATION",
+    "            51.051 +    3.3271x1o-z T              1.0116x106 T-Z",
+    "               (EQUATIOH VALID FROft             298- 744.30K)",
+    "BEFEREHCE          32           215                                          215                       COftPILED",
+    "                                                                                                        5-19-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26",
+      "detector_only": false
+    }
+  ]
+}
