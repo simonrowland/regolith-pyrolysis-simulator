@@ -1,0 +1,184 @@
+{
+  "record_id": "reference-p024-09",
+  "table_kind": "reference_state_298K",
+  "pdf_page": 30,
+  "page": 24,
+  "table_number": null,
+  "table_title_raw": "THERMODYNAMIC PROPERTIES OF HALIDE MINERALS AT 298.15 K",
+  "name_as_published": "COCCINITE",
+  "formula_as_published": "Haa 2",
+  "phase_as_published": [],
+  "header_and_units_raw": "     NAME AND FORJIJLA                WEIGHT      ENTROPY       VOLUME   ENTHALPY      FREE       LOG(K)    REFERENCES\n                                                                                      ENERGY\n                                                      s•          v•       A.Ho        A.Go\n                                       g       J ·110l\"1 ·1(1    c.f5    kJ•110l\"1   kJ•110l\"1             s    H/G   c\n",
+  "source_text": "     COCCINITE                       454.399        180.0       71.84     -105.4      -101.7      17.82 419 419       67\n     Haa 2                                            6.3        0.10        1.7         2.6       0.45 67 67",
+  "rows": [
+    {
+      "label_raw": "COCCINITE",
+      "cells": {
+        "weight": {
+          "raw": "454.399",
+          "value": 454.399,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 37,
+          "end_offset": 44
+        },
+        "entropy": {
+          "raw": "180.0",
+          "value": 180.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 52,
+          "end_offset": 57
+        },
+        "volume": {
+          "raw": "71.84",
+          "value": 71.84,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 64,
+          "end_offset": 69
+        },
+        "formation_enthalpy": {
+          "raw": "-105.4",
+          "value": -105.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 74,
+          "end_offset": 80
+        },
+        "formation_gibbs": {
+          "raw": "-101.7",
+          "value": -101.7,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 86,
+          "end_offset": 92
+        },
+        "log_kf": {
+          "raw": "17.82",
+          "value": 17.82,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 98,
+          "end_offset": 103
+        },
+        "references_unresolved": {
+          "raw": "419 419       67",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 104,
+          "end_offset": 120,
+          "spans_columns": [
+            "reference_entropy",
+            "reference_enthalpy_gibbs",
+            "reference_heat_capacity"
+          ],
+          "column_assignment": "unresolved OCR column collapse"
+        }
+      },
+      "source_line_index": 0
+    },
+    {
+      "label_raw": "Haa 2",
+      "cells": {
+        "weight": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "entropy": {
+          "raw": "6.3",
+          "value": 6.3,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 54,
+          "end_offset": 57
+        },
+        "volume": {
+          "raw": "0.10",
+          "value": 0.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 65,
+          "end_offset": 69
+        },
+        "formation_enthalpy": {
+          "raw": "1.7",
+          "value": 1.7,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 77,
+          "end_offset": 80
+        },
+        "formation_gibbs": {
+          "raw": "2.6",
+          "value": 2.6,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 89,
+          "end_offset": 92
+        },
+        "log_kf": {
+          "raw": "0.45",
+          "value": 0.45,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 99,
+          "end_offset": 103
+        },
+        "references_unresolved": {
+          "raw": "67 67",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 104,
+          "end_offset": 109,
+          "spans_columns": [
+            "reference_entropy",
+            "reference_enthalpy_gibbs",
+            "reference_heat_capacity"
+          ],
+          "column_assignment": "unresolved OCR column collapse"
+        }
+      },
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [
+    {
+      "identity": "delta_f_G + R*T*ln(10)*log_Kf = 0",
+      "residual_kJ_per_mol": 0.016729335178297333,
+      "rounding_tolerance_kJ_per_mol": 0.08854004751267629,
+      "disagreement": false
+    }
+  ],
+  "ambiguities": [
+    "reference_entropy: unparsed printed OCR token '419 419'",
+    "Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C",
+    "reference_entropy: unparsed printed OCR token '67 67'",
+    "Reference columns collapsed by OCR at source line 2; preserve raw span without assigning reference IDs to S/HG/C",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
+  ],
+  "temperature_grid": [
+    {
+      "raw": "298.15",
+      "value": 298.15,
+      "ocr_suspect": true,
+      "ocr_check": "machine_token_agreement_row_unverified"
+    }
+  ],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 35,
+  "source_line_end": 36
+}
