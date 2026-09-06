@@ -1,0 +1,187 @@
+{
+  "record_id": "reference-p011-15",
+  "table_kind": "reference_state_298K",
+  "pdf_page": 17,
+  "page": 11,
+  "table_number": null,
+  "table_title_raw": "THERMODYNAMIC PROPERTIES OF SULFIDE MINERALS AT 298.15 K",
+  "name_as_published": "CHALCOPYRITE",
+  "formula_as_published": "CuFes2",
+  "phase_as_published": [],
+  "header_and_units_raw": "NAME AND FORJIJLA                WEIGHT    ENTROPY   VOLUME   ENTHALPY     FREE        LOG(K)   REFERENCES\n                                                                          ENERGY\n                                                                &.H•       &.a•\n                                  I                           kJ·•l·'    kJ·•r'                 S    H/G   C\n\n",
+  "source_text": "CHALCOPYRITE                    183.525      124.9    43.92     ·194.9     ·195.1      34.18 371 369 325\nCuFes2                                         0.2     0.02        1.6        1.6       0.28     371 369",
+  "rows": [
+    {
+      "label_raw": "CHALCOPYRITE",
+      "cells": {
+        "weight": {
+          "raw": "183.525",
+          "value": 183.525,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 32,
+          "end_offset": 39
+        },
+        "entropy": {
+          "raw": "124.9",
+          "value": 124.9,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 45,
+          "end_offset": 50
+        },
+        "volume": {
+          "raw": "43.92",
+          "value": 43.92,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 54,
+          "end_offset": 59
+        },
+        "formation_enthalpy": {
+          "raw": "·194.9",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 64,
+          "end_offset": 70
+        },
+        "formation_gibbs": {
+          "raw": "·195.1",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 75,
+          "end_offset": 81
+        },
+        "log_kf": {
+          "raw": "34.18",
+          "value": 34.18,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 87,
+          "end_offset": 92
+        },
+        "references_unresolved": {
+          "raw": "371 369 325",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 93,
+          "end_offset": 104,
+          "spans_columns": [
+            "reference_entropy",
+            "reference_enthalpy_gibbs",
+            "reference_heat_capacity"
+          ],
+          "column_assignment": "unresolved OCR column collapse"
+        }
+      },
+      "source_line_index": 0
+    },
+    {
+      "label_raw": "CuFes2",
+      "cells": {
+        "weight": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "entropy": {
+          "raw": "0.2",
+          "value": 0.2,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 47,
+          "end_offset": 50
+        },
+        "volume": {
+          "raw": "0.02",
+          "value": 0.02,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 55,
+          "end_offset": 59
+        },
+        "formation_enthalpy": {
+          "raw": "1.6",
+          "value": 1.6,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 67,
+          "end_offset": 70
+        },
+        "formation_gibbs": {
+          "raw": "1.6",
+          "value": 1.6,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 78,
+          "end_offset": 81
+        },
+        "log_kf": {
+          "raw": "0.28",
+          "value": 0.28,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 88,
+          "end_offset": 92
+        },
+        "reference_entropy": {
+          "raw": "371",
+          "value": 371.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 97,
+          "end_offset": 100
+        },
+        "reference_enthalpy_gibbs": {
+          "raw": "369",
+          "value": 369.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 101,
+          "end_offset": 104
+        },
+        "reference_heat_capacity": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        }
+      },
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [],
+  "ambiguities": [
+    "formation_enthalpy: unparsed printed OCR token '·194.9'",
+    "formation_gibbs: unparsed printed OCR token '·195.1'",
+    "reference_entropy: unparsed printed OCR token '371 369'",
+    "Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
+  ],
+  "temperature_grid": [
+    {
+      "raw": "298.15",
+      "value": 298.15,
+      "ocr_suspect": true,
+      "ocr_check": "machine_disagreement"
+    }
+  ],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 55,
+  "source_line_end": 56
+}

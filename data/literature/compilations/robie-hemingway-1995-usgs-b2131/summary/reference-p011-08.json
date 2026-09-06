@@ -1,0 +1,187 @@
+{
+  "record_id": "reference-p011-08",
+  "table_kind": "reference_state_298K",
+  "pdf_page": 17,
+  "page": 11,
+  "table_number": null,
+  "table_title_raw": "THERMODYNAMIC PROPERTIES OF SULFIDE MINERALS AT 298.15 K",
+  "name_as_published": "CATTIERITE",
+  "formula_as_published": "coS2",
+  "phase_as_published": [],
+  "header_and_units_raw": "NAME AND FORJIJLA                WEIGHT    ENTROPY   VOLUME   ENTHALPY     FREE        LOG(K)   REFERENCES\n                                                                          ENERGY\n                                                                &.H•       &.a•\n                                  I                           kJ·•l·'    kJ·•r'                 S    H/G   C\n\n",
+  "source_text": "CATTIERITE                      123.065       74.8    25.52     ·150.9     ·145.1      25.42 399 60 326\ncoS2                                           0.2     0.01        4.9        4.9       0.86     376",
+  "rows": [
+    {
+      "label_raw": "CATTIERITE",
+      "cells": {
+        "weight": {
+          "raw": "123.065",
+          "value": 123.065,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 32,
+          "end_offset": 39
+        },
+        "entropy": {
+          "raw": "74.8",
+          "value": 74.8,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 46,
+          "end_offset": 50
+        },
+        "volume": {
+          "raw": "25.52",
+          "value": 25.52,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 54,
+          "end_offset": 59
+        },
+        "formation_enthalpy": {
+          "raw": "·150.9",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 64,
+          "end_offset": 70
+        },
+        "formation_gibbs": {
+          "raw": "·145.1",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 75,
+          "end_offset": 81
+        },
+        "log_kf": {
+          "raw": "25.42",
+          "value": 25.42,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 87,
+          "end_offset": 92
+        },
+        "references_unresolved": {
+          "raw": "399 60 326",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 93,
+          "end_offset": 103,
+          "spans_columns": [
+            "reference_entropy",
+            "reference_enthalpy_gibbs",
+            "reference_heat_capacity"
+          ],
+          "column_assignment": "unresolved OCR column collapse"
+        }
+      },
+      "source_line_index": 0
+    },
+    {
+      "label_raw": "coS2",
+      "cells": {
+        "weight": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "entropy": {
+          "raw": "0.2",
+          "value": 0.2,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 47,
+          "end_offset": 50
+        },
+        "volume": {
+          "raw": "0.01",
+          "value": 0.01,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 55,
+          "end_offset": 59
+        },
+        "formation_enthalpy": {
+          "raw": "4.9",
+          "value": 4.9,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 67,
+          "end_offset": 70
+        },
+        "formation_gibbs": {
+          "raw": "4.9",
+          "value": 4.9,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 78,
+          "end_offset": 81
+        },
+        "log_kf": {
+          "raw": "0.86",
+          "value": 0.86,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 88,
+          "end_offset": 92
+        },
+        "reference_entropy": {
+          "raw": "376",
+          "value": 376.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 97,
+          "end_offset": 100
+        },
+        "reference_enthalpy_gibbs": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "reference_heat_capacity": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        }
+      },
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [],
+  "ambiguities": [
+    "formation_enthalpy: unparsed printed OCR token '·150.9'",
+    "formation_gibbs: unparsed printed OCR token '·145.1'",
+    "reference_entropy: unparsed printed OCR token '399 60'",
+    "Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
+  ],
+  "temperature_grid": [
+    {
+      "raw": "298.15",
+      "value": 298.15,
+      "ocr_suspect": true,
+      "ocr_check": "machine_disagreement"
+    }
+  ],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 34,
+  "source_line_end": 35
+}
