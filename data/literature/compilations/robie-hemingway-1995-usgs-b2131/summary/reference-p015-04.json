@@ -1,0 +1,193 @@
+{
+  "record_id": "reference-p015-04",
+  "table_kind": "reference_state_298K",
+  "pdf_page": 21,
+  "page": 15,
+  "table_number": null,
+  "table_title_raw": "THERMODYNAMIC PROPERTIES OF OKIDE AND HYDROXIDE MINERALS AT 298.15 K",
+  "name_as_published": "GIBBSITE",
+  "formula_as_published": "Al(OH) 3",
+  "phase_as_published": [],
+  "header_and_units_raw": "NAME AND FORMULA                   WEIGHT      ENTROPY       VOLl.IE   ENTHALPY     FREE        LOG(K)    REFERENCES\n                                                                                   EtiERGY\n\n                                    I\n                                                   s•\n                                            J •IIDl\"' •I('\n                                                               v•\n                                                              a}\n                                                                        a.•·\n                                                                       kJ·•l\"'\n                                                                                     j\"'•\n                                                                                  kJ .. .,l\"'            s    H/G    c\n",
+  "source_text": "GIBBSITE                           78.004          68.4       31.96     -1293.1    -11154.9     202.33 178 171 178\nAl(OH) 3                                            0.1        0.02         1.2        1.2        0.21     212",
+  "rows": [
+    {
+      "label_raw": "GIBBSITE",
+      "cells": {
+        "weight": {
+          "raw": "78.004",
+          "value": 78.004,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 35,
+          "end_offset": 41
+        },
+        "entropy": {
+          "raw": "68.4",
+          "value": 68.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 51,
+          "end_offset": 55
+        },
+        "volume": {
+          "raw": "31.96",
+          "value": 31.96,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 62,
+          "end_offset": 67
+        },
+        "formation_enthalpy": {
+          "raw": "-1293.1",
+          "value": -1293.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 72,
+          "end_offset": 79
+        },
+        "formation_gibbs": {
+          "raw": "-11154.9",
+          "value": -11154.9,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 83,
+          "end_offset": 91
+        },
+        "log_kf": {
+          "raw": "202.33",
+          "value": 202.33,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 96,
+          "end_offset": 102
+        },
+        "references_unresolved": {
+          "raw": "178 171 178",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 103,
+          "end_offset": 114,
+          "spans_columns": [
+            "reference_entropy",
+            "reference_enthalpy_gibbs",
+            "reference_heat_capacity"
+          ],
+          "column_assignment": "unresolved OCR column collapse"
+        }
+      },
+      "source_line_index": 0
+    },
+    {
+      "label_raw": "Al(OH) 3",
+      "cells": {
+        "weight": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "entropy": {
+          "raw": "0.1",
+          "value": 0.1,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 52,
+          "end_offset": 55
+        },
+        "volume": {
+          "raw": "0.02",
+          "value": 0.02,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 63,
+          "end_offset": 67
+        },
+        "formation_enthalpy": {
+          "raw": "1.2",
+          "value": 1.2,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 76,
+          "end_offset": 79
+        },
+        "formation_gibbs": {
+          "raw": "1.2",
+          "value": 1.2,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 87,
+          "end_offset": 90
+        },
+        "log_kf": {
+          "raw": "0.21",
+          "value": 0.21,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 98,
+          "end_offset": 102
+        },
+        "reference_entropy": {
+          "raw": "212",
+          "value": 212.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 107,
+          "end_offset": 110
+        },
+        "reference_enthalpy_gibbs": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "reference_heat_capacity": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        }
+      },
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [
+    {
+      "identity": "delta_f_G + R*T*ln(10)*log_Kf = 0",
+      "residual_kJ_per_mol": -9999.99843735204,
+      "rounding_tolerance_kJ_per_mol": 0.08854004751267629,
+      "disagreement": true
+    }
+  ],
+  "ambiguities": [
+    "reference_entropy: unparsed printed OCR token '178 171'",
+    "Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C",
+    "Formation Gibbs/log Kf identity disagreement: residual -9999.99843735204 kJ/mol; tolerance 0.08854004751267629; detector only, raw unchanged",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
+  ],
+  "temperature_grid": [
+    {
+      "raw": "298.15",
+      "value": 298.15,
+      "ocr_suspect": true,
+      "ocr_check": "machine_token_agreement_row_unverified"
+    }
+  ],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 28,
+  "source_line_end": 29
+}
