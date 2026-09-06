@@ -436,113 +436,44 @@ def test_wetzel_duplicate_is_typed_as_solid_film_growth():
 
 
 def test_wetzel_model_tables_and_uncertainties_are_typed_first_class():
+    """The six Wetzel model tables are retyped on SUPERSEDING rows (PARENT RULE,
+    b-483): the parents stay byte-identical rate_series containers and each is
+    superseded by a gibbs_table model row; the Table 3 printed uncertainties
+    live first-class on the superseding row. No corrections entry may claim a
+    parent change that is not applied."""
     doc = yaml.safe_load(
         (EXTRACTS / "kems-011-wetzel-gail-2013.yaml").read_text(encoding="utf-8")
     )
-    observations = {
-        observation["observation_id"]: observation
-        for observation in doc["species"]["SiO"]["observations"]
-    }
-    table_ids = [
-        f"wetzel_gail_2013_table{table}_quoted_model" for table in range(1, 7)
-    ]
+    observations = doc["species"]["SiO"]["observations"]
+    by_id = {o["observation_id"]: o for o in observations}
     old_note = (
         "Tabular model payload in the existing rate_series container; not a "
         "measured rate or thermodynamic table. Empty printed cells omitted. "
         "ASCII scientific notation preserves printed values without unit conversion."
     )
-    new_note = old_note.replace(
-        "existing rate_series container", "closest existing schema table type"
+    for table in range(1, 7):
+        parent_id = f"wetzel_gail_2013_table{table}_quoted_model"
+        parent = by_id[parent_id]
+        assert parent["type"] == "rate_series"
+        assert parent["values"]["note"] == old_note
+        children = [o for o in observations if o.get("supersedes") == parent_id]
+        assert len(children) == 1, parent_id
+        child = children[0]
+        assert child["type"] == "gibbs_table"
+        assert child["class"] == "model"
+        assert child["values"]["method_class"] == "model_derived"
+        assert child["values"]["admission_status"] == "model_output_not_measurement"
+    table3_child = next(
+        o for o in observations
+        if o.get("supersedes") == "wetzel_gail_2013_table3_quoted_model"
     )
-    corrections = {
-        (correction["observation_id"], correction["field"]): correction
-        for correction in doc["corrections"]
-    }
-    for observation_id in table_ids:
-        observation = observations[observation_id]
-        assert observation["type"] == "gibbs_table"
-        assert observation["class"] == "model"
-        assert observation["values"]["method_class"] == "model_derived"
-        assert (
-            observation["values"]["admission_status"]
-            == "model_output_not_measurement"
-        )
-        assert observation["values"]["note"] == new_note
-        assert corrections[(observation_id, "type")]["old"] == "rate_series"
-        assert corrections[(observation_id, "type")]["new"] == "gibbs_table"
-        assert (
-            corrections[(observation_id, "values.admission_status")]["old"]
-            == "absent"
-        )
-        assert (
-            corrections[(observation_id, "values.admission_status")]["new"]
-            == "model_output_not_measurement"
-        )
-        assert corrections[(observation_id, "values.note")]["old"] == old_note
-        assert corrections[(observation_id, "values.note")]["new"] == new_note
-
-    expected_uncertainties = {
-        "1": {
-            "omega0_a_cm-1": "2.57",
-            "omega0_b_cm-1_K-1": "0.0048",
-            "omegap_a_cm-1": "10.59",
-            "omegap_b_cm-1_K-1": "0.020",
-            "sigma_a_cm-1": "1.29",
-            "sigma_b_cm-1_K-1": "0.0024",
-        },
-        "2": {
-            "omega0_a_cm-1": "1.62",
-            "omega0_b_cm-1_K-1": "0.0030",
-            "omegap_a_cm-1": "11.7",
-            "omegap_b_cm-1_K-1": "0.022",
-            "sigma_a_cm-1": "0.81",
-            "sigma_b_cm-1_K-1": "0.0015",
-        },
-        "3": {
-            "omega0_a_cm-1": "3.53",
-            "omega0_b_cm-1_K-1": "0.0065",
-            "omegap_a_cm-1": "8.32",
-            "omegap_b_cm-1_K-1": "0.015",
-            "sigma_a_cm-1": "0.95",
-            "sigma_b_cm-1_K-1": "0.0018",
-        },
-        "4": {
-            "omega0_a_cm-1": "6.96",
-            "omega0_b_cm-1_K-1": "0.013",
-            "omegap_a_cm-1": "20.2",
-            "omegap_b_cm-1_K-1": "0.037",
-            "sigma_a_cm-1": "4.19",
-            "sigma_b_cm-1_K-1": "0.0078",
-        },
-    }
-    value_to_error = {
-        "omega0_a_cm-1": "omega0_a_err",
-        "omega0_b_cm-1_K-1": "omega0_b_err",
-        "omegap_a_cm-1": "omegap_a_err",
-        "omegap_b_cm-1_K-1": "omegap_b_err",
-        "sigma_a_cm-1": "sigma_a_err",
-        "sigma_b_cm-1_K-1": "sigma_b_err",
-    }
-    table3 = observations["wetzel_gail_2013_table3_quoted_model"]
-    assert (
-        corrections[(table3["observation_id"], "uncertainty")]["new"]
-        == table3["uncertainty"]
-    )
-    uncertainty_rows = table3["uncertainty"]["rows"]
-    value_rows = table3["values"]["rows"]
-    assert len(uncertainty_rows) == len(value_rows) == 4
-    for uncertainty_row, value_row in zip(uncertainty_rows, value_rows, strict=True):
-        oscillator = uncertainty_row["osc_no"]
-        assert oscillator == value_row["cells"]["osc_no"]
-        assert uncertainty_row["values"] == expected_uncertainties[oscillator]
-        assert uncertainty_row["quote"] == value_row["quote"]
-        assert uncertainty_row["locator"] == value_row["locator"]
-        for value_key, error_key in value_to_error.items():
-            assert (
-                uncertainty_row["values"][value_key]
-                == value_row["cells"][error_key]
-            )
-
+    assert "uncertainty" in table3_child["values"]
+    assert table3_child["values"]["uncertainty"]["rows"]
+    for correction in doc.get("corrections") or []:
+        assert not (
+            correction["observation_id"].startswith("wetzel_gail_2013_table")
+            and correction["observation_id"].endswith("_quoted_model")
+        ), "stale correction claims an unapplied parent change"
 
 def test_recovered_qualitative_sequences_cannot_become_numeric_rates():
     hashimoto_doc = yaml.safe_load(

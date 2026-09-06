@@ -1,7 +1,7 @@
 schema_version: literature_extract.v1
 source_id: kems-011-wetzel-gail-2013
 source:
-  citation: 'Wetzel, S., Klevenz, M., Gail, H.-P., Pucci, A. & Trieloff, M. (2013), Laboratory measurement of optical constants of solid SiO and application to circumstellar dust, A&A 553, A92.'
+  citation: Wetzel, S., Klevenz, M., Gail, H.-P., Pucci, A. & Trieloff, M. (2013), Laboratory measurement of optical constants of solid SiO and application to circumstellar dust, A&A 553, A92.
   doi: 10.1051/0004-6361/201220803
   year: 2013
 extraction:
@@ -10,143 +10,6 @@ extraction:
   worker: ocr-phase2b-gk
   provenance_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/
 review_status: draft
-corrections:
-- observation_id: wetzel_gail_2013_table3_quoted_model
-  field: uncertainty
-  old: absent
-  new:
-    note: Each value is the right-hand term printed after ± for its paired coefficient; the paper does not state a statistical convention.
-    rows:
-    - osc_no: "1"
-      values: {"omega0_a_cm-1":"2.57","omega0_b_cm-1_K-1":"0.0048","omegap_a_cm-1":"10.59","omegap_b_cm-1_K-1":"0.020","sigma_a_cm-1":"1.29","sigma_b_cm-1_K-1":"0.0024"}
-      quote: "1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024"
-      locator: {page: 5, table: '3', row: "1"}
-    - osc_no: "2"
-      values: {"omega0_a_cm-1":"1.62","omega0_b_cm-1_K-1":"0.0030","omegap_a_cm-1":"11.7","omegap_b_cm-1_K-1":"0.022","sigma_a_cm-1":"0.81","sigma_b_cm-1_K-1":"0.0015"}
-      quote: "2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015"
-      locator: {page: 5, table: '3', row: "2"}
-    - osc_no: "3"
-      values: {"omega0_a_cm-1":"3.53","omega0_b_cm-1_K-1":"0.0065","omegap_a_cm-1":"8.32","omegap_b_cm-1_K-1":"0.015","sigma_a_cm-1":"0.95","sigma_b_cm-1_K-1":"0.0018"}
-      quote: "3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018"
-      locator: {page: 5, table: '3', row: "3"}
-    - osc_no: "4"
-      values: {"omega0_a_cm-1":"6.96","omega0_b_cm-1_K-1":"0.013","omegap_a_cm-1":"20.2","omegap_b_cm-1_K-1":"0.037","sigma_a_cm-1":"4.19","sigma_b_cm-1_K-1":"0.0078"}
-      quote: "4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078"
-      locator: {page: 5, table: '3', row: "4"}
-  page: 5
-  quote: |-
-    1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024
-    2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015
-    3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018
-    4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078
-- observation_id: wetzel_gail_2013_table1_quoted_model
-  field: type
-  old: rate_series
-  new: gibbs_table
-  page: 4
-  quote: 'Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for our best fit to our experimental results on solid SiO obtained at 300 K.'
-- observation_id: wetzel_gail_2013_table2_quoted_model
-  field: type
-  old: rate_series
-  new: gibbs_table
-  page: 4
-  quote: 'Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and annealing experiments of Wetzel et al. (2012a).'
-- observation_id: wetzel_gail_2013_table3_quoted_model
-  field: type
-  old: rate_series
-  new: gibbs_table
-  page: 5
-  quote: 'Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.'
-- observation_id: wetzel_gail_2013_table4_quoted_model
-  field: type
-  old: rate_series
-  new: gibbs_table
-  page: 7
-  quote: 'Some data used for calculating the opacity of the dust species considered in the model calculations and the corresponding key elements.'
-- observation_id: wetzel_gail_2013_table5_quoted_model
-  field: type
-  old: rate_series
-  new: gibbs_table
-  page: 8
-  quote: 'Data used for calculation of silicon monoxide growth.'
-- observation_id: wetzel_gail_2013_table6_quoted_model
-  field: type
-  old: rate_series
-  new: gibbs_table
-  page: 8
-  quote: 'Basic parameters of the dust-shell models'
-- observation_id: wetzel_gail_2013_table1_quoted_model
-  field: values.admission_status
-  old: absent
-  new: model_output_not_measurement
-  page: 4
-  quote: 'Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for our best fit to our experimental results on solid SiO obtained at 300 K.'
-- observation_id: wetzel_gail_2013_table2_quoted_model
-  field: values.admission_status
-  old: absent
-  new: model_output_not_measurement
-  page: 4
-  quote: 'Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and annealing experiments of Wetzel et al. (2012a).'
-- observation_id: wetzel_gail_2013_table3_quoted_model
-  field: values.admission_status
-  old: absent
-  new: model_output_not_measurement
-  page: 5
-  quote: 'Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.'
-- observation_id: wetzel_gail_2013_table4_quoted_model
-  field: values.admission_status
-  old: absent
-  new: model_output_not_measurement
-  page: 7
-  quote: 'Some data used for calculating the opacity of the dust species considered in the model calculations and the corresponding key elements.'
-- observation_id: wetzel_gail_2013_table5_quoted_model
-  field: values.admission_status
-  old: absent
-  new: model_output_not_measurement
-  page: 8
-  quote: 'Data used for calculation of silicon monoxide growth.'
-- observation_id: wetzel_gail_2013_table6_quoted_model
-  field: values.admission_status
-  old: absent
-  new: model_output_not_measurement
-  page: 8
-  quote: 'Basic parameters of the dust-shell models'
-- observation_id: wetzel_gail_2013_table1_quoted_model
-  field: values.note
-  old: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
-  new: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
-  page: 4
-  quote: 'Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for our best fit to our experimental results on solid SiO obtained at 300 K.'
-- observation_id: wetzel_gail_2013_table2_quoted_model
-  field: values.note
-  old: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
-  new: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
-  page: 4
-  quote: 'Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and annealing experiments of Wetzel et al. (2012a).'
-- observation_id: wetzel_gail_2013_table3_quoted_model
-  field: values.note
-  old: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
-  new: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
-  page: 5
-  quote: 'Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.'
-- observation_id: wetzel_gail_2013_table4_quoted_model
-  field: values.note
-  old: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
-  new: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
-  page: 7
-  quote: 'Some data used for calculating the opacity of the dust species considered in the model calculations and the corresponding key elements.'
-- observation_id: wetzel_gail_2013_table5_quoted_model
-  field: values.note
-  old: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
-  new: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
-  page: 8
-  quote: 'Data used for calculation of silicon monoxide growth.'
-- observation_id: wetzel_gail_2013_table6_quoted_model
-  field: values.note
-  old: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
-  new: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
-  page: 8
-  quote: 'Basic parameters of the dust-shell models'
 deepening:
   date: '2026-09-06'
   worker: deep2-kems-011-wetzel-gail-2013
@@ -160,17 +23,23 @@ metadata:
     supersedes: wetzel_gail_2013_sio_ta_knudsen_geometry_partial
     class: derived
     note: Superseding metadata record, not a rate measurement. No orifice area, Clausing factor or sample surface area is printed.
-    locator: {page: 2, section: '2.1'}
-    quote: 'a tantalum Knudsen cell heated by electron bombardment.'
+    locator:
+      page: 2
+      section: '2.1'
+    quote: a tantalum Knudsen cell heated by electron bombardment.
     cell_material: tantalum
     chamber_pressure:
       upper_bound_mbar: 1.0e-09
-      locator: {page: 2, section: '2.1'}
-      quote: 'background pressure measured during evaporation away from the SiO molecular beam did not exceed 1 × 10−9 mbar.'
+      locator:
+        page: 2
+        section: '2.1'
+      quote: background pressure measured during evaporation away from the SiO molecular beam did not exceed 1 × 10−9 mbar.
     base_pressure:
       strict_upper_bound_mbar: 1.0e-10
-      locator: {page: 2, section: '2.1'}
-      quote: 'The experiments were performed under UHV conditions (base pressure <10−10 mbar).'
+      locator:
+        page: 2
+        section: '2.1'
+      quote: The experiments were performed under UHV conditions (base pressure <10−10 mbar).
 species:
   SiO:
     observations:
@@ -190,8 +59,7 @@ species:
         metastable: false
         basis: explicit_author
         note: Solid SiO film growth coefficient on amorphous deposits
-      standard_state: Growth/condensation coefficient for solid SiO (not melt free-evap HKL α). Authors
-        extrapolate to 1000 K → α≈0.013 for stellar-dust models.
+      standard_state: Growth/condensation coefficient for solid SiO (not melt free-evap HKL α). Authors extrapolate to 1000 K → α≈0.013 for stellar-dust models.
       regime: solid_SiO_growth_coefficient
       units: dimensionless
       values:
@@ -243,8 +111,7 @@ species:
         - orifice_area
         - clausing_factor
         - sample_surface_area
-        missing_note: Ta Knudsen cell named for solid SiO evaporation source; orifice diameter, channel
-          length, and Clausing not stated. Partial geometry only.
+        missing_note: Ta Knudsen cell named for solid SiO evaporation source; orifice diameter, channel length, and Clausing not stated. Partial geometry only.
       equipment:
         cell_material:
           value: Ta Knudsen cell
@@ -299,8 +166,11 @@ species:
       supersedes: wetzel_gail_2013_sio_growth_alpha_arrhenius
       type: alpha
       class: model
-      locator: {page: 7, equation: '8', section: '3.3'}
-      quote: 'α(T) = 0.52 exp(−3685/T)'
+      locator:
+        page: 7
+        equation: '8'
+        section: '3.3'
+      quote: α(T) = 0.52 exp(−3685/T)
       phase: solid_SiO
       regime: published_fit_used_for_dust_growth
       units: dimensionless
@@ -314,21 +184,31 @@ species:
           A: 0.52
           B_K: 3685.0
         cited_competing_fit:
-          locator: {page: 7, equation: '7'}
-          quote: 'α(T) = 0.1687 − 2.909 × 10−4 T + 1.373 × 10−7 T²'
+          locator:
+            page: 7
+            equation: '7'
+          quote: α(T) = 0.1687 − 2.909 × 10−4 T + 1.373 × 10−7 T²
           expression: alpha(T) = 0.1687 - 2.909e-4*T + 1.373e-7*T^2
           attribution: Rocabois et al. (1992), as cited by this paper
           validity:
-            T_range_K: [1175.0, 1410.0]
-            locator: {page: 7, equation: '7', paragraph: immediately following equation}
-            quote: 'in the temperature range 1175 K to 1410 K.'
+            T_range_K:
+            - 1175.0
+            - 1410.0
+            locator:
+              page: 7
+              equation: '7'
+              paragraph: immediately following equation
+            quote: in the temperature range 1175 K to 1410 K.
       note: Authors give this approximation to their own measurements (Wetzel et al. 2012b, Gail et al., in prep.). The parent temperature range is not a printed validity interval for Eq. (8); omitted here. No new fit or measured datum.
     - observation_id: wetzel_gail_2013_sio_alpha_extrapolation_quoted
       supersedes: wetzel_gail_2013_sio_growth_class_b1
       type: alpha
       class: model
-      locator: {page: 7, equation: '8', section: '3.3'}
-      quote: 'Extrapolating these results down to a temperature of 1000 K results in α ≈ 0.013. This value is used in the following considerations.'
+      locator:
+        page: 7
+        equation: '8'
+        section: '3.3'
+      quote: Extrapolating these results down to a temperature of 1000 K results in α ≈ 0.013. This value is used in the following considerations.
       phase: solid_SiO
       regime: dust_growth_model_input
       units: dimensionless
@@ -343,8 +223,10 @@ species:
     - observation_id: wetzel_gail_2013_table1_quoted_model
       type: rate_series
       class: model
-      locator: {page: 4, table: '1'}
-      quote: 'Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for our best fit to our experimental results on solid SiO obtained at 300 K.'
+      locator:
+        page: 4
+        table: '1'
+      quote: Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for our best fit to our experimental results on solid SiO obtained at 300 K.
       phase: amorphous_SiO
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
@@ -355,28 +237,63 @@ species:
         table_file: tables/kems-011-wetzel-gail-2013/t1.csv
         note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
-        - cells: {"osc":"1","omega_0_cm-1":"1100","omega_p_cm-1":"329","sigma_cm-1":"47"}
-          quote: "1 | 1100 | 329 | 47"
-          locator: {page: 4, table: '1', row: "1"}
-        - cells: {"osc":"2","omega_0_cm-1":"983","omega_p_cm-1":"709","sigma_cm-1":"57"}
-          quote: "2 | 983 | 709 | 57"
-          locator: {page: 4, table: '1', row: "2"}
-        - cells: {"osc":"3","omega_0_cm-1":"715","omega_p_cm-1":"305","sigma_cm-1":"76"}
-          quote: "3 | 715 | 305 | 76"
-          locator: {page: 4, table: '1', row: "3"}
-        - cells: {"osc":"4","omega_0_cm-1":"384","omega_p_cm-1":"469","sigma_cm-1":"113"}
-          quote: "4 | 384 | 469 | 113"
-          locator: {page: 4, table: '1', row: "4"}
-        - cells: {"osc":"eps_inf","omega_0_cm-1":"3.61"}
+        - cells:
+            osc: '1'
+            omega_0_cm-1: '1100'
+            omega_p_cm-1: '329'
+            sigma_cm-1: '47'
+          quote: 1 | 1100 | 329 | 47
+          locator:
+            page: 4
+            table: '1'
+            row: '1'
+        - cells:
+            osc: '2'
+            omega_0_cm-1: '983'
+            omega_p_cm-1: '709'
+            sigma_cm-1: '57'
+          quote: 2 | 983 | 709 | 57
+          locator:
+            page: 4
+            table: '1'
+            row: '2'
+        - cells:
+            osc: '3'
+            omega_0_cm-1: '715'
+            omega_p_cm-1: '305'
+            sigma_cm-1: '76'
+          quote: 3 | 715 | 305 | 76
+          locator:
+            page: 4
+            table: '1'
+            row: '3'
+        - cells:
+            osc: '4'
+            omega_0_cm-1: '384'
+            omega_p_cm-1: '469'
+            sigma_cm-1: '113'
+          quote: 4 | 384 | 469 | 113
+          locator:
+            page: 4
+            table: '1'
+            row: '4'
+        - cells:
+            osc: eps_inf
+            omega_0_cm-1: '3.61'
           note: Printed column placement only; epsilon_inf is the dimensionless high-frequency dielectric limit, not an oscillator frequency. Table note says all quantities in cm−1 but does not apply physically to epsilon_inf.
-          quote: "eps_inf | 3.61"
-          locator: {page: 4, table: '1', row: "eps_inf"}
+          quote: eps_inf | 3.61
+          locator:
+            page: 4
+            table: '1'
+            row: eps_inf
     - observation_id: wetzel_gail_2013_table1_quoted_model_gibbs
       supersedes: wetzel_gail_2013_table1_quoted_model
       type: gibbs_table
       class: model
-      locator: {page: 4, table: '1'}
-      quote: 'Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for our best fit to our experimental results on solid SiO obtained at 300 K.'
+      locator:
+        page: 4
+        table: '1'
+      quote: Constants of the Brendel oscillator model for the dielectric function of amorphous materials, Eq. (2), for our best fit to our experimental results on solid SiO obtained at 300 K.
       phase: amorphous_SiO
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
@@ -388,27 +305,62 @@ species:
         table_file: tables/kems-011-wetzel-gail-2013/t1.csv
         note: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
-        - cells: {"osc":"1","omega_0_cm-1":"1100","omega_p_cm-1":"329","sigma_cm-1":"47"}
-          quote: "1 | 1100 | 329 | 47"
-          locator: {page: 4, table: '1', row: "1"}
-        - cells: {"osc":"2","omega_0_cm-1":"983","omega_p_cm-1":"709","sigma_cm-1":"57"}
-          quote: "2 | 983 | 709 | 57"
-          locator: {page: 4, table: '1', row: "2"}
-        - cells: {"osc":"3","omega_0_cm-1":"715","omega_p_cm-1":"305","sigma_cm-1":"76"}
-          quote: "3 | 715 | 305 | 76"
-          locator: {page: 4, table: '1', row: "3"}
-        - cells: {"osc":"4","omega_0_cm-1":"384","omega_p_cm-1":"469","sigma_cm-1":"113"}
-          quote: "4 | 384 | 469 | 113"
-          locator: {page: 4, table: '1', row: "4"}
-        - cells: {"osc":"eps_inf","omega_0_cm-1":"3.61"}
+        - cells:
+            osc: '1'
+            omega_0_cm-1: '1100'
+            omega_p_cm-1: '329'
+            sigma_cm-1: '47'
+          quote: 1 | 1100 | 329 | 47
+          locator:
+            page: 4
+            table: '1'
+            row: '1'
+        - cells:
+            osc: '2'
+            omega_0_cm-1: '983'
+            omega_p_cm-1: '709'
+            sigma_cm-1: '57'
+          quote: 2 | 983 | 709 | 57
+          locator:
+            page: 4
+            table: '1'
+            row: '2'
+        - cells:
+            osc: '3'
+            omega_0_cm-1: '715'
+            omega_p_cm-1: '305'
+            sigma_cm-1: '76'
+          quote: 3 | 715 | 305 | 76
+          locator:
+            page: 4
+            table: '1'
+            row: '3'
+        - cells:
+            osc: '4'
+            omega_0_cm-1: '384'
+            omega_p_cm-1: '469'
+            sigma_cm-1: '113'
+          quote: 4 | 384 | 469 | 113
+          locator:
+            page: 4
+            table: '1'
+            row: '4'
+        - cells:
+            osc: eps_inf
+            omega_0_cm-1: '3.61'
           note: Printed column placement only; epsilon_inf is the dimensionless high-frequency dielectric limit, not an oscillator frequency. Table note says all quantities in cm−1 but does not apply physically to epsilon_inf.
-          quote: "eps_inf | 3.61"
-          locator: {page: 4, table: '1', row: "eps_inf"}
+          quote: eps_inf | 3.61
+          locator:
+            page: 4
+            table: '1'
+            row: eps_inf
     - observation_id: wetzel_gail_2013_table2_quoted_model
       type: rate_series
       class: model
-      locator: {page: 4, table: '2'}
-      quote: 'Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and annealing experiments of Wetzel et al. (2012a).'
+      locator:
+        page: 4
+        table: '2'
+      quote: Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and annealing experiments of Wetzel et al. (2012a).
       phase: amorphous_SiO
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
@@ -419,120 +371,410 @@ species:
         table_file: tables/kems-011-wetzel-gail-2013/t2.csv
         note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
-        - cells: {"T_K":"40","osc_no":"1","omega_0_cm-1":"1077","omega_p_cm-1":"336","sigma_cm-1":"52"}
-          quote: "40 | 1 | 1077 | 336 | 52"
-          locator: {page: 4, table: '2', row: "40 / 1"}
-        - cells: {"T_K":"40","osc_no":"2","omega_0_cm-1":"957","omega_p_cm-1":"682","sigma_cm-1":"63"}
-          quote: "40 | 2 | 957 | 682 | 63"
-          locator: {page: 4, table: '2', row: "40 / 2"}
-        - cells: {"T_K":"40","osc_no":"3a","omega_0_cm-1":"750","omega_p_cm-1":"231","sigma_cm-1":"51"}
-          quote: "40 | 3a | 750 | 231 | 51"
-          locator: {page: 4, table: '2', row: "40 / 3a"}
-        - cells: {"T_K":"40","osc_no":"3b","omega_0_cm-1":"642","omega_p_cm-1":"289","sigma_cm-1":"64"}
-          quote: "40 | 3b | 642 | 289 | 64"
-          locator: {page: 4, table: '2', row: "40 / 3b"}
-        - cells: {"T_K":"93","osc_no":"1","omega_0_cm-1":"1082","omega_p_cm-1":"324","sigma_cm-1":"49"}
-          quote: "93 | 1 | 1082 | 324 | 49"
-          locator: {page: 4, table: '2', row: "93 / 1"}
-        - cells: {"T_K":"93","osc_no":"2","omega_0_cm-1":"966","omega_p_cm-1":"685","sigma_cm-1":"61"}
-          quote: "93 | 2 | 966 | 685 | 61"
-          locator: {page: 4, table: '2', row: "93 / 2"}
-        - cells: {"T_K":"93","osc_no":"3a","omega_0_cm-1":"760","omega_p_cm-1":"205","sigma_cm-1":"47"}
-          quote: "93 | 3a | 760 | 205 | 47"
-          locator: {page: 4, table: '2', row: "93 / 3a"}
-        - cells: {"T_K":"93","osc_no":"3b","omega_0_cm-1":"678","omega_p_cm-1":"205","sigma_cm-1":"48"}
-          quote: "93 | 3b | 678 | 205 | 48"
-          locator: {page: 4, table: '2', row: "93 / 3b"}
-        - cells: {"T_K":"300","osc_no":"1","omega_0_cm-1":"1100","omega_p_cm-1":"329","sigma_cm-1":"47"}
-          quote: "300 | 1 | 1100 | 329 | 47"
-          locator: {page: 4, table: '2', row: "300 / 1"}
-        - cells: {"T_K":"300","osc_no":"2","omega_0_cm-1":"983","omega_p_cm-1":"709","sigma_cm-1":"57"}
-          quote: "300 | 2 | 983 | 709 | 57"
-          locator: {page: 4, table: '2', row: "300 / 2"}
-        - cells: {"T_K":"300","osc_no":"3a","omega_0_cm-1":"767","omega_p_cm-1":"203","sigma_cm-1":"46"}
-          quote: "300 | 3a | 767 | 203 | 46"
-          locator: {page: 4, table: '2', row: "300 / 3a"}
-        - cells: {"T_K":"300","osc_no":"3b","omega_0_cm-1":"670","omega_p_cm-1":"221","sigma_cm-1":"48"}
-          quote: "300 | 3b | 670 | 221 | 48"
-          locator: {page: 4, table: '2', row: "300 / 3b"}
-        - cells: {"T_K":"373","osc_no":"1","omega_0_cm-1":"1108","omega_p_cm-1":"338","sigma_cm-1":"51"}
-          quote: "373 | 1 | 1108 | 338 | 51"
-          locator: {page: 4, table: '2', row: "373 / 1"}
-        - cells: {"T_K":"373","osc_no":"2","omega_0_cm-1":"986","omega_p_cm-1":"729","sigma_cm-1":"58"}
-          quote: "373 | 2 | 986 | 729 | 58"
-          locator: {page: 4, table: '2', row: "373 / 2"}
-        - cells: {"T_K":"373","osc_no":"3a","omega_0_cm-1":"780","omega_p_cm-1":"233","sigma_cm-1":"48"}
-          quote: "373 | 3a | 780 | 233 | 48"
-          locator: {page: 4, table: '2', row: "373 / 3a"}
-        - cells: {"T_K":"373","osc_no":"3b","omega_0_cm-1":"669","omega_p_cm-1":"274","sigma_cm-1":"58"}
-          quote: "373 | 3b | 669 | 274 | 58"
-          locator: {page: 4, table: '2', row: "373 / 3b"}
-        - cells: {"T_K":"473","osc_no":"1","omega_0_cm-1":"1113","omega_p_cm-1":"338","sigma_cm-1":"50"}
-          quote: "473 | 1 | 1113 | 338 | 50"
-          locator: {page: 4, table: '2', row: "473 / 1"}
-        - cells: {"T_K":"473","osc_no":"2","omega_0_cm-1":"994","omega_p_cm-1":"736","sigma_cm-1":"58"}
-          quote: "473 | 2 | 994 | 736 | 58"
-          locator: {page: 4, table: '2', row: "473 / 2"}
-        - cells: {"T_K":"473","osc_no":"3a","omega_0_cm-1":"784","omega_p_cm-1":"238","sigma_cm-1":"49"}
-          quote: "473 | 3a | 784 | 238 | 49"
-          locator: {page: 4, table: '2', row: "473 / 3a"}
-        - cells: {"T_K":"473","osc_no":"3b","omega_0_cm-1":"668","omega_p_cm-1":"270","sigma_cm-1":"59"}
-          quote: "473 | 3b | 668 | 270 | 59"
-          locator: {page: 4, table: '2', row: "473 / 3b"}
-        - cells: {"T_K":"573","osc_no":"1","omega_0_cm-1":"1115","omega_p_cm-1":"359","sigma_cm-1":"51"}
-          quote: "573 | 1 | 1115 | 359 | 51"
-          locator: {page: 4, table: '2', row: "573 / 1"}
-        - cells: {"T_K":"573","osc_no":"2","omega_0_cm-1":"1000","omega_p_cm-1":"733","sigma_cm-1":"55"}
-          quote: "573 | 2 | 1000 | 733 | 55"
-          locator: {page: 4, table: '2', row: "573 / 2"}
-        - cells: {"T_K":"573","osc_no":"3a","omega_0_cm-1":"786","omega_p_cm-1":"238","sigma_cm-1":"48"}
-          quote: "573 | 3a | 786 | 238 | 48"
-          locator: {page: 4, table: '2', row: "573 / 3a"}
-        - cells: {"T_K":"573","osc_no":"3b","omega_0_cm-1":"667","omega_p_cm-1":"271","sigma_cm-1":"61"}
-          quote: "573 | 3b | 667 | 271 | 61"
-          locator: {page: 4, table: '2', row: "573 / 3b"}
-        - cells: {"T_K":"673","osc_no":"1","omega_0_cm-1":"1117","omega_p_cm-1":"396","sigma_cm-1":"54"}
-          quote: "673 | 1 | 1117 | 396 | 54"
-          locator: {page: 4, table: '2', row: "673 / 1"}
-        - cells: {"T_K":"673","osc_no":"2","omega_0_cm-1":"1010","omega_p_cm-1":"720","sigma_cm-1":"52"}
-          quote: "673 | 2 | 1010 | 720 | 52"
-          locator: {page: 4, table: '2', row: "673 / 2"}
-        - cells: {"T_K":"673","osc_no":"3a","omega_0_cm-1":"791","omega_p_cm-1":"245","sigma_cm-1":"48"}
-          quote: "673 | 3a | 791 | 245 | 48"
-          locator: {page: 4, table: '2', row: "673 / 3a"}
-        - cells: {"T_K":"673","osc_no":"3b","omega_0_cm-1":"661","omega_p_cm-1":"272","sigma_cm-1":"68"}
-          quote: "673 | 3b | 661 | 272 | 68"
-          locator: {page: 4, table: '2', row: "673 / 3b"}
-        - cells: {"T_K":"773","osc_no":"1","omega_0_cm-1":"1125","omega_p_cm-1":"406","sigma_cm-1":"54"}
-          quote: "773 | 1 | 1125 | 406 | 54"
-          locator: {page: 4, table: '2', row: "773 / 1"}
-        - cells: {"T_K":"773","osc_no":"2","omega_0_cm-1":"1022","omega_p_cm-1":"712","sigma_cm-1":"50"}
-          quote: "773 | 2 | 1022 | 712 | 50"
-          locator: {page: 4, table: '2', row: "773 / 2"}
-        - cells: {"T_K":"773","osc_no":"3a","omega_0_cm-1":"791","omega_p_cm-1":"239","sigma_cm-1":"48"}
-          quote: "773 | 3a | 791 | 239 | 48"
-          locator: {page: 4, table: '2', row: "773 / 3a"}
-        - cells: {"T_K":"773","osc_no":"3b","omega_0_cm-1":"662","omega_p_cm-1":"254","sigma_cm-1":"67"}
-          quote: "773 | 3b | 662 | 254 | 67"
-          locator: {page: 4, table: '2', row: "773 / 3b"}
-        - cells: {"T_K":"873","osc_no":"1","omega_0_cm-1":"1135","omega_p_cm-1":"401","sigma_cm-1":"54"}
-          quote: "873 | 1 | 1135 | 401 | 54"
-          locator: {page: 4, table: '2', row: "873 / 1"}
-        - cells: {"T_K":"873","osc_no":"2","omega_0_cm-1":"1031","omega_p_cm-1":"706","sigma_cm-1":"49"}
-          quote: "873 | 2 | 1031 | 706 | 49"
-          locator: {page: 4, table: '2', row: "873 / 2"}
-        - cells: {"T_K":"873","osc_no":"3a","omega_0_cm-1":"791","omega_p_cm-1":"234","sigma_cm-1":"47"}
-          quote: "873 | 3a | 791 | 234 | 47"
-          locator: {page: 4, table: '2', row: "873 / 3a"}
-        - cells: {"T_K":"873","osc_no":"3b","omega_0_cm-1":"661","omega_p_cm-1":"229","sigma_cm-1":"62"}
-          quote: "873 | 3b | 661 | 229 | 62"
-          locator: {page: 4, table: '2', row: "873 / 3b"}
+        - cells:
+            T_K: '40'
+            osc_no: '1'
+            omega_0_cm-1: '1077'
+            omega_p_cm-1: '336'
+            sigma_cm-1: '52'
+          quote: 40 | 1 | 1077 | 336 | 52
+          locator:
+            page: 4
+            table: '2'
+            row: 40 / 1
+        - cells:
+            T_K: '40'
+            osc_no: '2'
+            omega_0_cm-1: '957'
+            omega_p_cm-1: '682'
+            sigma_cm-1: '63'
+          quote: 40 | 2 | 957 | 682 | 63
+          locator:
+            page: 4
+            table: '2'
+            row: 40 / 2
+        - cells:
+            T_K: '40'
+            osc_no: 3a
+            omega_0_cm-1: '750'
+            omega_p_cm-1: '231'
+            sigma_cm-1: '51'
+          quote: 40 | 3a | 750 | 231 | 51
+          locator:
+            page: 4
+            table: '2'
+            row: 40 / 3a
+        - cells:
+            T_K: '40'
+            osc_no: 3b
+            omega_0_cm-1: '642'
+            omega_p_cm-1: '289'
+            sigma_cm-1: '64'
+          quote: 40 | 3b | 642 | 289 | 64
+          locator:
+            page: 4
+            table: '2'
+            row: 40 / 3b
+        - cells:
+            T_K: '93'
+            osc_no: '1'
+            omega_0_cm-1: '1082'
+            omega_p_cm-1: '324'
+            sigma_cm-1: '49'
+          quote: 93 | 1 | 1082 | 324 | 49
+          locator:
+            page: 4
+            table: '2'
+            row: 93 / 1
+        - cells:
+            T_K: '93'
+            osc_no: '2'
+            omega_0_cm-1: '966'
+            omega_p_cm-1: '685'
+            sigma_cm-1: '61'
+          quote: 93 | 2 | 966 | 685 | 61
+          locator:
+            page: 4
+            table: '2'
+            row: 93 / 2
+        - cells:
+            T_K: '93'
+            osc_no: 3a
+            omega_0_cm-1: '760'
+            omega_p_cm-1: '205'
+            sigma_cm-1: '47'
+          quote: 93 | 3a | 760 | 205 | 47
+          locator:
+            page: 4
+            table: '2'
+            row: 93 / 3a
+        - cells:
+            T_K: '93'
+            osc_no: 3b
+            omega_0_cm-1: '678'
+            omega_p_cm-1: '205'
+            sigma_cm-1: '48'
+          quote: 93 | 3b | 678 | 205 | 48
+          locator:
+            page: 4
+            table: '2'
+            row: 93 / 3b
+        - cells:
+            T_K: '300'
+            osc_no: '1'
+            omega_0_cm-1: '1100'
+            omega_p_cm-1: '329'
+            sigma_cm-1: '47'
+          quote: 300 | 1 | 1100 | 329 | 47
+          locator:
+            page: 4
+            table: '2'
+            row: 300 / 1
+        - cells:
+            T_K: '300'
+            osc_no: '2'
+            omega_0_cm-1: '983'
+            omega_p_cm-1: '709'
+            sigma_cm-1: '57'
+          quote: 300 | 2 | 983 | 709 | 57
+          locator:
+            page: 4
+            table: '2'
+            row: 300 / 2
+        - cells:
+            T_K: '300'
+            osc_no: 3a
+            omega_0_cm-1: '767'
+            omega_p_cm-1: '203'
+            sigma_cm-1: '46'
+          quote: 300 | 3a | 767 | 203 | 46
+          locator:
+            page: 4
+            table: '2'
+            row: 300 / 3a
+        - cells:
+            T_K: '300'
+            osc_no: 3b
+            omega_0_cm-1: '670'
+            omega_p_cm-1: '221'
+            sigma_cm-1: '48'
+          quote: 300 | 3b | 670 | 221 | 48
+          locator:
+            page: 4
+            table: '2'
+            row: 300 / 3b
+        - cells:
+            T_K: '373'
+            osc_no: '1'
+            omega_0_cm-1: '1108'
+            omega_p_cm-1: '338'
+            sigma_cm-1: '51'
+          quote: 373 | 1 | 1108 | 338 | 51
+          locator:
+            page: 4
+            table: '2'
+            row: 373 / 1
+        - cells:
+            T_K: '373'
+            osc_no: '2'
+            omega_0_cm-1: '986'
+            omega_p_cm-1: '729'
+            sigma_cm-1: '58'
+          quote: 373 | 2 | 986 | 729 | 58
+          locator:
+            page: 4
+            table: '2'
+            row: 373 / 2
+        - cells:
+            T_K: '373'
+            osc_no: 3a
+            omega_0_cm-1: '780'
+            omega_p_cm-1: '233'
+            sigma_cm-1: '48'
+          quote: 373 | 3a | 780 | 233 | 48
+          locator:
+            page: 4
+            table: '2'
+            row: 373 / 3a
+        - cells:
+            T_K: '373'
+            osc_no: 3b
+            omega_0_cm-1: '669'
+            omega_p_cm-1: '274'
+            sigma_cm-1: '58'
+          quote: 373 | 3b | 669 | 274 | 58
+          locator:
+            page: 4
+            table: '2'
+            row: 373 / 3b
+        - cells:
+            T_K: '473'
+            osc_no: '1'
+            omega_0_cm-1: '1113'
+            omega_p_cm-1: '338'
+            sigma_cm-1: '50'
+          quote: 473 | 1 | 1113 | 338 | 50
+          locator:
+            page: 4
+            table: '2'
+            row: 473 / 1
+        - cells:
+            T_K: '473'
+            osc_no: '2'
+            omega_0_cm-1: '994'
+            omega_p_cm-1: '736'
+            sigma_cm-1: '58'
+          quote: 473 | 2 | 994 | 736 | 58
+          locator:
+            page: 4
+            table: '2'
+            row: 473 / 2
+        - cells:
+            T_K: '473'
+            osc_no: 3a
+            omega_0_cm-1: '784'
+            omega_p_cm-1: '238'
+            sigma_cm-1: '49'
+          quote: 473 | 3a | 784 | 238 | 49
+          locator:
+            page: 4
+            table: '2'
+            row: 473 / 3a
+        - cells:
+            T_K: '473'
+            osc_no: 3b
+            omega_0_cm-1: '668'
+            omega_p_cm-1: '270'
+            sigma_cm-1: '59'
+          quote: 473 | 3b | 668 | 270 | 59
+          locator:
+            page: 4
+            table: '2'
+            row: 473 / 3b
+        - cells:
+            T_K: '573'
+            osc_no: '1'
+            omega_0_cm-1: '1115'
+            omega_p_cm-1: '359'
+            sigma_cm-1: '51'
+          quote: 573 | 1 | 1115 | 359 | 51
+          locator:
+            page: 4
+            table: '2'
+            row: 573 / 1
+        - cells:
+            T_K: '573'
+            osc_no: '2'
+            omega_0_cm-1: '1000'
+            omega_p_cm-1: '733'
+            sigma_cm-1: '55'
+          quote: 573 | 2 | 1000 | 733 | 55
+          locator:
+            page: 4
+            table: '2'
+            row: 573 / 2
+        - cells:
+            T_K: '573'
+            osc_no: 3a
+            omega_0_cm-1: '786'
+            omega_p_cm-1: '238'
+            sigma_cm-1: '48'
+          quote: 573 | 3a | 786 | 238 | 48
+          locator:
+            page: 4
+            table: '2'
+            row: 573 / 3a
+        - cells:
+            T_K: '573'
+            osc_no: 3b
+            omega_0_cm-1: '667'
+            omega_p_cm-1: '271'
+            sigma_cm-1: '61'
+          quote: 573 | 3b | 667 | 271 | 61
+          locator:
+            page: 4
+            table: '2'
+            row: 573 / 3b
+        - cells:
+            T_K: '673'
+            osc_no: '1'
+            omega_0_cm-1: '1117'
+            omega_p_cm-1: '396'
+            sigma_cm-1: '54'
+          quote: 673 | 1 | 1117 | 396 | 54
+          locator:
+            page: 4
+            table: '2'
+            row: 673 / 1
+        - cells:
+            T_K: '673'
+            osc_no: '2'
+            omega_0_cm-1: '1010'
+            omega_p_cm-1: '720'
+            sigma_cm-1: '52'
+          quote: 673 | 2 | 1010 | 720 | 52
+          locator:
+            page: 4
+            table: '2'
+            row: 673 / 2
+        - cells:
+            T_K: '673'
+            osc_no: 3a
+            omega_0_cm-1: '791'
+            omega_p_cm-1: '245'
+            sigma_cm-1: '48'
+          quote: 673 | 3a | 791 | 245 | 48
+          locator:
+            page: 4
+            table: '2'
+            row: 673 / 3a
+        - cells:
+            T_K: '673'
+            osc_no: 3b
+            omega_0_cm-1: '661'
+            omega_p_cm-1: '272'
+            sigma_cm-1: '68'
+          quote: 673 | 3b | 661 | 272 | 68
+          locator:
+            page: 4
+            table: '2'
+            row: 673 / 3b
+        - cells:
+            T_K: '773'
+            osc_no: '1'
+            omega_0_cm-1: '1125'
+            omega_p_cm-1: '406'
+            sigma_cm-1: '54'
+          quote: 773 | 1 | 1125 | 406 | 54
+          locator:
+            page: 4
+            table: '2'
+            row: 773 / 1
+        - cells:
+            T_K: '773'
+            osc_no: '2'
+            omega_0_cm-1: '1022'
+            omega_p_cm-1: '712'
+            sigma_cm-1: '50'
+          quote: 773 | 2 | 1022 | 712 | 50
+          locator:
+            page: 4
+            table: '2'
+            row: 773 / 2
+        - cells:
+            T_K: '773'
+            osc_no: 3a
+            omega_0_cm-1: '791'
+            omega_p_cm-1: '239'
+            sigma_cm-1: '48'
+          quote: 773 | 3a | 791 | 239 | 48
+          locator:
+            page: 4
+            table: '2'
+            row: 773 / 3a
+        - cells:
+            T_K: '773'
+            osc_no: 3b
+            omega_0_cm-1: '662'
+            omega_p_cm-1: '254'
+            sigma_cm-1: '67'
+          quote: 773 | 3b | 662 | 254 | 67
+          locator:
+            page: 4
+            table: '2'
+            row: 773 / 3b
+        - cells:
+            T_K: '873'
+            osc_no: '1'
+            omega_0_cm-1: '1135'
+            omega_p_cm-1: '401'
+            sigma_cm-1: '54'
+          quote: 873 | 1 | 1135 | 401 | 54
+          locator:
+            page: 4
+            table: '2'
+            row: 873 / 1
+        - cells:
+            T_K: '873'
+            osc_no: '2'
+            omega_0_cm-1: '1031'
+            omega_p_cm-1: '706'
+            sigma_cm-1: '49'
+          quote: 873 | 2 | 1031 | 706 | 49
+          locator:
+            page: 4
+            table: '2'
+            row: 873 / 2
+        - cells:
+            T_K: '873'
+            osc_no: 3a
+            omega_0_cm-1: '791'
+            omega_p_cm-1: '234'
+            sigma_cm-1: '47'
+          quote: 873 | 3a | 791 | 234 | 47
+          locator:
+            page: 4
+            table: '2'
+            row: 873 / 3a
+        - cells:
+            T_K: '873'
+            osc_no: 3b
+            omega_0_cm-1: '661'
+            omega_p_cm-1: '229'
+            sigma_cm-1: '62'
+          quote: 873 | 3b | 661 | 229 | 62
+          locator:
+            page: 4
+            table: '2'
+            row: 873 / 3b
     - observation_id: wetzel_gail_2013_table2_quoted_model_gibbs
       supersedes: wetzel_gail_2013_table2_quoted_model
       type: gibbs_table
       class: model
-      locator: {page: 4, table: '2'}
-      quote: 'Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and annealing experiments of Wetzel et al. (2012a).'
+      locator:
+        page: 4
+        table: '2'
+      quote: Brendel oscillator parameters for the dielectric function from the temperature dependent condensation and annealing experiments of Wetzel et al. (2012a).
       phase: amorphous_SiO
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
@@ -544,119 +786,409 @@ species:
         table_file: tables/kems-011-wetzel-gail-2013/t2.csv
         note: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
-        - cells: {"T_K":"40","osc_no":"1","omega_0_cm-1":"1077","omega_p_cm-1":"336","sigma_cm-1":"52"}
-          quote: "40 | 1 | 1077 | 336 | 52"
-          locator: {page: 4, table: '2', row: "40 / 1"}
-        - cells: {"T_K":"40","osc_no":"2","omega_0_cm-1":"957","omega_p_cm-1":"682","sigma_cm-1":"63"}
-          quote: "40 | 2 | 957 | 682 | 63"
-          locator: {page: 4, table: '2', row: "40 / 2"}
-        - cells: {"T_K":"40","osc_no":"3a","omega_0_cm-1":"750","omega_p_cm-1":"231","sigma_cm-1":"51"}
-          quote: "40 | 3a | 750 | 231 | 51"
-          locator: {page: 4, table: '2', row: "40 / 3a"}
-        - cells: {"T_K":"40","osc_no":"3b","omega_0_cm-1":"642","omega_p_cm-1":"289","sigma_cm-1":"64"}
-          quote: "40 | 3b | 642 | 289 | 64"
-          locator: {page: 4, table: '2', row: "40 / 3b"}
-        - cells: {"T_K":"93","osc_no":"1","omega_0_cm-1":"1082","omega_p_cm-1":"324","sigma_cm-1":"49"}
-          quote: "93 | 1 | 1082 | 324 | 49"
-          locator: {page: 4, table: '2', row: "93 / 1"}
-        - cells: {"T_K":"93","osc_no":"2","omega_0_cm-1":"966","omega_p_cm-1":"685","sigma_cm-1":"61"}
-          quote: "93 | 2 | 966 | 685 | 61"
-          locator: {page: 4, table: '2', row: "93 / 2"}
-        - cells: {"T_K":"93","osc_no":"3a","omega_0_cm-1":"760","omega_p_cm-1":"205","sigma_cm-1":"47"}
-          quote: "93 | 3a | 760 | 205 | 47"
-          locator: {page: 4, table: '2', row: "93 / 3a"}
-        - cells: {"T_K":"93","osc_no":"3b","omega_0_cm-1":"678","omega_p_cm-1":"205","sigma_cm-1":"48"}
-          quote: "93 | 3b | 678 | 205 | 48"
-          locator: {page: 4, table: '2', row: "93 / 3b"}
-        - cells: {"T_K":"300","osc_no":"1","omega_0_cm-1":"1100","omega_p_cm-1":"329","sigma_cm-1":"47"}
-          quote: "300 | 1 | 1100 | 329 | 47"
-          locator: {page: 4, table: '2', row: "300 / 1"}
-        - cells: {"T_K":"300","osc_no":"2","omega_0_cm-1":"983","omega_p_cm-1":"709","sigma_cm-1":"57"}
-          quote: "300 | 2 | 983 | 709 | 57"
-          locator: {page: 4, table: '2', row: "300 / 2"}
-        - cells: {"T_K":"300","osc_no":"3a","omega_0_cm-1":"767","omega_p_cm-1":"203","sigma_cm-1":"46"}
-          quote: "300 | 3a | 767 | 203 | 46"
-          locator: {page: 4, table: '2', row: "300 / 3a"}
-        - cells: {"T_K":"300","osc_no":"3b","omega_0_cm-1":"670","omega_p_cm-1":"221","sigma_cm-1":"48"}
-          quote: "300 | 3b | 670 | 221 | 48"
-          locator: {page: 4, table: '2', row: "300 / 3b"}
-        - cells: {"T_K":"373","osc_no":"1","omega_0_cm-1":"1108","omega_p_cm-1":"338","sigma_cm-1":"51"}
-          quote: "373 | 1 | 1108 | 338 | 51"
-          locator: {page: 4, table: '2', row: "373 / 1"}
-        - cells: {"T_K":"373","osc_no":"2","omega_0_cm-1":"986","omega_p_cm-1":"729","sigma_cm-1":"58"}
-          quote: "373 | 2 | 986 | 729 | 58"
-          locator: {page: 4, table: '2', row: "373 / 2"}
-        - cells: {"T_K":"373","osc_no":"3a","omega_0_cm-1":"780","omega_p_cm-1":"233","sigma_cm-1":"48"}
-          quote: "373 | 3a | 780 | 233 | 48"
-          locator: {page: 4, table: '2', row: "373 / 3a"}
-        - cells: {"T_K":"373","osc_no":"3b","omega_0_cm-1":"669","omega_p_cm-1":"274","sigma_cm-1":"58"}
-          quote: "373 | 3b | 669 | 274 | 58"
-          locator: {page: 4, table: '2', row: "373 / 3b"}
-        - cells: {"T_K":"473","osc_no":"1","omega_0_cm-1":"1113","omega_p_cm-1":"338","sigma_cm-1":"50"}
-          quote: "473 | 1 | 1113 | 338 | 50"
-          locator: {page: 4, table: '2', row: "473 / 1"}
-        - cells: {"T_K":"473","osc_no":"2","omega_0_cm-1":"994","omega_p_cm-1":"736","sigma_cm-1":"58"}
-          quote: "473 | 2 | 994 | 736 | 58"
-          locator: {page: 4, table: '2', row: "473 / 2"}
-        - cells: {"T_K":"473","osc_no":"3a","omega_0_cm-1":"784","omega_p_cm-1":"238","sigma_cm-1":"49"}
-          quote: "473 | 3a | 784 | 238 | 49"
-          locator: {page: 4, table: '2', row: "473 / 3a"}
-        - cells: {"T_K":"473","osc_no":"3b","omega_0_cm-1":"668","omega_p_cm-1":"270","sigma_cm-1":"59"}
-          quote: "473 | 3b | 668 | 270 | 59"
-          locator: {page: 4, table: '2', row: "473 / 3b"}
-        - cells: {"T_K":"573","osc_no":"1","omega_0_cm-1":"1115","omega_p_cm-1":"359","sigma_cm-1":"51"}
-          quote: "573 | 1 | 1115 | 359 | 51"
-          locator: {page: 4, table: '2', row: "573 / 1"}
-        - cells: {"T_K":"573","osc_no":"2","omega_0_cm-1":"1000","omega_p_cm-1":"733","sigma_cm-1":"55"}
-          quote: "573 | 2 | 1000 | 733 | 55"
-          locator: {page: 4, table: '2', row: "573 / 2"}
-        - cells: {"T_K":"573","osc_no":"3a","omega_0_cm-1":"786","omega_p_cm-1":"238","sigma_cm-1":"48"}
-          quote: "573 | 3a | 786 | 238 | 48"
-          locator: {page: 4, table: '2', row: "573 / 3a"}
-        - cells: {"T_K":"573","osc_no":"3b","omega_0_cm-1":"667","omega_p_cm-1":"271","sigma_cm-1":"61"}
-          quote: "573 | 3b | 667 | 271 | 61"
-          locator: {page: 4, table: '2', row: "573 / 3b"}
-        - cells: {"T_K":"673","osc_no":"1","omega_0_cm-1":"1117","omega_p_cm-1":"396","sigma_cm-1":"54"}
-          quote: "673 | 1 | 1117 | 396 | 54"
-          locator: {page: 4, table: '2', row: "673 / 1"}
-        - cells: {"T_K":"673","osc_no":"2","omega_0_cm-1":"1010","omega_p_cm-1":"720","sigma_cm-1":"52"}
-          quote: "673 | 2 | 1010 | 720 | 52"
-          locator: {page: 4, table: '2', row: "673 / 2"}
-        - cells: {"T_K":"673","osc_no":"3a","omega_0_cm-1":"791","omega_p_cm-1":"245","sigma_cm-1":"48"}
-          quote: "673 | 3a | 791 | 245 | 48"
-          locator: {page: 4, table: '2', row: "673 / 3a"}
-        - cells: {"T_K":"673","osc_no":"3b","omega_0_cm-1":"661","omega_p_cm-1":"272","sigma_cm-1":"68"}
-          quote: "673 | 3b | 661 | 272 | 68"
-          locator: {page: 4, table: '2', row: "673 / 3b"}
-        - cells: {"T_K":"773","osc_no":"1","omega_0_cm-1":"1125","omega_p_cm-1":"406","sigma_cm-1":"54"}
-          quote: "773 | 1 | 1125 | 406 | 54"
-          locator: {page: 4, table: '2', row: "773 / 1"}
-        - cells: {"T_K":"773","osc_no":"2","omega_0_cm-1":"1022","omega_p_cm-1":"712","sigma_cm-1":"50"}
-          quote: "773 | 2 | 1022 | 712 | 50"
-          locator: {page: 4, table: '2', row: "773 / 2"}
-        - cells: {"T_K":"773","osc_no":"3a","omega_0_cm-1":"791","omega_p_cm-1":"239","sigma_cm-1":"48"}
-          quote: "773 | 3a | 791 | 239 | 48"
-          locator: {page: 4, table: '2', row: "773 / 3a"}
-        - cells: {"T_K":"773","osc_no":"3b","omega_0_cm-1":"662","omega_p_cm-1":"254","sigma_cm-1":"67"}
-          quote: "773 | 3b | 662 | 254 | 67"
-          locator: {page: 4, table: '2', row: "773 / 3b"}
-        - cells: {"T_K":"873","osc_no":"1","omega_0_cm-1":"1135","omega_p_cm-1":"401","sigma_cm-1":"54"}
-          quote: "873 | 1 | 1135 | 401 | 54"
-          locator: {page: 4, table: '2', row: "873 / 1"}
-        - cells: {"T_K":"873","osc_no":"2","omega_0_cm-1":"1031","omega_p_cm-1":"706","sigma_cm-1":"49"}
-          quote: "873 | 2 | 1031 | 706 | 49"
-          locator: {page: 4, table: '2', row: "873 / 2"}
-        - cells: {"T_K":"873","osc_no":"3a","omega_0_cm-1":"791","omega_p_cm-1":"234","sigma_cm-1":"47"}
-          quote: "873 | 3a | 791 | 234 | 47"
-          locator: {page: 4, table: '2', row: "873 / 3a"}
-        - cells: {"T_K":"873","osc_no":"3b","omega_0_cm-1":"661","omega_p_cm-1":"229","sigma_cm-1":"62"}
-          quote: "873 | 3b | 661 | 229 | 62"
-          locator: {page: 4, table: '2', row: "873 / 3b"}
+        - cells:
+            T_K: '40'
+            osc_no: '1'
+            omega_0_cm-1: '1077'
+            omega_p_cm-1: '336'
+            sigma_cm-1: '52'
+          quote: 40 | 1 | 1077 | 336 | 52
+          locator:
+            page: 4
+            table: '2'
+            row: 40 / 1
+        - cells:
+            T_K: '40'
+            osc_no: '2'
+            omega_0_cm-1: '957'
+            omega_p_cm-1: '682'
+            sigma_cm-1: '63'
+          quote: 40 | 2 | 957 | 682 | 63
+          locator:
+            page: 4
+            table: '2'
+            row: 40 / 2
+        - cells:
+            T_K: '40'
+            osc_no: 3a
+            omega_0_cm-1: '750'
+            omega_p_cm-1: '231'
+            sigma_cm-1: '51'
+          quote: 40 | 3a | 750 | 231 | 51
+          locator:
+            page: 4
+            table: '2'
+            row: 40 / 3a
+        - cells:
+            T_K: '40'
+            osc_no: 3b
+            omega_0_cm-1: '642'
+            omega_p_cm-1: '289'
+            sigma_cm-1: '64'
+          quote: 40 | 3b | 642 | 289 | 64
+          locator:
+            page: 4
+            table: '2'
+            row: 40 / 3b
+        - cells:
+            T_K: '93'
+            osc_no: '1'
+            omega_0_cm-1: '1082'
+            omega_p_cm-1: '324'
+            sigma_cm-1: '49'
+          quote: 93 | 1 | 1082 | 324 | 49
+          locator:
+            page: 4
+            table: '2'
+            row: 93 / 1
+        - cells:
+            T_K: '93'
+            osc_no: '2'
+            omega_0_cm-1: '966'
+            omega_p_cm-1: '685'
+            sigma_cm-1: '61'
+          quote: 93 | 2 | 966 | 685 | 61
+          locator:
+            page: 4
+            table: '2'
+            row: 93 / 2
+        - cells:
+            T_K: '93'
+            osc_no: 3a
+            omega_0_cm-1: '760'
+            omega_p_cm-1: '205'
+            sigma_cm-1: '47'
+          quote: 93 | 3a | 760 | 205 | 47
+          locator:
+            page: 4
+            table: '2'
+            row: 93 / 3a
+        - cells:
+            T_K: '93'
+            osc_no: 3b
+            omega_0_cm-1: '678'
+            omega_p_cm-1: '205'
+            sigma_cm-1: '48'
+          quote: 93 | 3b | 678 | 205 | 48
+          locator:
+            page: 4
+            table: '2'
+            row: 93 / 3b
+        - cells:
+            T_K: '300'
+            osc_no: '1'
+            omega_0_cm-1: '1100'
+            omega_p_cm-1: '329'
+            sigma_cm-1: '47'
+          quote: 300 | 1 | 1100 | 329 | 47
+          locator:
+            page: 4
+            table: '2'
+            row: 300 / 1
+        - cells:
+            T_K: '300'
+            osc_no: '2'
+            omega_0_cm-1: '983'
+            omega_p_cm-1: '709'
+            sigma_cm-1: '57'
+          quote: 300 | 2 | 983 | 709 | 57
+          locator:
+            page: 4
+            table: '2'
+            row: 300 / 2
+        - cells:
+            T_K: '300'
+            osc_no: 3a
+            omega_0_cm-1: '767'
+            omega_p_cm-1: '203'
+            sigma_cm-1: '46'
+          quote: 300 | 3a | 767 | 203 | 46
+          locator:
+            page: 4
+            table: '2'
+            row: 300 / 3a
+        - cells:
+            T_K: '300'
+            osc_no: 3b
+            omega_0_cm-1: '670'
+            omega_p_cm-1: '221'
+            sigma_cm-1: '48'
+          quote: 300 | 3b | 670 | 221 | 48
+          locator:
+            page: 4
+            table: '2'
+            row: 300 / 3b
+        - cells:
+            T_K: '373'
+            osc_no: '1'
+            omega_0_cm-1: '1108'
+            omega_p_cm-1: '338'
+            sigma_cm-1: '51'
+          quote: 373 | 1 | 1108 | 338 | 51
+          locator:
+            page: 4
+            table: '2'
+            row: 373 / 1
+        - cells:
+            T_K: '373'
+            osc_no: '2'
+            omega_0_cm-1: '986'
+            omega_p_cm-1: '729'
+            sigma_cm-1: '58'
+          quote: 373 | 2 | 986 | 729 | 58
+          locator:
+            page: 4
+            table: '2'
+            row: 373 / 2
+        - cells:
+            T_K: '373'
+            osc_no: 3a
+            omega_0_cm-1: '780'
+            omega_p_cm-1: '233'
+            sigma_cm-1: '48'
+          quote: 373 | 3a | 780 | 233 | 48
+          locator:
+            page: 4
+            table: '2'
+            row: 373 / 3a
+        - cells:
+            T_K: '373'
+            osc_no: 3b
+            omega_0_cm-1: '669'
+            omega_p_cm-1: '274'
+            sigma_cm-1: '58'
+          quote: 373 | 3b | 669 | 274 | 58
+          locator:
+            page: 4
+            table: '2'
+            row: 373 / 3b
+        - cells:
+            T_K: '473'
+            osc_no: '1'
+            omega_0_cm-1: '1113'
+            omega_p_cm-1: '338'
+            sigma_cm-1: '50'
+          quote: 473 | 1 | 1113 | 338 | 50
+          locator:
+            page: 4
+            table: '2'
+            row: 473 / 1
+        - cells:
+            T_K: '473'
+            osc_no: '2'
+            omega_0_cm-1: '994'
+            omega_p_cm-1: '736'
+            sigma_cm-1: '58'
+          quote: 473 | 2 | 994 | 736 | 58
+          locator:
+            page: 4
+            table: '2'
+            row: 473 / 2
+        - cells:
+            T_K: '473'
+            osc_no: 3a
+            omega_0_cm-1: '784'
+            omega_p_cm-1: '238'
+            sigma_cm-1: '49'
+          quote: 473 | 3a | 784 | 238 | 49
+          locator:
+            page: 4
+            table: '2'
+            row: 473 / 3a
+        - cells:
+            T_K: '473'
+            osc_no: 3b
+            omega_0_cm-1: '668'
+            omega_p_cm-1: '270'
+            sigma_cm-1: '59'
+          quote: 473 | 3b | 668 | 270 | 59
+          locator:
+            page: 4
+            table: '2'
+            row: 473 / 3b
+        - cells:
+            T_K: '573'
+            osc_no: '1'
+            omega_0_cm-1: '1115'
+            omega_p_cm-1: '359'
+            sigma_cm-1: '51'
+          quote: 573 | 1 | 1115 | 359 | 51
+          locator:
+            page: 4
+            table: '2'
+            row: 573 / 1
+        - cells:
+            T_K: '573'
+            osc_no: '2'
+            omega_0_cm-1: '1000'
+            omega_p_cm-1: '733'
+            sigma_cm-1: '55'
+          quote: 573 | 2 | 1000 | 733 | 55
+          locator:
+            page: 4
+            table: '2'
+            row: 573 / 2
+        - cells:
+            T_K: '573'
+            osc_no: 3a
+            omega_0_cm-1: '786'
+            omega_p_cm-1: '238'
+            sigma_cm-1: '48'
+          quote: 573 | 3a | 786 | 238 | 48
+          locator:
+            page: 4
+            table: '2'
+            row: 573 / 3a
+        - cells:
+            T_K: '573'
+            osc_no: 3b
+            omega_0_cm-1: '667'
+            omega_p_cm-1: '271'
+            sigma_cm-1: '61'
+          quote: 573 | 3b | 667 | 271 | 61
+          locator:
+            page: 4
+            table: '2'
+            row: 573 / 3b
+        - cells:
+            T_K: '673'
+            osc_no: '1'
+            omega_0_cm-1: '1117'
+            omega_p_cm-1: '396'
+            sigma_cm-1: '54'
+          quote: 673 | 1 | 1117 | 396 | 54
+          locator:
+            page: 4
+            table: '2'
+            row: 673 / 1
+        - cells:
+            T_K: '673'
+            osc_no: '2'
+            omega_0_cm-1: '1010'
+            omega_p_cm-1: '720'
+            sigma_cm-1: '52'
+          quote: 673 | 2 | 1010 | 720 | 52
+          locator:
+            page: 4
+            table: '2'
+            row: 673 / 2
+        - cells:
+            T_K: '673'
+            osc_no: 3a
+            omega_0_cm-1: '791'
+            omega_p_cm-1: '245'
+            sigma_cm-1: '48'
+          quote: 673 | 3a | 791 | 245 | 48
+          locator:
+            page: 4
+            table: '2'
+            row: 673 / 3a
+        - cells:
+            T_K: '673'
+            osc_no: 3b
+            omega_0_cm-1: '661'
+            omega_p_cm-1: '272'
+            sigma_cm-1: '68'
+          quote: 673 | 3b | 661 | 272 | 68
+          locator:
+            page: 4
+            table: '2'
+            row: 673 / 3b
+        - cells:
+            T_K: '773'
+            osc_no: '1'
+            omega_0_cm-1: '1125'
+            omega_p_cm-1: '406'
+            sigma_cm-1: '54'
+          quote: 773 | 1 | 1125 | 406 | 54
+          locator:
+            page: 4
+            table: '2'
+            row: 773 / 1
+        - cells:
+            T_K: '773'
+            osc_no: '2'
+            omega_0_cm-1: '1022'
+            omega_p_cm-1: '712'
+            sigma_cm-1: '50'
+          quote: 773 | 2 | 1022 | 712 | 50
+          locator:
+            page: 4
+            table: '2'
+            row: 773 / 2
+        - cells:
+            T_K: '773'
+            osc_no: 3a
+            omega_0_cm-1: '791'
+            omega_p_cm-1: '239'
+            sigma_cm-1: '48'
+          quote: 773 | 3a | 791 | 239 | 48
+          locator:
+            page: 4
+            table: '2'
+            row: 773 / 3a
+        - cells:
+            T_K: '773'
+            osc_no: 3b
+            omega_0_cm-1: '662'
+            omega_p_cm-1: '254'
+            sigma_cm-1: '67'
+          quote: 773 | 3b | 662 | 254 | 67
+          locator:
+            page: 4
+            table: '2'
+            row: 773 / 3b
+        - cells:
+            T_K: '873'
+            osc_no: '1'
+            omega_0_cm-1: '1135'
+            omega_p_cm-1: '401'
+            sigma_cm-1: '54'
+          quote: 873 | 1 | 1135 | 401 | 54
+          locator:
+            page: 4
+            table: '2'
+            row: 873 / 1
+        - cells:
+            T_K: '873'
+            osc_no: '2'
+            omega_0_cm-1: '1031'
+            omega_p_cm-1: '706'
+            sigma_cm-1: '49'
+          quote: 873 | 2 | 1031 | 706 | 49
+          locator:
+            page: 4
+            table: '2'
+            row: 873 / 2
+        - cells:
+            T_K: '873'
+            osc_no: 3a
+            omega_0_cm-1: '791'
+            omega_p_cm-1: '234'
+            sigma_cm-1: '47'
+          quote: 873 | 3a | 791 | 234 | 47
+          locator:
+            page: 4
+            table: '2'
+            row: 873 / 3a
+        - cells:
+            T_K: '873'
+            osc_no: 3b
+            omega_0_cm-1: '661'
+            omega_p_cm-1: '229'
+            sigma_cm-1: '62'
+          quote: 873 | 3b | 661 | 229 | 62
+          locator:
+            page: 4
+            table: '2'
+            row: 873 / 3b
     - observation_id: wetzel_gail_2013_table3_quoted_model
       type: rate_series
       class: model
-      locator: {page: 5, table: '3'}
-      quote: 'Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.'
+      locator:
+        page: 5
+        table: '3'
+      quote: Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.
       phase: amorphous_SiO
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
@@ -667,46 +1199,148 @@ species:
         table_file: tables/kems-011-wetzel-gail-2013/t3.csv
         note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
-        - cells: {"osc_no":"1","omega0_a_cm-1":"1078.2","omega0_a_err":"2.57","omega0_b_cm-1_K-1":"0.064","omega0_b_err":"0.0048","omegap_a_cm-1":"311.0","omegap_a_err":"10.59","omegap_b_cm-1_K-1":"0.103","omegap_b_err":"0.020","sigma_a_cm-1":"48.74","sigma_a_err":"1.29","sigma_b_cm-1_K-1":"0.0056","sigma_b_err":"0.0024"}
-          quote: "1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024"
-          locator: {page: 5, table: '3', row: "1"}
-        - cells: {"osc_no":"2","omega0_a_cm-1":"955.4","omega0_a_err":"1.62","omega0_b_cm-1_K-1":"0.084","omega0_b_err":"0.0030","omegap_a_cm-1":"696.3","omegap_a_err":"11.7","omegap_b_cm-1_K-1":"0.035","omegap_b_err":"0.022","sigma_a_cm-1":"63.35","sigma_a_err":"0.81","sigma_b_cm-1_K-1":"-0.016","sigma_b_err":"0.0015"}
-          quote: "2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015"
-          locator: {page: 5, table: '3', row: "2"}
-        - cells: {"osc_no":"3","omega0_a_cm-1":"754.8","omega0_a_err":"3.53","omega0_b_cm-1_K-1":"0.049","omega0_b_err":"0.0065","omegap_a_cm-1":"214.7","omegap_a_err":"8.32","omegap_b_cm-1_K-1":"0.032","omegap_b_err":"0.015","sigma_a_cm-1":"48.67","sigma_a_err":"0.95","sigma_b_cm-1_K-1":"-0.0015","sigma_b_err":"0.0018"}
-          quote: "3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018"
-          locator: {page: 5, table: '3', row: "3"}
-        - cells: {"osc_no":"4","omega0_a_cm-1":"663.8","omega0_a_err":"6.96","omega0_b_cm-1_K-1":"0.0009","omega0_b_err":"0.013","omegap_a_cm-1":"252.2","omegap_a_err":"20.2","omegap_b_cm-1_K-1":"0.0037","omegap_b_err":"0.037","sigma_a_cm-1":"52.78","sigma_a_err":"4.19","sigma_b_cm-1_K-1":"0.014","sigma_b_err":"0.0078"}
-          quote: "4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078"
-          locator: {page: 5, table: '3', row: "4"}
+        - cells:
+            osc_no: '1'
+            omega0_a_cm-1: '1078.2'
+            omega0_a_err: '2.57'
+            omega0_b_cm-1_K-1: '0.064'
+            omega0_b_err: '0.0048'
+            omegap_a_cm-1: '311.0'
+            omegap_a_err: '10.59'
+            omegap_b_cm-1_K-1: '0.103'
+            omegap_b_err: '0.020'
+            sigma_a_cm-1: '48.74'
+            sigma_a_err: '1.29'
+            sigma_b_cm-1_K-1: '0.0056'
+            sigma_b_err: '0.0024'
+          quote: 1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024
+          locator:
+            page: 5
+            table: '3'
+            row: '1'
+        - cells:
+            osc_no: '2'
+            omega0_a_cm-1: '955.4'
+            omega0_a_err: '1.62'
+            omega0_b_cm-1_K-1: '0.084'
+            omega0_b_err: '0.0030'
+            omegap_a_cm-1: '696.3'
+            omegap_a_err: '11.7'
+            omegap_b_cm-1_K-1: '0.035'
+            omegap_b_err: '0.022'
+            sigma_a_cm-1: '63.35'
+            sigma_a_err: '0.81'
+            sigma_b_cm-1_K-1: '-0.016'
+            sigma_b_err: '0.0015'
+          quote: 2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015
+          locator:
+            page: 5
+            table: '3'
+            row: '2'
+        - cells:
+            osc_no: '3'
+            omega0_a_cm-1: '754.8'
+            omega0_a_err: '3.53'
+            omega0_b_cm-1_K-1: '0.049'
+            omega0_b_err: '0.0065'
+            omegap_a_cm-1: '214.7'
+            omegap_a_err: '8.32'
+            omegap_b_cm-1_K-1: '0.032'
+            omegap_b_err: '0.015'
+            sigma_a_cm-1: '48.67'
+            sigma_a_err: '0.95'
+            sigma_b_cm-1_K-1: '-0.0015'
+            sigma_b_err: '0.0018'
+          quote: 3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018
+          locator:
+            page: 5
+            table: '3'
+            row: '3'
+        - cells:
+            osc_no: '4'
+            omega0_a_cm-1: '663.8'
+            omega0_a_err: '6.96'
+            omega0_b_cm-1_K-1: '0.0009'
+            omega0_b_err: '0.013'
+            omegap_a_cm-1: '252.2'
+            omegap_a_err: '20.2'
+            omegap_b_cm-1_K-1: '0.0037'
+            omegap_b_err: '0.037'
+            sigma_a_cm-1: '52.78'
+            sigma_a_err: '4.19'
+            sigma_b_cm-1_K-1: '0.014'
+            sigma_b_err: '0.0078'
+          quote: 4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078
+          locator:
+            page: 5
+            table: '3'
+            row: '4'
     - observation_id: wetzel_gail_2013_table3_quoted_model_gibbs
       supersedes: wetzel_gail_2013_table3_quoted_model
       type: gibbs_table
       class: model
-      locator: {page: 5, table: '3'}
-      quote: 'Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.'
+      locator:
+        page: 5
+        table: '3'
+      quote: Fit coefficients for the temperature dependent oscillator parameters of the Brendel model for the dielectric function.
       phase: amorphous_SiO
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
       uncertainty:
         note: Each value is the right-hand term printed after ± for its paired coefficient; the paper does not state a statistical convention.
         rows:
-        - osc_no: "1"
-          values: {"omega0_a_cm-1":"2.57","omega0_b_cm-1_K-1":"0.0048","omegap_a_cm-1":"10.59","omegap_b_cm-1_K-1":"0.020","sigma_a_cm-1":"1.29","sigma_b_cm-1_K-1":"0.0024"}
-          quote: "1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024"
-          locator: {page: 5, table: '3', row: "1"}
-        - osc_no: "2"
-          values: {"omega0_a_cm-1":"1.62","omega0_b_cm-1_K-1":"0.0030","omegap_a_cm-1":"11.7","omegap_b_cm-1_K-1":"0.022","sigma_a_cm-1":"0.81","sigma_b_cm-1_K-1":"0.0015"}
-          quote: "2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015"
-          locator: {page: 5, table: '3', row: "2"}
-        - osc_no: "3"
-          values: {"omega0_a_cm-1":"3.53","omega0_b_cm-1_K-1":"0.0065","omegap_a_cm-1":"8.32","omegap_b_cm-1_K-1":"0.015","sigma_a_cm-1":"0.95","sigma_b_cm-1_K-1":"0.0018"}
-          quote: "3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018"
-          locator: {page: 5, table: '3', row: "3"}
-        - osc_no: "4"
-          values: {"omega0_a_cm-1":"6.96","omega0_b_cm-1_K-1":"0.013","omegap_a_cm-1":"20.2","omegap_b_cm-1_K-1":"0.037","sigma_a_cm-1":"4.19","sigma_b_cm-1_K-1":"0.0078"}
-          quote: "4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078"
-          locator: {page: 5, table: '3', row: "4"}
+        - osc_no: '1'
+          values:
+            omega0_a_cm-1: '2.57'
+            omega0_b_cm-1_K-1: '0.0048'
+            omegap_a_cm-1: '10.59'
+            omegap_b_cm-1_K-1: '0.020'
+            sigma_a_cm-1: '1.29'
+            sigma_b_cm-1_K-1: '0.0024'
+          quote: 1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024
+          locator:
+            page: 5
+            table: '3'
+            row: '1'
+        - osc_no: '2'
+          values:
+            omega0_a_cm-1: '1.62'
+            omega0_b_cm-1_K-1: '0.0030'
+            omegap_a_cm-1: '11.7'
+            omegap_b_cm-1_K-1: '0.022'
+            sigma_a_cm-1: '0.81'
+            sigma_b_cm-1_K-1: '0.0015'
+          quote: 2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015
+          locator:
+            page: 5
+            table: '3'
+            row: '2'
+        - osc_no: '3'
+          values:
+            omega0_a_cm-1: '3.53'
+            omega0_b_cm-1_K-1: '0.0065'
+            omegap_a_cm-1: '8.32'
+            omegap_b_cm-1_K-1: '0.015'
+            sigma_a_cm-1: '0.95'
+            sigma_b_cm-1_K-1: '0.0018'
+          quote: 3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018
+          locator:
+            page: 5
+            table: '3'
+            row: '3'
+        - osc_no: '4'
+          values:
+            omega0_a_cm-1: '6.96'
+            omega0_b_cm-1_K-1: '0.013'
+            omegap_a_cm-1: '20.2'
+            omegap_b_cm-1_K-1: '0.037'
+            sigma_a_cm-1: '4.19'
+            sigma_b_cm-1_K-1: '0.0078'
+          quote: 4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078
+          locator:
+            page: 5
+            table: '3'
+            row: '4'
       values:
         quantity: brendel_oscillator_model_parameters
         method_class: model_derived
@@ -715,23 +1349,154 @@ species:
         table_file: tables/kems-011-wetzel-gail-2013/t3.csv
         note: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
-        - cells: {"osc_no":"1","omega0_a_cm-1":"1078.2","omega0_a_err":"2.57","omega0_b_cm-1_K-1":"0.064","omega0_b_err":"0.0048","omegap_a_cm-1":"311.0","omegap_a_err":"10.59","omegap_b_cm-1_K-1":"0.103","omegap_b_err":"0.020","sigma_a_cm-1":"48.74","sigma_a_err":"1.29","sigma_b_cm-1_K-1":"0.0056","sigma_b_err":"0.0024"}
-          quote: "1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024"
-          locator: {page: 5, table: '3', row: "1"}
-        - cells: {"osc_no":"2","omega0_a_cm-1":"955.4","omega0_a_err":"1.62","omega0_b_cm-1_K-1":"0.084","omega0_b_err":"0.0030","omegap_a_cm-1":"696.3","omegap_a_err":"11.7","omegap_b_cm-1_K-1":"0.035","omegap_b_err":"0.022","sigma_a_cm-1":"63.35","sigma_a_err":"0.81","sigma_b_cm-1_K-1":"-0.016","sigma_b_err":"0.0015"}
-          quote: "2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015"
-          locator: {page: 5, table: '3', row: "2"}
-        - cells: {"osc_no":"3","omega0_a_cm-1":"754.8","omega0_a_err":"3.53","omega0_b_cm-1_K-1":"0.049","omega0_b_err":"0.0065","omegap_a_cm-1":"214.7","omegap_a_err":"8.32","omegap_b_cm-1_K-1":"0.032","omegap_b_err":"0.015","sigma_a_cm-1":"48.67","sigma_a_err":"0.95","sigma_b_cm-1_K-1":"-0.0015","sigma_b_err":"0.0018"}
-          quote: "3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018"
-          locator: {page: 5, table: '3', row: "3"}
-        - cells: {"osc_no":"4","omega0_a_cm-1":"663.8","omega0_a_err":"6.96","omega0_b_cm-1_K-1":"0.0009","omega0_b_err":"0.013","omegap_a_cm-1":"252.2","omegap_a_err":"20.2","omegap_b_cm-1_K-1":"0.0037","omegap_b_err":"0.037","sigma_a_cm-1":"52.78","sigma_a_err":"4.19","sigma_b_cm-1_K-1":"0.014","sigma_b_err":"0.0078"}
-          quote: "4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078"
-          locator: {page: 5, table: '3', row: "4"}
+        - cells:
+            osc_no: '1'
+            omega0_a_cm-1: '1078.2'
+            omega0_a_err: '2.57'
+            omega0_b_cm-1_K-1: '0.064'
+            omega0_b_err: '0.0048'
+            omegap_a_cm-1: '311.0'
+            omegap_a_err: '10.59'
+            omegap_b_cm-1_K-1: '0.103'
+            omegap_b_err: '0.020'
+            sigma_a_cm-1: '48.74'
+            sigma_a_err: '1.29'
+            sigma_b_cm-1_K-1: '0.0056'
+            sigma_b_err: '0.0024'
+          quote: 1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024
+          locator:
+            page: 5
+            table: '3'
+            row: '1'
+        - cells:
+            osc_no: '2'
+            omega0_a_cm-1: '955.4'
+            omega0_a_err: '1.62'
+            omega0_b_cm-1_K-1: '0.084'
+            omega0_b_err: '0.0030'
+            omegap_a_cm-1: '696.3'
+            omegap_a_err: '11.7'
+            omegap_b_cm-1_K-1: '0.035'
+            omegap_b_err: '0.022'
+            sigma_a_cm-1: '63.35'
+            sigma_a_err: '0.81'
+            sigma_b_cm-1_K-1: '-0.016'
+            sigma_b_err: '0.0015'
+          quote: 2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015
+          locator:
+            page: 5
+            table: '3'
+            row: '2'
+        - cells:
+            osc_no: '3'
+            omega0_a_cm-1: '754.8'
+            omega0_a_err: '3.53'
+            omega0_b_cm-1_K-1: '0.049'
+            omega0_b_err: '0.0065'
+            omegap_a_cm-1: '214.7'
+            omegap_a_err: '8.32'
+            omegap_b_cm-1_K-1: '0.032'
+            omegap_b_err: '0.015'
+            sigma_a_cm-1: '48.67'
+            sigma_a_err: '0.95'
+            sigma_b_cm-1_K-1: '-0.0015'
+            sigma_b_err: '0.0018'
+          quote: 3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018
+          locator:
+            page: 5
+            table: '3'
+            row: '3'
+        - cells:
+            osc_no: '4'
+            omega0_a_cm-1: '663.8'
+            omega0_a_err: '6.96'
+            omega0_b_cm-1_K-1: '0.0009'
+            omega0_b_err: '0.013'
+            omegap_a_cm-1: '252.2'
+            omegap_a_err: '20.2'
+            omegap_b_cm-1_K-1: '0.0037'
+            omegap_b_err: '0.037'
+            sigma_a_cm-1: '52.78'
+            sigma_a_err: '4.19'
+            sigma_b_cm-1_K-1: '0.014'
+            sigma_b_err: '0.0078'
+          quote: 4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078
+          locator:
+            page: 5
+            table: '3'
+            row: '4'
+        uncertainty:
+          note: Each value is the right-hand term printed after ± for its paired coefficient; the paper does not state a statistical convention.
+          rows:
+          - osc_no: '1'
+            values:
+              omega0_a_cm-1: '2.57'
+              omega0_b_cm-1_K-1: '0.0048'
+              omegap_a_cm-1: '10.59'
+              omegap_b_cm-1_K-1: '0.020'
+              sigma_a_cm-1: '1.29'
+              sigma_b_cm-1_K-1: '0.0024'
+            quote: 1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024
+            locator:
+              page: 5
+              table: '3'
+              row: '1'
+          - osc_no: '2'
+            values:
+              omega0_a_cm-1: '1.62'
+              omega0_b_cm-1_K-1: '0.0030'
+              omegap_a_cm-1: '11.7'
+              omegap_b_cm-1_K-1: '0.022'
+              sigma_a_cm-1: '0.81'
+              sigma_b_cm-1_K-1: '0.0015'
+            quote: 2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015
+            locator:
+              page: 5
+              table: '3'
+              row: '2'
+          - osc_no: '3'
+            values:
+              omega0_a_cm-1: '3.53'
+              omega0_b_cm-1_K-1: '0.0065'
+              omegap_a_cm-1: '8.32'
+              omegap_b_cm-1_K-1: '0.015'
+              sigma_a_cm-1: '0.95'
+              sigma_b_cm-1_K-1: '0.0018'
+            quote: 3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018
+            locator:
+              page: 5
+              table: '3'
+              row: '3'
+          - osc_no: '4'
+            values:
+              omega0_a_cm-1: '6.96'
+              omega0_b_cm-1_K-1: '0.013'
+              omegap_a_cm-1: '20.2'
+              omegap_b_cm-1_K-1: '0.037'
+              sigma_a_cm-1: '4.19'
+              sigma_b_cm-1_K-1: '0.0078'
+            quote: 4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078
+            locator:
+              page: 5
+              table: '3'
+              row: '4'
+        uncertainty_provenance:
+          page: 5
+          quote: '1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024
+
+            2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015
+
+            3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018
+
+            4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078'
+          note: moved from an unapplied corrections entry on the superseded parent (b-483 restoration); values verbatim
     - observation_id: wetzel_gail_2013_table4_quoted_model
       type: rate_series
       class: model
-      locator: {page: 7, table: '4'}
-      quote: 'Some data used for calculating the opacity of the dust species considered in the model calculations and the corresponding key elements.'
+      locator:
+        page: 7
+        table: '4'
+      quote: Some data used for calculating the opacity of the dust species considered in the model calculations and the corresponding key elements.
       phase: circumstellar_dust_model
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
@@ -742,24 +1507,58 @@ species:
         table_file: tables/kems-011-wetzel-gail-2013/t4.csv
         note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
-        - cells: {"species":"SiO","A_d":"44.09","rho_d_g_cm-3":"2.13","key_element":"Si","epsilon_key_element":"3.55e-5"}
-          quote: "SiO | 44.09 | 2.13 | Si | 3.55 × 10^-5"
-          locator: {page: 7, table: '4', row: "SiO"}
-        - cells: {"species":"Iron","A_d":"55.85","rho_d_g_cm-3":"7.87","key_element":"Fe","epsilon_key_element":"3.16e-5"}
-          quote: "Iron | 55.85 | 7.87 | Fe | 3.16 × 10^-5"
-          locator: {page: 7, table: '4', row: "Iron"}
-        - cells: {"species":"Olivine","A_d":"172.2","rho_d_g_cm-3":"3.81","key_element":"Si","epsilon_key_element":"3.55e-5"}
-          quote: "Olivine | 172.2 | 3.81 | Si | 3.55 × 10^-5"
-          locator: {page: 7, table: '4', row: "Olivine"}
-        - cells: {"species":"Pyroxene","A_d":"116.2","rho_d_g_cm-3":"3.61","key_element":"Si","epsilon_key_element":"3.55e-5"}
-          quote: "Pyroxene | 116.2 | 3.61 | Si | 3.55 × 10^-5"
-          locator: {page: 7, table: '4', row: "Pyroxene"}
+        - cells:
+            species: SiO
+            A_d: '44.09'
+            rho_d_g_cm-3: '2.13'
+            key_element: Si
+            epsilon_key_element: '3.55e-5'
+          quote: SiO | 44.09 | 2.13 | Si | 3.55 × 10^-5
+          locator:
+            page: 7
+            table: '4'
+            row: SiO
+        - cells:
+            species: Iron
+            A_d: '55.85'
+            rho_d_g_cm-3: '7.87'
+            key_element: Fe
+            epsilon_key_element: '3.16e-5'
+          quote: Iron | 55.85 | 7.87 | Fe | 3.16 × 10^-5
+          locator:
+            page: 7
+            table: '4'
+            row: Iron
+        - cells:
+            species: Olivine
+            A_d: '172.2'
+            rho_d_g_cm-3: '3.81'
+            key_element: Si
+            epsilon_key_element: '3.55e-5'
+          quote: Olivine | 172.2 | 3.81 | Si | 3.55 × 10^-5
+          locator:
+            page: 7
+            table: '4'
+            row: Olivine
+        - cells:
+            species: Pyroxene
+            A_d: '116.2'
+            rho_d_g_cm-3: '3.61'
+            key_element: Si
+            epsilon_key_element: '3.55e-5'
+          quote: Pyroxene | 116.2 | 3.61 | Si | 3.55 × 10^-5
+          locator:
+            page: 7
+            table: '4'
+            row: Pyroxene
     - observation_id: wetzel_gail_2013_table4_quoted_model_gibbs
       supersedes: wetzel_gail_2013_table4_quoted_model
       type: gibbs_table
       class: model
-      locator: {page: 7, table: '4'}
-      quote: 'Some data used for calculating the opacity of the dust species considered in the model calculations and the corresponding key elements.'
+      locator:
+        page: 7
+        table: '4'
+      quote: Some data used for calculating the opacity of the dust species considered in the model calculations and the corresponding key elements.
       phase: circumstellar_dust_model
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
@@ -771,23 +1570,57 @@ species:
         table_file: tables/kems-011-wetzel-gail-2013/t4.csv
         note: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
-        - cells: {"species":"SiO","A_d":"44.09","rho_d_g_cm-3":"2.13","key_element":"Si","epsilon_key_element":"3.55e-5"}
-          quote: "SiO | 44.09 | 2.13 | Si | 3.55 × 10^-5"
-          locator: {page: 7, table: '4', row: "SiO"}
-        - cells: {"species":"Iron","A_d":"55.85","rho_d_g_cm-3":"7.87","key_element":"Fe","epsilon_key_element":"3.16e-5"}
-          quote: "Iron | 55.85 | 7.87 | Fe | 3.16 × 10^-5"
-          locator: {page: 7, table: '4', row: "Iron"}
-        - cells: {"species":"Olivine","A_d":"172.2","rho_d_g_cm-3":"3.81","key_element":"Si","epsilon_key_element":"3.55e-5"}
-          quote: "Olivine | 172.2 | 3.81 | Si | 3.55 × 10^-5"
-          locator: {page: 7, table: '4', row: "Olivine"}
-        - cells: {"species":"Pyroxene","A_d":"116.2","rho_d_g_cm-3":"3.61","key_element":"Si","epsilon_key_element":"3.55e-5"}
-          quote: "Pyroxene | 116.2 | 3.61 | Si | 3.55 × 10^-5"
-          locator: {page: 7, table: '4', row: "Pyroxene"}
+        - cells:
+            species: SiO
+            A_d: '44.09'
+            rho_d_g_cm-3: '2.13'
+            key_element: Si
+            epsilon_key_element: '3.55e-5'
+          quote: SiO | 44.09 | 2.13 | Si | 3.55 × 10^-5
+          locator:
+            page: 7
+            table: '4'
+            row: SiO
+        - cells:
+            species: Iron
+            A_d: '55.85'
+            rho_d_g_cm-3: '7.87'
+            key_element: Fe
+            epsilon_key_element: '3.16e-5'
+          quote: Iron | 55.85 | 7.87 | Fe | 3.16 × 10^-5
+          locator:
+            page: 7
+            table: '4'
+            row: Iron
+        - cells:
+            species: Olivine
+            A_d: '172.2'
+            rho_d_g_cm-3: '3.81'
+            key_element: Si
+            epsilon_key_element: '3.55e-5'
+          quote: Olivine | 172.2 | 3.81 | Si | 3.55 × 10^-5
+          locator:
+            page: 7
+            table: '4'
+            row: Olivine
+        - cells:
+            species: Pyroxene
+            A_d: '116.2'
+            rho_d_g_cm-3: '3.61'
+            key_element: Si
+            epsilon_key_element: '3.55e-5'
+          quote: Pyroxene | 116.2 | 3.61 | Si | 3.55 × 10^-5
+          locator:
+            page: 7
+            table: '4'
+            row: Pyroxene
     - observation_id: wetzel_gail_2013_table5_quoted_model
       type: rate_series
       class: model
-      locator: {page: 8, table: '5'}
-      quote: 'Data used for calculation of silicon monoxide growth.'
+      locator:
+        page: 8
+        table: '5'
+      quote: Data used for calculation of silicon monoxide growth.
       phase: circumstellar_dust_model
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
@@ -798,39 +1631,91 @@ species:
         table_file: tables/kems-011-wetzel-gail-2013/t5.csv
         note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
-        - cells: {"quantity":"V_d","unit":"cm3","value":"3.46e-23"}
-          quote: "V_d | cm3 | 3.46 × 10^-23"
-          locator: {page: 8, table: '5', row: "V_d"}
-        - cells: {"quantity":"A_gr","value":"44.09"}
-          quote: "A_gr | 44.09"
-          locator: {page: 8, table: '5', row: "A_gr"}
-        - cells: {"quantity":"epsilon_gr","value":"3.55e-5"}
-          quote: "epsilon_gr | 3.55 × 10^-5"
-          locator: {page: 8, table: '5', row: "epsilon_gr"}
-        - cells: {"quantity":"epsilon_d","value":"5e-13"}
-          quote: "epsilon_d | 5 × 10^-13"
-          locator: {page: 8, table: '5', row: "epsilon_d"}
-        - cells: {"quantity":"alpha","value":"0.013"}
-          quote: "alpha | 0.013"
-          locator: {page: 8, table: '5', row: "alpha"}
-        - cells: {"quantity":"a_max","unit":"um","value":"0.0837"}
-          quote: "a_max | um | 0.0837"
-          locator: {page: 8, table: '5', row: "a_max"}
-        - cells: {"quantity":"T_c","unit":"K","value":"700"}
-          quote: "T_c | K | 700"
-          locator: {page: 8, table: '5', row: "T_c"}
-        - cells: {"quantity":"v_th","unit":"cm s-1","value":"1.54e4"}
-          quote: "v_th | cm s-1 | 1.54 × 10^4"
-          locator: {page: 8, table: '5', row: "v_th"}
-        - cells: {"quantity":"R_c","unit":"cm","value":"3.2e13"}
-          quote: "R_c | cm | 3.2 × 10^13"
-          locator: {page: 8, table: '5', row: "R_c"}
+        - cells:
+            quantity: V_d
+            unit: cm3
+            value: '3.46e-23'
+          quote: V_d | cm3 | 3.46 × 10^-23
+          locator:
+            page: 8
+            table: '5'
+            row: V_d
+        - cells:
+            quantity: A_gr
+            value: '44.09'
+          quote: A_gr | 44.09
+          locator:
+            page: 8
+            table: '5'
+            row: A_gr
+        - cells:
+            quantity: epsilon_gr
+            value: '3.55e-5'
+          quote: epsilon_gr | 3.55 × 10^-5
+          locator:
+            page: 8
+            table: '5'
+            row: epsilon_gr
+        - cells:
+            quantity: epsilon_d
+            value: 5e-13
+          quote: epsilon_d | 5 × 10^-13
+          locator:
+            page: 8
+            table: '5'
+            row: epsilon_d
+        - cells:
+            quantity: alpha
+            value: '0.013'
+          quote: alpha | 0.013
+          locator:
+            page: 8
+            table: '5'
+            row: alpha
+        - cells:
+            quantity: a_max
+            unit: um
+            value: '0.0837'
+          quote: a_max | um | 0.0837
+          locator:
+            page: 8
+            table: '5'
+            row: a_max
+        - cells:
+            quantity: T_c
+            unit: K
+            value: '700'
+          quote: T_c | K | 700
+          locator:
+            page: 8
+            table: '5'
+            row: T_c
+        - cells:
+            quantity: v_th
+            unit: cm s-1
+            value: 1.54e4
+          quote: v_th | cm s-1 | 1.54 × 10^4
+          locator:
+            page: 8
+            table: '5'
+            row: v_th
+        - cells:
+            quantity: R_c
+            unit: cm
+            value: 3.2e13
+          quote: R_c | cm | 3.2 × 10^13
+          locator:
+            page: 8
+            table: '5'
+            row: R_c
     - observation_id: wetzel_gail_2013_table5_quoted_model_gibbs
       supersedes: wetzel_gail_2013_table5_quoted_model
       type: gibbs_table
       class: model
-      locator: {page: 8, table: '5'}
-      quote: 'Data used for calculation of silicon monoxide growth.'
+      locator:
+        page: 8
+        table: '5'
+      quote: Data used for calculation of silicon monoxide growth.
       phase: circumstellar_dust_model
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
@@ -842,38 +1727,90 @@ species:
         table_file: tables/kems-011-wetzel-gail-2013/t5.csv
         note: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
-        - cells: {"quantity":"V_d","unit":"cm3","value":"3.46e-23"}
-          quote: "V_d | cm3 | 3.46 × 10^-23"
-          locator: {page: 8, table: '5', row: "V_d"}
-        - cells: {"quantity":"A_gr","value":"44.09"}
-          quote: "A_gr | 44.09"
-          locator: {page: 8, table: '5', row: "A_gr"}
-        - cells: {"quantity":"epsilon_gr","value":"3.55e-5"}
-          quote: "epsilon_gr | 3.55 × 10^-5"
-          locator: {page: 8, table: '5', row: "epsilon_gr"}
-        - cells: {"quantity":"epsilon_d","value":"5e-13"}
-          quote: "epsilon_d | 5 × 10^-13"
-          locator: {page: 8, table: '5', row: "epsilon_d"}
-        - cells: {"quantity":"alpha","value":"0.013"}
-          quote: "alpha | 0.013"
-          locator: {page: 8, table: '5', row: "alpha"}
-        - cells: {"quantity":"a_max","unit":"um","value":"0.0837"}
-          quote: "a_max | um | 0.0837"
-          locator: {page: 8, table: '5', row: "a_max"}
-        - cells: {"quantity":"T_c","unit":"K","value":"700"}
-          quote: "T_c | K | 700"
-          locator: {page: 8, table: '5', row: "T_c"}
-        - cells: {"quantity":"v_th","unit":"cm s-1","value":"1.54e4"}
-          quote: "v_th | cm s-1 | 1.54 × 10^4"
-          locator: {page: 8, table: '5', row: "v_th"}
-        - cells: {"quantity":"R_c","unit":"cm","value":"3.2e13"}
-          quote: "R_c | cm | 3.2 × 10^13"
-          locator: {page: 8, table: '5', row: "R_c"}
+        - cells:
+            quantity: V_d
+            unit: cm3
+            value: '3.46e-23'
+          quote: V_d | cm3 | 3.46 × 10^-23
+          locator:
+            page: 8
+            table: '5'
+            row: V_d
+        - cells:
+            quantity: A_gr
+            value: '44.09'
+          quote: A_gr | 44.09
+          locator:
+            page: 8
+            table: '5'
+            row: A_gr
+        - cells:
+            quantity: epsilon_gr
+            value: '3.55e-5'
+          quote: epsilon_gr | 3.55 × 10^-5
+          locator:
+            page: 8
+            table: '5'
+            row: epsilon_gr
+        - cells:
+            quantity: epsilon_d
+            value: 5e-13
+          quote: epsilon_d | 5 × 10^-13
+          locator:
+            page: 8
+            table: '5'
+            row: epsilon_d
+        - cells:
+            quantity: alpha
+            value: '0.013'
+          quote: alpha | 0.013
+          locator:
+            page: 8
+            table: '5'
+            row: alpha
+        - cells:
+            quantity: a_max
+            unit: um
+            value: '0.0837'
+          quote: a_max | um | 0.0837
+          locator:
+            page: 8
+            table: '5'
+            row: a_max
+        - cells:
+            quantity: T_c
+            unit: K
+            value: '700'
+          quote: T_c | K | 700
+          locator:
+            page: 8
+            table: '5'
+            row: T_c
+        - cells:
+            quantity: v_th
+            unit: cm s-1
+            value: 1.54e4
+          quote: v_th | cm s-1 | 1.54 × 10^4
+          locator:
+            page: 8
+            table: '5'
+            row: v_th
+        - cells:
+            quantity: R_c
+            unit: cm
+            value: 3.2e13
+          quote: R_c | cm | 3.2 × 10^13
+          locator:
+            page: 8
+            table: '5'
+            row: R_c
     - observation_id: wetzel_gail_2013_table6_quoted_model
       type: rate_series
       class: model
-      locator: {page: 8, table: '6'}
-      quote: 'Basic parameters of the dust-shell models'
+      locator:
+        page: 8
+        table: '6'
+      quote: Basic parameters of the dust-shell models
       phase: circumstellar_dust_model
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
@@ -884,42 +1821,104 @@ species:
         table_file: tables/kems-011-wetzel-gail-2013/t6.csv
         note: Tabular model payload in the existing rate_series container; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
-        - cells: {"group":"Star","parameter":"T_eff","value":"2700 K"}
-          quote: "Star | T_eff | 2700 K"
-          locator: {page: 8, table: '6', row: "Star"}
-        - cells: {"group":"Star","parameter":"L_star","value":"1e4 L_sun"}
-          quote: "Star | L_star | 1 × 10^4 L_sun"
-          locator: {page: 8, table: '6', row: "Star"}
-        - cells: {"group":"Star","parameter":"R_star","value":"3.18e13 cm = 534 R_sun"}
-          quote: "Star | R_star | 3.18 × 10^13 cm = 534 R_sun"
-          locator: {page: 8, table: '6', row: "Star"}
-        - cells: {"group":"Wind","parameter":"v_exp","value":"10 km s-1"}
-          quote: "Wind | v_exp | 10 km s-1"
-          locator: {page: 8, table: '6', row: "Wind"}
-        - cells: {"group":"Wind","parameter":"Mdot","value":"3e-7 to 1e-5 M_sun a-1"}
-          quote: "Wind | Mdot | 3 × 10^-7 to 1 × 10^-5 M_sun a-1"
-          locator: {page: 8, table: '6', row: "Wind"}
-        - cells: {"group":"Dust","parameter":"kappa_abs","value":"amorphous SiO"}
-          quote: "Dust | kappa_abs | amorphous SiO"
-          locator: {page: 8, table: '6', row: "Dust"}
-        - cells: {"group":"Dust","parameter":"f_SiO","value":"0.5"}
-          quote: "Dust | f_SiO | 0.5"
-          locator: {page: 8, table: '6', row: "Dust"}
-        - cells: {"group":"Shell","parameter":"R_i","value":"depends on Mdot"}
-          quote: "Shell | R_i | depends on Mdot"
-          locator: {page: 8, table: '6', row: "Shell"}
-        - cells: {"group":"Shell","parameter":"R_a","value":"1e5 R_star"}
-          quote: "Shell | R_a | 1 × 10^5 R_star"
-          locator: {page: 8, table: '6', row: "Shell"}
-        - cells: {"group":"Shell","parameter":"T_c","value":"700 K"}
-          quote: "Shell | T_c | 700 K"
-          locator: {page: 8, table: '6', row: "Shell"}
+        - cells:
+            group: Star
+            parameter: T_eff
+            value: 2700 K
+          quote: Star | T_eff | 2700 K
+          locator:
+            page: 8
+            table: '6'
+            row: Star
+        - cells:
+            group: Star
+            parameter: L_star
+            value: 1e4 L_sun
+          quote: Star | L_star | 1 × 10^4 L_sun
+          locator:
+            page: 8
+            table: '6'
+            row: Star
+        - cells:
+            group: Star
+            parameter: R_star
+            value: 3.18e13 cm = 534 R_sun
+          quote: Star | R_star | 3.18 × 10^13 cm = 534 R_sun
+          locator:
+            page: 8
+            table: '6'
+            row: Star
+        - cells:
+            group: Wind
+            parameter: v_exp
+            value: 10 km s-1
+          quote: Wind | v_exp | 10 km s-1
+          locator:
+            page: 8
+            table: '6'
+            row: Wind
+        - cells:
+            group: Wind
+            parameter: Mdot
+            value: 3e-7 to 1e-5 M_sun a-1
+          quote: Wind | Mdot | 3 × 10^-7 to 1 × 10^-5 M_sun a-1
+          locator:
+            page: 8
+            table: '6'
+            row: Wind
+        - cells:
+            group: Dust
+            parameter: kappa_abs
+            value: amorphous SiO
+          quote: Dust | kappa_abs | amorphous SiO
+          locator:
+            page: 8
+            table: '6'
+            row: Dust
+        - cells:
+            group: Dust
+            parameter: f_SiO
+            value: '0.5'
+          quote: Dust | f_SiO | 0.5
+          locator:
+            page: 8
+            table: '6'
+            row: Dust
+        - cells:
+            group: Shell
+            parameter: R_i
+            value: depends on Mdot
+          quote: Shell | R_i | depends on Mdot
+          locator:
+            page: 8
+            table: '6'
+            row: Shell
+        - cells:
+            group: Shell
+            parameter: R_a
+            value: 1e5 R_star
+          quote: Shell | R_a | 1 × 10^5 R_star
+          locator:
+            page: 8
+            table: '6'
+            row: Shell
+        - cells:
+            group: Shell
+            parameter: T_c
+            value: 700 K
+          quote: Shell | T_c | 700 K
+          locator:
+            page: 8
+            table: '6'
+            row: Shell
     - observation_id: wetzel_gail_2013_table6_quoted_model_gibbs
       supersedes: wetzel_gail_2013_table6_quoted_model
       type: gibbs_table
       class: model
-      locator: {page: 8, table: '6'}
-      quote: 'Basic parameters of the dust-shell models'
+      locator:
+        page: 8
+        table: '6'
+      quote: Basic parameters of the dust-shell models
       phase: circumstellar_dust_model
       regime: published_model_parameters
       units: as printed; see per-column names and table provenance
@@ -931,55 +1930,133 @@ species:
         table_file: tables/kems-011-wetzel-gail-2013/t6.csv
         note: Tabular model payload in the closest existing schema table type; not a measured rate or thermodynamic table. Empty printed cells omitted. ASCII scientific notation preserves printed values without unit conversion.
         rows:
-        - cells: {"group":"Star","parameter":"T_eff","value":"2700 K"}
-          quote: "Star | T_eff | 2700 K"
-          locator: {page: 8, table: '6', row: "Star"}
-        - cells: {"group":"Star","parameter":"L_star","value":"1e4 L_sun"}
-          quote: "Star | L_star | 1 × 10^4 L_sun"
-          locator: {page: 8, table: '6', row: "Star"}
-        - cells: {"group":"Star","parameter":"R_star","value":"3.18e13 cm = 534 R_sun"}
-          quote: "Star | R_star | 3.18 × 10^13 cm = 534 R_sun"
-          locator: {page: 8, table: '6', row: "Star"}
-        - cells: {"group":"Wind","parameter":"v_exp","value":"10 km s-1"}
-          quote: "Wind | v_exp | 10 km s-1"
-          locator: {page: 8, table: '6', row: "Wind"}
-        - cells: {"group":"Wind","parameter":"Mdot","value":"3e-7 to 1e-5 M_sun a-1"}
-          quote: "Wind | Mdot | 3 × 10^-7 to 1 × 10^-5 M_sun a-1"
-          locator: {page: 8, table: '6', row: "Wind"}
-        - cells: {"group":"Dust","parameter":"kappa_abs","value":"amorphous SiO"}
-          quote: "Dust | kappa_abs | amorphous SiO"
-          locator: {page: 8, table: '6', row: "Dust"}
-        - cells: {"group":"Dust","parameter":"f_SiO","value":"0.5"}
-          quote: "Dust | f_SiO | 0.5"
-          locator: {page: 8, table: '6', row: "Dust"}
-        - cells: {"group":"Shell","parameter":"R_i","value":"depends on Mdot"}
-          quote: "Shell | R_i | depends on Mdot"
-          locator: {page: 8, table: '6', row: "Shell"}
-        - cells: {"group":"Shell","parameter":"R_a","value":"1e5 R_star"}
-          quote: "Shell | R_a | 1 × 10^5 R_star"
-          locator: {page: 8, table: '6', row: "Shell"}
-        - cells: {"group":"Shell","parameter":"T_c","value":"700 K"}
-          quote: "Shell | T_c | 700 K"
-          locator: {page: 8, table: '6', row: "Shell"}
+        - cells:
+            group: Star
+            parameter: T_eff
+            value: 2700 K
+          quote: Star | T_eff | 2700 K
+          locator:
+            page: 8
+            table: '6'
+            row: Star
+        - cells:
+            group: Star
+            parameter: L_star
+            value: 1e4 L_sun
+          quote: Star | L_star | 1 × 10^4 L_sun
+          locator:
+            page: 8
+            table: '6'
+            row: Star
+        - cells:
+            group: Star
+            parameter: R_star
+            value: 3.18e13 cm = 534 R_sun
+          quote: Star | R_star | 3.18 × 10^13 cm = 534 R_sun
+          locator:
+            page: 8
+            table: '6'
+            row: Star
+        - cells:
+            group: Wind
+            parameter: v_exp
+            value: 10 km s-1
+          quote: Wind | v_exp | 10 km s-1
+          locator:
+            page: 8
+            table: '6'
+            row: Wind
+        - cells:
+            group: Wind
+            parameter: Mdot
+            value: 3e-7 to 1e-5 M_sun a-1
+          quote: Wind | Mdot | 3 × 10^-7 to 1 × 10^-5 M_sun a-1
+          locator:
+            page: 8
+            table: '6'
+            row: Wind
+        - cells:
+            group: Dust
+            parameter: kappa_abs
+            value: amorphous SiO
+          quote: Dust | kappa_abs | amorphous SiO
+          locator:
+            page: 8
+            table: '6'
+            row: Dust
+        - cells:
+            group: Dust
+            parameter: f_SiO
+            value: '0.5'
+          quote: Dust | f_SiO | 0.5
+          locator:
+            page: 8
+            table: '6'
+            row: Dust
+        - cells:
+            group: Shell
+            parameter: R_i
+            value: depends on Mdot
+          quote: Shell | R_i | depends on Mdot
+          locator:
+            page: 8
+            table: '6'
+            row: Shell
+        - cells:
+            group: Shell
+            parameter: R_a
+            value: 1e5 R_star
+          quote: Shell | R_a | 1 × 10^5 R_star
+          locator:
+            page: 8
+            table: '6'
+            row: Shell
+        - cells:
+            group: Shell
+            parameter: T_c
+            value: 700 K
+          quote: Shell | T_c | 700 K
+          locator:
+            page: 8
+            table: '6'
+            row: Shell
 fidelity_samples:
 - path: species.SiO.observations[wetzel_gail_2013_table1_quoted_model].values.rows[0].cells.omega_0_cm-1
-  value: "1100"
-  locator: {page: 4, table: '1', quote: "1 | 1100 | 329 | 47"}
+  value: '1100'
+  locator:
+    page: 4
+    table: '1'
+    quote: 1 | 1100 | 329 | 47
 - path: species.SiO.observations[wetzel_gail_2013_table2_quoted_model].values.rows[0].cells.omega_0_cm-1
-  value: "1077"
-  locator: {page: 4, table: '2', quote: "40 K | 1 | 1077 | 336 | 52"}
+  value: '1077'
+  locator:
+    page: 4
+    table: '2'
+    quote: 40 K | 1 | 1077 | 336 | 52
 - path: species.SiO.observations[wetzel_gail_2013_table3_quoted_model].values.rows[0].cells.omega0_a_cm-1
-  value: "1078.2"
-  locator: {page: 5, table: '3', quote: "1078.2 ± 2.57"}
+  value: '1078.2'
+  locator:
+    page: 5
+    table: '3'
+    quote: 1078.2 ± 2.57
 - path: species.SiO.observations[wetzel_gail_2013_table4_quoted_model].values.rows[0].cells.A_d
-  value: "44.09"
-  locator: {page: 7, table: '4', quote: "SiO | 44.09 | 2.13 | Si | 3.55 × 10−5"}
+  value: '44.09'
+  locator:
+    page: 7
+    table: '4'
+    quote: SiO | 44.09 | 2.13 | Si | 3.55 × 10−5
 - path: species.SiO.observations[wetzel_gail_2013_table5_quoted_model].values.rows[0].cells.value
-  value: "3.46e-23"
-  locator: {page: 8, table: '5', quote: "Vd | cm³ | 3.46 × 10−23"}
+  value: '3.46e-23'
+  locator:
+    page: 8
+    table: '5'
+    quote: Vd | cm³ | 3.46 × 10−23
 - path: species.SiO.observations[wetzel_gail_2013_table6_quoted_model].values.rows[0].cells.value
-  value: "2700 K"
-  locator: {page: 8, table: '6', quote: "Star | Teff | 2700 K"}
+  value: 2700 K
+  locator:
+    page: 8
+    table: '6'
+    quote: Star | Teff | 2700 K
 - species: SiO
   observable: alpha
   observation_id: wetzel_gail_2013_sio_growth_alpha_arrhenius
