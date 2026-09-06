@@ -15,10 +15,10 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 - Sources: 105
 - Extracts (`literature_extract.v1`): 104
-- PDFs present in this worktree: 24
-- Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 24
+- PDFs present in this worktree: 26
+- Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 25
 - PDFs with no extract: 1
-- Extracts with no PDF: 81
+- Extracts with no PDF: 79
 - Alias groups needing owner/controller resolution: 26
 
 ## Sources
@@ -123,11 +123,11 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `richter-et-al-2007` | `kems-010-richter-2007` | Richter, F. M. et al. (2007), Geochim. Cosmochim. Acta 71:5544-5564, abstract and Fig. ... | 10.1016/j.gca.2007.09.005 | ABSENT | `` | unknown | `data/literature/extracts/richter-et-al-2007.yaml` (draft) | — | — |
 | `safarian-engh-2013-si-pure-langmuir` | — | Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s116... | 10.1007/s11661-012-1464-2 | ABSENT | `` | unknown | `data/literature/extracts/safarian-engh-2013-si-pure-langmuir.yaml` (draft) | — | — |
 | `sf04-magma-companion-workbook` | `ref-016-sio-kems-1700-2000k` | Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature lava vapor... | 10.1016/j.icarus.2003.08.023 | ABSENT | `` | unknown | `data/literature/extracts/sf04-magma-companion-workbook.yaml` (reviewed) | — | — |
-| `smales-1971-lpsc-12022` | — | Smales, A. A. et al. (1971), "Elemental composition of lunar surface material (part 2)"... |  | ABSENT | `` | unknown | `data/literature/extracts/smales-1971-lpsc-12022.yaml` (draft) | — | — |
+| `smales-1971-lpsc-12022` | — | Smales, A. A. et al. (1971), "Elemental composition of lunar surface material (part 2)"... |  | `docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.pdf` | `7af2b6b0f870` | held | `data/literature/extracts/smales-1971-lpsc-12022.yaml` (draft) | — | — |
 | `sossi-et-al-2019` | `kems-012-sossi-2019` | Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.201... | 10.1016/j.gca.2019.06.021 | ABSENT | `` | unknown | `data/literature/extracts/sossi-et-al-2019.yaml` (draft) | — | — |
 | `sossi-fegley-2018` | — | Sossi, P. A. & Fegley, B. Jr., Thermodynamics of Element Volatility and its Application... | 10.2138/rmg.2018.84.11 | ABSENT | `` | unknown | `data/literature/extracts/sossi-fegley-2018.yaml` (draft) | — | — |
 | `span-wagner-1996-co2-psat` | — | Span, R. & Wagner, W. (1996), "A New Equation of State for Carbon Dioxide Covering the ... | 10.1063/1.555991 | ABSENT | `` | unknown | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` (draft) | — | — |
-| `stebbins-carmichael-weill-1983` | — | Stebbins, J. F., Carmichael, I. S. E. & Weill, D. E. (1983), "The high temperature liqu... |  | ABSENT | `` | unknown | `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` (draft) | — | — |
+| `stebbins-carmichael-weill-1983` | — | Stebbins, J. F., Carmichael, I. S. E. & Weill, D. E. (1983), "The high temperature liqu... |  | `docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.pdf` | `5246cf5b6bfd` | held | `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` (draft) | — | — |
 | `ts1985` | — | Tsukihashi, F. & Sano, N. (1985), "Measurement of the Activity of Na2O in Na2O-SiO2 Mel... | 10.2355/tetsutohagane1955.71.7_815 | `docs/references/pdfs/99-kems-langmuir/ts1985.pdf` | `8345faa48d38` | held | `data/literature/extracts/ts1985.yaml` (draft) | — | — |
 | `wetzel-gail-2013-sio-arrhenius` | — | Wetzel, S. & Gail, H.-P. (2013), Astron. Astrophys. 553:A92, DOI 10.1051/0004-6361/2012... | 10.1051/0004-6361/201220803 | ABSENT | `` | unknown | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` (draft) | — | — |
 | `yam1983` | — | Yamaguchi, S., Imai, A. & Goto, K.S. (1983), "Measurement of Activity of Na2O in Na2O-S... | 10.2320/jinstmet1952.47.9_736 | `docs/references/pdfs/99-kems-langmuir/yam1983.pdf` | `cb29fbbb3ed9` | held | `data/literature/extracts/yam1983.yaml` (draft) | — | — |
@@ -213,11 +213,9 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `richter-et-al-2007`
 - `safarian-engh-2013-si-pure-langmuir`
 - `sf04-magma-companion-workbook`
-- `smales-1971-lpsc-12022`
 - `sossi-et-al-2019`
 - `sossi-fegley-2018`
 - `span-wagner-1996-co2-psat`
-- `stebbins-carmichael-weill-1983`
 - `wetzel-gail-2013-sio-arrhenius`
 
 ### Untracked files
@@ -250,6 +248,8 @@ Required sibling fields: citation, DOI, license/OA basis, sha256, retrieved date
 - `kems-041-sossi-fegley-2018` — `(no sidecar)` — missing: citation, doi, license_or_oa_basis, sha256, retrieved_date, retrieval_url
 - `kems-045-sossi-2018-pnas-cr` — `(no sidecar)` — missing: citation, doi, license_or_oa_basis, sha256, retrieved_date, retrieval_url
 - `kems-ms2000-044` — `(no sidecar)` — missing: citation, doi, license_or_oa_basis, sha256, retrieved_date, retrieval_url
+- `smales-1971-lpsc-12022` — `docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md` — missing: doi, retrieved_date
+- `stebbins-carmichael-weill-1983` — `docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md` — missing: doi, retrieved_date
 - `ts1985` — `(no sidecar)` — missing: citation, doi, license_or_oa_basis, sha256, retrieved_date, retrieval_url
 - `yam1983` — `(no sidecar)` — missing: citation, doi, license_or_oa_basis, sha256, retrieved_date, retrieval_url
 

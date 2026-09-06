@@ -10,10 +10,10 @@ scan:
 counts:
   sources: 105
   extracts: 104
-  pdfs_present_in_worktree: 24
-  pdfs_tracked_99_kems_langmuir: 24
+  pdfs_present_in_worktree: 26
+  pdfs_tracked_99_kems_langmuir: 25
   pdfs_without_extract: 1
-  extracts_without_pdf: 81
+  extracts_without_pdf: 79
   alias_groups_needing_resolution: 26
 gaps:
   pdfs_without_extract:
@@ -94,11 +94,9 @@ gaps:
   - richter-et-al-2007
   - safarian-engh-2013-si-pure-langmuir
   - sf04-magma-companion-workbook
-  - smales-1971-lpsc-12022
   - sossi-et-al-2019
   - sossi-fegley-2018
   - span-wagner-1996-co2-psat
-  - stebbins-carmichael-weill-1983
   - wetzel-gail-2013-sio-arrhenius
   untracked_files: []
   sidecars_missing_fields:
@@ -300,9 +298,19 @@ gaps:
     - sha256
     - retrieved_date
     - retrieval_url
+  - source_id: smales-1971-lpsc-12022
+    sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
+    missing_fields: &id023
+    - doi
+    - retrieved_date
+  - source_id: stebbins-carmichael-weill-1983
+    sidecar_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md
+    missing_fields: &id024
+    - doi
+    - retrieved_date
   - source_id: ts1985
     sidecar_path: null
-    missing_fields: &id023
+    missing_fields: &id025
     - citation
     - doi
     - license_or_oa_basis
@@ -311,7 +319,7 @@ gaps:
     - retrieval_url
   - source_id: yam1983
     sidecar_path: null
-    missing_fields: &id024
+    missing_fields: &id026
     - citation
     - doi
     - license_or_oa_basis
@@ -1468,7 +1476,8 @@ sources:
   - sesko_2024
   - sesko_2024_vapor_phase_pyrolysis
   citation: Šeško, R., Lamboley, K., Cutard, T., Grill, L., Reiss, P. & Cowley, A. (2024), "Oxygen production
-    by solar vapor-phase pyrolysis of lunar regolith simulant", Acta Astronautica 224:215–225, DOI 10.1016/j.actaastro.2024.08.009
+    by solar vapor-phase pyrolysis of lunar regolith simulant", Acta Astronautica 224:215–225, DOI 10.1016/j.actaastro.2024.08.009.
+    PDF not on disk (CC BY, fetch bot-blocked; see sidecar docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md)
   doi: 10.1016/j.actaastro.2024.08.009
   report_number: null
   identifier: 10.1016/j.actaastro.2024.08.009
@@ -2729,14 +2738,14 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
+  pdf_status: present
+  pdf_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.pdf
   pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields: []
-  access_status: unknown
+  pdf_sha256: 7af2b6b0f870ba5b92a3ec6f490449eb7c9fc2f20f069a8bab9a21762e014fec
+  pdf_tracked: true
+  sidecar_path: docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md
+  sidecar_missing_fields: *id023
+  access_status: held
   extracts:
   - path: data/literature/extracts/smales-1971-lpsc-12022.yaml
     review_status: draft
@@ -2821,14 +2830,14 @@ sources:
   doi: null
   report_number: null
   identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
+  pdf_status: present
+  pdf_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.pdf
   pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields: []
-  access_status: unknown
+  pdf_sha256: 5246cf5b6bfd79f16961aac8264757af04da1d308e5d6b860aac747a44b2d8d6
+  pdf_tracked: true
+  sidecar_path: docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md
+  sidecar_missing_fields: *id024
+  access_status: held
   extracts:
   - path: data/literature/extracts/stebbins-carmichael-weill-1983.yaml
     review_status: draft
@@ -2850,7 +2859,7 @@ sources:
   pdf_sha256: 8345faa48d38200c457cb0af9a15c44c4cddedad8c93cac3ca1d118de4a7c7c8
   pdf_tracked: true
   sidecar_path: null
-  sidecar_missing_fields: *id023
+  sidecar_missing_fields: *id025
   access_status: held
   extracts:
   - path: data/literature/extracts/ts1985.yaml
@@ -2894,7 +2903,7 @@ sources:
   pdf_sha256: cb29fbbb3ed9e55c403ee6eccdf166d4b0cdaebb3a08604d004047ca49e569b1
   pdf_tracked: true
   sidecar_path: null
-  sidecar_missing_fields: *id024
+  sidecar_missing_fields: *id026
   access_status: held
   extracts:
   - path: data/literature/extracts/yam1983.yaml
