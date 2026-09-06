@@ -1,0 +1,145 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0179",
+  "census_id": "high-temperature-printed-page-205",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "LITHARGE (RED)",
+  "formula_as_published": "PbO",
+  "phase_state_as_published": [
+    "Tetragonal crystals 298.15 to 1400 K. !assicot (orthorhombic) is the",
+    "         stable phase above 762 K.               See table for lead aoooxide (reference state)."
+  ],
+  "description_lines_as_published": [
+    "PbO:     Tetragonal crystals 298.15 to 1400 K. !assicot (orthorhombic) is the",
+    "         stable phase above 762 K.               See table for lead aoooxide (reference state)."
+  ],
+  "formation_basis_header_as_published": "FORMATION FRO! THE ELEMENTS",
+  "formula_weight": {
+    "as_published": "223.199",
+    "value": 223.199,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      211
+    ],
+    "printed_pages": [
+      205
+    ],
+    "pdftotext_layout_page_file": "page-211.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27"
+  ],
+  "title_line_as_published": "LITHARGE (RED)                                                                   FOB!OLA WEIGHT   223.199",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "PbO:     Tetragonal crystals 298.15 to 1400 K. !assicot (orthorhombic) is the",
+    "         stable phase above 762 K.               See table for lead aoooxide (reference state).",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORMATION FRO! THE ELEMENTS",
+    "                                                                                       GIBBS",
+    "TE!!P.    ( u;-H~ 98 )/T      so       -(G;-a~ 98 )/T     cop     ENTHALPY          FREE ENERGY     Log Kf",
+    "                               T",
+    "  K        J;mol•K         J/aol•K       J/aol•lt       J;aol•K         kJ/mol         kJ/aol",
+    "---------·-----------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J;mol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•lt",
+    "heat_capacity": "J;aol•K",
+    "formation_enthalpy": "kJ/mol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 13,
+  "uncertainty_line_as_published": "UHCERT AIIITY                 0.84             0.84                       0.830          0.900       0.158",
+  "uncertainty_values": [
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.830",
+      "value": 0.83,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.900",
+      "value": 0.9,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.158",
+      "value": 0.158,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "PbO:     Tetragonal crystals 298.15 to 1400 K. !assicot (orthorhombic) is the",
+    "         stable phase above 762 K.               See table for lead aoooxide (reference state)."
+  ],
+  "auxiliary_lines_as_published": [
+    "!ELTIIIG POIIIT                           K             BOILIIIG POINT                               K",
+    "EITHALPY OF !ELTIIIG                      kJ            EIITHALPY OF VAPORIZATION                    kJ",
+    "                                          kJ            SOLAR VOLOIIE                       2.3910 J/bar",
+    "                                                                                           23.910 cm 3",
+    "TBAIISITIOIIS Ill REPEBEBCE STATE ELBIIEIITS",
+    "      LEAD ••••••• B. P. 600.6, B. P. 2021 K.",
+    "HEAT CAPACITY EQUATIOI",
+    "          51.011 + 1.0272x1o-z T                  7. 3872x1 os T-2",
+    "             (EQOlTIOII VALID PRO!             298 - 1400 K)",
+    "BEPIREIICB        32            32                                          32                    COIIPILED",
+    "                                                                                                   6- 7-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27",
+      "detector_only": false
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0177",
+  "census_id": "high-temperature-printed-page-203",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "ORTHOPHOSPHORIC ACID (CRYSTAL)",
+  "formula_as_published": "H3 Po.",
+  "phase_state_as_published": [
+    "Crystals 298.15 to aeltinq point 315.5 K.                   AboYe 315.5 K the data",
+    "           tabalated are a metastable extrapolation."
+  ],
+  "description_lines_as_published": [
+    "H3 Po.:    Crystals 298.15 to aeltinq point 315.5 K.                   AboYe 315.5 K the data",
+    "           tabalated are a metastable extrapolation."
+  ],
+  "formation_basis_header_as_published": "FORMATION FRO I! THE ELEIIEIITS",
+  "formula_weight": {
+    "as_published": "97.995",
+    "value": 97.995,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      209
+    ],
+    "printed_pages": [
+      203
+    ],
+    "pdftotext_layout_page_file": "page-209.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24"
+  ],
+  "title_line_as_published": "ORTHOPHOSPHORIC ACID (CRYSTAL)                                                   FORilULA IIEIGHT     97.995",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "H3 Po.:    Crystals 298.15 to aeltinq point 315.5 K.                   AboYe 315.5 K the data",
+    "           tabalated are a metastable extrapolation.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORMATION FRO I! THE ELEIIEIITS",
+    "                                                                                       GIBBS",
+    "TEilP.     (H;-H~ 98 );T      so     -(G;-a~ 98 )/T      cop    ENTHALPY            FREE ENERGY       Loq    Kf",
+    "                               T",
+    "             J;aol•K       J/aol•K      J/aol•K       Jjaol•K          ltJ/aol         kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "J;aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "Jjaol•K",
+    "formation_enthalpy": "ltJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 9,
+  "uncertainty_line_as_published": "UNCERTAINTY                   0.42             0.42                      2. 090           2.510        0.440",
+  "uncertainty_values": [
+    {
+      "as_published": "0.42",
+      "value": 0.42,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.42",
+      "value": 0.42,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2. 090",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.510",
+      "value": 2.51,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.440",
+      "value": 0.44,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "H3 Po.:    Crystals 298.15 to aeltinq point 315.5 K.                   AboYe 315.5 K the data",
+    "           tabalated are a metastable extrapolation."
+  ],
+  "auxiliary_lines_as_published": [
+    "!!ELTING POINT                 315.50 K               BOILING POUT                                     K",
+    "ENTHALPY OF llELTI IIIG        13.400 ltJ             ENTHALPY OF VAPORIZATION                         kJ",
+    "H~98 - H~                                ltJ          llOLAR VOLUilE                         4.8520 J/bar",
+    "                                                                                            48.520 c11 3",
+    "TRANSITIONS IN REFERENCE STATE ELEilENTS",
+    "      PHOSPHORUS. SUBLII!ES 704 K.",
+    "HEAT CAPACITY EQUATION",
+    " c;       15.756 +    0.30288 T",
+    "              (EQUATION VALID FRO!l            298- 1000 K)",
+    "BEFEBEIICE       32            32                                          32                       COI!PILED",
+    "                                                                                                     5-19-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24",
+      "detector_only": false
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0173",
+  "census_id": "high-temperature-printed-page-199",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "BUIISBUTE",
+  "formula_as_published": "lliO",
+  "phase_state_as_published": [
+    "Crystals 298.15 to aeltinq point 2257 K. a-p transition at 525 K and",
+    "          p-y transition at 565 K.",
+    "                                                                      FORftlTIOII PBOft THE ELEftEITS",
+    "                                                                                       GIBBS"
+  ],
+  "description_lines_as_published": [
+    "lliO:    Crystals 298.15 to aeltinq point 2257 K. a-p transition at 525 K and",
+    "          p-y transition at 565 K.",
+    "                                                                      FORftlTIOII PBOft THE ELEftEITS",
+    "                                                                                       GIBBS"
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "711.699",
+    "value": 711.699,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      205
+    ],
+    "printed_pages": [
+      199
+    ],
+    "pdftotext_layout_page_file": "page-205.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28, 41, 43"
+  ],
+  "title_line_as_published": "BUIISBUTE                                                                             FOBIIULA !lEIGHT     711.699",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "lliO:    Crystals 298.15 to aeltinq point 2257 K. a-p transition at 525 K and",
+    "          p-y transition at 565 K.",
+    "                                                                      FORftlTIOII PBOft THE ELEftEITS",
+    "                                                                                       GIBBS",
+    "TEMP.      cH;-a; 98 )/T      soT      -( G;-a~ 98 )/T        cop    EIITH.U.Pl    FREE EIIEBGY    Loq Kf",
+    "  K         J;aol•K        J;aol•K        J/aol•K        J/aol•K            ltJ/aol         ltJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J;aol•K",
+    "entropy": "J;aol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "ltJ/aol",
+    "formation_gibbs_energy": "ltJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 18,
+  "uncertainty_line_as_published": "UICEBTUIITY                   0.17               0.17                         0.418            0.460        0.081",
+  "uncertainty_values": [
+    {
+      "as_published": "0.17",
+      "value": 0.17,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.17",
+      "value": 0.17,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.418",
+      "value": 0.418,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.460",
+      "value": 0.46,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.081",
+      "value": 0.081,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "lliO:    Crystals 298.15 to aeltinq point 2257 K. a-p transition at 525 K and",
+    "          p-y transition at 565 K.",
+    "                                                                      FORftlTIOII PBOft THE ELEftEITS",
+    "                                                                                       GIBBS"
+  ],
+  "auxiliary_lines_as_published": [
+    "I!ELTI IIG POIIIT             2257         K             BOILING POINT                                      K",
+    "EIITHlLPY OF !ELTING                       ltJ           ENTHALPY OF VAPORIZATION                           ltJ",
+    "                                    6.&911 ltJ           I!OLAI:! VOLUI!E                         1.0970 J/bar",
+    "                                                                                                 10.970 ca 3",
+    "TRANSITIONS Ill BEFEBEICE STATE ELEBEIITS",
+    "      NICKEL ••••• CURIE P. 631 t         1!.    P. 1726 K.",
+    "HEAT CAPACITY EQUATION",
+    " c~       115.175 +  9.6149x1o-~ T",
+    "             (EQUATION VALID FRO!!               565 -   1800 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28, 41, 43",
+      "detector_only": false
+    }
+  ]
+}

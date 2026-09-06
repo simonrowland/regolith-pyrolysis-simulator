@@ -1,0 +1,139 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0172",
+  "census_id": "high-temperature-printed-page-198",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "NEODYftiUft S!SQUIOIIDE (HEXAGONAL)",
+  "formula_as_published": "Nd 2 0~",
+  "phase_state_as_published": [
+    "Alpha crystals 298.15 to 1395 K.              Beta crystals 1395 to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "Nd 2 0~:   Alpha crystals 298.15 to 1395 K.              Beta crystals 1395 to 1800 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "336.478",
+    "value": 336.478,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      204
+    ],
+    "printed_pages": [
+      198
+    ],
+    "pdftotext_layout_page_file": "page-204.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "3 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 32, 36, 38"
+  ],
+  "title_line_as_published": "NEODYftiUft S!SQUIOIIDE (HEXAGONAL)                                               FOBftULA WEIGHT    336.478",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Nd 2 0~:   Alpha crystals 298.15 to 1395 K.              Beta crystals 1395 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 PO illATION FBOll THE ELEIUUITS",
+    "                                                                                        GIBBS",
+    "TEftP.     ca;-a; 98 )/T      so",
+    "                               T     -( G;-H; 98 )/T      cop     ENTHALPY           FREE ENERGY      Log Kf",
+    "  K         J;mol•K        J/mol•K     J/aol• K        J/aol• K         ltJ/mol         ltJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J;mol•K",
+    "entropy": "J/mol•K",
+    "negative_gibbs_function": "J/aol• K",
+    "heat_capacity": "J/aol• K",
+    "formation_enthalpy": "ltJ/mol",
+    "formation_gibbs_energy": "ltJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 19,
+  "uncertainty_line_as_published": "UICERTAINTY                   4.20            4.20                        1.000           1.020         0.179",
+  "uncertainty_values": [
+    {
+      "as_published": "4.20",
+      "value": 4.2,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.20",
+      "value": 4.2,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.000",
+      "value": 1.0,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.020",
+      "value": 1.02,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.179",
+      "value": 0.179,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Nd 2 0~:   Alpha crystals 298.15 to 1395 K.              Beta crystals 1395 to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "!!ELTING POINT                          K              BOILING POINT                                   K",
+    "EITHALPY OP !ELTING                     k.J            ENTHALPY OF YAPOBIZATION                         ltJ",
+    "                               21.004 ltJ              liOLAB VOLU!!E                        4.5920 J/bar",
+    "                                                                                            45.920 cm3",
+    "TRANSITIONS IN REFERENCE STATE ELEftENTS",
+    "      NEODYMIUM •• ALPHA-BETA 1128, M. P. 1289 K.",
+    "HEAT CAPACITY EQUATION",
+    " c~        1.1574xtoz + 2.9779x1o-z T     1.188Jx10• T-z",
+    "              (EQUATIOH VALID FBOft 298- 1395 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "3 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 32, 36, 38",
+      "detector_only": false
+    }
+  ]
+}
