@@ -4,6 +4,7 @@ source:
   citation: Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature lava vaporization
     on Io", Icarus 169:216-241 (MAGMA code; α_s survey Table 10)
   year: 2004
+  doi: 10.1016/j.icarus.2003.08.023
 extraction:
   method: OCR-artifact transcription (MinerU vlm) + phase-2 alpha-bounds review extract
   date: '2026-08-03'
@@ -56,6 +57,137 @@ species:
         - cell_material_for_own_experiment
       uncertainty:
         note: compilation bounds; contradictory Al2O3 literature cited as example
+    - observation_id: sf2004_t4_sio
+      type: psat_series
+      class: model
+      locator:
+        page: 221
+        table: '4'
+        row: SiO
+        source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+        SiO | ∼ 9.0(−7) | 7.1(−7)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_partial_vapor_pressures
+        Grossman_as_published: ∼ 9.0(−7)
+        MAGMA_as_published: 7.1(−7)
+        note: Both columns are model results. Grossman values approximate figure readings; no experimental partial pressure.
+    - observation_id: sf2004_t9_sio
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: SiO
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        SiO | 3.01(12) | 1.60(14) | 1.19(16)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 3.01(12)
+          1700 K: 1.60(14)
+          1900 K: 1.19(16)
+        note: Exponent notation retained as printed; no unit conversion.
+    - observation_id: sf2004_t10_r16_sio
+      supersedes: schaefer_fegley_2004_sio_alpha_s_survey
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 16; SiO2 (liq); Hashimoto (1990)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        SiO2 (liq) | 2173–2373 | 0.038–0.048 | Hashimoto (1990)
+
+        These show vaporization coefficients for SiO (g) of ∼ 0.04 in the 2173–2373 K range over liquid silica'
+      T_range_K:
+      - 2173
+      - 2373
+      phase: liquid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: SiO2 (liq)
+        alpha_as_published: 0.038–0.048
+        reference: Hashimoto (1990)
+        alpha_range_as_printed:
+        - 0.038
+        - 0.048
+    - observation_id: sf2004_t10_r17_sio
+      supersedes: schaefer_fegley_2004_sio_alpha_s_survey
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 17; Mg2SiO4 (s)b; Hashimoto (1990)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        Mg2SiO4 (s)b | 1873–2163 | 0.09–0.16 | Hashimoto (1990)
+
+        The αs values for Mg2SiO4 (s, l) are for Mg (g) and SiO (g) and are taken as equal for each.'
+      T_range_K:
+      - 1873
+      - 2163
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: Mg2SiO4 (s)b
+        alpha_as_published: 0.09–0.16
+        reference: Hashimoto (1990)
+        alpha_range_as_printed:
+        - 0.09
+        - 0.16
+        gas_species: SiO(g)
+    - observation_id: sf2004_t10_r18_sio
+      supersedes: schaefer_fegley_2004_sio_alpha_s_survey
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 18; Mg2SiO4 (l)b; Hashimoto (1990)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        Mg2SiO4 (l)b | 2163–2323 | 0.20–0.21 | Hashimoto (1990)
+
+        The αs values for Mg2SiO4 (s, l) are for Mg (g) and SiO (g) and are taken as equal for each.'
+      T_range_K:
+      - 2163
+      - 2323
+      phase: liquid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: Mg2SiO4 (l)b
+        alpha_as_published: 0.20–0.21
+        reference: Hashimoto (1990)
+        alpha_range_as_printed:
+        - 0.2
+        - 0.21
+        gas_species: SiO(g)
   Mg:
     observations:
     - observation_id: schaefer_fegley_2004_mg_forsterite_alpha_s_survey
@@ -93,6 +225,108 @@ species:
         - orifice_area
         - clausing_factor
         - sample_surface_area
+    - observation_id: sf2004_t4_mg
+      type: psat_series
+      class: model
+      locator:
+        page: 221
+        table: '4'
+        row: Mg
+        source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+        Mg | ∼ 2.0(−7)a | 1.4(−7)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_partial_vapor_pressures
+        Grossman_as_published: ∼ 2.0(−7)a
+        MAGMA_as_published: 1.4(−7)
+        note: Both columns are model results. Grossman values approximate figure readings; no experimental partial pressure.
+    - observation_id: sf2004_t9_mg
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: Mg
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        Mg | 1.70(11) | 6.69(12) | 3.49(14)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 1.70(11)
+          1700 K: 6.69(12)
+          1900 K: 3.49(14)
+        note: Exponent notation retained as printed; no unit conversion.
+    - observation_id: sf2004_t10_r17_mg
+      supersedes: schaefer_fegley_2004_mg_forsterite_alpha_s_survey
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 17; Mg2SiO4 (s)b; Hashimoto (1990)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        Mg2SiO4 (s)b | 1873–2163 | 0.09–0.16 | Hashimoto (1990)
+
+        The αs values for Mg2SiO4 (s, l) are for Mg (g) and SiO (g) and are taken as equal for each.'
+      T_range_K:
+      - 1873
+      - 2163
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: Mg2SiO4 (s)b
+        alpha_as_published: 0.09–0.16
+        reference: Hashimoto (1990)
+        alpha_range_as_printed:
+        - 0.09
+        - 0.16
+        gas_species: Mg(g)
+    - observation_id: sf2004_t10_r18_mg
+      supersedes: schaefer_fegley_2004_mg_forsterite_alpha_s_survey
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 18; Mg2SiO4 (l)b; Hashimoto (1990)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        Mg2SiO4 (l)b | 2163–2323 | 0.20–0.21 | Hashimoto (1990)
+
+        The αs values for Mg2SiO4 (s, l) are for Mg (g) and SiO (g) and are taken as equal for each.'
+      T_range_K:
+      - 2163
+      - 2323
+      phase: liquid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: Mg2SiO4 (l)b
+        alpha_as_published: 0.20–0.21
+        reference: Hashimoto (1990)
+        alpha_range_as_printed:
+        - 0.2
+        - 0.21
+        gas_species: Mg(g)
   Al2O3:
     observations:
     - observation_id: schaefer_fegley_2004_al2o3_table10_b1
@@ -175,6 +409,186 @@ species:
           cite: Burns 1966
         semantics: competing_observation_do_not_average
         note: Table 10 complete oxide rows; α_s compilation mostly solids. Not Motzfeldt geometry.
+    - observation_id: sf2004_t10_r01_al2o3
+      supersedes: schaefer_fegley_2004_al2o3_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 1; Al2O3 (s); Peleg and Alcock (1974)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        Al2O3 (s) | 1800–1900 | 0.24–0.49 | Peleg and Alcock (1974)'
+      T_range_K:
+      - 1800
+      - 1900
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: Al2O3 (s)
+        alpha_as_published: 0.24–0.49
+        reference: Peleg and Alcock (1974)
+        alpha_range_as_printed:
+        - 0.24
+        - 0.49
+    - observation_id: sf2004_t10_r02_al2o3
+      supersedes: schaefer_fegley_2004_al2o3_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 2; Al2O3 (s); Krönert and Boehm (1972)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        Al2O3 (s) | 2000 | 0.14 | Krönert and Boehm (1972)'
+      T_range_K:
+      - 2000
+      - 2000
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: Al2O3 (s)
+        alpha_as_published: '0.14'
+        reference: Krönert and Boehm (1972)
+        alpha: 0.14
+    - observation_id: sf2004_t10_r03_al2o3
+      supersedes: schaefer_fegley_2004_al2o3_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 3; Al2O3 (s); Wolff and Alcock (1962)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        Al2O3 (s) | 2000 | 0.067 | Wolff and Alcock (1962)'
+      T_range_K:
+      - 2000
+      - 2000
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: Al2O3 (s)
+        alpha_as_published: '0.067'
+        reference: Wolff and Alcock (1962)
+        alpha: 0.067
+    - observation_id: sf2004_t10_r04_al2o3
+      supersedes: schaefer_fegley_2004_al2o3_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 4; Al2O3 (s); Farber et al. (1972)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        Al2O3 (s) | 2195 | 0.08 | Farber et al. (1972)'
+      T_range_K:
+      - 2195
+      - 2195
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: Al2O3 (s)
+        alpha_as_published: '0.08'
+        reference: Farber et al. (1972)
+        alpha: 0.08
+    - observation_id: sf2004_t10_r05_al2o3
+      supersedes: schaefer_fegley_2004_al2o3_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 5; Al2O3 (s); Alcock and Peleg (1967)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        Al2O3 (s) | 2290 | ∼ 0.80 | Alcock and Peleg (1967)'
+      T_range_K:
+      - 2290
+      - 2290
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: Al2O3 (s)
+        alpha_as_published: ∼ 0.80
+        reference: Alcock and Peleg (1967)
+        alpha_approx: 0.8
+    - observation_id: sf2004_t10_r06_al2o3
+      supersedes: schaefer_fegley_2004_al2o3_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 6; Al2O3 (s); Burns (1966)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        Al2O3 (s) | 2310a | 0.3 ± 0.05 | Burns (1966)'
+      T_range_K:
+      - 2310
+      - 2310
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: Al2O3 (s)
+        alpha_as_published: 0.3 ± 0.05
+        reference: Burns (1966)
+        alpha: 0.3
+        sigma: 0.05
+      uncertainty:
+        note: 0.3 ± 0.05
+    - observation_id: sf2004_t10_r07_al2o3
+      supersedes: schaefer_fegley_2004_al2o3_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 7; Al2O3 (l); Burns (1966)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        Al2O3 (l) | 2310a | 1.0 | Burns (1966)'
+      T_range_K:
+      - 2310
+      - 2310
+      phase: liquid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: Al2O3 (l)
+        alpha_as_published: '1.0'
+        reference: Burns (1966)
+        alpha: 1
   MgO:
     observations:
     - observation_id: schaefer_fegley_2004_mgo_table10_b1
@@ -241,6 +655,153 @@ species:
           cite: Hashimoto 1990
         semantics: competing_observation_do_not_average
         note: Table 10 complete oxide rows; α_s compilation mostly solids. Not Motzfeldt geometry.
+    - observation_id: sf2004_t4_mgo
+      type: psat_series
+      class: model
+      locator:
+        page: 221
+        table: '4'
+        row: MgO
+        source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+        MgO | ∼ 8.0(−10) | 3.6(−10)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_partial_vapor_pressures
+        Grossman_as_published: ∼ 8.0(−10)
+        MAGMA_as_published: 3.6(−10)
+        note: Both columns are model results. Grossman values approximate figure readings; no experimental partial pressure.
+    - observation_id: sf2004_t10_r08_mgo
+      supersedes: schaefer_fegley_2004_mgo_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 8; MgO (s); Peleg and Alcock (1974)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        MgO (s) | 1800 | 0.25 | Peleg and Alcock (1974)'
+      T_range_K:
+      - 1800
+      - 1800
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: MgO (s)
+        alpha_as_published: '0.25'
+        reference: Peleg and Alcock (1974)
+        alpha: 0.25
+    - observation_id: sf2004_t10_r09_mgo
+      supersedes: schaefer_fegley_2004_mgo_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 9; MgO (s); Peleg and Alcock (1974)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        MgO (s) | 1900 | 0.4 | Peleg and Alcock (1974)'
+      T_range_K:
+      - 1900
+      - 1900
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: MgO (s)
+        alpha_as_published: '0.4'
+        reference: Peleg and Alcock (1974)
+        alpha: 0.4
+    - observation_id: sf2004_t10_r10_mgo
+      supersedes: schaefer_fegley_2004_mgo_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 10; MgO (s); Alcock and Peleg (1967)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        MgO (s) | 1820–1960 | ∼ 0.25 | Alcock and Peleg (1967)'
+      T_range_K:
+      - 1820
+      - 1960
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: MgO (s)
+        alpha_as_published: ∼ 0.25
+        reference: Alcock and Peleg (1967)
+        alpha_approx: 0.25
+    - observation_id: sf2004_t10_r11_mgo
+      supersedes: schaefer_fegley_2004_mgo_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 11; MgO (s); Krönert and Boehm (1972)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        MgO (s) | 2273 | 0.09 | Krönert and Boehm (1972)'
+      T_range_K:
+      - 2273
+      - 2273
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: MgO (s)
+        alpha_as_published: '0.09'
+        reference: Krönert and Boehm (1972)
+        alpha: 0.09
+    - observation_id: sf2004_t10_r12_mgo
+      supersedes: schaefer_fegley_2004_mgo_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 12; MgO (s); Hashimoto (1990)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        MgO (s) | 1873–2173 | 0.12–0.22 | Hashimoto (1990)'
+      T_range_K:
+      - 1873
+      - 2173
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: MgO (s)
+        alpha_as_published: 0.12–0.22
+        reference: Hashimoto (1990)
+        alpha_range_as_printed:
+        - 0.12
+        - 0.22
   SiO2:
     observations:
     - observation_id: schaefer_fegley_2004_sio2_table10_b1
@@ -303,6 +864,1191 @@ species:
           cite: Hashimoto 1990
         semantics: competing_observation_do_not_average
         note: Table 10 complete oxide rows; α_s compilation mostly solids. Not Motzfeldt geometry.
+    - observation_id: sf2004_t4_sio2
+      type: psat_series
+      class: model
+      locator:
+        page: 221
+        table: '4'
+        row: SiO2
+        source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+        SiO2 | ∼ 7.0(−9) | 4.6(−9)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_partial_vapor_pressures
+        Grossman_as_published: ∼ 7.0(−9)
+        MAGMA_as_published: 4.6(−9)
+        note: Both columns are model results. Grossman values approximate figure readings; no experimental partial pressure.
+    - observation_id: sf2004_t9_sio2
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: SiO2
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        SiO2 | 4.08(11) | 1.65(13) | 9.26(14)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 4.08(11)
+          1700 K: 1.65(13)
+          1900 K: 9.26(14)
+        note: Exponent notation retained as printed; no unit conversion.
+    - observation_id: sf2004_t10_r13_sio2
+      supersedes: schaefer_fegley_2004_sio2_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 13; SiO2 (s); Nagai et al. (1973)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        SiO2 (s) | 1823–1983 | 0.022 ± 0.008 | Nagai et al. (1973)'
+      T_range_K:
+      - 1823
+      - 1983
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: SiO2 (s)
+        alpha_as_published: 0.022 ± 0.008
+        reference: Nagai et al. (1973)
+        alpha: 0.022
+        sigma: 0.008
+      uncertainty:
+        note: 0.022 ± 0.008
+    - observation_id: sf2004_t10_r14_sio2
+      supersedes: schaefer_fegley_2004_sio2_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 14; SiO2 (s); Shornikov et al. (1999)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        SiO2 (s) | 1700–1950 | 0.022 ± 0.003 | Shornikov et al. (1999)'
+      T_range_K:
+      - 1700
+      - 1950
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: SiO2 (s)
+        alpha_as_published: 0.022 ± 0.003
+        reference: Shornikov et al. (1999)
+        alpha: 0.022
+        sigma: 0.003
+      uncertainty:
+        note: 0.022 ± 0.003
+    - observation_id: sf2004_t10_r15_sio2
+      supersedes: schaefer_fegley_2004_sio2_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 15; SiO2 (s); Hashimoto (1990)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        SiO2 (s) | 1833–1958 | 0.11–0.015 | Hashimoto (1990)'
+      T_range_K:
+      - 1833
+      - 1958
+      phase: solid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: SiO2 (s)
+        alpha_as_published: 0.11–0.015
+        reference: Hashimoto (1990)
+        alpha_range_as_printed:
+        - 0.11
+        - 0.015
+    - observation_id: sf2004_t10_r16_sio2
+      supersedes: schaefer_fegley_2004_sio2_table10_b1
+      type: alpha
+      class: derived
+      locator:
+        page: 235
+        table: '10'
+        row: 16; SiO2 (liq); Hashimoto (1990)
+        source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+      quote: 'Oxide | T (K) | αs | Reference
+
+        SiO2 (liq) | 2173–2373 | 0.038–0.048 | Hashimoto (1990)'
+      T_range_K:
+      - 2173
+      - 2373
+      phase: liquid
+      regime: review_compilation
+      units: dimensionless
+      values:
+        method_class: secondary_compilation
+        quantity: literature_vaporization_coefficient
+        material: SiO2 (liq)
+        alpha_as_published: 0.038–0.048
+        reference: Hashimoto (1990)
+        alpha_range_as_printed:
+        - 0.038
+        - 0.048
+  "K2O":
+    observations:
+    - observation_id: sf2004_t2_reaction_1
+      type: gibbs_table
+      class: model
+      locator:
+        page: 218
+        table: '2'
+        row: K2 O (liq) + SiO2 (liq) = K2 SiO3 (liq)
+        source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Reaction | A | B | Ref.
+
+        K2 O (liq) + SiO2 (liq) = K2 SiO3 (liq) | 0.27 | 12735 | Hastie and Bonnell (1985)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: equilibrium_constant_parameters
+        formula_as_published: log10 K = A + B/T
+        reaction: K2 O (liq) + SiO2 (liq) = K2 SiO3 (liq)
+        A: 0.27
+        B: 12735
+        reference: Hastie and Bonnell (1985)
+        evidence_class: thermodynamic_model_parameter
+    - observation_id: sf2004_t2_reaction_2
+      type: gibbs_table
+      class: model
+      locator:
+        page: 218
+        table: '2'
+        row: K2 O (liq) + 2SiO2 (liq) = K2 Si2 O5 (liq)
+        source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Reaction | A | B | Ref.
+
+        K2 O (liq) + 2SiO2 (liq) = K2 Si2 O5 (liq) | 0.35 | 14685 | Hastie and Bonnell (1985)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: equilibrium_constant_parameters
+        formula_as_published: log10 K = A + B/T
+        reaction: K2 O (liq) + 2SiO2 (liq) = K2 Si2 O5 (liq)
+        A: 0.35
+        B: 14685
+        reference: Hastie and Bonnell (1985)
+        evidence_class: thermodynamic_model_parameter
+    - observation_id: sf2004_t2_reaction_3
+      type: gibbs_table
+      class: model
+      locator:
+        page: 218
+        table: '2'
+        row: K2 O (liq) + 4SiO2 (liq) = K2 Si4 O9 (liq)
+        source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Reaction | A | B | Ref.
+
+        K2 O (liq) + 4SiO2 (liq) = K2 Si4 O9 (liq) | −0.96 | 17572 | Hastie and Bonnell (1985)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: equilibrium_constant_parameters
+        formula_as_published: log10 K = A + B/T
+        reaction: K2 O (liq) + 4SiO2 (liq) = K2 Si4 O9 (liq)
+        A: -0.96
+        B: 17572
+        reference: Hastie and Bonnell (1985)
+        evidence_class: thermodynamic_model_parameter
+    - observation_id: sf2004_t2_reaction_4
+      type: gibbs_table
+      class: model
+      locator:
+        page: 218
+        table: '2'
+        row: 0.5K2 O (liq) + CaO (liq) + 0.5Al2 O3 + 2SiO2 (liq) = KCaAlSi2 O7 (liq)
+        source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Reaction | A | B | Ref.
+
+        0.5K2 O (liq) + CaO (liq) + 0.5Al2 O3 + 2SiO2 (liq) = KCaAlSi2 O7 (liq) | 4.30 | 17037 | Hastie and Bonnell
+        (1985)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: equilibrium_constant_parameters
+        formula_as_published: log10 K = A + B/T
+        reaction: 0.5K2 O (liq) + CaO (liq) + 0.5Al2 O3 + 2SiO2 (liq) = KCaAlSi2 O7 (liq)
+        A: 4.3
+        B: 17037
+        reference: Hastie and Bonnell (1985)
+        evidence_class: thermodynamic_model_parameter
+  "Na":
+    observations:
+    - observation_id: sf2004_t2_reaction_5
+      type: gibbs_table
+      class: model
+      locator:
+        page: 218
+        table: '2'
+        row: Na (g) = Na+ (g) + e− (g)
+        source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Reaction | A | B | Ref.
+
+        Na (g) = Na+ (g) + e− (g) | −15.33 | 36735 | Chase (1998)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: equilibrium_constant_parameters
+        formula_as_published: log10 K = A + B/T
+        reaction: Na (g) = Na+ (g) + e− (g)
+        A: -15.33
+        B: 36735
+        reference: Chase (1998)
+        evidence_class: thermodynamic_model_parameter
+    - observation_id: sf2004_t8_na_model
+      type: gibbs_table
+      class: model
+      locator:
+        page: 232
+        table: '8'
+        row: Na
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        Na | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_metal_to_sodium_abundance
+        T_as_published: 1900 K
+        published_cells:
+          Tholeiite: '1.000'
+          Alkali basalt: '1.000'
+          Komatiite: '1.000'
+          Dunite: '1.000'
+          Type B1 CAI: '1.000'
+        temperature_quote: a T = 1900 K.
+    - observation_id: sf2004_t8_na_observational_comparison
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 232
+        table: '8'
+        row: Na
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: dimensionless
+      regime: secondary_compilation
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        Na | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000'
+      values:
+        quantity: normalization_identity
+        ratio_as_published: '1.000'
+        method_class: secondary_compilation
+        note: Na/Na normalization, not an independent measured datum.
+    - observation_id: sf2004_t9_na
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: Na
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        Na | 1.00(17)a | 7.94(17) | 7.67(18)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 1.00(17)a
+          1700 K: 7.94(17)
+          1900 K: 7.67(18)
+        note: Exponent notation retained as printed; no unit conversion.
+  "K":
+    observations:
+    - observation_id: sf2004_t2_reaction_6
+      type: gibbs_table
+      class: model
+      locator:
+        page: 218
+        table: '2'
+        row: K (g) = K+ (g) + e− (g)
+        source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Reaction | A | B | Ref.
+
+        K (g) = K+ (g) + e− (g) | 2.76 | 23760 | Chase (1998)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: equilibrium_constant_parameters
+        formula_as_published: log10 K = A + B/T
+        reaction: K (g) = K+ (g) + e− (g)
+        A: 2.76
+        B: 23760
+        reference: Chase (1998)
+        evidence_class: thermodynamic_model_parameter
+    - observation_id: sf2004_t8_k_model
+      type: gibbs_table
+      class: model
+      locator:
+        page: 232
+        table: '8'
+        row: K
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        K | 0.10b | 2.11(−4)c | 1.88(−4) | 1.87(−4) | 2.92(−3) | 1.19(−4)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_metal_to_sodium_abundance
+        T_as_published: 1900 K
+        published_cells:
+          Tholeiite: 2.11(−4)c
+          Alkali basalt: 1.88(−4)
+          Komatiite: 1.87(−4)
+          Dunite: 2.92(−3)
+          Type B1 CAI: 1.19(−4)
+        temperature_quote: a T = 1900 K.
+    - observation_id: sf2004_t8_k_observational_comparison
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 232
+        table: '8'
+        row: K
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: dimensionless
+      regime: secondary_compilation
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        K | 0.10b | 2.11(−4)c | 1.88(−4) | 1.87(−4) | 2.92(−3) | 1.19(−4)'
+      values:
+        quantity: secondary_atmospheric_metal_to_sodium_ratio
+        ratio_as_published: 0.10b
+        method_class: secondary_compilation
+        note: 'Footnote b: Brown (2001).'
+    - observation_id: sf2004_t9_k
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: K
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        K | 1.01(13) | 9.84(13) | 1.22(15)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 1.01(13)
+          1700 K: 9.84(13)
+          1900 K: 1.22(15)
+        note: Exponent notation retained as printed; no unit conversion.
+  "Al":
+    observations:
+    - observation_id: sf2004_t4_al
+      type: psat_series
+      class: model
+      locator:
+        page: 221
+        table: '4'
+        row: Al
+        source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+        Al | ∼ 9.0(−12) | 3.4(−12)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_partial_vapor_pressures
+        Grossman_as_published: ∼ 9.0(−12)
+        MAGMA_as_published: 3.4(−12)
+        note: Both columns are model results. Grossman values approximate figure readings; no experimental partial pressure.
+    - observation_id: sf2004_t8_al_model
+      type: gibbs_table
+      class: model
+      locator:
+        page: 232
+        table: '8'
+        row: Al
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        Al | < 0.008 | 8.77(−9) | 2.68(−9) | 5.79(−9) | 3.98(−10) | 1.31(−8)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_metal_to_sodium_abundance
+        T_as_published: 1900 K
+        published_cells:
+          Tholeiite: 8.77(−9)
+          Alkali basalt: 2.68(−9)
+          Komatiite: 5.79(−9)
+          Dunite: 3.98(−10)
+          Type B1 CAI: 1.31(−8)
+        temperature_quote: a T = 1900 K.
+    - observation_id: sf2004_t8_al_observational_comparison
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 232
+        table: '8'
+        row: Al
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: dimensionless
+      regime: secondary_compilation
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        Al | < 0.008 | 8.77(−9) | 2.68(−9) | 5.79(−9) | 3.98(−10) | 1.31(−8)'
+      values:
+        quantity: secondary_atmospheric_metal_to_sodium_ratio
+        ratio_as_published: < 0.008
+        method_class: secondary_compilation
+        note: Na et al. (1998) upper limit; retain inequality. Not a lava measurement.
+  "AlO":
+    observations:
+    - observation_id: sf2004_t4_alo
+      type: psat_series
+      class: model
+      locator:
+        page: 221
+        table: '4'
+        row: AlO
+        source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+        AlO | ∼ 9.0(−11) | 2.7(−11)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_partial_vapor_pressures
+        Grossman_as_published: ∼ 9.0(−11)
+        MAGMA_as_published: 2.7(−11)
+        note: Both columns are model results. Grossman values approximate figure readings; no experimental partial pressure.
+  "Al2O":
+    observations:
+    - observation_id: sf2004_t4_al2o
+      type: psat_series
+      class: model
+      locator:
+        page: 221
+        table: '4'
+        row: Al2 O
+        source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+        Al2 O | ∼ 10.0(−15) | 2.3(−15)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_partial_vapor_pressures
+        Grossman_as_published: ∼ 10.0(−15)
+        MAGMA_as_published: 2.3(−15)
+        note: Both columns are model results. Grossman values approximate figure readings; no experimental partial pressure.
+  "O":
+    observations:
+    - observation_id: sf2004_t4_o
+      type: psat_series
+      class: model
+      locator:
+        page: 221
+        table: '4'
+        row: O
+        source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+        O | ∼ 3.0(−7) | 3.4(−7)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_partial_vapor_pressures
+        Grossman_as_published: ∼ 3.0(−7)
+        MAGMA_as_published: 3.4(−7)
+        note: Both columns are model results. Grossman values approximate figure readings; no experimental partial pressure.
+    - observation_id: sf2004_t9_o
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: O
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        O | 5.65(14) | 8.84(15) | 1.76(17)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 5.65(14)
+          1700 K: 8.84(15)
+          1900 K: 1.76(17)
+        note: Exponent notation retained as printed; no unit conversion.
+  "O2":
+    observations:
+    - observation_id: sf2004_t4_o2
+      type: psat_series
+      class: model
+      locator:
+        page: 221
+        table: '4'
+        row: O2
+        source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+        O2 | ∼ 3.0(−7) | 2.6(−7)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_partial_vapor_pressures
+        Grossman_as_published: ∼ 3.0(−7)
+        MAGMA_as_published: 2.6(−7)
+        note: Both columns are model results. Grossman values approximate figure readings; no experimental partial pressure.
+    - observation_id: sf2004_t9_o2
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: O2
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        O2 | 2.10(18) | 1.66(17) | 1.58(18)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 2.10(18)
+          1700 K: 1.66(17)
+          1900 K: 1.58(18)
+        note: The printed 1550 K cell is 2.10(18), retained despite nonmonotonicity.
+  "Ca":
+    observations:
+    - observation_id: sf2004_t4_ca
+      type: psat_series
+      class: model
+      locator:
+        page: 221
+        table: '4'
+        row: Ca
+        source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+        Ca | ∼ 1.5(−9) | 1.1(−9)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_partial_vapor_pressures
+        Grossman_as_published: ∼ 1.5(−9)
+        MAGMA_as_published: 1.1(−9)
+        note: Both columns are model results. Grossman values approximate figure readings; no experimental partial pressure.
+    - observation_id: sf2004_t8_ca_model
+      type: gibbs_table
+      class: model
+      locator:
+        page: 232
+        table: '8'
+        row: Ca
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        Ca | < 0.001 | 8.25(−9) | 4.15(−9) | 1.03(−8) | 7.91(−10) | 1.60(−7)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_metal_to_sodium_abundance
+        T_as_published: 1900 K
+        published_cells:
+          Tholeiite: 8.25(−9)
+          Alkali basalt: 4.15(−9)
+          Komatiite: 1.03(−8)
+          Dunite: 7.91(−10)
+          Type B1 CAI: 1.60(−7)
+        temperature_quote: a T = 1900 K.
+    - observation_id: sf2004_t8_ca_observational_comparison
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 232
+        table: '8'
+        row: Ca
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: dimensionless
+      regime: secondary_compilation
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        Ca | < 0.001 | 8.25(−9) | 4.15(−9) | 1.03(−8) | 7.91(−10) | 1.60(−7)'
+      values:
+        quantity: secondary_atmospheric_metal_to_sodium_ratio
+        ratio_as_published: < 0.001
+        method_class: secondary_compilation
+        note: Na et al. (1998) upper limit; retain inequality. Not a lava measurement.
+  "CaO":
+    observations:
+    - observation_id: sf2004_t4_cao
+      type: psat_series
+      class: model
+      locator:
+        page: 221
+        table: '4'
+        row: CaO
+        source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+        CaO | ∼ 2.5(−11) | 1.6(−11)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_partial_vapor_pressures
+        Grossman_as_published: ∼ 2.5(−11)
+        MAGMA_as_published: 1.6(−11)
+        note: Both columns are model results. Grossman values approximate figure readings; no experimental partial pressure.
+  "bulk_lava":
+    observations:
+    - observation_id: sf2004_t4_total
+      type: psat_series
+      class: model
+      locator:
+        page: 221
+        table: '4'
+        row: Total
+        source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+        Total | ∼ 1.7(−6) | 1.5(−6)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_partial_vapor_pressures
+        Grossman_as_published: ∼ 1.7(−6)
+        MAGMA_as_published: 1.5(−6)
+        note: Both columns are model results. Grossman values approximate figure readings; no experimental partial pressure.
+    - observation_id: sf2004_t7_tholeiites
+      type: psat_series
+      class: model
+      locator:
+        page: 226
+        table: '7'
+        row: Tholeiites
+        source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+        Tholeiites | 4.719 | −16761 | 7.72(−5)d | 5.52(−5) | 7.72(−5)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_total_vapor_pressure
+        composition: Tholeiites
+        published_cells:
+          Aa,b: '4.719'
+          Ba,b: −16761
+          Pressureb (bars) at 1900 K: 7.72(−5)d
+          Range at 1900 Kc minimum: 5.52(−5)
+          Range at 1900 Kc maximum: 7.72(−5)
+        note: Printed d denotes exponent notation; e denotes median. En dash means absent, not zero.
+    - observation_id: sf2004_t7_morbs
+      type: psat_series
+      class: model
+      locator:
+        page: 226
+        table: '7'
+        row: MORBs
+        source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+        MORBs | – | – | 8.23(−5)e | 7.79(−5) | 1.01(−4)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_total_vapor_pressure
+        composition: MORBs
+        published_cells:
+          Aa,b: –
+          Ba,b: –
+          Pressureb (bars) at 1900 K: 8.23(−5)e
+          Range at 1900 Kc minimum: 7.79(−5)
+          Range at 1900 Kc maximum: 1.01(−4)
+        note: Printed d denotes exponent notation; e denotes median. En dash means absent, not zero.
+    - observation_id: sf2004_t7_alkalis
+      type: psat_series
+      class: model
+      locator:
+        page: 226
+        table: '7'
+        row: Alkalis
+        source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+        Alkalis | 4.716 | −16037 | 1.87(−4) | – | –'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_total_vapor_pressure
+        composition: Alkalis
+        published_cells:
+          Aa,b: '4.716'
+          Ba,b: −16037
+          Pressureb (bars) at 1900 K: 1.87(−4)
+          Range at 1900 Kc minimum: –
+          Range at 1900 Kc maximum: –
+        note: Printed d denotes exponent notation; e denotes median. En dash means absent, not zero.
+    - observation_id: sf2004_t7_oibs
+      type: psat_series
+      class: model
+      locator:
+        page: 226
+        table: '7'
+        row: OIBs
+        source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+        OIBs | – | – | 1.26(−4)e | 3.59(−5) | 4.43(−4)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_total_vapor_pressure
+        composition: OIBs
+        published_cells:
+          Aa,b: –
+          Ba,b: –
+          Pressureb (bars) at 1900 K: 1.26(−4)e
+          Range at 1900 Kc minimum: 3.59(−5)
+          Range at 1900 Kc maximum: 4.43(−4)
+        note: Printed d denotes exponent notation; e denotes median. En dash means absent, not zero.
+    - observation_id: sf2004_t7_komatiites
+      type: psat_series
+      class: model
+      locator:
+        page: 226
+        table: '7'
+        row: Komatiites
+        source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+        Komatiites | 4.480 | −16404 | 6.89(−5) | 2.08(−5) | 9.73(−5)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_total_vapor_pressure
+        composition: Komatiites
+        published_cells:
+          Aa,b: '4.480'
+          Ba,b: −16404
+          Pressureb (bars) at 1900 K: 6.89(−5)
+          Range at 1900 Kc minimum: 2.08(−5)
+          Range at 1900 Kc maximum: 9.73(−5)
+        note: Printed d denotes exponent notation; e denotes median. En dash means absent, not zero.
+    - observation_id: sf2004_t7_dunite
+      type: psat_series
+      class: model
+      locator:
+        page: 226
+        table: '7'
+        row: Dunite
+        source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+        Dunite | 4.618 | −15724 | 2.19(−4) | – | –'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_total_vapor_pressure
+        composition: Dunite
+        published_cells:
+          Aa,b: '4.618'
+          Ba,b: −15724
+          Pressureb (bars) at 1900 K: 2.19(−4)
+          Range at 1900 Kc minimum: –
+          Range at 1900 Kc maximum: –
+        note: Printed d denotes exponent notation; e denotes median. En dash means absent, not zero.
+    - observation_id: sf2004_t7_cais
+      type: psat_series
+      class: model
+      locator:
+        page: 226
+        table: '7'
+        row: CAIs
+        source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
+      units: bar
+      regime: thermodynamic_model
+      quote: 'Composition | Aa,b | Ba,b | Pressureb (bars) at 1900 K | Range at 1900 Kc minimum | Range at 1900 Kc maximum
+
+        CAIs | 3.890 | −15373 | 6.46(−5) | 1.98(−5) | 1.62(−4)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_total_vapor_pressure
+        composition: CAIs
+        published_cells:
+          Aa,b: '3.890'
+          Ba,b: −15373
+          Pressureb (bars) at 1900 K: 6.46(−5)
+          Range at 1900 Kc minimum: 1.98(−5)
+          Range at 1900 Kc maximum: 1.62(−4)
+        note: Printed d denotes exponent notation; e denotes median. En dash means absent, not zero.
+  "Si":
+    observations:
+    - observation_id: sf2004_t8_si_model
+      type: gibbs_table
+      class: model
+      locator:
+        page: 232
+        table: '8'
+        row: Si
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        Si | < 0.014 | 2.35(−3) | 3.49(−4) | 1.27(−3) | 8.31(−5) | 3.79(−4)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_metal_to_sodium_abundance
+        T_as_published: 1900 K
+        published_cells:
+          Tholeiite: 2.35(−3)
+          Alkali basalt: 3.49(−4)
+          Komatiite: 1.27(−3)
+          Dunite: 8.31(−5)
+          Type B1 CAI: 3.79(−4)
+        temperature_quote: a T = 1900 K.
+    - observation_id: sf2004_t8_si_observational_comparison
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 232
+        table: '8'
+        row: Si
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: dimensionless
+      regime: secondary_compilation
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        Si | < 0.014 | 2.35(−3) | 3.49(−4) | 1.27(−3) | 8.31(−5) | 3.79(−4)'
+      values:
+        quantity: secondary_atmospheric_metal_to_sodium_ratio
+        ratio_as_published: < 0.014
+        method_class: secondary_compilation
+        note: Na et al. (1998) upper limit; retain inequality. Not a lava measurement.
+  "Ti":
+    observations:
+    - observation_id: sf2004_t8_ti_model
+      type: gibbs_table
+      class: model
+      locator:
+        page: 232
+        table: '8'
+        row: Ti
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        Ti | < 0.014 | 1.68(−6) | 6.67(−7) | 2.08(−7) | 3.31(−8) | 6.79(−7)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_metal_to_sodium_abundance
+        T_as_published: 1900 K
+        published_cells:
+          Tholeiite: 1.68(−6)
+          Alkali basalt: 6.67(−7)
+          Komatiite: 2.08(−7)
+          Dunite: 3.31(−8)
+          Type B1 CAI: 6.79(−7)
+        temperature_quote: a T = 1900 K.
+    - observation_id: sf2004_t8_ti_observational_comparison
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 232
+        table: '8'
+        row: Ti
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: dimensionless
+      regime: secondary_compilation
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        Ti | < 0.014 | 1.68(−6) | 6.67(−7) | 2.08(−7) | 3.31(−8) | 6.79(−7)'
+      values:
+        quantity: secondary_atmospheric_metal_to_sodium_ratio
+        ratio_as_published: < 0.014
+        method_class: secondary_compilation
+        note: Na et al. (1998) upper limit; retain inequality. Not a lava measurement.
+  "Fe":
+    observations:
+    - observation_id: sf2004_t8_fe_model
+      type: gibbs_table
+      class: model
+      locator:
+        page: 232
+        table: '8'
+        row: Fe
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: as published
+      regime: thermodynamic_model
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        Fe | < 0.038 | 4.10(−3) | 1.26(−3) | 4.53(−3) | 1.26(−3) | 2.64(−4)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_metal_to_sodium_abundance
+        T_as_published: 1900 K
+        published_cells:
+          Tholeiite: 4.10(−3)
+          Alkali basalt: 1.26(−3)
+          Komatiite: 4.53(−3)
+          Dunite: 1.26(−3)
+          Type B1 CAI: 2.64(−4)
+        temperature_quote: a T = 1900 K.
+    - observation_id: sf2004_t8_fe_observational_comparison
+      type: gibbs_table
+      class: derived
+      locator:
+        page: 232
+        table: '8'
+        row: Fe
+        source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+      units: dimensionless
+      regime: secondary_compilation
+      quote: 'Element | Na et al. (1998) | Tholeiite | Alkali basalt | Komatiite | Dunite | Type B1 CAI
+
+        Fe | < 0.038 | 4.10(−3) | 1.26(−3) | 4.53(−3) | 1.26(−3) | 2.64(−4)'
+      values:
+        quantity: secondary_atmospheric_metal_to_sodium_ratio
+        ratio_as_published: < 0.038
+        method_class: secondary_compilation
+        note: Na et al. (1998) upper limit; retain inequality. Not a lava measurement.
+    - observation_id: sf2004_t9_fe
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: Fe
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        Fe | 1.64(13) | 4.03(14) | 1.29(16)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 1.64(13)
+          1700 K: 4.03(14)
+          1900 K: 1.29(16)
+        note: Exponent notation retained as printed; no unit conversion.
+  "e-":
+    observations:
+    - observation_id: sf2004_t9_eminus
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: e−
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        e− | 6.51(14) | 1.10(16) | 2.42(17)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 6.51(14)
+          1700 K: 1.10(16)
+          1900 K: 2.42(17)
+        note: Exponent notation retained as printed; no unit conversion.
+  "FeO":
+    observations:
+    - observation_id: sf2004_t9_feo
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: FeO
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        FeO | 1.30(13) | 2.56(14) | 6.45(15)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 1.30(13)
+          1700 K: 2.56(14)
+          1900 K: 6.45(15)
+        note: Exponent notation retained as printed; no unit conversion.
+  "NaO":
+    observations:
+    - observation_id: sf2004_t9_nao
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: NaO
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        NaO | 1.26(13) | 2.43(14) | 6.20(15)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 1.26(13)
+          1700 K: 2.43(14)
+          1900 K: 6.20(15)
+        note: Exponent notation retained as printed; no unit conversion.
+  "Na+":
+    observations:
+    - observation_id: sf2004_t9_naplus
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: Na+
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        Na+ | 3.02(12) | 5.20(13) | 1.15(15)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 3.02(12)
+          1700 K: 5.20(13)
+          1900 K: 1.15(15)
+        note: Exponent notation retained as printed; no unit conversion.
+  "K+":
+    observations:
+    - observation_id: sf2004_t9_kplus
+      type: rate_series
+      class: model
+      locator:
+        page: 234
+        table: '9'
+        row: K+
+        source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+      units: molecules cm^-2 s^-1
+      regime: thermodynamic_model
+      quote: 'Species | 1550 K | 1700 K | 1900 K
+
+        K+ | 1.21(11) | 1.50(12) | 2.37(13)'
+      values:
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        quantity: calculated_molecular_flux
+        published_cells:
+          1550 K: 1.21(11)
+          1700 K: 1.50(12)
+          1900 K: 2.37(13)
+        note: Exponent notation retained as printed; no unit conversion.
 fidelity_samples:
 - species: SiO
   observable: alpha
@@ -378,3 +2124,407 @@ fidelity_samples:
   locator:
     source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
     table: '10'
+
+- species: K2O
+  observation_id: sf2004_t2_reaction_1
+  field: A
+  value: 0.27
+  locator:
+    page: 218
+    table: '2'
+    row: K2 O (liq) + SiO2 (liq) = K2 SiO3 (liq)
+    source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
+    quote: 'Reaction | A | B | Ref.
+
+      K2 O (liq) + SiO2 (liq) = K2 SiO3 (liq) | 0.27 | 12735 | Hastie and Bonnell (1985)'
+- species: Mg
+  observation_id: sf2004_t10_r18_mg
+  field: alpha_range_as_printed
+  value:
+  - 0.2
+  - 0.21
+  locator:
+    page: 235
+    table: '10'
+    row: 18; Mg2SiO4 (l)b; Hashimoto (1990)
+    source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    quote: 'Oxide | T (K) | αs | Reference
+
+      Mg2SiO4 (l)b | 2163–2323 | 0.20–0.21 | Hashimoto (1990)
+
+      The αs values for Mg2SiO4 (s, l) are for Mg (g) and SiO (g) and are taken as equal for each.'
+- species: O2
+  observation_id: sf2004_t9_o2
+  field: published_cells
+  value:
+    1550 K: 2.10(18)
+    1700 K: 1.66(17)
+    1900 K: 1.58(18)
+  locator:
+    page: 234
+    table: '9'
+    row: O2
+    source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+    quote: 'Species | 1550 K | 1700 K | 1900 K
+
+      O2 | 2.10(18) | 1.66(17) | 1.58(18)'
+- species: SiO
+  observation_id: sf2004_t4_sio
+  field: MAGMA_as_published
+  value: 7.1(−7)
+  locator:
+    page: 221
+    table: '4'
+    row: SiO
+    source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+    quote: 'Gas | Grossman et al. (2000) | MAGMA code
+
+      SiO | ∼ 9.0(−7) | 7.1(−7)'
+- species: Al2O3
+  observation_id: sf2004_t10_r03_al2o3
+  field: alpha
+  value: 0.067
+  locator:
+    page: 235
+    table: '10'
+    row: 3; Al2O3 (s); Wolff and Alcock (1962)
+    source_path: tables/kems-008-schaefer-fegley-2004/t10.csv
+    quote: 'Oxide | T (K) | αs | Reference
+
+      Al2O3 (s) | 2000 | 0.067 | Wolff and Alcock (1962)'
+table_metadata:
+- table: '1'
+  locator:
+    page: 218
+    table: '1'
+    row: complete table
+    source_path: tables/kems-008-schaefer-fegley-2004/t1.csv
+  class: model
+  title: Species included in MAGMA code calculations
+  columns:
+  - Melt species
+  - Vapor species
+  rows:
+  - - SiO2 ,MgO, FeO, CaO, Al2 O3 , TiO2 ,
+    - O, O2
+  - - Na2 O, K2 O
+    - Si, SiO, SiO2
+  - - MgSiO3 , Mg2 SiO4 , MgAl2 O4 ,MgTiO3 , MgTi2 O5 ,
+    - Mg, MgO
+  - - Mg2 TiO4 ,Mg2 Al4 Si5 O18
+    - Fe, FeO
+  - - FeTiO3 , Fe2 SiO4 , FeAl2 O4
+    - Ca, CaO
+  - - CaAl2 O4 , CaAl4 O7 , Ca12 Al14 O33 , CaMgSi2 O6 ,
+    - Al, AlO, AlO2 ,
+  - - Ca2 MgSi2 O7 , Ca2 Al2 SiO7 , CaAl2 Si2 O8 , CaTiO3 ,
+    - Al2 O, Al2 O2
+  - - Ca2 SiO4 , CaTiSiO5 , CaAl12 O19 , CaSiO3
+    - Ti, TiO, TiO2
+  - - Al6 Si2 O13
+    - Na, Na2 , NaO,
+  - - Na2 SiO3 , Na2 Si2 O5 , NaAlSiO4 , NaAlSi3 O8 ,
+    - Na2 O, Na+
+  - - NaAlO2 ,Na2 TiO3 , NaAlSi2 O6
+    - K, K2 , KO,
+  - - K2 SiO3 , K2 Si2 O5 , K2 Si4 O9 , KAlSiO4 ,
+    - K2 O, K+
+  - - KAlSi3 O8 ,KAlO2 , KAlSi2 O6 , KCaAlSi2 O7
+    - e−
+  quote: 'Table 1
+
+    Species included in MAGMA code calculations
+
+    Melt species                                                  Vapor species
+
+    SiO2 ,MgO, FeO, CaO, Al2 O3 , TiO2 ,                         O, O2
+
+    Na2 O, K2 O                                                  Si, SiO, SiO2
+
+    MgSiO3 , Mg2 SiO4 , MgAl2 O4 ,MgTiO3 , MgTi2 O5 ,            Mg, MgO
+
+    Mg2 TiO4 ,Mg2 Al4 Si5 O18                                    Fe, FeO
+
+
+    FeTiO3 , Fe2 SiO4 , FeAl2 O4                                 Ca, CaO
+
+    CaAl2 O4 , CaAl4 O7 , Ca12 Al14 O33 , CaMgSi2 O6 ,           Al, AlO, AlO2 ,
+
+    Ca2 MgSi2 O7 , Ca2 Al2 SiO7 , CaAl2 Si2 O8 , CaTiO3 ,        Al2 O, Al2 O2
+
+    Ca2 SiO4 , CaTiSiO5 , CaAl12 O19 , CaSiO3                    Ti, TiO, TiO2
+
+    Al6 Si2 O13                                                  Na, Na2 , NaO,
+
+    Na2 SiO3 , Na2 Si2 O5 , NaAlSiO4 , NaAlSi3 O8 ,              Na2 O, Na+
+
+
+    NaAlO2 ,Na2 TiO3 , NaAlSi2 O6                                K, K2 , KO,
+
+    K2 SiO3 , K2 Si2 O5 , K2 Si4 O9 , KAlSiO4 ,                  K2 O, K+
+
+    KAlSi3 O8 ,KAlO2 , KAlSi2 O6 , KCaAlSi2 O7                   e−'
+  note: Model species inventory, not observations. CSV preserves display lines independently; wrapped cell groups
+    are not melt-vapor pairings.
+- table: '3'
+  locator:
+    page: 220
+    table: '3'
+    row: complete table
+    source_path: tables/kems-008-schaefer-fegley-2004/t3.csv
+  class: derived
+  title: Melt compositions for Fig. 5
+  columns:
+  - Oxide (wt%)
+  - 1a
+  - 2a
+  - 3a
+  - 4a
+  - 5a
+  - SRM glassb
+  rows:
+  - - Na2 O
+    - –
+    - –
+    - –
+    - '0.5'
+    - '0.2'
+    - '12.75'
+  - - K2 O
+    - '22.95'
+    - '14.93'
+    - '16.33'
+    - '19.5'
+    - '7.4'
+    - '2.02'
+  - - SiO2
+    - '77.05'
+    - –
+    - '54.83'
+    - '46.8'
+    - '60.2'
+    - '71.39'
+  - - CaO
+    - –
+    - –
+    - '10.23'
+    - '3.8'
+    - –
+    - '10.75'
+  - - Al2 O3
+    - –
+    - '85.07'
+    - '18.61'
+    - '12.1'
+    - '26.0'
+    - '2.78'
+  - - MgO
+    - –
+    - –
+    - –
+    - '1.0'
+    - '2.1'
+    - '0.27'
+  - - Fe2 O3
+    - –
+    - –
+    - –
+    - '14.3'
+    - '4.4'
+    - '0.04'
+  - - Total
+    - '100.00'
+    - '100.00'
+    - '100.00'
+    - '98.0'
+    - '100.3'
+    - '100.00'
+  quote: "Table 3\nMelt compositions for Fig. 5\nOxide         1a          2a         3a         4a         5a \
+    \       SRM\n(wt%)                                                                glassb\nNa2 O        –   \
+    \          –         –         0.5         0.2        12.75\nK2 O        22.95         14.93     16.33     19.5\
+    \         7.4         2.02\nSiO2        77.05          –        54.83     46.8        60.2        71.39\nCaO\
+    \          –             –        10.23      3.8         –          10.75\n\nAl2 O3       –            85.07\
+    \     18.61     12.1        26.0         2.78\n\nMgO          –             –         –         1.0        \
+    \ 2.1         0.27\n\nFe2 O3       –             –         –        14.3         4.4         0.04\n\nTotal \
+    \     100.00        100.00    100.00     98.0       100.3       100.00\n\n   a Hastie et al. (1982b).\n   b\
+    \ Hastie and Bonnell (1985)."
+  note: Secondary starting-composition metadata, not vapor measurements. Printed en dash remains missing; not converted
+    to zero.
+- table: '5'
+  locator:
+    page: 224
+    table: '5'
+    row: complete table
+    source_path: tables/kems-008-schaefer-fegley-2004/t5.csv
+  class: derived
+  title: Model compositions
+  columns:
+  - Wt. oxide
+  - Tholeiite
+  - Alkali basalt
+  - Komatiite
+  - Dunite
+  - Type B1 CAI
+  rows:
+  - - SiO2
+    - '50.71'
+    - '44.80'
+    - '47.10'
+    - '40.20'
+    - '29.10'
+  - - MgO
+    - '4.68'
+    - '11.07'
+    - '29.60'
+    - '43.20'
+    - '10.20'
+  - - Al2 O3
+    - '14.48'
+    - '13.86'
+    - '4.04'
+    - '0.80'
+    - '29.60'
+  - - TiO2
+    - '1.70'
+    - '1.96'
+    - '0.24'
+    - '0.20'
+    - '1.30'
+  - - Fe2 O3
+    - '4.89'
+    - '2.91'
+    - '12.80'
+    - '1.90'
+    - '0'
+  - - FeO
+    - '9.07'
+    - '9.63'
+    - '0'
+    - '11.90'
+    - '0.60'
+  - - CaO
+    - '8.83'
+    - '10.16'
+    - '5.44'
+    - '0.80'
+    - '28.80'
+  - - Na2 O
+    - '3.16'
+    - '3.19'
+    - '0.46'
+    - '0.30'
+    - '0.18'
+  - - K2 O
+    - '0.77'
+    - '1.09'
+    - '0.09'
+    - '0.10'
+    - '0.10'
+  - - Other
+    - 1.62a
+    - 1.45b
+    - 0.27c
+    - 0.70d
+    - 0.10e
+  - - Total
+    - '99.91'
+    - '100.12'
+    - '100.04'
+    - '100.10'
+    - '100.01'
+  - - Tliq (K)f
+    - 1433g
+    - '1504'
+    - '1838'
+    - '1954'
+    - 1823h
+  - - Ref.
+    - '[1]'
+    - '[2]'
+    - '[3]'
+    - '[4]'
+    - '[5]'
+  quote: "Table 5\nModel compositions\nWt. oxide   Tholeiite   Alkali basalt   Komatiite    Dunite   Type B1 CAI\n\
+    SiO2         50.71        44.80          47.10       40.20       29.10\nMgO           4.68        11.07    \
+    \      29.60       43.20       10.20\nAl2 O3       14.48        13.86           4.04        0.80       29.60\n\
+    TiO2          1.70         1.96           0.24        0.20        1.30\n\nFe2 O3        4.89         2.91  \
+    \        12.80        1.90        0\nFeO           9.07         9.63           0          11.90        0.60\n\
+    CaO           8.83        10.16           5.44        0.80       28.80\nNa2 O         3.16         3.19    \
+    \       0.46        0.30        0.18\nK2 O          0.77         1.09           0.09        0.10        0.10\n\
+    Other         1.62a        1.45b          0.27c       0.70d       0.10e\nTotal        99.91       100.12   \
+    \      100.04      100.10      100.01\nTliq (K)f    1433g         1504           1838        1954       1823h\n\
+    Ref.           [1]           [2]           [3]        [4]          [5]\n\n   a MnO (0.22%), H O (1.04%), P O\
+    \ (0.36%).\n                       2             2 5\n   b MnO (0.17%), H O (0.73%), P O (0.55%).\n\n      \
+    \                 2             2 5\n   c MnO (0.22%), P O (0.05%).\n                       2 5\n   d MnO (0.20%),\
+    \ H O (0.40%), P O (0.10%).\n                       2             2 5\n   e Cr O (0.04%), NiO (0.06%).\n   \
+    \    2 3\n\n   f See text for details.\n   g From Williams et al. (2001).\n\n   h From Stolper (1982).\n [1]\
+    \ Murase and McBirney (1973).\n [2] Carmichael et al. (1974, p. 501 #1).\n [3] Arndt (2002, personal communication\
+    \ to B. Fegley).\n [4] MacDonald (1972).\n [5] MacPherson et al. (1988)."
+  note: 'Starting composition metadata compiled for models. Tliq: alkali basalt, komatiite, dunite calculated with
+    MAGfox (model); tholeiite and CAI literature values. No normalization performed.'
+- table: '6'
+  locator:
+    page: 224
+    table: '6'
+    row: complete table
+    source_path: tables/kems-008-schaefer-fegley-2004/t6.csv
+  class: inverse
+  title: Hot spot temperatures from Galileo observations
+  columns:
+  - Hot spot
+  - Orbit
+  - Best T (K)a
+  - Area (km2)
+  - Ref.
+  rows:
+  - - Pillan
+    - C9
+    - '1870'
+    - '0.11'
+    - Davies et al. (2001)
+  - - Pele
+    - I27
+    - 1760 ± 210
+    - < 0.00005
+    - Lopes et al. (2001)
+  - - Kanehekili-N
+    - G7
+    - '1660'
+    - '> 0.006'
+    - McEwen et al. (1998)
+  - - 'Unnamed
+
+      22° N, 238°'
+    - E11
+    - '1620'
+    - '0.0002'
+    - McEwen et al. (1998)
+  - - Surt
+    - –b
+    - '> 1470'
+    - '30'
+    - Marchis et al. (2002)
+  - - Amirani
+    - G8
+    - '1675'
+    - '0.00006'
+    - McEwen et al. (1998)
+  quote: "Table 6\nHot spot temperatures from Galileo observations\nHot spot        Orbit    Best T (K)a   Area\
+    \ (km2 )   Ref.\nPillan           C9         1870          0.11       Davies et al. (2001)\nPele           \
+    \  I27     1760 ± 210    < 0.00005     Lopes et al. (2001)\nKanehekili-N     G7         1660        > 0.006\
+    \      McEwen et al. (1998)\nUnnamed          E11        1620        0.0002       McEwen et al. (1998)\n22 ◦\
+    \ N, 238◦\n\nSurt             –b        > 1470          30        Marchis et al. (2002)\nAmirani          G8\
+    \         1675        0.00006      McEwen et al. (1998)\n   a Uncertainties are given where available.\n   b\
+    \ Ground-based observation from the Keck Observatory."
+  note: Remote thermal-inference metadata; not phase transitions or species rates. Surt is ground-based Keck (footnote
+    b).
+deepening:
+  date: '2026-09-06'
+  worker: deep2-kems-008-schaefer-fegley-2004
+  pdf_sha256: c50765341a3be2cdd0e305cda582f996f4f3a7046469e327043a70493f46c46c
+  method: pdftotext_layout_with_manual_table_transcription_and_visual_checks
+  provenance_path: tables/kems-008-schaefer-fegley-2004/
+  parent_policy: Five original observations retained unchanged; quoted per-row successors carry supersedes. Legacy objects remain untagged under the binding parent rule.
+  classification_note: Model calculations are model; secondary alpha survey and atmospheric ratios are derived, not new measured lava observations. No new measured rows are claimed.
+  corpus_identity_note: ref-016-sio-kems-1700-2000k is a multi-paper synthesis, not a second single-paper extract; untouched under one-source scope.
+  resolver_note: DOI printed in PDF; network-disabled brief prohibits resolver lookup.
