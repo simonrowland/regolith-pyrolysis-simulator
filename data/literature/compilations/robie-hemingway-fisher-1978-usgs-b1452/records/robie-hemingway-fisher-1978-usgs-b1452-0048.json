@@ -1,0 +1,114 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0048",
+  "census_id": "high-temperature-printed-page-074",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "NITROGEN ( BIPEREHCE STATE)",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "28.013",
+    "value": 28.013,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      80
+    ],
+    "printed_pages": [
+      74
+    ],
+    "pdftotext_layout_page_file": "page-080.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer"
+  ],
+  "title_line_as_published": "NITROGEN ( BIPEREHCE STATE)                                                     PORI!D LA If BIGHT      28.013",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "================================================================================",
+    "N2 :     Ideal diatoaic gas 298.15 to 180(1 11:.",
+    "--------------------------------------------------------------------------------",
+    "                                                 PO Ill U' 10 N FROII THE ELEI!EITS",
+    "                                                                                      GIBBS",
+    "TEI!P.     ( a;-H~ 98 )/T     soT      -(G;-H~ 98 )/T      cop    ENTHALPY         FREE EIIBBGY         Log   't",
+    "   II:      J/aol•K         J/aol•K      J/aol•K        J/aol•K       ltJ/aol          kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "II:",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "ltJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 16,
+  "uncertainty_line_as_published": "DNCERTAIIITY                   0.02           0.02",
+  "uncertainty_values": [
+    {
+      "as_published": "0.02",
+      "value": 0.02,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.02",
+      "value": 0.02,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "ftELTI NG POI NT                    63.14 K          BOlLI IIG POINT                           77.35 II:",
+    "ENTHALPY OF !!ELTING            o. 720 kJ            ENTHALPY OF VAPORIZATION                   5. 586 kJ",
+    "                                8.669 kJ             I!OLAR VOLUIIE                       2478.9200 J;bar",
+    "                                                                                        i4789.2011 cal",
+    "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
+    "HEAT CAPACITY EQUATION",
+    "         23.941 +      1.1068x1o-z T              2.5518x10-• TZ",
+    "             (EQUATION VALID FRO!!            298 - 1800 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer",
+      "detector_only": false
+    }
+  ]
+}
