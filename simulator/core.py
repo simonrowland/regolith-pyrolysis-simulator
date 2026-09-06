@@ -68,7 +68,7 @@ class _RefusalSnapshotHistoryPrefix:
     entries are read but never mutated by later hours.  Holding a prefix view
     avoids recursively copying the complete hourly history before every step.
     Condensation operating history additionally permits edits to its last row,
-    which is copied eagerly while the older prefix remains shared.
+    which is copied eagerly while the older, recursively frozen prefix is shared.
     A terminal refusal materializes the prefix before the rollback consumer is
     called, so restored state still owns an ordinary list with identical
     ordered content.
@@ -12814,9 +12814,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             getattr(self, '_condensation_model', None), 'operating_history', None,
         )
         if defer_committed_history and isinstance(operating_history, list):
-            # Condensation only edits history[-1] and appends new rows. Keep that
-            # mutable frontier detached; copying the older rows every hour turns
-            # linear history growth into quadratic rollback-preparation work.
+            from simulator.trace import _freeze_value
+
+            # Only the tail may change. Freeze each newly committed row once,
+            # detaching nested aliases; stop at the already frozen prefix. Thus
+            # ordinary hourly append costs O(1) rows, and prefix writes refuse
+            # instead of contaminating a later terminal-refusal rollback.
+            for index in range(len(operating_history) - 2, -1, -1):
+                if isinstance(operating_history[index], MappingProxyType):
+                    break
+                operating_history[index] = _freeze_value(operating_history[index])
             memo[id(operating_history)] = _RefusalSnapshotHistoryPrefix(
                 operating_history, memo, mutable_tail=1,
             )

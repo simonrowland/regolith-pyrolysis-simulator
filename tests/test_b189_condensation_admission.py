@@ -18,6 +18,7 @@ from simulator.condensation import (
     WallSaturationPressureRefusal,
     _antoine_psat_pa,
     _condensation_admission_refusal,
+    _condensation_catalog,
     _promote_non_debiting_carrier_status,
     _species_has_antoine_data,
     _species_has_compiled_or_legacy_pressure,
@@ -29,6 +30,7 @@ from simulator.condensation import (
 from simulator.diagnostic_helpers.extract_reproduction import _engine_pure_psat_pa
 from simulator.state import CondensationTrain, EvaporationFlux, MeltState
 from simulator.vapour_rail.catalog import (
+    CatalogCompileError,
     HotTrainInapplicable,
     compiled_catalog_for,
     vapor_pressure_legacy_view,
@@ -119,6 +121,63 @@ def test_route_reuses_catalog_but_rechecks_mutations_between_batches(payload, mo
     )
     with pytest.raises(HotTrainInapplicable):
         _antoine_psat_pa("Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data)
+
+
+def test_route_sees_mid_batch_catalog_mutation(payload, monkeypatch):
+    model = _configured_model(payload, "Na")
+
+    def mutating_route(*args):
+        assert _antoine_psat_pa(
+            "Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data,
+        ) is not None
+        _set_applicability(
+            model.vapor_pressure_data.catalog_payload, "Na", "not_applicable",
+        )
+        with pytest.raises(HotTrainInapplicable):
+            _antoine_psat_pa(
+                "Na", 1200.0, vapor_pressure_data=model.vapor_pressure_data,
+            )
+
+    monkeypatch.setattr(model, "_route", mutating_route)
+    model.route(EvaporationFlux(), MeltState())
+
+
+def test_route_distinguishes_catalog_payloads(payload, monkeypatch):
+    model = _configured_model(payload, "Na")
+    other = deepcopy(model.vapor_pressure_data.catalog_payload)
+    _set_applicability(other, "Na", "not_applicable")
+
+    def probing_route(*args):
+        first = _condensation_catalog(
+            model.vapor_pressure_data, model.vapor_pressure_data.catalog_payload,
+        )
+        second = _condensation_catalog(model.vapor_pressure_data, other)
+        assert first is not second
+        first.assert_hot_train_applicable("Na")
+        with pytest.raises(HotTrainInapplicable):
+            second.assert_hot_train_applicable("Na")
+
+    monkeypatch.setattr(model, "_route", probing_route)
+    model.route(EvaporationFlux(), MeltState())
+
+
+def test_route_revalidates_equal_valued_type_mutation(payload, monkeypatch):
+    model = _configured_model(payload, "Na")
+    owned = model.vapor_pressure_data.catalog_payload
+    family_id = compiled_catalog_for(owned).species["Na"].family_id
+    pressure_model = owned["families"][family_id]["physical_properties"][
+        "species"
+    ]["Na"]["pressure_models"][0]
+
+    def probing_route(*args):
+        _condensation_catalog(model.vapor_pressure_data, owned)
+        pressure_model["activity_exponent"] = True
+        with pytest.raises(CatalogCompileError):
+            _condensation_catalog(model.vapor_pressure_data, owned)
+
+    assert pressure_model["activity_exponent"] == 1.0
+    monkeypatch.setattr(model, "_route", probing_route)
+    model.route(EvaporationFlux(), MeltState())
 
 
 def test_route_failure_does_not_leave_a_stale_catalog(payload, monkeypatch):

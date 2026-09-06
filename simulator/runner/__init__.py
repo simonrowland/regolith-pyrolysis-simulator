@@ -3957,7 +3957,7 @@ def build_sio_yield_report(
             "wall_deposit_carrier_gas": str(
                 operating_entry.get("carrier_gas", "")
             ),
-            "wall_deposit_knudsen_regime_diagnostic": dict(
+            "wall_deposit_knudsen_regime_diagnostic": _json_safe(
                 operating_entry.get("knudsen_regime_diagnostic", {}) or {}
             ),
             "wall_deposit_pipe_segment_temperatures_C": dict(

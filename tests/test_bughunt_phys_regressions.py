@@ -318,6 +318,9 @@ def test_terminal_refusal_materializes_detached_committed_history() -> None:
     def refuse_after_mutation() -> None:
         sim.runtime_state["nested"]["temperature_C"] = 900.0
         sim.record.snapshots.append(HourSnapshot(hour=4))
+        with pytest.raises(TypeError):
+            sim._condensation_model.operating_history[0]["pressures"]["Na"] = 777.0
+        operating_prefix["pressures"]["Na"] = 888.0
         sim._condensation_model.operating_history[-1]["pressures"]["Na"] = 999.0
         sim._condensation_model.operating_history.append({"pressures": {"Na": 3.0}})
         raise refusal

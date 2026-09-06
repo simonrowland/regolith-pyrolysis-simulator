@@ -2717,7 +2717,7 @@ class CondensationModel:
         return geometry
 
     def route(self, evap_flux: EvaporationFlux, melt: MeltState):
-        """Route one flux batch, checking catalog mutations once per batch."""
+        """Route one flux batch with mutation-checked catalog reuse."""
         data = self.vapor_pressure_data
         if not isinstance(data, VaporPressureCompatibilityView):
             return self._route(evap_flux, melt)
@@ -4657,17 +4657,45 @@ CONDENSATION_ADMISSION_REFUSAL_NO_DATA = "antoine_data_unavailable"
 CONDENSATION_FLUX_DORMANT_REFUSAL = "flux_dormant_never_inventory_debit"
 
 
+class _CatalogNumberSnapshot:
+    __slots__ = ('value',)
+
+    def __init__(self, value):
+        self.value = value
+
+    def __eq__(self, other):
+        return type(self.value) is type(other) and self.value == other
+
+
+def _catalog_content_snapshot(value):
+    if isinstance(value, Mapping):
+        return {key: _catalog_content_snapshot(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return type(value)(_catalog_content_snapshot(item) for item in value)
+    if isinstance(value, (bool, int, float)):
+        return _CatalogNumberSnapshot(value)
+    return value
+
+
 def _condensation_catalog(vapor_pressure_data, catalog_payload):
     cached = getattr(vapor_pressure_data, '_route_catalog', None)
-    if cached is not None:
-        return cached
+    # Route-local key: payload identity plus a detached, type-faithful content
+    # snapshot. Numeric wrappers prevent Python's 1.0 == True from bypassing
+    # validation. Compare containers without repeated serialization; any content
+    # change or different payload misses, and route() clears the slot in finally.
+    if (
+        cached is not None
+        and cached[0] is catalog_payload
+        and cached[1] == catalog_payload
+    ):
+        return cached[2]
     from simulator.vapour_rail.catalog import compiled_catalog_for
 
     catalog = compiled_catalog_for(catalog_payload, emit_u0_request_rules=False)
-    # The owned input is read-only during route(). Standalone calls and the next
-    # route still check mutations; per-species pressure samples reuse this result.
     if hasattr(vapor_pressure_data, '_route_catalog'):
-        vapor_pressure_data._route_catalog = catalog
+        vapor_pressure_data._route_catalog = (
+            catalog_payload, _catalog_content_snapshot(catalog_payload), catalog,
+        )
     return catalog
 
 
