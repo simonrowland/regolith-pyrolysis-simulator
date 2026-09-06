@@ -1,0 +1,959 @@
+schema_version: literature_extract.v1
+source_id: kems-138-bischof-2023
+source:
+  citation: >-
+    Bischof, L., Sossi, P. A., Sergeev, D., Müller, M. & Schmidt, M. W. (2023),
+    "Quantification of thermodynamic properties for vaporisation reactions above
+    solid Ga2O3 and In2O3 by Knudsen Effusion Mass Spectrometry", Calphad 80:102507,
+    DOI 10.1016/j.calphad.2022.102507
+  doi: 10.1016/j.calphad.2022.102507
+  url: https://doi.org/10.1016/j.calphad.2022.102507
+  year: 2023
+  version: publishedVersion_CC_BY_4.0
+  related_sources:
+    - source_id: kems-137-bischof-2023
+      doi: 10.1016/j.gca.2023.08.027
+      relation: later_melt_activity_paper_same_group
+      note: >-
+        GCA 360:1-15 (2023) measures gamma(GaO1.5) and gamma(InO1.5) in An-Di
+        eutectic melts and cites this Calphad pure-oxide KEMS paper. Different DOI;
+        do not merge or remint.
+extraction:
+  method: >-
+    Official OA: VOR CC BY 4.0. ScienceDirect landing HTTP 403 Cloudflare JS
+    challenge (not bypassed). Elsevier CDN served accepted manuscript
+    (1-s2.0-S0364591622001109-am.pdf). ETH Research Collection bitstream served
+    the typeset VOR PDF (1-s2.0-S0364591622001109-main.pdf). JuSER OpenAccess
+    PDF returned a fast-challenge JS wall (not bypassed). No MinerU. Tables 1-13
+    transcribed from pdftotext -layout of the AM (single column) and certified
+    against VOR page renders (pdftoppm 150 dpi). Figures 1-15 listed figure-only
+    (not digitised). Measured ion intensities and printed partial-pressure points
+    kept distinct from 3rd-law reductions, 2nd-law van't Hoff fits, and FACTSAGE
+    / literature-recalculated columns. No unit conversion. Missing = absent
+    (n.d. and em-dash stored as printed, never 0).
+  date: '2026-09-06'
+  worker: wave-W2-kems-138-bischof-2023
+  provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-138-bischof-2023/kems-138-bischof-2023/
+review_status: draft
+fidelity_samples:
+  - species: Ga
+    observable: rate_series
+    observation_id: bischof_2023_table7_ga_isotherm_intensities
+    field: Ga_plus_cps
+    value: 57061
+    locator:
+      pdf_page_index: 8
+      published_page: 7
+      table: "7"
+      note: "Table 7 Ga+ average intensity 57061 cps"
+  - species: In
+    observable: psat_series
+    observation_id: bischof_2023_table12_in_psat_this_work
+    field: p_Pa_1550
+    value: 0.072
+    locator:
+      pdf_page_index: 17
+      published_page: 16
+      table: "12"
+      note: "Table 12 p(In) [Pa] this work Oct. 2019 at 1550 K = 0.072"
+  - species: Ga2O
+    observable: gibbs_table
+    observation_id: bischof_2023_table10_ga2o_delta_f_3rd_recommended
+    field: delta_f_H_298_3rd_J_mol
+    value: -68966
+    locator:
+      pdf_page_index: 2
+      published_page: 1
+      paragraph: abstract
+      note: "Abstract Delta_f H298,3rd (Ga2O(g)) = -68966 ± 7442 Jmol-1"
+  - species: In2O
+    observable: gibbs_table
+    observation_id: bischof_2023_table11_in2o_delta_f_3rd_recommended
+    field: delta_f_H_298_3rd_J_mol
+    value: -22245
+    locator:
+      pdf_page_index: 2
+      published_page: 1
+      paragraph: abstract
+      note: "Abstract Delta_f H298,3rd (In2O(g)) = -22245 ± 964 Jmol-1"
+  - species: Ga2O3
+    observable: gibbs_table
+    observation_id: bischof_2023_table3_ga2o3_runs
+    field: initial_weight_mg_2019
+    value: 41.4
+    locator:
+      pdf_page_index: 4
+      published_page: 3
+      table: "3"
+      note: "Table 3 alpha-Ga2O3 (s) 2019 initial weight 41.4 mg"
+  - species: O2
+    observable: gibbs_table
+    observation_id: bischof_2023_table12_o2_psat_derived
+    field: p_O2_Pa_1550
+    value: 0.147
+    locator:
+      pdf_page_index: 17
+      published_page: 16
+      table: "12"
+      note: "Table 12 p(O2) this work Oct. 2019 at 1550 K = 0.147 Pa; stoichiometry-derived, not psat_series"
+  - species: Ga2O
+    observable: gibbs_table
+    observation_id: bischof_2023_table13_ga2o_2nd_law_factsage
+    field: HCM778_delta_r_H_298_3rd_J_mol
+    value: 523647
+    locator:
+      pdf_page_index: 18
+      published_page: 17
+      table: "13"
+      note: "Table 13 HCM778 3rd-law column 523647"
+species:
+  Ga2O3:
+    observations:
+    - observation_id: bischof_2023_kems_ir_cell_geometry
+      type: gibbs_table
+      locator:
+        pdf_page_index: 3
+        published_page: 2
+        paragraph: experimental
+        figure: "1"
+        quote: >-
+          The iridium KC contains the sample to be analysed and is composed of a
+          crucible 8.5 mm high with an outer diameter of 7.8 mm and 0.2 mm wall
+          thickness, and a lid with a 0.4 mm orifice at its centre.
+      T_range_K: [1200.0, 1750.0]
+      phase: solid_Ga2O3_In2O3_KEMS
+      condensed_form:
+        state: crystalline
+        metastable: false
+        basis: explicit_author
+        note: Starting Ga2O3 mainly alpha, transformed to beta after heating (Figs. 12-13).
+      standard_state: method geometry; not a species observation
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: KMS_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        cell_material_as_published: iridium
+        crucible_height_mm: 8.5
+        crucible_outer_diameter_mm: 7.8
+        wall_thickness_mm: 0.2
+        orifice_diameter_mm: 0.4
+        bakeout_T_K: 1930
+        bakeout_t_h: 12
+        electron_energy_eV_range: [60, 70]
+        emission_current_mA: 0.468
+        sample_mass_mg_approx: 40
+        chamber_pressure_mbar_as_printed: "~10^-6"
+        other_compartments_mbar_as_printed: "~10^-9"
+        spectrometer: FINNIGAN MAT 271 magnetic-sector KEMS at Forschungszentrum Juelich
+        thermocouple: W97Re3/W75Re25
+        pyrometer: IGA-12 (LUMASENSE)
+        as_printed:
+          cell_material_as_published: "The iridium KC contains the sample to be analysed"
+          crucible_height_mm: "a crucible 8.5 mm high"
+          crucible_outer_diameter_mm: "an outer diameter of 7.8 mm"
+          wall_thickness_mm: "0.2 mm wall thickness"
+          orifice_diameter_mm: "a lid with a 0.4 mm orifice at its centre"
+          bakeout_T_K: "baked out for 12 h at 1930 K"
+          bakeout_t_h: "empty Knudsen cells were baked out for 12 h"
+          electron_energy_eV_range: "electron ionisation energy E(e-) of 60 eV or 70 eV"
+          emission_current_mA: "a constant electron emission i(em) of 0.468 mA"
+          sample_mass_mg_approx: "Approximately 40 mg of pure (>99.9%) Ga2O3 or In2O3"
+          chamber_pressure_mbar_as_printed: "evacuated through a turbo molecular pump to ~10-6 mbar"
+          other_compartments_mbar_as_printed: "constantly kept under ultrahigh vacuum (~10-9 mbar)"
+          spectrometer: "The schematic setup of the FINNIGAN MAT 271 Knudsen effusion mass spectrometer at the Forschungszentrum, Julich"
+          thermocouple: "monitored by a W97Re3/W75Re25 thermocouple"
+          pyrometer: "a single wavelength IGA-12 pyrometer (LUMASENSE TECHNOLOGIES)"
+        note: >-
+          Equipment metadata for the Ir Knudsen cell. Fragmentation fi and
+          sigma(O2) are not on this page; they live on
+          bischof_2023_fragmentation_f_i (p.6) and bischof_2023_sigma_O2 (p.4).
+      uncertainty:
+        note: geometry as printed; numeric Clausing not tabulated
+      equipment:
+        orifice_area:
+          value: 1.256637e-07
+          units: m2
+          diameter_m: 0.0004
+          orifice_shape: circular_effusion
+          inferred: true
+          inference: area = pi*(d/2)^2 from stated lid orifice diameter 0.4 mm
+          locator:
+            pdf_page_index: 3
+            published_page: 2
+            paragraph: experimental
+            quote: "a lid with a 0.4 mm orifice at its centre"
+        cell_material:
+          value: Ir (iridium Knudsen cell)
+          locator:
+            pdf_page_index: 3
+            published_page: 2
+            paragraph: experimental
+            quote: "The iridium KC contains the sample to be analysed"
+        chamber_pressure:
+          value: 1.0e-06
+          units: mbar
+          note: KC chamber (~10^-6 mbar) as printed; other compartments ~10^-9 mbar
+          locator:
+            pdf_page_index: 3
+            published_page: 2
+            paragraph: experimental
+            quote: "evacuated through a turbo molecular pump to ~10-6 mbar"
+    - observation_id: bischof_2023_fragmentation_f_i
+      type: gibbs_table
+      locator:
+        pdf_page_index: 7
+        published_page: 6
+        paragraph: ionisation_efficiency
+        quote: "a correction factor fi of 0.14 for Ga+ and of 0.19 for In+"
+      T_range_K: [1200.0, 1750.0]
+      phase: method_calibration
+      standard_state: ion-fragmentation correction; not a species observation
+      regime: kems_effusion
+      units: dimensionless
+      values:
+        quantity: ion_fragmentation_correction_f_i
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        fragmentation_f_i_Ga_plus: 0.14
+        fragmentation_f_i_In_plus: 0.19
+        as_printed:
+          fragmentation_f_i_Ga_plus: "a correction factor fi of 0.14 for Ga+"
+          fragmentation_f_i_In_plus: "and of 0.19 for In+"
+        note: >-
+          Calibration factor from ionisation-efficiency curves at 60/70 eV
+          (published p.6). Not a measured ion current or partial pressure.
+      uncertainty:
+        note: "The error of the correction factor fi, Delta fi, amounts to 0.1 for all species"
+    - observation_id: bischof_2023_table3_ga2o3_runs
+      type: gibbs_table
+      locator:
+        pdf_page_index: 4
+        published_page: 3
+        table: "3"
+        quote: "alpha-Ga2O3 (s) 2019 41.4 39.2 1622 12 1510-1750"
+      T_range_K: [1510.0, 1750.0]
+      phase: solid_alpha_Ga2O3
+      regime: kems_effusion
+      units: mg and K as printed
+      values:
+        quantity: sample_run_parameters
+        method_class: measured_direct
+        initial_weight_mg_2019: 41.4
+        final_weight_mg_2019: 39.2
+        isotherm_T_K_2019: 1622
+        isotherm_t_h_2019: 12
+        polytherm_T_range_K_2019: "1510-1750"
+        initial_weight_mg_2021: 46.7
+        final_weight_mg_2021: "n.d."
+        polytherm_T_range_K_2021: "1540-1644 (run 1); 1520-1662 (run 2)"
+        as_printed:
+          initial_weight_mg_2019: "41.4"
+          final_weight_mg_2019: "39.2"
+          isotherm_T_K_2019: "1622"
+          isotherm_t_h_2019: "12"
+          polytherm_T_range_K_2019: "1510-1750"
+          initial_weight_mg_2021: "46.7"
+          final_weight_mg_2021: "n.d."
+          polytherm_T_range_K_2021: "1540-1644 (run 1); 1520-1662 (run 2)"
+        table_csv: tables/kems-138-bischof-2023/t3.csv
+      uncertainty:
+        note: n.d. as printed for 2021 final weight; not invented as 0
+  Ga:
+    observations:
+    - observation_id: bischof_2023_table7_ga_isotherm_intensities
+      type: rate_series
+      locator:
+        pdf_page_index: 8
+        published_page: 7
+        table: "7"
+        quote: "Ga+ 57061 1569"
+      T_range_K: [1622.0, 1622.0]
+      phase: vapor_over_solid_Ga2O3
+      regime: kems_effusion
+      units: cps
+      values:
+        quantity: ion_intensity_isotherm
+        method_class: measured_direct
+        Ga_plus_cps: 57061
+        Ga2_plus_cps: 13615
+        Ga3_plus_cps: 3042
+        GaO_plus_cps: 374
+        Ga2_dimer_plus_cps: 638
+        Ga2O_plus_cps: 4782
+        T_K: 1622.0
+        duration_h: 12
+        as_printed:
+          Ga_plus_cps: "Ga+ 57061 1569"
+          Ga2_plus_cps: "Ga2+ 13615 749"
+          Ga3_plus_cps: "Ga3+ 3042 98"
+          GaO_plus_cps: "GaO+ 374 21"
+          Ga2_dimer_plus_cps: "Ga2+ (fifth ion, dimer Ga2+) 638 43"
+          Ga2O_plus_cps: "Ga2O+ 4782 146"
+          T_K: "12 h at 1622 K with Ga2O3 (s) (Fig. 4)"
+          duration_h: "an isotherm measurement was performed for 12 h at 1622 K"
+        table_csv: tables/kems-138-bischof-2023/t7.csv
+      uncertainty:
+        Ga_plus_cps: 1569
+        Ga2_plus_cps: 749
+        Ga3_plus_cps: 98
+        GaO_plus_cps: 21
+        Ga2_dimer_plus_cps: 43
+        Ga2O_plus_cps: 146
+        note: Table 7 standard deviation [cps] as printed
+    - observation_id: bischof_2023_psat_ga_1752k
+      type: psat_series
+      locator:
+        pdf_page_index: 8
+        published_page: 7
+        paragraph: results_polytherm
+        quote: "followed by Ga, whose partial pressure is lower by a factor of 7 (0.11 ± 0.016 Pa at 1752 K)"
+      T_range_K: [1752.0, 1752.0]
+      phase: vapor_over_solid_Ga2O3
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        gas_species: Ga
+        points:
+          - T_K: 1752.0
+            P_Pa: 0.11
+            quote: "0.11 ± 0.016 Pa at 1752 K"
+      uncertainty:
+        P_Pa: 0.016
+        as_printed: "0.11 ± 0.016 Pa"
+    - observation_id: bischof_2023_fig5_ga_psat_figure_only
+      type: psat_series
+      locator:
+        pdf_page_index: 10
+        published_page: 9
+        figure: "5"
+        note: Fig. 5a-c P(T) of Ga2O, Ga, GaO; no numeric table besides printed 1752 K points
+      T_range_K: [1510.0, 1752.0]
+      phase: vapor_over_solid_Ga2O3
+      regime: kems_effusion
+      units: as plotted (not tabulated)
+      values:
+        quantity: partial_pressure_figure_only
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: >-
+          Full P(T) series exists only as Fig. 5; not digitised this round.
+          Printed 1752 K points are in bischof_2023_psat_ga_1752k / _gao_ / _ga2o_.
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: bischof_2023_table8_ga_3rd_law_this_work
+      type: gibbs_table
+      locator:
+        pdf_page_index: 9
+        published_page: 8
+        table: "8"
+        quote: "Mean 1654037 ± 2365"
+      T_range_K: [1510.0, 1752.0]
+      phase: vapor_over_solid_Ga2O3
+      regime: kems_effusion
+      units: J mol-1 as printed
+      values:
+        quantity: enthalpy_of_reaction_3rd_law
+        method_class: author_derived
+        reaction: "Ga2O3(s) = 2 Ga(g) + 1.5 O2(g)"
+        delta_r_H_298_3rd_J_mol_mean: 1654037
+        as_printed:
+          delta_r_H_298_3rd_J_mol_mean: "1654037 ± 2365"
+        table_csv: tables/kems-138-bischof-2023/t8.csv
+        note: 3rd-law from measured K plus FACTSAGE gef; recommended over 2nd-law by the authors
+      uncertainty:
+        delta_r_H_298_3rd_J_mol_mean: 2365
+    - observation_id: bischof_2023_table8_ga_2nd_law_and_factsage
+      type: gibbs_table
+      locator:
+        pdf_page_index: 9
+        published_page: 8
+        table: "8"
+        quote: "Mean 1753218 ± 126122"
+      T_range_K: [1510.0, 1752.0]
+      phase: vapor_over_solid_Ga2O3
+      regime: thermochemical_equilibrium_model
+      units: J mol-1 as printed
+      values:
+        quantity: second_law_and_FACTSAGE_enthalpies
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        model: van't Hoff 2nd-law fits of this work plus FACTSAGE/Hultgren columns
+        delta_r_H_298_2nd_J_mol_mean: 1753218
+        Hult73_delta_r_H_298_3rd_J_mol: 1646749
+        as_printed:
+          delta_r_H_298_2nd_J_mol_mean: "1753218 ± 126122"
+          Hult73_delta_r_H_298_3rd_J_mol: "Hult73 1646749"
+        table_csv: tables/kems-138-bischof-2023/t8.csv
+        note: Battery must refuse as model_output_not_measurement / gibbs_table_not_runtime_observable
+      uncertainty:
+        delta_r_H_298_2nd_J_mol_mean: 126122
+  GaO:
+    observations:
+    - observation_id: bischof_2023_psat_gao_1752k
+      type: psat_series
+      locator:
+        pdf_page_index: 8
+        published_page: 7
+        paragraph: results_polytherm
+        quote: "The partial pressures of GaO (0.007 ± 0.002 Pa) are several orders of magnitude lower again at the same temperature."
+      T_range_K: [1752.0, 1752.0]
+      phase: vapor_over_solid_Ga2O3
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        gas_species: GaO
+        points:
+          - T_K: 1752.0
+            P_Pa: 0.007
+            quote: "0.007 ± 0.002 Pa"
+      uncertainty:
+        P_Pa: 0.002
+        as_printed: "0.007 ± 0.002 Pa"
+    - observation_id: bischof_2023_table10_gao_delta_f_3rd_recommended
+      type: gibbs_table
+      locator:
+        pdf_page_index: 15
+        published_page: 14
+        table: "10"
+        quote: "148816 ± 993 Mean"
+      T_range_K: [1510.0, 1752.0]
+      phase: vapor_over_solid_Ga2O3
+      regime: kems_effusion
+      units: J mol-1 as printed
+      values:
+        quantity: enthalpy_of_formation_3rd_law
+        method_class: author_derived
+        species_as_published: GaO(g)
+        delta_f_H_298_3rd_J_mol: 148816
+        as_printed:
+          delta_f_H_298_3rd_J_mol: "148816 ± 993 Jmol-1"
+        table_csv: tables/kems-138-bischof-2023/t10.csv
+      uncertainty:
+        delta_f_H_298_3rd_J_mol: 993
+    - observation_id: bischof_2023_table10_gao_ab_initio
+      type: gibbs_table
+      locator:
+        pdf_page_index: 15
+        published_page: 14
+        table: "10"
+        quote: "GaO(g) = Ga(g) + O(g) 129404 Pets04, FACTSG"
+      T_range_K: [298.15, 298.15]
+      phase: gas
+      regime: thermochemical_equilibrium_model
+      units: J mol-1 as printed
+      values:
+        quantity: ab_initio_enthalpy_of_formation
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        model: Petsalakis et al. (2004) bonding energy 4.06 eV via FACTSAGE elements
+        delta_f_H_J_mol: 129404
+        as_printed:
+          delta_f_H_J_mol: "129404"
+      uncertainty:
+        note: none printed on the Pets04/FACTSAGE cell
+  Ga2O:
+    observations:
+    - observation_id: bischof_2023_psat_ga2o_1752k
+      type: psat_series
+      locator:
+        pdf_page_index: 8
+        published_page: 7
+        paragraph: results_polytherm
+        quote: "Ga2O exhibits by far the highest partial pressures (0.79 ± 0.3 Pa at 1752 K)"
+      T_range_K: [1752.0, 1752.0]
+      phase: vapor_over_solid_Ga2O3
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        gas_species: Ga2O
+        points:
+          - T_K: 1752.0
+            P_Pa: 0.79
+            quote: "0.79 ± 0.3 Pa at 1752 K"
+      uncertainty:
+        P_Pa: 0.3
+        as_printed: "0.79 ± 0.3 Pa"
+    - observation_id: bischof_2023_table10_ga2o_delta_f_3rd_recommended
+      type: gibbs_table
+      locator:
+        pdf_page_index: 2
+        published_page: 1
+        paragraph: abstract
+        table: "10"
+        quote: "Delta_f H298, 3rd (Ga2O(g)) = -68966 ± 7442 Jmol-1"
+      T_range_K: [1510.0, 1752.0]
+      phase: vapor_over_solid_Ga2O3
+      regime: kems_effusion
+      units: J mol-1 as printed
+      values:
+        quantity: enthalpy_of_formation_3rd_law
+        method_class: author_derived
+        species_as_published: Ga2O(g)
+        delta_f_H_298_3rd_J_mol: -68966
+        as_printed:
+          delta_f_H_298_3rd_J_mol: "-68966 ± 7442 Jmol-1"
+        table_csv: tables/kems-138-bischof-2023/t10.csv
+      uncertainty:
+        delta_f_H_298_3rd_J_mol: 7442
+    - observation_id: bischof_2023_table13_ga2o_homogeneous_3rd
+      type: gibbs_table
+      locator:
+        pdf_page_index: 18
+        published_page: 17
+        table: "13"
+        quote: "MEAN 500155 ± 6169"
+      T_range_K: [1510.0, 1752.0]
+      phase: homogeneous_gas
+      regime: kems_effusion
+      units: J mol-1 as printed
+      values:
+        quantity: enthalpy_of_reaction_3rd_law
+        method_class: author_derived
+        reaction: "Ga2O(g) = Ga(g) + GaO(g)"
+        delta_r_H_298_3rd_J_mol_mean: 500155
+        as_printed:
+          delta_r_H_298_3rd_J_mol_mean: "500155 ± 6169"
+        table_csv: tables/kems-138-bischof-2023/t13.csv
+      uncertainty:
+        delta_r_H_298_3rd_J_mol_mean: 6169
+    - observation_id: bischof_2023_table13_ga2o_2nd_law_factsage
+      type: gibbs_table
+      locator:
+        pdf_page_index: 18
+        published_page: 17
+        table: "13"
+        quote: "523647 HCM778"
+      T_range_K: [1510.0, 1752.0]
+      phase: homogeneous_gas
+      regime: thermochemical_equilibrium_model
+      units: J mol-1 as printed
+      values:
+        quantity: second_law_and_FACTSAGE_enthalpies
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        model: van't Hoff 2nd-law plus FACTSAGE HCM778
+        HCM778_delta_r_H_298_3rd_J_mol: 523647
+        as_printed:
+          HCM778_delta_r_H_298_3rd_J_mol: "523647 HCM778"
+        table_csv: tables/kems-138-bischof-2023/t13.csv
+      uncertainty:
+        note: FACTSAGE column has no printed sigma
+  In2O3:
+    observations:
+    - observation_id: bischof_2023_table3_in2o3_runs
+      type: gibbs_table
+      locator:
+        pdf_page_index: 4
+        published_page: 3
+        table: "3"
+        quote: "alpha-In2O3 (s) 2019 42.6 20.3 1210-1610"
+      T_range_K: [1209.0, 1610.0]
+      phase: solid_alpha_In2O3
+      regime: kems_effusion
+      units: mg and K as printed
+      values:
+        quantity: sample_run_parameters
+        method_class: measured_direct
+        initial_weight_mg_2019: 42.6
+        final_weight_mg_2019: 20.3
+        polytherm_T_range_K_2019: "1210-1610"
+        initial_weight_mg_2021: 61.0
+        final_weight_mg_2021: "n.d."
+        isotherm_T_K_2021: 1295
+        isotherm_t_h_2021: 15
+        polytherm_T_range_K_2021: "1291-1429 (run 1); 1280-1422 (run 2); 1209-1424 (run 3)"
+        as_printed:
+          initial_weight_mg_2019: "42.6"
+          final_weight_mg_2019: "20.3"
+          polytherm_T_range_K_2019: "1210-1610"
+          initial_weight_mg_2021: "61.0"
+          final_weight_mg_2021: "n.d."
+          isotherm_T_K_2021: "1295"
+          isotherm_t_h_2021: "15"
+          polytherm_T_range_K_2021: "1291-1429 (run 1); 1280-1422 (run 2); 1209-1424 (run 3)"
+        table_csv: tables/kems-138-bischof-2023/t3.csv
+      uncertainty:
+        note: n.d. as printed for 2021 final weight
+  In:
+    observations:
+    - observation_id: bischof_2023_table12_in_psat_this_work
+      type: psat_series
+      locator:
+        pdf_page_index: 17
+        published_page: 16
+        table: "12"
+        quote: "p(In) [Pa] 0.003 0.072"
+      T_range_K: [1425.0, 1550.0]
+      phase: vapor_over_solid_In2O3
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        gas_species: In
+        run: Oct2019
+        p_Pa_1550: 0.072
+        points:
+          - T_K: 1425.0
+            P_Pa: 0.003
+            quote: "p(In) [Pa] this work Oct. 2019 at 1425 K = 0.003"
+          - T_K: 1550.0
+            P_Pa: 0.072
+            quote: "p(In) [Pa] this work Oct. 2019 at 1550 K = 0.072"
+        table_csv: tables/kems-138-bischof-2023/t12.csv
+      uncertainty:
+        note: no sigma printed on Table 12 cells
+    - observation_id: bischof_2023_psat_in_1611k
+      type: psat_series
+      locator:
+        pdf_page_index: 9
+        published_page: 8
+        paragraph: results_In
+        quote: "then In (0.30 ± 0.05 Pa) to InO (0.0036 ± 0.001 Pa)"
+      T_range_K: [1611.0, 1611.0]
+      phase: vapor_over_solid_In2O3
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        gas_species: In
+        points:
+          - T_K: 1611.0
+            P_Pa: 0.30
+            quote: "In (0.30 ± 0.05 Pa)"
+      uncertainty:
+        P_Pa: 0.05
+        as_printed: "0.30 ± 0.05 Pa"
+    - observation_id: bischof_2023_fig6_in_psat_figure_only
+      type: psat_series
+      locator:
+        pdf_page_index: 10
+        published_page: 9
+        figure: "6"
+      T_range_K: [1210.0, 1611.0]
+      phase: vapor_over_solid_In2O3
+      regime: kems_effusion
+      units: as plotted (not tabulated)
+      values:
+        quantity: partial_pressure_figure_only
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Full P(T) series exists only as Fig. 6; not digitised this round.
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: bischof_2023_table9_in_3rd_law_this_work
+      type: gibbs_table
+      locator:
+        pdf_page_index: 14
+        published_page: 13
+        table: "9"
+        quote: "Mean 1457625 ± 6908"
+      T_range_K: [1210.0, 1611.0]
+      phase: vapor_over_solid_In2O3
+      regime: kems_effusion
+      units: J mol-1 as printed
+      values:
+        quantity: enthalpy_of_reaction_3rd_law
+        method_class: author_derived
+        reaction: "In2O3(s) = 2 In(g) + 1.5 O2(g)"
+        delta_r_H_298_3rd_J_mol_mean: 1457625
+        as_printed:
+          delta_r_H_298_3rd_J_mol_mean: "1457625 ± 6908"
+        table_csv: tables/kems-138-bischof-2023/t9.csv
+      uncertainty:
+        delta_r_H_298_3rd_J_mol_mean: 6908
+    - observation_id: bischof_2023_table9_in_2nd_law_and_factsage
+      type: gibbs_table
+      locator:
+        pdf_page_index: 14
+        published_page: 13
+        table: "9"
+        quote: "1509511 ± 132368 Mean"
+      T_range_K: [1210.0, 1611.0]
+      phase: vapor_over_solid_In2O3
+      regime: thermochemical_equilibrium_model
+      units: J mol-1 as printed
+      values:
+        quantity: second_law_and_FACTSAGE_enthalpies
+        method_class: model_derived
+        semantics: bound_not_point_ordering
+        model: van't Hoff 2nd-law plus FACTSAGE/Hultgren/Gomez/Smirnov recalculated columns
+        table_csv: tables/kems-138-bischof-2023/t9.csv
+      uncertainty:
+        note: see t9.csv for printed sigmas
+  InO:
+    observations:
+    - observation_id: bischof_2023_psat_ino_1611k
+      type: psat_series
+      locator:
+        pdf_page_index: 9
+        published_page: 8
+        paragraph: results_In
+        quote: "InO (0.0036 ± 0.001 Pa)"
+      T_range_K: [1611.0, 1611.0]
+      phase: vapor_over_solid_In2O3
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        gas_species: InO
+        points:
+          - T_K: 1611.0
+            P_Pa: 0.0036
+            quote: "InO (0.0036 ± 0.001 Pa)"
+      uncertainty:
+        P_Pa: 0.001
+        as_printed: "0.0036 ± 0.001 Pa"
+    - observation_id: bischof_2023_table11_ino_delta_f_3rd_recommended
+      type: gibbs_table
+      locator:
+        pdf_page_index: 2
+        published_page: 1
+        paragraph: abstract
+        table: "11"
+        quote: "Delta_f H298, 3rd (InO(g)) = 157744 ± 3681 Jmol-1"
+      T_range_K: [1210.0, 1611.0]
+      phase: vapor_over_solid_In2O3
+      regime: kems_effusion
+      units: J mol-1 as printed
+      values:
+        quantity: enthalpy_of_formation_3rd_law
+        method_class: author_derived
+        species_as_published: InO(g)
+        delta_f_H_298_3rd_J_mol: 157744
+        as_printed:
+          delta_f_H_298_3rd_J_mol: "157744 ± 3681 Jmol-1"
+        table_csv: tables/kems-138-bischof-2023/t11.csv
+      uncertainty:
+        delta_f_H_298_3rd_J_mol: 3681
+  In2O:
+    observations:
+    - observation_id: bischof_2023_table12_in2o_psat_this_work
+      type: psat_series
+      locator:
+        pdf_page_index: 17
+        published_page: 16
+        table: "12"
+        quote: "p(In2O) [Pa] 0.014 0.327"
+      T_range_K: [1425.0, 1550.0]
+      phase: vapor_over_solid_In2O3
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        gas_species: In2O
+        run: Oct2019
+        points:
+          - T_K: 1425.0
+            P_Pa: 0.014
+            quote: "p(In2O) [Pa] this work Oct. 2019 at 1425 K = 0.014"
+          - T_K: 1550.0
+            P_Pa: 0.327
+            quote: "p(In2O) [Pa] this work Oct. 2019 at 1550 K = 0.327"
+        table_csv: tables/kems-138-bischof-2023/t12.csv
+      uncertainty:
+        note: no sigma printed on Table 12 cells
+    - observation_id: bischof_2023_psat_in2o_1611k
+      type: psat_series
+      locator:
+        pdf_page_index: 9
+        published_page: 8
+        paragraph: results_In
+        quote: "from In2O (1.41 ± 0.52 Pa at 1611 K)"
+      T_range_K: [1611.0, 1611.0]
+      phase: vapor_over_solid_In2O3
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: partial_pressure
+        method_class: measured_direct
+        gas_species: In2O
+        points:
+          - T_K: 1611.0
+            P_Pa: 1.41
+            quote: "In2O (1.41 ± 0.52 Pa at 1611 K)"
+      uncertainty:
+        P_Pa: 0.52
+        as_printed: "1.41 ± 0.52 Pa"
+    - observation_id: bischof_2023_table11_in2o_delta_f_3rd_recommended
+      type: gibbs_table
+      locator:
+        pdf_page_index: 2
+        published_page: 1
+        paragraph: abstract
+        table: "11"
+        quote: "Delta_f H298, 3rd (In2O(g)) = -22245 ± 964 Jmol-1"
+      T_range_K: [1210.0, 1611.0]
+      phase: vapor_over_solid_In2O3
+      regime: kems_effusion
+      units: J mol-1 as printed
+      values:
+        quantity: enthalpy_of_formation_3rd_law
+        method_class: author_derived
+        species_as_published: In2O(g)
+        delta_f_H_298_3rd_J_mol: -22245
+        as_printed:
+          delta_f_H_298_3rd_J_mol: "-22245 ± 964 Jmol-1"
+        table_csv: tables/kems-138-bischof-2023/t11.csv
+      uncertainty:
+        delta_f_H_298_3rd_J_mol: 964
+    - observation_id: bischof_2023_table13_in2o_homogeneous_3rd
+      type: gibbs_table
+      locator:
+        pdf_page_index: 18
+        published_page: 17
+        table: "13"
+        quote: "MEAN 440627 ± 3044"
+      T_range_K: [1210.0, 1611.0]
+      phase: homogeneous_gas
+      regime: kems_effusion
+      units: J mol-1 as printed
+      values:
+        quantity: enthalpy_of_reaction_3rd_law
+        method_class: author_derived
+        reaction: "In2O(g) = In(g) + InO(g)"
+        delta_r_H_298_3rd_J_mol_mean: 440627
+        as_printed:
+          delta_r_H_298_3rd_J_mol_mean: "440627 ± 3044"
+        table_csv: tables/kems-138-bischof-2023/t13.csv
+      uncertainty:
+        delta_r_H_298_3rd_J_mol_mean: 3044
+  O2:
+    observations:
+    - observation_id: bischof_2023_sigma_O2
+      type: gibbs_table
+      locator:
+        pdf_page_index: 5
+        published_page: 4
+        paragraph: ionisation_cross_section
+        quote: "For molecular oxygen, not listed in Table 4 or 5, a cross section of sigma(O2) = 2.8 is used [32]."
+      T_range_K: [1200.0, 1750.0]
+      phase: method_calibration
+      standard_state: adopted ionisation cross section; not a species observation
+      regime: kems_effusion
+      units: A2 as published
+      values:
+        quantity: adopted_ionisation_cross_section
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        sigma_O2_A2: 2.8
+        as_printed:
+          sigma_O2_A2: "a cross section of sigma(O2) = 2.8 is used [32]"
+        citation_as_printed: "[32] W.L. Fite, R.T. Brackmann, Ionization of atomic oxygen on electron impact, Phys. Rev."
+        note: >-
+          Adopted sigma(O2) from Fite and Brackmann (1959), Phys. Rev. 113:815-816.
+          Not a measured O2 ion current. Parked here because the sentence is on
+          published p.4, not the Ir-cell paragraph on p.2.
+      uncertainty:
+        note: "As no error is given, an error of 17% (= 0.5) is assumed, based on errors of other cross sections."
+    - observation_id: bischof_2023_table6_po2_equations
+      type: gibbs_table
+      locator:
+        pdf_page_index: 7
+        published_page: 6
+        table: "6"
+        equation: "15"
+        quote: "pGa(O2) = 0.51 p(Ga)"
+      T_range_K: [1200.0, 1750.0]
+      phase: vapor_over_solid_M2O3
+      regime: kems_effusion
+      units: dimensionless stoichiometric coefficients
+      values:
+        quantity: pO2_from_metal_bearing_species
+        method_class: author_derived
+        derivation: >-
+          Published p.6: "The partial pressure of oxygen is not obtained by means
+          of a measured intensity, but determined by stoichiometry according to
+          the measured p(M), p(MO), p(M2) and p(M2O)." Table 6 and eq. (15)
+          convert each metal-bearing p(i) into a stoichiometric p(O2) contribution.
+        pGa_O2_coeff: 0.51
+        pGaO_O2_coeff: 0.15
+        pGa2_O2_coeff: 0.72
+        pGa2O_O2_coeff: 0.45
+        pIn_O2_coeff: 0.40
+        pInO_O2_coeff: 0.12
+        pIn2_O2_coeff: 0.56
+        pIn2O_O2_coeff: 0.36
+        as_printed:
+          pGa_O2_coeff: "0.51 p(Ga)"
+          pGaO_O2_coeff: "0.15 p(GaO)"
+          pGa2_O2_coeff: "0.72 p(Ga2)"
+          pGa2O_O2_coeff: "0.45 p(Ga2O)"
+          pIn_O2_coeff: "0.40 p(In)"
+          pInO_O2_coeff: "0.12 p(InO)"
+          pIn2_O2_coeff: "0.56 p(In2)"
+          pIn2O_O2_coeff: "0.36 p(In2O)"
+        table_csv: tables/kems-138-bischof-2023/t6.csv
+        note: p(O2) is not measured; it is calculated from metal-bearing partial pressures
+      uncertainty:
+        note: coefficients as printed; no sigma
+    - observation_id: bischof_2023_table12_o2_psat_derived
+      type: gibbs_table
+      locator:
+        pdf_page_index: 17
+        published_page: 16
+        table: "12"
+        quote: "p(O2) [Pa] 0.006 0.147"
+      T_range_K: [1425.0, 1550.0]
+      phase: vapor_over_solid_In2O3
+      regime: kems_effusion
+      units: Pa
+      values:
+        quantity: stoichiometry_derived_pO2
+        method_class: author_derived
+        gas_species: O2
+        derivation: >-
+          Published p.6: "The partial pressure of oxygen is not obtained by means
+          of a measured intensity, but determined by stoichiometry according to
+          the measured p(M), p(MO), p(M2) and p(M2O)." Table 12 this-work p(O2)
+          cells are those derived values, not an O2 ion current. Stored as
+          gibbs_table so the battery does not treat P_Pa points as measured
+          psat_series partial_pressure.
+        p_O2_Pa_1425: 0.006
+        p_O2_Pa_1550: 0.147
+        as_printed:
+          p_O2_Pa_1425: "p(O2) [Pa] this work Oct. 2019 at 1425 K = 0.006"
+          p_O2_Pa_1550: "p(O2) [Pa] this work Oct. 2019 at 1550 K = 0.147"
+        table_csv: tables/kems-138-bischof-2023/t12.csv
+        note: stoichiometry-derived p(O2), not a measured O2 ion current
+      uncertainty:
+        note: no sigma printed on Table 12 cells
+    - observation_id: bischof_2023_fig7_11_lnK_figure_only
+      type: gibbs_table
+      locator:
+        pdf_page_index: 11
+        published_page: 10
+        figure: "7"
+        quote: "ln(K) for the reactions of Ga2O3 into a) Ga2O, b) Ga and c) GaO plotted vs. reciprocal T for measured and literature data."
+        note: also Figs 8-11 ln(K) and Delta_r H vs 1/T
+      T_range_K: [1200.0, 1750.0]
+      phase: vapor_over_solid_M2O3
+      regime: kems_effusion
+      units: as plotted (not tabulated)
+      values:
+        quantity: lnK_and_3rd_law_figure_only
+        method_class: author_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: >-
+          Figs 7-11 are ln(K) and 3rd-law enthalpy vs 1/T plots; numeric values
+          are in Tables 8-13. Not digitised.
+        semantics: bound_not_point_ordering
+        figures: ["7", "8", "9", "10", "11"]
+      uncertainty:
+        note: not applicable; figure not digitised
