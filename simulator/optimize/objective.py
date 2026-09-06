@@ -4369,7 +4369,12 @@ def _silica_objective_evidence(
         else None
     )
     qualified_kg = 0.0
-    if isinstance(bucket, Mapping) and bucket.get("class_total_kg") is not None:
+    report_flag = bucket.get("flag") if isinstance(bucket, Mapping) else None
+    if (
+        isinstance(bucket, Mapping)
+        and bucket.get("class_total_kg") is not None
+        and report_flag is None
+    ):
         product_label = ".".join(_SILICA_PRODUCT_PATH)
         qualified_kg = _finite_float(bucket["class_total_kg"], product_label)
         if qualified_kg < 0.0:
@@ -4382,9 +4387,16 @@ def _silica_objective_evidence(
     payload["unqualified_capture_kg"] = unqualified_kg
     if unqualified_kg > 0.0:
         payload["flag"] = _SILICA_UNQUALIFIED_FLAG
+        if isinstance(report_flag, Mapping):
+            payload["certification_flag"] = dict(report_flag)
+        flag_reason = (
+            str(report_flag.get("reason"))
+            if isinstance(report_flag, Mapping) and report_flag.get("reason")
+            else _SILICA_UNQUALIFIED_REASON
+        )
         payload["notes"] = (
             f"{unqualified_kg:g} kg Stage-3 silica capture is unqualified "
-            f"(not certified product): {_SILICA_UNQUALIFIED_REASON}",
+            f"(not certified product): {flag_reason}",
         )
     return payload
 

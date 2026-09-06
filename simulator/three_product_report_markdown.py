@@ -36,12 +36,14 @@ _CLASS_DISPLAY_ORDER: tuple[tuple[str, str], ...] = (
 )
 
 
-def _format_kg(value: float) -> str:
+def _format_kg(value: float | None) -> str:
     """Format a kg value with appropriate precision.
 
     Values < 1e-9 read as "—" (effective zero); values < 1.0 use
     scientific notation; values >= 1.0 use 3 decimal places.
     """
+    if value is None:
+        return "unavailable"
     if value < 1.0e-9:
         return "—"
     if value < 1.0:
@@ -122,8 +124,15 @@ def format_three_product_markdown(
     # ----- Per-class expansion -----
     for bucket_key, header in _CLASS_DISPLAY_ORDER:
         bucket = dict(classification.get(bucket_key, {}) or {})
-        class_total_kg = float(bucket.get('class_total_kg', 0.0))
-        if bucket_key == 'pure_silica_glass' and class_total_kg <= 0.0:
+        raw_class_total_kg = bucket.get('class_total_kg', 0.0)
+        class_total_kg = (
+            None if raw_class_total_kg is None else float(raw_class_total_kg)
+        )
+        if (
+            bucket_key == 'pure_silica_glass'
+            and class_total_kg is not None
+            and class_total_kg <= 0.0
+        ):
             header = '2. Stage 3 silica capture (not a product)'
         lines.append(f"## {header}")
         lines.append(f"**Class total**: {_format_kg(class_total_kg)} kg")
@@ -145,16 +154,25 @@ def format_three_product_markdown(
             lines.append(_kg_by_species_block(metals_kg))
         elif bucket_key == 'pure_silica_glass':
             stage_3 = bucket.get('stage_3_kg_by_species', {}) or {}
-            if class_total_kg <= 0.0:
+            if class_total_kg is not None and class_total_kg <= 0.0:
                 lines.append(
                     'Pure silica glass is not established. Qualification requires '
                     'positive capture following a recorded pO₂ hold → pN₂ SiO-release '
-                    'switch, with authoritative SiO evidence for every capture.'
+                    'switch.'
+                )
+                lines.append('')
+            flag = bucket.get('flag')
+            if isinstance(flag, Mapping):
+                lines.append(
+                    '- Certification flag: '
+                    f"authority={flag.get('authority')}; "
+                    f"band={flag.get('band')}; "
+                    f"reason={flag.get('reason')}"
                 )
                 lines.append('')
             lines.append(
                 f"- Stage 3 capture: "
-                f"{_format_kg(float(bucket.get('stage_3_capture_kg', 0.0)))} kg"
+                f"{_format_kg(bucket.get('stage_3_capture_kg', 0.0))} kg"
             )
             lines.append("")
             lines.append("Per-species on Stage 3 baffles:")

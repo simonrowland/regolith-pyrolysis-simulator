@@ -129,7 +129,52 @@ def test_unqualified_silica_preserves_measured_capture_without_product_claim():
     assert 'Silica glass: — kg' in report
     assert '## 2. Pure silica glass' not in report
     assert 'Stage 3 capture: 1.442e-08 kg' in report
-    assert 'authoritative SiO evidence for every capture' in report
+    assert 'recorded pO₂ hold → pN₂ SiO-release switch' in report
+
+
+def test_flagged_silica_product_reports_mass_and_certification_evidence():
+    classification = _empty_classification()
+    classification['pure_silica_glass'].update({
+        'stage_3_capture_kg': 2.5,
+        'stage_3_kg_by_species': {'SiO2': 2.5},
+        'class_total_kg': 2.5,
+        'flag': {
+            'status': 'flagged prediction',
+            'authority': 'extrapolated',
+            'band': [1400.0, 2200.0],
+            'reason': 'outside certified SiO source band',
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+
+    assert 'Silica glass: 2.500 kg' in report
+    assert '**Class total**: 2.500 kg' in report
+    assert 'authority=extrapolated' in report
+    assert 'band=[1400.0, 2200.0]' in report
+    assert 'reason=outside certified SiO source band' in report
+
+
+def test_refused_silica_product_quantity_is_unavailable_not_zero():
+    classification = _empty_classification()
+    classification['pure_silica_glass'].update({
+        'stage_3_capture_kg': None,
+        'stage_3_kg_by_species': {},
+        'class_total_kg': None,
+        'flag': {
+            'status': 'unavailable',
+            'authority': 'refused',
+            'band': None,
+            'reason': 'missing SiO carrier input',
+        },
+    })
+
+    report = format_three_product_markdown(classification)
+    silica_section = report.split('## 2.', 1)[1].split('## 3.', 1)[0]
+
+    assert '**Class total**: unavailable kg' in silica_section
+    assert 'Stage 3 capture: unavailable kg' in silica_section
+    assert '**Class total**: — kg' not in silica_section
 
 
 def test_rump_class_shows_per_species_breakdown():

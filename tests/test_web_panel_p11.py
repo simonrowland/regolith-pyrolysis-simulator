@@ -6,8 +6,11 @@ from pathlib import Path
 import re
 import subprocess
 import tempfile
+from types import SimpleNamespace
 
 import pytest
+
+from simulator.three_product_report import classify_products
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,7 +24,11 @@ RUNNER_LUNAR = ROOT / "tests/fixtures/runner/lunar_mare_low_ti_C0_24h.json"
 _AUTO_ROWS = object()
 
 GRADE_TOKENS = ("soda_lime", "container_sls", "optical_clear", "use_grade")
-P15_ROUTE_CHIPS = ("qualified silica product", "flagged capture · not a product")
+P15_ROUTE_CHIPS = (
+    "qualified silica product",
+    "flagged silica product",
+    "flagged capture · not a product",
+)
 
 
 def _js_num(value: float | int) -> str:
@@ -161,6 +168,57 @@ def _ci() -> tuple[dict, dict]:
 def _lunar() -> tuple[dict, dict]:
     block = _runner_block(RUNNER_LUNAR)
     return block, block["classification"]
+
+
+def _flagged_silica_product_block() -> dict:
+    authority = {
+        "species_id": "SiO",
+        "pressure": {"kind": "value", "pa": 1.0},
+        "flux": {"kind": "eligible"},
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+        "validation_status": "pending_validation",
+        "is_flux_active": True,
+        "authority_level": "extrapolated",
+        "valid_range_K": [1400.0, 2200.0],
+        "reason": "outside certified SiO source band",
+    }
+    snapshots = (
+        SimpleNamespace(
+            c2a_staged_gas={
+                "stage_name": "alkali_early_fe",
+                "gas_cover_mode": "po2_hold",
+            },
+            condensed_by_stage_species_delta={},
+            evap_flux=SimpleNamespace(carrier_authority_by_species={}),
+        ),
+        SimpleNamespace(
+            c2a_staged_gas={
+                "stage_name": "sio_window",
+                "gas_cover_mode": "pn2_sweep",
+            },
+            condensed_by_stage_species_delta={(3, "SiO2"): 4.5},
+            evap_flux=SimpleNamespace(
+                carrier_authority_by_species={"SiO": authority}
+            ),
+        ),
+    )
+    silica = classify_products(SimpleNamespace(
+        train=SimpleNamespace(stages=[
+            None,
+            None,
+            None,
+            SimpleNamespace(collected_kg={"SiO2": 4.5}),
+        ]),
+        record=SimpleNamespace(snapshots=snapshots),
+    ))["pure_silica_glass"]
+    silica["switch_executed"] = True
+    return {
+        "classification": {
+            "pure_silica_glass": silica,
+        },
+        "markdown": "## 2. Pure silica glass\n",
+    }
 
 
 def test_p11_wrapped_runner_mars_renders_emitted_class_totals() -> None:
@@ -585,9 +643,7 @@ def test_p11_silica_state_chips_are_mutually_exclusive() -> None:
     # executed the pO2-hold -> pN2 SiO-release switch (mandate section 5,
     # class 2 is on-demand by that switch), so its incidental Stage-3 capture
     # is non-product inventory and the chip is derived, not a snapshot. The
-    # separate b-476 question (producer zeroing class_total_kg for
-    # non-authoritative SiO evidence) is held in the strict xfail below and
-    # must not be read into this assertion.
+    # Separate certification flags do not change this no-switch classification.
     assert _assert_exclusive_silica_chips(lunar_card) == [
         "flagged capture · not a product"
     ]
@@ -629,45 +685,43 @@ def test_p11_mutant_that_emits_both_silica_route_chips_must_fail() -> None:
     assert len(chips) >= 2
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="b-476: producer zeros Class-2 silica mass for non-authoritative SiO",
-)
-def test_p11_lunar_class_total_tracks_flagged_stage_3_capture() -> None:
-    _, lunar_cls = _lunar()
-    silica = lunar_cls["pure_silica_glass"]
+def test_p11_switch_executed_class_total_tracks_flagged_stage_3_capture() -> None:
+    silica = _flagged_silica_product_block()["classification"]["pure_silica_glass"]
+    assert silica["switch_executed"] is True
     assert silica["stage_3_capture_kg"] > 0
     assert silica["class_total_kg"] == silica["stage_3_capture_kg"]
 
 
-@pytest.mark.skip(reason="needs qualified-switch golden; b-476")
-def test_p11_lunar_qualified_silica_capture_is_not_flagged() -> None:
-    # Qualified-chip rendering needs a golden that executed the pO2-hold → pN2
-    # SiO-release switch. The lunar C0 fixture did not, and manufacturing that
-    # premise is forbidden. Keep the nodeid so the skip is visible in the
-    # original ten.
-    block, classification = _lunar()
+def test_p11_switch_executed_extrapolated_silica_is_product_with_flag() -> None:
+    block = _flagged_silica_product_block()
+    classification = block["classification"]
     silica = classification["pure_silica_glass"]
     html = _render(_wrapped(block))
     silica_card = _card(html, "silica")
-    assert _assert_exclusive_silica_chips(silica_card) == ["qualified silica product"]
+    assert _assert_exclusive_silica_chips(silica_card) == ["flagged silica product"]
     _assert_traced_kg(
-        silica_card, "class_total_kg", silica["class_total_kg"], state="qualified-product"
+        silica_card,
+        "class_total_kg",
+        silica["class_total_kg"],
+        state="flagged-product",
     )
     _assert_traced_kg(
         silica_card,
         "stage_3_capture_kg",
         silica["stage_3_capture_kg"],
-        state="qualified-product",
+        state="flagged-product",
     )
     _assert_traced_kg(
         silica_card,
         "stage_3_kg_by_species.SiO2",
         silica["stage_3_kg_by_species"]["SiO2"],
-        state="qualified-product",
+        state="flagged-product",
     )
     assert "flagged capture · not a product" not in silica_card
-    assert "Pure silica glass is not established" not in html
+    visible = _visible(silica_card)
+    assert "authority: extrapolated" in visible
+    assert "band: [1400,2200]" in visible
+    assert "reason: outside certified SiO source band" in visible
 
 
 def test_p11_indeterminate_classification_kg_is_no_material() -> None:

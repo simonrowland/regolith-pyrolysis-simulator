@@ -2461,8 +2461,27 @@ def _authoritative_sio_carrier() -> dict[str, object]:
     }
 
 
-def _qualified_silica_snapshots(capture_kg: float = 12.5) -> tuple[SimpleNamespace, ...]:
-    authority = _authoritative_sio_carrier()
+def _extrapolated_sio_carrier() -> dict[str, object]:
+    return {
+        "species_id": "SiO",
+        "pressure": {"kind": "value", "pa": 1.0},
+        "flux": {"kind": "eligible"},
+        "verdict_status": "status_bearing_non_authoritative",
+        "certification_ceiling": "never",
+        "validation_status": "pending_validation",
+        "is_flux_active": True,
+        "authority_level": "extrapolated",
+        "valid_range_K": [1400.0, 2200.0],
+        "reason": "outside certified SiO source band",
+    }
+
+
+def _qualified_silica_snapshots(
+    capture_kg: float = 12.5,
+    *,
+    authority: dict[str, object] | None = None,
+) -> tuple[SimpleNamespace, ...]:
+    authority = authority or _authoritative_sio_carrier()
     return (
         SimpleNamespace(
             c2a_staged_gas={
@@ -2513,6 +2532,29 @@ def test_silica_objective_values_qualified_and_unqualified_and_refuses_unavailab
     assert "flag" not in qualified_evidence
     assert qualified_evidence["qualified_product_kg"] == pytest.approx(12.5)
     assert qualified_evidence["unqualified_capture_kg"] == pytest.approx(0.0)
+
+    flagged_execution = _execution()
+    flagged_execution.simulator.record.snapshots = _qualified_silica_snapshots(
+        authority=_extrapolated_sio_carrier()
+    )
+    flagged = evaluate(
+        _valid_patch(),
+        "lunar_mare_low_ti",
+        "fast",
+        profile=PROFILE,
+        executor=FakeExecutor(flagged_execution),
+    )
+    assert flagged.objectives.as_mapping()["pure_silica_glass_kg"] == pytest.approx(12.5)
+    flagged_evidence = flagged.objectives.evidence["pure_silica_glass_kg"]
+    assert flagged_evidence["flag"] == objective_module._SILICA_UNQUALIFIED_FLAG
+    assert flagged_evidence["qualified_product_kg"] == pytest.approx(0.0)
+    assert flagged_evidence["unqualified_capture_kg"] == pytest.approx(12.5)
+    assert flagged_evidence["certification_flag"] == {
+        "status": "flagged prediction",
+        "authority": "extrapolated",
+        "band": [1400.0, 2200.0],
+        "reason": "outside certified SiO source band",
+    }
 
     real_classify = objective_module.classify_products
 

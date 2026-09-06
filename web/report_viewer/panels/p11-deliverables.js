@@ -229,11 +229,15 @@
     return claim.state === "value" && claim.value > 0;
   }
 
-  // P15 route statuses are mutually exclusive on this card: qualified
-  // product only when class_total_kg > 0; flagged capture only when the
-  // producer marked capture as non-product. Never both.
+  function silicaFlaggedProduct(row) {
+    return silicaQualifiedProduct(row) && isRecord(row) && own(row, "flag");
+  }
+
+  // Route/classification and certification are separate: positive class mass
+  // may be authoritative or flagged, while non-product capture stays distinct.
   function silicaRouteChip(row, markdown) {
     if (silicaQualifiedProduct(row)) {
+      if (silicaFlaggedProduct(row)) return flagChip("flagged silica product");
       return chip("qualified silica product");
     }
     if (silicaNonProductMark(markdown, row)) {
@@ -245,6 +249,7 @@
   function silicaClassRole(row, markdown) {
     const claim = quantityClaim(row, "class_total_kg");
     if (claim.state !== "value") return claim.state;
+    if (silicaFlaggedProduct(row)) return "flagged-product";
     if (claim.value > 0) return "qualified-product";
     if (silicaNonProductMark(markdown, row)) return "flagged-unqualified-capture";
     return "qualified-product";
@@ -252,6 +257,7 @@
 
   function silicaCaptureRole(row, markdown) {
     if (silicaNonProductMark(markdown, row)) return "flagged-unqualified-capture";
+    if (silicaFlaggedProduct(row)) return "flagged-product";
     if (silicaQualifiedProduct(row)) return "qualified-product";
     return "value";
   }
@@ -263,7 +269,13 @@
       return `<p class="sec-p11-flag">${esc(flag.trim())}</p>`;
     }
     if (isRecord(flag) && typeof flag.status === "string" && flag.status.trim()) {
-      return `<p class="sec-p11-flag">${esc(flag.status.trim())}</p>`;
+      const parts = [
+        flag.status.trim(),
+        `authority: ${String(flag.authority)}`,
+        `band: ${typeof flag.band === "string" ? flag.band : JSON.stringify(flag.band)}`,
+        `reason: ${String(flag.reason)}`
+      ];
+      return `<p class="sec-p11-flag">${esc(parts.join(" · "))}</p>`;
     }
     return "";
   }
@@ -298,7 +310,7 @@
 
   function renderSilica(classification, markdown) {
     const title = "Pure silica glass";
-    const subtitle = "Mandate class 2. class_total_kg is qualified product; stage_3_capture_kg is Stage-3 capture.";
+    const subtitle = "Mandate class 2. class_total_kg is product mass; stage_3_capture_kg is Stage-3 capture. Certification flags remain attached.";
     const bucket = bucketRecord(classification, "pure_silica_glass");
     if (!bucket.present) {
       return missingBucket("silica", "", title, subtitle, "Pure silica glass not emitted");
@@ -314,9 +326,11 @@
     const row = bucket.value;
     const classRole = silicaClassRole(row, markdown);
     const captureRole = silicaCaptureRole(row, markdown);
-    const classLabel = classRole === "qualified-product"
-      ? "Qualified product · kg"
-      : "Class total · kg";
+    const classLabel = silicaFlaggedProduct(row)
+      ? "Flagged product · kg"
+      : classRole === "qualified-product"
+        ? "Qualified product · kg"
+        : "Class total · kg";
     return cardShell("silica", "", title, subtitle,
       silicaRouteChip(row, markdown) +
       kgRow(row, "class_total_kg", classLabel, classRole) +

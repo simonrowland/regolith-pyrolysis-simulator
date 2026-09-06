@@ -1548,9 +1548,38 @@ class _FakeProductSim:
             ),
             snapshots=(
                 SimpleNamespace(
+                    c2a_staged_gas={
+                        "stage_name": "alkali_early_fe",
+                        "gas_cover_mode": "po2_hold",
+                    },
+                    condensed_by_stage_species_delta={},
+                    evap_flux=SimpleNamespace(carrier_authority_by_species={}),
+                ),
+                SimpleNamespace(
                     mass_in_kg=1001.5,
                     mass_out_kg=1001.5,
                     mass_balance_error_pct=0.0,
+                    c2a_staged_gas={
+                        "stage_name": "sio_window",
+                        "gas_cover_mode": "pn2_sweep",
+                    },
+                    condensed_by_stage_species_delta={(3, "SiO"): 40.0},
+                    evap_flux=SimpleNamespace(
+                        carrier_authority_by_species={
+                            "SiO": {
+                                "species_id": "SiO",
+                                "pressure": {"kind": "value", "pa": 1.0},
+                                "flux": {"kind": "eligible"},
+                                "verdict_status": "status_bearing_non_authoritative",
+                                "certification_ceiling": "never",
+                                "validation_status": "pending_validation",
+                                "is_flux_active": True,
+                                "authority_level": "extrapolated",
+                                "valid_range_K": [1400.0, 2200.0],
+                                "reason": "outside certified SiO source band",
+                            },
+                        },
+                    ),
                 ),
             ),
         )
@@ -2207,6 +2236,9 @@ def test_product_summary_includes_input_output_yield_table_and_mass_closure() ->
     }
     assert outputs["ingots_metals"]["kg"] == pytest.approx(50.0)
     assert outputs["glass"]["yield_pct"] == pytest.approx(40.0 / 1001.5 * 100.0)
+    assert summary["product_classes"]["pure_silica_glass"]["flag"]["authority"] == (
+        "extrapolated"
+    )
     assert outputs["oxygen"]["partition_kg"]["mre_anode_stored"] == pytest.approx(20.0)
     assert outputs["captured_volatiles"]["kg_by_species"] == {"H2O": 5.0}
     assert table["mass_closure"]["status"] == "closed"

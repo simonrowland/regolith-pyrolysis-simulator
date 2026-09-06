@@ -48,6 +48,7 @@ from simulator.accounting.queries import (
 )
 from simulator.vapour_rail.instrumentation import (
     VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE,
+    VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING,
     vapour_carrier_authority_status,
 )
 
@@ -161,9 +162,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 'class_total_kg': float,
             },
             'pure_silica_glass': {
-                'stage_3_capture_kg': float,
+                'stage_3_capture_kg': float | None,
                 'stage_3_kg_by_species': {species: kg, ...},
-                'class_total_kg': float,
+                'class_total_kg': float | None,
+                'flag': {status, authority, band, reason},  # when flagged
             },
             'glass': {
                 'species_kg': {species: kg, ...},
@@ -243,7 +245,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
                 stage_3_kg_by_species[species] = kg
     stage_3_capture_kg = float(sum(stage_3_kg_by_species.values()))
     saw_oxygen_hold = False
-    silica_is_product = False
+    saw_release_capture = False
+    every_capture_followed_release_switch = True
+    silica_quantity_available = True
+    silica_certification_flag: dict[str, Any] | None = None
     for snapshot in getattr(getattr(sim, 'record', None), 'snapshots', ()) or ():
         gas = getattr(snapshot, 'c2a_staged_gas', {}) or {}
         if gas.get('gas_cover_mode') == 'po2_hold':
@@ -252,21 +257,75 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
         if not any(capture.get((3, species), 0.0) > 0.0
                    for species in PURE_SILICA_GLASS_SPECIES):
             continue
-        authority = getattr(
-            getattr(snapshot, 'evap_flux', None), 'carrier_authority_by_species', {}
-        ) or {}
-        if not (
+        release_capture = (
             saw_oxygen_hold
             and gas.get('stage_name') == 'sio_window'
             and gas.get('gas_cover_mode') == 'pn2_sweep'
-            and vapour_carrier_authority_status(
-                authority.get('SiO'), expected_species_id='SiO'
-            ) == VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE
-        ):
-            silica_is_product = False
-            break
-        silica_is_product = True
-    silica_product_kg = stage_3_capture_kg if silica_is_product else 0.0
+        )
+        saw_release_capture = saw_release_capture or release_capture
+        every_capture_followed_release_switch = (
+            every_capture_followed_release_switch and release_capture
+        )
+        if not release_capture:
+            continue
+        authority = getattr(
+            getattr(snapshot, 'evap_flux', None), 'carrier_authority_by_species', {}
+        ) or {}
+        authority_record = authority.get('SiO')
+        authority_status = vapour_carrier_authority_status(
+            authority_record, expected_species_id='SiO'
+        )
+        if authority_status == VAPOUR_CARRIER_AUTHORITY_AUTHORITATIVE:
+            continue
+
+        record = authority_record if isinstance(authority_record, Mapping) else {}
+        extra = record.get('extra')
+        extra = extra if isinstance(extra, Mapping) else {}
+        band = record.get('certified_band')
+        if band is None:
+            band = record.get('valid_range_K')
+        if band is None:
+            band = record.get('certification_ceiling')
+        reason = (
+            record.get('reason')
+            or record.get('original_reason')
+            or record.get('refusal_code')
+            or extra.get('reason')
+            or extra.get('activity_reason')
+            or 'missing SiO carrier evidence'
+        )
+        flag_status = (
+            'flagged prediction'
+            if authority_status == VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING
+            else 'unavailable'
+        )
+        if flag_status == 'unavailable' or silica_certification_flag is None:
+            silica_certification_flag = {
+                'status': flag_status,
+                'authority': record.get('authority_level') or authority_status,
+                'band': band,
+                'reason': str(reason),
+            }
+        if authority_status != VAPOUR_CARRIER_AUTHORITY_STATUS_BEARING:
+            silica_quantity_available = False
+
+    # Product classification is derived from the executed release route;
+    # evidence authority certifies that mass but never erases a prediction.
+    silica_is_product = (
+        saw_release_capture and every_capture_followed_release_switch
+    )
+    if not silica_is_product:
+        silica_product_kg: float | None = 0.0
+        reported_stage_3_capture_kg: float | None = stage_3_capture_kg
+    elif silica_quantity_available:
+        silica_product_kg = stage_3_capture_kg
+        reported_stage_3_capture_kg = stage_3_capture_kg
+    else:
+        silica_product_kg = None
+        reported_stage_3_capture_kg = None
+    reported_stage_3_species = (
+        stage_3_kg_by_species if reported_stage_3_capture_kg is not None else {}
+    )
 
     # ----- Captured volatiles -----
     captured_volatiles_kg_by_species = _ledger_species_kg(
@@ -320,6 +379,11 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             )
         except (AttributeError, TypeError, ValueError):
             mixed_melt_residual_kg = 0.0
+    glass_class_total_kg = (
+        None
+        if silica_product_kg is None
+        else silica_product_kg + mixed_melt_residual_kg
+    )
 
     # ----- Unclassified bin -----
     classified_species: set[str] = (
@@ -343,6 +407,14 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             unclassified[species] = value
     unclassified_total = float(sum(unclassified.values()))
 
+    silica_bucket: dict[str, Any] = {
+        'stage_3_capture_kg': reported_stage_3_capture_kg,
+        'stage_3_kg_by_species': reported_stage_3_species,
+        'class_total_kg': silica_product_kg,
+    }
+    if silica_is_product and silica_certification_flag is not None:
+        silica_bucket['flag'] = silica_certification_flag
+
     return {
         'metals_plus_O2': {
             'metals_kg': metals_kg,
@@ -360,14 +432,10 @@ def classify_products(sim, *, early_tap_mode: bool = False) -> dict[str, Any]:
             'partition_kg': oxygen_partition,
             'class_total_kg': o2_kg,
         },
-        'pure_silica_glass': {
-            'stage_3_capture_kg': stage_3_capture_kg,
-            'stage_3_kg_by_species': stage_3_kg_by_species,
-            'class_total_kg': silica_product_kg,
-        },
+        'pure_silica_glass': silica_bucket,
         'glass': {
-            'species_kg': stage_3_kg_by_species if silica_is_product else {},
-            'class_total_kg': silica_product_kg + mixed_melt_residual_kg,
+            'species_kg': reported_stage_3_species if silica_is_product else {},
+            'class_total_kg': glass_class_total_kg,
             'pure_silica_glass_kg': silica_product_kg,
             'industrial_mixed_glass_kg': mixed_melt_residual_kg,
         },

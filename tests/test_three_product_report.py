@@ -190,20 +190,24 @@ def test_silica_glass_zero_when_stage_3_missing():
 
 
 @pytest.mark.parametrize(
-    ('events', 'verdict', 'is_product'),
+    ('events', 'verdict', 'outcome'),
     [
-        ([], 'authoritative', False),
-        (['release'], 'authoritative', False),
-        (['hold', 'release'], 'authoritative', True),
-        (['hold', 'release'], 'status_bearing_non_authoritative', False),
-        (['hold', 'release'], 'missing', False),
-        (['hold', 'incidental'], 'authoritative', False),
-        (['incidental', 'hold', 'release'], 'authoritative', False),
-        (['hold', 'release', 'incidental'], 'authoritative', False),
+        ([], 'authoritative', 'non_product'),
+        (['release'], 'authoritative', 'non_product'),
+        (['hold', 'release'], 'authoritative', 'authoritative_product'),
+        (
+            ['hold', 'release'],
+            'status_bearing_non_authoritative',
+            'flagged_product',
+        ),
+        (['hold', 'release'], 'missing', 'unavailable'),
+        (['hold', 'incidental'], 'authoritative', 'non_product'),
+        (['incidental', 'hold', 'release'], 'authoritative', 'non_product'),
+        (['hold', 'release', 'incidental'], 'authoritative', 'non_product'),
     ],
 )
-def test_silica_product_requires_executed_switch_and_authority_for_every_capture(
-    events, verdict, is_product
+def test_silica_product_separates_executed_switch_from_evidence_certification(
+    events, verdict, outcome
 ):
     authority = {
         'species_id': 'SiO',
@@ -214,6 +218,12 @@ def test_silica_product_requires_executed_switch_and_authority_for_every_capture
         'validation_status': 'validated',
         'is_flux_active': True,
     }
+    if verdict == 'status_bearing_non_authoritative':
+        authority.update({
+            'authority_level': 'extrapolated',
+            'valid_range_K': [1400.0, 2200.0],
+            'reason': 'outside certified SiO source band',
+        })
     snapshots = [
         SimpleNamespace(
             c2a_staged_gas={
@@ -241,12 +251,39 @@ def test_silica_product_requires_executed_switch_and_authority_for_every_capture
 
     result = classify_products(sim)
 
-    assert result['pure_silica_glass']['stage_3_capture_kg'] == captured_kg
-    assert result['pure_silica_glass']['stage_3_kg_by_species'] == {'SiO2': captured_kg}
-    expected_product_kg = captured_kg if is_product else 0.0
-    assert result['pure_silica_glass']['class_total_kg'] == expected_product_kg
+    silica = result['pure_silica_glass']
+    expected_product_kg = {
+        'non_product': 0.0,
+        'authoritative_product': captured_kg,
+        'flagged_product': captured_kg,
+        'unavailable': None,
+    }[outcome]
+    expected_capture_kg = None if outcome == 'unavailable' else captured_kg
+    expected_species = (
+        {} if outcome == 'unavailable' else {'SiO2': captured_kg}
+    )
+    assert silica['stage_3_capture_kg'] == expected_capture_kg
+    assert silica['stage_3_kg_by_species'] == expected_species
+    assert silica['class_total_kg'] == expected_product_kg
     assert result['glass']['class_total_kg'] == expected_product_kg
-    assert result['glass']['species_kg'] == ({'SiO2': captured_kg} if is_product else {})
+    assert result['glass']['species_kg'] == (
+        {'SiO2': captured_kg}
+        if outcome in {'authoritative_product', 'flagged_product'}
+        else {}
+    )
+    if outcome == 'flagged_product':
+        assert silica['flag'] == {
+            'status': 'flagged prediction',
+            'authority': 'extrapolated',
+            'band': [1400.0, 2200.0],
+            'reason': 'outside certified SiO source band',
+        }
+    elif outcome == 'unavailable':
+        assert silica['flag']['status'] == 'unavailable'
+        assert silica['flag']['authority'] == 'missing'
+        assert silica['flag']['reason'] == 'missing SiO carrier evidence'
+    else:
+        assert 'flag' not in silica
 
 
 def test_captured_volatiles_include_condensation_train_account():
