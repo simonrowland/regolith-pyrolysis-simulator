@@ -285,11 +285,28 @@ def corpus_pointers(corpus: Path, source_id: str, pdf_sha: str | None,
     raw_sha = sha256_file(raw) if raw.is_file() else None
     ledger_error = None
     try:
-        stages = (load_yaml(ledger).get("stages") or {}) if ledger.is_file() else {}
+        loaded = load_yaml(ledger) if ledger.is_file() else {}
     except yaml.YAMLError as exc:
-        stages = {}
+        loaded = {}
         ledger_error = f"Invalid YAML: {exc.problem} at line {exc.problem_mark.line + 1}"
-    last = max(stages, key=lambda stage: (str((stages[stage] or {}).get("date") or ""),
+    # Ledger stage shapes seen in the corpus: a mapping stage -> {date, ...},
+    # a mapping stage -> str, a list of {stage, date, ...} entries, or nothing.
+    # Normalise to an ordered mapping stage -> dict so no shape can crash the
+    # index; anything unrecognisable is reported via ledger_error, never guessed.
+    stages = {}
+    raw_stages = loaded.get("stages") if isinstance(loaded, dict) else None
+    if isinstance(raw_stages, dict):
+        for name, value in raw_stages.items():
+            stages[str(name)] = value if isinstance(value, dict) else {"note": value}
+    elif isinstance(raw_stages, list):
+        for i, entry in enumerate(raw_stages):
+            if isinstance(entry, dict):
+                stages[str(entry.get("stage") or f"stage_{i}")] = entry
+            elif entry is not None:
+                stages[f"stage_{i}"] = {"note": entry}
+    elif raw_stages not in (None, {}, []) and ledger_error is None:
+        ledger_error = f"Unrecognised stages shape: {type(raw_stages).__name__}"
+    last = max(stages, key=lambda stage: (str(stages[stage].get("date") or ""),
                                          list(stages).index(stage))) if stages else None
     def directory(name):
         path = corpus / name / source_id

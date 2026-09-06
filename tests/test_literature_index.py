@@ -8,6 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+import re
 import yaml
 import pytest
 
@@ -142,10 +143,17 @@ def test_builder_temp_corpus_row_truth(tmp_path: Path) -> None:
 
 def test_doi_bearing_sidecars_reach_index():
     index = yaml.safe_load(COMMITTED_YAML.read_text())
+    # Detect DOI-bearing sidecars with a parser-independent regex on the raw
+    # text so a parser regression cannot hide itself (review r2 P3): if the
+    # production parser dropped every DOI, the parser-based check would pass
+    # vacuously while this one fails.
+    # Only a DOI *field* counts (doi: / DOI: / **DOI:** ...); free-text
+    # mentions of rejected or guessed DOIs (e.g. a recorded resolver miss) do not.
+    doi_re = re.compile(r"^\s*[-*#]*\s*\**doi\**\s*[:=]\s*\**\s*`?(10\.\d{4,9}/\S+)", re.I | re.M)
     for row in index["sources"]:
         if row["sidecar_path"]:
-            sidecar = builder.parse_sidecar(REPO_ROOT / row["sidecar_path"])
-            if sidecar["doi"]:
+            raw = (REPO_ROOT / row["sidecar_path"]).read_text(errors="replace")
+            if doi_re.search(raw):
                 assert row["doi"], row["source_id"]
     kems = next(row for row in index["sources"] if row["source_id"] == "kems-017-stolyarova-2013")
     assert kems["doi"] == "10.2174/1874396x01307010057"

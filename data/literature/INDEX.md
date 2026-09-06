@@ -6,7 +6,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 ## Scan
 
 - root: `.`
-- corpus root: `/Users/simonrowland/Repos/regolith-corpus` (raw/text/tables/ledger paths below are relative to this root)
+- corpus root: `/Users/simonrowland/Repos/regolith-corpus-ctl` (raw/text/tables/ledger paths below are relative to this root)
 - Ledger stage: latest dated event; same-date ties use ledger insertion order.
 - private_roots_scanned: (none)
 - private_roots_not_scanned: (none)
@@ -15,14 +15,14 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 120
-- Extracts (`literature_extract.v1`): 118
-- PDFs present in this worktree: 40
-- Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 37
+- Sources: 122
+- Extracts (`literature_extract.v1`): 120
+- PDFs present in this worktree: 42
+- Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 38
 - PDFs with no extract: 2
 - Extracts with no PDF: 80
-- Alias groups needing owner/controller resolution: 27
-- Extracts with private/non-public row locators: 35
+- Alias groups needing owner/controller resolution: 28
+- Extracts with private/non-public row locators: 36
 
 ## Sources
 
@@ -37,6 +37,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `datz-and-smith-1961` | Datz, S. & Smith, W. T. Jr. (and related Datz 1961 tabulations) — Na2Cl2 dissociation equilibrium constants (Table II lineage) as transcribed in vp-acquire-5 chloride-dimers DRAFT |  | ABSENT, `` | `raw/datz-and-smith-1961/datz-and-smith-1961.pdf` (ABSENT, ); `text/datz-and-smith-1961/` (0 files, ABSENT); `tables/datz-and-smith-1961/` (0 files, ABSENT) | `data/literature/extracts/datz-and-smith-1961.yaml` (3 rows, draft) | `ledger/datz-and-smith-1961.yaml`: extracted (2026-09-06) |
 | `datz-smith-taylor-1961-nacl-vapor` | Zimmermann, K. / later KEMS salt reviews; preferred primary: Barton, J.L. & Bloom, H. (1956–), molten alkali-halide vapor pressures (transpirations), and Datz, S., Smith, W.T. & Taylor, E.H. (1961), "The Molecular Composition of Sodium Chloride Vapor", J. Chem. Phys. 34:558–564, DOI 10.1063/1.1700984 — monomer/dimer partials over liquid NaCl (independent of Stull Antoine). Thermochemical: NIST-JANAF NaCl(l)/NaCl(g)/Na2Cl2(g) Chase 1998 (REF-020). | 10.1063/1.1700984 | ABSENT, `` | `raw/datz-smith-taylor-1961-nacl-vapor/datz-smith-taylor-1961-nacl-vapor.pdf` (ABSENT, ); `text/datz-smith-taylor-1961-nacl-vapor/` (0 files, ABSENT); `tables/datz-smith-taylor-1961-nacl-vapor/` (0 files, ABSENT) | `data/literature/extracts/datz-smith-taylor-1961-nacl-vapor.yaml` (1 rows, draft) | `ledger/datz-smith-taylor-1961-nacl-vapor.yaml`: extracted (2026-09-06) |
 | `fedkin-grossman-ghiorso-2006` | Fedkin, A. V., Grossman, L. & Ghiorso, M. S. (2006), Geochim. Cosmochim. Acta 70:206-223, Table 3 pp. 212-213; primary vacuum free-evaporation data Hashimoto, A. (1983), Geochem. J. 17:111-145 | 10.1016/j.gca.2005.08.014 | ABSENT, `` | `raw/fedkin-grossman-ghiorso-2006/fedkin-grossman-ghiorso-2006.pdf` (ABSENT, ); `text/fedkin-grossman-ghiorso-2006/` (0 files, ABSENT); `tables/fedkin-grossman-ghiorso-2006/` (0 files, ABSENT) | `data/literature/extracts/fedkin-grossman-ghiorso-2006.yaml` (8 rows, draft) | `ledger/fedkin-grossman-ghiorso-2006.yaml`: extracted (2026-09-06) |
+| `fegley-2023-chemical-equilibrium-calculations-bu` | Fegley, B., Jr., Lodders, K., and Jacobson, N. S. (2023). Chemical Equilibrium Calculations for Bulk Silicate Earth Material at High Temperatures. Geochemistry (formerly Chemie der Erde). | 10.1016/j.chemer.2023.125961 | `docs/references/pdfs/02-thermochemistry/fegley-2023-chemical-equilibrium-calculations-bu.pdf`, `093cbfa9` | `raw/fegley-2023-chemical-equilibrium-calculations-bu/fegley-2023-chemical-equilibrium-calculations-bu.pdf` (present, 093cbfa9); `text/fegley-2023-chemical-equilibrium-calculations-bu/` (3 files, exists); `tables/fegley-2023-chemical-equilibrium-calculations-bu/` (64 files, exists) | `data/literature/extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml` (28 rows, draft, private_path) | `ledger/fegley-2023-chemical-equilibrium-calculations-bu.yaml`: scored (—) |
 | `fray-schmitt-2009-ch4-1` | Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CH4-1 correlation; disagreement vs Grundy already stored on the family row (~69.5% at 37 K). | 10.1016/j.pss.2009.09.011 | ABSENT, `` | `raw/fray-schmitt-2009-ch4-1/fray-schmitt-2009-ch4-1.pdf` (ABSENT, ); `text/fray-schmitt-2009-ch4-1/` (0 files, ABSENT); `tables/fray-schmitt-2009-ch4-1/` (0 files, ABSENT) | `data/literature/extracts/fray-schmitt-2009-ch4-1.yaml` (1 rows, draft) | `ledger/fray-schmitt-2009-ch4-1.yaml`: extracted (2026-09-06) |
 | `fray-schmitt-2009-co-1` | Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CO-1 correlation (coefficients in NASA NTRS 20210019502 supplementary Table 2). Row already records disagreement at 31 K (~513% vs Grundy); use FS09 as the independent promotion check, not a second fit of Grundy. | 10.1016/j.pss.2009.09.011 | ABSENT, `` | `raw/fray-schmitt-2009-co-1/fray-schmitt-2009-co-1.pdf` (ABSENT, ); `text/fray-schmitt-2009-co-1/` (0 files, ABSENT); `tables/fray-schmitt-2009-co-1/` (0 files, ABSENT) | `data/literature/extracts/fray-schmitt-2009-co-1.yaml` (1 rows, draft) | `ledger/fray-schmitt-2009-co-1.yaml`: extracted (2026-09-06) |
 | `fray-schmitt-2009-nh3` | Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, NH3 correlations (NASA NTRS supplementary Table 2). Alternate liquid branch: NIST Chemistry WebBook SRD 69 ammonia Antoine (Stull 1947 lineage), ~164–240 K liquid — independent of the 2024 QCM ice fit. |  | ABSENT, `` | `raw/fray-schmitt-2009-nh3/fray-schmitt-2009-nh3.pdf` (ABSENT, ); `text/fray-schmitt-2009-nh3/` (0 files, ABSENT); `tables/fray-schmitt-2009-nh3/` (0 files, ABSENT) | `data/literature/extracts/fray-schmitt-2009-nh3.yaml` (1 rows, draft) | `ledger/fray-schmitt-2009-nh3.yaml`: extracted (2026-09-06) |
@@ -91,6 +92,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `kems-138-bischof-2023` | Bischof, L., Sossi, P. A., Sergeev, D., Müller, M. & Schmidt, M. W. (2023), "Quantification of thermodynamic properties for vaporisation reactions above solid Ga2O3 and In2O3 by Knudsen Effusion Mass Spectrometry", Calphad 80:102507, DOI 10.1016/j.calphad.2022.102507 | 10.1016/j.calphad.2022.102507 | `docs/references/pdfs/99-kems-langmuir/kems-138-bischof-2023.pdf`, `cd9ab2b7` | `raw/kems-138-bischof-2023/kems-138-bischof-2023.pdf` (present, cd9ab2b7); `text/kems-138-bischof-2023/` (72 files, exists); `tables/kems-138-bischof-2023/` (26 files, exists) | `data/literature/extracts/kems-138-bischof-2023.yaml` (31 rows, draft) | `ledger/kems-138-bischof-2023.yaml`: decoded (2026-09-06) |
 | `kems-139-jacobson-2024` | Jacobson, N. S., Colle, J.-Y., Stolyarova, V., Markus, T. & Nuta, I. (2024), "Knudsen effusion mass spectrometry: Current and future approaches", Rapid Commun. Mass Spectrom. 38(14):e9744, DOI 10.1002/rcm.9744. HAL hal-04602114. | 10.1002/rcm.9744 | `docs/references/pdfs/99-kems-langmuir/kems-139-jacobson-2024.pdf`, `3896c027` | `raw/kems-139-jacobson-2024/kems-139-jacobson-2024.pdf` (present, 3896c027); `text/kems-139-jacobson-2024/` (136 files, exists); `tables/kems-139-jacobson-2024/` (28 files, exists) | `data/literature/extracts/kems-139-jacobson-2024.yaml` (8 rows, draft) | `ledger/kems-139-jacobson-2024.yaml`: decoded (2026-09-06) |
 | `kems-140-heck-2025` | Heck, W. F., Herrmann, A. D. & Jackson, C. R. M. (2025), "Experimental degassing of moderately volatile chalcophile elements from silicate melt with and without sulfur present", Geochim. Cosmochim. Acta 402:153-172, DOI 10.1016/j.gca.2025.05.007 | 10.1016/j.gca.2025.05.007 | ABSENT, `` | `raw/kems-140-heck-2025/kems-140-heck-2025.pdf` (ABSENT, ); `text/kems-140-heck-2025/` (0 files, ABSENT); `tables/kems-140-heck-2025/` (22 files, exists) | `data/literature/extracts/kems-140-heck-2025.yaml` (53 rows, draft) | `ledger/kems-140-heck-2025.yaml`: — (—) |
+| `kems-184-behrens-1979` | Behrens, Robert G., and Rinehart, Gary H. (1979). Vaporization Thermodynamics and Kinetics of Hexagonal Silicon Carbide. Characterization of High Temperature Vapors and Gases, NBS Special Publication 561, volume 1, pp. 125–142. | NBS Special Publication 561 | `docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.pdf`, `02bcfb56` | `raw/kems-184-behrens-1979/kems-184-behrens-1979.pdf` (present, 02bcfb56); `text/kems-184-behrens-1979/` (3 files, exists); `tables/kems-184-behrens-1979/` (5 files, exists) | `data/literature/extracts/kems-184-behrens-1979.yaml` (33 rows, draft) | `ledger/kems-184-behrens-1979.yaml`: scored (—) |
 | `kems-189-bischof-2021` | Bischof, L., Sossi, P. A., Sergeev, D., Müller, M. & Schmidt, M. W. (2021), "Vaporisation of group 13 elements from basaltic melts by Knudsen Effusion Mass Spectrometry", Goldschmidt2021 abstracts (Virtual, 4-9 July 2021), DOI 10.7185/gold2021.7353 | 10.7185/gold2021.7353 | `docs/references/pdfs/99-kems-langmuir/kems-189-bischof-2021.pdf`, `3a20da01` | `raw/kems-189-bischof-2021/kems-189-bischof-2021.pdf` (present, 3a20da01); `text/kems-189-bischof-2021/` (10 files, exists); `tables/kems-189-bischof-2021/` (2 files, exists) | `data/literature/extracts/kems-189-bischof-2021.yaml` (16 rows, draft) | `ledger/kems-189-bischof-2021.yaml`: decoded (2026-09-06) |
 | `kems-ms2000-044` | Tsaplin, A. A., Zaitsev, A. I., Shelkova, N. E. & Mogutnov, B. M., "Thermodynamic properties and phase equilibria in Na2O-SiO2 and K2O-SiO2 systems", conference preprint, 24 pp. |  | `docs/references/pdfs/99-kems-langmuir/ms2000-044.pdf`, `3d78f4e6` | `raw/kems-ms2000-044/kems-ms2000-044.pdf` (present, 3d78f4e6); `text/kems-ms2000-044/` (24 files, exists); `tables/kems-ms2000-044/` (0 files, ABSENT) | `data/literature/extracts/kems-ms2000-044.yaml` (50 rows, draft, private_path) | `ledger/kems-ms2000-044.yaml`: decoded (2026-09-06) |
 | `lamoreaux-hildenbrand-1984` | Lamoreaux, R. H. & Hildenbrand, D. L., High Temperature Vaporization Behavior of Oxides. I. Alkali Metal Binary Oxides, J. Phys. Chem. Ref. Data 13 (1984) 151–173 | 10.1063/1.555706 | ABSENT, `` | `raw/lamoreaux-hildenbrand-1984/lamoreaux-hildenbrand-1984.pdf` (ABSENT, ); `text/lamoreaux-hildenbrand-1984/` (0 files, ABSENT); `tables/lamoreaux-hildenbrand-1984/` (0 files, ABSENT) | `data/literature/extracts/lamoreaux-hildenbrand-1984.yaml` (20 rows, draft, private_path) | `ledger/lamoreaux-hildenbrand-1984.yaml`: extracted (2026-09-06) |
@@ -239,6 +241,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ### Extracts needing public row locators (b-477)
 
+- `fegley-2023-chemical-equilibrium-calculations-bu`
 - `kems-001-homma-1966`
 - `kems-002-ohno-1967`
 - `kems-003-pound-1972`
@@ -312,6 +315,7 @@ Required sibling fields: citation, DOI, license/OA basis, sha256, retrieved date
 - `kems-133-costa-2017` — `docs/references/pdfs/99-kems-langmuir/kems-133-costa-2017.md` — missing: sha256
 - `kems-137-bischof-2023-mmc1` — `(no sidecar)` — missing: citation, doi, license_or_oa_basis, sha256, retrieved_date, retrieval_url
 - `kems-140-heck-2025` — `docs/references/pdfs/99-kems-langmuir/kems-140-heck-2025.md` — missing: sha256
+- `kems-184-behrens-1979` — `docs/references/pdfs/99-kems-langmuir/kems-184-behrens-1979.md` — missing: doi, sha256
 - `kems-ms2000-044` — `(no sidecar)` — missing: citation, doi, license_or_oa_basis, sha256, retrieved_date, retrieval_url
 - `smales-1971-lpsc-12022` — `docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.md` — missing: doi, retrieved_date
 - `stebbins-carmichael-weill-1983` — `docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.md` — missing: doi, retrieved_date
@@ -335,6 +339,7 @@ The builder does not pick a winner.
 - same_doi `10.1063/1.3253096`: `REF-040`, `kems-003-pound-1972`, `pound-1972-cr-langmuir-knudsen`, `pound-1972-mccabe-cr` — needs owner/controller resolution
 - same_doi `10.1063/1.555706`: `lamoreaux-hildenbrand-1984`, `ref-052-k-o-gas`, `ref-052-na-o-gas` — needs owner/controller resolution
 - same_doi `10.1063/1.555799`: `lamoreaux-hildenbrand-hildenbrand-1987`, `lh87-al-o-gas-species`, `lh87-cao-g`, `lh87-mgo-g` — needs owner/controller resolution
+- same_report `NBS Special Publication 561`: `kems-042-plante-1979`, `kems-184-behrens-1979` — needs owner/controller resolution
 - same_report `NTRS 20150002321`: `costa-jacobson-2015`, `kems-007-costa-2015` — needs owner/controller resolution
 - source_id_alias `alcock-1984`: `ref-032-al`, `ref-032-bi`, `ref-032-ca`, `ref-032-fe-liquid-equation`, `ref-032-k`, `ref-032-mg`, `ref-032-na`, `ref-032-pb`, `ref-032-si`, `ref-032-zr` — needs owner/controller resolution
 - source_id_alias `bischof-2023`: `kems-137-bischof-2023`, `kems-137-bischof-2023-mmc1`, `kems-138-bischof-2023` — needs owner/controller resolution
