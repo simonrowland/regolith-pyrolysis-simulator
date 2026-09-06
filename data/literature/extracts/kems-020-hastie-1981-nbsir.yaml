@@ -6,16 +6,20 @@ source:
     in Coal Conversion and Combustion Systems", NBSIR 81-2279, National Bureau
     of Standards, May 1981 (interim report)
   year: 1981
+  url: https://nvlpubs.nist.gov/nistpubs/Legacy/IR/nbsir81-2279.pdf
+  doi: 10.6028/NBS.IR.81-2279
 extraction:
   method: >-
-    300 dpi pdftoppm of Tables 1-3 (Table 2 rotated landscape); visual
-    certification; tesseract second reader; pdftotext -layout third reader on
-    portrait tables only. Studio-3 MinerU not ready. No figure digitization.
-    Compilation rule: original source credited per Table 2 row; NBSIR is the
-    access path.
-  date: '2026-08-27'
-  worker: orphans-close
-  provenance_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/
+    RH-47 r2. Parent observation objects restored bit-for-bit from 70a5c569
+    (EXTEND, never rewrite). Fig. 4/5/11 re-digitised from 300 dpi pdftoppm of
+    PDF pages 64/65/71 with labelled-tick calibration (not frame edges) and a
+    second-pass residual on every stored point. Split-out siblings hold NaCl
+    dimerization, 0.34 mm orifice, Table 3 species grid, Fig. 5 residue, and
+    the printed Table 2 6.350 spelling. Compilation rule: original source
+    credited per Table 2 row; NBSIR is the access path.
+  date: '2026-09-06'
+  worker: hunt-RH-47-r2
+  provenance_path: docs-private/research/2026-09-06-hunts/RH-47/kems-020-hastie-1981-nbsir/
 review_status: draft
 fidelity_samples:
   - species: K
@@ -35,6 +39,21 @@ fidelity_samples:
     locator:
       page: 11
       paragraph: log P_NaCl (atm) = 4.85 (+- 0.3) - 8820 (+- 200)/T
+  - species: Na
+    observable: activity_coefficient
+    observation_id: hastie_1981_table3_solgasmix_model_not_measurement
+    field: Na2O_activity_nonideal
+    value: 3.4e-8
+    locator:
+      page: 43
+      table: '3'
+      note: Table 3 Na2O activity non-ideal N2 column as printed 3.4(-8)
+  - path: species.K2O.observations[hastie_1981_fig11_k1_slag_k2o_gamma_digitized].values.points[0].gamma
+    value: 2.26e-07
+    locator:
+      page: 61
+      figure: '11'
+      note: Run 1 rightmost filled circle; printed x(K2O)=0.154; 300 dpi tick-calibrated render
 species:
   K:
     observations:
@@ -249,6 +268,69 @@ species:
           locator:
             page: 9
             paragraph: upper pressure limits of 10^-4 and one atm
+    - observation_id: hastie_1981_table2_17k2o_A_as_printed_note
+      type: psat_series
+      locator:
+        table: '2'
+        page: 23
+        published_page: 23
+        pdf_page_index: 29
+        note: rotated Table 2 ~17[K2O] row; report p. 23
+      T_range_K:
+      - 1600.0
+      - 2000.0
+      phase: K2O-Al2O3-SiO2_phases_uncertain
+      regime: kems_effusion
+      units: dimensionless coefficient as printed
+      values:
+        quantity: table2_A_spelling_note
+        status: typed_refusal
+        reason: >-
+          Parent row hastie_1981_table2_k_logP_coefficients stores A as 6.35
+          (70a5c569). Rotated Table 2 prints 6.350. Parent left unchanged;
+          this sibling cites the printed spelling.
+        admission_status: note_parent_unaltered
+        printed_A: 6.350
+        parent_A: 6.35
+        printed_B: 20693
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
+    - observation_id: hastie_1981_k2_slag_orifice_0p34mm
+      type: psat_series
+      locator:
+        page: 28
+        paragraph: relatively small effusion orifice (0.34 mm diameter)
+        figure: '20'
+      T_range_K:
+      - 1470.0
+      - 1820.0
+      phase: K2_slag_liquid
+      regime: kems_effusion
+      units: m2
+      values:
+        quantity: effusion_orifice_on_K2_slag_runs
+        status: typed_refusal
+        reason: >-
+          Diameter printed for slag-run apparatus (report p. 28; Fig. 20 caption
+          repeats 0.34 mm). Not a P(T) series. Not attached to the Table 2
+          compilation parent.
+        admission_status: equipment_metadata
+        orifice_diameter_mm_as_printed: 0.34
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: diameter as printed; area inferred
+      equipment:
+        orifice_area:
+          value: 9.079226e-08
+          units: m2
+          diameter_m: 0.00034
+          orifice_shape: circular_effusion
+          inferred: true
+          inference: area = π (d/2)^2 from stated 0.34 mm effusion orifice
+          locator:
+            page: 28
+            paragraph: relatively small effusion orifice (0.34 mm diameter)
     - observation_id: hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked
       type: psat_series
       locator:
@@ -270,6 +352,44 @@ species:
         admission_status: rejected_no_figure_reading
         original_source: Hastie et al. (1979) illite; Plante and Cook (1978) slags
         access_path: NBSIR 81-2279 figures
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
+    - observation_id: hastie_1981_remaining_figures_ledger
+      type: psat_series
+      locator:
+        page: 51
+        section: '15'
+        note: figure captions report pp. 51-53; figures PDF 61-81
+      T_range_K:
+      - 1100.0
+      - 2150.0
+      phase: K-bearing_oxide_and_slag_mix
+      regime: mixed_kms_tms
+      units: atm
+      values:
+        quantity: figure_completeness_ledger
+        status: typed_refusal
+        admission_status: figure_only_or_proxy
+        kinetic_alpha: true_absence
+        mass_loss_mg_series: true_absence
+        figures:
+          '1': {role: apparatus, status: not_numeric}
+          '2': {role: K2SO4_g_over_K2SO4_l, status: figure_only, detail_elsewhere: Plante et al. 1981}
+          '3': {role: KOH_and_KOH2_over_KOH_l, status: figure_only, detail_elsewhere: Hastie et al. 1981}
+          '7': {role: nonequilibrium_KAlSiO4, status: figure_only, proxy: non_equilibrium_not_Psat}
+          '8': {role: Western_Eastern_slag_K, status: figure_only, table2_covers: true}
+          '9': {role: Eastern_slag_K_and_O2, status: figure_only, table2_covers: true}
+          '10': {role: K1_initial_volatiles_vs_T_time, status: figure_only, note: time series without numeric table}
+          '12': {role: K2_slag_K_and_O2, status: figure_only, table2_covers: true}
+          '13': {role: K_ion_intensity_vs_time, status: figure_only, note: rate_series plot, no mg or s table}
+          '14': {role: K2O_dissociation_pressure_product_plasma_vs_slag, status: model_proxy, note: Table 2 P_K recast vs SOLGASMIX plasma}
+          '16': {role: silica_activity_function_illite_vs_quartz_plus_H2, status: figure_only, note: 1-2 orders below JANAF unit-activity SiO2}
+          '17': {role: H2O_dissociation_Kp, status: figure_only, note: gas-equilibrium check vs JANAF}
+          '18': {role: K_and_O2_vs_H2O_at_1655K_K2_slag, status: figure_only}
+          '19': {role: K_vs_H2O_isothermal_1610K, status: figure_only}
+          '20': {role: KOH_vs_H2O_at_1794K, status: figure_only, orifice_mm: 0.34}
+          '21': {role: SOLGASMIX_alkali_speciation_vs_T, status: model_proxy, table3_covers: true}
         semantics: bound_not_point_ordering
       uncertainty:
         note: not applicable
@@ -335,6 +455,41 @@ species:
           locator:
             page: 9
             paragraph: usually operated at total pressures of 0.2 to 1.0 atm
+    - observation_id: hastie_1981_nacl_dimerization_second_law
+      type: transition_point
+      locator:
+        page: 11
+        published_page: 11
+        pdf_page_index: 17
+        paragraph: 2NaCl (g) = (NaCl)2 (g)
+      T_range_K:
+      - 1300.0
+      - 1300.0
+      phase: NaCl_gas_dimerization
+      regime: transpiration_and_kems
+      units: kcal/mol and cal/deg mol
+      values:
+        quantity: second_law_deltaH_deltaS
+        reaction_as_printed: 2NaCl(g) = (NaCl)2(g)
+        T_K: 1300.0
+        dimer_minus_deltaH_1300_kcal_per_mol: 46.4
+        dimer_minus_deltaH_sigma: 0.7
+        dimer_minus_deltaS_1300_cal_per_deg_mol: 30.2
+        dimer_minus_deltaS_sigma: 0.6
+        janaf_1971_in_parentheses:
+          minus_deltaH_kcal_per_mol: 47.1
+          minus_deltaH_sigma: 3.5
+          minus_deltaS_cal_per_deg_mol: 29.7
+          minus_deltaS_sigma: 1.0
+        original_source: Bonnell and Hastie (1979)
+        access_path: NBSIR 81-2279 report p. 11-12
+        method_class: measured_direct
+        note: >-
+          Printed as -ΔHd(1300) and -ΔSd(1300) for the dimerization reaction.
+          TMS and KMS this campaign; detail in Bonnell and Hastie 1979.
+          Sibling of hastie_1981_nacl_liquid_logP_prose; parent unaltered.
+      uncertainty:
+        note: +- as printed on -ΔHd and -ΔSd; JANAF 1971 in parentheses
     - observation_id: hastie_1981_table3_solgasmix_model_not_measurement
       type: activity_coefficient
       locator:
@@ -374,6 +529,63 @@ species:
         semantics: bound_not_point_ordering
       uncertainty:
         note: model table; no experimental sigma
+    - observation_id: hastie_1981_table3_solgasmix_species_grid
+      type: activity_coefficient
+      locator:
+        table: '3'
+        page: 43
+        published_page: 43
+        pdf_page_index: 49
+      T_range_K:
+      - 1400.0
+      - 1400.0
+      phase: soda_lime_silica_glass_model
+      standard_state: Na2O activity as SOLGASMIX input (footnote c infinite reservoir)
+      regime: thermochemical_equilibrium_model
+      units: atm and dimensionless activity
+      values:
+        quantity: SOLGASMIX_alkali_speciation_full_grid
+        method_class: model_derived
+        system_class: silicate_melt
+        model: SOLGASMIX (Eriksson 1975); data base mainly JANAF (1971)
+        T_K: 1400.0
+        P_total_atm: 1.0
+        columns:
+          nonideal_N2_atm:
+            Na: 3.1e-7
+            NaOH: not_reported
+            NaCl: not_reported
+            Na2Cl2: not_reported
+            Na2SO4: not_reported
+            Na2O_activity: 3.4e-8
+            total_Na: 3.1e-7
+            no_halogen: 3.1e-7
+          ideal_gas_atm:
+            Na: 2.2e-4
+            NaOH: 8.5e-2
+            NaCl: 9.8e-3
+            Na2Cl2: 7.1e-4
+            Na2SO4: 4.4e-6
+            Na2O_activity: 0.162
+            total_Na: 9.6e-2
+            no_halogen: 8.5e-2
+          nonideal_gas_atm:
+            Na: 1.0e-7
+            NaOH: 9.2e-5
+            NaCl: 8.8e-3
+            Na2Cl2: 5.8e-4
+            Na2SO4: 4.4e-6
+            Na2O_activity: 3.4e-8
+            total_Na: 1.1e-2
+            no_halogen: 1.0e-2
+        computer_notation_as_printed: 3.1(-7) = 3.1e-7
+        note: >-
+          Full Table 3 species grid. Sibling of
+          hastie_1981_table3_solgasmix_model_not_measurement (parent unaltered).
+          Dashes in the N2 column are true absence (not zero). Not a measurement.
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: model table; no experimental sigma
     - observation_id: hastie_1981_fig5_glass_Na_figure_only_blocked
       type: psat_series
       locator:
@@ -392,6 +604,154 @@ species:
         admission_status: rejected_no_figure_reading
         original_source: this campaign KMS/TMS; overlays are foreign
         access_path: NBSIR 81-2279 Fig. 5
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
+    - observation_id: hastie_1981_fig5_glass_Na_this_work_digitized
+      type: psat_series
+      locator:
+        figure: '5'
+        page: 59
+        published_page: 59
+        pdf_page_index: 65
+      T_range_K:
+      - 1333.3
+      - 1493.7
+      phase: soda_lime_silica_glass
+      regime: mixed_kms_tms
+      units: atm as published
+      values:
+        quantity: P_Na_over_soda_lime_glass
+        method_class: measured_direct
+        figure_digitized: true
+        digitization_error_dex: 0.10
+        digitization:
+          dpi: 300
+          pdf_page: 65
+          render_px: {width: 2392, height: 3234}
+          frame_px: {left: 459, top: 435, right: 2007, bottom: 2676}
+          x_ticks:
+            - {label: '6.0', value: 6.0, px: [599, 2676]}
+            - {label: '7.0', value: 7.0, px: [1193, 2676]}
+            - {label: '8.0', value: 8.0, px: [1792, 2676]}
+          y_ticks:
+            - {label: '10^-4', log10: -4.0, px: [2007, 1026]}
+            - {label: '10^-5', log10: -5.0, px: [2007, 1615]}
+            - {label: '10^-6', log10: -6.0, px: [2007, 2206]}
+          pass2_y_ticks_left_axis:
+            - {label: '10^-4', log10: -4.0, px: [459, 1027]}
+            - {label: '10^-5', log10: -5.0, px: [459, 1617]}
+            - {label: '10^-6', log10: -6.0, px: [459, 2208]}
+          pass2_x_ticks:
+            - {label: '6.0', value: 6.0, px: [598, 2676]}
+            - {label: '7.0', value: 7.0, px: [1194, 2676]}
+            - {label: '8.0', value: 8.0, px: [1793, 2676]}
+          px_per_x_unit: 596.5
+          px_per_decade: 590.0
+          frame_x_as_invT: [5.767, 8.362]
+          frame_y_as_log10_p: [-2.999, -6.797]
+          note: >-
+            Labelled 10^-4 is well below the top rail (top ≈ 10^-3.0). 6.0 and
+            8.0 are inset from the left/right frame. Mapping uses labelled
+            ticks, not frame edges.
+        digitization_method: >-
+          300 dpi pdftoppm of PDF page 65. Linear map in 10^4/T and log10 P
+          from labelled ticks (not frame). Pass 2 = left-axis decades + x-tick
+          cluster edges. residual_dex_vs_pass2 is pass1 minus pass2 at the
+          same pixel.
+        glass_initial_wt_pct:
+          Na2O: 17
+          CaO: 12
+          SiO2: 71
+        residue_Na2O_wt_pct_as_published:
+          initial: 17.0
+          KMS_3_final: 13.3
+          TMS_2_final: 16.9
+        Na2CO3_impurity_wt_pct: 0.45
+        residue_note: >-
+          Report p. 19: KMS(3) final wt.% Na2O = 13.3 and TMS(2) = 16.9 vs
+          initial 17.0. Time-integrated CO2 and excess Na give 0.45 wt.%
+          impurity Na2CO3 (p. 20). Caption: KMS(1) 17.0 to 16.7; KMS(3) 15.6
+          to 13.3; TMS(1) 17.0; TMS(2) 16.9 wt.%.
+        points:
+        - series: TMS_1
+          T_K: 1493.7
+          invT_times_1e4_K_inv: 6.695
+          p_atm: 9.49e-05
+          log10_p_atm: -4.023
+          pixel_pass1: [1013, 1039]
+          residual_dex_vs_pass2: -0.002
+          Na2O_wt_pct: 17.0
+          note: TMS(1) error-bar midpoint (bar log10 P -3.73 to -4.32)
+        - series: KMS_1
+          T_K: 1488.8
+          invT_times_1e4_K_inv: 6.717
+          p_atm: 2.49e-06
+          log10_p_atm: -5.604
+          pixel_pass1: [1026, 1972]
+          residual_dex_vs_pass2: -0.003
+          Na2O_wt_pct: 17.0-16.7
+          note: KMS(1) error-bar midpoint (bar log10 P -5.35 to -5.86)
+        - series: KMS_1
+          T_K: 1333.3
+          invT_times_1e4_K_inv: 7.5
+          p_atm: 3.64e-07
+          log10_p_atm: -6.440
+          pixel_pass1: [1493, 2465]
+          residual_dex_vs_pass2: -0.004
+          Na2O_wt_pct: 17.0-16.7
+          note: KMS(1) curve at 10^4/T=7.5 (tick-calibrated; prior frame map was -6.05)
+        - series: TMS_1
+          T_K: 1333.3
+          invT_times_1e4_K_inv: 7.5
+          p_atm: 1.72e-05
+          log10_p_atm: -4.765
+          pixel_pass1: [1493, 1477]
+          residual_dex_vs_pass2: -0.003
+          Na2O_wt_pct: 17.0
+        - series: TMS_2
+          T_K: 1333.3
+          invT_times_1e4_K_inv: 7.5
+          p_atm: 1.41e-05
+          log10_p_atm: -4.850
+          pixel_pass1: [1493, 1527]
+          residual_dex_vs_pass2: -0.003
+          Na2O_wt_pct: 16.9
+        - series: KMS_3
+          T_K: 1428.6
+          invT_times_1e4_K_inv: 7.0
+          p_atm: 1.44e-06
+          log10_p_atm: -5.843
+          pixel_pass1: [1195, 2113]
+          residual_dex_vs_pass2: -0.004
+          Na2O_wt_pct: 15.6-13.3
+        tms_vs_kms_note: >-
+          TMS Na pressures more than an order of magnitude greater than KMS
+          (p. 19). Authors attribute TMS/high-KMS-early to residual Na2CO3
+          (0.45 wt.%), not surface depletion.
+      uncertainty:
+        note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum conceivable error.
+    - observation_id: hastie_1981_fig6_na2co3_gamma_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '6'
+        page: 60
+        pdf_page_index: 66
+      T_range_K:
+      - 1200.0
+      - 1700.0
+      phase: soda_lime_silica_glass
+      regime: transpiration_mass_spectrometry
+      units: dimensionless
+      values:
+        quantity: gamma_Na2CO3_in_glass
+        status: typed_refusal
+        reason: >-
+          Fig. 6 plots log(activity coefficient) of 0.45 wt.% Na2CO3 in the
+          soda-lime glass (TMS). Ideal-solution dashed line is printed. No
+          numeric table. Open circles increasing-T, squares decreasing-T.
+        admission_status: figure_only
+        Na2CO3_wt_pct: 0.45
         semantics: bound_not_point_ordering
       uncertainty:
         note: not applicable
@@ -434,3 +794,497 @@ species:
           locator:
             page: 12
             paragraph: from our TMS and KMS second-law data (see Bonnell and Hastie, 1979)
+    - observation_id: hastie_1981_kohl1975_na2so4g_foreign_second_law
+      type: transition_point
+      locator:
+        page: 13
+        published_page: 13
+        pdf_page_index: 19
+        paragraph: Kohl et al. (1975), who give
+      T_range_K:
+      - 1267.0
+      - 1267.0
+      phase: Na2SO4_liquid
+      regime: literature_quotation
+      units: kcal/mol and cal/deg mol
+      values:
+        quantity: second_law_deltaH_deltaS
+        reaction_as_printed: Na2SO4(l) = Na2SO4(g)
+        T_K: 1267.0
+        deltaH_v_kcal_per_mol: 65.9
+        deltaH_v_sigma: 3.0
+        deltaS_v_cal_per_deg_mol: 22.3
+        deltaS_v_sigma: 2.8
+        original_source: Kohl et al. (1975)
+        access_path: NBSIR 81-2279 report p. 13
+        method_class: compilation_foreign
+        note: >-
+          NBSIR reprints Kohl 1975 molecular-Na2SO4(g) second-law numbers.
+          Authors say their data are consistent; this is not a this-work table.
+        semantics: competing_observation_do_not_average
+      uncertainty:
+        note: +- as printed from Kohl et al. 1975
+  K2O:
+    observations:
+    - observation_id: hastie_1981_k2o_liquid_kp_janaf_derived
+      type: activity_coefficient
+      locator:
+        page: 22
+        published_page: 22
+        pdf_page_index: 28
+        equation: '6'
+      T_range_K:
+      - 1100.0
+      - 2150.0
+      phase: K2O_liquid_reference
+      standard_state: pure liquid K2O dissociation Kp for a(K2O)=(P_K)^{5/2}/(2 Kp)
+      regime: compilation_derived
+      units: Kp as printed; activity dimensionless
+      values:
+        quantity: K2O_liquid_dissociation_Kp
+        method_class: compilation_derived
+        equation_activity_as_printed: a_K2O = (P_K)^{5/2} / 2 Kp
+        log10_Kp_as_printed: log Kp [K2O(l)] = -23751/T + 11.7723
+        A: 11.7723
+        B: 23751.0
+        Cp_liquid_K2O_cal_per_deg_mol_estimated: 25
+        derivation: >-
+          JANAF (1971) Kp for K2O(s) + fusion H,S of Natola and Touzain (1970)
+          + estimated Cp(l)=25 cal/deg mol. Not a measurement.
+        used_to_convert: Table 2 P_K to a(K2O) when pO2 is assigned
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: estimated Cp(l); compilation-derived; no experimental sigma
+    - observation_id: hastie_1981_fig11_k1_slag_k2o_gamma_digitized
+      type: activity_coefficient
+      locator:
+        figure: '11'
+        page: 61
+        published_page: 61
+        pdf_page_index: 71
+        note: report figure page after captions; PDF page 71
+      T_range_K:
+      - 1248.8
+      - 1857.4
+      phase: real_MHD_channel_slag_K1
+      standard_state: apparent gamma(K2O) via eq. (6); authors' "apparent" (may not be fully equilibrated)
+      regime: mixed_kms_tms
+      units: dimensionless
+      values:
+        quantity: apparent_gamma_K2O
+        method_class: measured_direct
+        system_class: mixed_oxide_slag
+        gamma_symbol_as_printed: y(K2O)
+        x_K2O_note: printed mole-fraction labels on the figure (0.154 to 0.08)
+        x_K2O_uncertainty_as_published: probably uncertain by ten percent
+        figure_digitized: true
+        digitization_error_dex: 0.15
+        digitization:
+          dpi: 300
+          pdf_page: 71
+          render_px: {width: 2392, height: 3234}
+          frame_px: {left: 331, top: 457, right: 2036, bottom: 2470}
+          x_ticks:
+            - {label: '5.0', value: 5.0, px: [579, 2474]}
+            - {label: '6.0', value: 6.0, px: [1062, 2474]}
+            - {label: '7.0', value: 7.0, px: [1546, 2474]}
+            - {label: '8.0', value: 8.0, px: [2036, 2474]}
+          y_ticks:
+            - {label: '10^-6', log10: -6.0, px: [327, 644]}
+            - {label: '10^-7', log10: -7.0, px: [327, 1250]}
+            - {label: '10^-8', log10: -8.0, px: [327, 1857]}
+          pass2_y_ticks:
+            - {label: '10^-6', log10: -6.0, px: [327, 644]}
+            - {label: '10^-7', log10: -7.0, px: [327, 1250]}
+            - {label: '10^-8', log10: -8.0, px: [327, 1857]}
+            - {label: '10^-9', log10: -9.0, px: [327, 2467]}
+          px_per_x_unit: 485.5
+          px_per_decade: 606.5
+          note: >-
+            10^-6 tick is below the top rail (y=644 vs frame top 457). 5.0 is
+            inset from the left frame (x=579 vs 331). 8.0 sits on the right
+            frame. Pass 2 adds the 10^-9 tick at y=2467 (log-minor fit);
+            mid-plot residual ≤0.01 dex.
+        digitization_method: >-
+          300 dpi pdftoppm of PDF page 71. Linear map in 10^4/T and
+          log10(gamma) from labelled decade ticks, not frame edges.
+        liquidus_note: most points below the K1 liquidus (~1700 ± 30 K)
+        caption_open_square_quote: >-
+          Caption (report p. 52): "The open square data point at 1575 K, run 1,
+          was obtained by TMS with additional O2 present."
+        caption_vs_figure_note: >-
+          The plotted open square sits on the curve labelled RUN 2. Point is
+          labelled run: 2 by what the figure shows; caption wording "run 1"
+          is quoted, not followed.
+        points:
+        - run: 1
+          T_K: 1266.5
+          invT_times_1e4_K_inv: 7.896
+          x_K2O: 0.154
+          gamma: 2.26e-07
+          log10_gamma: -6.64
+          symbol: filled_circle
+        - run: 1
+          T_K: 1334.0
+          invT_times_1e4_K_inv: 7.496
+          x_K2O: 0.153
+          gamma: 2.99e-07
+          log10_gamma: -6.53
+          symbol: filled_circle
+        - run: 1
+          T_K: 1431.8
+          invT_times_1e4_K_inv: 6.984
+          x_K2O: 0.151
+          gamma: 3.43e-07
+          log10_gamma: -6.46
+          symbol: filled_circle
+          note: ridge maximum
+        - run: 1
+          T_K: 1479.3
+          invT_times_1e4_K_inv: 6.76
+          x_K2O: 0.151
+          gamma: 2.79e-07
+          log10_gamma: -6.55
+          symbol: filled_circle
+        - run: 1
+          T_K: 1530.0
+          invT_times_1e4_K_inv: 6.536
+          x_K2O: 0.149
+          gamma: 1.72e-07
+          log10_gamma: -6.76
+          symbol: filled_circle
+        - run: 1
+          T_K: 1568.4
+          invT_times_1e4_K_inv: 6.376
+          x_K2O: 0.147
+          gamma: 8.32e-08
+          log10_gamma: -7.08
+          symbol: filled_circle
+        - run: 1
+          T_K: 1596.4
+          invT_times_1e4_K_inv: 6.264
+          x_K2O: 0.143
+          gamma: 3.63e-08
+          log10_gamma: -7.44
+          symbol: filled_circle
+        - run: 2
+          T_K: 1248.8
+          invT_times_1e4_K_inv: 8.008
+          x_K2O: 0.143
+          gamma: 3.63e-08
+          log10_gamma: -7.44
+          symbol: triangle
+        - run: 2
+          T_K: 1445.1
+          invT_times_1e4_K_inv: 6.92
+          x_K2O: 0.142
+          gamma: 1.82e-08
+          log10_gamma: -7.74
+          symbol: triangle
+        - run: 2
+          T_K: 1552.8
+          invT_times_1e4_K_inv: 6.44
+          x_K2O: 0.13
+          gamma: 3.63e-08
+          log10_gamma: -7.44
+          symbol: triangle
+        - run: 2
+          T_K: 1576.3
+          invT_times_1e4_K_inv: 6.344
+          x_K2O: 0.13
+          gamma: 3.16e-08
+          log10_gamma: -7.5
+          symbol: open_square
+          method: TMS_with_added_O2
+          caption_T_K: 1575
+          figure_run_label: RUN 2
+          caption_quote: >-
+            The open square data point at 1575 K, run 1, was obtained by TMS
+            with additional O2 present.
+          note: >-
+            Caption says run 1; the symbol sits on the RUN 2 curve. Labelled
+            by the figure (run 2). Tick-calibrated 10^4/T=6.344 is 1576 K
+            vs caption 1575 K.
+        - run: 2
+          T_K: 1625.5
+          invT_times_1e4_K_inv: 6.152
+          x_K2O: 0.12
+          gamma: 5.5e-08
+          log10_gamma: -7.26
+          symbol: triangle
+        - run: 2
+          T_K: 1700.7
+          invT_times_1e4_K_inv: 5.88
+          x_K2O: 0.12
+          gamma: 2.75e-08
+          log10_gamma: -7.56
+          symbol: triangle
+        - run: 3
+          T_K: 1334.0
+          invT_times_1e4_K_inv: 7.496
+          x_K2O: 0.115
+          gamma: 6.92e-09
+          log10_gamma: -8.16
+          symbol: open_circle
+        - run: 3
+          T_K: 1458.6
+          invT_times_1e4_K_inv: 6.856
+          x_K2O: 0.115
+          gamma: 4.42e-09
+          log10_gamma: -8.36
+          symbol: open_circle
+          note: run-3 minimum
+        - run: 3
+          T_K: 1651.3
+          invT_times_1e4_K_inv: 6.056
+          x_K2O: 0.114
+          gamma: 6.92e-09
+          log10_gamma: -8.16
+          symbol: open_circle
+        - run: 3
+          T_K: 1700.7
+          invT_times_1e4_K_inv: 5.88
+          x_K2O: 0.10
+          gamma: 1.38e-08
+          log10_gamma: -7.86
+          symbol: open_circle
+        - run: 3
+          T_K: 1773.0
+          invT_times_1e4_K_inv: 5.64
+          x_K2O: 0.10
+          gamma: 3.63e-08
+          log10_gamma: -7.44
+          symbol: open_circle
+        - run: 3
+          T_K: 1857.4
+          invT_times_1e4_K_inv: 5.384
+          x_K2O: 0.08
+          gamma: 4.47e-08
+          log10_gamma: -7.35
+          symbol: open_circle
+        prose_ratio_at_1700K: >-
+          At 10 mol% K2O and 1700 K, K1 slag gamma about 30 times the K2O-SiO2
+          binary (report p. 31). Ratio only; binary gamma not reprinted here.
+      uncertainty:
+        note: >-
+          Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably
+          uncertain by ten percent. Run 1 below ~1430 K includes K2SO4/K2CO3
+          volatile K; not bulk-silicate equilibrium.
+  SiO:
+    observations:
+    - observation_id: hastie_1981_fig4_illite_K_SiO_digitized
+      type: psat_series
+      locator:
+        figure: '4'
+        page: 58
+        published_page: 58
+        pdf_page_index: 64
+      T_range_K:
+      - 1745.1
+      - 1961.3
+      phase: illite_liquid
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: partial_pressure_over_illite
+        method_class: measured_direct
+        figure_digitized: true
+        digitization_error_dex: 0.10
+        digitization:
+          dpi: 300
+          pdf_page: 64
+          render_px: {width: 2392, height: 3234}
+          frame_px: {left: 650, top: 562, right: 2032, bottom: 2268}
+          x_ticks:
+            - {label: '5.0', value: 5.0, px: [870, 2272]}
+            - {label: '6.0', value: 6.0, px: [1453, 2272]}
+            - {label: '7.0', value: 7.0, px: [2032, 2272]}
+          y_ticks:
+            - {label: '10^-4', log10: -4.0, px: [650, 562]}
+            - {label: '10^-5', log10: -5.0, px: [2038, 1126]}
+            - {label: '10^-6', log10: -6.0, px: [2038, 1704]}
+            - {label: '10^-7', log10: -7.0, px: [650, 2268]}
+          pass2_y_ticks_left_axis:
+            - {label: '10^-4', log10: -4.0, px: [650, 562]}
+            - {label: '10^-5', log10: -5.0, px: [650, 1124]}
+            - {label: '10^-6', log10: -6.0, px: [650, 1703]}
+            - {label: '10^-7', log10: -7.0, px: [650, 2268]}
+          pass2_x_ticks:
+            - {label: '5.0', value: 5.0, px: [868, 2272]}
+            - {label: '6.0', value: 6.0, px: [1450, 2272]}
+            - {label: '7.0', value: 7.0, px: [2032, 2272]}
+          px_per_x_unit: 581.0
+          px_per_decade: 569.6
+          note: >-
+            10^-4 and 10^-7 sit on the top/bottom frame. 5.0 is inset from the
+            left frame (x=870 vs 650); 7.0 is the right frame. Pass 2 uses
+            left-axis decades and x-tick cluster edges.
+        digitization_method: >-
+          300 dpi pdftoppm of PDF page 64. Linear map in 10^4/T and log10 P
+          from labelled ticks. residual_dex_vs_pass2 is pass1 minus pass2 at
+          the same pixel.
+        points:
+        - T_K: 1946.8
+          invT_times_1e4_K_inv: 5.137
+          p_atm: 2.20e-06
+          log10_p_atm: -5.658
+          pixel_pass1: [950, 1505]
+          residual_dex_vs_pass2: 0.001
+          symbol: open_square
+          species: SiO
+        - T_K: 1911.6
+          invT_times_1e4_K_inv: 5.231
+          p_atm: 1.21e-06
+          log10_p_atm: -5.916
+          pixel_pass1: [1005, 1652]
+          residual_dex_vs_pass2: 0.001
+          symbol: open_square
+          species: SiO
+        - T_K: 1914.8
+          invT_times_1e4_K_inv: 5.223
+          p_atm: 8.57e-07
+          log10_p_atm: -6.067
+          pixel_pass1: [1000, 1738]
+          residual_dex_vs_pass2: 0.001
+          symbol: open_square
+          species: SiO
+          note: square sits slightly left of the SiO line
+        - T_K: 1868.6
+          invT_times_1e4_K_inv: 5.352
+          p_atm: 6.81e-07
+          log10_p_atm: -6.167
+          pixel_pass1: [1075, 1795]
+          residual_dex_vs_pass2: 0.001
+          symbol: open_square
+          species: SiO
+        - T_K: 1860.8
+          invT_times_1e4_K_inv: 5.374
+          p_atm: 4.83e-07
+          log10_p_atm: -6.316
+          pixel_pass1: [1088, 1880]
+          residual_dex_vs_pass2: 0.001
+          symbol: open_square
+          species: SiO
+        - T_K: 1821.7
+          invT_times_1e4_K_inv: 5.489
+          p_atm: 3.16e-07
+          log10_p_atm: -6.501
+          pixel_pass1: [1155, 1985]
+          residual_dex_vs_pass2: 0.001
+          symbol: open_square
+          species: SiO
+        k_open_circle_points:
+        - T_K: 1961.3
+          invT_times_1e4_K_inv: 5.099
+          p_atm: 5.38e-05
+          log10_p_atm: -4.269
+          pixel_pass1: [928, 714]
+          residual_dex_vs_pass2: 0.002
+          symbol: open_circle
+          species: K
+        - T_K: 1914.8
+          invT_times_1e4_K_inv: 5.223
+          p_atm: 3.58e-05
+          log10_p_atm: -4.447
+          pixel_pass1: [1000, 815]
+          residual_dex_vs_pass2: 0.001
+          symbol: open_circle
+          species: K
+        - T_K: 1841.9
+          invT_times_1e4_K_inv: 5.429
+          p_atm: 1.02e-05
+          log10_p_atm: -4.991
+          pixel_pass1: [1120, 1125]
+          residual_dex_vs_pass2: 0.001
+          symbol: open_circle
+          species: K
+        - T_K: 1788.1
+          invT_times_1e4_K_inv: 5.593
+          p_atm: 4.55e-06
+          log10_p_atm: -5.342
+          pixel_pass1: [1215, 1325]
+          residual_dex_vs_pass2: 0.001
+          symbol: open_circle
+          species: K
+        - T_K: 1745.1
+          invT_times_1e4_K_inv: 5.730
+          p_atm: 2.11e-06
+          log10_p_atm: -5.676
+          pixel_pass1: [1295, 1515]
+          residual_dex_vs_pass2: 0.001
+          symbol: open_circle
+          species: K
+        table2_crosscheck: >-
+          Illite Table 2 A=6.286 B=20642 at 1961 K gives log10 P(K)/atm=-4.240
+          vs digitized -4.269 (0.03 dex). Prefer Table 2 coefficients for P(K);
+          SiO has no table.
+        o2_and_tms: >-
+          Filled circles are O2 (ticks = T chronology). TMS K triangles at
+          10^4/T~6.3 and 6.6 with large error bars. Not digitized as points
+          (error bars larger than the digitization budget).
+      uncertainty:
+        note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma on Fig. 4
+  NaCl:
+    observations:
+    - observation_id: hastie_1981_fig15_salt_slag_exchange
+      type: activity_coefficient
+      locator:
+        figure: '15'
+        page: 63
+        pdf_page_index: 75
+        paragraph: report p. 35-36
+      T_range_K:
+      - 1074.0
+      - 1074.0
+      phase: NaCl_on_K1_slag
+      standard_state: JANAF 1971 P° as printed on Fig. 15
+      regime: transpiration_mass_spectrometry
+      units: dimensionless activity; atm for P°
+      values:
+        quantity: salt_slag_alkali_exchange
+        method_class: measured_direct
+        reaction_as_printed: NaCl(l) + K2O(slag) = KCl(l) + Na2O(slag)
+        P_NaCl_std_atm_as_printed: 0.003
+        P_KCl_std_atm_as_printed: 0.005
+        T_note: >-
+          Near melting point of NaCl then isothermal (Fig. 15 "T CONSTANT" /
+          "mp NaCl"). Numeric T of the plateau is not tabulated; NaCl mp
+          1074 K is the caption locus, not an independent measurement.
+        time_to_depletion_min: 50
+        NaCl_converted_to_Na2O_slag_percent: 90
+        K2O_converted_to_KCl_vapor_percent: 6
+        NaCl_lost_by_vaporization_percent: 10
+        K_transport_enhancement:
+          expression_as_printed: P_KCl / P_K(no NaCl) ~ 10^4
+          isothermal_window_min: [20, 40]
+        initial_NaCl_activity: near_unity
+        figure_status: figure_only_for_a_vs_time
+        reason: >-
+          Activities vs time are plotted, not tabulated. Printed P° and the
+          conversion percentages / 10^4 enhancement are prose/figure text.
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: enhancement printed as ~ 10^4; conversion percentages as printed
+  KCl:
+    observations:
+    - observation_id: hastie_1981_fig15_kcl_std_pressure_printed
+      type: psat_series
+      locator:
+        figure: '15'
+        page: 63
+        pdf_page_index: 75
+      T_range_K:
+      - 1074.0
+      - 1074.0
+      phase: KCl_reference_on_fig15
+      regime: compilation_quotation
+      units: atm
+      values:
+        quantity: P_std_KCl_as_printed_on_figure
+        method_class: compilation_foreign
+        P_KCl_std_atm_as_printed: 0.005
+        original_source: JANAF (1971) as cited in caption
+        note: Reference-state P° used to convert ion currents to activity on Fig. 15. Not a this-work P_sat series.
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not restated on the figure
