@@ -2637,6 +2637,9 @@ class CondensationModel:
                 self.wall_temperature_C)
         updated: list[PipeSegment] = []
         for segment in self.pipe_segments:
+            if segment.name in self.wall_temperature_input_refusals:
+                updated.append(segment)
+                continue
             raw_temperature = float(temperatures_C.get(
                 segment.name, self.wall_temperature_C)
             )
@@ -2669,16 +2672,21 @@ class CondensationModel:
         self._apply_pipe_segment_temperatures(temperatures_C)
         if not self.pipe_segments:
             return
-        self.wall_temperature_C = min(
+        self.wall_temperature_C = None if self.wall_temperature_input_refusals else min(
             segment.wall_temperature_C for segment in self.pipe_segments
         )
         if self.operating_history:
-            self.operating_history[-1]["wall_temperature_C"] = float(
-                self.wall_temperature_C
-            )
+            self.operating_history[-1]["wall_temperature_C"] = self.wall_temperature_C
+            if self.wall_temperature_input_refusals:
+                self.operating_history[-1]["wall_temperature_input_refusals"] = dict(
+                    self.wall_temperature_input_refusals
+                )
+            else:
+                self.operating_history[-1].pop("wall_temperature_input_refusals", None)
             self.operating_history[-1]["pipe_segment_temperatures_C"] = {
                 segment.name: float(segment.wall_temperature_C)
                 for segment in self.pipe_segments
+                if segment.name not in self.wall_temperature_input_refusals
             }
 
     def configure_lab_geometry(
@@ -5512,7 +5520,7 @@ def _antoine_psat_pa(
     )
     T_K = _deposition_finite_scalar("T_wall_K", T_K)
     if T_K <= 0.0 or A <= 0.0:
-        raise DepositionInputRefusal("wall_antoine", (A, T_K), "requires A > 0 and T > 0")
+        raise DepositionInputRefusal(coefficient_block, (A, T_K), "requires A > 0 and T > 0")
     if T_K + C <= 0.0:
         refusal = WallSaturationPressureRefusal(species, T_K,
             f"no extrapolation available: Antoine denominator T+C <= 0; valid_range_K={source_band}")
@@ -5593,7 +5601,7 @@ def _try_antoine_psat_pa(
             enforce_hot_train_applicability=enforce_hot_train_applicability,
         )
     except (CatalogCompileError, VaporPressureRangeError, NasaCeaDomainError, ShomateDomainError,
-            WallSaturationPressureRefusal, DepositionInputRefusal) as exc:
+            WallSaturationPressureRefusal) as exc:
         if antoine_extrapolations is not None:
             antoine_extrapolations[f"{species}#wall:{T_K}"] = {
                 "temperature_K": T_K, "status": "refused", "reason": str(exc),

@@ -72,7 +72,7 @@ def wall_deposit_candidates_by_segment_kg(
     antoine_extrapolation_warnings: list[str] | None = None,
 ) -> dict[str, float]:
     from simulator.condensation import (
-        DepositionInputRefusal, WallSaturationPressureRefusal, _deposition_finite_scalar,
+        WallSaturationPressureRefusal, _deposition_finite_scalar,
     )
 
     rate_kg_hr = _deposition_finite_scalar("rate_kg_hr", rate_kg_hr)
@@ -106,7 +106,7 @@ def wall_deposit_candidates_by_segment_kg(
                 segment=segment,
                 antoine_extrapolation_warnings=antoine_extrapolation_warnings,
             )
-        except (DepositionInputRefusal, WallSaturationPressureRefusal) as exc:
+        except WallSaturationPressureRefusal as exc:
             record = {
                 "status": "refused", "reason": str(exc), "refusal_type": type(exc).__name__,
                 "output_status": "status_bearing", "authority_level": "unavailable",
@@ -197,7 +197,17 @@ def wall_deposit_candidate_for_surface_kg(
         str(getattr(segment, "name", "default_pipe"))
     )
     if temperature_refusal:
-        raise DepositionInputRefusal("T_wall_K", None, temperature_refusal)
+        refusal = DepositionInputRefusal("T_wall_K", None, temperature_refusal)
+        record = {
+            "status": "refused", "reason": str(refusal), "refusal_type": type(refusal).__name__,
+            "output_status": "status_bearing", "authority_level": "unavailable",
+            "wall_temperature_K": None, "wall_saturation_pressure_pa": None,
+        }
+        _record_wall_pressure_notice(
+            model, "wall_saturation_pressure_refusals_by_species",
+            species, str(segment.name), record,
+        )
+        return {**record, "status": "unavailable", "species": species}
 
     rate_kg_hr = _deposition_finite_scalar("rate_kg_hr", rate_kg_hr)
     surface_area_m2 = _deposition_finite_scalar("surface_area_m2", surface_area_m2)
@@ -367,18 +377,10 @@ def wall_deposit_candidate_for_surface_kg(
             source_data.get("fit_target") == "standard_reaction_term"
             and "pure_component_antoine" not in source_data
         )
-        if source_only_wall_channel or rate_diagnostic.get("wall_saturation_pressure_notice", {}).get("refusal_type") == "DepositionInputRefusal":
-            from engines.builtin.vapor_pressure import (
-                _coefficient_mapping,
-                wall_condensation_antoine_coefficients,
-            )
+        if source_only_wall_channel:
+            from engines.builtin.vapor_pressure import _coefficient_mapping
 
-            if source_only_wall_channel:
-                coefficient_block = "antoine"
-            else:
-                _, coefficient_block = wall_condensation_antoine_coefficients(
-                    source_data, temperature_K=T_wall_K
-                )
+            coefficient_block = "antoine"
             if coefficient_block in source_data:
                 # A range label can also mask an incomplete or invalid fit.
                 # Validate the declared fit before treating it as domain-only.
@@ -392,9 +394,7 @@ def wall_deposit_candidate_for_surface_kg(
                     for key in ("A", "B", "C")
                 }
                 # Reaction-term log fits may have A <= 0; their denominator must still be valid.
-                if (not source_only_wall_channel and coefficients["A"] <= 0.0) or (
-                    T_wall_K + coefficients["C"] <= 0.0
-                ):
+                if T_wall_K + coefficients["C"] <= 0.0:
                     raise DepositionInputRefusal(
                         coefficient_block, coefficients,
                         "Antoine fit requires T_wall_K + C > 0 and wall fits require A > 0",

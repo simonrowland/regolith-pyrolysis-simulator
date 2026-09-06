@@ -3474,13 +3474,16 @@ class EvaporationMixin:
                 'sp_data': dict(sp_data or {}),
                 'wall_deposit_fraction': wall_deposit_fraction,
                 'wall_deposit_account_fractions': wall_deposit_account_fractions,
-                'wall_temperature_K': float(
-                    self.condensation_model.wall_temperature_C) + 273.15,
+                'wall_temperature_K': (
+                    float(self.condensation_model.wall_temperature_C) + 273.15
+                    if self.condensation_model.wall_temperature_C is not None else None
+                ),
                 'wall_deposit_account_temperatures_K': {
                     segment.wall_deposit_account: (
                         float(segment.wall_temperature_C) + 273.15
                     )
                     for segment in self.condensation_model.pipe_segments
+                    if segment.name not in self.condensation_model.wall_temperature_input_refusals
                 },
                 'wall_alkali_binding_diagnostic_state_by_account': dict(
                     getattr(
@@ -3516,6 +3519,13 @@ class EvaporationMixin:
         )
         if tar_kg <= 1e-12:
             return
+        if self.condensation_model.wall_temperature_C is None:
+            from simulator.condensation import DepositionInputRefusal
+
+            raise DepositionInputRefusal(
+                "T_wall_K", None,
+                str(self.condensation_model.wall_temperature_input_refusals),
+            )
         wall_T = float(self.condensation_model.wall_temperature_C)
         melt_T = float(getattr(self.melt, 'temperature_C', wall_T) or wall_T)
         formula = resolve_species_formula(

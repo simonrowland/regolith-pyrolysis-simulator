@@ -279,6 +279,51 @@ def test_merge_cannot_overwrite_carried_status_bearing_carrier() -> None:
     )
 
 
+@pytest.mark.parametrize("reverse", [False, True])
+@pytest.mark.parametrize("first_temperature", [None, 1500.0])
+def test_merge_equal_severity_carriers_preserves_source_extrapolation_notices(
+    reverse, first_temperature,
+) -> None:
+    snapshots = []
+    expected = []
+    for temperature in (first_temperature, 500.0):
+        authority = _alpha_notice("Mg")
+        carrier = authority["vapour_carrier_authority_by_species"]["Mg"]
+        carrier.update({
+            "verdict_status": "status_bearing_non_authoritative",
+            "certification_ceiling": "never",
+            "validation_status": "modeled-PENDING",
+        })
+        if temperature is not None:
+            notice = {
+                "authority_level": "extrapolated", "temperature_K": temperature,
+                "valid_range_K": [701.0, 1361.0], "reason": "outside source band",
+            }
+            carrier["extra"] = {"extrapolation_notice": notice}
+            expected.append(notice)
+        snapshots.append(FoulingTerminalSnapshot.from_trace(
+            _trace({("hot_wall", "Mg"): 0.1}, authority)
+        ))
+    if reverse:
+        snapshots.reverse()
+    merged, _ = merge_run_snapshot(*snapshots)
+    assert merged.wall_deposit_by_segment_species_kg["hot_wall"]["Mg"] == 0.2
+    assert merged.wall_deposit_sticking_authority["authoritative_for_resinter"] is False
+    extra = merged.wall_deposit_sticking_authority["vapour_carrier_authority_by_species"]["Mg"]["extra"]
+    assert extra["extrapolation_notice"]["reason"] == "outside source band"
+    assert extra["extrapolation_notice"]["valid_range_K"] == (701.0, 1361.0)
+    assert {notice["temperature_K"] for notice in extra["extrapolation_notices"]} == {
+        notice["temperature_K"] for notice in expected
+    }
+    assert all(notice["reason"] == "outside source band"
+               and notice["valid_range_K"] == (701.0, 1361.0)
+               and notice["authority_level"] == "extrapolated"
+               for notice in extra["extrapolation_notices"])
+    repeated, _ = merge_run_snapshot(merged, snapshots[1])
+    repeated_extra = repeated.wall_deposit_sticking_authority["vapour_carrier_authority_by_species"]["Mg"]["extra"]
+    assert repeated_extra["extrapolation_notices"] == extra["extrapolation_notices"]
+
+
 @pytest.mark.parametrize("later_status", ("proven_zero", "refused"))
 def test_merge_promotes_later_worse_typed_carrier(later_status: str) -> None:
     carried_notice = _alpha_notice("Fe", cited=True)

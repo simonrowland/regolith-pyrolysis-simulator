@@ -3597,16 +3597,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             unavailable=unavailable,
         )
         self.condensation_model.wall_temperature_input_refusals = unavailable
-        if temperatures_C:
-            self.condensation_model.update_pipe_segment_temperatures(
-                temperatures_C
-            )
-        if unavailable and self.condensation_model.operating_history:
-            history = self.condensation_model.operating_history[-1]
-            history['pipe_segment_temperatures_C'] = {
-                name: temperature for name, temperature in history.get('pipe_segment_temperatures_C', {}).items()
-                if name not in unavailable
-            }
+        self.condensation_model.update_pipe_segment_temperatures(temperatures_C)
 
     def _headspace_downstream_pressure_bar(
         self,

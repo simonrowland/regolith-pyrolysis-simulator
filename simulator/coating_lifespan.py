@@ -315,6 +315,20 @@ def _merged_wall_deposit_sticking_authority(
                         > vapour_carrier_authority_severity(current_status)
                     ):
                         carriers_by_species[species_key] = record
+                    notices: list[dict[str, Any]] = []
+                    for carrier in (current, record):
+                        extra = carrier.get("extra") if isinstance(carrier, Mapping) else None
+                        if not isinstance(extra, Mapping):
+                            continue
+                        candidates = [extra.get("extrapolation_notice")]
+                        candidates.extend(extra.get("extrapolation_notices", ()))
+                        for notice in candidates:
+                            if isinstance(notice, Mapping) and notice not in notices:
+                                notices.append(_plain_authority_mapping(notice))
+                    if notices:
+                        extra = carriers_by_species[species_key].setdefault("extra", {})
+                        extra.setdefault("extrapolation_notice", notices[0])
+                        extra["extrapolation_notices"] = notices
         raw_lineage = authority.get(
             "vapour_carrier_lineage_by_deposited_species"
         )

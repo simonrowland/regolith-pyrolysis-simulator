@@ -53,7 +53,8 @@ def test_predict_flag_cold_na_pole_is_unavailable_with_band():
     assert "no extrapolation available" in notice["reason"]
 
 
-def test_predict_flag_missing_wall_input_is_typed_and_hour_completes(monkeypatch):
+@pytest.mark.parametrize("invalid_value", [None, float("nan")], ids=["missing_B", "nan_B"])
+def test_predict_flag_invalid_wall_input_is_typed_and_terminal(monkeypatch, invalid_value):
     from simulator.runner import PyrolysisRun
     from simulator.run_executor import RunExecutor
     from tests.test_lab_geometry_runtime import dynamic_lab_schedule, dynamic_surface_geometry_fixture
@@ -64,7 +65,10 @@ def test_predict_flag_missing_wall_input_is_typed_and_hour_completes(monkeypatch
         import copy
         data = copy.deepcopy(original(species, **kwargs))
         if species == "Mg":
-            del data["pure_component_antoine"]["B"]
+            if invalid_value is None:
+                del data["pure_component_antoine"]["B"]
+            else:
+                data["pure_component_antoine"]["B"] = invalid_value
         return data
 
     monkeypatch.setattr(condensation, "_species_vapor_data", missing_coefficient)
@@ -78,12 +82,33 @@ def test_predict_flag_missing_wall_input_is_typed_and_hour_completes(monkeypatch
         allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
     )
     execution = RunExecutor().execute(run._session_config())
+    assert execution.status == "failed"
+    assert len(execution.snapshots) == 0
+    assert "DepositionInputRefusal" in execution.error_message
+    assert "pure_component_antoine.B" in execution.error_message
+
+
+def test_predict_flag_finite_below_band_wall_input_completes():
+    from simulator.runner import PyrolysisRun
+    from simulator.run_executor import RunExecutor
+    from tests.test_lab_geometry_runtime import dynamic_lab_schedule, dynamic_surface_geometry_fixture
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti", campaign="C2A", hours=1,
+        mass_kg=1000.0, backend_name="internal-analytical",
+        setpoints_patch={"lab_geometry": dynamic_surface_geometry_fixture()},
+        lab_schedule=dynamic_lab_schedule(), force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
+    )
+    execution = RunExecutor().execute(run._session_config())
     assert execution.status == "ok", execution.error_message
     assert len(execution.snapshots) == 1
     document = run._build_output(execution)
     authority = document["per_hour_summary"][0]["vapour_batch_summary"]["metadata"]["wall_deposit_sticking_authority"]
-    refusals = authority["wall_saturation_pressure_refusals_by_species"]["Mg"]
-    assert any(record["refusal_type"] == "DepositionInputRefusal" for record in refusals.values()), refusals
+    notices = authority["wall_saturation_pressure_extrapolations_by_species"]["Mg"]
+    assert any(record["temperature_K"] < record["valid_range_K"][0]
+               and record["authority_level"] == "extrapolated"
+               and record["reason"] for record in notices.values())
 
 
 @pytest.mark.parametrize("hours", [2, 24])
@@ -145,6 +170,51 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
     if hours == 24:
         assert pareto["SiO"]["evaporation_transport_notices"] == transport["SiO"]
         assert pareto["Si"]["evaporation_transport_notices"] == transport["Si"]
+
+
+@pytest.mark.parametrize("all_missing", [False, True], ids=["partial", "all"])
+def test_missing_runtime_wall_profile_keeps_aggregate_unavailable(all_missing):
+    from types import MethodType, SimpleNamespace
+    from simulator.core import PyrolysisSimulator
+    from simulator.lab_geometry import parse_lab_geometry
+    from tests.test_lab_geometry_runtime import dynamic_lab_schedule, dynamic_surface_geometry_fixture
+
+    model = condensation.CondensationModel(CondensationTrain(stages=[]), wall_temperature_C=25.0)
+    geometry = model.configure_lab_geometry(parse_lab_geometry(
+        dynamic_surface_geometry_fixture(), allow_temperature_profiles=True,
+    ))
+    prior = {segment.name: segment.wall_temperature_C for segment in model.pipe_segments}
+    model.operating_history = [{}]
+    schedule = dynamic_lab_schedule()["surface_temperature_C"]
+    del schedule["holder_profile"]
+    if all_missing:
+        del schedule["condenser_profile"]
+    sim = SimpleNamespace(
+        lab_geometry=geometry, condensation_model=model,
+        _active_surface_temperature_schedule=lambda: schedule,
+    )
+    sim._resolve_lab_surface_temperatures = MethodType(
+        PyrolysisSimulator._resolve_lab_surface_temperatures, sim,
+    )
+    PyrolysisSimulator._apply_lab_surface_temperatures(sim, sample_time_h=0.0)
+
+    assert model.wall_temperature_C is None
+    history = model.operating_history[-1]
+    assert history["wall_temperature_C"] is None
+    missing = {"holder": "lab_schedule_missing_surface_temperature: holder_profile"}
+    if all_missing:
+        missing["condenser"] = "lab_schedule_missing_surface_temperature: condenser_profile"
+    assert history["wall_temperature_input_refusals"] == missing
+    assert history["pipe_segment_temperatures_C"] == ({} if all_missing else {"condenser": 1500.0})
+    for segment in model.pipe_segments:
+        if segment.name in missing:
+            assert segment.wall_temperature_C == prior[segment.name]
+
+    schedule.update(dynamic_lab_schedule()["surface_temperature_C"])
+    PyrolysisSimulator._apply_lab_surface_temperatures(sim, sample_time_h=0.0)
+    assert model.wall_temperature_C == 25.0
+    assert model.wall_temperature_input_refusals == {}
+    assert "wall_temperature_input_refusals" not in history
 
 
 @pytest.mark.parametrize(("species", "temperature"), [("Na", 417.0), ("Mg", 115.0)])

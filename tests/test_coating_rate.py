@@ -452,6 +452,8 @@ def test_missing_wall_alpha_record_refuses_before_zero(monkeypatch):
 def test_unusable_wall_antoine_coefficients_raise_typed_refusal(
     monkeypatch,
 ) -> None:
+    from simulator.condensation import DepositionInputRefusal
+
     monkeypatch.setattr(
         "simulator.condensation._species_vapor_data",
         lambda *args, **kwargs: {
@@ -460,8 +462,8 @@ def test_unusable_wall_antoine_coefficients_raise_typed_refusal(
     )
 
     with pytest.raises(
-        WallSaturationPressureRefusal,
-        match="reason=source_certified_range_refused",
+        DepositionInputRefusal,
+        match="pure_component_antoine.B",
     ):
         _wall_deposition_driving_pressure_pa(
             "Fe",
