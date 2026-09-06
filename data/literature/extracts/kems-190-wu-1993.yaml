@@ -11,6 +11,85 @@ extraction:
   worker: wave-W3-wu-1993-r3
   provenance_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/
 review_status: draft
+corrections:
+  - observation_id: wu_1993_reported_ternary_peritectic
+    field: regime
+    old: reported_quench_experiment_from_Bowen_and_Schairer_1932
+    new: reported_quench_experiment_from_Bowen_and_Schairer_1935
+    page: 35
+    quote: '16) N. L. Bowen and J. F. Schairer: Am. J. Sci., 29 (1935), 157.'
+  - observation_id: wu_1993_reported_ternary_peritectic
+    field: values.original_experimental_citation
+    old: 'N. L. Bowen and J. F. Schairer, Am. J. Sci. 24 (1932) 177 [reference 16]'
+    new: 'N. L. Bowen and J. F. Schairer, Am. J. Sci. 29 (1935) 157 [reference 16]'
+    page: 35
+    quote: '16) N. L. Bowen and J. F. Schairer: Am. J. Sci., 29 (1935), 157.'
+  - observation_id: wu_1993_table3_reported_solidus_points
+    field: regime
+    old: reported_quench_experiment_from_Bowen_and_Schairer_1932
+    new: reported_quench_experiment_from_Bowen_and_Schairer_1935
+    page: 35
+    quote: '16) N. L. Bowen and J. F. Schairer: Am. J. Sci., 29 (1935), 157.'
+  - observation_id: wu_1993_table3_reported_solidus_points
+    field: values.original_experimental_citation
+    old: 'N. L. Bowen and J. F. Schairer, Am. J. Sci. 24 (1932) 177 [reference 16]'
+    new: 'N. L. Bowen and J. F. Schairer, Am. J. Sci. 29 (1935) 157 [reference 16]'
+    page: 35
+    quote: '16) N. L. Bowen and J. F. Schairer: Am. J. Sci., 29 (1935), 157.'
+  - observation_id: wu_1993_table1_feo_compiled_thermochemistry
+    field: values.method_class
+    old: review_compilation
+    new: model_derived
+    page: '27–28'
+    quote: 'The thermodynamic properties of one mole of hypothetical solid stoichiometric "FeO" below the melting point were obtained by adding the values of Fe0.947O and 0.053 moles of Fe; the Cp expressions were obtained by curve-fitting the tabulated values; the molar entropy of fusion was assumed equal to that of Fe0.947O.'
+  - observation_id: wu_1993_table1_feo_compiled_thermochemistry
+    field: values.admission_status
+    old: omitted
+    new: model_output_not_measurement
+    page: '27–28'
+    quote: 'The thermodynamic properties of one mole of hypothetical solid stoichiometric "FeO" below the melting point were obtained by adding the values of Fe0.947O and 0.053 moles of Fe; the Cp expressions were obtained by curve-fitting the tabulated values; the molar entropy of fusion was assumed equal to that of Fe0.947O.'
+  - observation_id: wu_1993_table1_feo_compiled_thermochemistry
+    field: values.evidence_class
+    old: compiled_pure_component_thermochemistry
+    new: thermodynamic_model_parameter
+    page: '27–28'
+    quote: 'The thermodynamic properties of one mole of hypothetical solid stoichiometric "FeO" below the melting point were obtained by adding the values of Fe0.947O and 0.053 moles of Fe; the Cp expressions were obtained by curve-fitting the tabulated values; the molar entropy of fusion was assumed equal to that of Fe0.947O.'
+  - observation_id: wu_1993_table1_feo_compiled_thermochemistry
+    field: values.source_basis_as_published
+    old: 'Robie et al. [13], Barin et al. [10], Coughlin et al. [15], with stated assumptions for stoichiometric FeO'
+    new: 'Robie et al. [13] for Fe0.947O, Barin et al. [10] for Fe, Kubaschewski et al. [14] for the adopted melting point, and Coughlin et al. [15] for liquid Cp'
+    page: 28
+    quote: 'A melting point of 1371°C [14] was adopted. The heat capacity of the liquid was taken from Coughlin et al. [15].'
+  - observation_id: wu_1993_table1_feo_compiled_thermochemistry
+    field: values.construction_as_published
+    old: omitted
+    new: 'Hypothetical stoichiometric FeO was constructed by adding Fe0.947O and 0.053 moles of Fe, curve-fitting the Cp expressions, and assuming the fusion entropy equal to that of Fe0.947O.'
+    page: '27–28'
+    quote: 'The thermodynamic properties of one mole of hypothetical solid stoichiometric "FeO" below the melting point were obtained by adding the values of Fe0.947O and 0.053 moles of Fe; the Cp expressions were obtained by curve-fitting the tabulated values; the molar entropy of fusion was assumed equal to that of Fe0.947O.'
+  - observation_id: wu_1993_table1_mgo_compiled_thermochemistry
+    field: values.rows[0].method_class
+    old: omitted
+    new: model_derived
+    page: 27
+    quote: 'Below the melting point, Cp(liq) was obtained by adding to Cp(sol) the expression for ΔCp(fus) from Barin et al. [10].'
+  - observation_id: wu_1993_table1_mgo_compiled_thermochemistry
+    field: values.rows[0].construction_as_published
+    old: omitted
+    new: 'Below-melting Cp(liq) was constructed by adding the ΔCp(fus) expression from Barin et al. [10] to Cp(sol); the compiled liquid and solid source basis remains recorded at observation level.'
+    page: 27
+    quote: 'Below the melting point, Cp(liq) was obtained by adding to Cp(sol) the expression for ΔCp(fus) from Barin et al. [10].'
+  - observation_id: wu_1993_table1_sio2_compiled_thermochemistry
+    field: values.rows[0].method_class
+    old: omitted
+    new: model_derived
+    page: 27
+    quote: 'Below the melting point, Cp(liq) was set equal to Cp of high cristobalite.'
+  - observation_id: wu_1993_table1_sio2_compiled_thermochemistry
+    field: values.rows[0].construction_as_published
+    old: omitted
+    new: 'Below-melting Cp(liq) was set equal to high-cristobalite Cp; the compiled solid and above-melting liquid source basis remains recorded at observation level.'
+    page: 27
+    quote: 'Below the melting point, Cp(liq) was set equal to Cp of high cristobalite.'
 figures_not_digitized:
   locator:
     published_page: 28
@@ -103,6 +182,8 @@ species:
           rows:
             - phase_as_published: MgO(l)
               T_range_K_as_published: [298, 3098]
+              method_class: model_derived
+              construction_as_published: 'Below-melting Cp(liq) was constructed by adding the ΔCp(fus) expression from Barin et al. [10] to Cp(sol); the compiled liquid and solid source basis remains recorded at observation level.'
               A_cal_mol: -130340.58
               B_cal_mol_K: 6.4541207
               a_cal_mol_K: 17.398557
@@ -196,9 +277,11 @@ species:
         units: cal_mol_and_cal_mol_K_as_published
         values:
           quantity: thermodynamic_function_coefficients
-          method_class: review_compilation
-          evidence_class: compiled_pure_component_thermochemistry
-          source_basis_as_published: Robie et al. [13], Barin et al. [10], Coughlin et al. [15], with stated assumptions for stoichiometric FeO
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          evidence_class: thermodynamic_model_parameter
+          source_basis_as_published: 'Robie et al. [13] for Fe0.947O, Barin et al. [10] for Fe, Kubaschewski et al. [14] for the adopted melting point, and Coughlin et al. [15] for liquid Cp'
+          construction_as_published: 'Hypothetical stoichiometric FeO was constructed by adding Fe0.947O and 0.053 moles of Fe, curve-fitting the Cp expressions, and assuming the fusion entropy equal to that of Fe0.947O.'
           rows:
             - phase_as_published: FeO(l)
               T_range_K_as_published: [298, 1644]
@@ -291,13 +374,13 @@ species:
           paragraph: The MgO-FeO-SiO2 System
           note: Reported ternary peritectic and phase compositions from reference 16
         phase: MgO-FeO-SiO2_peritectic_in_equilibrium_with_metallic_Fe
-        regime: reported_quench_experiment_from_Bowen_and_Schairer_1932
+        regime: reported_quench_experiment_from_Bowen_and_Schairer_1935
         units: C_and_wt_percent_as_published
         values:
           quantity: ternary_peritectic_temperature_and_phase_compositions
           property_kind: ternary_peritectic
           method_class: measured_direct
-          original_experimental_citation: 'N. L. Bowen and J. F. Schairer, Am. J. Sci. 24 (1932) 177 [reference 16]'
+          original_experimental_citation: 'N. L. Bowen and J. F. Schairer, Am. J. Sci. 29 (1935) 157 [reference 16]'
           temperature_C_as_published: 1306
           liquid_wt_pct_as_published: {MgO: 9, FeO: 46, SiO2: 45}
           olivine_wt_pct_as_published: {Fe2SiO4: 68, Mg2SiO4: 32}
@@ -348,6 +431,8 @@ species:
           rows:
             - phase_as_published: SiO2(l)
               T_range_K_as_published: [298, 1996]
+              method_class: model_derived
+              construction_as_published: 'Below-melting Cp(liq) was set equal to high-cristobalite Cp; the compiled solid and above-melting liquid source basis remains recorded at observation level.'
               A_cal_mol: -214339.36
               B_cal_mol_K: 12.148448
               a_cal_mol_K: 19.960229
@@ -611,13 +696,13 @@ species:
           table: '3'
           note: Reported column, wt% Fe2SiO4 along Mg2SiO4-Fe2SiO4 pseudobinary join
         phase: Mg2SiO4-Fe2SiO4_solidus
-        regime: reported_quench_experiment_from_Bowen_and_Schairer_1932
+        regime: reported_quench_experiment_from_Bowen_and_Schairer_1935
         units: C_and_wt_percent_as_published
         values:
           quantity: composition_dependent_solidus_points
           property_kind: solidus_composition_series
           method_class: measured_direct
-          original_experimental_citation: 'N. L. Bowen and J. F. Schairer, Am. J. Sci. 24 (1932) 177 [reference 16]'
+          original_experimental_citation: 'N. L. Bowen and J. F. Schairer, Am. J. Sci. 29 (1935) 157 [reference 16]'
           fidelity_first_temperature_C: 1495
           fidelity_quote: '1 495 | Exp. 41 | Calc. 40.5'
           rows:
