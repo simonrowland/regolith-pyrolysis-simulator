@@ -1,0 +1,541 @@
+schema_version: literature_extract.v1
+source_id: kems-184-behrens-1979
+source:
+  citation: "Behrens, Robert G., and Rinehart, Gary H. (1979). Vaporization Thermodynamics and Kinetics of Hexagonal Silicon Carbide. Characterization of High Temperature Vapors and Gases, NBS Special Publication 561, volume 1, pp. 125–142."
+  year: 1979
+  url: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nbsspecialpublication561v1.pdf
+  report_number: NBS SP 561 volume 1
+  doi_status: Not supplied by hunt; resolver verification unavailable in network-disabled seat.
+  calibration_caveat:
+    locator: {page: 138, section: Discussion}
+    quote: The partial vapor pressures of Si(g), SiC₂(g), and Si₂C(g) reported in table 2 for the present work are believed to be too high and the corresponding third-law enthalpy changes are believed to be too low for the following reasons.
+    explanation: Authors question the assumed mass-independent quadrupole transmission in the separate gold calibration; source values preserved without retuning.
+extraction:
+  method: manual_visual_transcription_from_official_pdf
+  date: '2026-09-06'
+  worker: wave-W3-behrens-1979
+review_status: draft
+fidelity_samples:
+  - species: Si
+    observation_id: behrens_1979_table1_si_second_law_this_work
+    field: enthalpy_kcal_mol
+    value: 119.2
+    locator: {page: 136, table: '1', quote: '119.2±2.1'}
+  - species: Si
+    observation_id: behrens_1979_table2_si_this_work
+    locator: {page: 136, table: '2', column: This work, quote: '1800 1.2 x 10⁻⁶; 2000 2.9 x 10⁻⁵; 2200 3.8 x 10⁻⁴'}
+    field: series
+    value:
+      - {T_K: 1800, p_atm: 1.2e-6, quote: '1800; 1.2 x 10⁻⁶', locator: {page: 136, table: '2'}}
+      - {T_K: 2000, p_atm: 2.9e-5, quote: '2000; 2.9 x 10⁻⁵', locator: {page: 136, table: '2'}}
+      - {T_K: 2200, p_atm: 3.8e-4, quote: '2200; 3.8 x 10⁻⁴', locator: {page: 136, table: '2'}}
+species:
+  Si:
+    observations:
+      - observation_id: behrens_1979_knudsen_detected_species
+        type: psat_series
+        locator: {page: 132, section: '4.1', quote: 'The most important vapor molecule in the SiC-C system over the experimental temperature range of 1835-2264 K is found to be Si(g) with Si₂C(g) and SiC₂(g) being the next most important molecules.'}
+        regime: kems_effusion
+        phase: SiC_hexagonal_plus_graphite
+        units: qualitative
+        values:
+          method_class: measured
+          quantity: vapour_species_map_no_numeric_pressures
+          T_range_K: [1835, 2264]
+          predominant_species: Si
+          next_most_important_species: [Si2C, SiC2]
+          note: Identified species without tabulated direct absolute-pressure readings; Table 2 pressures are calculated.
+        equipment:
+          cell_material:
+            value: graphite
+            locator: {page: 130, section: '3.2', quote: Knudsen effusion cells used in the equilibrium vapor pressure measurements are machined from graphite}
+      - observation_id: behrens_1979_table1_si_second_law_this_work
+        type: gibbs_table
+        locator: {page: 136, table: '1', column: "second_law this_work", quote: "119.2±2.1"}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: kcal_mol
+        uncertainty:
+          standard_deviation_kcal_mol: 2.1
+          quote: "119.2±2.1"
+          locator: {page: 136, table: '1'}
+          definition_quote: All uncertainties are quoted as one standard deviation.
+        values:
+          method_class: model_derived
+          method: second_law_least_squares_fit
+          source_column: this_work
+          reaction: "SiC(s) = Si(g) + C(s)"
+          enthalpy_kcal_mol: 119.2
+          reference_temperature_K: 298
+          header_quote: ΔH°(298), second-law (kcal mol⁻¹)
+          cell_quote: "119.2±2.1"
+      - observation_id: behrens_1979_table1_si_second_law_reference_10
+        type: gibbs_table
+        locator: {page: 136, table: '1', column: "second_law reference_10", quote: "136.9±0.7"}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: kcal_mol
+        uncertainty:
+          standard_deviation_kcal_mol: 0.7
+          quote: "136.9±0.7"
+          locator: {page: 136, table: '1'}
+          definition_quote: All uncertainties are quoted as one standard deviation.
+        values:
+          method_class: model_derived
+          method: second_law_least_squares_fit
+          source_column: reference_10
+          reaction: "SiC(s) = Si(g) + C(s)"
+          enthalpy_kcal_mol: 136.9
+          reference_temperature_K: 298
+          header_quote: ΔH°(298), second-law (kcal mol⁻¹)
+          cell_quote: "136.9±0.7"
+          footnote_quote: Recalculated from partial pressures reported in reference [10] using JANAF free energy functions.
+      - observation_id: behrens_1979_table1_si_third_law_this_work
+        type: gibbs_table
+        locator: {page: 136, table: '1', column: "third_law this_work", quote: "115.2±0.8"}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: kcal_mol
+        uncertainty:
+          standard_deviation_kcal_mol: 0.8
+          quote: "115.2±0.8"
+          locator: {page: 136, table: '1'}
+          definition_quote: All uncertainties are quoted as one standard deviation.
+        values:
+          method_class: model_derived
+          method: third_law
+          source_column: this_work
+          reaction: "SiC(s) = Si(g) + C(s)"
+          enthalpy_kcal_mol: 115.2
+          reference_temperature_K: 298
+          header_quote: ΔH°(298), third-law (kcal mol⁻¹)
+          cell_quote: "115.2±0.8"
+      - observation_id: behrens_1979_table1_si_third_law_reference_10
+        type: gibbs_table
+        locator: {page: 136, table: '1', column: "third_law reference_10", quote: "124.6±0.3"}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: kcal_mol
+        uncertainty:
+          standard_deviation_kcal_mol: 0.3
+          quote: "124.6±0.3"
+          locator: {page: 136, table: '1'}
+          definition_quote: All uncertainties are quoted as one standard deviation.
+        values:
+          method_class: model_derived
+          method: third_law
+          source_column: reference_10
+          reaction: "SiC(s) = Si(g) + C(s)"
+          enthalpy_kcal_mol: 124.6
+          reference_temperature_K: 298
+          header_quote: ΔH°(298), third-law (kcal mol⁻¹)
+          cell_quote: "124.6±0.3"
+          footnote_quote: Recalculated from partial pressures reported in reference [10] using JANAF free energy functions.
+      - observation_id: behrens_1979_table2_si_this_work
+        type: psat_series
+        locator: {page: 136, table: '2', column: "this_work", quote: 'Comparison of calculated equilibrium pressures in the SiC(hex)-C system.'}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: atm
+        values:
+          method_class: model_derived
+          source_column: this_work
+          quantity: partial_pressure
+          footnote_quote: Calculated using third-law values of ΔH°(298) given in table 1 and JANAF free energy functions.
+          series:
+            - {T_K: 1800, p_atm: 1.2e-6, quote: "1800; 1.2 x 10⁻⁶", locator: {page: 136, table: '2'}}
+            - {T_K: 2000, p_atm: 2.9e-5, quote: "2000; 2.9 x 10⁻⁵", locator: {page: 136, table: '2'}}
+            - {T_K: 2200, p_atm: 3.8e-4, quote: "2200; 3.8 x 10⁻⁴", locator: {page: 136, table: '2'}}
+      - observation_id: behrens_1979_table2_si_reference_10
+        type: psat_series
+        locator: {page: 136, table: '2', column: "reference_10", quote: 'Comparison of calculated equilibrium pressures in the SiC(hex)-C system.'}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: atm
+        values:
+          method_class: model_derived
+          source_column: reference_10
+          quantity: partial_pressure
+          footnote_quote: Calculated using third-law values of ΔH°(298) given in table 1 and JANAF free energy functions.
+          series:
+            - {T_K: 1800, p_atm: 8.7e-8, quote: "1800; 8.7 x 10⁻⁸", locator: {page: 136, table: '2'}}
+            - {T_K: 2000, p_atm: 2.7e-6, quote: "2000; 2.7 x 10⁻⁶", locator: {page: 136, table: '2'}}
+            - {T_K: 2200, p_atm: 4.4e-5, quote: "2200; 4.4 x 10⁻⁵", locator: {page: 136, table: '2'}}
+      - observation_id: behrens_1979_si_langmuir_intensity_induction
+        type: rate_series
+        locator: {page: 135, section: '4.2', quote: 'The steady-state Si⁺ intensity is a factor of 1.5 higher than that measured during the initial stages of heating.'}
+        regime: langmuir_single_crystal
+        phase: hexagonal_SiC_basal_plane
+        units: dimensionless
+        values:
+          method_class: measured
+          quantity: relative_ion_intensity
+          steady_state_to_initial_intensity_ratio: 1.5
+          note: Relative instrument reading; no absolute species flux or pressure implied.
+      - observation_id: behrens_1979_si_langmuir_vs_extrapolated_knudsen
+        type: rate_series
+        locator: {page: 135, section: '4.2', quote: 'At 2400 K, measured steady-state ion intensities are a factor of 80-100 lower than intensities extrapolated from those measured in the Knudsen effusion experiments.'}
+        regime: langmuir_to_extrapolated_knudsen_comparison
+        units: dimensionless
+        values:
+          method_class: proxy
+          quantity: relative_ion_intensity_comparison
+          T_K: 2400
+          suppression_factor_range: [80, 100]
+          note: Printed plural ion intensities; Si record retains shared statement, not a species-resolved absolute measurement. Knudsen comparator is extrapolated.
+      - observation_id: behrens_1979_si_activation_enthalpy
+        type: gibbs_table
+        locator: {page: 135, section: '4.2', quote: 'ΔH*(2350) = 141.6 ± 2.7 kcal mol⁻¹ for Si(g)'}
+        regime: langmuir_least_squares_model
+        phase: hexagonal_SiC_basal_plane
+        units: kcal_mol
+        uncertainty: {reported_plus_minus_kcal_mol: 2.7, locator: {page: 135, section: '4.2'}, quote: '141.6 ± 2.7 kcal mol⁻¹'}
+        values: {method_class: model_derived, method: least_squares_fit_of_Rln_IT, reference_temperature_K: 2350, activation_enthalpy_kcal_mol: 141.6}
+      - observation_id: behrens_1979_si_equilibrium_enthalpy_and_barrier
+        type: gibbs_table
+        locator: {page: 135, section: '4.2', quote: 'ΔH°(2350) = 111.3 kcal mol⁻¹ and ΔH°(2350) = 143.7 kcal mol⁻¹, respectively, gives enthalpy barriers of 30.3 kcal mol⁻¹ and 22.5 kcal mol⁻¹ for Si(g) and SiC₂(g) sublimation.'}
+        regime: thermochemical_equilibrium_model
+        units: kcal_mol
+        values: {method_class: model_derived, reference_temperature_K: 2350, equilibrium_enthalpy_kcal_mol: 111.3, enthalpy_barrier_kcal_mol: 30.3}
+      - observation_id: behrens_1979_si_assumed_entropy_alpha
+        type: alpha
+        locator: {page: 139, section: '5.2', quote: 'vaporization coefficients of 1.5 x 10⁻³ and 8.1 x 10⁻³, respectively, at 2350 K if it is assumed there are no corresponding entropy barriers'}
+        regime: langmuir_activation_barrier_model
+        units: dimensionless
+        values: {method_class: model_derived, T_K: 2350, alpha: 1.5e-3, assumption: 'ΔS° = ΔS*; no entropy barrier, not a measured evaporation coefficient'}
+  Si2C:
+    observations:
+      - observation_id: behrens_1979_table1_si2c_second_law_this_work
+        type: gibbs_table
+        locator: {page: 136, table: '1', column: "second_law this_work", quote: "162.4±2.1"}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: kcal_mol
+        uncertainty:
+          standard_deviation_kcal_mol: 2.1
+          quote: "162.4±2.1"
+          locator: {page: 136, table: '1'}
+          definition_quote: All uncertainties are quoted as one standard deviation.
+        values:
+          method_class: model_derived
+          method: second_law_least_squares_fit
+          source_column: this_work
+          reaction: "2SiC(s) = Si₂C(g) + C(s)"
+          enthalpy_kcal_mol: 162.4
+          reference_temperature_K: 298
+          header_quote: ΔH°(298), second-law (kcal mol⁻¹)
+          cell_quote: "162.4±2.1"
+      - observation_id: behrens_1979_table1_si2c_second_law_reference_10
+        type: gibbs_table
+        locator: {page: 136, table: '1', column: "second_law reference_10", quote: "169.6±7.5"}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: kcal_mol
+        uncertainty:
+          standard_deviation_kcal_mol: 7.5
+          quote: "169.6±7.5"
+          locator: {page: 136, table: '1'}
+          definition_quote: All uncertainties are quoted as one standard deviation.
+        values:
+          method_class: model_derived
+          method: second_law_least_squares_fit
+          source_column: reference_10
+          reaction: "2SiC(s) = Si₂C(g) + C(s)"
+          enthalpy_kcal_mol: 169.6
+          reference_temperature_K: 298
+          header_quote: ΔH°(298), second-law (kcal mol⁻¹)
+          cell_quote: "169.6±7.5"
+          footnote_quote: Recalculated from partial pressures reported in reference [10] using JANAF free energy functions.
+      - observation_id: behrens_1979_table1_si2c_third_law_this_work
+        type: gibbs_table
+        locator: {page: 136, table: '1', column: "third_law this_work", quote: "145.3±1.2"}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: kcal_mol
+        uncertainty:
+          standard_deviation_kcal_mol: 1.2
+          quote: "145.3±1.2"
+          locator: {page: 136, table: '1'}
+          definition_quote: All uncertainties are quoted as one standard deviation.
+        values:
+          method_class: model_derived
+          method: third_law
+          source_column: this_work
+          reaction: "2SiC(s) = Si₂C(g) + C(s)"
+          enthalpy_kcal_mol: 145.3
+          reference_temperature_K: 298
+          header_quote: ΔH°(298), third-law (kcal mol⁻¹)
+          cell_quote: "145.3±1.2"
+      - observation_id: behrens_1979_table1_si2c_third_law_reference_10
+        type: gibbs_table
+        locator: {page: 136, table: '1', column: "third_law reference_10", quote: "161.3±0.5"}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: kcal_mol
+        uncertainty:
+          standard_deviation_kcal_mol: 0.5
+          quote: "161.3±0.5"
+          locator: {page: 136, table: '1'}
+          definition_quote: All uncertainties are quoted as one standard deviation.
+        values:
+          method_class: model_derived
+          method: third_law
+          source_column: reference_10
+          reaction: "2SiC(s) = Si₂C(g) + C(s)"
+          enthalpy_kcal_mol: 161.3
+          reference_temperature_K: 298
+          header_quote: ΔH°(298), third-law (kcal mol⁻¹)
+          cell_quote: "161.3±0.5"
+          footnote_quote: Recalculated from partial pressures reported in reference [10] using JANAF free energy functions.
+      - observation_id: behrens_1979_table2_si2c_this_work
+        type: psat_series
+        locator: {page: 136, table: '2', column: "this_work", quote: 'Comparison of calculated equilibrium pressures in the SiC(hex)-C system.'}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: atm
+        values:
+          method_class: model_derived
+          source_column: this_work
+          quantity: partial_pressure
+          footnote_quote: Calculated using third-law values of ΔH°(298) given in table 1 and JANAF free energy functions.
+          series:
+            - {T_K: 1800, p_atm: 1.2e-7, quote: "1800; 1.2 x 10⁻⁷", locator: {page: 136, table: '2'}}
+            - {T_K: 2000, p_atm: 5.7e-6, quote: "2000; 5.7 x 10⁻⁶", locator: {page: 136, table: '2'}}
+            - {T_K: 2200, p_atm: 1.4e-4, quote: "2200; 1.4 x 10⁻⁴", locator: {page: 136, table: '2'}}
+      - observation_id: behrens_1979_table2_si2c_reference_10
+        type: psat_series
+        locator: {page: 136, table: '2', column: "reference_10", quote: 'Comparison of calculated equilibrium pressures in the SiC(hex)-C system.'}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: atm
+        values:
+          method_class: model_derived
+          source_column: reference_10
+          quantity: partial_pressure
+          footnote_quote: Calculated using third-law values of ΔH°(298) given in table 1 and JANAF free energy functions.
+          series:
+            - {T_K: 1800, p_atm: 1.3e-9, quote: "1800; 1.3 x 10⁻⁹", locator: {page: 136, table: '2'}}
+            - {T_K: 2000, p_atm: 1.0e-7, quote: "2000; 1.0 x 10⁻⁷", locator: {page: 136, table: '2'}}
+            - {T_K: 2200, p_atm: 3.5e-6, quote: "2200; 3.5 x 10⁻⁶", locator: {page: 136, table: '2'}}
+      - observation_id: behrens_1979_si2c_formation_enthalpies
+        type: gibbs_table
+        locator: {page: 139, section: '5.1', quote: 'Enthalpies of formation for Si₂C(g) and SiC₂(g) are computed to be 130.3 kcal mol⁻¹ and 144.6 kcal mol⁻¹, respectively', note: 'Same paragraph: ΔH°f(298 K) = 121.1 kcal mol⁻¹ and 144.8 kcal mol⁻¹; (128 ± 6) kcal mol⁻¹ and (147 ± 7) kcal mol⁻¹, respectively.'}
+        regime: thermochemical_equilibrium_model
+        units: kcal_mol
+        values:
+          method_class: model_derived
+          reference_temperature_K: 298
+          gold_calibrated_formation_enthalpy: 130.3
+          drowart_normalized_formation_enthalpy: 121.1
+          janaf_reference_formation_enthalpy: 128
+          janaf_reference_plus_minus: 6
+          quote: 'ΔH°f(298 K) = 121.1 kcal mol⁻¹ and 144.8 kcal mol⁻¹; (128 ± 6) kcal mol⁻¹ and (147 ± 7) kcal mol⁻¹, respectively.'
+          note: Separate printed derived and reference values; no averaging or recalibration by worker.
+  SiC2:
+    observations:
+      - observation_id: behrens_1979_table1_sic2_second_law_this_work
+        type: gibbs_table
+        locator: {page: 136, table: '1', column: "second_law this_work", quote: "169.0±6.4"}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: kcal_mol
+        uncertainty:
+          standard_deviation_kcal_mol: 6.4
+          quote: "169.0±6.4"
+          locator: {page: 136, table: '1'}
+          definition_quote: All uncertainties are quoted as one standard deviation.
+        values:
+          method_class: model_derived
+          method: second_law_least_squares_fit
+          source_column: this_work
+          reaction: "SiC(s) + C(s) = SiC₂(g)"
+          enthalpy_kcal_mol: 169.0
+          reference_temperature_K: 298
+          header_quote: ΔH°(298), second-law (kcal mol⁻¹)
+          cell_quote: "169.0±6.4"
+      - observation_id: behrens_1979_table1_sic2_second_law_reference_10
+        type: gibbs_table
+        locator: {page: 136, table: '1', column: "second_law reference_10", quote: "168.1±9.4"}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: kcal_mol
+        uncertainty:
+          standard_deviation_kcal_mol: 9.4
+          quote: "168.1±9.4"
+          locator: {page: 136, table: '1'}
+          definition_quote: All uncertainties are quoted as one standard deviation.
+        values:
+          method_class: model_derived
+          method: second_law_least_squares_fit
+          source_column: reference_10
+          reaction: "SiC(s) + C(s) = SiC₂(g)"
+          enthalpy_kcal_mol: 168.1
+          reference_temperature_K: 298
+          header_quote: ΔH°(298), second-law (kcal mol⁻¹)
+          cell_quote: "168.1±9.4"
+          footnote_quote: Recalculated from partial pressures reported in reference [10] using JANAF free energy functions.
+      - observation_id: behrens_1979_table1_sic2_third_law_this_work
+        type: gibbs_table
+        locator: {page: 136, table: '1', column: "third_law this_work", quote: "152.1±1.6"}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: kcal_mol
+        uncertainty:
+          standard_deviation_kcal_mol: 1.6
+          quote: "152.1±1.6"
+          locator: {page: 136, table: '1'}
+          definition_quote: All uncertainties are quoted as one standard deviation.
+        values:
+          method_class: model_derived
+          method: third_law
+          source_column: this_work
+          reaction: "SiC(s) + C(s) = SiC₂(g)"
+          enthalpy_kcal_mol: 152.1
+          reference_temperature_K: 298
+          header_quote: ΔH°(298), third-law (kcal mol⁻¹)
+          cell_quote: "152.1±1.6"
+      - observation_id: behrens_1979_table1_sic2_third_law_reference_10
+        type: gibbs_table
+        locator: {page: 136, table: '1', column: "third_law reference_10", quote: "163.6±0.6"}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: kcal_mol
+        uncertainty:
+          standard_deviation_kcal_mol: 0.6
+          quote: "163.6±0.6"
+          locator: {page: 136, table: '1'}
+          definition_quote: All uncertainties are quoted as one standard deviation.
+        values:
+          method_class: model_derived
+          method: third_law
+          source_column: reference_10
+          reaction: "SiC(s) + C(s) = SiC₂(g)"
+          enthalpy_kcal_mol: 163.6
+          reference_temperature_K: 298
+          header_quote: ΔH°(298), third-law (kcal mol⁻¹)
+          cell_quote: "163.6±0.6"
+          footnote_quote: Recalculated from partial pressures reported in reference [10] using JANAF free energy functions.
+      - observation_id: behrens_1979_table2_sic2_this_work
+        type: psat_series
+        locator: {page: 136, table: '2', column: "this_work", quote: 'Comparison of calculated equilibrium pressures in the SiC(hex)-C system.'}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: atm
+        values:
+          method_class: model_derived
+          source_column: this_work
+          quantity: partial_pressure
+          footnote_quote: Calculated using third-law values of ΔH°(298) given in table 1 and JANAF free energy functions.
+          series:
+            - {T_K: 1800, p_atm: 3.6e-8, quote: "1800; 3.6 x 10⁻⁸", locator: {page: 136, table: '2'}}
+            - {T_K: 2000, p_atm: 2.3e-6, quote: "2000; 2.3 x 10⁻⁶", locator: {page: 136, table: '2'}}
+            - {T_K: 2200, p_atm: 6.6e-5, quote: "2200; 6.6 x 10⁻⁵", locator: {page: 136, table: '2'}}
+      - observation_id: behrens_1979_table2_sic2_reference_10
+        type: psat_series
+        locator: {page: 136, table: '2', column: "reference_10", quote: 'Comparison of calculated equilibrium pressures in the SiC(hex)-C system.'}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: atm
+        values:
+          method_class: model_derived
+          source_column: reference_10
+          quantity: partial_pressure
+          footnote_quote: Calculated using third-law values of ΔH°(298) given in table 1 and JANAF free energy functions.
+          series:
+            - {T_K: 1800, p_atm: 1.5e-9, quote: "1800; 1.5 x 10⁻⁹", locator: {page: 136, table: '2'}}
+            - {T_K: 2000, p_atm: 1.3e-7, quote: "2000; 1.3 x 10⁻⁷", locator: {page: 136, table: '2'}}
+            - {T_K: 2200, p_atm: 4.7e-6, quote: "2200; 4.7 x 10⁻⁶", locator: {page: 136, table: '2'}}
+      - observation_id: behrens_1979_sic2_activation_enthalpy
+        type: gibbs_table
+        locator: {page: 135, section: '4.2', quote: 'ΔH*(2350) = 166.2 ± 3.5 kcal mol⁻¹ for SiC₂(g) sublimation'}
+        regime: langmuir_least_squares_model
+        phase: hexagonal_SiC_basal_plane
+        units: kcal_mol
+        uncertainty: {reported_plus_minus_kcal_mol: 3.5, locator: {page: 135, section: '4.2'}, quote: '166.2 ± 3.5 kcal mol⁻¹'}
+        values: {method_class: model_derived, method: least_squares_fit_of_Rln_IT, reference_temperature_K: 2350, activation_enthalpy_kcal_mol: 166.2}
+      - observation_id: behrens_1979_sic2_equilibrium_enthalpy_and_barrier
+        type: gibbs_table
+        locator: {page: 135, section: '4.2', quote: 'ΔH°(2350) = 111.3 kcal mol⁻¹ and ΔH°(2350) = 143.7 kcal mol⁻¹, respectively, gives enthalpy barriers of 30.3 kcal mol⁻¹ and 22.5 kcal mol⁻¹ for Si(g) and SiC₂(g) sublimation.'}
+        regime: thermochemical_equilibrium_model
+        units: kcal_mol
+        values: {method_class: model_derived, reference_temperature_K: 2350, equilibrium_enthalpy_kcal_mol: 143.7, enthalpy_barrier_kcal_mol: 22.5}
+      - observation_id: behrens_1979_sic2_assumed_entropy_alpha
+        type: alpha
+        locator: {page: 139, section: '5.2', quote: 'vaporization coefficients of 1.5 x 10⁻³ and 8.1 x 10⁻³, respectively, at 2350 K if it is assumed there are no corresponding entropy barriers'}
+        regime: langmuir_activation_barrier_model
+        units: dimensionless
+        values: {method_class: model_derived, T_K: 2350, alpha: 8.1e-3, assumption: 'ΔS° = ΔS*; no entropy barrier, not a measured evaporation coefficient'}
+      - observation_id: behrens_1979_sic2_formation_enthalpies
+        type: gibbs_table
+        locator: {page: 139, section: '5.1', quote: 'Enthalpies of formation for Si₂C(g) and SiC₂(g) are computed to be 130.3 kcal mol⁻¹ and 144.6 kcal mol⁻¹, respectively', note: 'Same paragraph: ΔH°f(298 K) = 121.1 kcal mol⁻¹ and 144.8 kcal mol⁻¹; (128 ± 6) kcal mol⁻¹ and (147 ± 7) kcal mol⁻¹, respectively.'}
+        regime: thermochemical_equilibrium_model
+        units: kcal_mol
+        values:
+          method_class: model_derived
+          reference_temperature_K: 298
+          gold_calibrated_formation_enthalpy: 144.6
+          drowart_normalized_formation_enthalpy: 144.8
+          janaf_reference_formation_enthalpy: 147
+          janaf_reference_plus_minus: 7
+          quote: 'ΔH°f(298 K) = 121.1 kcal mol⁻¹ and 144.8 kcal mol⁻¹; (128 ± 6) kcal mol⁻¹ and (147 ± 7) kcal mol⁻¹, respectively.'
+          note: Separate printed derived and reference values; no averaging or recalibration by worker.
+  total_vapor:
+    observations:
+      - observation_id: behrens_1979_total_initial_langmuir_flux
+        type: rate_series
+        locator: {page: 135, section: '4.2', quote: 'the flux measured initially (0.31 mg min⁻¹ cm²) is a factor of about 10⁴ below the equilibrium flux of Si(g) at 2498 K'}
+        regime: langmuir_total_mass_loss
+        phase: hexagonal_SiC_basal_plane
+        units: 'mg min⁻¹ cm² (as printed)'
+        values:
+          method_class: directly_reduced_measurement
+          quantity: total_mass_loss_apparent_initial_flux
+          initial_flux_as_printed: 0.31
+          T_K: 2498
+          note: Total mass-loss reduction, not a Si partial flux. Printed area exponent retained without silently correcting or converting units; plotted series remains figure-only.
+        equipment:
+          cell_material:
+            value: graphite holder
+            locator: {page: 130, section: '3.2', quote: Total mass-loss Langmuir vaporization experiments are performed with a SiC single crystal wafer sitting in a graphite holder.}
+      - observation_id: behrens_1979_total_flux_time_dependence
+        type: rate_series
+        locator: {page: 135, section: '4.2', quote: 'during the 1300 minute vaporization, the apparent flux drops by a factor of four. The flux then immediately drops to zero'}
+        regime: langmuir_total_mass_loss
+        units: dimensionless
+        values:
+          method_class: directly_reduced_measurement
+          quantity: total_flux_relative_drop
+          duration_min: 1300
+          drop_factor: 4
+          endpoint_as_published: immediately drops to zero
+          note: No numeric zero invented for a missing endpoint time; no species-resolved rates inferred.
+      - observation_id: behrens_1979_table2_total_vapor_this_work
+        type: psat_series
+        locator: {page: 136, table: '2', column: "this_work", quote: 'Comparison of calculated equilibrium pressures in the SiC(hex)-C system.'}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: atm
+        values:
+          method_class: model_derived
+          source_column: this_work
+          quantity: total_pressure
+          footnote_quote: Calculated using third-law values of ΔH°(298) given in table 1 and JANAF free energy functions.
+          series:
+            - {T_K: 1800, p_atm: 1.4e-6, quote: "1800; 1.4 x 10⁻⁶", locator: {page: 136, table: '2'}}
+            - {T_K: 2000, p_atm: 3.7e-5, quote: "2000; 3.7 x 10⁻⁵", locator: {page: 136, table: '2'}}
+            - {T_K: 2200, p_atm: 5.9e-4, quote: "2200; 5.9 x 10⁻⁴", locator: {page: 136, table: '2'}}
+      - observation_id: behrens_1979_table2_total_vapor_reference_10
+        type: psat_series
+        locator: {page: 136, table: '2', column: "reference_10", quote: 'Comparison of calculated equilibrium pressures in the SiC(hex)-C system.'}
+        regime: thermochemical_equilibrium_model
+        phase: SiC_hexagonal_plus_graphite
+        units: atm
+        values:
+          method_class: model_derived
+          source_column: reference_10
+          quantity: total_pressure
+          footnote_quote: Calculated using third-law values of ΔH°(298) given in table 1 and JANAF free energy functions.
+          series:
+            - {T_K: 1800, p_atm: 9.0e-8, quote: "1800; 9.0 x 10⁻⁸", locator: {page: 136, table: '2'}}
+            - {T_K: 2000, p_atm: 2.9e-6, quote: "2000; 2.9 x 10⁻⁶", locator: {page: 136, table: '2'}}
+            - {T_K: 2200, p_atm: 5.2e-5, quote: "2200; 5.2 x 10⁻⁵", locator: {page: 136, table: '2'}}
