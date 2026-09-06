@@ -38,6 +38,23 @@ sources:
     known_gap: Page and sidecar claim 3444 species; supplied HTML contains 3442 species rows. Discrepancy preserved in manifest.
     note: Formation enthalpies only; no Cp, entropy or Gibbs functions; no battery scoring rows.
 
+  usgs_bulletin_1452:
+    citation: 'Robie, R. A., Hemingway, B. S. and Fisher, J. R., 1978 (reprinted 1979), Thermodynamic properties of minerals and related substances at 298.15 K and 1 bar (10^5 pascals) pressure and at higher temperatures: U.S. Geological Survey Bulletin 1452, 456 p.'
+    doi: 10.3133/b1452
+    access: open_public_domain_us_government_work
+    official_url: https://pubs.usgs.gov/bul/1452/report.pdf
+    licence_basis: United States government work; USGS numbered-series bulletin; public domain in the United States.
+    accessed_at: '2026-09-06'
+    verified_date: '2026-09-06'
+    source_sha256: 3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622
+    local_status: complete_numeric_table_census_with_explicit_ocr_gaps
+    harvested_path: data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452/
+    census_record_count: 400
+    transcribed_record_count: 96
+    untranscribed_record_count: 304
+    temperature_row_count: 1528
+    note: Assessed reference functions only; never measured validation evidence and no battery scoring rows.
+
   nist_janaf_4th:
     citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, Fourth Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998).
     identifier: NIST Standard Reference Database 13
