@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Br-016.html
   download_url: https://janaf.nist.gov/tables/Br-016.txt
   index_entry:
-    formula: "KBr"
-    formula_as_published: "KBr"
-    formula_normalised: "KBr"
-    name: "Potassium Bromide"
-    state: "l"
+    formula: KBr
+    formula_as_published: KBr
+    formula_normalised: KBr
+    name: Potassium Bromide
+    state: l
+    charge: 0
   title_as_published: Potassium Bromide (KBr)  |  Br1K1(l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -1771,4 +1772,8 @@ table:
         download_url: https://janaf.nist.gov/tables/Br-016.txt
         row_temperature_as_published: '2500'
         column: log Kf
-  parse_ambiguities: []
+  parse_ambiguities:
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 8d94624747fa5df1d53fbf2a389a1fb5d6353060df2fbfa93957185c0fbb0539

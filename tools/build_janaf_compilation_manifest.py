@@ -104,12 +104,14 @@ def main() -> int:
             "formula": published,
             "formula_as_published": published,
             "formula_normalised": normalised,
+            "charge": (table.get("index_entry") or {}).get("charge"),
             "phase": phase,
             "title_as_published": table.get("title_as_published"),
             "url": url,
             "download_url": table.get("download_url"),
             "row_count": len(rows),
             "ambiguity_count": len(ambiguities),
+            "parse_ambiguities": ambiguities,
             "harvest_era": era,
             "path": path.relative_to(ROOT).as_posix(),
         }
@@ -143,6 +145,14 @@ def main() -> int:
                 "previous_integerised_formula": meta["previous_integerised_formula"],
             }
         )
+    harvest_refusals = []
+    run_path = JANAF_ROOT / "source-cache" / "harvest-run.yaml"
+    if run_path.is_file():
+        run = load_table_document(run_path)
+        harvest_refusals = [
+            {"table_id": entry["table_id"], "reason": entry["error"]}
+            for entry in run.get("entries", []) if entry.get("status") == "failed"
+        ]
     manifest = {
         "schema_version": "literature_compilation_manifest.v1",
         "source_id": "nist-janaf-4th",
@@ -152,8 +162,8 @@ def main() -> int:
             "scope": "feedstock-element complete harvest",
             "full_formula_index_status": (
                 "harvested every official-index table whose formula uses only "
-                "the feedstock element set; HTML-era held tables were not "
-                "overwritten by the 2026-09-06 .txt harvest"
+                "the feedstock element set; available hash-verified .txt sources "
+                "replace HTML-era loadable records; unavailable sources are explicit ambiguities"
             ),
             "official_formula_index_url": "https://janaf.nist.gov/formula.html",
             "official_formula_index_total_lines_observed": 1796,
@@ -165,10 +175,11 @@ def main() -> int:
         "summary": {
             "table_count": len(entries),
             "thermodynamic_row_count": row_count,
-            "parse_ambiguity_count": ambiguity_count,
+            "parse_ambiguity_count": ambiguity_count + len(harvest_refusals),
             "formula_count": len(by_formula),
         },
         "non_stoichiometric_formulas": non_stoich,
+        "parse_ambiguities": harvest_refusals,
         "feedstock_element_coverage": {
             "elements": feedstock_elements,
             "covered_elements": [

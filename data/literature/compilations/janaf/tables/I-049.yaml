@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/I-049.html
   download_url: https://janaf.nist.gov/tables/I-049.txt
   index_entry:
-    formula: "ZrI2"
-    formula_as_published: "ZrI2"
-    formula_normalised: "ZrI2"
-    name: "Zirconium Iodide"
-    state: "cr,l"
+    formula: ZrI2
+    formula_as_published: ZrI2
+    formula_normalised: ZrI2
+    name: Zirconium Iodide
+    state: cr,l
+    charge: 0
   title_as_published: Zirconium Iodide (ZrI2)  |  I2Zr1(cr,l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -1640,3 +1641,7 @@ table:
     locator:
       table_id: I-049
       url: https://janaf.nist.gov/tables/I-049.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: f20ea71f8678eb4952778a03b3c8ec24b080c893ff290493607eef19eb9facfc

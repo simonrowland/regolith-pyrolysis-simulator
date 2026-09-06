@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/I-062.html
   download_url: https://janaf.nist.gov/tables/I-062.txt
   index_entry:
-    formula: "SiI4"
-    formula_as_published: "SiI4"
-    formula_normalised: "SiI4"
-    name: "Tetraiodosilane"
-    state: "l"
+    formula: SiI4
+    formula_as_published: SiI4
+    formula_normalised: SiI4
+    name: Tetraiodosilane
+    state: l
+    charge: 0
   title_as_published: Tetraiodosilane (SiI4)  |  I4Si1(l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -632,3 +633,7 @@ table:
     locator:
       table_id: I-062
       url: https://janaf.nist.gov/tables/I-062.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: bf21da9ea071edb3c8a4141d0fe1c5a2fa251adbe7d327755c5b34c6ab3ea6d2

@@ -4,11 +4,10 @@ Reads ``data/literature/compilations/janaf/`` (one YAML/JSON file per
 table). Numbers stay as published tokens; there is no unit conversion,
 smoothing, phase merging, or integer rewrite of printed formulas.
 
-The 380 HTML-era tables (2026-08-27) and the 1275 NIST ``.txt`` tables
-(2026-09-06) share this loader. Source ``.txt`` bytes are not in git;
-round-trip tests re-parse stored ``as_published`` tokens from the table
-files. A live ``.txt`` parse path lives here so the harvester can
-reproduce those files from the current NIST download format.
+Source ``.txt`` bytes are not in git. Source round-trip tests re-parse
+available original downloads and compare complete printed-token rows;
+unavailable sources are explicitly unverified. The same native parser
+supports the harvester, preserving blank cells by header position.
 """
 
 from __future__ import annotations
@@ -63,14 +62,14 @@ HEADER_ALIASES = ("T/K", "T(K)")
 NUMBER_RE = re.compile(r"^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?$")
 # Decimal subscripts are retained. Charge is optional.
 FORMULA_TOKEN_RE = re.compile(r"([A-Z][a-z]?)(\d+(?:\.\d+)?)?")
-CHARGE_RE = re.compile(r"(\d+)?[+-]$")
+CHARGE_RE = re.compile(r"[+-]$")
 PHASE_SUFFIX_RE = re.compile(r"\((ref|cr|l|cr,l|g|l,g|fl)\)$")
 SUBSCRIPT_ONE_RE = re.compile(r"([A-Z][a-z]?)1(?=[A-Z]|[+-]|$)")
 
 # Review F2: these eleven printed formulas were integerised in c35ea8e1.
 NON_STOICHIOMETRIC_TABLES: dict[str, dict[str, str]] = {
     "C-001": {
-        "formula_as_published": "C0.98Nb",
+        "formula_as_published": "NbC0.98",
         "previous_integerised_formula": "CNb",
     },
     "Fe-001": {
@@ -82,7 +81,7 @@ NON_STOICHIOMETRIC_TABLES: dict[str, dict[str, str]] = {
         "previous_integerised_formula": "FeS",
     },
     "H-097": {
-        "formula_as_published": "H15O10.5S",
+        "formula_as_published": "H15O10.5S1",
         "previous_integerised_formula": "H15O10S",
     },
     "Mo-011": {
@@ -98,19 +97,19 @@ NON_STOICHIOMETRIC_TABLES: dict[str, dict[str, str]] = {
         "previous_integerised_formula": "MoO2",
     },
     "N-001": {
-        "formula_as_published": "N0.465V",
+        "formula_as_published": "VN0.465",
         "previous_integerised_formula": "NV",
     },
     "O-049": {
-        "formula_as_published": "O2.72W",
+        "formula_as_published": "WO2.72",
         "previous_integerised_formula": "O2W",
     },
     "O-050": {
-        "formula_as_published": "O2.90W",
+        "formula_as_published": "WO2.90",
         "previous_integerised_formula": "O2W",
     },
     "O-051": {
-        "formula_as_published": "O2.96W",
+        "formula_as_published": "WO2.96",
         "previous_integerised_formula": "O2W",
     },
 }
@@ -303,19 +302,21 @@ def parse_janaf_txt(
     header_index = _header_index(lines)
     header_as_published = lines[header_index].strip()
     header_fields = [field.strip() for field in lines[header_index].split("\t")]
+    while header_fields and not header_fields[-1]:
+        header_fields.pop()
+    if len(header_fields) != len(VALUE_COLUMNS):
+        raise JanafParseError(f"{table_id}: expected eight native header columns")
     values: list[dict[str, Any]] = []
     ambiguities: list[dict[str, Any]] = []
     for line_number, line in enumerate(lines[header_index + 1 :], start=header_index + 2):
         if not line.strip():
             continue
         fields = [field.strip() for field in line.split("\t")]
-        while fields and fields[-1] == "":
+        while len(fields) > len(header_fields) and fields[-1] == "":
             fields.pop()
-        if len(fields) == 1:
-            fields = line.split()
         if not fields or not NUMBER_RE.fullmatch(fields[0]):
             continue
-        if len(fields) != len(VALUE_COLUMNS):
+        if len(fields) != len(header_fields):
             ambiguities.append(
                 {
                     "line_number": line_number,

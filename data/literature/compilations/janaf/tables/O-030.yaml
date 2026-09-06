@@ -6,6 +6,9 @@ source:
   doi: 10.18434/T42S31
   url: https://janaf.nist.gov/
   last_data_update: 1998
+  licence: 'Quoted from NIST SRD 13 (https://data.nist.gov/od/id/ECBCC1C1301D2ED9E04306570681B10735): "These data are public."
+    Quoted from https://www.nist.gov/copyrights-disclaimers: "With the exception of material marked as copyrighted, information
+    presented on NIST sites are considered public information and may be distributed or copied."'
 compilation_role:
   kind: assessed_thermodynamic_functions
   engine_reference_input: true
@@ -18,7 +21,7 @@ extraction:
   date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
-  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/O-030.txt
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/O/O-030.txt
   source_sha256: 165ccb343d316fc743a422e91f499c51e9c066e166f81faadd24da4d369c8e96
   review_status: machine_transcribed_unreviewed
 table:
@@ -26,11 +29,12 @@ table:
   url: https://janaf.nist.gov/tables/O-030.html
   download_url: https://janaf.nist.gov/tables/O-030.txt
   index_entry:
-    formula: "O2+"
-    formula_as_published: "O2+"
-    formula_normalised: "O"
-    name: "Oxygen, Ion"
-    state: "g"
+    formula: O2+
+    formula_as_published: O2+
+    formula_normalised: O2
+    charge: 1
+    name: Oxygen, Ion
+    state: g
   title_as_published: Oxygen, Ion (O2+)  |  O2+(g)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -51,7 +55,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '0'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 0.0
       as_published: '0.'
@@ -60,7 +64,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '0'
-        column: Cp°
+        column: Cp
     entropy:
       value: 0.0
       as_published: '0.'
@@ -69,7 +73,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '0'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: null
       as_published: INFINITE
@@ -78,7 +82,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '0'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -8.674
       as_published: '-8.674'
@@ -87,7 +91,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '0'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1164.7
       as_published: '1164.700'
@@ -96,7 +100,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '0'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: null
       as_published: ''
@@ -105,7 +109,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '0'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: null
       as_published: ''
@@ -123,7 +127,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 29.105
       as_published: '29.105'
@@ -132,7 +136,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 174.406
       as_published: '174.406'
@@ -141,7 +145,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 232.113
       as_published: '232.113'
@@ -150,7 +154,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -5.771
       as_published: '-5.771'
@@ -159,7 +163,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: null
       as_published: ''
@@ -168,7 +172,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: null
       as_published: ''
@@ -177,7 +181,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: null
       as_published: ''
@@ -195,7 +199,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 29.111
       as_published: '29.111'
@@ -204,7 +208,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 194.582
       as_published: '194.582'
@@ -213,7 +217,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 208.881
       as_published: '208.881'
@@ -222,7 +226,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -2.86
       as_published: '-2.860'
@@ -231,7 +235,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: null
       as_published: ''
@@ -240,7 +244,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: null
       as_published: ''
@@ -249,7 +253,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: null
       as_published: ''
@@ -267,7 +271,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '250'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 29.132
       as_published: '29.132'
@@ -276,7 +280,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '250'
-        column: Cp°
+        column: Cp
     entropy:
       value: 201.079
       as_published: '201.079'
@@ -285,7 +289,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '250'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 206.695
       as_published: '206.695'
@@ -294,7 +298,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '250'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -1.404
       as_published: '-1.404'
@@ -303,7 +307,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '250'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: null
       as_published: ''
@@ -312,7 +316,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '250'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: null
       as_published: ''
@@ -321,7 +325,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '250'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: null
       as_published: ''
@@ -339,7 +343,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '298.15'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 29.195
       as_published: '29.195'
@@ -348,7 +352,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '298.15'
-        column: Cp°
+        column: Cp
     entropy:
       value: 206.215
       as_published: '206.215'
@@ -357,7 +361,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '298.15'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 206.215
       as_published: '206.215'
@@ -366,7 +370,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '298.15'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 0.0
       as_published: '0.'
@@ -375,7 +379,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '298.15'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1170.888
       as_published: '1170.888'
@@ -384,7 +388,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '298.15'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1164.315
       as_published: '1164.315'
@@ -393,7 +397,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '298.15'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -203.983
       as_published: '-203.983'
@@ -411,7 +415,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 29.199
       as_published: '29.199'
@@ -420,7 +424,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 206.396
       as_published: '206.396'
@@ -429,7 +433,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 206.216
       as_published: '206.216'
@@ -438,7 +442,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 0.054
       as_published: '0.054'
@@ -447,7 +451,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1170.926
       as_published: '1170.926'
@@ -456,7 +460,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1164.274
       as_published: '1164.274'
@@ -465,7 +469,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -202.718
       as_published: '-202.718'
@@ -483,7 +487,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '350'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 29.342
       as_published: '29.342'
@@ -492,7 +496,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '350'
-        column: Cp°
+        column: Cp
     entropy:
       value: 210.906
       as_published: '210.906'
@@ -501,7 +505,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '350'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 206.572
       as_published: '206.572'
@@ -510,7 +514,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '350'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 1.517
       as_published: '1.517'
@@ -519,7 +523,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '350'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1171.952
       as_published: '1171.952'
@@ -528,7 +532,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '350'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1163.084
       as_published: '1163.084'
@@ -537,7 +541,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '350'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -173.581
       as_published: '-173.581'
@@ -555,7 +559,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 29.573
       as_published: '29.573'
@@ -564,7 +568,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 214.839
       as_published: '214.839'
@@ -573,7 +577,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 207.364
       as_published: '207.364'
@@ -582,7 +586,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 2.99
       as_published: '2.990'
@@ -591,7 +595,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1172.97
       as_published: '1172.970'
@@ -600,7 +604,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1161.748
       as_published: '1161.748'
@@ -609,7 +613,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -151.709
       as_published: '-151.709'
@@ -627,7 +631,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '450'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 29.882
       as_published: '29.882'
@@ -636,7 +640,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '450'
-        column: Cp°
+        column: Cp
     entropy:
       value: 218.339
       as_published: '218.339'
@@ -645,7 +649,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '450'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 208.393
       as_published: '208.393'
@@ -654,7 +658,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '450'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 4.476
       as_published: '4.476'
@@ -663,7 +667,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '450'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1173.978
       as_published: '1173.978'
@@ -672,7 +676,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '450'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1160.285
       as_published: '1160.285'
@@ -681,7 +685,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '450'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -134.682
       as_published: '-134.682'
@@ -699,7 +703,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 30.25
       as_published: '30.250'
@@ -708,7 +712,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 221.506
       as_published: '221.506'
@@ -717,7 +721,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 209.548
       as_published: '209.548'
@@ -726,7 +730,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 5.979
       as_published: '5.979'
@@ -735,7 +739,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1174.978
       as_published: '1174.978'
@@ -744,7 +748,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1158.71
       as_published: '1158.710'
@@ -753,7 +757,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -121.05
       as_published: '-121.050'
@@ -771,7 +775,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 31.078
       as_published: '31.078'
@@ -780,7 +784,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 227.093
       as_published: '227.093'
@@ -789,7 +793,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 212.019
       as_published: '212.019'
@@ -798,7 +802,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 9.045
       as_published: '9.045'
@@ -807,7 +811,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1176.963
       as_published: '1176.963'
@@ -816,7 +820,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1155.269
       as_published: '1155.269'
@@ -825,7 +829,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -100.575
       as_published: '-100.575'
@@ -843,7 +847,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 31.916
       as_published: '31.916'
@@ -852,7 +856,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 231.947
       as_published: '231.947'
@@ -861,7 +865,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 214.526
       as_published: '214.526'
@@ -870,7 +874,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 12.195
       as_published: '12.195'
@@ -879,7 +883,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1178.937
       as_published: '1178.937'
@@ -888,7 +892,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1151.497
       as_published: '1151.497'
@@ -897,7 +901,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -85.926
       as_published: '-85.926'
@@ -915,7 +919,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 32.687
       as_published: '32.687'
@@ -924,7 +928,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 236.26
       as_published: '236.260'
@@ -933,7 +937,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 216.978
       as_published: '216.978'
@@ -942,7 +946,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 15.426
       as_published: '15.426'
@@ -951,7 +955,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1180.91
       as_published: '1180.910'
@@ -960,7 +964,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1147.442
       as_published: '1147.442'
@@ -969,7 +973,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -74.92
       as_published: '-74.920'
@@ -987,7 +991,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 33.364
       as_published: '33.364'
@@ -996,7 +1000,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 240.15
       as_published: '240.150'
@@ -1005,7 +1009,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 219.34
       as_published: '219.340'
@@ -1014,7 +1018,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 18.729
       as_published: '18.729'
@@ -1023,7 +1027,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1182.886
       as_published: '1182.886'
@@ -1032,7 +1036,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1143.14
       as_published: '1143.140'
@@ -1041,7 +1045,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -66.346
       as_published: '-66.346'
@@ -1059,7 +1063,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 33.945
       as_published: '33.945'
@@ -1068,7 +1072,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 243.697
       as_published: '243.697'
@@ -1077,7 +1081,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 221.601
       as_published: '221.601'
@@ -1086,7 +1090,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 22.095
       as_published: '22.095'
@@ -1095,7 +1099,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1184.869
       as_published: '1184.869'
@@ -1104,7 +1108,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1138.618
       as_published: '1138.618'
@@ -1113,7 +1117,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -59.475
       as_published: '-59.475'
@@ -1131,7 +1135,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 34.44
       as_published: '34.440'
@@ -1140,7 +1144,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 246.956
       as_published: '246.956'
@@ -1149,7 +1153,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 223.76
       as_published: '223.760'
@@ -1158,7 +1162,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 25.515
       as_published: '25.515'
@@ -1167,7 +1171,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1186.859
       as_published: '1186.859'
@@ -1176,7 +1180,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1133.897
       as_published: '1133.897'
@@ -1185,7 +1189,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -53.844
       as_published: '-53.844'
@@ -1203,7 +1207,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 34.859
       as_published: '34.859'
@@ -1212,7 +1216,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 249.971
       as_published: '249.971'
@@ -1221,7 +1225,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 225.82
       as_published: '225.820'
@@ -1230,7 +1234,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 28.981
       as_published: '28.981'
@@ -1239,7 +1243,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1188.854
       as_published: '1188.854'
@@ -1248,7 +1252,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1128.994
       as_published: '1128.994'
@@ -1257,7 +1261,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -49.144
       as_published: '-49.144'
@@ -1275,7 +1279,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 35.216
       as_published: '35.216'
@@ -1284,7 +1288,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 252.776
       as_published: '252.776'
@@ -1293,7 +1297,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 227.787
       as_published: '227.787'
@@ -1302,7 +1306,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 32.485
       as_published: '32.485'
@@ -1311,7 +1315,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1190.854
       as_published: '1190.854'
@@ -1320,7 +1324,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1123.924
       as_published: '1123.924'
@@ -1329,7 +1333,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -45.16
       as_published: '-45.160'
@@ -1347,7 +1351,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 35.521
       as_published: '35.521'
@@ -1356,7 +1360,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 255.397
       as_published: '255.397'
@@ -1365,7 +1369,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 229.667
       as_published: '229.667'
@@ -1374,7 +1378,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 36.022
       as_published: '36.022'
@@ -1383,7 +1387,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1192.856
       as_published: '1192.856'
@@ -1392,7 +1396,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1118.701
       as_published: '1118.701'
@@ -1401,7 +1405,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -41.739
       as_published: '-41.739'
@@ -1419,7 +1423,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 35.784
       as_published: '35.784'
@@ -1428,7 +1432,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 257.857
       as_published: '257.857'
@@ -1437,7 +1441,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 231.465
       as_published: '231.465'
@@ -1446,7 +1450,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 39.588
       as_published: '39.588'
@@ -1455,7 +1459,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1194.859
       as_published: '1194.859'
@@ -1464,7 +1468,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1113.334
       as_published: '1113.334'
@@ -1473,7 +1477,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -38.77
       as_published: '-38.770'
@@ -1491,7 +1495,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 36.011
       as_published: '36.011'
@@ -1500,7 +1504,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 260.174
       as_published: '260.174'
@@ -1509,7 +1513,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 233.187
       as_published: '233.187'
@@ -1518,7 +1522,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 43.178
       as_published: '43.178'
@@ -1527,7 +1531,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1196.861
       as_published: '1196.861'
@@ -1536,7 +1540,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1107.834
       as_published: '1107.834'
@@ -1545,7 +1549,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -36.167
       as_published: '-36.167'
@@ -1563,7 +1567,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 36.21
       as_published: '36.210'
@@ -1572,7 +1576,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 262.363
       as_published: '262.363'
@@ -1581,7 +1585,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 234.84
       as_published: '234.840'
@@ -1590,7 +1594,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 46.789
       as_published: '46.789'
@@ -1599,7 +1603,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1198.859
       as_published: '1198.859'
@@ -1608,7 +1612,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1102.208
       as_published: '1102.208'
@@ -1617,7 +1621,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -33.867
       as_published: '-33.867'
@@ -1635,7 +1639,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 36.384
       as_published: '36.384'
@@ -1644,7 +1648,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 264.438
       as_published: '264.438'
@@ -1653,7 +1657,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 236.427
       as_published: '236.427'
@@ -1662,7 +1666,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 50.419
       as_published: '50.419'
@@ -1671,7 +1675,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1200.851
       as_published: '1200.851'
@@ -1680,7 +1684,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1096.465
       as_published: '1096.465'
@@ -1689,7 +1693,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -31.819
       as_published: '-31.819'
@@ -1707,7 +1711,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 36.538
       as_published: '36.538'
@@ -1716,7 +1720,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 266.409
       as_published: '266.409'
@@ -1725,7 +1729,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 237.954
       as_published: '237.954'
@@ -1734,7 +1738,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 54.065
       as_published: '54.065'
@@ -1743,7 +1747,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1202.837
       as_published: '1202.837'
@@ -1752,7 +1756,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1090.612
       as_published: '1090.612'
@@ -1761,7 +1765,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '1900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -29.983
       as_published: '-29.983'
@@ -1779,7 +1783,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 36.675
       as_published: '36.675'
@@ -1788,7 +1792,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 268.287
       as_published: '268.287'
@@ -1797,7 +1801,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 239.424
       as_published: '239.424'
@@ -1806,7 +1810,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 57.726
       as_published: '57.726'
@@ -1815,7 +1819,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1204.813
       as_published: '1204.813'
@@ -1824,7 +1828,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1084.654
       as_published: '1084.654'
@@ -1833,7 +1837,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -28.328
       as_published: '-28.328'
@@ -1851,7 +1855,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 36.798
       as_published: '36.798'
@@ -1860,7 +1864,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 270.079
       as_published: '270.079'
@@ -1869,7 +1873,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 240.841
       as_published: '240.841'
@@ -1878,7 +1882,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 61.399
       as_published: '61.399'
@@ -1887,7 +1891,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1206.78
       as_published: '1206.780'
@@ -1896,7 +1900,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1078.598
       as_published: '1078.598'
@@ -1905,7 +1909,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -26.829
       as_published: '-26.829'
@@ -1923,7 +1927,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 36.908
       as_published: '36.908'
@@ -1932,7 +1936,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 271.793
       as_published: '271.793'
@@ -1941,7 +1945,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 242.209
       as_published: '242.209'
@@ -1950,7 +1954,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 65.085
       as_published: '65.085'
@@ -1959,7 +1963,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1208.736
       as_published: '1208.736'
@@ -1968,7 +1972,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1072.449
       as_published: '1072.449'
@@ -1977,7 +1981,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -25.463
       as_published: '-25.463'
@@ -1995,7 +1999,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.009
       as_published: '37.009'
@@ -2004,7 +2008,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 273.436
       as_published: '273.436'
@@ -2013,7 +2017,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 243.532
       as_published: '243.532'
@@ -2022,7 +2026,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 68.781
       as_published: '68.781'
@@ -2031,7 +2035,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1210.68
       as_published: '1210.680'
@@ -2040,7 +2044,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1066.21
       as_published: '1066.210'
@@ -2049,7 +2053,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -24.214
       as_published: '-24.214'
@@ -2067,7 +2071,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.101
       as_published: '37.101'
@@ -2076,7 +2080,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 275.013
       as_published: '275.013'
@@ -2085,7 +2089,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 244.811
       as_published: '244.811'
@@ -2094,7 +2098,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 72.486
       as_published: '72.486'
@@ -2103,7 +2107,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1212.611
       as_published: '1212.611'
@@ -2112,7 +2116,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1059.887
       as_published: '1059.887'
@@ -2121,7 +2125,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -23.068
       as_published: '-23.068'
@@ -2139,7 +2143,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.185
       as_published: '37.185'
@@ -2148,7 +2152,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 276.53
       as_published: '276.530'
@@ -2157,7 +2161,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 246.049
       as_published: '246.049'
@@ -2166,7 +2170,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 76.201
       as_published: '76.201'
@@ -2175,7 +2179,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1214.529
       as_published: '1214.529'
@@ -2184,7 +2188,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1053.484
       as_published: '1053.484'
@@ -2193,7 +2197,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -22.011
       as_published: '-22.011'
@@ -2211,7 +2215,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.263
       as_published: '37.263'
@@ -2220,7 +2224,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 277.99
       as_published: '277.990'
@@ -2229,7 +2233,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 247.25
       as_published: '247.250'
@@ -2238,7 +2242,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 79.923
       as_published: '79.923'
@@ -2247,7 +2251,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1216.434
       as_published: '1216.434'
@@ -2256,7 +2260,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1047.004
       as_published: '1047.004'
@@ -2265,7 +2269,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -21.035
       as_published: '-21.035'
@@ -2283,7 +2287,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.336
       as_published: '37.336'
@@ -2292,7 +2296,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 279.397
       as_published: '279.397'
@@ -2301,7 +2305,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 248.415
       as_published: '248.415'
@@ -2310,7 +2314,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 83.653
       as_published: '83.653'
@@ -2319,7 +2323,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1218.325
       as_published: '1218.325'
@@ -2328,7 +2332,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1040.452
       as_published: '1040.452'
@@ -2337,7 +2341,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -20.129
       as_published: '-20.129'
@@ -2355,7 +2359,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.403
       as_published: '37.403'
@@ -2364,7 +2368,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 280.756
       as_published: '280.756'
@@ -2373,7 +2377,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 249.546
       as_published: '249.546'
@@ -2382,7 +2386,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 87.39
       as_published: '87.390'
@@ -2391,7 +2395,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1220.203
       as_published: '1220.203'
@@ -2400,7 +2404,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1033.83
       as_published: '1033.830'
@@ -2409,7 +2413,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -19.286
       as_published: '-19.286'
@@ -2427,7 +2431,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.466
       as_published: '37.466'
@@ -2436,7 +2440,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 282.07
       as_published: '282.070'
@@ -2445,7 +2449,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 250.645
       as_published: '250.645'
@@ -2454,7 +2458,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 91.134
       as_published: '91.134'
@@ -2463,7 +2467,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1222.068
       as_published: '1222.068'
@@ -2472,7 +2476,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1027.14
       as_published: '1027.140'
@@ -2481,7 +2485,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '2900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -18.501
       as_published: '-18.501'
@@ -2499,7 +2503,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.526
       as_published: '37.526'
@@ -2508,7 +2512,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 283.341
       as_published: '283.341'
@@ -2517,7 +2521,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 251.713
       as_published: '251.713'
@@ -2526,7 +2530,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 94.883
       as_published: '94.883'
@@ -2535,7 +2539,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1223.919
       as_published: '1223.919'
@@ -2544,7 +2548,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1020.387
       as_published: '1020.387'
@@ -2553,7 +2557,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -17.767
       as_published: '-17.767'
@@ -2571,7 +2575,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.583
       as_published: '37.583'
@@ -2580,7 +2584,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 284.573
       as_published: '284.573'
@@ -2589,7 +2593,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 252.754
       as_published: '252.754'
@@ -2598,7 +2602,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 98.639
       as_published: '98.639'
@@ -2607,7 +2611,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1225.757
       as_published: '1225.757'
@@ -2616,7 +2620,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1013.573
       as_published: '1013.573'
@@ -2625,7 +2629,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -17.079
       as_published: '-17.079'
@@ -2643,7 +2647,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.637
       as_published: '37.637'
@@ -2652,7 +2656,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 285.767
       as_published: '285.767'
@@ -2661,7 +2665,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 253.767
       as_published: '253.767'
@@ -2670,7 +2674,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 102.4
       as_published: '102.400'
@@ -2679,7 +2683,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1227.583
       as_published: '1227.583'
@@ -2688,7 +2692,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1006.699
       as_published: '1006.699'
@@ -2697,7 +2701,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -16.433
       as_published: '-16.433'
@@ -2715,7 +2719,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.689
       as_published: '37.689'
@@ -2724,7 +2728,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 286.926
       as_published: '286.926'
@@ -2733,7 +2737,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 254.754
       as_published: '254.754'
@@ -2742,7 +2746,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 106.166
       as_published: '106.166'
@@ -2751,7 +2755,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1229.397
       as_published: '1229.397'
@@ -2760,7 +2764,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 999.768
       as_published: '999.768'
@@ -2769,7 +2773,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -15.825
       as_published: '-15.825'
@@ -2787,7 +2791,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.74
       as_published: '37.740'
@@ -2796,7 +2800,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 288.051
       as_published: '288.051'
@@ -2805,7 +2809,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 255.717
       as_published: '255.717'
@@ -2814,7 +2818,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 109.938
       as_published: '109.938'
@@ -2823,7 +2827,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1231.2
       as_published: '1231.200'
@@ -2832,7 +2836,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 992.783
       as_published: '992.783'
@@ -2841,7 +2845,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -15.252
       as_published: '-15.252'
@@ -2859,7 +2863,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.79
       as_published: '37.790'
@@ -2868,7 +2872,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 289.146
       as_published: '289.146'
@@ -2877,7 +2881,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 256.656
       as_published: '256.656'
@@ -2886,7 +2890,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 113.714
       as_published: '113.714'
@@ -2895,7 +2899,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1232.991
       as_published: '1232.991'
@@ -2904,7 +2908,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 985.744
       as_published: '985.744'
@@ -2913,7 +2917,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -14.711
       as_published: '-14.711'
@@ -2931,7 +2935,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.838
       as_published: '37.838'
@@ -2940,7 +2944,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 290.211
       as_published: '290.211'
@@ -2949,7 +2953,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 257.574
       as_published: '257.574'
@@ -2958,7 +2962,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 117.496
       as_published: '117.496'
@@ -2967,7 +2971,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1234.772
       as_published: '1234.772'
@@ -2976,7 +2980,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 978.655
       as_published: '978.655'
@@ -2985,7 +2989,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -14.2
       as_published: '-14.200'
@@ -3003,7 +3007,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.887
       as_published: '37.887'
@@ -3012,7 +3016,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 291.249
       as_published: '291.249'
@@ -3021,7 +3025,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 258.47
       as_published: '258.470'
@@ -3030,7 +3034,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 121.282
       as_published: '121.282'
@@ -3039,7 +3043,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1236.542
       as_published: '1236.542'
@@ -3048,7 +3052,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 971.515
       as_published: '971.515'
@@ -3057,7 +3061,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -13.715
       as_published: '-13.715'
@@ -3075,7 +3079,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.936
       as_published: '37.936'
@@ -3084,7 +3088,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 292.26
       as_published: '292.260'
@@ -3093,7 +3097,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 259.346
       as_published: '259.346'
@@ -3102,7 +3106,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 125.073
       as_published: '125.073'
@@ -3111,7 +3115,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1238.304
       as_published: '1238.304'
@@ -3120,7 +3124,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 964.33
       as_published: '964.330'
@@ -3129,7 +3133,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -13.256
       as_published: '-13.256'
@@ -3147,7 +3151,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.985
       as_published: '37.985'
@@ -3156,7 +3160,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 293.246
       as_published: '293.246'
@@ -3165,7 +3169,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 260.203
       as_published: '260.203'
@@ -3174,7 +3178,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 128.869
       as_published: '128.869'
@@ -3183,7 +3187,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1240.056
       as_published: '1240.056'
@@ -3192,7 +3196,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 957.097
       as_published: '957.097'
@@ -3201,7 +3205,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '3900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -12.819
       as_published: '-12.819'
@@ -3219,7 +3223,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.035
       as_published: '38.035'
@@ -3228,7 +3232,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 294.208
       as_published: '294.208'
@@ -3237,7 +3241,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 261.041
       as_published: '261.041'
@@ -3246,7 +3250,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 132.67
       as_published: '132.670'
@@ -3255,7 +3259,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1241.8
       as_published: '1241.800'
@@ -3264,7 +3268,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 949.819
       as_published: '949.819'
@@ -3273,7 +3277,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -12.403
       as_published: '-12.403'
@@ -3291,7 +3295,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.088
       as_published: '38.088'
@@ -3300,7 +3304,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 295.148
       as_published: '295.148'
@@ -3309,7 +3313,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 261.861
       as_published: '261.861'
@@ -3318,7 +3322,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 136.476
       as_published: '136.476'
@@ -3327,7 +3331,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1243.536
       as_published: '1243.536'
@@ -3336,7 +3340,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 942.498
       as_published: '942.498'
@@ -3345,7 +3349,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -12.008
       as_published: '-12.008'
@@ -3363,7 +3367,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.142
       as_published: '38.142'
@@ -3372,7 +3376,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 296.067
       as_published: '296.067'
@@ -3381,7 +3385,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 262.665
       as_published: '262.665'
@@ -3390,7 +3394,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 140.288
       as_published: '140.288'
@@ -3399,7 +3403,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1245.265
       as_published: '1245.265'
@@ -3408,7 +3412,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 935.135
       as_published: '935.135'
@@ -3417,7 +3421,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -11.63
       as_published: '-11.630'
@@ -3435,7 +3439,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.199
       as_published: '38.199'
@@ -3444,7 +3448,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 296.965
       as_published: '296.965'
@@ -3453,7 +3457,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 263.452
       as_published: '263.452'
@@ -3462,7 +3466,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 144.105
       as_published: '144.105'
@@ -3471,7 +3475,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1246.987
       as_published: '1246.987'
@@ -3480,7 +3484,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 927.731
       as_published: '927.731'
@@ -3489,7 +3493,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -11.27
       as_published: '-11.270'
@@ -3507,7 +3511,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.258
       as_published: '38.258'
@@ -3516,7 +3520,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 297.844
       as_published: '297.844'
@@ -3525,7 +3529,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 264.224
       as_published: '264.224'
@@ -3534,7 +3538,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 147.927
       as_published: '147.927'
@@ -3543,7 +3547,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1248.702
       as_published: '1248.702'
@@ -3552,7 +3556,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 920.286
       as_published: '920.286'
@@ -3561,7 +3565,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -10.925
       as_published: '-10.925'
@@ -3579,7 +3583,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.322
       as_published: '38.322'
@@ -3588,7 +3592,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 298.704
       as_published: '298.704'
@@ -3597,7 +3601,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 264.98
       as_published: '264.980'
@@ -3606,7 +3610,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 151.756
       as_published: '151.756'
@@ -3615,7 +3619,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1250.412
       as_published: '1250.412'
@@ -3624,7 +3628,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 912.802
       as_published: '912.802'
@@ -3633,7 +3637,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -10.596
       as_published: '-10.596'
@@ -3651,7 +3655,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.389
       as_published: '38.389'
@@ -3660,7 +3664,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 299.547
       as_published: '299.547'
@@ -3669,7 +3673,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 265.723
       as_published: '265.723'
@@ -3678,7 +3682,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 155.592
       as_published: '155.592'
@@ -3687,7 +3691,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1252.116
       as_published: '1252.116'
@@ -3696,7 +3700,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 905.281
       as_published: '905.281'
@@ -3705,7 +3709,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -10.28
       as_published: '-10.280'
@@ -3723,7 +3727,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.462
       as_published: '38.462'
@@ -3732,7 +3736,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 300.373
       as_published: '300.373'
@@ -3741,7 +3745,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 266.451
       as_published: '266.451'
@@ -3750,7 +3754,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 159.434
       as_published: '159.434'
@@ -3759,7 +3763,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1253.815
       as_published: '1253.815'
@@ -3768,7 +3772,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 897.723
       as_published: '897.723'
@@ -3777,7 +3781,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -9.977
       as_published: '-9.977'
@@ -3795,7 +3799,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.539
       as_published: '38.539'
@@ -3804,7 +3808,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 301.184
       as_published: '301.184'
@@ -3813,7 +3817,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 267.166
       as_published: '267.166'
@@ -3822,7 +3826,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 163.284
       as_published: '163.284'
@@ -3831,7 +3835,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1255.508
       as_published: '1255.508'
@@ -3840,7 +3844,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 890.129
       as_published: '890.129'
@@ -3849,7 +3853,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -9.687
       as_published: '-9.687'
@@ -3867,7 +3871,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.622
       as_published: '38.622'
@@ -3876,7 +3880,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 301.979
       as_published: '301.979'
@@ -3885,7 +3889,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 267.869
       as_published: '267.869'
@@ -3894,7 +3898,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 167.142
       as_published: '167.142'
@@ -3903,7 +3907,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1257.197
       as_published: '1257.197'
@@ -3912,7 +3916,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 882.5
       as_published: '882.500'
@@ -3921,7 +3925,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '4900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -9.408
       as_published: '-9.408'
@@ -3939,7 +3943,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.711
       as_published: '38.711'
@@ -3948,7 +3952,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 302.761
       as_published: '302.761'
@@ -3957,7 +3961,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 268.559
       as_published: '268.559'
@@ -3966,7 +3970,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 171.009
       as_published: '171.009'
@@ -3975,7 +3979,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1258.881
       as_published: '1258.881'
@@ -3984,7 +3988,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 874.836
       as_published: '874.836'
@@ -3993,7 +3997,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -9.139
       as_published: '-9.139'
@@ -4011,7 +4015,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.807
       as_published: '38.807'
@@ -4020,7 +4024,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 303.528
       as_published: '303.528'
@@ -4029,7 +4033,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 269.237
       as_published: '269.237'
@@ -4038,7 +4042,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 174.885
       as_published: '174.885'
@@ -4047,7 +4051,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1260.561
       as_published: '1260.561'
@@ -4056,7 +4060,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 867.139
       as_published: '867.139'
@@ -4065,7 +4069,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -8.881
       as_published: '-8.881'
@@ -4083,7 +4087,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.91
       as_published: '38.910'
@@ -4092,7 +4096,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 304.283
       as_published: '304.283'
@@ -4101,7 +4105,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 269.904
       as_published: '269.904'
@@ -4110,7 +4114,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 178.771
       as_published: '178.771'
@@ -4119,7 +4123,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1262.237
       as_published: '1262.237'
@@ -4128,7 +4132,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 859.407
       as_published: '859.407'
@@ -4137,7 +4141,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -8.633
       as_published: '-8.633'
@@ -4155,7 +4159,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.02
       as_published: '39.020'
@@ -4164,7 +4168,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 305.025
       as_published: '305.025'
@@ -4173,7 +4177,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 270.559
       as_published: '270.559'
@@ -4182,7 +4186,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 182.667
       as_published: '182.667'
@@ -4191,7 +4195,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1263.91
       as_published: '1263.910'
@@ -4200,7 +4204,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 851.645
       as_published: '851.645'
@@ -4209,7 +4213,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -8.393
       as_published: '-8.393'
@@ -4227,7 +4231,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.138
       as_published: '39.138'
@@ -4236,7 +4240,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 305.755
       as_published: '305.755'
@@ -4245,7 +4249,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 271.204
       as_published: '271.204'
@@ -4254,7 +4258,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 186.575
       as_published: '186.575'
@@ -4263,7 +4267,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1265.578
       as_published: '1265.578'
@@ -4272,7 +4276,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 843.85
       as_published: '843.850'
@@ -4281,7 +4285,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -8.163
       as_published: '-8.163'
@@ -4299,7 +4303,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.265
       as_published: '39.265'
@@ -4308,7 +4312,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 306.475
       as_published: '306.475'
@@ -4317,7 +4321,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 271.839
       as_published: '271.839'
@@ -4326,7 +4330,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 190.495
       as_published: '190.495'
@@ -4335,7 +4339,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1267.242
       as_published: '1267.242'
@@ -4344,7 +4348,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 836.025
       as_published: '836.025'
@@ -4353,7 +4357,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -7.94
       as_published: '-7.940'
@@ -4371,7 +4375,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.4
       as_published: '39.400'
@@ -4380,7 +4384,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 307.183
       as_published: '307.183'
@@ -4389,7 +4393,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 272.464
       as_published: '272.464'
@@ -4398,7 +4402,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 194.428
       as_published: '194.428'
@@ -4407,7 +4411,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1268.903
       as_published: '1268.903'
@@ -4416,7 +4420,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 828.17
       as_published: '828.170'
@@ -4425,7 +4429,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -7.725
       as_published: '-7.725'
@@ -4443,7 +4447,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.545
       as_published: '39.545'
@@ -4452,7 +4456,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 307.882
       as_published: '307.882'
@@ -4461,7 +4465,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 273.079
       as_published: '273.079'
@@ -4470,7 +4474,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 198.375
       as_published: '198.375'
@@ -4479,7 +4483,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1270.559
       as_published: '1270.559'
@@ -4488,7 +4492,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 820.285
       as_published: '820.285'
@@ -4497,7 +4501,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -7.517
       as_published: '-7.517'
@@ -4515,7 +4519,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.699
       as_published: '39.699'
@@ -4524,7 +4528,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 308.571
       as_published: '308.571'
@@ -4533,7 +4537,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 273.685
       as_published: '273.685'
@@ -4542,7 +4546,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 202.338
       as_published: '202.338'
@@ -4551,7 +4555,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1272.213
       as_published: '1272.213'
@@ -4560,7 +4564,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 812.372
       as_published: '812.372'
@@ -4569,7 +4573,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -7.316
       as_published: '-7.316'
@@ -4587,7 +4591,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.863
       as_published: '39.863'
@@ -4596,7 +4600,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 309.251
       as_published: '309.251'
@@ -4605,7 +4609,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 274.282
       as_published: '274.282'
@@ -4614,7 +4618,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 206.316
       as_published: '206.316'
@@ -4623,7 +4627,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1273.862
       as_published: '1273.862'
@@ -4632,7 +4636,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 804.428
       as_published: '804.428'
@@ -4641,7 +4645,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '5900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -7.122
       as_published: '-7.122'
@@ -4659,7 +4663,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '6000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 40.036
       as_published: '40.036'
@@ -4668,7 +4672,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '6000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 309.922
       as_published: '309.922'
@@ -4677,7 +4681,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '6000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 274.871
       as_published: '274.871'
@@ -4686,7 +4690,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '6000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 210.31
       as_published: '210.310'
@@ -4695,7 +4699,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '6000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 1275.507
       as_published: '1275.507'
@@ -4704,7 +4708,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '6000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 796.458
       as_published: '796.458'
@@ -4713,7 +4717,7 @@ table:
         url: https://janaf.nist.gov/tables/O-030.html
         download_url: https://janaf.nist.gov/tables/O-030.txt
         row_temperature_as_published: '6000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -6.934
       as_published: '-6.934'

@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/I-009.html
   download_url: https://janaf.nist.gov/tables/I-009.txt
   index_entry:
-    formula: "LiI"
-    formula_as_published: "LiI"
-    formula_normalised: "LiI"
-    name: "Lithium Iodide"
-    state: "l"
+    formula: LiI
+    formula_as_published: LiI
+    formula_normalised: LiI
+    name: Lithium Iodide
+    state: l
+    charge: 0
   title_as_published: Lithium Iodide (LiI)  |  I1Li1(l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -1928,3 +1929,7 @@ table:
     locator:
       table_id: I-009
       url: https://janaf.nist.gov/tables/I-009.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: a5c69431b9a907509b4c8ded1a186b0a7892f86661da9823b41c19375c410b7e

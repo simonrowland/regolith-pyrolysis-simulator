@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Br-100.html
   download_url: https://janaf.nist.gov/tables/Br-100.txt
   index_entry:
-    formula: "TiBr4"
-    formula_as_published: "TiBr4"
-    formula_normalised: "TiBr4"
-    name: "Titanium Bromide"
-    state: "cr,l"
+    formula: TiBr4
+    formula_as_published: TiBr4
+    formula_normalised: TiBr4
+    name: Titanium Bromide
+    state: cr,l
+    charge: 0
   title_as_published: Titanium Bromide (TiBr4)  |  Br4Ti1(cr,l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -920,3 +921,7 @@ table:
     locator:
       table_id: Br-100
       url: https://janaf.nist.gov/tables/Br-100.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 603f1440d0949be04fe66e23b56ec261cf116eda6ca5284dc63a9a9e87fda8a5

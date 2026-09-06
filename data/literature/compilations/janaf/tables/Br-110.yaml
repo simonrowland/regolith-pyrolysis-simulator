@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Br-110.html
   download_url: https://janaf.nist.gov/tables/Br-110.txt
   index_entry:
-    formula: "WBr5"
-    formula_as_published: "WBr5"
-    formula_normalised: "WBr5"
-    name: "Tungsten Bromide"
-    state: "cr,l"
+    formula: WBr5
+    formula_as_published: WBr5
+    formula_normalised: WBr5
+    name: Tungsten Bromide
+    state: cr,l
+    charge: 0
   title_as_published: Tungsten Bromide (WBr5)  |  Br5W1(cr,l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -704,3 +705,7 @@ table:
     locator:
       table_id: Br-110
       url: https://janaf.nist.gov/tables/Br-110.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: b9f5b2ef515bd81af2c81403347a2489b9eaa6381edf1204673b4bc9eec4420c

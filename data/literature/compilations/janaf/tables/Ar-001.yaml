@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Ar-001.html
   download_url: https://janaf.nist.gov/tables/Ar-001.txt
   index_entry:
-    formula: "Ar"
-    formula_as_published: "Ar"
-    formula_normalised: "Ar"
-    name: "Argon"
-    state: "ref"
+    formula: Ar
+    formula_as_published: Ar
+    formula_normalised: Ar
+    name: Argon
+    state: ref
+    charge: 0
   title_as_published: Argon (Ar)  |  Ar1(ref)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -4723,4 +4724,8 @@ table:
         download_url: https://janaf.nist.gov/tables/Ar-001.txt
         row_temperature_as_published: '6000'
         column: log Kf
-  parse_ambiguities: []
+  parse_ambiguities:
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 06338dcfe23baf0265d82d0ab665bf9b630ee8bc1e6d1e7bab48a0715a1abeaf

@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Ga-002.html
   download_url: https://janaf.nist.gov/tables/Ga-002.txt
   index_entry:
-    formula: "Ga"
-    formula_as_published: "Ga"
-    formula_normalised: "Ga"
-    name: "Gallium"
-    state: "cr"
+    formula: Ga
+    formula_as_published: Ga
+    formula_normalised: Ga
+    name: Gallium
+    state: cr
+    charge: 0
   title_as_published: Gallium (Ga)  |  Ga1(cr)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -704,3 +705,7 @@ table:
     locator:
       table_id: Ga-002
       url: https://janaf.nist.gov/tables/Ga-002.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 5b2eea3063ddbbc78783deded5149cf4a4c2cc64765a5f7d01d150b95de2f981

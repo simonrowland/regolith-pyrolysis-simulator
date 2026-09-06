@@ -1,13 +1,13 @@
 schema_version: janaf_html_era_txt_divergence.v1
-verdict: keep_both
+verdict: available_txt_reharvested
 html_era_table_count: 380
 tables_with_numeric_value_mismatch: 0
 tables_missing_rows_only: 379
 tables_perfect_overlap: 1
 numeric_mismatch_cell_count: 0
 format_only_cell_count: 0
-note: HTML-era YAML kept in tables/. Current NIST .txt is in source-cache/ (gitignored). Re-harvest into the same files was
-  refused because differences are missing rows and/or numeric values, not format/precision.
+note: Historical HTML/TXT comparison. Loadable records now come from hash-verified TXT; original HTML-derived records remain
+  in git history at c4aebdeb64d978b66df64cf09cae97b041042fc0
 tables:
 - table_id: Al-001
   html_rows: 48
@@ -34,6 +34,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: ce4bb740c061a75998b3b4262bbdabf76c010360a7eeb73188476005878a1e58
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-002
   html_rows: 12
   txt_rows: 16
@@ -49,6 +50,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7a71835b18d962e32e118063ace9069632b3ad53131127e84cd1458132cb1426
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-003
   html_rows: 22
   txt_rows: 29
@@ -67,6 +69,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a36de1edb6002908206ace92276184aeefb0afc70ef40c95c5288f7fcde4abc1
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-004
   html_rows: 26
   txt_rows: 34
@@ -86,6 +89,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 526a70932b2299dbf9851501aee1f82d1d070d0ae1fb83c65181888f761e8d46
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-005
   html_rows: 57
   txt_rows: 64
@@ -104,6 +108,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 666ec06681fe525b68eab0c2f297bd1be28144bd3bb7ab27cc48fc67dc76e5e7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-014
   html_rows: 64
   txt_rows: 65
@@ -116,6 +121,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7f341aad31799eed725c7a7fae6e9fb15a47c155a358222c6af32323b13887a7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-019
   html_rows: 22
   txt_rows: 29
@@ -134,6 +140,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 952062052d28b34ad42cf82532240957d8d3f3990f2ec44f0ad41052ce7cf8ef
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-020
   html_rows: 64
   txt_rows: 65
@@ -146,6 +153,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6806d7b8939aab73f393315f0249f295ee736ec40f210029423567da0fa6d117
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-021
   html_rows: 51
   txt_rows: 65
@@ -171,6 +179,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: fbbf2446c4b77d0d6b623091be5839d46f6cb2e5ae18204fab6e3ca18a12ca4e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-025
   html_rows: 12
   txt_rows: 16
@@ -186,6 +195,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: da8aa48aea93bc7f2f7536a4bf2e5320102f091988de77799124915f6d06f0a2
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-026
   html_rows: 9
   txt_rows: 13
@@ -201,6 +211,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c26024e0b54ebea2aa203df9d62cf1cd99e847cc324773e234f953c92d820034
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-027
   html_rows: 13
   txt_rows: 17
@@ -216,6 +227,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 16b9c0634ad3595901792e5d1e98592199d059d185007de5ebfaed556df54af1
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-028
   html_rows: 56
   txt_rows: 65
@@ -236,6 +248,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a8060367eb2719dd9cac16b126646e32684ad4fd7a711b04cc1e558ef15d23f7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-033
   html_rows: 49
   txt_rows: 62
@@ -260,6 +273,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f18d8dc224ed153a09032067c640836904ae686c7977073d2c5da3851195d839
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-035
   html_rows: 47
   txt_rows: 65
@@ -289,6 +303,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: ac1c462c90be4d3d9ed509b1b5925d6d77645c93056a43a76fd1c090b4a4e48a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-036
   html_rows: 58
   txt_rows: 65
@@ -307,6 +322,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 1c9b9dac453abdb72f4bb1bbe1023022812136abe517387f8870741666c1c077
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-039
   html_rows: 43
   txt_rows: 65
@@ -340,6 +356,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 1cc346f267e30331fdc7280e68b74e282f133fd8ca37d95a67ed48779885ee50
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-041
   html_rows: 25
   txt_rows: 31
@@ -357,6 +374,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: fba7bf7f51784699fd18ba7a6a983904ae6b35600fa08326f6a16ebcf9e7507a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-042
   html_rows: 30
   txt_rows: 38
@@ -376,6 +394,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 4088f45a27362dcca9449cdc6cf595dc56730da6b55f08b5b451227ec26df813
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-043
   html_rows: 34
   txt_rows: 42
@@ -395,6 +414,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 53be5a7a7bc0b41857943064d6258ce43b7da74c497e7767e4e38aa0e290daf5
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-044
   html_rows: 56
   txt_rows: 65
@@ -415,6 +435,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 51acaa3ff21d7214f2ec787a338f5e2d18918065e61b04e6feed4ee0a3e88596
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-079
   html_rows: 39
   txt_rows: 62
@@ -449,6 +470,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: d59e56b4b3ef540afb558fd6956d08503cf3f236158929f37f71c9d7c81b743b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-080
   html_rows: 49
   txt_rows: 62
@@ -473,6 +495,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 30baf0339d37e31b39979c03ed19ed6b010d62fa291d610aed038ede34edf77b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-085
   html_rows: 56
   txt_rows: 65
@@ -493,6 +516,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 57343db58095884603478c76b6f60cd89ae5d8a82afce9a48949a3d0835cf6ed
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-087
   html_rows: 64
   txt_rows: 65
@@ -505,6 +529,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9f8f0cf3844d4d26f12d6009739ab49861f2b1f82a604d7d71881d19e6c666a2
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-096
   html_rows: 25
   txt_rows: 31
@@ -522,6 +547,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2054107c6e2f7c35d0196530f1d9362981612271d82731437cc016d74f147da6
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-097
   html_rows: 23
   txt_rows: 29
@@ -539,6 +565,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e6da5c33d31d070bfcf620b7a44fa63e0405c33b61a46ebfa5a2126ada93527d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-098
   html_rows: 23
   txt_rows: 29
@@ -556,6 +583,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 035d4d22aebf50e27e86e50b938508d792aaa53b8b6ea3eec2dc8908cdabff84
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-099
   html_rows: 23
   txt_rows: 29
@@ -573,6 +601,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 3ed9d5983e2339bebe6aad4a45089734f821684f45fd9ea259052b36b054ac9b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-100
   html_rows: 30
   txt_rows: 38
@@ -592,6 +621,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b27ae0ccebb7433b209b9dbd7f0b67448e49cf2b613625e22b05709e49c0dbe0
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-101
   html_rows: 25
   txt_rows: 42
@@ -620,6 +650,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f67a631de0d4f7194210cc9c7b9d74c0f5b887d9c7e3b2fa3f87f1afb799a24f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Al-105
   html_rows: 13
   txt_rows: 17
@@ -635,6 +666,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 4315162a8c9905a1ac99d6a43a3737a1f4fc50b2dca68ff378bf2f625048dad8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-018
   html_rows: 50
   txt_rows: 65
@@ -661,6 +693,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: db85dd5ae8dbf84b42bebf3ceaa9edc24337d051c4a71dd7d19792d1fc5d3b35
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-022
   html_rows: 64
   txt_rows: 65
@@ -673,6 +706,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 8cc8c3520afdb2edc386c1e3f090f8d7168566b17622c3ad42a362af783d94c3
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-023
   html_rows: 64
   txt_rows: 65
@@ -685,6 +719,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 591b935a358ce389628a251c21d40a1b8ed0bb500ace2d2e5ec3ebc2e812fe78
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-025
   html_rows: 64
   txt_rows: 65
@@ -697,6 +732,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: dc7eb5f496143fb483cbbfe1a702d0fcffe9ea007d8a8b23ae7006a46ee53b31
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-026
   html_rows: 52
   txt_rows: 65
@@ -721,6 +757,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 3992cfbbfe410c46fd30970854b7d77647767b732ef0321c76387b6bae280fe4
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-028
   html_rows: 64
   txt_rows: 65
@@ -733,6 +770,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: fb42fe4ad357bcffb07133a1acbf7218e326e90d7482361191cbe4d9ef8be571
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-030
   html_rows: 64
   txt_rows: 65
@@ -745,6 +783,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 5a8608194d330cd5935903683a6857537a1afbb237a20b81c8beeaac3399424e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-033
   html_rows: 64
   txt_rows: 65
@@ -757,6 +796,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9db88acba8b6a67257501bda80d427194a647411e1413682ed4deaaa3853ca69
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-034
   html_rows: 52
   txt_rows: 65
@@ -781,6 +821,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 12199356aab0bdcca13b54c478341ae23329863c1f2155132760f37681fcc67e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-036
   html_rows: 56
   txt_rows: 65
@@ -801,6 +842,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: cefbe03f033861225a33cb13447291ded24e300590532aaaec56f1e9de4b9ce0
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-037
   html_rows: 45
   txt_rows: 65
@@ -832,6 +874,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f88e19b84a522d2ffe878391ccd63d6a2d48db73996338df3c00c45de3f4071f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-040
   html_rows: 57
   txt_rows: 65
@@ -851,6 +894,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: bf392571af28b1bff899884b5b405bc5a2c08e7c7d9db61ffad356674c7565b7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-041
   html_rows: 41
   txt_rows: 62
@@ -883,6 +927,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 54cfab0262de58813b0320ad18e1521d7b89a4ffa7f0768d6c9e3c025c5d7089
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-093
   html_rows: 49
   txt_rows: 62
@@ -907,6 +952,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: dcfea0f98f9ae41a91e7f4c1a713bec463a6f0cf52333216605a908ba73d9242
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-094
   html_rows: 49
   txt_rows: 62
@@ -931,6 +977,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: bc3f3b6942ed14cfb9a1d1a9f54ee4e40b56d09e948b5ed2a8736c094801bd54
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-095
   html_rows: 49
   txt_rows: 62
@@ -955,6 +1002,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b9ecbb3758246a5d992e8313f281b81a7b33ddce20ae611dd5e8419e7b970aea
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-098
   html_rows: 64
   txt_rows: 65
@@ -967,6 +1015,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 36df73c5a6e98742428f4d15e7126cf7f75ec02092d5fb47c1a09c9b9dec047a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-099
   html_rows: 41
   txt_rows: 62
@@ -999,6 +1048,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 05a72cf0eea94c430e0ac8e463d323655a4e9e323c14e8c51cdf907b6345ab45
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-116
   html_rows: 52
   txt_rows: 65
@@ -1023,6 +1073,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f9393fa936ca08d01d5910175ddaf1b3c0468068aa9187aff04174ac6228e1d9
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-117
   html_rows: 64
   txt_rows: 65
@@ -1035,6 +1086,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 3d2bec532672febbd9d7b161b90d553ff462e98658ee6977fcbb3c06808c3e85
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-118
   html_rows: 42
   txt_rows: 61
@@ -1065,6 +1117,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b3a1acf016afca168a894a6c1c400838077bfe74487158dd04390c179924607e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-120
   html_rows: 64
   txt_rows: 65
@@ -1077,6 +1130,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b1df0564da5b8292f5a1e6147c5c6c3acf6ddf2218c8fb783f83452709627910
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-122
   html_rows: 44
   txt_rows: 65
@@ -1109,6 +1163,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 0237a9738f45a0240fa3cb3d58a0db8634511d8b1ec4bc01d51bf2db37ea6109
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: C-123
   html_rows: 53
   txt_rows: 62
@@ -1129,6 +1184,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: fdb8297e0c16b2adab5162809d52ebc477e1be8a1ffa2b0e79120422caff5646
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-001
   html_rows: 49
   txt_rows: 57
@@ -1148,6 +1204,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e3c57462be88d427d674b46c9ffcf0ffebe1b0311263c2275b8338b7f9e6a425
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-002
   html_rows: 11
   txt_rows: 15
@@ -1163,6 +1220,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 4bb1f9cf20427e6e7b7dceaefcb1eee1cd707eb28598a14a965ec3bc823e0529
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-003
   html_rows: 10
   txt_rows: 14
@@ -1178,6 +1236,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 5994377555adb1df9838813ac1bd5f2e0223a915652d5a6e83beb841b31bf52a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-004
   html_rows: 19
   txt_rows: 24
@@ -1194,6 +1253,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a17ec044be4d9afc7980e8d557e205502572df2b57a2b1423fb492bce183ab9c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-005
   html_rows: 22
   txt_rows: 29
@@ -1212,6 +1272,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: bd00761f693a41c4a93c4043c22aae7ac493e19ce9863fa7c2065ef05949d85a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-006
   html_rows: 55
   txt_rows: 64
@@ -1232,6 +1293,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 974d576e6c2f0774695ac1904d97f3b9292ec402a1f7b4f733fa10a3bbb3855a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-008
   html_rows: 64
   txt_rows: 65
@@ -1244,6 +1306,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 3155a9922e218495fa945210638d92f5143f234805bed7bb60147631d3c60afd
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-009
   html_rows: 17
   txt_rows: 21
@@ -1259,6 +1322,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e9a13f45c0ae3a740afe3c3f9a0fa0393943ec6609843d3b37bc0ceecf79b5bd
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-010
   html_rows: 23
   txt_rows: 28
@@ -1275,6 +1339,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e85f188b043dfecb508558e10ca61ff814046f0044599e731e0b8de8618df100
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-011
   html_rows: 26
   txt_rows: 32
@@ -1292,6 +1357,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 5daa3c97724deddce25509aef0621cb44b6a6204bd273f060bac119fb6c2459f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-012
   html_rows: 56
   txt_rows: 65
@@ -1312,6 +1378,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f70ffb20eefdd4e571481f963860b48a9901bc7962349d8247b7a7054dcb493f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-013
   html_rows: 53
   txt_rows: 65
@@ -1335,6 +1402,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: ebdd3926c905d56c9dc698659e965fd61eec7b6e2b17ae891715bd3b8601fab5
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-014
   html_rows: 21
   txt_rows: 28
@@ -1353,6 +1421,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c5988e6baefd486ee77f295376bb9767a026505bb0cc5e00f53c1d129e0230d8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-015
   html_rows: 31
   txt_rows: 38
@@ -1371,6 +1440,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: ebd71ec6cbd2cc7a541a57abf1e6eabe11153b3191d03af318195699d47ceb84
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-016
   html_rows: 33
   txt_rows: 42
@@ -1391,6 +1461,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b7d52ecb85769c7f2558e9b6199ced5f413d9afa3524e99c56b08411a476ed1d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-017
   html_rows: 58
   txt_rows: 65
@@ -1409,6 +1480,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9833e90d59fb252073c341cfeecbbd55ca055ef7e45b3164142a5e970265371d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-027
   html_rows: 28
   txt_rows: 37
@@ -1429,6 +1501,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b6a05e07aa1156d58ec9fa701a4c3e338dbbde38c0c6c16660a23c57aac7563d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-028
   html_rows: 32
   txt_rows: 43
@@ -1451,6 +1524,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 44546e962fd516f7e9cf035429593916440008b7f81c06b5915da86b1203d072
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-029
   html_rows: 36
   txt_rows: 47
@@ -1473,6 +1547,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 042860485bf9a961d944c6940ce525f94399ed0d98f5fae32d521c2de0b580d4
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-030
   html_rows: 49
   txt_rows: 62
@@ -1497,6 +1572,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 3f42254ae1e2b79579fa5e28f8ba8a724ed520ffd720228f7761be956a647078
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-031
   html_rows: 25
   txt_rows: 32
@@ -1515,6 +1591,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c83b7cc5b837df6ef7304f12abc49408726e73b081f223c6bb9dfd927d7af263
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-032
   html_rows: 49
   txt_rows: 62
@@ -1539,6 +1616,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9526044cc6676eaf12bca99696555533027939362156fbbd41ab0c9847be0c6a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ca-033
   html_rows: 64
   txt_rows: 65
@@ -1551,6 +1629,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7f586f6bf2b2907d592e8f2bf2e1ae529b1c242e388a14123c217a6fceda1aff
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-001
   html_rows: 64
   txt_rows: 65
@@ -1563,6 +1642,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 71bd927241f0c0c59b216b82179f844b2e3047823a4f50df14d6f74d396e36e3
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-025
   html_rows: 51
   txt_rows: 65
@@ -1588,6 +1668,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 1c1bc8624542192c32b0b22bfe32f943b8b9428fedd6542ebe24d8bb91130d0b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-026
   html_rows: 64
   txt_rows: 65
@@ -1600,6 +1681,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: db6e04a1ea64c7a1b9988d7d89b98b812fc5ccedf2fd07942553b6f542d35223
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-027
   html_rows: 52
   txt_rows: 65
@@ -1624,6 +1706,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 451d97f0037ac2f23ad1e935f736777cea70f12874568a7e1d16341eb7ccc37a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-036
   html_rows: 13
   txt_rows: 16
@@ -1638,6 +1721,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2386171cb7795a81f6acb0442fb34bd2b9840b2a1b2b3888e97c4972322ad2c5
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-037
   html_rows: 14
   txt_rows: 18
@@ -1653,6 +1737,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 1ca8418b2f195d261032cad11aee75c6a4ee90e11d034b24dafe8bec74e83420
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-038
   html_rows: 17
   txt_rows: 22
@@ -1669,6 +1754,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2b6848bc75724e7b8ff2aa80301a7406ebd168a22ea16e0affc10015741d3ffc
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-039
   html_rows: 64
   txt_rows: 65
@@ -1681,6 +1767,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 495c70e88c7ddbde0bd896d8a6571232192e4b016d27afd6c772505c6714c62c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-040
   html_rows: 13
   txt_rows: 17
@@ -1696,6 +1783,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7255f7ef2dd05d412f9e5b18242629164cb7cf65db9be0f38fc1ed5e0d610c7b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-049
   html_rows: 64
   txt_rows: 65
@@ -1708,6 +1796,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 16e7649ca03fda76352e95a8d5e846613dfb0a925c5122283fb5029959249d98
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-053
   html_rows: 13
   txt_rows: 16
@@ -1722,6 +1811,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 630e98a29fff1855862a52738c271058d1217948e2a6830a71b600924f7fc468
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-054
   html_rows: 17
   txt_rows: 23
@@ -1739,6 +1829,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 23e9b8e3b303c46257213d2fdd27365b60aa86e8f66bd63403f7103dd25c1444
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-055
   html_rows: 21
   txt_rows: 27
@@ -1756,6 +1847,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: dee1f06671fa08adc1ccdab8c9db63472064170cb5caea3005d1be32b53a515a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-056
   html_rows: 64
   txt_rows: 65
@@ -1768,6 +1860,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6d74c2d54489222468bd6652950616f1851f90ba762509043286753921ab9156
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-057
   html_rows: 10
   txt_rows: 14
@@ -1783,6 +1876,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7d820bc8c07356cb6a0f21c02d14625c5761caee4fab2bc47433a5b0a310496f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-058
   html_rows: 64
   txt_rows: 65
@@ -1795,6 +1889,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 8b00c64ebf492329c18f0d974d580025bd1fe89cf78af8f6f0827a91b3ad9eb1
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-060
   html_rows: 64
   txt_rows: 65
@@ -1807,6 +1902,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a01ba52e5d826991bdaf4cec9a7e21a04684d533106b71afef890a85357cb8e7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-062
   html_rows: 64
   txt_rows: 65
@@ -1819,6 +1915,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 003407d791454114d6cf9fdaede009cb71f9a18f9a0df23dcac58e2230b21732
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-068
   html_rows: 49
   txt_rows: 62
@@ -1843,6 +1940,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f6ef09f2e983584e1fd38792019251709c5f8f26f0b0c79d1eabdb9afea7cc3d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-070
   html_rows: 54
   txt_rows: 65
@@ -1865,6 +1963,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 642e4b07d3868e33b298c6265d23e74889d1795c3cb737a7d717b61943e24156
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-073
   html_rows: 52
   txt_rows: 65
@@ -1889,6 +1988,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a9d15f46ae04f5ce907b2bfd9a81bbb1b7b30565ce7d4a82cf7291bb2abc1632
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-081
   html_rows: 16
   txt_rows: 21
@@ -1905,6 +2005,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 790d3cd77a7c1d475db9f2955736bcd8d5633ca2a0df6607efe0612ae12ee172
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-082
   html_rows: 13
   txt_rows: 18
@@ -1921,6 +2022,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 0eb1e7400aeb7046010ad049bfeebb48b5cddc5f20f4d8bfcba29d6557afb4a8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-083
   html_rows: 17
   txt_rows: 22
@@ -1937,6 +2039,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c2bd213d1c4c1ec09a5d03ac6f186ce3fc2e8f4f73ee94751600acc9f83cffb6
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-084
   html_rows: 64
   txt_rows: 65
@@ -1949,6 +2052,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6f29aedbc1634f69e78a5dffafc95723401e5782010fe587594b4162f5fa6a25
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-091
   html_rows: 56
   txt_rows: 65
@@ -1969,6 +2073,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6b3acbd3612a09e81d6207a365652b325d3104d55353756a0cf574c02279fc86
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-093
   html_rows: 16
   txt_rows: 21
@@ -1985,6 +2090,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e5adcaf2115bcc1a179d2e5e1fb051daa9c0b08182e1198bb8401895343fb853
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-094
   html_rows: 17
   txt_rows: 23
@@ -2002,6 +2108,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 0d30dfec4bc9a3c354b58763d75b98ee62f42d79a2e5b1fbf637b19bfae258ba
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-095
   html_rows: 21
   txt_rows: 27
@@ -2019,6 +2126,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 43f8e9690ccaa4313c2c215db59988d19e46da2fd097d222df2a73e336a4348f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-096
   html_rows: 64
   txt_rows: 65
@@ -2031,6 +2139,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: ea372ec77bbf06828e1c8ce14765381052e71c187cfa60a6351864d2df676f7a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-098
   html_rows: 45
   txt_rows: 65
@@ -2062,6 +2171,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 3d88ccb166e0a5c1d6b9883b6f06f974f27e8af0b132c47e6998951a1cec05ca
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-099
   html_rows: 15
   txt_rows: 19
@@ -2077,6 +2187,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e7d34445321d92b5f1e9d5076c40eca888a020bfa83624c8ca0b450e3728ff70
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-100
   html_rows: 10
   txt_rows: 16
@@ -2094,6 +2205,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 97cf3a3238f423427c7e30ef72a2a0f1778fdab4392d65d92dbb4d60ed795838
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-101
   html_rows: 14
   txt_rows: 20
@@ -2111,6 +2223,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: ce3f7c1e04a9831c1a97b8a03bdb431e9716ac76fcc21fcba8506a7e63ead64f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-102
   html_rows: 64
   txt_rows: 65
@@ -2123,6 +2236,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 0da66bb9b9c6b702e06b19bd366cbfd5772a460853e109f7e46647e56534ebc3
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-104
   html_rows: 57
   txt_rows: 65
@@ -2142,6 +2256,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 037703057bb2caad095b8687870758d1ca89e728f0b6779238e5eeb223976473
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-118
   html_rows: 51
   txt_rows: 65
@@ -2167,6 +2282,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 41eb6e88d24bf4534eb43fee13f0c7e882a3da8d7a65220c2e068aa024a4bf31
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-123
   html_rows: 17
   txt_rows: 22
@@ -2183,6 +2299,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: d9005bb98feea48e83f091da17bbacac14e05d096f99d72b0de5b70d7d5c425e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-124
   html_rows: 64
   txt_rows: 65
@@ -2195,6 +2312,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7db13efe9ac3214cbd4be6c93da4123c7e76942a2f5845268225a4a3eed27beb
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-134
   html_rows: 13
   txt_rows: 16
@@ -2209,6 +2327,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a4bc303630bccb9c2a8725090e09c55dc80c6be75f0bae3a0907f0b28a7bd805
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-135
   html_rows: 10
   txt_rows: 13
@@ -2223,6 +2342,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 72d5a855d2355d86a7782a822ebc885f09ad9224ee3bc6ae12a565435903b5d9
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-136
   html_rows: 14
   txt_rows: 17
@@ -2237,6 +2357,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a74cd6f4ab034b034fcdde7679208216ee222f56ec493201fbc2a7153498e661
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-137
   html_rows: 64
   txt_rows: 65
@@ -2249,6 +2370,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c6a2807df5f1e00d6337512f0d8801f37a4fb84e84b09747467ddb0aa40e7855
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-140
   html_rows: 57
   txt_rows: 65
@@ -2268,6 +2390,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7aad438c2447500a15b88689276761f394cba4f11db853de766a438875eda3ca
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-141
   html_rows: 51
   txt_rows: 65
@@ -2293,6 +2416,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 8b3c52c72c228c7f27ce3f004cd87c2fb1a8739f417108104a029782dbd3ef86
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-143
   html_rows: 59
   txt_rows: 65
@@ -2310,6 +2434,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6ee009cc2cc9c92827a087eff5024df0eff41ee0e5b8d9ae682311210488aa20
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-144
   html_rows: 13
   txt_rows: 17
@@ -2325,6 +2450,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 95a575aab7410a49f746ff6f36cd7737935eaa46ee0c6d65ac7ec633982db87a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-145
   html_rows: 57
   txt_rows: 65
@@ -2344,6 +2470,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 4653d113c4a46f4c8e08922411d3eff28d2ea1fd7fca011a3789b1d9174f0da6
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-149
   html_rows: 43
   txt_rows: 65
@@ -2377,6 +2504,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c122d700b8904a58d013d74b5df919b3fd6ce66771d32dca45e94c8e5f90b4b7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-150
   html_rows: 55
   txt_rows: 65
@@ -2398,6 +2526,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 068f9488e98a17b10f2cf08ebcbd423b7c7e284f4534aa4a51a30a6b9eeccd02
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-160
   html_rows: 43
   txt_rows: 65
@@ -2431,6 +2560,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 47636bbeffdcc9f08d240975b809bae38bac5816c1c54a888a52687a6e9008b2
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-161
   html_rows: 6
   txt_rows: 6
@@ -2442,6 +2572,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7d25791eeb07645fb16513f67de7a27dfc43129b99fb9d97ca6b5456eb6cacd5
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-162
   html_rows: 7
   txt_rows: 9
@@ -2455,6 +2586,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 24a74ed8b0a7f999e28ce1cc96c37d564bf041cf4f6204d66c271b09edd06f45
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-163
   html_rows: 11
   txt_rows: 12
@@ -2467,6 +2599,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b9a9c1afefe5ec95be4f0c4e538a4798c2432f0cedd10e4c831ef80ec9a32f99
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-164
   html_rows: 56
   txt_rows: 65
@@ -2487,6 +2620,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e5fa56eeb98cf295131edcd82127f9d8d8aad663322daf6726da4be62b21d702
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-177
   html_rows: 57
   txt_rows: 65
@@ -2506,6 +2640,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e456d628544d806c5fb7ec8a71fe6fc158d3bd74a2395d76bb30fb741080f3c9
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cl-186
   html_rows: 44
   txt_rows: 65
@@ -2538,6 +2673,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 63ed5adbdf8e89287934c0424af48d0b9e60fb16fb6de49e9ab248ab0c2a4fac
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cr-001
   html_rows: 43
   txt_rows: 57
@@ -2563,6 +2699,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 346915a11ffabbf92cd8dd0ce39d41c5c2f23b894bb9f761e005a82c0d263e0c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cr-002
   html_rows: 25
   txt_rows: 32
@@ -2581,6 +2718,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2c49a20db54e7b84e15ce35364a3bde9d1f4cf460677ec14bdb68210ffe85abc
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cr-003
   html_rows: 25
   txt_rows: 34
@@ -2601,6 +2739,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2030a4e9addf0918b98dcbd7c2b3e53c86476280b435f312aef17ff4941e3479
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cr-004
   html_rows: 32
   txt_rows: 39
@@ -2619,6 +2758,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 00a0f3ea35abd27604d322c95379d7b2620b30241210b5abbb6041126b6791c9
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cr-005
   html_rows: 62
   txt_rows: 64
@@ -2632,6 +2772,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c16958856a7aa86c1864644c0546a2d9a385edd890930fd3726981c3f44ffb83
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cr-014
   html_rows: 24
   txt_rows: 31
@@ -2650,6 +2791,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f8633dbb3e0471a40a5229aae974babd1167a6fd5b91bb449dd59f6073188b54
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cr-015
   html_rows: 33
   txt_rows: 43
@@ -2671,6 +2813,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 092b991dbbba68ebc27d24fed2799702823d974b3ab0bc182924c67544a25475
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Cr-016
   html_rows: 36
   txt_rows: 47
@@ -2693,6 +2836,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e9db035d95ebc859c0b0f03e23a05abc7a2221ecac742a76023017ab3f4719e6
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-001
   html_rows: 64
   txt_rows: 65
@@ -2705,6 +2849,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a670b87bbc01a9abb87dfccfc8dc7814310d08b8b343270f6fb7b7a49a8f90ad
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-004
   html_rows: 64
   txt_rows: 65
@@ -2717,6 +2862,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 8f2cfe45b48473ff5f6b84f63fe179019c04444f3e3c2132864b4649f68d8591
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-005
   html_rows: 52
   txt_rows: 65
@@ -2741,6 +2887,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 799816ded74b23c8579f82d5b6c6a5fba1b9459c85584aa593c612ddc6b5aa10
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-006
   html_rows: 58
   txt_rows: 65
@@ -2759,6 +2906,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: d186f044ba78646da75aa12bde67d3d316205d05d21d33cb464002ee5c155b6a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-007
   html_rows: 45
   txt_rows: 65
@@ -2790,6 +2938,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 1e0742bbc78972298a81126909060a5b986f461f864d825754065a202842037e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-008
   html_rows: 56
   txt_rows: 65
@@ -2810,6 +2959,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9608a22e362f3e9208f10b2fd3b9e6e39c1e0dc4cdc8073765f2085ea5e6e277
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-009
   html_rows: 42
   txt_rows: 65
@@ -2844,6 +2994,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9e9cf7922da85bc71e30b3293eee0ead2f282ffdd1d1f86102c64574103c4089
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-010
   html_rows: 56
   txt_rows: 65
@@ -2864,6 +3015,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 5fb57a4f066ddc09adfbb44e0e164f303da07fa2ebc605de69d97623041564c6
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-011
   html_rows: 41
   txt_rows: 65
@@ -2899,6 +3051,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2174cadc75358d751c9555b3a8aeeaa028aa43b4648d6d7dc44bcc8d000c37d0
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-012
   html_rows: 64
   txt_rows: 65
@@ -2911,6 +3064,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: eab450b219b36e342633628b247377740897dff151b9ee7fe9ee520c135edddc
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-017
   html_rows: 16
   txt_rows: 21
@@ -2927,6 +3081,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7d450c924b1d24aa27a9b0912ee8b25b34b89c7b5c3d4b1fa7a51780830130fa
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-018
   html_rows: 21
   txt_rows: 28
@@ -2945,6 +3100,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: bc0d29332443ad942db1f452522063c2518cc6f2ad51b362ed60e6cb26ee6715
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-019
   html_rows: 26
   txt_rows: 32
@@ -2962,6 +3118,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e206d41501212cd4d85bdc2a4405e65bc4daead93da9cfce29bdaef5ed18c396
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-020
   html_rows: 64
   txt_rows: 65
@@ -2974,6 +3131,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 493e748a3e8795ec49852320754b8e8919d567a6cd7ced9112091af2aa427047
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-026
   html_rows: 52
   txt_rows: 65
@@ -2998,6 +3156,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a27fc29f6d7d7097812bde3473534b7d6fedb68f3808ebd988fd265461e64d72
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-033
   html_rows: 24
   txt_rows: 31
@@ -3016,6 +3175,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: bb25050b269616892c329fa3b09204f0b9319d94b4fe87edfbb681eded2cfe49
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-034
   html_rows: 24
   txt_rows: 33
@@ -3036,6 +3196,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 339560cdf9d70c114429682d4ee83da3c63d1d9ba71995708ff7864c40668278
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-035
   html_rows: 31
   txt_rows: 37
@@ -3053,6 +3214,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: bfd9c9049fc930f85cbe4e919716c7845e7246747f88a130e291e1f75e3d1ed6
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-036
   html_rows: 64
   txt_rows: 65
@@ -3065,6 +3227,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 696d5c61ae29ebeea967bf3e672ec3e610328631c1d27b2f16fc6c2835bf9fb5
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-038
   html_rows: 56
   txt_rows: 65
@@ -3085,6 +3248,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 5bb0028fcc29d446f931242533e3cc412f91d1880beca772f046109334958cc7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-040
   html_rows: 51
   txt_rows: 65
@@ -3110,6 +3274,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c79233e03e9722fee13f9b40b3ca07b1805ed57f7f3667b424455af4a6d59ba0
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-048
   html_rows: 64
   txt_rows: 65
@@ -3122,6 +3287,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9f496e6985ca17d9d4b6e3fa1c2d482a9d826b03f7222dbbe9fe9615d8d73547
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-051
   html_rows: 52
   txt_rows: 65
@@ -3146,6 +3312,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 3bb0c2678366b84ef29994ea49216f3ff599ff4412e651a99c1750d25e7a2612
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-054
   html_rows: 52
   txt_rows: 65
@@ -3170,6 +3337,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6f0f2a74b1de477739338d46360dc009d0733ea19bc4c65a950a21933a0fe6be
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-055
   html_rows: 16
   txt_rows: 21
@@ -3186,6 +3354,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: df656ce3129dd45179ad54c6438b15a1da4842eb55a32e4bcade1de30a1381e2
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-056
   html_rows: 21
   txt_rows: 28
@@ -3204,6 +3373,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: fe5ca5efd1e1671b7e3da991fe9b5b05905ccf03fac2ee43418e17bda462a292
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-057
   html_rows: 25
   txt_rows: 32
@@ -3222,6 +3392,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 949f7252faed4a43462da3617dae76c383797b62dae5bc67a36147ec457d83bc
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-058
   html_rows: 64
   txt_rows: 65
@@ -3234,6 +3405,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 0523d9aef88961e89bbc833eca7ddc70733c02cdb5ef0a9e4ba85f827e5b76e3
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-069
   html_rows: 58
   txt_rows: 65
@@ -3252,6 +3424,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: cd5c27ced34766d00a83e0a90fa88235b602c820200912c74229fb4c3d895d32
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-072
   html_rows: 17
   txt_rows: 21
@@ -3267,6 +3440,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: d045e80a57c22cafd2e6da521db43a8fe98a694e7f7033547a92836d5ccc224f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-073
   html_rows: 23
   txt_rows: 28
@@ -3283,6 +3457,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2d780a763c0380f18381fff34e16741f0a77507b24443a2610796b055c8521e9
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-074
   html_rows: 26
   txt_rows: 32
@@ -3300,6 +3475,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 4ebd236cd1021c17020ec2018dfae073340fff067ca915fe3476f120aa2eb89e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-075
   html_rows: 57
   txt_rows: 65
@@ -3319,6 +3495,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 1c6ad8d363609dc9b79cc78c6a7b5f1360571757cdcaba66a12267911d7ac5d6
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-082
   html_rows: 44
   txt_rows: 65
@@ -3351,6 +3528,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 424ac12bee332a6cc8dd5278fe8bfd60b77adbea94860a0bb0af041ed3f9fedd
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-085
   html_rows: 64
   txt_rows: 65
@@ -3363,6 +3541,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 046f42440490d54bd87b701fac1bc9edc6d3463312b1a3185ff83c21e75c03d8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-086
   html_rows: 58
   txt_rows: 65
@@ -3381,6 +3560,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f2b4bd6ba43eb5d60a21714e397585687dfc51ac8ee1985acfc0cabf288d7272
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-088
   html_rows: 64
   txt_rows: 65
@@ -3393,6 +3573,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: d1a3b741f4784bdc3b571906f58c49b8f429461992995670e561752a95eec28c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-101
   html_rows: 58
   txt_rows: 65
@@ -3411,6 +3592,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 84644036f120188ad12c6e1f49bceb6f00c96a9f6893e6273a36d78b422cefa3
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-106
   html_rows: 57
   txt_rows: 65
@@ -3430,6 +3612,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7892ed275cf01fbcccacf1c2b66f3b84b5d072192685341718ee6dc762b4841d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-111
   html_rows: 14
   txt_rows: 19
@@ -3446,6 +3629,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e1bb58443ebcbdbccbf634ecd29dd79d1a36967d5daaa9c6ec58302b385afd41
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-112
   html_rows: 58
   txt_rows: 65
@@ -3464,6 +3648,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b45f0d3186d062889961454eaae0699a061b2672883eac7fd70acdfcba0c8e70
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-118
   html_rows: 43
   txt_rows: 65
@@ -3497,6 +3682,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f8660fd81c7da63528f5a762b6569704859951fe59c8db5cd4177fc172688a83
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-119
   html_rows: 56
   txt_rows: 65
@@ -3517,6 +3703,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 16880763e9b463751ba43f9eaa5aec462878184ddcb2bc8c6daa8e6be9d4551d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-124
   html_rows: 43
   txt_rows: 65
@@ -3550,6 +3737,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6e1d4bfbdf9ba265176a4a45ffbfff4f9bb8d26dbaea045c6f5016c70751f709
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-125
   html_rows: 14
   txt_rows: 19
@@ -3566,6 +3754,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 85e7b8553b692f4b6793694f884a4cc7ad0b24f9bc778e0d45b37b6566de1923
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-126
   html_rows: 56
   txt_rows: 65
@@ -3586,6 +3775,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9ef2842c18e413ebb5f28cf45dd226c5794333e4791b1e6474a868e83de77ecc
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-129
   html_rows: 56
   txt_rows: 65
@@ -3606,6 +3796,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e9800432e8e881a981a8e21772cb0dc9edabaf95b3f71962c748f66f22bbd60b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-141
   html_rows: 42
   txt_rows: 65
@@ -3640,6 +3831,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 65e2222b76ad08701ef5c89da0eba7ddff66bc41a6dc0a5cb054aa894a90c8df
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-142
   html_rows: 15
   txt_rows: 17
@@ -3653,6 +3845,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2ab3a8b840a69819f6e238c1d387c9c696c50e89f3f6c8d79e5f3e2dba52c812
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-143
   html_rows: 56
   txt_rows: 65
@@ -3673,6 +3866,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 8658bacc2e2d713c36da3fda01c292a7ae3e571aaf8097ed549d46bb53ef1299
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: F-148
   html_rows: 56
   txt_rows: 65
@@ -3693,6 +3887,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6d280a191bfdce4f866fcae09cd47d41973230dcbf2462e6b1bda6f94813ec27
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-003
   html_rows: 37
   txt_rows: 47
@@ -3714,6 +3909,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 45f0482d04a071cfa335c65be80f248df47f9e217fab253f5bbd77bfb725cb93
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-004
   html_rows: 19
   txt_rows: 24
@@ -3730,6 +3926,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b0d930a94c83bf1c6d0baeee224d59d2697bb220614f486a5dfa0702336221c9
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-005
   html_rows: 16
   txt_rows: 21
@@ -3746,6 +3943,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 5b989dccee50a73fdb19d07b9adbd08482e63e695ddb554f7d07717d3c74bd52
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-006
   html_rows: 31
   txt_rows: 39
@@ -3765,6 +3963,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: dd1439201d7c80741103b4369cf6062bfda4c828bd36213cf0bd4a58b3f4d0a8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-007
   html_rows: 33
   txt_rows: 41
@@ -3784,6 +3983,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: ce2d9e837793fc4e00e574f7fc2da21702b7f78c07b6b9bc2105dba6f70a9a86
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-008
   html_rows: 58
   txt_rows: 64
@@ -3801,6 +4001,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9b9dc08f49b6330581c336f45a2a6866224e4b5c4603ba81308f5a2f4c3dda8b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-018
   html_rows: 13
   txt_rows: 18
@@ -3817,6 +4018,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 50d315d03448a6b7c686bc18de97e6c6d173cbfbd0673c1a5a9b09f916eda51e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-019
   html_rows: 36
   txt_rows: 48
@@ -3840,6 +4042,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7da2f7429380ef0e77ea265acb8f9c7d9986b45828373f4f83a857f619dd0d8b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-020
   html_rows: 37
   txt_rows: 49
@@ -3863,6 +4066,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: bd1a3e055c90995b3b2cb3a555d98bb47f39a1dc6878646e0c2e6f63da69c989
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-021
   html_rows: 64
   txt_rows: 65
@@ -3875,6 +4079,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c4960e0f647a79787323cd6d6f2bf5e6c6465964bfd11bfd314f39a9c07d61e5
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-022
   html_rows: 18
   txt_rows: 22
@@ -3890,6 +4095,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9da2d4e031d83acb37f96af46141a0d02c205ec39200c53484ef92d3ac827fd0
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-023
   html_rows: 14
   txt_rows: 20
@@ -3907,6 +4113,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: fec794b01f28c2b0b7e780f18811a02f5394b1b9a60518a08da2e33c939d77a3
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-024
   html_rows: 27
   txt_rows: 36
@@ -3927,6 +4134,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b3df4f2a6cda1d407a1b41a5f61c2176136d782ad5a3205e6e28942a6b44ed0f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-025
   html_rows: 29
   txt_rows: 40
@@ -3949,6 +4157,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 733d932f43ae2b722654179da85811b5080f212f47fc4274bcce0551956876a2
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-026
   html_rows: 64
   txt_rows: 65
@@ -3961,6 +4170,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b3064244b0fc5625a9e67f5191beabc61acce143c167b425aaf8c4bf4f6f8bb6
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-027
   html_rows: 12
   txt_rows: 16
@@ -3976,6 +4186,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 4434f0a003f37ba05e36bbb7e0919af97ed8bfb66b944d284482eeb048f7c03e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-028
   html_rows: 12
   txt_rows: 16
@@ -3991,6 +4202,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 396e4141a3d68840682305e74d0bc74dfebecbe25d6663fc07456644b679c13d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-030
   html_rows: 20
   txt_rows: 27
@@ -4009,6 +4221,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: d2810183a29dd3b48f6d77980ac77ace1104a42e00638467e27baf7433b84c21
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Fe-031
   html_rows: 14
   txt_rows: 19
@@ -4025,6 +4238,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 72662c8cce082712764174bbb7dab721b91168ab5f1769818999c7ac30412f94
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-046
   html_rows: 64
   txt_rows: 65
@@ -4037,6 +4251,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7fd41d2fe547008df5e989a0e88c697a168ca4c201bada4ed2da38e09d6d77ce
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-063
   html_rows: 10
   txt_rows: 12
@@ -4050,6 +4265,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: fef7b1e2f3b5dfcdd26253b630512125903c65533e25ae8aba46cfa95c5b6531
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-064
   html_rows: 49
   txt_rows: 62
@@ -4074,6 +4290,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 8d68b9985b337c4d2918741a0d597799bf7b0205c00433a1f251c126ec0d65cb
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-065
   html_rows: 16
   txt_rows: 21
@@ -4090,6 +4307,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 530d5b1fe06c9833c4085157081c8dc13999098dd62b6b199543d16e570f4f5a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-066
   html_rows: 11
   txt_rows: 17
@@ -4107,6 +4325,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: ddedc193c965f877fe63be14b37274bd56a388456eb133e914fe316f300fbff7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-067
   html_rows: 12
   txt_rows: 17
@@ -4123,6 +4342,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 02f1319f8ad3d70f620eff61b2425d03f1a6b2102da01727271bc846dc647798
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-068
   html_rows: 12
   txt_rows: 17
@@ -4139,6 +4359,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: d390c7ea24b232098691d3ea5fd4147546b7b2a18bed4cd3e4180cf3446fdce7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-069
   html_rows: 12
   txt_rows: 17
@@ -4155,6 +4376,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6f450b8436e64584a5134ae47bd4329c7dce6b354d02681a871d25a2bf1d8046
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-075
   html_rows: 11
   txt_rows: 12
@@ -4167,6 +4389,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7d86811ebb2cecd64465ba67fdf6deae0efaa8ee22cad2abf9ef91a5bca0c4a3
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-076
   html_rows: 56
   txt_rows: 65
@@ -4187,6 +4410,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 5d1e7858aaf169fb5bfe25080beda7745608c6c961fd14f7438d22b43f6297a1
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-080
   html_rows: 40
   txt_rows: 62
@@ -4220,6 +4444,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 02734808ded995f5bde71c6596681ba1a9686b622dc65f2bb2fd07d30b3016ed
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-092
   html_rows: 11
   txt_rows: 12
@@ -4232,6 +4457,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 30b05996f28e9668d10b3a9739619f910b31e9a8841b687dd535a95b445a6289
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-094
   html_rows: 11
   txt_rows: 12
@@ -4244,6 +4470,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 4323b5e2105cce74af45c26bdee4e06f7a11bb251e6d1717c5fa2dd73fdcb24f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-095
   html_rows: 11
   txt_rows: 12
@@ -4256,6 +4483,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 045687c151a615997ffe5f014244aa632032d8673c70223157eb60f2bac0bdb6
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: H-096
   html_rows: 11
   txt_rows: 12
@@ -4268,6 +4496,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9e22be02a798623d2a48a1e7c8acc13da781d44fd106a6a940f3da313fa7741c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-001
   html_rows: 48
   txt_rows: 62
@@ -4293,6 +4522,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 85c896eb06c26574ca56ab7edb1e93f78b903f48886ae5ffd39dd50efe28a54c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-002
   html_rows: 5
   txt_rows: 7
@@ -4306,6 +4536,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 207bdd94f1cf644dce45098ad00fd9867f9caaf9affe925fc5fa3399f6d054c6
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-003
   html_rows: 11
   txt_rows: 14
@@ -4320,6 +4551,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2ac04ad8831222af0fbc868de6edcc184b5e99ad01e51e6ed7c672ef4c63e308
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-004
   html_rows: 16
   txt_rows: 19
@@ -4334,6 +4566,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 10e04f8a0c6a5435a0861e44a4462132be7e4b1549239dc871cbc94012e02233
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-005
   html_rows: 63
   txt_rows: 64
@@ -4346,6 +4579,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7729eda5976a6eacd68197b80eaadaf4f8bd1805f6673a08206c91827d1c407d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-008
   html_rows: 64
   txt_rows: 65
@@ -4358,6 +4592,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 0f87a5c7c894d028bb8ed22f359c2bdce33a30d6785a1443c2adc61352115558
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-011
   html_rows: 49
   txt_rows: 62
@@ -4382,6 +4617,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e8f761c2b4128ba82a3fb6f0e742675dd81a165b73fbbcdb006fa8133b27ded8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-012
   html_rows: 14
   txt_rows: 19
@@ -4398,6 +4634,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 1322cee6495ef8394705a5005365575e809ea4b671ff63971c3be57c04208b93
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-017
   html_rows: 11
   txt_rows: 13
@@ -4411,6 +4648,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 408e30c871d0090426bf46457c03ad6452b7ba71c872233870d548969382eeb0
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-018
   html_rows: 8
   txt_rows: 12
@@ -4426,6 +4664,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 570be719e67c7a806b715258dccfb66131fca5864f855cc0629fb708c75a1273
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-019
   html_rows: 21
   txt_rows: 28
@@ -4444,6 +4683,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7375880c1fe817cb334e1b079e622fe2a95f85a9c9973f90478e44173bc79aa3
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-020
   html_rows: 25
   txt_rows: 32
@@ -4462,6 +4702,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 3e8e0a366c43fd8000a054a60b4c2676e1c837b437fef5f3e2cfc28400bddf46
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-021
   html_rows: 56
   txt_rows: 65
@@ -4482,6 +4723,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 74d08981961c24a2556bdc010dfee5e71b3277ae4245d6756fd79971d60e5cef
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-022
   html_rows: 14
   txt_rows: 18
@@ -4497,6 +4739,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 0e7cad04d5b20b3244bf13ca8d5fe14163a4968c97a6ba6d49a05c412b02ed85
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-023
   html_rows: 21
   txt_rows: 28
@@ -4515,6 +4758,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 92b15e9bf6ffd8429ea60d3bd84691737d00c211ee8826db6ad8e1d15d2e186c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: K-024
   html_rows: 26
   txt_rows: 29
@@ -4531,6 +4775,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 413b4e6cfc40be4d7a54be4b5dc7e276700143f02ac1269cfdb6a38828411bec
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-001
   html_rows: 47
   txt_rows: 62
@@ -4557,6 +4802,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 135816fdcfe2f146029faecbeae56fb3bee7a07234f1747124b64311181d9db1
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-002
   html_rows: 19
   txt_rows: 24
@@ -4573,6 +4819,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 29509238f547188af94dd0732da6bde7776bcb6a87d98115c5edbfd92153fcb1
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-003
   html_rows: 15
   txt_rows: 19
@@ -4588,6 +4835,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9d2b074354c86880b7a2373d9d158245cc6faf90ac66e5ba4e70a800e1ec5826
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-004
   html_rows: 19
   txt_rows: 24
@@ -4604,6 +4852,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 66bbfcf6062e7e6282e7896f828d98acbabb4c9b7e51c6c1b49891fb952d2d2f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-005
   html_rows: 54
   txt_rows: 64
@@ -4625,6 +4874,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2052a054ee62c6f2ea603b42a1340bb7b48218a23e419ef7702748ebc9028dc0
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-008
   html_rows: 32
   txt_rows: 41
@@ -4645,6 +4895,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2efaf6db392a6ee21a2720b84bad3cd2e9b4cbbdd2afce0a1145fbecdae796d8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-009
   html_rows: 36
   txt_rows: 48
@@ -4668,6 +4919,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f31771f1a45e7749f20bcdc70557a32e85dcb9d79a8b53f7c59c6a3cda482a41
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-010
   html_rows: 41
   txt_rows: 52
@@ -4690,6 +4942,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 00c32804c1b69503ce480c6ff095412dfe48693259a8a7e387576cfa2e7c304b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-011
   html_rows: 64
   txt_rows: 65
@@ -4702,6 +4955,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 3d8c81ea7738b75f068d8287d5e888cc013bc81dca90abed0186dc2a7c3a9cf0
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-018
   html_rows: 21
   txt_rows: 26
@@ -4718,6 +4972,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f1fb5fff3c6085649f44dca85116bb85dec1dfce34b71bd6dab8015ece589e28
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-019
   html_rows: 18
   txt_rows: 23
@@ -4734,6 +4989,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 5e755c576aed69a226e862da0fbe08a8d6fe04ae39fa7673c8f10d225ecb5949
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-020
   html_rows: 21
   txt_rows: 27
@@ -4751,6 +5007,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f7c435443adefa0d016a6fe43743fe761518e4baab2fce5e0958f5cd70704926
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-025
   html_rows: 25
   txt_rows: 32
@@ -4769,6 +5026,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2e929f2b501f137ceccde88bb9b6239568c30c8b13581edf19a2ae1b1fa689b8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-026
   html_rows: 64
   txt_rows: 65
@@ -4781,6 +5039,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c2fec65ccd455bb19388d5f49148b5132d226265c1d5f52c7c6c3e9f43507d87
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mg-027
   html_rows: 64
   txt_rows: 65
@@ -4793,6 +5052,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2660a9a8d66696e773c62fbbebd0f81bfc553ea9e82779e8baef6ab6f4ddb142
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mn-001
   html_rows: 39
   txt_rows: 52
@@ -4817,6 +5077,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c3e66ea07da055be4fbd44031e38f1a1e77c28b1a7e2cd336be7c551a94e4660
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mn-002
   html_rows: 16
   txt_rows: 23
@@ -4835,6 +5096,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 60857a1d518051f687c0d8b58d5ee87fe6ccc02b0d19f0fe2d0551366541be61
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mn-003
   html_rows: 22
   txt_rows: 29
@@ -4853,6 +5115,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 4bab88b4a4e14c5dec6b74b19dd80bade06cff6e42630342d2b54b0f5fed94c2
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mn-004
   html_rows: 24
   txt_rows: 34
@@ -4874,6 +5137,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 8d50c34527d39235e3ccad4b98037572e79845a5f520a4a3a0c7fa0b6543645c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Mn-005
   html_rows: 56
   txt_rows: 64
@@ -4893,6 +5157,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6e2b4c4f4fee21fa925c34e7aac461d5a8d709f06159bd70c626c621596faa19
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-001
   html_rows: 45
   txt_rows: 58
@@ -4917,6 +5182,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: d2e320637cb903cf1beb6ea0885227d9be6d7fcce3c03e431dc1156bab3e668e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-002
   html_rows: 11
   txt_rows: 14
@@ -4931,6 +5197,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6ac4553b8fcd67afa97299326d206a778dabd8494b972b7a6b22d9a1ba210ed9
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-003
   html_rows: 10
   txt_rows: 15
@@ -4947,6 +5214,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6b5d090c7e79cc604c52da75a8c6fd8a77892352a001ce4583260fd38839b19c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-004
   html_rows: 14
   txt_rows: 20
@@ -4964,6 +5232,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 91e855d7762e289ca0d1757b8c8a7a204dac720af83b0f682da2fb8db0be6fcc
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-005
   html_rows: 54
   txt_rows: 64
@@ -4985,6 +5254,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 56df39453bc3895f80161d7ca0146b344669da2d1a9918b27139e917d491c255
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-008
   html_rows: 64
   txt_rows: 65
@@ -4997,6 +5267,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c4bc3188c4513c66dff04ebbe2925fcac5de23a2bcce7700971be2363c4809bb
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-011
   html_rows: 64
   txt_rows: 65
@@ -5009,6 +5280,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: fb770370f6503812dd1a82e77785a8bae8e8f06d7e88de295b31bf45dc8fb88b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-012
   html_rows: 15
   txt_rows: 21
@@ -5026,6 +5298,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 45dc840e86108c57de27df6bef0885efab4a209940a8bbc7610f5019cf3d9042
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-013
   html_rows: 21
   txt_rows: 28
@@ -5044,6 +5317,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6d1a2122965e67cea023a9732122e6755049a651ab233273c66c9e756be91270
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-014
   html_rows: 23
   txt_rows: 32
@@ -5064,6 +5338,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 3e12b7accf8d4c4a37fe7b84e19b5a6777168f104a84088aa02174f258f40540
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-019
   html_rows: 10
   txt_rows: 14
@@ -5079,6 +5354,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2e728f4f8c446586decd2bba0c798502298fa2a04da51212ffde30112f8378f7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-020
   html_rows: 9
   txt_rows: 12
@@ -5093,6 +5369,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 607ae5e5843a574b3fd79773ccf677e221fbe84234f5b4d54793cbd9fe18c076
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-021
   html_rows: 10
   txt_rows: 12
@@ -5106,6 +5383,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6f792866ee928200cb39b96db3adc0f71bd438900b6a6c899488fbcf09c68763
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-022
   html_rows: 5
   txt_rows: 7
@@ -5119,6 +5397,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 5ee71b3586b99758ca99a25acf62df53e473bf42163cb54c6ef7be4d52e994e7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-023
   html_rows: 9
   txt_rows: 11
@@ -5132,6 +5411,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 281b9ecff1183ccea5c60dd45968822b6f5ddc0f41361fddaae59ecea03a136c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-024
   html_rows: 21
   txt_rows: 28
@@ -5150,6 +5430,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b5d75e5cfabd1a204dba8827456f62e1182731fbd0386c01f2fe8cdd979c13df
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-025
   html_rows: 26
   txt_rows: 32
@@ -5167,6 +5448,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 0781a1282ff926614003900e7465985d50969ee361c0e65c1c2e2a19d4d1200d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-026
   html_rows: 54
   txt_rows: 65
@@ -5189,6 +5471,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 4be59e973f88e41908b6f87afb78d91c98bc4ec973d3ea1313f54ec7e633ef6a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-031
   html_rows: 13
   txt_rows: 18
@@ -5205,6 +5488,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 28dc2b0f85b3d1425cca08ab5899404b1ad596f510ef09f26b7a1051f9ca46f1
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-032
   html_rows: 23
   txt_rows: 28
@@ -5221,6 +5505,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: debe52de534744049d17c805796617737e9331bccdad4bc1aaf846c0c1edb573
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-033
   html_rows: 21
   txt_rows: 29
@@ -5240,6 +5525,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 674ab119232a020dfa96fb54da40082ad83ba90947dfc87262db7c8bf5438c36
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-034
   html_rows: 5
   txt_rows: 8
@@ -5254,6 +5540,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 18d455fa50952ca571e933762ae6b07db20a3df1d99fbcde348b7c9c71a5005e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-035
   html_rows: 10
   txt_rows: 13
@@ -5268,6 +5555,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 3738f4a272554859c848801be021bee51fa105f0f0306ba9e2274b5f5d0619b3
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Na-036
   html_rows: 9
   txt_rows: 14
@@ -5284,6 +5572,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 25bb830c2da64ee1761098e30457bf35fbdd64ddad9d07d7056c25e1465972bf
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-001
   html_rows: 42
   txt_rows: 57
@@ -5310,6 +5599,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2b1b9e9922dacf3c111d9b2b7ee6b1bd91c9279c8f0913f0ed19e41bd57ba755
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-002
   html_rows: 22
   txt_rows: 29
@@ -5328,6 +5618,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 44dafd1069e85f898c4a3ac7952c68446389ab04549eaf4c08f40ee8972e6323
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-003
   html_rows: 27
   txt_rows: 35
@@ -5347,6 +5638,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c776a8f8ccb87db59568917526398c5160b639e63efc5a73b23dae846e17f810
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-004
   html_rows: 30
   txt_rows: 40
@@ -5368,6 +5660,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7a9c5ee776938a9031c6a26a87c270a989795a5fc3bcbab6045ac698f2d55940
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-005
   html_rows: 58
   txt_rows: 64
@@ -5385,6 +5678,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 1b86d14a543e9268d056860462f4604b8e987bfe66d78c17ea84ce7a85414cbf
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-008
   html_rows: 14
   txt_rows: 18
@@ -5400,6 +5694,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 25610c0e51fad9c2b1fd9b0011e3ee9f89a38bf5b22a16506e585df81c93dfe7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-009
   html_rows: 23
   txt_rows: 32
@@ -5420,6 +5715,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 959dde80c5051c15336d52da1fe1c86c4e3a28422bad0b17c4c4ebfc5b920f9d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-010
   html_rows: 32
   txt_rows: 36
@@ -5435,6 +5731,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b7d6c5151122810726d137912df0592ac13aa18fa1989dcf88bbcf1b66d9703b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-011
   html_rows: 64
   txt_rows: 65
@@ -5447,6 +5744,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 72de30d0fe77a94a61f84dda418d65eb9b7550b84d112a6d51cd0b93683bdc33
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-012
   html_rows: 11
   txt_rows: 16
@@ -5463,6 +5761,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: dce04bdfa9a3609bae8d29ce37b89906ef35c6f166ab72370d59db6589698aec
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-013
   html_rows: 11
   txt_rows: 16
@@ -5479,6 +5778,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7040627a963c7b4efc355325d0a8f9fed5b9111c64f7a20d59cfb37d3989a58c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-014
   html_rows: 11
   txt_rows: 17
@@ -5496,6 +5796,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 5b75e4842de632578bd30abc1cfda2eb578bcb56289eb7b311e6f1712bda683a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-015
   html_rows: 13
   txt_rows: 17
@@ -5511,6 +5812,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f2e21458c1954f4064b9d43987e4a592040a817e6c65d9df70e42c03d3a8f22b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-016
   html_rows: 29
   txt_rows: 36
@@ -5529,6 +5831,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 716f78ecdb06435c598145b0c1d93f42394187a85f9dc2c74b1ec198362f5ff3
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-017
   html_rows: 31
   txt_rows: 40
@@ -5549,6 +5852,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 4edd3e331202633a08e9480b8815e4d41755f457d0564274ca0fac436661f2a8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ni-018
   html_rows: 6
   txt_rows: 10
@@ -5564,6 +5868,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 15f09587a3f07c127e617b1b2958cf4cce356f5542ab0a724d7e6d849ddd4427
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-001
   html_rows: 64
   txt_rows: 65
@@ -5576,6 +5881,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: cece32f5b417e5df12f22357934d4eeaa9cbacf751a8f76a17a62e41a57cca5e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-004
   html_rows: 64
   txt_rows: 65
@@ -5588,6 +5894,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 1d0840518240ca926c61ba15de617ef32b0edca2b559d9815ed80febe0f96310
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-012
   html_rows: 64
   txt_rows: 65
@@ -5600,6 +5907,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e786b264b198a4e3fce25393c511dca8c24d2049651ff20c8f6f44079f064f45
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-018
   html_rows: 20
   txt_rows: 26
@@ -5617,6 +5925,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 5242e30f15498132517f84b58ff446b17113801a96fb65970df8870e0730cb9d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-019
   html_rows: 17
   txt_rows: 22
@@ -5633,6 +5942,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: aeacd556eb0efabeaf12bf66df97807de4721823b7f7446a5607a333a5d7aa56
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-020
   html_rows: 34
   txt_rows: 43
@@ -5653,6 +5963,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e1d62979c62dd64dece5eca0c9fb579547b90e1467944daba582be083b575f08
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-021
   html_rows: 36
   txt_rows: 47
@@ -5675,6 +5986,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 105e77f35f4da93d99c8cdf0bebc15b5f1df29b6feb3eed0a4d682060a4a810c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-022
   html_rows: 64
   txt_rows: 65
@@ -5687,6 +5999,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 4ffccfd8bda5f4944e176562fb66c6281d3f7bdddc80a467fb5eb5b7399997a1
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-029
   html_rows: 52
   txt_rows: 65
@@ -5711,6 +6024,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 47bd5d4d600e962b0ca18c30016364762ce9d4ff1a07f39ff300648635f7e648
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-032
   html_rows: 64
   txt_rows: 65
@@ -5723,6 +6037,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a93f51f8dbd7d0e1ac7005519cd33dc41e066acd7d90830de97ec9f38feb8513
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-035
   html_rows: 22
   txt_rows: 29
@@ -5741,6 +6056,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b3b964ea6baf5ad47b27a212ef9192762c51fb2acf26f1cec521658fb41fb742
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-036
   html_rows: 9
   txt_rows: 12
@@ -5755,6 +6071,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6c98270832bd92260afeb266147ac7dc1fa073c355cddaa25d66803387ac2bd2
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-037
   html_rows: 15
   txt_rows: 21
@@ -5772,6 +6089,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9eabe66085680ba0bfb7a30c39a26c9ce5f45a4a463e6626b7ff0444b54b70b2
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-038
   html_rows: 39
   txt_rows: 46
@@ -5790,6 +6108,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f1233d320c6c49aa8055a95b7e0f2d6404b47d42079f42966c5f1331f94f3f2c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-039
   html_rows: 36
   txt_rows: 47
@@ -5812,6 +6131,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 94d67d995f6dbe7eda10e4a0e43671cf6489e2a2fd58617bb064ca9f9df3512c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-040
   html_rows: 64
   txt_rows: 65
@@ -5824,6 +6144,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 55f2f98221b348e89bdad573a36f83a0ed2bb7d4d3789b928a852e20a4a53845
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-042
   html_rows: 17
   txt_rows: 22
@@ -5840,6 +6161,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: d0243195b6dc5fc75bb2ed5987afb6af60b1751602ebeb2055005e81cb4fc983
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-043
   html_rows: 20
   txt_rows: 26
@@ -5857,6 +6179,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 58eae2c9890c5c2fbd7a0210922529a98ae0ff855255e54463194cb08d64fcd0
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-044
   html_rows: 29
   txt_rows: 38
@@ -5877,6 +6200,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 09aaf780268692090aa7fbc7e279f7949ea0d918144d2068ec65608f1510cb8d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-045
   html_rows: 34
   txt_rows: 40
@@ -5894,6 +6218,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b20d88570f89ca9f23e34067c7f7e3c6b593b74ec411867acddea07f3ae4726f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-046
   html_rows: 64
   txt_rows: 65
@@ -5906,6 +6231,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7dd56850c1ce8f2b74327202af8db7a6f4e4f50ee8635ef5982cbdf4aa21c122
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-071
   html_rows: 17
   txt_rows: 22
@@ -5922,6 +6248,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: cfbaa3c0f6f8964197c027ebd298182b68a896de517ce8a64155da5971087925
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-087
   html_rows: 56
   txt_rows: 65
@@ -5942,6 +6269,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 728c9d6a6af142e13c3b50465e8da076fde4d324d6754f33a0c1c51e49dbeab2
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-094
   html_rows: 15
   txt_rows: 17
@@ -5955,6 +6283,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 88da25f3488ef1770d6a2ade4ff706f4935feadaa07e7dd715dd605214f2629e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: O-095
   html_rows: 56
   txt_rows: 65
@@ -5975,6 +6304,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 047863437ee71e0ee605e9b6dcd25531ac7d9ba93c3bfaf64cdf7c510fec01c7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-001
   html_rows: 51
   txt_rows: 57
@@ -5992,6 +6322,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 06086a8d0f26ace07c4d0207646987a2cff605380e69b89af9a21da28649c81b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-002
   html_rows: 11
   txt_rows: 14
@@ -6006,6 +6337,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: bfe643af76d2d4c1ff8ef220a9c226cc1668263e035e3e3794c3daafdc0786f7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-003
   html_rows: 14
   txt_rows: 19
@@ -6022,6 +6354,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 328a7983a091522f6b1dd7c3c49a123a907c9a7e268be83a3510209fa8d180c2
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-004
   html_rows: 18
   txt_rows: 24
@@ -6039,6 +6372,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 822a395b83f877c1d277ad9dbf5e60586ff6d150654c63b62f821f00d0476111
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-005
   html_rows: 14
   txt_rows: 15
@@ -6051,6 +6385,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 038deae79033a2cb00d73912c5b5f120798c5dba2f4c61cddb0f1f0ff2e4a04b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-006
   html_rows: 14
   txt_rows: 15
@@ -6063,6 +6398,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9e200394369e07b241d4f3234c7ef3798d2a7fc07d85b12ba603995237723d5b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-007
   html_rows: 14
   txt_rows: 15
@@ -6075,6 +6411,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: af0665a0829975906b5c51288085f724a71ebaeadeb4fb458ef7f195ed3a2735
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-008
   html_rows: 64
   txt_rows: 65
@@ -6087,6 +6424,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a71761ba86cfb2b728d22642903bbf44eb7cfcf78fbee07a73930ce652cec879
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-011
   html_rows: 64
   txt_rows: 65
@@ -6099,6 +6437,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 720105ae4c3ea42e176258f3d4fadafd2d74a25410e63dbe828e9725c5101461
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-012
   html_rows: 54
   txt_rows: 64
@@ -6120,6 +6459,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 521d7fbdc1055c79d755dfc6957534c87e19b4418a00a386a2f06a650fc29ec8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-013
   html_rows: 64
   txt_rows: 65
@@ -6132,6 +6472,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6adff82129f3f0d18cbf885690db66fdb0616254785b371419b803c6743e4463
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-014
   html_rows: 13
   txt_rows: 18
@@ -6148,6 +6489,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 9b6fe4b04a096a93fbac3c8eb6d83c24020f9bdf483f771e699d059359f1cec6
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-015
   html_rows: 22
   txt_rows: 28
@@ -6165,6 +6507,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: aaf1804eb86ab1d818ac184ec06d31c71d4391d5b4340af5e6fd7dbb4de1fd5f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-016
   html_rows: 27
   txt_rows: 29
@@ -6178,6 +6521,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f2aa4cae0ad7cb1eab45f8c3caf9c9ad26387273c0c89a6df1e956166c3da016
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: P-017
   html_rows: 48
   txt_rows: 59
@@ -6200,6 +6544,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 38f5bc02c00d6b915defe5edb04b00b45aa361817b34c025688813ebe305fde6
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-001
   html_rows: 40
   txt_rows: 52
@@ -6223,6 +6568,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b5adb34e047a8461d0a496c4c4d27d0c5eec39fed86dfa6be5a5e5f6de5df779
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-002
   html_rows: 10
   txt_rows: 12
@@ -6236,6 +6582,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f389771a316b5e382166ec4111b6b8bb0e16f648f27686336af59437563a249e
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-003
   html_rows: 8
   txt_rows: 13
@@ -6252,6 +6599,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: dfea0e0101114f228e753fd3b84bb04f4e1042fae53199461a73e4c7c571efb1
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-004
   html_rows: 10
   txt_rows: 14
@@ -6267,6 +6615,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 60f1feec4a60d4f29d3bab0636a67c85161d45f496f2fa20e1d32d2bc7120339
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-005
   html_rows: 13
   txt_rows: 19
@@ -6284,6 +6633,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 0d295adfc83315bde87d07134ba62acdd7c1538a378db79ce81f61884afd93d7
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-006
   html_rows: 64
   txt_rows: 65
@@ -6296,6 +6646,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a85fdb5db4289f30ef7a39f951c1bc79b79e843c7522d4310ce1a27bcc89ce9a
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-009
   html_rows: 64
   txt_rows: 65
@@ -6308,6 +6659,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: dac94ecd5f4218dbf53502e3ab9b912758ad1080a687165e99607585902549e3
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-012
   html_rows: 53
   txt_rows: 64
@@ -6330,6 +6682,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f031a576d7d137a32fde6f7b4771d8f440d53a8ded1a3e8d0dcc7ec7dc0b8889
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-013
   html_rows: 13
   txt_rows: 18
@@ -6346,6 +6699,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f7e5427389cb06dc4666776aa317473c402df4a10ac750e8232147a033fde008
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-014
   html_rows: 13
   txt_rows: 18
@@ -6362,6 +6716,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: ebd5959dc9f42ff12bed7f6f49e72b8764680e502ee0a81cfca61388140d618b
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-015
   html_rows: 13
   txt_rows: 19
@@ -6379,6 +6734,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 94310a0525a28d690c6db26c9b69d5ed6572654645fd9fa6783197eb76886aaf
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-016
   html_rows: 48
   txt_rows: 61
@@ -6403,6 +6759,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e981c1f231b321e6e593237b3d4f35252d7007898d9a448e9b6f4a1d03661dbd
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-017
   html_rows: 48
   txt_rows: 61
@@ -6427,6 +6784,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 7f3bc7e9d0a7cc64200d27d66f5e8ea8d527f932b1ffb339f51774442d4b7d97
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-018
   html_rows: 51
   txt_rows: 61
@@ -6448,6 +6806,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: add470cc6cac5e5adfc689b487aae86754f089b72261d6f757999e30176088e3
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-019
   html_rows: 51
   txt_rows: 61
@@ -6469,6 +6828,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 3ba2c703dabbe3664cfcde6de38ffbb7cf79804eff0a1074060b1f724206ec1f
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-020
   html_rows: 51
   txt_rows: 61
@@ -6490,6 +6850,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: be68622abbe0b1b5bec8ecfb6cc2f81b9fd95c1dbe6bf23886364e5a7b626bc8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: S-021
   html_rows: 56
   txt_rows: 65
@@ -6510,6 +6871,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 04431474b38369fe65570344b3c10471a7753f2904ee80f6447bb0e0db7655c8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Si-001
   html_rows: 52
   txt_rows: 62
@@ -6531,6 +6893,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: c5caba9f1a7f0214fa95df04a69b69921aca114bd5c1a9d6a2a699fcf9dc2c83
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Si-002
   html_rows: 23
   txt_rows: 29
@@ -6548,6 +6911,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 4411818af0e41e3cfe2586c1c090b43a77a593ce8c19616fda5b3f4f85983778
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Si-003
   html_rows: 35
   txt_rows: 44
@@ -6568,6 +6932,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 014834423b0521e30b16c55256aa6c65785836d8bed0d82cbb0cba9dd438408c
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Si-004
   html_rows: 39
   txt_rows: 49
@@ -6589,6 +6954,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: e02460b88490d505e7cb433d8f0066ccffc9cad61119e4bd5c558be8ca045bfb
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Si-005
   html_rows: 63
   txt_rows: 64
@@ -6601,6 +6967,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 269ee0967ede0a7277d9bfd946a1e9fa99f5fa02a8dd605f3ba036f63c3850a8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Si-008
   html_rows: 64
   txt_rows: 65
@@ -6613,6 +6980,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 6b15df4a28ed0efe57a4492e3d44a7274fdf5506adee3968c6aa6b935bd24b88
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Si-009
   html_rows: 64
   txt_rows: 65
@@ -6625,6 +6993,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 2db61e19f97851308fa50eb73efed4b4d4bac43f4c1f07ee8d6967be5e0dc5af
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ti-001
   html_rows: 43
   txt_rows: 57
@@ -6650,6 +7019,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 1e0b0264150d5f0a06615b56fb103847adfdb1bf0d06b6b0fef446612b8d22aa
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ti-002
   html_rows: 16
   txt_rows: 21
@@ -6666,6 +7036,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 10598076980e174ea28cbe4bb80c67375634977c35fd44922d61db9a856c28f4
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ti-003
   html_rows: 19
   txt_rows: 24
@@ -6682,6 +7053,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 5eb78f3386b9224f8144983a3f4e9e36bfbee55dc2e93e851c04a2a32150ba22
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ti-004
   html_rows: 34
   txt_rows: 44
@@ -6703,6 +7075,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b9a025f4ac918bac9932c47970a7f48ef85bcf1b9b7801015651030194baeac0
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ti-005
   html_rows: 39
   txt_rows: 49
@@ -6724,6 +7097,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: f7156e36fffe16485523fe30ff0747a6f2165fa88eae461eea8737bfeeb50e40
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Ti-006
   html_rows: 59
   txt_rows: 64
@@ -6740,6 +7114,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 66f195c514cbc4378faf2d5d7978015c92230777fb77e0947d7204672879b69d
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Zn-001
   html_rows: 48
   txt_rows: 62
@@ -6765,6 +7140,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 24effe46b439292d06f38ba4bfd0041b1b1be5bbfb8a9affd297f4a469c197c9
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Zn-002
   html_rows: 11
   txt_rows: 14
@@ -6779,6 +7155,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: a10aaa36ec09d1b31621c81701b66a52fb27fb9a61e1dc9fd095995460b820dc
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Zn-003
   html_rows: 15
   txt_rows: 19
@@ -6794,6 +7171,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 04492aee549e37792747ba6410849cadc0da90b8ed0d2c3b81905de1441073e8
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Zn-004
   html_rows: 19
   txt_rows: 24
@@ -6810,6 +7188,7 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: 85212f8a14fc0d97b6afbae3399ad62f11178c53a4f4cf1f7f4e75478486c8ac
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.
 - table_id: Zn-005
   html_rows: 54
   txt_rows: 64
@@ -6831,3 +7210,4 @@ tables:
   numeric_mismatches: []
   format_only_diffs: []
   source_txt_sha256: b67dd110d66081622c01e120d71e6d2f181f50c22b157d8f3a6aa6f9732cd060
+  note: Loadable record replaced from hash-verified current TXT; historical comparison retained.

@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Br-076.html
   download_url: https://janaf.nist.gov/tables/Br-076.txt
   index_entry:
-    formula: "ZrBr2"
-    formula_as_published: "ZrBr2"
-    formula_normalised: "ZrBr2"
-    name: "Zirconium Bromide"
-    state: "cr"
+    formula: ZrBr2
+    formula_as_published: ZrBr2
+    formula_normalised: ZrBr2
+    name: Zirconium Bromide
+    state: cr
+    charge: 0
   title_as_published: Zirconium Bromide (ZrBr2)  |  Br2Zr1(cr)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -992,3 +993,7 @@ table:
     locator:
       table_id: Br-076
       url: https://janaf.nist.gov/tables/Br-076.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: ec0690f30a28357f8c49d8797f93d0d2a9cafc33571aabfef19eb04b2d72da54

@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Ga-005.html
   download_url: https://janaf.nist.gov/tables/Ga-005.txt
   index_entry:
-    formula: "Ga"
-    formula_as_published: "Ga"
-    formula_normalised: "Ga"
-    name: "Gallium"
-    state: "g"
+    formula: Ga
+    formula_as_published: Ga
+    formula_normalised: Ga
+    name: Gallium
+    state: g
+    charge: 0
   title_as_published: Gallium (Ga)  |  Ga1(g)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -4664,3 +4665,7 @@ table:
     locator:
       table_id: Ga-005
       url: https://janaf.nist.gov/tables/Ga-005.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 460c1c6f62d2f90ebd727c631597c891f7ffe4aa442998947ea4c45eaf3c9b51

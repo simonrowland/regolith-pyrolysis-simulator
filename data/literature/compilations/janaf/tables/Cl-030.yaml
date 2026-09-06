@@ -6,6 +6,9 @@ source:
   doi: 10.18434/T42S31
   url: https://janaf.nist.gov/
   last_data_update: 1998
+  licence: 'Quoted from NIST SRD 13 (https://data.nist.gov/od/id/ECBCC1C1301D2ED9E04306570681B10735): "These data are public."
+    Quoted from https://www.nist.gov/copyrights-disclaimers: "With the exception of material marked as copyrighted, information
+    presented on NIST sites are considered public information and may be distributed or copied."'
 compilation_role:
   kind: assessed_thermodynamic_functions
   engine_reference_input: true
@@ -18,7 +21,7 @@ extraction:
   date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
-  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/Cl-030.txt
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Cl/Cl-030.txt
   source_sha256: 8ac6e5d24984e60938ffc23130b79ec4521ba5a4d7c87dd8df413b5bedbf2705
   review_status: machine_transcribed_unreviewed
 table:
@@ -26,11 +29,12 @@ table:
   url: https://janaf.nist.gov/tables/Cl-030.html
   download_url: https://janaf.nist.gov/tables/Cl-030.txt
   index_entry:
-    formula: "NH4ClO4"
-    formula_as_published: "NH4ClO4"
-    formula_normalised: "NH4ClO4"
-    name: "Ammonium Perchlorate"
-    state: "cr"
+    formula: NH4ClO4
+    formula_as_published: NH4ClO4
+    formula_normalised: NH4ClO4
+    charge: 0
+    name: Ammonium Perchlorate
+    state: cr
   title_as_published: Ammonium Perchlorate (NH4ClO4)  |  Cl1H4N1O4(cr)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -51,7 +55,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '0'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 0.0
       as_published: '0.'
@@ -60,7 +64,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '0'
-        column: Cp°
+        column: Cp
     entropy:
       value: 0.0
       as_published: '0.'
@@ -69,7 +73,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '0'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: null
       as_published: INFINITE
@@ -78,7 +82,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '0'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -25.238
       as_published: '-25.238'
@@ -87,7 +91,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '0'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -277.778
       as_published: '-277.778'
@@ -96,7 +100,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '0'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -277.778
       as_published: '-277.778'
@@ -105,7 +109,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '0'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: null
       as_published: INFINITE
@@ -123,7 +127,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 79.622
       as_published: '79.622'
@@ -132,7 +136,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 72.894
       as_published: '72.894'
@@ -141,7 +145,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 283.14
       as_published: '283.140'
@@ -150,7 +154,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -21.025
       as_published: '-21.025'
@@ -159,7 +163,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -288.28
       as_published: '-288.280'
@@ -168,7 +172,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -223.321
       as_published: '-223.321'
@@ -177,7 +181,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 116.651
       as_published: '116.651'
@@ -195,7 +199,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 107.236
       as_published: '107.236'
@@ -204,7 +208,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 137.419
       as_published: '137.419'
@@ -213,7 +217,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 195.2
       as_published: '195.200'
@@ -222,7 +226,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -11.556
       as_published: '-11.556'
@@ -231,7 +235,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -292.995
       as_published: '-292.995'
@@ -240,7 +244,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -156.325
       as_published: '-156.325'
@@ -249,7 +253,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 40.828
       as_published: '40.828'
@@ -267,7 +271,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '298.15'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 128.072
       as_published: '128.072'
@@ -276,7 +280,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '298.15'
-        column: Cp°
+        column: Cp
     entropy:
       value: 184.18
       as_published: '184.180'
@@ -285,7 +289,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '298.15'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 184.18
       as_published: '184.180'
@@ -294,7 +298,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '298.15'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 0.0
       as_published: '0.'
@@ -303,7 +307,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '298.15'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -295.767
       as_published: '-295.767'
@@ -312,7 +316,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '298.15'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -88.607
       as_published: '-88.607'
@@ -321,7 +325,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '298.15'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 15.524
       as_published: '15.524'
@@ -339,7 +343,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 128.449
       as_published: '128.449'
@@ -348,7 +352,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 184.973
       as_published: '184.973'
@@ -357,7 +361,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 184.182
       as_published: '184.182'
@@ -366,7 +370,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 0.237
       as_published: '0.237'
@@ -375,7 +379,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -295.804
       as_published: '-295.804'
@@ -384,7 +388,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -87.322
       as_published: '-87.322'
@@ -393,7 +397,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 15.204
       as_published: '15.204'
@@ -411,7 +415,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 148.699
       as_published: '148.699'
@@ -420,7 +424,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 224.699
       as_published: '224.699'
@@ -429,7 +433,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 189.462
       as_published: '189.462'
@@ -438,7 +442,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 14.095
       as_published: '14.095'
@@ -447,7 +451,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -296.894
       as_published: '-296.894'
@@ -456,7 +460,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -17.615
       as_published: '-17.615'
@@ -465,7 +469,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 2.3
       as_published: '2.300'
@@ -483,7 +487,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 168.95
       as_published: '168.950'
@@ -492,7 +496,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 260.052
       as_published: '260.052'
@@ -501,7 +505,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 200.101
       as_published: '200.101'
@@ -510,7 +514,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 29.975
       as_published: '29.975'
@@ -519,7 +523,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -296.232
       as_published: '-296.232'
@@ -528,7 +532,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 52.165
       as_published: '52.165'
@@ -537,7 +541,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -5.45
       as_published: '-5.450'
@@ -555,7 +559,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 197.568
       as_published: '197.568'
@@ -564,7 +568,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 312.708
       as_published: '312.708'
@@ -573,7 +577,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 215.652
       as_published: '215.652'
@@ -582,7 +586,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 58.234
       as_published: '58.234'
@@ -591,7 +595,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -283.459
       as_published: '-283.459'
@@ -600,7 +604,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 119.958
       as_published: '119.958'
@@ -609,7 +613,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -10.443
       as_published: '-10.443'
@@ -627,7 +631,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 217.819
       as_published: '217.819'
@@ -636,7 +640,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 344.684
       as_published: '344.684'
@@ -645,7 +649,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 231.823
       as_published: '231.823'
@@ -654,7 +658,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 79.003
       as_published: '79.003'
@@ -663,7 +667,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -278.431
       as_published: '-278.431'
@@ -672,7 +676,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 186.822
       as_published: '186.822'
@@ -681,7 +685,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -13.941
       as_published: '-13.941'
@@ -699,7 +703,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 238.07
       as_published: '238.070'
@@ -708,7 +712,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 375.092
       as_published: '375.092'
@@ -717,7 +721,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 247.845
       as_published: '247.845'
@@ -726,7 +730,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 101.797
       as_published: '101.797'
@@ -735,7 +739,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -271.621
       as_published: '-271.621'
@@ -744,7 +748,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 252.842
       as_published: '252.842'
@@ -753,7 +757,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -16.509
       as_published: '-16.509'
@@ -771,7 +775,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 258.456
       as_published: '258.456'
@@ -780,7 +784,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 404.312
       as_published: '404.312'
@@ -789,7 +793,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 263.616
       as_published: '263.616'
@@ -798,7 +802,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 126.626
       as_published: '126.626'
@@ -807,7 +811,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -263.001
       as_published: '-263.001'
@@ -816,7 +820,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 317.902
       as_published: '317.902'
@@ -825,7 +829,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -18.451
       as_published: '-18.451'
@@ -843,7 +847,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 278.571
       as_published: '278.571'
@@ -852,7 +856,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 432.586
       as_published: '432.586'
@@ -861,7 +865,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 279.107
       as_published: '279.107'
@@ -870,7 +874,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 153.48
       as_published: '153.480'
@@ -879,7 +883,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -252.567
       as_published: '-252.567'
@@ -888,7 +892,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 381.904
       as_published: '381.904'
@@ -897,7 +901,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -19.949
       as_published: '-19.949'
@@ -915,7 +919,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 299.569
       as_published: '299.569'
@@ -924,7 +928,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 460.142
       as_published: '460.142'
@@ -933,7 +937,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 294.317
       as_published: '294.317'
@@ -942,7 +946,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 182.408
       as_published: '182.408'
@@ -951,7 +955,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -240.258
       as_published: '-240.258'
@@ -960,7 +964,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 444.771
       as_published: '444.771'
@@ -969,7 +973,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -21.12
       as_published: '-21.120'
@@ -987,7 +991,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 317.984
       as_published: '317.984'
@@ -996,7 +1000,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 487.016
       as_published: '487.016'
@@ -1005,7 +1009,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 309.26
       as_published: '309.260'
@@ -1014,7 +1018,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 213.307
       as_published: '213.307'
@@ -1023,7 +1027,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -226.169
       as_published: '-226.169'
@@ -1032,7 +1036,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 506.437
       as_published: '506.437'
@@ -1041,7 +1045,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -22.045
       as_published: '-22.045'
@@ -1059,7 +1063,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 333.816
       as_published: '333.816'
@@ -1068,7 +1072,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 513.111
       as_published: '513.111'
@@ -1077,7 +1081,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 323.943
       as_published: '323.943'
@@ -1086,7 +1090,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 245.919
       as_published: '245.919'
@@ -1095,7 +1099,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -210.548
       as_published: '-210.548'
@@ -1104,7 +1108,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 566.864
       as_published: '566.864'
@@ -1113,7 +1117,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -22.777
       as_published: '-22.777'
@@ -1131,7 +1135,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 347.066
       as_published: '347.066'
@@ -1140,7 +1144,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 538.35
       as_published: '538.350'
@@ -1149,7 +1153,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 338.362
       as_published: '338.362'
@@ -1158,7 +1162,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 279.984
       as_published: '279.984'
@@ -1167,7 +1171,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -193.645
       as_published: '-193.645'
@@ -1176,7 +1180,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 626.039
       as_published: '626.039'
@@ -1185,7 +1189,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -23.358
       as_published: '-23.358'
@@ -1203,7 +1207,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 357.732
       as_published: '357.732'
@@ -1212,7 +1216,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 562.674
       as_published: '562.674'
@@ -1221,7 +1225,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 352.51
       as_published: '352.510'
@@ -1230,7 +1234,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 315.246
       as_published: '315.246'
@@ -1239,7 +1243,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -175.712
       as_published: '-175.712'
@@ -1248,7 +1252,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 683.966
       as_published: '683.966'
@@ -1257,7 +1261,7 @@ table:
         url: https://janaf.nist.gov/tables/Cl-030.html
         download_url: https://janaf.nist.gov/tables/Cl-030.txt
         row_temperature_as_published: '1500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -23.818
       as_published: '-23.818'

@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/I-022.html
   download_url: https://janaf.nist.gov/tables/I-022.txt
   index_entry:
-    formula: "ZrI"
-    formula_as_published: "ZrI"
-    formula_normalised: "ZrI"
-    name: "Zirconium Iodide"
-    state: "g"
+    formula: ZrI
+    formula_as_published: ZrI
+    formula_normalised: ZrI
+    name: Zirconium Iodide
+    state: g
+    charge: 0
   title_as_published: Zirconium Iodide (ZrI)  |  I1Zr1(g)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -4723,4 +4724,8 @@ table:
         download_url: https://janaf.nist.gov/tables/I-022.txt
         row_temperature_as_published: '6000'
         column: log Kf
-  parse_ambiguities: []
+  parse_ambiguities:
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 7bb219e2995eaa01d1248a26323ef20a0550b13785285ee9be15ab9631487872

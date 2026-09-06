@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Br-042.html
   download_url: https://janaf.nist.gov/tables/Br-042.txt
   index_entry:
-    formula: "CaBr2"
-    formula_as_published: "CaBr2"
-    formula_normalised: "CaBr2"
-    name: "Calcium Bromide"
-    state: "l"
+    formula: CaBr2
+    formula_as_published: CaBr2
+    formula_normalised: CaBr2
+    name: Calcium Bromide
+    state: l
+    charge: 0
   title_as_published: Calcium Bromide (CaBr2)  |  Br2Ca1(l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -1784,3 +1785,7 @@ table:
     locator:
       table_id: Br-042
       url: https://janaf.nist.gov/tables/Br-042.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 5caad0b573e7a2a04f28ab9107b71ecdde445ffda25bd7597434c2397ad279cd

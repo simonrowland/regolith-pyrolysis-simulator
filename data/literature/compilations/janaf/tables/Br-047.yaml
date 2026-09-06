@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Br-047.html
   download_url: https://janaf.nist.gov/tables/Br-047.txt
   index_entry:
-    formula: "FeBr2"
-    formula_as_published: "FeBr2"
-    formula_normalised: "FeBr2"
-    name: "Iron Bromide"
-    state: "cr,l"
+    formula: FeBr2
+    formula_as_published: FeBr2
+    formula_normalised: FeBr2
+    name: Iron Bromide
+    state: cr,l
+    charge: 0
   title_as_published: Iron Bromide (FeBr2)  |  Br2Fe1(cr,l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -1436,3 +1437,7 @@ table:
     locator:
       table_id: Br-047
       url: https://janaf.nist.gov/tables/Br-047.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 9ee17beac890d59cd0e4ce880fa4dd4a1eff6e039493faa4c9282a131394fd82

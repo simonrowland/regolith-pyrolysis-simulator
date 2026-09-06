@@ -6,6 +6,9 @@ source:
   doi: 10.18434/T42S31
   url: https://janaf.nist.gov/
   last_data_update: 1998
+  licence: 'Quoted from NIST SRD 13 (https://data.nist.gov/od/id/ECBCC1C1301D2ED9E04306570681B10735): "These data are public."
+    Quoted from https://www.nist.gov/copyrights-disclaimers: "With the exception of material marked as copyrighted, information
+    presented on NIST sites are considered public information and may be distributed or copied."'
 compilation_role:
   kind: assessed_thermodynamic_functions
   engine_reference_input: true
@@ -18,7 +21,7 @@ extraction:
   date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
-  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/Cu-018.txt
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Cu/Cu-018.txt
   source_sha256: 197b846efd949d57cba468ee95cdcb60540efc830d6767fb4103796c3e0ba40a
   review_status: machine_transcribed_unreviewed
 table:
@@ -26,11 +29,12 @@ table:
   url: https://janaf.nist.gov/tables/Cu-018.html
   download_url: https://janaf.nist.gov/tables/Cu-018.txt
   index_entry:
-    formula: "Cu2"
-    formula_as_published: "Cu2"
-    formula_normalised: "Cu2"
-    name: "Copper"
-    state: "g"
+    formula: Cu2
+    formula_as_published: Cu2
+    formula_normalised: Cu2
+    charge: 0
+    name: Copper
+    state: g
   title_as_published: Copper (Cu2)  |  Cu2(g)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -51,7 +55,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '0'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 0.0
       as_published: '0.'
@@ -60,7 +64,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '0'
-        column: Cp°
+        column: Cp
     entropy:
       value: 0.0
       as_published: '0.'
@@ -69,7 +73,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '0'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: null
       as_published: INFINITE
@@ -78,7 +82,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '0'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -9.93
       as_published: '-9.930'
@@ -87,7 +91,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '0'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 485.428
       as_published: '485.428'
@@ -96,7 +100,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '0'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 485.428
       as_published: '485.428'
@@ -105,7 +109,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '0'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: null
       as_published: INFINITE
@@ -123,7 +127,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 31.964
       as_published: '31.964'
@@ -132,7 +136,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 203.874
       as_published: '203.874'
@@ -141,7 +145,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 273.337
       as_published: '273.337'
@@ -150,7 +154,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -6.946
       as_published: '-6.946'
@@ -159,7 +163,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 487.074
       as_published: '487.074'
@@ -168,7 +172,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 468.693
       as_published: '468.693'
@@ -177,7 +181,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -244.82
       as_published: '-244.820'
@@ -195,7 +199,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 35.442
       as_published: '35.442'
@@ -204,7 +208,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 227.321
       as_published: '227.321'
@@ -213,7 +217,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 245.038
       as_published: '245.038'
@@ -222,7 +226,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -3.543
       as_published: '-3.543'
@@ -231,7 +235,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 486.45
       as_published: '486.450'
@@ -240,7 +244,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 450.478
       as_published: '450.478'
@@ -249,7 +253,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -117.653
       as_published: '-117.653'
@@ -267,7 +271,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '250'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 36.156
       as_published: '36.156'
@@ -276,7 +280,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '250'
-        column: Cp°
+        column: Cp
     entropy:
       value: 235.313
       as_published: '235.313'
@@ -285,7 +289,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '250'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 242.321
       as_published: '242.321'
@@ -294,7 +298,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '250'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -1.752
       as_published: '-1.752'
@@ -303,7 +307,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '250'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 485.916
       as_published: '485.916'
@@ -312,7 +316,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '250'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 441.545
       as_published: '441.545'
@@ -321,7 +325,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '250'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -92.256
       as_published: '-92.256'
@@ -339,7 +343,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '298.15'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 36.585
       as_published: '36.585'
@@ -348,7 +352,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '298.15'
-        column: Cp°
+        column: Cp
     entropy:
       value: 241.721
       as_published: '241.721'
@@ -357,7 +361,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '298.15'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 241.721
       as_published: '241.721'
@@ -366,7 +370,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '298.15'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 0.0
       as_published: '0.'
@@ -375,7 +379,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '298.15'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 485.344
       as_published: '485.344'
@@ -384,7 +388,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '298.15'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 433.051
       as_published: '433.051'
@@ -393,7 +397,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '298.15'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -75.869
       as_published: '-75.869'
@@ -411,7 +415,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 36.598
       as_published: '36.598'
@@ -420,7 +424,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 241.947
       as_published: '241.947'
@@ -429,7 +433,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 241.722
       as_published: '241.722'
@@ -438,7 +442,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 0.068
       as_published: '0.068'
@@ -447,7 +451,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 485.321
       as_published: '485.321'
@@ -456,7 +460,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 432.726
       as_published: '432.726'
@@ -465,7 +469,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -75.344
       as_published: '-75.344'
@@ -483,7 +487,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '350'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 36.893
       as_published: '36.893'
@@ -492,7 +496,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '350'
-        column: Cp°
+        column: Cp
     entropy:
       value: 247.612
       as_published: '247.612'
@@ -501,7 +505,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '350'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 242.168
       as_published: '242.168'
@@ -510,7 +514,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '350'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 1.905
       as_published: '1.905'
@@ -519,7 +523,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '350'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 484.686
       as_published: '484.686'
@@ -528,7 +532,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '350'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 424.01
       as_published: '424.010'
@@ -537,7 +541,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '350'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -63.28
       as_published: '-63.280'
@@ -555,7 +559,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.103
       as_published: '37.103'
@@ -564,7 +568,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 252.553
       as_published: '252.553'
@@ -573,7 +577,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 243.164
       as_published: '243.164'
@@ -582,7 +586,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 3.756
       as_published: '3.756'
@@ -591,7 +595,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 484.021
       as_published: '484.021'
@@ -600,7 +604,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 415.387
       as_published: '415.387'
@@ -609,7 +613,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -54.244
       as_published: '-54.244'
@@ -627,7 +631,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '450'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.261
       as_published: '37.261'
@@ -636,7 +640,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '450'
-        column: Cp°
+        column: Cp
     entropy:
       value: 256.933
       as_published: '256.933'
@@ -645,7 +649,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '450'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 244.455
       as_published: '244.455'
@@ -654,7 +658,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '450'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 5.615
       as_published: '5.615'
@@ -663,7 +667,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '450'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 483.329
       as_published: '483.329'
@@ -672,7 +676,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '450'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 406.849
       as_published: '406.849'
@@ -681,7 +685,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '450'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -47.226
       as_published: '-47.226'
@@ -699,7 +703,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.386
       as_published: '37.386'
@@ -708,7 +712,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 260.865
       as_published: '260.865'
@@ -717,7 +721,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 245.903
       as_published: '245.903'
@@ -726,7 +730,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 7.481
       as_published: '7.481'
@@ -735,7 +739,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 482.616
       as_published: '482.616'
@@ -744,7 +748,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 398.39
       as_published: '398.390'
@@ -753,7 +757,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -41.619
       as_published: '-41.619'
@@ -771,7 +775,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.576
       as_published: '37.576'
@@ -780,7 +784,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 267.699
       as_published: '267.699'
@@ -789,7 +793,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 248.983
       as_published: '248.983'
@@ -798,7 +802,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 11.23
       as_published: '11.230'
@@ -807,7 +811,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 481.124
       as_published: '481.124'
@@ -816,7 +820,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 381.683
       as_published: '381.683'
@@ -825,7 +829,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -33.228
       as_published: '-33.228'
@@ -843,7 +847,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.72
       as_published: '37.720'
@@ -852,7 +856,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 273.503
       as_published: '273.503'
@@ -861,7 +865,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 252.082
       as_published: '252.082'
@@ -870,7 +874,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 14.995
       as_published: '14.995'
@@ -879,7 +883,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 479.541
       as_published: '479.541'
@@ -888,7 +892,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 365.233
       as_published: '365.233'
@@ -897,7 +901,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -27.254
       as_published: '-27.254'
@@ -915,7 +919,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.84
       as_published: '37.840'
@@ -924,7 +928,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 278.548
       as_published: '278.548'
@@ -933,7 +937,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 255.082
       as_published: '255.082'
@@ -942,7 +946,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 18.773
       as_published: '18.773'
@@ -951,7 +955,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 477.872
       as_published: '477.872'
@@ -960,7 +964,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 349.016
       as_published: '349.016'
@@ -969,7 +973,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -22.788
       as_published: '-22.788'
@@ -987,7 +991,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 37.945
       as_published: '37.945'
@@ -996,7 +1000,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 283.011
       as_published: '283.011'
@@ -1005,7 +1009,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 257.942
       as_published: '257.942'
@@ -1014,7 +1018,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 22.562
       as_published: '22.562'
@@ -1023,7 +1027,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 476.108
       as_published: '476.108'
@@ -1032,7 +1036,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 333.014
       as_published: '333.014'
@@ -1041,7 +1045,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -19.328
       as_published: '-19.328'
@@ -1059,7 +1063,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.041
       as_published: '38.041'
@@ -1068,7 +1072,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 287.014
       as_published: '287.014'
@@ -1077,7 +1081,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 260.652
       as_published: '260.652'
@@ -1086,7 +1090,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 26.362
       as_published: '26.362'
@@ -1095,7 +1099,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 474.239
       as_published: '474.239'
@@ -1104,7 +1108,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 317.214
       as_published: '317.214'
@@ -1113,7 +1117,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -16.57
       as_published: '-16.570'
@@ -1131,7 +1135,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.131
       as_published: '38.131'
@@ -1140,7 +1144,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 290.644
       as_published: '290.644'
@@ -1149,7 +1153,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 263.216
       as_published: '263.216'
@@ -1158,7 +1162,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 30.17
       as_published: '30.170'
@@ -1167,7 +1171,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 472.237
       as_published: '472.237'
@@ -1176,7 +1180,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 301.607
       as_published: '301.607'
@@ -1185,7 +1189,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -14.322
       as_published: '-14.322'
@@ -1203,7 +1207,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.216
       as_published: '38.216'
@@ -1212,7 +1216,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 293.965
       as_published: '293.965'
@@ -1221,7 +1225,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 265.642
       as_published: '265.642'
@@ -1230,7 +1234,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 33.988
       as_published: '33.988'
@@ -1239,7 +1243,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 470.065
       as_published: '470.065'
@@ -1248,7 +1252,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 286.19
       as_published: '286.190'
@@ -1257,7 +1261,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -12.458
       as_published: '-12.458'
@@ -1275,7 +1279,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.299
       as_published: '38.299'
@@ -1284,7 +1288,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 297.027
       as_published: '297.027'
@@ -1293,7 +1297,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 267.94
       as_published: '267.940'
@@ -1302,7 +1306,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 37.813
       as_published: '37.813'
@@ -1311,7 +1315,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 467.634
       as_published: '467.634'
@@ -1320,7 +1324,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 270.963
       as_published: '270.963'
@@ -1329,7 +1333,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -10.887
       as_published: '-10.887'
@@ -1347,7 +1351,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.38
       as_published: '38.380'
@@ -1356,7 +1360,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 299.869
       as_published: '299.869'
@@ -1365,7 +1369,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 270.121
       as_published: '270.121'
@@ -1374,7 +1378,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 41.647
       as_published: '41.647'
@@ -1383,7 +1387,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 438.637
       as_published: '438.637'
@@ -1392,7 +1396,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 256.749
       as_published: '256.749'
@@ -1401,7 +1405,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -9.579
       as_published: '-9.579'
@@ -1419,7 +1423,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.459
       as_published: '38.459'
@@ -1428,7 +1432,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 302.519
       as_published: '302.519'
@@ -1437,7 +1441,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 272.193
       as_published: '272.193'
@@ -1446,7 +1450,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 45.489
       as_published: '45.489'
@@ -1455,7 +1459,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 435.91
       as_published: '435.910'
@@ -1464,7 +1468,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 243.852
       as_published: '243.852'
@@ -1473,7 +1477,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -8.492
       as_published: '-8.492'
@@ -1491,7 +1495,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.537
       as_published: '38.537'
@@ -1500,7 +1504,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 305.004
       as_published: '305.004'
@@ -1509,7 +1513,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 274.167
       as_published: '274.167'
@@ -1518,7 +1522,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 49.339
       as_published: '49.339'
@@ -1527,7 +1531,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 433.191
       as_published: '433.191'
@@ -1536,7 +1540,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 231.137
       as_published: '231.137'
@@ -1545,7 +1549,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -7.546
       as_published: '-7.546'
@@ -1563,7 +1567,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.614
       as_published: '38.614'
@@ -1572,7 +1576,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 307.343
       as_published: '307.343'
@@ -1581,7 +1585,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 276.05
       as_published: '276.050'
@@ -1590,7 +1594,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 53.197
       as_published: '53.197'
@@ -1599,7 +1603,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 430.479
       as_published: '430.479'
@@ -1608,7 +1612,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 218.591
       as_published: '218.591'
@@ -1617,7 +1621,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -6.716
       as_published: '-6.716'
@@ -1635,7 +1639,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.691
       as_published: '38.691'
@@ -1644,7 +1648,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 309.552
       as_published: '309.552'
@@ -1653,7 +1657,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 277.851
       as_published: '277.851'
@@ -1662,7 +1666,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 57.062
       as_published: '57.062'
@@ -1671,7 +1675,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 427.776
       as_published: '427.776'
@@ -1680,7 +1684,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 206.205
       as_published: '206.205'
@@ -1689,7 +1693,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -5.984
       as_published: '-5.984'
@@ -1707,7 +1711,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.767
       as_published: '38.767'
@@ -1716,7 +1720,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 311.646
       as_published: '311.646'
@@ -1725,7 +1729,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 279.575
       as_published: '279.575'
@@ -1734,7 +1738,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 60.935
       as_published: '60.935'
@@ -1743,7 +1747,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 425.08
       as_published: '425.080'
@@ -1752,7 +1756,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 193.969
       as_published: '193.969'
@@ -1761,7 +1765,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '1900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -5.333
       as_published: '-5.333'
@@ -1779,7 +1783,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.843
       as_published: '38.843'
@@ -1788,7 +1792,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 313.636
       as_published: '313.636'
@@ -1797,7 +1801,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 281.229
       as_published: '281.229'
@@ -1806,7 +1810,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 64.815
       as_published: '64.815'
@@ -1815,7 +1819,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 422.392
       as_published: '422.392'
@@ -1824,7 +1828,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 181.875
       as_published: '181.875'
@@ -1833,7 +1837,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -4.75
       as_published: '-4.750'
@@ -1851,7 +1855,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.919
       as_published: '38.919'
@@ -1860,7 +1864,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 315.533
       as_published: '315.533'
@@ -1869,7 +1873,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 282.817
       as_published: '282.817'
@@ -1878,7 +1882,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 68.704
       as_published: '68.704'
@@ -1887,7 +1891,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 419.711
       as_published: '419.711'
@@ -1896,7 +1900,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 169.915
       as_published: '169.915'
@@ -1905,7 +1909,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -4.226
       as_published: '-4.226'
@@ -1923,7 +1927,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.995
       as_published: '38.995'
@@ -1932,7 +1936,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 317.346
       as_published: '317.346'
@@ -1941,7 +1945,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 284.346
       as_published: '284.346'
@@ -1950,7 +1954,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 72.599
       as_published: '72.599'
@@ -1959,7 +1963,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 417.038
       as_published: '417.038'
@@ -1968,7 +1972,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 158.083
       as_published: '158.083'
@@ -1977,7 +1981,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.753
       as_published: '-3.753'
@@ -1995,7 +1999,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.071
       as_published: '39.071'
@@ -2004,7 +2008,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 319.081
       as_published: '319.081'
@@ -2013,7 +2017,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 285.819
       as_published: '285.819'
@@ -2022,7 +2026,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 76.503
       as_published: '76.503'
@@ -2031,7 +2035,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 414.372
       as_published: '414.372'
@@ -2040,7 +2044,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 146.372
       as_published: '146.372'
@@ -2049,7 +2053,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.324
       as_published: '-3.324'
@@ -2067,7 +2071,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.149
       as_published: '39.149'
@@ -2076,7 +2080,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 320.745
       as_published: '320.745'
@@ -2085,7 +2089,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 287.239
       as_published: '287.239'
@@ -2094,7 +2098,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 80.414
       as_published: '80.414'
@@ -2103,7 +2107,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 411.714
       as_published: '411.714'
@@ -2112,7 +2116,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 134.777
       as_published: '134.777'
@@ -2121,7 +2125,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.933
       as_published: '-2.933'
@@ -2139,7 +2143,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.228
       as_published: '39.228'
@@ -2148,7 +2152,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 322.345
       as_published: '322.345'
@@ -2157,7 +2161,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 288.612
       as_published: '288.612'
@@ -2166,7 +2170,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 84.332
       as_published: '84.332'
@@ -2175,7 +2179,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 409.064
       as_published: '409.064'
@@ -2184,7 +2188,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 123.292
       as_published: '123.292'
@@ -2193,7 +2197,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.576
       as_published: '-2.576'
@@ -2211,7 +2215,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.308
       as_published: '39.308'
@@ -2220,7 +2224,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 323.885
       as_published: '323.885'
@@ -2229,7 +2233,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 289.939
       as_published: '289.939'
@@ -2238,7 +2242,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 88.259
       as_published: '88.259'
@@ -2247,7 +2251,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 406.422
       as_published: '406.422'
@@ -2256,7 +2260,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 111.914
       as_published: '111.914'
@@ -2265,7 +2269,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.248
       as_published: '-2.248'
@@ -2283,7 +2287,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.39
       as_published: '39.390'
@@ -2292,7 +2296,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 325.37
       as_published: '325.370'
@@ -2301,7 +2305,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 291.224
       as_published: '291.224'
@@ -2310,7 +2314,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 92.194
       as_published: '92.194'
@@ -2319,7 +2323,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 403.788
       as_published: '403.788'
@@ -2328,7 +2332,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 100.637
       as_published: '100.637'
@@ -2337,7 +2341,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -1.947
       as_published: '-1.947'
@@ -2355,7 +2359,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.475
       as_published: '39.475'
@@ -2364,7 +2368,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 326.804
       as_published: '326.804'
@@ -2373,7 +2377,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 292.469
       as_published: '292.469'
@@ -2382,7 +2386,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 96.137
       as_published: '96.137'
@@ -2391,7 +2395,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: 401.162
       as_published: '401.162'
@@ -2400,7 +2404,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 89.457
       as_published: '89.457'
@@ -2409,7 +2413,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -1.669
       as_published: '-1.669'
@@ -2427,7 +2431,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.562
       as_published: '39.562'
@@ -2436,7 +2440,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 328.191
       as_published: '328.191'
@@ -2445,7 +2449,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 293.677
       as_published: '293.677'
@@ -2454,7 +2458,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 100.089
       as_published: '100.089'
@@ -2463,7 +2467,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -201.863
       as_published: '-201.863'
@@ -2472,7 +2476,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 90.362
       as_published: '90.362'
@@ -2481,7 +2485,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '2900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -1.628
       as_published: '-1.628'
@@ -2499,7 +2503,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.653
       as_published: '39.653'
@@ -2508,7 +2512,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 329.533
       as_published: '329.533'
@@ -2517,7 +2521,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 294.85
       as_published: '294.850'
@@ -2526,7 +2530,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 104.05
       as_published: '104.050'
@@ -2535,7 +2539,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -202.882
       as_published: '-202.882'
@@ -2544,7 +2548,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 100.456
       as_published: '100.456'
@@ -2553,7 +2557,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -1.749
       as_published: '-1.749'
@@ -2571,7 +2575,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.747
       as_published: '39.747'
@@ -2580,7 +2584,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 330.835
       as_published: '330.835'
@@ -2589,7 +2593,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 295.99
       as_published: '295.990'
@@ -2598,7 +2602,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 108.02
       as_published: '108.020'
@@ -2607,7 +2611,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -203.991
       as_published: '-203.991'
@@ -2616,7 +2620,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 110.585
       as_published: '110.585'
@@ -2625,7 +2629,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -1.863
       as_published: '-1.863'
@@ -2643,7 +2647,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.845
       as_published: '39.845'
@@ -2652,7 +2656,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 332.099
       as_published: '332.099'
@@ -2661,7 +2665,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 297.099
       as_published: '297.099'
@@ -2670,7 +2674,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 111.999
       as_published: '111.999'
@@ -2679,7 +2683,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -205.193
       as_published: '-205.193'
@@ -2688,7 +2692,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 120.752
       as_published: '120.752'
@@ -2697,7 +2701,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -1.971
       as_published: '-1.971'
@@ -2715,7 +2719,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 39.948
       as_published: '39.948'
@@ -2724,7 +2728,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 333.326
       as_published: '333.326'
@@ -2733,7 +2737,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 298.178
       as_published: '298.178'
@@ -2742,7 +2746,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 115.989
       as_published: '115.989'
@@ -2751,7 +2755,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -206.487
       as_published: '-206.487'
@@ -2760,7 +2764,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 130.958
       as_published: '130.958'
@@ -2769,7 +2773,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.073
       as_published: '-2.073'
@@ -2787,7 +2791,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 40.055
       as_published: '40.055'
@@ -2796,7 +2800,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 334.52
       as_published: '334.520'
@@ -2805,7 +2809,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 299.23
       as_published: '299.230'
@@ -2814,7 +2818,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 119.989
       as_published: '119.989'
@@ -2823,7 +2827,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -207.872
       as_published: '-207.872'
@@ -2832,7 +2836,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 141.204
       as_published: '141.204'
@@ -2841,7 +2845,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.169
       as_published: '-2.169'
@@ -2859,7 +2863,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 40.166
       as_published: '40.166'
@@ -2868,7 +2872,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 335.683
       as_published: '335.683'
@@ -2877,7 +2881,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 300.255
       as_published: '300.255'
@@ -2886,7 +2890,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 124.0
       as_published: '124.000'
@@ -2895,7 +2899,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -209.348
       as_published: '-209.348'
@@ -2904,7 +2908,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 151.492
       as_published: '151.492'
@@ -2913,7 +2917,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.261
       as_published: '-2.261'
@@ -2931,7 +2935,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 40.283
       as_published: '40.283'
@@ -2940,7 +2944,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 336.816
       as_published: '336.816'
@@ -2949,7 +2953,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 301.255
       as_published: '301.255'
@@ -2958,7 +2962,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 128.022
       as_published: '128.022'
@@ -2967,7 +2971,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -210.91
       as_published: '-210.910'
@@ -2976,7 +2980,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 161.823
       as_published: '161.823'
@@ -2985,7 +2989,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.348
       as_published: '-2.348'
@@ -3003,7 +3007,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 40.405
       as_published: '40.405'
@@ -3012,7 +3016,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 337.922
       as_published: '337.922'
@@ -3021,7 +3025,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 302.231
       as_published: '302.231'
@@ -3030,7 +3034,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 132.057
       as_published: '132.057'
@@ -3039,7 +3043,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -212.557
       as_published: '-212.557'
@@ -3048,7 +3052,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 172.2
       as_published: '172.200'
@@ -3057,7 +3061,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.431
       as_published: '-2.431'
@@ -3075,7 +3079,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 40.533
       as_published: '40.533'
@@ -3084,7 +3088,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 339.001
       as_published: '339.001'
@@ -3093,7 +3097,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 303.184
       as_published: '303.184'
@@ -3102,7 +3106,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 136.104
       as_published: '136.104'
@@ -3111,7 +3115,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -214.284
       as_published: '-214.284'
@@ -3120,7 +3124,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 182.621
       as_published: '182.621'
@@ -3129,7 +3133,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.51
       as_published: '-2.510'
@@ -3147,7 +3151,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 40.666
       as_published: '40.666'
@@ -3156,7 +3160,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 340.055
       as_published: '340.055'
@@ -3165,7 +3169,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 304.116
       as_published: '304.116'
@@ -3174,7 +3178,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 140.164
       as_published: '140.164'
@@ -3183,7 +3187,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -216.088
       as_published: '-216.088'
@@ -3192,7 +3196,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 193.09
       as_published: '193.090'
@@ -3201,7 +3205,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '3900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.586
       as_published: '-2.586'
@@ -3219,7 +3223,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 40.804
       as_published: '40.804'
@@ -3228,7 +3232,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 341.087
       as_published: '341.087'
@@ -3237,7 +3241,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 305.027
       as_published: '305.027'
@@ -3246,7 +3250,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 144.237
       as_published: '144.237'
@@ -3255,7 +3259,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -217.963
       as_published: '-217.963'
@@ -3264,7 +3268,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 203.605
       as_published: '203.605'
@@ -3273,7 +3277,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.659
       as_published: '-2.659'
@@ -3291,7 +3295,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 40.947
       as_published: '40.947'
@@ -3300,7 +3304,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 342.096
       as_published: '342.096'
@@ -3309,7 +3313,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 305.919
       as_published: '305.919'
@@ -3318,7 +3322,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 148.324
       as_published: '148.324'
@@ -3327,7 +3331,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -219.904
       as_published: '-219.904'
@@ -3336,7 +3340,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 214.168
       as_published: '214.168'
@@ -3345,7 +3349,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.729
       as_published: '-2.729'
@@ -3363,7 +3367,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 41.096
       as_published: '41.096'
@@ -3372,7 +3376,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 343.085
       as_published: '343.085'
@@ -3381,7 +3385,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 306.793
       as_published: '306.793'
@@ -3390,7 +3394,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 152.427
       as_published: '152.427'
@@ -3399,7 +3403,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -221.907
       as_published: '-221.907'
@@ -3408,7 +3412,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 224.779
       as_published: '224.779'
@@ -3417,7 +3421,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.796
       as_published: '-2.796'
@@ -3435,7 +3439,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 41.25
       as_published: '41.250'
@@ -3444,7 +3448,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 344.053
       as_published: '344.053'
@@ -3453,7 +3457,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 307.648
       as_published: '307.648'
@@ -3462,7 +3466,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 156.544
       as_published: '156.544'
@@ -3471,7 +3475,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -223.966
       as_published: '-223.966'
@@ -3480,7 +3484,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 235.439
       as_published: '235.439'
@@ -3489,7 +3493,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.86
       as_published: '-2.860'
@@ -3507,7 +3511,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 41.409
       as_published: '41.409'
@@ -3516,7 +3520,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 345.003
       as_published: '345.003'
@@ -3525,7 +3529,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 308.486
       as_published: '308.486'
@@ -3534,7 +3538,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 160.677
       as_published: '160.677'
@@ -3543,7 +3547,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -226.076
       as_published: '-226.076'
@@ -3552,7 +3556,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 246.147
       as_published: '246.147'
@@ -3561,7 +3565,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.922
       as_published: '-2.922'
@@ -3579,7 +3583,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 41.572
       as_published: '41.572'
@@ -3588,7 +3592,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 345.936
       as_published: '345.936'
@@ -3597,7 +3601,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 309.308
       as_published: '309.308'
@@ -3606,7 +3610,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 164.826
       as_published: '164.826'
@@ -3615,7 +3619,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -228.231
       as_published: '-228.231'
@@ -3624,7 +3628,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 256.904
       as_published: '256.904'
@@ -3633,7 +3637,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -2.982
       as_published: '-2.982'
@@ -3651,7 +3655,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 41.74
       as_published: '41.740'
@@ -3660,7 +3664,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 346.851
       as_published: '346.851'
@@ -3669,7 +3673,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 310.114
       as_published: '310.114'
@@ -3678,7 +3682,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 168.991
       as_published: '168.991'
@@ -3687,7 +3691,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -230.426
       as_published: '-230.426'
@@ -3696,7 +3700,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 267.709
       as_published: '267.709'
@@ -3705,7 +3709,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.04
       as_published: '-3.040'
@@ -3723,7 +3727,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 41.913
       as_published: '41.913'
@@ -3732,7 +3736,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 347.751
       as_published: '347.751'
@@ -3741,7 +3745,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 310.905
       as_published: '310.905'
@@ -3750,7 +3754,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 173.174
       as_published: '173.174'
@@ -3759,7 +3763,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -232.656
       as_published: '-232.656'
@@ -3768,7 +3772,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 278.562
       as_published: '278.562'
@@ -3777,7 +3781,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.096
       as_published: '-3.096'
@@ -3795,7 +3799,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 42.089
       as_published: '42.089'
@@ -3804,7 +3808,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 348.635
       as_published: '348.635'
@@ -3813,7 +3817,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 311.682
       as_published: '311.682'
@@ -3822,7 +3826,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 177.374
       as_published: '177.374'
@@ -3831,7 +3835,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -234.916
       as_published: '-234.916'
@@ -3840,7 +3844,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 289.462
       as_published: '289.462'
@@ -3849,7 +3853,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.15
       as_published: '-3.150'
@@ -3867,7 +3871,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 42.27
       as_published: '42.270'
@@ -3876,7 +3880,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 349.505
       as_published: '349.505'
@@ -3885,7 +3889,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 312.445
       as_published: '312.445'
@@ -3894,7 +3898,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 181.592
       as_published: '181.592'
@@ -3903,7 +3907,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -237.201
       as_published: '-237.201'
@@ -3912,7 +3916,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 300.411
       as_published: '300.411'
@@ -3921,7 +3925,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '4900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.202
       as_published: '-3.202'
@@ -3939,7 +3943,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 42.454
       as_published: '42.454'
@@ -3948,7 +3952,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 350.361
       as_published: '350.361'
@@ -3957,7 +3961,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 313.195
       as_published: '313.195'
@@ -3966,7 +3970,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 185.828
       as_published: '185.828'
@@ -3975,7 +3979,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -239.509
       as_published: '-239.509'
@@ -3984,7 +3988,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 311.406
       as_published: '311.406'
@@ -3993,7 +3997,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.253
       as_published: '-3.253'
@@ -4011,7 +4015,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 42.641
       as_published: '42.641'
@@ -4020,7 +4024,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 351.203
       as_published: '351.203'
@@ -4029,7 +4033,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 313.932
       as_published: '313.932'
@@ -4038,7 +4042,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 190.083
       as_published: '190.083'
@@ -4047,7 +4051,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -241.833
       as_published: '-241.833'
@@ -4056,7 +4060,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 322.447
       as_published: '322.447'
@@ -4065,7 +4069,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.303
       as_published: '-3.303'
@@ -4083,7 +4087,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 42.831
       as_published: '42.831'
@@ -4092,7 +4096,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 352.033
       as_published: '352.033'
@@ -4101,7 +4105,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 314.657
       as_published: '314.657'
@@ -4110,7 +4114,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 194.356
       as_published: '194.356'
@@ -4119,7 +4123,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -244.172
       as_published: '-244.172'
@@ -4128,7 +4132,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 333.534
       as_published: '333.534'
@@ -4137,7 +4141,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.35
       as_published: '-3.350'
@@ -4155,7 +4159,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 43.023
       as_published: '43.023'
@@ -4164,7 +4168,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 352.851
       as_published: '352.851'
@@ -4173,7 +4177,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 315.37
       as_published: '315.370'
@@ -4182,7 +4186,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 198.649
       as_published: '198.649'
@@ -4191,7 +4195,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -246.521
       as_published: '-246.521'
@@ -4200,7 +4204,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 344.666
       as_published: '344.666'
@@ -4209,7 +4213,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.397
       as_published: '-3.397'
@@ -4227,7 +4231,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 43.218
       as_published: '43.218'
@@ -4236,7 +4240,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 353.657
       as_published: '353.657'
@@ -4245,7 +4249,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 316.071
       as_published: '316.071'
@@ -4254,7 +4258,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 202.961
       as_published: '202.961'
@@ -4263,7 +4267,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -248.878
       as_published: '-248.878'
@@ -4272,7 +4276,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 355.843
       as_published: '355.843'
@@ -4281,7 +4285,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.442
       as_published: '-3.442'
@@ -4299,7 +4303,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 43.414
       as_published: '43.414'
@@ -4308,7 +4312,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 354.452
       as_published: '354.452'
@@ -4317,7 +4321,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 316.762
       as_published: '316.762'
@@ -4326,7 +4330,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 207.293
       as_published: '207.293'
@@ -4335,7 +4339,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -251.24
       as_published: '-251.240'
@@ -4344,7 +4348,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 367.063
       as_published: '367.063'
@@ -4353,7 +4357,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.486
       as_published: '-3.486'
@@ -4371,7 +4375,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 43.612
       as_published: '43.612'
@@ -4380,7 +4384,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 355.236
       as_published: '355.236'
@@ -4389,7 +4393,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 317.442
       as_published: '317.442'
@@ -4398,7 +4402,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 211.644
       as_published: '211.644'
@@ -4407,7 +4411,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -253.606
       as_published: '-253.606'
@@ -4416,7 +4420,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 378.326
       as_published: '378.326'
@@ -4425,7 +4429,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.529
       as_published: '-3.529'
@@ -4443,7 +4447,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 43.811
       as_published: '43.811'
@@ -4452,7 +4456,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 356.009
       as_published: '356.009'
@@ -4461,7 +4465,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 318.112
       as_published: '318.112'
@@ -4470,7 +4474,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 216.015
       as_published: '216.015'
@@ -4479,7 +4483,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -255.973
       as_published: '-255.973'
@@ -4488,7 +4492,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 389.632
       as_published: '389.632'
@@ -4497,7 +4501,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.571
       as_published: '-3.571'
@@ -4515,7 +4519,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 44.012
       as_published: '44.012'
@@ -4524,7 +4528,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 356.773
       as_published: '356.773'
@@ -4533,7 +4537,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 318.772
       as_published: '318.772'
@@ -4542,7 +4546,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 220.406
       as_published: '220.406'
@@ -4551,7 +4555,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -258.341
       as_published: '-258.341'
@@ -4560,7 +4564,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 400.979
       as_published: '400.979'
@@ -4569,7 +4573,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.611
       as_published: '-3.611'
@@ -4587,7 +4591,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 44.212
       as_published: '44.212'
@@ -4596,7 +4600,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 357.527
       as_published: '357.527'
@@ -4605,7 +4609,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 319.422
       as_published: '319.422'
@@ -4614,7 +4618,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 224.817
       as_published: '224.817'
@@ -4623,7 +4627,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -260.709
       as_published: '-260.709'
@@ -4632,7 +4636,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 412.367
       as_published: '412.367'
@@ -4641,7 +4645,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '5900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.651
       as_published: '-3.651'
@@ -4659,7 +4663,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '6000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 44.414
       as_published: '44.414'
@@ -4668,7 +4672,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '6000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 358.272
       as_published: '358.272'
@@ -4677,7 +4681,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '6000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 320.064
       as_published: '320.064'
@@ -4686,7 +4690,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '6000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 229.249
       as_published: '229.249'
@@ -4695,7 +4699,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '6000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -263.075
       as_published: '-263.075'
@@ -4704,7 +4708,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '6000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 423.795
       as_published: '423.795'
@@ -4713,7 +4717,7 @@ table:
         url: https://janaf.nist.gov/tables/Cu-018.html
         download_url: https://janaf.nist.gov/tables/Cu-018.txt
         row_temperature_as_published: '6000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -3.689
       as_published: '-3.689'

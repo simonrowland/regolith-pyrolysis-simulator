@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Br-034.html
   download_url: https://janaf.nist.gov/tables/Br-034.txt
   index_entry:
-    formula: "SrBr"
-    formula_as_published: "SrBr"
-    formula_normalised: "SrBr"
-    name: "Strontium Bromide"
-    state: "g"
+    formula: SrBr
+    formula_as_published: SrBr
+    formula_normalised: SrBr
+    name: Strontium Bromide
+    state: g
+    charge: 0
   title_as_published: Strontium Bromide (SrBr)  |  Br1Sr1(g)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -4723,4 +4724,8 @@ table:
         download_url: https://janaf.nist.gov/tables/Br-034.txt
         row_temperature_as_published: '6000'
         column: log Kf
-  parse_ambiguities: []
+  parse_ambiguities:
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 91888d86509053a09b7349d1714aae18edd0ffe6275ae13dc71e2fff40282abf

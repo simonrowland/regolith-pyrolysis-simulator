@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/I-054.html
   download_url: https://janaf.nist.gov/tables/I-054.txt
   index_entry:
-    formula: "TiI3"
-    formula_as_published: "TiI3"
-    formula_normalised: "TiI3"
-    name: "Titanium Iodide"
-    state: "cr"
+    formula: TiI3
+    formula_as_published: TiI3
+    formula_normalised: TiI3
+    name: Titanium Iodide
+    state: cr
+    charge: 0
   title_as_published: Titanium Iodide (TiI3)  |  I3Ti1(cr)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -1267,4 +1268,8 @@ table:
         download_url: https://janaf.nist.gov/tables/I-054.txt
         row_temperature_as_published: '1500'
         column: log Kf
-  parse_ambiguities: []
+  parse_ambiguities:
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 48b142fe7b6cbf35d453e3e229e614a3f3c71712f37d80a62a4a8394bab1bb3e

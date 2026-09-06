@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/I-026.html
   download_url: https://janaf.nist.gov/tables/I-026.txt
   index_entry:
-    formula: "I2"
-    formula_as_published: "I2"
-    formula_normalised: "I2"
-    name: "Iodine"
-    state: "cr,l"
+    formula: I2
+    formula_as_published: I2
+    formula_normalised: I2
+    name: Iodine
+    state: cr,l
+    charge: 0
   title_as_published: Iodine (I2)  |  I2(cr,l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -1076,3 +1077,7 @@ table:
     locator:
       table_id: I-026
       url: https://janaf.nist.gov/tables/I-026.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: f65fedac4c8251389688a7c571c21457a3c625758fdd8786cb61456883548da6

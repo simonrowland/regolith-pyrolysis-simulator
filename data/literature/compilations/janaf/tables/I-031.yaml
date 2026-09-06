@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/I-031.html
   download_url: https://janaf.nist.gov/tables/I-031.txt
   index_entry:
-    formula: "MgI2"
-    formula_as_published: "MgI2"
-    formula_normalised: "MgI2"
-    name: "Magnesium Iodide"
-    state: "l"
+    formula: MgI2
+    formula_as_published: MgI2
+    formula_normalised: MgI2
+    name: Magnesium Iodide
+    state: l
+    charge: 0
   title_as_published: Magnesium Iodide (MgI2)  |  I2Mg1(l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -1580,3 +1581,7 @@ table:
     locator:
       table_id: I-031
       url: https://janaf.nist.gov/tables/I-031.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 8b61a9a45ef342c0e7db63c1301447bd94609ca4b3223dcb55da24395de53bc6

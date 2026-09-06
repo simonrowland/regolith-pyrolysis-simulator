@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/I-016.html
   download_url: https://janaf.nist.gov/tables/I-016.txt
   index_entry:
-    formula: "NaI"
-    formula_as_published: "NaI"
-    formula_normalised: "NaI"
-    name: "Sodium Iodide"
-    state: "l"
+    formula: NaI
+    formula_as_published: NaI
+    formula_normalised: NaI
+    name: Sodium Iodide
+    state: l
+    charge: 0
   title_as_published: Sodium Iodide (NaI)  |  I1Na1(l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -2300,3 +2301,7 @@ table:
     locator:
       table_id: I-016
       url: https://janaf.nist.gov/tables/I-016.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 33bb9c7654692ee18d749498abba32ea071b89692c919e529d882b4a19ceeca8

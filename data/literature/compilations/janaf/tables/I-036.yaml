@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/I-036.html
   download_url: https://janaf.nist.gov/tables/I-036.txt
   index_entry:
-    formula: "PbI2"
-    formula_as_published: "PbI2"
-    formula_normalised: "PbI2"
-    name: "Lead Iodide"
-    state: "cr"
+    formula: PbI2
+    formula_as_published: PbI2
+    formula_normalised: PbI2
+    name: Lead Iodide
+    state: cr
+    charge: 0
   title_as_published: Lead Iodide (PbI2)  |  I2Pb1(cr)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -848,3 +849,7 @@ table:
     locator:
       table_id: I-036
       url: https://janaf.nist.gov/tables/I-036.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 8d92bfaef540dd3985f787758f2de66e0a0613000c383eece202f93a4d295a1b

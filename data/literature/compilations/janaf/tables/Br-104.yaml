@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Br-104.html
   download_url: https://janaf.nist.gov/tables/Br-104.txt
   index_entry:
-    formula: "NbBr5"
-    formula_as_published: "NbBr5"
-    formula_normalised: "NbBr5"
-    name: "Niobium Bromide"
-    state: "cr"
+    formula: NbBr5
+    formula_as_published: NbBr5
+    formula_normalised: NbBr5
+    name: Niobium Bromide
+    state: cr
+    charge: 0
   title_as_published: Niobium Bromide (NbBr5)  |  Br5Nb1(cr)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -776,3 +777,7 @@ table:
     locator:
       table_id: Br-104
       url: https://janaf.nist.gov/tables/Br-104.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: a442843bcb35384a51244b3e1e7fab7ec0d3ea0a29fd91d250d4e32882c2496e

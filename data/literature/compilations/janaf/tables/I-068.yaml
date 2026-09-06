@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/I-068.html
   download_url: https://janaf.nist.gov/tables/I-068.txt
   index_entry:
-    formula: "TiI4"
-    formula_as_published: "TiI4"
-    formula_normalised: "TiI4"
-    name: "Titanium Iodide"
-    state: "g"
+    formula: TiI4
+    formula_as_published: TiI4
+    formula_normalised: TiI4
+    name: Titanium Iodide
+    state: g
+    charge: 0
   title_as_published: Titanium Iodide (TiI4)  |  I4Ti1(g)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -4723,4 +4724,8 @@ table:
         download_url: https://janaf.nist.gov/tables/I-068.txt
         row_temperature_as_published: '6000'
         column: log Kf
-  parse_ambiguities: []
+  parse_ambiguities:
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 36eb6949045bfa2eb8f57e149aec49cdaab2a76f3433706a4d75a626e42f1110

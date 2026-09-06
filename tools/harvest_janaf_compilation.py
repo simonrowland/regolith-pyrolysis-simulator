@@ -30,6 +30,7 @@ from simulator.reference_data.janaf import (  # noqa: E402
     NON_STOICHIOMETRIC_TABLES,
     NON_STOICH_AMBIGUITY_REASON,
     SCHEMA_VERSION,
+    formula_composition,
     formula_elements,
     formula_normalised,
     parse_janaf_txt,
@@ -239,7 +240,6 @@ def parse_element_index(payload: bytes, element: str) -> list[dict[str, Any]]:
         entries.append(
             attach_table_identity(
                 {
-                    "formula_label": element,
                     "name": "",
                     "index_element": element,
                 },
@@ -307,7 +307,7 @@ def _title_formula_and_state(title_lines: list[str]) -> tuple[str, str, str]:
         if state_match:
             state = state_match.group(1)
             hill = right[: state_match.start()]
-            if not published:
+            if not published or formula_composition(published) != formula_composition(hill):
                 published = hill
     return name, published, state
 
@@ -323,19 +323,9 @@ def parse_table(payload: bytes, entry: dict[str, Any], cache_path: Path) -> dict
         download_url=str(entry["download_url"]),
     )
     name, title_formula, state = _title_formula_and_state(parsed.title_lines)
-    if table_id in NON_STOICHIOMETRIC_TABLES:
-        formula_as_published = NON_STOICHIOMETRIC_TABLES[table_id]["formula_as_published"]
-    else:
-        formula_as_published = str(
-            entry.get("formula_label") or title_formula or entry.get("formula") or ""
-        )
-        if title_formula and (
-            any(char in title_formula for char in ".+-")
-            and not any(char in formula_as_published for char in ".+-")
-        ):
-            formula_as_published = title_formula
-    if not formula_as_published:
-        raise ValueError(f"{table_id}: missing printed formula")
+    formula_as_published = title_formula
+    if not formula_as_published or formula_composition(formula_as_published) is None:
+        raise ValueError(f"{table_id}: unparseable printed header formula {title_formula!r}")
     normalised = formula_normalised(formula_as_published)
     ambiguities = list(parsed.parse_ambiguities)
     if table_id in NON_STOICHIOMETRIC_TABLES:
@@ -358,6 +348,7 @@ def parse_table(payload: bytes, entry: dict[str, Any], cache_path: Path) -> dict
         "formula": formula_as_published,
         "formula_as_published": formula_as_published,
         "formula_normalised": normalised,
+        "charge": 1 if formula_as_published.endswith("+") else -1 if formula_as_published.endswith("-") else 0,
         "name": name or entry.get("name") or "",
         "state": state or entry.get("state") or "not_parsed",
     }

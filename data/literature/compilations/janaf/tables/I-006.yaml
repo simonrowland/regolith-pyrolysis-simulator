@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/I-006.html
   download_url: https://janaf.nist.gov/tables/I-006.txt
   index_entry:
-    formula: "KI"
-    formula_as_published: "KI"
-    formula_normalised: "KI"
-    name: "Potassium Iodide"
-    state: "cr,l"
+    formula: KI
+    formula_as_published: KI
+    formula_normalised: KI
+    name: Potassium Iodide
+    state: cr,l
+    charge: 0
   title_as_published: Potassium Iodide (KI)  |  I1K1(cr,l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -2000,3 +2001,7 @@ table:
     locator:
       table_id: I-006
       url: https://janaf.nist.gov/tables/I-006.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 3cc053146b6b359ab668ddec288e34bdfb30add1b3b3cc8054cf1c8e39fe9ca1

@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/I-030.html
   download_url: https://janaf.nist.gov/tables/I-030.txt
   index_entry:
-    formula: "MgI2"
-    formula_as_published: "MgI2"
-    formula_normalised: "MgI2"
-    name: "Magnesium Iodide"
-    state: "cr"
+    formula: MgI2
+    formula_as_published: MgI2
+    formula_normalised: MgI2
+    name: Magnesium Iodide
+    state: cr
+    charge: 0
   title_as_published: Magnesium Iodide (MgI2)  |  I2Mg1(cr)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -1208,3 +1209,7 @@ table:
     locator:
       table_id: I-030
       url: https://janaf.nist.gov/tables/I-030.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: b3f66df3eb74c884510272f281265773df262430ef9c95a568b0b5620a9f8f02

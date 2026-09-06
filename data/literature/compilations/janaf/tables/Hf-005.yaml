@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Hf-005.html
   download_url: https://janaf.nist.gov/tables/Hf-005.txt
   index_entry:
-    formula: "Hf"
-    formula_as_published: "Hf"
-    formula_normalised: "Hf"
-    name: "Hafnium"
-    state: "cr,l"
+    formula: Hf
+    formula_as_published: Hf
+    formula_normalised: Hf
+    name: Hafnium
+    state: cr,l
+    charge: 0
   title_as_published: Hafnium (Hf)  |  Hf1(cr,l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -4328,3 +4329,7 @@ table:
     locator:
       table_id: Hf-005
       url: https://janaf.nist.gov/tables/Hf-005.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 9f2bc40903b0b89b3bdfd626e598ea5acefe8d4764abb33e1742e9735574e051

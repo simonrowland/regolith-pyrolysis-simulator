@@ -6,6 +6,9 @@ source:
   doi: 10.18434/T42S31
   url: https://janaf.nist.gov/
   last_data_update: 1998
+  licence: 'Quoted from NIST SRD 13 (https://data.nist.gov/od/id/ECBCC1C1301D2ED9E04306570681B10735): "These data are public."
+    Quoted from https://www.nist.gov/copyrights-disclaimers: "With the exception of material marked as copyrighted, information
+    presented on NIST sites are considered public information and may be distributed or copied."'
 compilation_role:
   kind: assessed_thermodynamic_functions
   engine_reference_input: true
@@ -18,7 +21,7 @@ extraction:
   date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
-  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/Mo-017.txt
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Mo/Mo-017.txt
   source_sha256: b4e90f01ef0ee97eea98bed1d641b8bf95023821001c68b5e7c61d06e2c04767
   review_status: machine_transcribed_unreviewed
 table:
@@ -26,11 +29,12 @@ table:
   url: https://janaf.nist.gov/tables/Mo-017.html
   download_url: https://janaf.nist.gov/tables/Mo-017.txt
   index_entry:
-    formula: "MoO3"
-    formula_as_published: "MoO3"
-    formula_normalised: "MoO3"
-    name: "Molybdenum Oxide"
-    state: "g"
+    formula: MoO3
+    formula_as_published: MoO3
+    formula_normalised: MoO3
+    charge: 0
+    name: Molybdenum Oxide
+    state: g
   title_as_published: Molybdenum Oxide (MoO3)  |  Mo1O3(g)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -51,7 +55,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '0'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 0.0
       as_published: '0.'
@@ -60,7 +64,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '0'
-        column: Cp°
+        column: Cp
     entropy:
       value: 0.0
       as_published: '0.'
@@ -69,7 +73,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '0'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: null
       as_published: INFINITE
@@ -78,7 +82,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '0'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -13.399
       as_published: '-13.399'
@@ -87,7 +91,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '0'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -342.225
       as_published: '-342.225'
@@ -96,7 +100,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '0'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -342.225
       as_published: '-342.225'
@@ -105,7 +109,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '0'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: null
       as_published: INFINITE
@@ -123,7 +127,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 38.694
       as_published: '38.694'
@@ -132,7 +136,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 231.037
       as_published: '231.037'
@@ -141,7 +145,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 330.596
       as_published: '330.596'
@@ -150,7 +154,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -9.956
       as_published: '-9.956'
@@ -159,7 +163,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -343.63
       as_published: '-343.630'
@@ -168,7 +172,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -340.035
       as_published: '-340.035'
@@ -177,7 +181,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 177.616
       as_published: '177.616'
@@ -195,7 +199,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 50.906
       as_published: '50.906'
@@ -204,7 +208,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 261.923
       as_published: '261.923'
@@ -213,7 +217,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 289.07
       as_published: '289.070'
@@ -222,7 +226,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -5.429
       as_published: '-5.429'
@@ -231,7 +235,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -345.312
       as_published: '-345.312'
@@ -240,7 +244,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -335.755
       as_published: '-335.755'
@@ -249,7 +253,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 87.69
       as_published: '87.690'
@@ -267,7 +271,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '250'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 55.482
       as_published: '55.482'
@@ -276,7 +280,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '250'
-        column: Cp°
+        column: Cp
     entropy:
       value: 273.785
       as_published: '273.785'
@@ -285,7 +289,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '250'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 284.854
       as_published: '284.854'
@@ -294,7 +298,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '250'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: -2.767
       as_published: '-2.767'
@@ -303,7 +307,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '250'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -345.954
       as_published: '-345.954'
@@ -312,7 +316,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '250'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -333.289
       as_published: '-333.289'
@@ -321,7 +325,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '250'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 69.637
       as_published: '69.637'
@@ -339,7 +343,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '298.15'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 59.378
       as_published: '59.378'
@@ -348,7 +352,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '298.15'
-        column: Cp°
+        column: Cp
     entropy:
       value: 283.897
       as_published: '283.897'
@@ -357,7 +361,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '298.15'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 283.897
       as_published: '283.897'
@@ -366,7 +370,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '298.15'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 0.0
       as_published: '0.'
@@ -375,7 +379,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '298.15'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -346.435
       as_published: '-346.435'
@@ -384,7 +388,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '298.15'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -330.804
       as_published: '-330.804'
@@ -393,7 +397,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '298.15'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 57.955
       as_published: '57.955'
@@ -411,7 +415,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 59.518
       as_published: '59.518'
@@ -420,7 +424,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 284.265
       as_published: '284.265'
@@ -429,7 +433,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 283.899
       as_published: '283.899'
@@ -438,7 +442,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 0.11
       as_published: '0.110'
@@ -447,7 +451,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -346.451
       as_published: '-346.451'
@@ -456,7 +460,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -330.707
       as_published: '-330.707'
@@ -465,7 +469,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 57.581
       as_published: '57.581'
@@ -483,7 +487,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '350'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 63.017
       as_published: '63.017'
@@ -492,7 +496,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '350'
-        column: Cp°
+        column: Cp
     entropy:
       value: 293.71
       as_published: '293.710'
@@ -501,7 +505,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '350'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 284.637
       as_published: '284.637'
@@ -510,7 +514,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '350'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 3.176
       as_published: '3.176'
@@ -519,7 +523,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '350'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -346.814
       as_published: '-346.814'
@@ -528,7 +532,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '350'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -328.052
       as_published: '-328.052'
@@ -537,7 +541,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '350'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 48.959
       as_published: '48.959'
@@ -555,7 +559,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 65.979
       as_published: '65.979'
@@ -564,7 +568,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 302.324
       as_published: '302.324'
@@ -573,7 +577,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 286.317
       as_published: '286.317'
@@ -582,7 +586,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 6.403
       as_published: '6.403'
@@ -591,7 +595,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -347.071
       as_published: '-347.071'
@@ -600,7 +604,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -325.353
       as_published: '-325.353'
@@ -609,7 +613,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 42.487
       as_published: '42.487'
@@ -627,7 +631,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '450'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 68.449
       as_published: '68.449'
@@ -636,7 +640,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '450'
-        column: Cp°
+        column: Cp
     entropy:
       value: 310.242
       as_published: '310.242'
@@ -645,7 +649,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '450'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 288.541
       as_published: '288.541'
@@ -654,7 +658,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '450'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 9.765
       as_published: '9.765'
@@ -663,7 +667,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '450'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -347.249
       as_published: '-347.249'
@@ -672,7 +676,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '450'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -322.627
       as_published: '-322.627'
@@ -681,7 +685,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '450'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 37.45
       as_published: '37.450'
@@ -699,7 +703,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 70.494
       as_published: '70.494'
@@ -708,7 +712,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 317.563
       as_published: '317.563'
@@ -717,7 +721,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 291.082
       as_published: '291.082'
@@ -726,7 +730,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 13.241
       as_published: '13.241'
@@ -735,7 +739,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -347.37
       as_published: '-347.370'
@@ -744,7 +748,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -319.885
       as_published: '-319.885'
@@ -753,7 +757,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 33.418
       as_published: '33.418'
@@ -771,7 +775,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 73.589
       as_published: '73.589'
@@ -780,7 +784,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 330.707
       as_published: '330.707'
@@ -789,7 +793,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 296.616
       as_published: '296.616'
@@ -798,7 +802,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 20.454
       as_published: '20.454'
@@ -807,7 +811,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -347.512
       as_published: '-347.512'
@@ -816,7 +820,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -314.373
       as_published: '-314.373'
@@ -825,7 +829,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 27.369
       as_published: '27.369'
@@ -843,7 +847,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 75.738
       as_published: '75.738'
@@ -852,7 +856,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 342.222
       as_published: '342.222'
@@ -861,7 +865,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 302.326
       as_published: '302.326'
@@ -870,7 +874,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 27.927
       as_published: '27.927'
@@ -879,7 +883,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -347.594
       as_published: '-347.594'
@@ -888,7 +892,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -308.842
       as_published: '-308.842'
@@ -897,7 +901,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 23.046
       as_published: '23.046'
@@ -915,7 +919,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 77.266
       as_published: '77.266'
@@ -924,7 +928,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 352.44
       as_published: '352.440'
@@ -933,7 +937,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 307.964
       as_published: '307.964'
@@ -942,7 +946,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 35.581
       as_published: '35.581'
@@ -951,7 +955,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -347.666
       as_published: '-347.666'
@@ -960,7 +964,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -303.302
       as_published: '-303.302'
@@ -969,7 +973,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 19.804
       as_published: '19.804'
@@ -987,7 +991,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 78.381
       as_published: '78.381'
@@ -996,7 +1000,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 361.609
       as_published: '361.609'
@@ -1005,7 +1009,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 313.424
       as_published: '313.424'
@@ -1014,7 +1018,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 43.366
       as_published: '43.366'
@@ -1023,7 +1027,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -347.756
       as_published: '-347.756'
@@ -1032,7 +1036,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -297.751
       as_published: '-297.751'
@@ -1041,7 +1045,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 17.281
       as_published: '17.281'
@@ -1059,7 +1063,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 79.214
       as_published: '79.214'
@@ -1068,7 +1072,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 369.912
       as_published: '369.912'
@@ -1077,7 +1081,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 318.664
       as_published: '318.664'
@@ -1086,7 +1090,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 51.248
       as_published: '51.248'
@@ -1095,7 +1099,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -347.88
       as_published: '-347.880'
@@ -1104,7 +1108,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -292.189
       as_published: '-292.189'
@@ -1113,7 +1117,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 15.262
       as_published: '15.262'
@@ -1131,7 +1135,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 79.851
       as_published: '79.851'
@@ -1140,7 +1144,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 377.493
       as_published: '377.493'
@@ -1149,7 +1153,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 323.672
       as_published: '323.672'
@@ -1158,7 +1162,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 59.203
       as_published: '59.203'
@@ -1167,7 +1171,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -348.051
       as_published: '-348.051'
@@ -1176,7 +1180,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -286.612
       as_published: '-286.612'
@@ -1185,7 +1189,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 13.61
       as_published: '13.610'
@@ -1203,7 +1207,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 80.348
       as_published: '80.348'
@@ -1212,7 +1216,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 384.463
       as_published: '384.463'
@@ -1221,7 +1225,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 328.452
       as_published: '328.452'
@@ -1230,7 +1234,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 67.214
       as_published: '67.214'
@@ -1239,7 +1243,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -348.282
       as_published: '-348.282'
@@ -1248,7 +1252,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -281.017
       as_published: '-281.017'
@@ -1257,7 +1261,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 12.232
       as_published: '12.232'
@@ -1275,7 +1279,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 80.742
       as_published: '80.742'
@@ -1284,7 +1288,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 390.911
       as_published: '390.911'
@@ -1293,7 +1297,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 333.011
       as_published: '333.011'
@@ -1302,7 +1306,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 75.269
       as_published: '75.269'
@@ -1311,7 +1315,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -348.582
       as_published: '-348.582'
@@ -1320,7 +1324,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -275.4
       as_published: '-275.400'
@@ -1329,7 +1333,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 11.066
       as_published: '11.066'
@@ -1347,7 +1351,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 81.059
       as_published: '81.059'
@@ -1356,7 +1360,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 396.906
       as_published: '396.906'
@@ -1365,7 +1369,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 337.364
       as_published: '337.364'
@@ -1374,7 +1378,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 83.359
       as_published: '83.359'
@@ -1383,7 +1387,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -348.962
       as_published: '-348.962'
@@ -1392,7 +1396,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -269.756
       as_published: '-269.756'
@@ -1401,7 +1405,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 10.065
       as_published: '10.065'
@@ -1419,7 +1423,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 81.318
       as_published: '81.318'
@@ -1428,7 +1432,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 402.508
       as_published: '402.508'
@@ -1437,7 +1441,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 341.522
       as_published: '341.522'
@@ -1446,7 +1450,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 91.479
       as_published: '91.479'
@@ -1455,7 +1459,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -349.43
       as_published: '-349.430'
@@ -1464,7 +1468,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -264.083
       as_published: '-264.083'
@@ -1473,7 +1477,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 9.196
       as_published: '9.196'
@@ -1491,7 +1495,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 81.532
       as_published: '81.532'
@@ -1500,7 +1504,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 407.763
       as_published: '407.763'
@@ -1509,7 +1513,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 345.5
       as_published: '345.500'
@@ -1518,7 +1522,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 99.622
       as_published: '99.622'
@@ -1527,7 +1531,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -349.995
       as_published: '-349.995'
@@ -1536,7 +1540,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -258.376
       as_published: '-258.376'
@@ -1545,7 +1549,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 8.435
       as_published: '8.435'
@@ -1563,7 +1567,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 81.711
       as_published: '81.711'
@@ -1572,7 +1576,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 412.711
       as_published: '412.711'
@@ -1581,7 +1585,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 349.309
       as_published: '349.309'
@@ -1590,7 +1594,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 107.784
       as_published: '107.784'
@@ -1599,7 +1603,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -350.665
       as_published: '-350.665'
@@ -1608,7 +1612,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -252.629
       as_published: '-252.629'
@@ -1617,7 +1621,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 7.762
       as_published: '7.762'
@@ -1635,7 +1639,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 81.862
       as_published: '81.862'
@@ -1644,7 +1648,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 417.386
       as_published: '417.386'
@@ -1653,7 +1657,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 352.962
       as_published: '352.962'
@@ -1662,7 +1666,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 115.963
       as_published: '115.963'
@@ -1671,7 +1675,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -351.452
       as_published: '-351.452'
@@ -1680,7 +1684,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -246.841
       as_published: '-246.841'
@@ -1689,7 +1693,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 7.163
       as_published: '7.163'
@@ -1707,7 +1711,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 81.99
       as_published: '81.990'
@@ -1716,7 +1720,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 421.816
       as_published: '421.816'
@@ -1725,7 +1729,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 356.471
       as_published: '356.471'
@@ -1734,7 +1738,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 124.156
       as_published: '124.156'
@@ -1743,7 +1747,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -352.363
       as_published: '-352.363'
@@ -1752,7 +1756,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -241.005
       as_published: '-241.005'
@@ -1761,7 +1765,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '1900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 6.626
       as_published: '6.626'
@@ -1779,7 +1783,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.1
       as_published: '82.100'
@@ -1788,7 +1792,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 426.024
       as_published: '426.024'
@@ -1797,7 +1801,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 359.844
       as_published: '359.844'
@@ -1806,7 +1810,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 132.36
       as_published: '132.360'
@@ -1815,7 +1819,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -353.408
       as_published: '-353.408'
@@ -1824,7 +1828,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -235.117
       as_published: '-235.117'
@@ -1833,7 +1837,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 6.141
       as_published: '6.141'
@@ -1851,7 +1855,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.196
       as_published: '82.196'
@@ -1860,7 +1864,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 430.032
       as_published: '430.032'
@@ -1869,7 +1873,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 363.092
       as_published: '363.092'
@@ -1878,7 +1882,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 140.575
       as_published: '140.575'
@@ -1887,7 +1891,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -354.598
       as_published: '-354.598'
@@ -1896,7 +1900,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -229.174
       as_published: '-229.174'
@@ -1905,7 +1909,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 5.7
       as_published: '5.700'
@@ -1923,7 +1927,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.278
       as_published: '82.278'
@@ -1932,7 +1936,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 433.858
       as_published: '433.858'
@@ -1941,7 +1945,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 366.222
       as_published: '366.222'
@@ -1950,7 +1954,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 148.799
       as_published: '148.799'
@@ -1959,7 +1963,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -355.942
       as_published: '-355.942'
@@ -1968,7 +1972,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -223.17
       as_published: '-223.170'
@@ -1977,7 +1981,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 5.299
       as_published: '5.299'
@@ -1995,7 +1999,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.351
       as_published: '82.351'
@@ -2004,7 +2008,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 437.517
       as_published: '437.517'
@@ -2013,7 +2017,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 369.243
       as_published: '369.243'
@@ -2022,7 +2026,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 157.03
       as_published: '157.030'
@@ -2031,7 +2035,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -357.451
       as_published: '-357.451'
@@ -2040,7 +2044,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -217.102
       as_published: '-217.102'
@@ -2049,7 +2053,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 4.931
       as_published: '4.931'
@@ -2067,7 +2071,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.415
       as_published: '82.415'
@@ -2076,7 +2080,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 441.023
       as_published: '441.023'
@@ -2085,7 +2089,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 372.161
       as_published: '372.161'
@@ -2094,7 +2098,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 165.269
       as_published: '165.269'
@@ -2103,7 +2107,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -359.136
       as_published: '-359.136'
@@ -2112,7 +2116,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -210.965
       as_published: '-210.965'
@@ -2121,7 +2125,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 4.592
       as_published: '4.592'
@@ -2139,7 +2143,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.471
       as_published: '82.471'
@@ -2148,7 +2152,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 444.389
       as_published: '444.389'
@@ -2157,7 +2161,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 374.983
       as_published: '374.983'
@@ -2166,7 +2170,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 173.513
       as_published: '173.513'
@@ -2175,7 +2179,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -361.007
       as_published: '-361.007'
@@ -2184,7 +2188,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -204.754
       as_published: '-204.754'
@@ -2193,7 +2197,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 4.278
       as_published: '4.278'
@@ -2211,7 +2215,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.521
       as_published: '82.521'
@@ -2220,7 +2224,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 447.624
       as_published: '447.624'
@@ -2229,7 +2233,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 377.716
       as_published: '377.716'
@@ -2238,7 +2242,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 181.763
       as_published: '181.763'
@@ -2247,7 +2251,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -363.087
       as_published: '-363.087'
@@ -2256,7 +2260,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -198.463
       as_published: '-198.463'
@@ -2265,7 +2269,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 3.987
       as_published: '3.987'
@@ -2283,7 +2287,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.566
       as_published: '82.566'
@@ -2292,7 +2296,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 450.74
       as_published: '450.740'
@@ -2301,7 +2305,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 380.363
       as_published: '380.363'
@@ -2310,7 +2314,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 190.017
       as_published: '190.017'
@@ -2319,7 +2323,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -365.416
       as_published: '-365.416'
@@ -2328,7 +2332,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -192.088
       as_published: '-192.088'
@@ -2337,7 +2341,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 3.716
       as_published: '3.716'
@@ -2355,7 +2359,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.606
       as_published: '82.606'
@@ -2364,7 +2368,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 453.743
       as_published: '453.743'
@@ -2373,7 +2377,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 382.93
       as_published: '382.930'
@@ -2382,7 +2386,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 198.276
       as_published: '198.276'
@@ -2391,7 +2395,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -368.055
       as_published: '-368.055'
@@ -2400,7 +2404,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -185.621
       as_published: '-185.621'
@@ -2409,7 +2413,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 3.463
       as_published: '3.463'
@@ -2427,7 +2431,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.642
       as_published: '82.642'
@@ -2436,7 +2440,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 456.642
       as_published: '456.642'
@@ -2445,7 +2449,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 385.422
       as_published: '385.422'
@@ -2454,7 +2458,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 206.538
       as_published: '206.538'
@@ -2463,7 +2467,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -406.969
       as_published: '-406.969'
@@ -2472,7 +2476,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -179.005
       as_published: '-179.005'
@@ -2481,7 +2485,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '2900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 3.224
       as_published: '3.224'
@@ -2499,7 +2503,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.675
       as_published: '82.675'
@@ -2508,7 +2512,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 459.445
       as_published: '459.445'
@@ -2517,7 +2521,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 387.843
       as_published: '387.843'
@@ -2526,7 +2530,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 214.804
       as_published: '214.804'
@@ -2535,7 +2539,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -408.435
       as_published: '-408.435'
@@ -2544,7 +2548,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -171.118
       as_published: '-171.118'
@@ -2553,7 +2557,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 2.979
       as_published: '2.979'
@@ -2571,7 +2575,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.704
       as_published: '82.704'
@@ -2580,7 +2584,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 462.156
       as_published: '462.156'
@@ -2589,7 +2593,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 390.197
       as_published: '390.197'
@@ -2598,7 +2602,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 223.073
       as_published: '223.073'
@@ -2607,7 +2611,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -409.925
       as_published: '-409.925'
@@ -2616,7 +2620,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -163.183
       as_published: '-163.183'
@@ -2625,7 +2629,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 2.75
       as_published: '2.750'
@@ -2643,7 +2647,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.731
       as_published: '82.731'
@@ -2652,7 +2656,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 464.782
       as_published: '464.782'
@@ -2661,7 +2665,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 392.487
       as_published: '392.487'
@@ -2670,7 +2674,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 231.345
       as_published: '231.345'
@@ -2679,7 +2683,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -411.439
       as_published: '-411.439'
@@ -2688,7 +2692,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -155.2
       as_published: '-155.200'
@@ -2697,7 +2701,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 2.533
       as_published: '2.533'
@@ -2715,7 +2719,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.756
       as_published: '82.756'
@@ -2724,7 +2728,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 467.328
       as_published: '467.328'
@@ -2733,7 +2737,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 394.716
       as_published: '394.716'
@@ -2742,7 +2746,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 239.619
       as_published: '239.619'
@@ -2751,7 +2755,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -412.977
       as_published: '-412.977'
@@ -2760,7 +2764,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -147.169
       as_published: '-147.169'
@@ -2769,7 +2773,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 2.329
       as_published: '2.329'
@@ -2787,7 +2791,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.778
       as_published: '82.778'
@@ -2796,7 +2800,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 469.799
       as_published: '469.799'
@@ -2805,7 +2809,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 396.889
       as_published: '396.889'
@@ -2814,7 +2818,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 247.896
       as_published: '247.896'
@@ -2823,7 +2827,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -414.537
       as_published: '-414.537'
@@ -2832,7 +2836,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -139.09
       as_published: '-139.090'
@@ -2841,7 +2845,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 2.137
       as_published: '2.137'
@@ -2859,7 +2863,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.798
       as_published: '82.798'
@@ -2868,7 +2872,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 472.199
       as_published: '472.199'
@@ -2877,7 +2881,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 399.006
       as_published: '399.006'
@@ -2886,7 +2890,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 256.175
       as_published: '256.175'
@@ -2895,7 +2899,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -416.12
       as_published: '-416.120'
@@ -2904,7 +2908,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -130.967
       as_published: '-130.967'
@@ -2913,7 +2917,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 1.955
       as_published: '1.955'
@@ -2931,7 +2935,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.817
       as_published: '82.817'
@@ -2940,7 +2944,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 474.532
       as_published: '474.532'
@@ -2949,7 +2953,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 401.072
       as_published: '401.072'
@@ -2958,7 +2962,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 264.456
       as_published: '264.456'
@@ -2967,7 +2971,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -417.724
       as_published: '-417.724'
@@ -2976,7 +2980,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -122.796
       as_published: '-122.796'
@@ -2985,7 +2989,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 1.782
       as_published: '1.782'
@@ -3003,7 +3007,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.835
       as_published: '82.835'
@@ -3012,7 +3016,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 476.801
       as_published: '476.801'
@@ -3021,7 +3025,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 403.088
       as_published: '403.088'
@@ -3030,7 +3034,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 272.738
       as_published: '272.738'
@@ -3039,7 +3043,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -419.348
       as_published: '-419.348'
@@ -3048,7 +3052,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -114.582
       as_published: '-114.582'
@@ -3057,7 +3061,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 1.618
       as_published: '1.618'
@@ -3075,7 +3079,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.851
       as_published: '82.851'
@@ -3084,7 +3088,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 479.01
       as_published: '479.010'
@@ -3093,7 +3097,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 405.057
       as_published: '405.057'
@@ -3102,7 +3106,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 281.023
       as_published: '281.023'
@@ -3111,7 +3115,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -420.992
       as_published: '-420.992'
@@ -3120,7 +3124,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -106.322
       as_published: '-106.322'
@@ -3129,7 +3133,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 1.462
       as_published: '1.462'
@@ -3147,7 +3151,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.865
       as_published: '82.865'
@@ -3156,7 +3160,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 481.163
       as_published: '481.163'
@@ -3165,7 +3169,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 406.981
       as_published: '406.981'
@@ -3174,7 +3178,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 289.308
       as_published: '289.308'
@@ -3183,7 +3187,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -422.655
       as_published: '-422.655'
@@ -3192,7 +3196,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -98.019
       as_published: '-98.019'
@@ -3201,7 +3205,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '3900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 1.313
       as_published: '1.313'
@@ -3219,7 +3223,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.879
       as_published: '82.879'
@@ -3228,7 +3232,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 483.261
       as_published: '483.261'
@@ -3237,7 +3241,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 408.862
       as_published: '408.862'
@@ -3246,7 +3250,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 297.596
       as_published: '297.596'
@@ -3255,7 +3259,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -424.337
       as_published: '-424.337'
@@ -3264,7 +3268,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -89.675
       as_published: '-89.675'
@@ -3273,7 +3277,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 1.171
       as_published: '1.171'
@@ -3291,7 +3295,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.892
       as_published: '82.892'
@@ -3300,7 +3304,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 485.308
       as_published: '485.308'
@@ -3309,7 +3313,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 410.702
       as_published: '410.702'
@@ -3318,7 +3322,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 305.884
       as_published: '305.884'
@@ -3327,7 +3331,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -426.037
       as_published: '-426.037'
@@ -3336,7 +3340,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -81.287
       as_published: '-81.287'
@@ -3345,7 +3349,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 1.036
       as_published: '1.036'
@@ -3363,7 +3367,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.904
       as_published: '82.904'
@@ -3372,7 +3376,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 487.305
       as_published: '487.305'
@@ -3381,7 +3385,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 412.502
       as_published: '412.502'
@@ -3390,7 +3394,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 314.174
       as_published: '314.174'
@@ -3399,7 +3403,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -427.754
       as_published: '-427.754'
@@ -3408,7 +3412,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -72.858
       as_published: '-72.858'
@@ -3417,7 +3421,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 0.906
       as_published: '0.906'
@@ -3435,7 +3439,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.915
       as_published: '82.915'
@@ -3444,7 +3448,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 489.256
       as_published: '489.256'
@@ -3453,7 +3457,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 414.264
       as_published: '414.264'
@@ -3462,7 +3466,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 322.465
       as_published: '322.465'
@@ -3471,7 +3475,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -429.489
       as_published: '-429.489'
@@ -3480,7 +3484,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -64.387
       as_published: '-64.387'
@@ -3489,7 +3493,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 0.782
       as_published: '0.782'
@@ -3507,7 +3511,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.925
       as_published: '82.925'
@@ -3516,7 +3520,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 491.162
       as_published: '491.162'
@@ -3525,7 +3529,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 415.99
       as_published: '415.990'
@@ -3534,7 +3538,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 330.757
       as_published: '330.757'
@@ -3543,7 +3547,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -431.242
       as_published: '-431.242'
@@ -3552,7 +3556,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -55.877
       as_published: '-55.877'
@@ -3561,7 +3565,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 0.663
       as_published: '0.663'
@@ -3579,7 +3583,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.934
       as_published: '82.934'
@@ -3588,7 +3592,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 493.026
       as_published: '493.026'
@@ -3597,7 +3601,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 417.682
       as_published: '417.682'
@@ -3606,7 +3610,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 339.05
       as_published: '339.050'
@@ -3615,7 +3619,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -433.011
       as_published: '-433.011'
@@ -3624,7 +3628,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -47.327
       as_published: '-47.327'
@@ -3633,7 +3637,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 0.549
       as_published: '0.549'
@@ -3651,7 +3655,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.943
       as_published: '82.943'
@@ -3660,7 +3664,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 494.849
       as_published: '494.849'
@@ -3669,7 +3673,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 419.339
       as_published: '419.339'
@@ -3678,7 +3682,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 347.344
       as_published: '347.344'
@@ -3687,7 +3691,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -434.798
       as_published: '-434.798'
@@ -3696,7 +3700,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -38.737
       as_published: '-38.737'
@@ -3705,7 +3709,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 0.44
       as_published: '0.440'
@@ -3723,7 +3727,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.952
       as_published: '82.952'
@@ -3732,7 +3736,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 496.633
       as_published: '496.633'
@@ -3741,7 +3745,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 420.965
       as_published: '420.965'
@@ -3750,7 +3754,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 355.639
       as_published: '355.639'
@@ -3759,7 +3763,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -436.603
       as_published: '-436.603'
@@ -3768,7 +3772,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -30.106
       as_published: '-30.106'
@@ -3777,7 +3781,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 0.335
       as_published: '0.335'
@@ -3795,7 +3799,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.96
       as_published: '82.960'
@@ -3804,7 +3808,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 498.379
       as_published: '498.379'
@@ -3813,7 +3817,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 422.56
       as_published: '422.560'
@@ -3822,7 +3826,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 363.934
       as_published: '363.934'
@@ -3831,7 +3835,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -438.426
       as_published: '-438.426'
@@ -3840,7 +3844,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -21.438
       as_published: '-21.438'
@@ -3849,7 +3853,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 0.233
       as_published: '0.233'
@@ -3867,7 +3871,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.967
       as_published: '82.967'
@@ -3876,7 +3880,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 500.09
       as_published: '500.090'
@@ -3885,7 +3889,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 424.125
       as_published: '424.125'
@@ -3894,7 +3898,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 372.23
       as_published: '372.230'
@@ -3903,7 +3907,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -440.267
       as_published: '-440.267'
@@ -3912,7 +3916,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -12.731
       as_published: '-12.731'
@@ -3921,7 +3925,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '4900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 0.136
       as_published: '0.136'
@@ -3939,7 +3943,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.974
       as_published: '82.974'
@@ -3948,7 +3952,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 501.766
       as_published: '501.766'
@@ -3957,7 +3961,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 425.661
       as_published: '425.661'
@@ -3966,7 +3970,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 380.528
       as_published: '380.528'
@@ -3975,7 +3979,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -1033.511
       as_published: '-1033.511'
@@ -3984,7 +3988,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 1.744
       as_published: '1.744'
@@ -3993,7 +3997,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -0.018
       as_published: '-0.018'
@@ -4011,7 +4015,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.981
       as_published: '82.981'
@@ -4020,7 +4024,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 503.409
       as_published: '503.409'
@@ -4029,7 +4033,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 427.169
       as_published: '427.169'
@@ -4038,7 +4042,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 388.825
       as_published: '388.825'
@@ -4047,7 +4051,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -1037.07
       as_published: '-1037.070'
@@ -4056,7 +4060,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 22.485
       as_published: '22.485'
@@ -4065,7 +4069,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -0.23
       as_published: '-0.230'
@@ -4083,7 +4087,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.987
       as_published: '82.987'
@@ -4092,7 +4096,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 505.021
       as_published: '505.021'
@@ -4101,7 +4105,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 428.651
       as_published: '428.651'
@@ -4110,7 +4114,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 397.124
       as_published: '397.124'
@@ -4119,7 +4123,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -1040.796
       as_published: '-1040.796'
@@ -4128,7 +4132,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 43.295
       as_published: '43.295'
@@ -4137,7 +4141,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -0.435
       as_published: '-0.435'
@@ -4155,7 +4159,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.993
       as_published: '82.993'
@@ -4164,7 +4168,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 506.602
       as_published: '506.602'
@@ -4173,7 +4177,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 430.107
       as_published: '430.107'
@@ -4182,7 +4186,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 405.423
       as_published: '405.423'
@@ -4191,7 +4195,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -1044.686
       as_published: '-1044.686'
@@ -4200,7 +4204,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 64.181
       as_published: '64.181'
@@ -4209,7 +4213,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -0.633
       as_published: '-0.633'
@@ -4227,7 +4231,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 82.998
       as_published: '82.998'
@@ -4236,7 +4240,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 508.153
       as_published: '508.153'
@@ -4245,7 +4249,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 431.538
       as_published: '431.538'
@@ -4254,7 +4258,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 413.722
       as_published: '413.722'
@@ -4263,7 +4267,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -1048.742
       as_published: '-1048.742'
@@ -4272,7 +4276,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 85.14
       as_published: '85.140'
@@ -4281,7 +4285,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -0.824
       as_published: '-0.824'
@@ -4299,7 +4303,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 83.004
       as_published: '83.004'
@@ -4308,7 +4312,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 509.676
       as_published: '509.676'
@@ -4317,7 +4321,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 432.945
       as_published: '432.945'
@@ -4326,7 +4330,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 422.022
       as_published: '422.022'
@@ -4335,7 +4339,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -1052.961
       as_published: '-1052.961'
@@ -4344,7 +4348,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 106.176
       as_published: '106.176'
@@ -4353,7 +4357,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -1.008
       as_published: '-1.008'
@@ -4371,7 +4375,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 83.009
       as_published: '83.009'
@@ -4380,7 +4384,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 511.172
       as_published: '511.172'
@@ -4389,7 +4393,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 434.328
       as_published: '434.328'
@@ -4398,7 +4402,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 430.323
       as_published: '430.323'
@@ -4407,7 +4411,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -1057.343
       as_published: '-1057.343'
@@ -4416,7 +4420,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 127.292
       as_published: '127.292'
@@ -4425,7 +4429,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -1.187
       as_published: '-1.187'
@@ -4443,7 +4447,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 83.013
       as_published: '83.013'
@@ -4452,7 +4456,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 512.641
       as_published: '512.641'
@@ -4461,7 +4465,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 435.689
       as_published: '435.689'
@@ -4470,7 +4474,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 438.624
       as_published: '438.624'
@@ -4479,7 +4483,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -1061.885
       as_published: '-1061.885'
@@ -4488,7 +4492,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 148.485
       as_published: '148.485'
@@ -4497,7 +4501,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -1.361
       as_published: '-1.361'
@@ -4515,7 +4519,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 83.018
       as_published: '83.018'
@@ -4524,7 +4528,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 514.085
       as_published: '514.085'
@@ -4533,7 +4537,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 437.028
       as_published: '437.028'
@@ -4542,7 +4546,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 446.926
       as_published: '446.926'
@@ -4551,7 +4555,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -1066.587
       as_published: '-1066.587'
@@ -4560,7 +4564,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 169.761
       as_published: '169.761'
@@ -4569,7 +4573,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -1.529
       as_published: '-1.529'
@@ -4587,7 +4591,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 83.022
       as_published: '83.022'
@@ -4596,7 +4600,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 515.504
       as_published: '515.504'
@@ -4605,7 +4609,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 438.347
       as_published: '438.347'
@@ -4614,7 +4618,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 455.228
       as_published: '455.228'
@@ -4623,7 +4627,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -1071.446
       as_published: '-1071.446'
@@ -4632,7 +4636,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 191.116
       as_published: '191.116'
@@ -4641,7 +4645,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '5900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -1.692
       as_published: '-1.692'
@@ -4659,7 +4663,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '6000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 83.026
       as_published: '83.026'
@@ -4668,7 +4672,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '6000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 516.899
       as_published: '516.899'
@@ -4677,7 +4681,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '6000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 439.644
       as_published: '439.644'
@@ -4686,7 +4690,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '6000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 463.53
       as_published: '463.530'
@@ -4695,7 +4699,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '6000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -1076.463
       as_published: '-1076.463'
@@ -4704,7 +4708,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '6000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: 212.559
       as_published: '212.559'
@@ -4713,7 +4717,7 @@ table:
         url: https://janaf.nist.gov/tables/Mo-017.html
         download_url: https://janaf.nist.gov/tables/Mo-017.txt
         row_temperature_as_published: '6000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: -1.85
       as_published: '-1.850'

@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Br-029.html
   download_url: https://janaf.nist.gov/tables/Br-029.txt
   index_entry:
-    formula: "NaBr"
-    formula_as_published: "NaBr"
-    formula_normalised: "NaBr"
-    name: "Sodium Bromide"
-    state: "cr,l"
+    formula: NaBr
+    formula_as_published: NaBr
+    formula_normalised: NaBr
+    name: Sodium Bromide
+    state: cr,l
+    charge: 0
   title_as_published: Sodium Bromide (NaBr)  |  Br1Na1(cr,l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -2000,3 +2001,7 @@ table:
     locator:
       table_id: Br-029
       url: https://janaf.nist.gov/tables/Br-029.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 024dda2462447d3f241bffd32cbfb66c3983d8d26ade15b47525b1dbebc55f01

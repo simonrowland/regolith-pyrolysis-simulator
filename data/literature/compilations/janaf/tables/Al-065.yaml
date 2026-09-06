@@ -6,6 +6,9 @@ source:
   doi: 10.18434/T42S31
   url: https://janaf.nist.gov/
   last_data_update: 1998
+  licence: 'Quoted from NIST SRD 13 (https://data.nist.gov/od/id/ECBCC1C1301D2ED9E04306570681B10735): "These data are public."
+    Quoted from https://www.nist.gov/copyrights-disclaimers: "With the exception of material marked as copyrighted, information
+    presented on NIST sites are considered public information and may be distributed or copied."'
 compilation_role:
   kind: assessed_thermodynamic_functions
   engine_reference_input: true
@@ -18,7 +21,7 @@ extraction:
   date: '2026-09-06'
   user_agent: RegolithPyrolysisSimulator-corpus-harvester/1.0 (public thermochemical reference-data research; polite cached
     client)
-  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/worktrees/regolith-main/s-2/data/literature/compilations/janaf/source-cache/tables/Al-065.txt
+  source_cache_path: /Users/simonrowland/Library/CloudStorage/Dropbox/Starship Mission Design/Regolith Processing/regolith-pyrolysis-simulator/docs-private/research/2026-08-09-upstream-mission/IMCC-impl/janaf-mirror/Al/Al-065.txt
   source_sha256: bcc7fc0b217be4c2123a8b7ac4cd3d31f5c44f96e451db9f2925f78266b58950
   review_status: machine_transcribed_unreviewed
 table:
@@ -26,11 +29,12 @@ table:
   url: https://janaf.nist.gov/tables/Al-065.html
   download_url: https://janaf.nist.gov/tables/Al-065.txt
   index_entry:
-    formula: "AlI3"
-    formula_as_published: "AlI3"
-    formula_normalised: "AlI3"
-    name: "Aluminum Iodide"
-    state: "l"
+    formula: AlI3
+    formula_as_published: AlI3
+    formula_normalised: AlI3
+    charge: 0
+    name: Aluminum Iodide
+    state: l
   title_as_published: Aluminum Iodide (AlI3)  |  Al1I3(l)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -51,7 +55,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '0'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: null
       as_published: ''
@@ -60,7 +64,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '0'
-        column: Cp°
+        column: Cp
     entropy:
       value: null
       as_published: ''
@@ -69,7 +73,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '0'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: null
       as_published: ''
@@ -78,7 +82,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '0'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: null
       as_published: ''
@@ -87,7 +91,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '0'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: null
       as_published: ''
@@ -96,7 +100,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '0'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: null
       as_published: ''
@@ -105,7 +109,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '0'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: null
       as_published: ''
@@ -123,7 +127,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: null
       as_published: ''
@@ -132,7 +136,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '100'
-        column: Cp°
+        column: Cp
     entropy:
       value: null
       as_published: ''
@@ -141,7 +145,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: null
       as_published: ''
@@ -150,7 +154,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: null
       as_published: ''
@@ -159,7 +163,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: null
       as_published: ''
@@ -168,7 +172,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: null
       as_published: ''
@@ -177,7 +181,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: null
       as_published: ''
@@ -195,7 +199,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: null
       as_published: ''
@@ -204,7 +208,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '200'
-        column: Cp°
+        column: Cp
     entropy:
       value: null
       as_published: ''
@@ -213,7 +217,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: null
       as_published: ''
@@ -222,7 +226,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: null
       as_published: ''
@@ -231,7 +235,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: null
       as_published: ''
@@ -240,7 +244,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: null
       as_published: ''
@@ -249,7 +253,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: null
       as_published: ''
@@ -267,7 +271,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '250'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: null
       as_published: ''
@@ -276,7 +280,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '250'
-        column: Cp°
+        column: Cp
     entropy:
       value: null
       as_published: ''
@@ -285,7 +289,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '250'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: null
       as_published: ''
@@ -294,7 +298,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '250'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: null
       as_published: ''
@@ -303,7 +307,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '250'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: null
       as_published: ''
@@ -312,7 +316,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '250'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: null
       as_published: ''
@@ -321,7 +325,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '250'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: null
       as_published: ''
@@ -339,7 +343,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '298.15'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -348,7 +352,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '298.15'
-        column: Cp°
+        column: Cp
     entropy:
       value: 223.648
       as_published: '223.648'
@@ -357,7 +361,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '298.15'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 223.648
       as_published: '223.648'
@@ -366,7 +370,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '298.15'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 0.0
       as_published: '0.'
@@ -375,7 +379,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '298.15'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -289.444
       as_published: '-289.444'
@@ -384,7 +388,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '298.15'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -295.752
       as_published: '-295.752'
@@ -393,7 +397,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '298.15'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 51.815
       as_published: '51.815'
@@ -411,7 +415,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -420,7 +424,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 224.398
       as_published: '224.398'
@@ -429,7 +433,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 223.65
       as_published: '223.650'
@@ -438,7 +442,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 0.224
       as_published: '0.224'
@@ -447,7 +451,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -289.415
       as_published: '-289.415'
@@ -456,7 +460,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -295.792
       as_published: '-295.792'
@@ -465,7 +469,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 51.502
       as_published: '51.502'
@@ -483,7 +487,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -492,7 +496,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 259.305
       as_published: '259.305'
@@ -501,7 +505,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 228.409
       as_published: '228.409'
@@ -510,7 +514,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 12.358
       as_published: '12.358'
@@ -519,7 +523,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -312.247
       as_published: '-312.247'
@@ -528,7 +532,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -297.28
       as_published: '-297.280'
@@ -537,7 +541,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 38.821
       as_published: '38.821'
@@ -555,7 +559,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -564,7 +568,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 308.502
       as_published: '308.502'
@@ -573,7 +577,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 247.46
       as_published: '247.460'
@@ -582,7 +586,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 36.625
       as_published: '36.625'
@@ -591,7 +595,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -371.274
       as_published: '-371.274'
@@ -600,7 +604,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -270.397
       as_published: '-270.397'
@@ -609,7 +613,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 23.54
       as_published: '23.540'
@@ -627,7 +631,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -636,7 +640,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 327.206
       as_published: '327.206'
@@ -645,7 +649,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 257.551
       as_published: '257.551'
@@ -654,7 +658,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 48.759
       as_published: '48.759'
@@ -663,7 +667,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -367.639
       as_published: '-367.639'
@@ -672,7 +676,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -253.873
       as_published: '-253.873'
@@ -681,7 +685,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 18.944
       as_published: '18.944'
@@ -699,7 +703,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -708,7 +712,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 343.408
       as_published: '343.408'
@@ -717,7 +721,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 267.293
       as_published: '267.293'
@@ -726,7 +730,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 60.892
       as_published: '60.892'
@@ -735,7 +739,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -364.155
       as_published: '-364.155'
@@ -744,7 +748,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -237.86
       as_published: '-237.860'
@@ -753,7 +757,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 15.531
       as_published: '15.531'
@@ -771,7 +775,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -780,7 +784,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 357.7
       as_published: '357.700'
@@ -789,7 +793,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 276.559
       as_published: '276.559'
@@ -798,7 +802,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 73.026
       as_published: '73.026'
@@ -807,7 +811,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -360.848
       as_published: '-360.848'
@@ -816,7 +820,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -222.274
       as_published: '-222.274'
@@ -825,7 +829,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 12.9
       as_published: '12.900'
@@ -843,7 +847,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -852,7 +856,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 370.484
       as_published: '370.484'
@@ -861,7 +865,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 285.324
       as_published: '285.324'
@@ -870,7 +874,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 85.16
       as_published: '85.160'
@@ -879,7 +883,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -368.333
       as_published: '-368.333'
@@ -888,7 +892,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -206.286
       as_published: '-206.286'
@@ -897,7 +901,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 10.775
       as_published: '10.775'
@@ -915,7 +919,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1100'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -924,7 +928,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1100'
-        column: Cp°
+        column: Cp
     entropy:
       value: 382.048
       as_published: '382.048'
@@ -933,7 +937,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1100'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 293.6
       as_published: '293.600'
@@ -942,7 +946,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1100'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 97.293
       as_published: '97.293'
@@ -951,7 +955,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1100'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -365.097
       as_published: '-365.097'
@@ -960,7 +964,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1100'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -190.238
       as_published: '-190.238'
@@ -969,7 +973,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1100'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 9.034
       as_published: '9.034'
@@ -987,7 +991,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1200'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -996,7 +1000,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1200'
-        column: Cp°
+        column: Cp
     entropy:
       value: 392.606
       as_published: '392.606'
@@ -1005,7 +1009,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1200'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 301.417
       as_published: '301.417'
@@ -1014,7 +1018,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1200'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 109.427
       as_published: '109.427'
@@ -1023,7 +1027,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1200'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -361.887
       as_published: '-361.887'
@@ -1032,7 +1036,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1200'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -174.483
       as_published: '-174.483'
@@ -1041,7 +1045,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1200'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 7.595
       as_published: '7.595'
@@ -1059,7 +1063,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1300'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -1068,7 +1072,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1300'
-        column: Cp°
+        column: Cp
     entropy:
       value: 402.318
       as_published: '402.318'
@@ -1077,7 +1081,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1300'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 308.81
       as_published: '308.810'
@@ -1086,7 +1090,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1300'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 121.56
       as_published: '121.560'
@@ -1095,7 +1099,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1300'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -358.713
       as_published: '-358.713'
@@ -1104,7 +1108,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1300'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -158.995
       as_published: '-158.995'
@@ -1113,7 +1117,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1300'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 6.389
       as_published: '6.389'
@@ -1131,7 +1135,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1400'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -1140,7 +1144,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1400'
-        column: Cp°
+        column: Cp
     entropy:
       value: 411.31
       as_published: '411.310'
@@ -1149,7 +1153,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1400'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 315.814
       as_published: '315.814'
@@ -1158,7 +1162,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1400'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 133.694
       as_published: '133.694'
@@ -1167,7 +1171,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1400'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -355.585
       as_published: '-355.585'
@@ -1176,7 +1180,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1400'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -143.75
       as_published: '-143.750'
@@ -1185,7 +1189,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1400'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 5.363
       as_published: '5.363'
@@ -1203,7 +1207,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1500'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -1212,7 +1216,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1500'
-        column: Cp°
+        column: Cp
     entropy:
       value: 419.681
       as_published: '419.681'
@@ -1221,7 +1225,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1500'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 322.463
       as_published: '322.463'
@@ -1230,7 +1234,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1500'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 145.828
       as_published: '145.828'
@@ -1239,7 +1243,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1500'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -352.517
       as_published: '-352.517'
@@ -1248,7 +1252,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1500'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -128.726
       as_published: '-128.726'
@@ -1257,7 +1261,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1500'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 4.483
       as_published: '4.483'
@@ -1275,7 +1279,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1600'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -1284,7 +1288,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1600'
-        column: Cp°
+        column: Cp
     entropy:
       value: 427.512
       as_published: '427.512'
@@ -1293,7 +1297,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1600'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 328.786
       as_published: '328.786'
@@ -1302,7 +1306,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1600'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 157.961
       as_published: '157.961'
@@ -1311,7 +1315,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1600'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -349.524
       as_published: '-349.524'
@@ -1320,7 +1324,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1600'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -113.905
       as_published: '-113.905'
@@ -1329,7 +1333,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1600'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 3.719
       as_published: '3.719'
@@ -1347,7 +1351,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1700'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -1356,7 +1360,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1700'
-        column: Cp°
+        column: Cp
     entropy:
       value: 434.868
       as_published: '434.868'
@@ -1365,7 +1369,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1700'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 334.812
       as_published: '334.812'
@@ -1374,7 +1378,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1700'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 170.095
       as_published: '170.095'
@@ -1383,7 +1387,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1700'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -346.619
       as_published: '-346.619'
@@ -1392,7 +1396,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1700'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -99.268
       as_published: '-99.268'
@@ -1401,7 +1405,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1700'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 3.05
       as_published: '3.050'
@@ -1419,7 +1423,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1800'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -1428,7 +1432,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1800'
-        column: Cp°
+        column: Cp
     entropy:
       value: 441.803
       as_published: '441.803'
@@ -1437,7 +1441,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1800'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 340.565
       as_published: '340.565'
@@ -1446,7 +1450,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1800'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 182.228
       as_published: '182.228'
@@ -1455,7 +1459,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1800'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -343.812
       as_published: '-343.812'
@@ -1464,7 +1468,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1800'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -84.8
       as_published: '-84.800'
@@ -1473,7 +1477,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1800'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 2.461
       as_published: '2.461'
@@ -1491,7 +1495,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1900'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -1500,7 +1504,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1900'
-        column: Cp°
+        column: Cp
     entropy:
       value: 448.364
       as_published: '448.364'
@@ -1509,7 +1513,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1900'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 346.068
       as_published: '346.068'
@@ -1518,7 +1522,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1900'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 194.362
       as_published: '194.362'
@@ -1527,7 +1531,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1900'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -341.109
       as_published: '-341.109'
@@ -1536,7 +1540,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1900'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -70.485
       as_published: '-70.485'
@@ -1545,7 +1549,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '1900'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 1.938
       as_published: '1.938'
@@ -1563,7 +1567,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '2000'
-        column: T/K
+        column: T(K)
     heat_capacity:
       value: 121.336
       as_published: '121.336'
@@ -1572,7 +1576,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '2000'
-        column: Cp°
+        column: Cp
     entropy:
       value: 454.587
       as_published: '454.587'
@@ -1581,7 +1585,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '2000'
-        column: S°
+        column: S
     negative_gibbs_enthalpy_function:
       value: 351.339
       as_published: '351.339'
@@ -1590,7 +1594,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '2000'
-        column: -[G°-H°(Tr)]/T
+        column: -[G-H(Tr)]/T
     enthalpy_increment:
       value: 206.496
       as_published: '206.496'
@@ -1599,7 +1603,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '2000'
-        column: H-H°(Tr)
+        column: H-H(Tr)
     formation_enthalpy:
       value: -338.511
       as_published: '-338.511'
@@ -1608,7 +1612,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '2000'
-        column: ΔfH°
+        column: delta-f H
     formation_gibbs_energy:
       value: -56.309
       as_published: '-56.309'
@@ -1617,7 +1621,7 @@ table:
         url: https://janaf.nist.gov/tables/Al-065.html
         download_url: https://janaf.nist.gov/tables/Al-065.txt
         row_temperature_as_published: '2000'
-        column: ΔfG°
+        column: delta-f G
     log10_formation_equilibrium_constant:
       value: 1.471
       as_published: '1.471'

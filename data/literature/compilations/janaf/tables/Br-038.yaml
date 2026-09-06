@@ -26,11 +26,12 @@ table:
   url: https://janaf.nist.gov/tables/Br-038.html
   download_url: https://janaf.nist.gov/tables/Br-038.txt
   index_entry:
-    formula: "Br2"
-    formula_as_published: "Br2"
-    formula_normalised: "Br2"
-    name: "Bromine"
-    state: "ref"
+    formula: Br2
+    formula_as_published: Br2
+    formula_normalised: Br2
+    name: Bromine
+    state: ref
+    charge: 0
   title_as_published: Bromine (Br2)  |  Br2(ref)
   standard_state_as_published: p° = 0.1 MPa (as published by JANAF)
   units_as_published:
@@ -4532,3 +4533,7 @@ table:
     locator:
       table_id: Br-038
       url: https://janaf.nist.gov/tables/Br-038.html
+  - kind: source_unavailable
+    reason: Round-3 source bytes not found in regolith-corpus raw/text or recovered local caches; reharvest and source-token
+      fidelity NOT VERIFIED.
+    sha256: 7c8f4722cc50da3fa460395681710dd7fb63e53d9827b3fdd348c29a92d61519
