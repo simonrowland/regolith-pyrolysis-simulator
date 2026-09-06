@@ -1,0 +1,3329 @@
+schema_version: literature_extract.v1
+source_id: fegley-2023-chemical-equilibrium-calculations-bu
+source:
+  citation: Fegley, B., Jr., Lodders, K., and Jacobson, N. S. (2023). Chemical Equilibrium Calculations for Bulk
+    Silicate Earth Material at High Temperatures. Geochemistry (formerly Chemie der Erde).
+  doi: 10.1016/j.chemer.2023.125961
+  url: https://arxiv.org/pdf/2305.13327
+  year: 2023
+  related_sources:
+  - source_id: fegley-2016-rock-steam-solubility
+    relationship: Related rock/steam paper; distinct DOI, not an alias.
+extraction:
+  method: Full-table transcription from pdftotext-layout with rendered-page checks; printed strings retained without
+    unit conversion.
+  date: '2026-09-06'
+  worker: wave-W3-fegley-2023
+  provenance_path: docs-private/research/2026-09-06-wave-3/W3-fegley-2023-chemical-equilibrium-calculations-bu/fegley-2023-chemical-equilibrium-calculations-bu
+review_status: draft
+evidence_policy:
+  classification: model
+  measurement_claim: No observation is claimed as an instrument measurement. Fitted literature coefficients remain
+    model parameters; primary citations retained in table text.
+  numeric_encoding: Numeric cells remain printed strings, including inequalities, uncertainty notation and scientific
+    exponents. Every table payload includes its printed source text and PDF-page locator.
+  missing_values: Printed dash markers retained in transcription; absent values never replaced by zero.
+  layout: CSV column labels disambiguate grouped printed headers. Table text preserves original labels, notes and
+    uncertainties.
+  identity_check: No DOI or title alias found in available simulator extracts or corpus INDEX/extracts. Simulator
+    INDEX files absent in seat; corpus index checked.
+  schema_scope: Composition inputs/results, gas virials, and gas-speciation-only table are metadata because the
+    closed observation types do not describe them.
+model_tables:
+- table: '1'
+  locator:
+    page: 61
+    table: '1'
+    note: PDF pages 61; printed table-section pagination differs.
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t01.csv
+  classification: model
+  values:
+    method_class: model_derived
+    evidence_class: thermodynamic_model_parameter
+    measurement_kind: model
+    quantity: BSE_composition_model_inputs
+    rows_as_printed:
+    - oxide: MgO
+      mol_percent_printed: '47.67'
+    - oxide: Rb2O
+      mol_percent_printed: 1.8 × 10-5
+    - oxide: SiO2
+      mol_percent_printed: '39.48'
+    - oxide: La2O3
+      mol_percent_printed: 1.3 × 10-5
+    - oxide: FeO
+      mol_percent_printed: '5.90'
+    - oxide: Dy2O3
+      mol_percent_printed: 1.2 × 10-5
+    - oxide: CaO
+      mol_percent_printed: '3.40'
+    - oxide: Gd2O3
+      mol_percent_printed: 9.7 × 10-6
+    - oxide: Al2O3
+      mol_percent_printed: '2.30'
+    - oxide: HfO2
+      mol_percent_printed: 8.8 × 10-6
+    - oxide: Na2O
+      mol_percent_printed: '0.29'
+    - oxide: Sm2O3
+      mol_percent_printed: 7.5 × 10-6
+    - oxide: NiO
+      mol_percent_printed: '0.17'
+    - oxide: Er2O3
+      mol_percent_printed: 7.3 × 10-6
+    - oxide: TiO2
+      mol_percent_printed: '0.14'
+    - oxide: Yb2O3
+      mol_percent_printed: 7.2 × 10-6
+    - oxide: Cr2O3
+      mol_percent_printed: '0.13'
+    - oxide: SnO
+      mol_percent_printed: 6.2 × 10-6
+    - oxide: MnO
+      mol_percent_printed: '0.10'
+    - oxide: Pr2O3
+      mol_percent_printed: 4.9 × 10-6
+    - oxide: K2 O
+      mol_percent_printed: 1.74 × 10-2
+    - oxide: PbO
+      mol_percent_printed: 4.7 × 10-6
+    - oxide: CoO
+      mol_percent_printed: 9.1 × 10-3
+    - oxide: Eu2O3
+      mol_percent_printed: 2.9 × 10-6
+    - oxide: P2O5
+      mol_percent_printed: 7.3 × 10-3
+    - oxide: MoO3
+      mol_percent_printed: 2.6 × 10-6
+    - oxide: V2O3
+      mol_percent_printed: 4.4 × 10-3
+    - oxide: Ho2O3
+      mol_percent_printed: 2.5 × 10-6
+    - oxide: ZnO
+      mol_percent_printed: 4.3 × 10-3
+    - oxide: As2O3
+      mol_percent_printed: 2.4 × 10-6
+    - oxide: SrO
+      mol_percent_printed: 1.3 × 10-3
+    - oxide: ThO2
+      mol_percent_printed: 1.9 × 10-6
+    - oxide: Sc2O3
+      mol_percent_printed: 9.6 × 10-4
+    - oxide: Tb2O3
+      mol_percent_printed: 1.8 × 10-6
+    - oxide: Cu2O
+      mol_percent_printed: 8.2 × 10-4
+    - oxide: CdO
+      mol_percent_printed: 1.6 × 10-6
+    - oxide: Li2O
+      mol_percent_printed: 6.0 × 10-4
+    - oxide: Tm2O3
+      mol_percent_printed: 1.1 × 10-6
+    - oxide: ZrO2
+      mol_percent_printed: 5.9 × 10-4
+    - oxide: Lu2O3
+      mol_percent_printed: 1.1 × 10-6
+    - oxide: BaO
+      mol_percent_printed: 2.6 × 10-4
+    - oxide: Ta2O5
+      mol_percent_printed: 6.2 × 10-7
+    - oxide: Ga2O3
+      mol_percent_printed: 1.6 × 10-4
+    - oxide: UO2
+      mol_percent_printed: 5.0 × 10-7
+    - oxide: Y2 O3
+      mol_percent_printed: 1.2 × 10-4
+    - oxide: In2O3
+      mol_percent_printed: 4.1 × 10-7
+    - oxide: B2 O3
+      mol_percent_printed: 6.3 × 10-5
+    - oxide: Cs2O
+      mol_percent_printed: 3.5 × 10-7
+    - oxide: GeO2
+      mol_percent_printed: 8.6 × 10-5
+    - oxide: WO3
+      mol_percent_printed: 3.4 × 10-7
+    - oxide: BeO
+      mol_percent_printed: 3.6 × 10-5
+    - oxide: Ag2O
+      mol_percent_printed: 1.5 × 10-7
+    - oxide: NbO2
+      mol_percent_printed: 3.3 × 10-5
+    - oxide: Sb2O3
+      mol_percent_printed: 1.2 × 10-7
+    - oxide: Ce2O3
+      mol_percent_printed: 3.3 × 10-5
+    - oxide: Tl2O
+      mol_percent_printed: 5.2 × 10-8
+    - oxide: Nd2O3
+      mol_percent_printed: 2.4 × 10-5
+    - oxide: Bi2O3
+      mol_percent_printed: 3.7 × 10-8
+    quote_as_printed: "Table 1. Composition model for the Bulk Silicate Earth (BSE)a,b\nOxide                Mol%\
+      \                  Oxide               Mol%\nMgO                  47.67                 Rb2O             \
+      \   1.8 × 10-5\nSiO2                 39.48                 La2O3               1.3 × 10-5\nFeO           \
+      \       5.90                  Dy2O3               1.2 × 10-5\nCaO                  3.40                  Gd2O3\
+      \               9.7 × 10-6\nAl2O3                2.30                  HfO2                8.8 × 10-6\nNa2O\
+      \                 0.29                  Sm2O3               7.5 × 10-6\nNiO                  0.17        \
+      \          Er2O3               7.3 × 10-6\nTiO2                 0.14                  Yb2O3              \
+      \ 7.2 × 10-6\nCr2O3                0.13                  SnO                 6.2 × 10-6\nMnO             \
+      \     0.10                  Pr2O3               4.9 × 10-6\nK2 O                 1.74 × 10-2           PbO\
+      \                 4.7 × 10-6\nCoO                  9.1 × 10-3            Eu2O3               2.9 × 10-6\n\
+      P2O5                 7.3 × 10-3            MoO3                2.6 × 10-6\nV2O3                 4.4 × 10-3\
+      \            Ho2O3               2.5 × 10-6\nZnO                  4.3 × 10-3            As2O3            \
+      \   2.4 × 10-6\nSrO                  1.3 × 10-3            ThO2                1.9 × 10-6\nSc2O3         \
+      \       9.6 × 10-4            Tb2O3               1.8 × 10-6\nCu2O                 8.2 × 10-4            CdO\
+      \                 1.6 × 10-6\nLi2O                 6.0 × 10-4            Tm2O3               1.1 × 10-6\n\
+      ZrO2                 5.9 × 10-4            Lu2O3               1.1 × 10-6\nBaO                  2.6 × 10-4\
+      \            Ta2O5               6.2 × 10-7\nGa2O3                1.6 × 10-4            UO2              \
+      \   5.0 × 10-7\nY2 O3                1.2 × 10-4            In2O3               4.1 × 10-7\nB2 O3         \
+      \       6.3 × 10-5            Cs2O                3.5 × 10-7\nGeO2                 8.6 × 10-5            WO3\
+      \                 3.4 × 10-7\nBeO                  3.6 × 10-5            Ag2O                1.5 × 10-7\n\
+      NbO2                 3.3 × 10-5            Sb2O3               1.2 × 10-7\nCe2O3                3.3 × 10-5\
+      \            Tl2O                5.2 × 10-8\nNd2O3                2.4 × 10-5            Bi2O3            \
+      \   3.7 × 10-8\naCalculated from Palme and O’Neill (2014).\nbThe molar percentages of volatiles in the wet\
+      \ BSE model are 0.31 H O, 0.044 CO ,\n                                                                   \
+      \  2           2\n0.0326 S, 6.9 × 10 F, 4.4 × 10 Cl, 4.9 × 10 Br, 3.0 × 10 I ,7.5 × 10 N, 5.0 × 10\n     \
+      \               -3           -3        -6           -7           -4         -6\n\nSe, 4.0 × 10-7 Te, and 1.6\
+      \ × 10-6 Hg.\n\n\n\n\n                                        1"
+    render_verified_footnotes:
+      a: Calculated from Palme and O’Neill (2014).
+      b: The molar percentages of volatiles in the wet BSE model are 0.31 H2O, 0.044 CO2, 0.0326 S, 6.9 × 10^-3
+        F, 4.4 × 10^-3 Cl, 4.9 × 10^-6 Br, 3.0 × 10^-7 I, 7.5 × 10^-4 N, 5.0 × 10^-6 Se, 4.0 × 10^-7 Te, and 1.6
+        × 10^-6 Hg.
+- table: '3'
+  locator:
+    page: 65
+    table: '3'
+    note: PDF pages 65; printed table-section pagination differs.
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t03.csv
+  classification: model
+  values:
+    method_class: model_derived
+    evidence_class: thermodynamic_model_parameter
+    measurement_kind: model
+    quantity: gas_virials_and_fugacity_model
+    rows_as_printed:
+    - gas: O2
+      epsilon_over_k: '118'
+      sigma_angstrom: '3.460'
+      b0_cm3: '52.26'
+      B_T: '26.97'
+      phi: '1.006'
+      reference: HCB
+    - gas: O
+      epsilon_over_k: '81.5'
+      sigma_angstrom: '2.956'
+      b0_cm3: '32.58'
+      B_T: '16.19'
+      phi: 1.004 *
+      reference: W62
+    - gas: SiO
+      epsilon_over_k: '569'
+      sigma_angstrom: '3.374'
+      b0_cm3: '48.45'
+      B_T: '21.07'
+      phi: '1.005'
+      reference: Sv62
+    - gas: SiO2
+      epsilon_over_k: '2954'
+      sigma_angstrom: '3.706'
+      b0_cm3: '64.21'
+      B_T: '-59.89'
+      phi: '0.99'
+      reference: Sv62
+    - gas: Mg
+      epsilon_over_k: '1614'
+      sigma_angstrom: '2.926'
+      b0_cm3: '31.60'
+      B_T: –2.69
+      phi: '0.9994'
+      reference: Sv62
+    - gas: Fe
+      epsilon_over_k: '3521'
+      sigma_angstrom: '2.435'
+      b0_cm3: '18.21'
+      B_T: –24.39
+      phi: '0.994'
+      reference: T62
+    - gas: Na
+      epsilon_over_k: '8471'
+      sigma_angstrom: '3.0788'
+      b0_cm3: '36.82'
+      B_T: –73.77
+      phi: 0.98**
+      reference: HB87
+    - gas: Hg†
+      epsilon_over_k: '851'
+      sigma_angstrom: '2.898'
+      b0_cm3: '30.70'
+      B_T: –26.15†
+      phi: 0.98†
+      reference: HCB
+    quote_as_printed: "Table 3. Second virials and fugacity coefficients at 5000 K in BSE vapor\n   Gas        \
+      \  e/k        s (Å)      bo (cm3)       B(T)          f     Reference\n    O2          118        3.460  \
+      \     52.26         26.97      1.006       HCB\n    O          81.5        2.956       32.58         16.19\
+      \      1.004 *     W62\n   SiO          569        3.374       48.45         21.07      1.005       Sv62\n\
+      \   SiO2        2954        3.706       64.21        -59.89       0.99       Sv62\n   Mg          1614   \
+      \     2.926       31.60         –2.69      0.9994      Sv62\n    Fe         3521        2.435       18.21\
+      \       –24.39       0.994        T62\n    Na         8471       3.0788       36.82       –73.77       0.98**\
+      \      HB87\n   Hg†          851        2.898       30.70       –26.15†       0.98†      HCB\nHCB: Hirschfelder\
+      \ et al. (1964). W62: Woolley (1962). Sv62: Svehla (1962). T62:\nTurkdogan (1962). HB87: Holland and Bilosi\
+      \ (1987).\n*Capitelli and Lamanna (1976) considered all electronic states of interacting\n\noxygen atoms and\
+      \ computed BTotal = 10.55 cm3 at 5000 K corresponding to f =\n1.0025.\n**Holland and Bilosi (1987) used the\
+      \ Hulbert – Hirschfelder potential to compute\n\nB for Na.\n†At 1500 K where Hg is the 2nd most abundant gas\
+      \ with a mole fraction of 1.5×10-3.\n\n\n\n\n                                        5"
+- table: '5'
+  locator:
+    page: 67
+    table: '5'
+    note: PDF pages 67; printed table-section pagination differs.
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t05.csv
+  classification: model
+  values:
+    method_class: model_derived
+    evidence_class: thermodynamic_model_parameter
+    measurement_kind: model
+    quantity: initial_condensate_model_compositions
+    rows_as_printed:
+    - oxide: CaO
+      P_10^-3_bar_CONDOR_a: '48.'
+      P_10^-3_bar_FactSage_b: '21.'
+      P_10_bar_CONDOR_a: '34.'
+      P_10_bar_FactSage_b: '3.'
+      P_100_bar_CONDOR_a: '24.'
+      P_100_bar_FactSage_b: '1.'
+    - oxide: MgO
+      P_10^-3_bar_CONDOR_a: '2.'
+      P_10^-3_bar_FactSage_b: '2.'
+      P_10_bar_CONDOR_a: '44.'
+      P_10_bar_FactSage_b: '52.'
+      P_100_bar_CONDOR_a: '59.'
+      P_100_bar_FactSage_b: '58.'
+    - oxide: Al2O3
+      P_10^-3_bar_CONDOR_a: '50.'
+      P_10^-3_bar_FactSage_b: '76.'
+      P_10_bar_CONDOR_a: '20.'
+      P_10_bar_FactSage_b: '16.'
+      P_100_bar_CONDOR_a: '13.'
+      P_100_bar_FactSage_b: '14.'
+    - oxide: SiO2
+      P_10^-3_bar_CONDOR_a: '0.06'
+      P_10^-3_bar_FactSage_b: '0.6'
+      P_10_bar_CONDOR_a: '0.8'
+      P_10_bar_FactSage_b: '28.'
+      P_100_bar_CONDOR_a: '1.'
+      P_100_bar_FactSage_b: '26.'
+    - oxide: FeO
+      P_10^-3_bar_CONDOR_a: '0.01'
+      P_10^-3_bar_FactSage_b: '0.04'
+      P_10_bar_CONDOR_a: '1.'
+      P_10_bar_FactSage_b: '0.3'
+      P_100_bar_CONDOR_a: '3.'
+      P_100_bar_FactSage_b: '0.4'
+    - oxide: Na2O
+      P_10^-3_bar_CONDOR_a: '1.e-14'
+      P_10^-3_bar_FactSage_b: '1.e-7'
+      P_10_bar_CONDOR_a: '4.e-5'
+      P_10_bar_FactSage_b: '1.e-4'
+      P_100_bar_CONDOR_a: '7.e-6'
+      P_100_bar_FactSage_b: '4.e-4'
+    - oxide: Total
+      P_10^-3_bar_CONDOR_a: 100.1 c,d
+      P_10^-3_bar_FactSage_b: 99.6 c,d
+      P_10_bar_CONDOR_a: 100.0 c
+      P_10_bar_FactSage_b: 99.3 d
+      P_100_bar_CONDOR_a: 100.2 c,d
+      P_100_bar_FactSage_b: 99.4d
+    quote_as_printed: "Table 5. Composition of initial condensates (mol%)\n                P = 10-3 bar        \
+      \      P = 10 bar               P = 100 bar\nOxide     CONDORa FactSageb CONDORa FactSageb CONDORa FactSageb\n\
+      CaO       48.          21.        34.           3.          24.          1.\nMgO       2.           2.   \
+      \      44.           52.         59.          58.\nAl2O3     50.          76.        20.           16.   \
+      \      13.          14.\nSiO2      0.06         0.6        0.8           28.         1.           26.\nFeO\
+      \       0.01         0.04       1.            0.3         3.           0.4\nNa2O      1.e-14       1.e-7 \
+      \     4.e-5         1.e-4       7.e-6        4.e-4\nTotal     100.1  c,d   99.6 c,d   100.0 c       99.3 d\
+      \      100.2 c,d    99.4d\naThe calculated condensation temperatures are 2706 K at 10-3 bar, 4152 K at 10\n\
+      \nbar, and 4895 K at 100 bar. bThe calculated condensation temperatures are 2710\nK at 10-3 bar, 4272 K at\
+      \ 10 bar and 5168 K at 100 bar. cAlso includes 0.03% TiO2\n(10-3 bars), and 0.2% TiO2 at 10 and 100 bars.\
+      \ dTotals are not 100% due to\nrounding.\n\n\n\n\n                                       7"
+- table: '26'
+  locator:
+    page: 74
+    table: '26'
+    note: PDF pages 74; printed table-section pagination differs.
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t26.csv
+  classification: model
+  values:
+    method_class: model_derived
+    evidence_class: thermodynamic_model_parameter
+    measurement_kind: model
+    quantity: model_gas_speciation_ratios
+    rows_as_printed:
+    - Z: '14'
+      Element: Si
+      T50/K*: '2159'
+      Major gas: SiO
+      M/MO: 2.3×10^-8
+      M/MO2: 3.2×10^-7
+      MO/MO2: 1.4×10^1
+    - Z: '32'
+      Element: Ge
+      T50/K*: '1781'
+      Major gas: GeO
+      M/MO: 2.3×10^-7
+      M/MO2: 7.2×10^-3
+      MO/MO2: 3.1×10^4
+    - Z: '50'
+      Element: Sn
+      T50/K*: '1791'
+      Major gas: SnO
+      M/MO: 4.3×10^-4
+      M/MO2: 5.2×10^2
+      MO/MO2: 1.2×10^6
+    - Z: '82'
+      Element: Pb
+      T50/K*: '1782'
+      Major gas: Pb
+      M/MO: '4'
+      M/MO2: 7.1×10^8
+      MO/MO2: 1.7×10^8
+    quote_as_printed: "Table 26. Group 14 (Si, Ge, Sn, Pb) gas chemistry at 10-4 bar for the dry BSE model\n  Z\
+      \      Element     T50/K*      Major gas     M/MO         M/MO2          MO/MO2\n 14         Si       2159\
+      \           SiO       2.3×10  -8    3.2×10  -7     1.4×101\n 32         Ge       1781           GeO      \
+      \ 2.3×10-7      7.2×10-3       3.1×104\n 50         Sn       1791           SnO       4.3×10  -4    5.2×10\
+      \   2     1.2×106\n 82         Pb       1782            Pb          4          7.1×108        1.7×108\n*Nominal\
+      \ values. The T ranges from different activity coefficient models are\n                       50\n2159-2221\
+      \ K for Si, 1725-1783 K for Ge, and 1782-1789 K for Pb. See text for\ndetails."
+fidelity_samples:
+- path: species.BSE.observations[fegley_2023_table_02_model].values.rows_as_printed[0].A_printed
+  value: '0'
+  locator:
+    page: 62
+    table: '2'
+    note: 'First CSV data row, column A_printed; printed cell: 0'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t02.csv
+- path: species.BSE.observations[fegley_2023_table_04_model].values.rows_as_printed[0].log_P_-4
+  value: '2498'
+  locator:
+    page: 66
+    table: '4'
+    note: 'First CSV data row, column log_P_-4; printed cell: 2498'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t04.csv
+- path: species.BSE.observations[fegley_2023_table_06_model].values.rows_as_printed[0].BanYa
+  value: '2159'
+  locator:
+    page: 68
+    table: '6'
+    note: 'First CSV data row, column BanYa; printed cell: 2159'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t06.csv
+- path: species.BSE.observations[fegley_2023_table_07_model].values.rows_as_printed[0].BanYa
+  value: '1882'
+  locator:
+    page: 69
+    table: '7'
+    note: 'First CSV data row, column BanYa; printed cell: 1882'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t07.csv
+- path: species.BSE.observations[fegley_2023_table_08_model].values.rows_as_printed[0].BanYa
+  value: '1807'
+  locator:
+    page: 69
+    table: '8'
+    note: 'First CSV data row, column BanYa; printed cell: 1807'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t08.csv
+- path: species.BSE.observations[fegley_2023_table_09_model].values.rows_as_printed[0].FactSage
+  value: '1803'
+  locator:
+    page: 69
+    table: '9'
+    note: 'First CSV data row, column FactSage; printed cell: 1803'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t09.csv
+- path: species.BSE.observations[fegley_2023_table_10_model].values.rows_as_printed[0].BanYa
+  value: '1477'
+  locator:
+    page: 69
+    table: '10'
+    note: 'First CSV data row, column BanYa; printed cell: 1477'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t10.csv
+- path: species.BSE.observations[fegley_2023_table_11_model].values.rows_as_printed[0].MELTS
+  value: '1528'
+  locator:
+    page: 70
+    table: '11'
+    note: 'First CSV data row, column MELTS; printed cell: 1528'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t11.csv
+- path: species.BSE.observations[fegley_2023_table_12_model].values.rows_as_printed[0].FactSage
+  value: '1793'
+  locator:
+    page: 70
+    table: '12'
+    note: 'First CSV data row, column FactSage; printed cell: 1793'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t12.csv
+- path: species.BSE.observations[fegley_2023_table_13_model].values.rows_as_printed[0].real_Rb
+  value: '1439'
+  locator:
+    page: 70
+    table: '13'
+    note: 'First CSV data row, column real_Rb; printed cell: 1439'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t13.csv
+- path: species.BSE.observations[fegley_2023_table_14_model].values.rows_as_printed[0].Be
+  value: '2101'
+  locator:
+    page: 70
+    table: '14'
+    note: 'First CSV data row, column Be; printed cell: 2101'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t14.csv
+- path: species.BSE.observations[fegley_2023_table_15_model].values.rows_as_printed[0].Sc
+  value: '2054'
+  locator:
+    page: 71
+    table: '15'
+    note: 'First CSV data row, column Sc; printed cell: 2054'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t15.csv
+- path: species.BSE.observations[fegley_2023_table_16_model].values.rows_as_printed[0].La
+  value: '1850'
+  locator:
+    page: 71
+    table: '16'
+    note: 'First CSV data row, column La; printed cell: 1850'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t16.csv
+- path: species.BSE.observations[fegley_2023_table_17_model].values.rows_as_printed[0].V_real
+  value: '1729'
+  locator:
+    page: 71
+    table: '17'
+    note: 'First CSV data row, column V_real; printed cell: 1729'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t17.csv
+- path: species.BSE.observations[fegley_2023_table_18_model].values.rows_as_printed[0].Real solution Cr
+  value: '1803'
+  locator:
+    page: 72
+    table: '18'
+    note: 'First CSV data row, column Real solution Cr; printed cell: 1803'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t18.csv
+- path: species.BSE.observations[fegley_2023_table_19_model].values.rows_as_printed[0].Re
+  value: '755'
+  locator:
+    page: 72
+    table: '19'
+    note: 'First CSV data row, column Re; printed cell: 755'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t19.csv
+- path: species.BSE.observations[fegley_2023_table_20_model].values.rows_as_printed[0].Cobalt FactSage
+  value: '1781'
+  locator:
+    page: 72
+    table: '20'
+    note: 'First CSV data row, column Cobalt FactSage; printed cell: 1781'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t20.csv
+- path: species.BSE.observations[fegley_2023_table_21_model].values.rows_as_printed[0].Cu-1
+  value: '1452'
+  locator:
+    page: 73
+    table: '21'
+    note: 'First CSV data row, column Cu-1; printed cell: 1452'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t21.csv
+- path: species.BSE.observations[fegley_2023_table_22_model].values.rows_as_printed[0].ideal
+  value: '1035'
+  locator:
+    page: 73
+    table: '22'
+    note: 'First CSV data row, column ideal; printed cell: 1035'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t22.csv
+- path: species.BSE.observations[fegley_2023_table_23_model].values.rows_as_printed[0].Zn-1
+  value: '1453'
+  locator:
+    page: 73
+    table: '23'
+    note: 'First CSV data row, column Zn-1; printed cell: 1453'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t23.csv
+- path: species.BSE.observations[fegley_2023_table_24_model].values.rows_as_printed[0].Real
+  value: '1361'
+  locator:
+    page: 73
+    table: '24'
+    note: 'First CSV data row, column Real; printed cell: 1361'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t24.csv
+- path: species.BSE.observations[fegley_2023_table_25_model].values.rows_as_printed[0].B
+  value: '1113'
+  locator:
+    page: 74
+    table: '25'
+    note: 'First CSV data row, column B; printed cell: 1113'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t25.csv
+- path: species.BSE.observations[fegley_2023_table_27_model].values.rows_as_printed[0].Ge-1
+  value: '1464'
+  locator:
+    page: 74
+    table: '27'
+    note: 'First CSV data row, column Ge-1; printed cell: 1464'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t27.csv
+- path: species.BSE.observations[fegley_2023_table_28_model].values.rows_as_printed[0].Sn-1
+  value: '1461'
+  locator:
+    page: 75
+    table: '28'
+    note: 'First CSV data row, column Sn-1; printed cell: 1461'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t28.csv
+- path: species.BSE.observations[fegley_2023_table_29_model].values.rows_as_printed[0].P2O5 – 1
+  value: '1583'
+  locator:
+    page: 75
+    table: '29'
+    note: 'First CSV data row, column P2O5 – 1; printed cell: 1583'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t29.csv
+- path: species.BSE.observations[fegley_2023_table_30_model].values.rows_as_printed[0].As2O3
+  value: '1200'
+  locator:
+    page: 75
+    table: '30'
+    note: 'First CSV data row, column As2O3; printed cell: 1200'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t30.csv
+- path: species.BSE.observations[fegley_2023_table_31_model].values.rows_as_printed[0].Real
+  value: '1858'
+  locator:
+    page: 75
+    table: '31'
+    note: 'First CSV data row, column Real; printed cell: 1858'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t31.csv
+- path: species.BSE.observations[fegley_2023_table_32_model].values.rows_as_printed[0].T50/K
+  value: '2122'
+  locator:
+    page: 76
+    table: '32'
+    note: 'First CSV data row, column T50/K; printed cell: 2122'
+    source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t32.csv
+species:
+  BSE:
+    observations:
+    - observation_id: fegley_2023_table_02_model
+      type: activity_coefficient
+      locator:
+        page: 62
+        table: '2'
+        note: PDF pages 62, 63, 64; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t02.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_activity_coefficient_models
+        rows_as_printed:
+        - oxide: Ag2O
+          A_printed: '0'
+          B_printed: −582
+          notes_printed: Regular solution 1673 K point, Sossi et al. (2019)
+        - oxide: Ag2O
+          A_printed: '0'
+          B_printed: '3582.8'
+          notes_printed: Set = g(Cu2O), Sossi et al. (2019)
+        - oxide: Al2O3
+          A_printed: '0'
+          B_printed: −6253.138
+          notes_printed: Ban-Ya (1993)
+        - oxide: Al2O3
+          A_printed: −0.938
+          B_printed: '720.9'
+          notes_printed: MAGMA code
+        - oxide: Al2O3
+          A_printed: −12.515
+          B_printed: 19,111.25
+          notes_printed: FactSage
+        - oxide: As2O3
+          A_printed: '3.4014'
+          B_printed: −26309.08
+          notes_printed: FactSage 1800−2200 K, CMAS+FeO
+        - oxide: As2O3
+          A_printed: '0'
+          B_printed: −4791
+          notes_printed: Chen and Jahanshahi (2010), g (AsO1.5) = 0.03 at 1573 K
+        - oxide: As2O3
+          A_printed: '0'
+          B_printed: −396.2
+          notes_printed: Chen and Jahanshahi (2010), g (AsO1.5) = 0.56 at 1573 K
+        - oxide: B2O3
+          A_printed: −7.1517
+          B_printed: '508.158'
+          notes_printed: FactSage 1800−2200 K, CMAS+FeO
+        - oxide: Bi2O3
+          A_printed: '3.4014'
+          B_printed: −26309.08
+          notes_printed: Set = g(As2O3) from FactSage
+        - oxide: Bi2O3
+          A_printed: '0'
+          B_printed: −1251.8
+          notes_printed: Paulina et al. (2013), regular solution, 1573 K point
+        - oxide: CaO
+          A_printed: −0.246
+          B_printed: −6710.736
+          notes_printed: Ban-Ya (1993)
+        - oxide: CaO
+          A_printed: −0.144
+          B_printed: −4656.5
+          notes_printed: MAGMA code
+        - oxide: CaO
+          A_printed: '1.30'
+          B_printed: −7014.6
+          notes_printed: FactSage
+        - oxide: CdO
+          A_printed: −1.23
+          B_printed: '803.1'
+          notes_printed: Regular solution, liquid standard state, 1473 K point, Sossi et al. (2019)
+        - oxide: CoO
+          A_printed: '0.303'
+          B_printed: '0'
+          notes_printed: FactSage BSE melt, 2000−3000 K mean g = 2.01±0.07
+        - oxide: CrO
+          A_printed: '0.165'
+          B_printed: '601.518'
+          notes_printed: FactSage
+        - oxide: Cr2O3
+          A_printed: −2.318
+          B_printed: '4413.29'
+          notes_printed: FactSage
+        - oxide: Cs2O
+          A_printed: −0.083
+          B_printed: −13634.1
+          notes_printed: See text, set = g(Na2O) FactSage
+        - oxide: Cs2O
+          A_printed: '0'
+          B_printed: −12144.
+          notes_printed: Cs2O-Na2O-SiO2 ternary, Bennour (1999), see text
+        - oxide: CuO
+          A_printed: '4'
+          B_printed: '0'
+          notes_printed: Set = 10,000, see text
+        - oxide: Cu2O
+          A_printed: '0'
+          B_printed: '373.261'
+          notes_printed: Altman (1978)
+        - oxide: Cu2O
+          A_printed: '0'
+          B_printed: '3144.1'
+          notes_printed: Regular solution, 1573 K point, Holzheid and Lodders (2001)
+        - oxide: Cu2O
+          A_printed: '0'
+          B_printed: '3582.8'
+          notes_printed: Regular solution, 1673 K point, Sossi et al. (2019)
+        - oxide: Cu2O
+          A_printed: '0'
+          B_printed: '2094'
+          notes_printed: Regular solution, 1923 K point, Wood and Wade (2013)
+        - oxide: FeO
+          A_printed: '0.373'
+          B_printed: '399.1'
+          notes_printed: Ban-Ya (1993)
+        - oxide: FeO
+          A_printed: '0.025'
+          B_printed: −141.8
+          notes_printed: MAGMA code
+        - oxide: FeO
+          A_printed: '0.282'
+          B_printed: '49.7'
+          notes_printed: FactSage
+        - oxide: Fe2O3
+          A_printed: −1.2867
+          B_printed: '1336.0'
+          notes_printed: FactSage
+        - oxide: Ga2O3
+          A_printed: '0'
+          B_printed: −6314
+          notes_printed: Interpolated from log g vs OB using Al2O3 and In2O3
+        - oxide: GeO2
+          A_printed: '3.669'
+          B_printed: −7886
+          notes_printed: Sossi et al. (2019)
+        - oxide: GeO2
+          A_printed: '0'
+          B_printed: −1601
+          notes_printed: Regular solution, 1673 K point, Sossi et al. (2019)
+        - oxide: GeO2
+          A_printed: '0.8692'
+          B_printed: '0'
+          notes_printed: g(GeO2) = 7.4, FactSage
+        - oxide: GeO2
+          A_printed: −0.010
+          B_printed: −580.4
+          notes_printed: g(GeO2) = g(SiO2) from FactSage
+        - oxide: In2O3
+          A_printed: '0'
+          B_printed: −6534.2
+          notes_printed: Regular solution, 1923 K point, Wood and Wade (2013)
+        - oxide: K2 O
+          A_printed: '0.8218'
+          B_printed: −18774.
+          notes_printed: pMELTS, BSE 2000-3000 K
+        - oxide: K2 O
+          A_printed: −1.64
+          B_printed: −15671.2
+          notes_printed: MAGMA code
+        - oxide: K2 O
+          A_printed: −1.13
+          B_printed: −16818.8
+          notes_printed: FactSage
+        - oxide: K2 O
+          A_printed: '0'
+          B_printed: −12239
+          notes_printed: Regular solution, 1673 K point, Sossi et al. (2019)
+        - oxide: Li2O
+          A_printed: −3.1647
+          B_printed: −7945.375
+          notes_printed: FactSage 1800−2200 K CMAS+FeO
+        - oxide: Li2O
+          A_printed: '0'
+          B_printed: −2046.
+          notes_printed: Regular solution, 1573 K point, Nassarella and Fruehan (1992)
+        - oxide: Li2O
+          A_printed: '0'
+          B_printed: '853.7'
+          notes_printed: Regular solution, 1673 K, fO2 = 10-8 bar point, Sossi et al. (2019)
+        - oxide: Li2O
+          A_printed: '0'
+          B_printed: '3973.'
+          notes_printed: Regular solution, 1673 K, fO2 = air point, Sossi et al. (2019)
+        - oxide: MgO
+          A_printed: '0.09574'
+          B_printed: −1774.577
+          notes_printed: Ban-Ya (1993)
+        - oxide: MgO
+          A_printed: '0.021'
+          B_printed: −1800.3
+          notes_printed: MAGMA code
+        - oxide: MgO
+          A_printed: '0.565'
+          B_printed: −2794.3
+          notes_printed: FactSage
+        - oxide: MnO
+          A_printed: '0'
+          B_printed: '672.096'
+          notes_printed: Ban-Ya (1993)
+        - oxide: MnO
+          A_printed: '1.068'
+          B_printed: −2787.3
+          notes_printed: FactSage
+        - oxide: MoO2
+          A_printed: '0.187'
+          B_printed: '681.0'
+          notes_printed: Geometric mean of FeO and TiO2, Ban-Ya (1993)
+        - oxide: MoO3
+          A_printed: '0.7494'
+          B_printed: −347.091
+          notes_printed: Set log g(MoO3) = log g(WO3) + log(4)
+        - oxide: Na2O
+          A_printed: '1.19437'
+          B_printed: −11521.64
+          notes_printed: Ban-Ya (1993)
+        - oxide: Na2O
+          A_printed: '0.573'
+          B_printed: −13034.2
+          notes_printed: MAGMA code
+        - oxide: Na2O
+          A_printed: −0.083
+          B_printed: −13634.1
+          notes_printed: FactSage
+        - oxide: Na2O
+          A_printed: '0'
+          B_printed: −10039
+          notes_printed: Regular solution, 1673 K point, Sossi et al. (2019)
+        - oxide: NiO
+          A_printed: '0.352'
+          B_printed: '114.05'
+          notes_printed: FactSage
+        - oxide: P2O5
+          A_printed: −12.0506
+          B_printed: '4076.293'
+          notes_printed: Ban-Ya (1993)
+        - oxide: P2O5
+          A_printed: '1.8919'
+          B_printed: −25111.69
+          notes_printed: FactSage
+        - oxide: P2O5
+          A_printed: '1.75'
+          B_printed: −26270
+          notes_printed: Suito (1981)
+        - oxide: PbO
+          A_printed: '0.7172'
+          B_printed: −1863.825
+          notes_printed: FactSage 1800−2200 K
+        - oxide: PbO
+          A_printed: '0'
+          B_printed: −1265
+          notes_printed: Regular solution, 1923 K point, Wood and Wade (2013)
+        - oxide: PbO
+          A_printed: '0'
+          B_printed: −689
+          notes_printed: PbO(liq) = Pb(g) + ½O2(g), 1673 K, Sossi et al. (2019)
+        - oxide: PbO
+          A_printed: '0'
+          B_printed: −1320
+          notes_printed: PbO (liq) = PbO (g), 1673 K, Sossi et al. (2019)
+        - oxide: Rb2O
+          A_printed: '0'
+          B_printed: −13,400
+          notes_printed: Regular solution, 1673 K point, Sossi et al. (2019)
+        - oxide: Sb2O3
+          A_printed: '3.4014'
+          B_printed: −26309.08
+          notes_printed: Set = As2O3, FactSage
+        - oxide: SiO2
+          A_printed: '0.14730'
+          B_printed: −347.091
+          notes_printed: Ban-Ya (1993)
+        - oxide: SiO2
+          A_printed: −0.320
+          B_printed: −929.6
+          notes_printed: MAGMA code
+        - oxide: SiO2
+          A_printed: −0.010
+          B_printed: −580.4
+          notes_printed: FactSage
+        - oxide: SnO
+          A_printed: '0.470'
+          B_printed: −90.4
+          notes_printed: FactSage 1800−2200 K CMAS+FeO
+        - oxide: SnO2
+          A_printed: '0.86923'
+          B_printed: '0'
+          notes_printed: Set = GeO2, FactSage
+        - oxide: TiO2
+          A_printed: '0'
+          B_printed: '963.090'
+          notes_printed: Ban-Ya (1993)
+        - oxide: TiO2
+          A_printed: −0.305
+          B_printed: −964.6
+          notes_printed: MAGMA code
+        - oxide: TiO2
+          A_printed: −1.407
+          B_printed: '3073.5'
+          notes_printed: FactSage
+        - oxide: Ti2O3
+          A_printed: −2.432
+          B_printed: '289.76'
+          notes_printed: FactSage
+        - oxide: Tl2O
+          A_printed: '0'
+          B_printed: −13145
+          notes_printed: Basicity modified Rb2O value
+        - oxide: Tl2O3
+          A_printed: −1.2867
+          B_printed: '1336.0'
+          notes_printed: Set = Fe2O3, FactSage
+        - oxide: VO
+          A_printed: '0.373'
+          B_printed: '399.1'
+          notes_printed: Set = FeO, Ban-Ya (1993)
+        - oxide: V2O3
+          A_printed: −1.1319
+          B_printed: −16818.75
+          notes_printed: Set = Ti2O3, FactSage, Pistorius (2006)
+        - oxide: WO3
+          A_printed: '0.14730'
+          B_printed: −347.091
+          notes_printed: Set = SiO2, Ban-Ya (1993)
+        - oxide: ZnO
+          A_printed: '1.126'
+          B_printed: −1868.7
+          notes_printed: FactSage 1800−2200 K, CMAS+FeO
+        - oxide: ZnO
+          A_printed: '3.624'
+          B_printed: −7061.6
+          notes_printed: E1 composition, Reyes and Gaskell (1983)
+        - oxide: ZnO
+          A_printed: '4.161'
+          B_printed: −7488.1
+          notes_printed: 1573 – 1823 K, Sossi et al. (2019)
+        - oxide: ZnO
+          A_printed: '0'
+          B_printed: −51.65
+          notes_printed: MAGMA code, Visscher and Fegley (2013)
+        quote_as_printed: "Table 2. Activity coefficients (log10 g = A + B/T)\nOxide A              B          \
+          \   Notes\nAg2O 0               −582          Regular solution 1673 K point, Sossi et al. (2019)\n   \
+          \     0            3582.8        Set = g(Cu2O), Sossi et al. (2019)\nAl2O3 0              −6253.138 Ban-Ya\
+          \ (1993)\n        −0.938       720.9         MAGMA code\n        −12.515 19,111.25 FactSage\nAs2O3 3.4014\
+          \         −26309.08 FactSage 1800−2200 K, CMAS+FeO\n        0            −4791         Chen and Jahanshahi\
+          \ (2010), g (AsO1.5) = 0.03 at\n                                   1573 K\n        0            −396.2\
+          \        Chen and Jahanshahi (2010), g (AsO1.5) = 0.56 at\n                                   1573 K\n\
+          B2O3 −7.1517 508.158               FactSage 1800−2200 K, CMAS+FeO\nBi2O3 3.4014         −26309.08 Set\
+          \ = g(As2O3) from FactSage\n        0            −1251.8       Paulina et al. (2013), regular solution,\
+          \ 1573 K\n                                   point\nCaO     −0.246       −6710.736 Ban-Ya (1993)\n   \
+          \     −0.144       −4656.5       MAGMA code\n        1.30         −7014.6       FactSage\nCdO     −1.23\
+          \        803.1         Regular solution, liquid standard state, 1473 K\n                             \
+          \      point, Sossi et al. (2019)\nCoO     0.303        0             FactSage BSE melt, 2000−3000 K mean\
+          \ g =\n                                   2.01±0.07\nCrO     0.165        601.518       FactSage\nCr2O3\
+          \ −2.318         4413.29       FactSage\nCs2O −0.083          −13634.1 See text, set = g(Na2O) FactSage\n\
+          \        0            −12144.       Cs2O-Na2O-SiO2 ternary, Bennour (1999), see text\nCuO     4      \
+          \      0             Set = 10,000, see text\nCu2O 0               373.261       Altman (1978)\n      \
+          \  0            3144.1        Regular solution, 1573 K point, Holzheid and\n                         \
+          \          Lodders (2001)\n        0            3582.8        Regular solution, 1673 K point, Sossi et\
+          \ al. (2019)\n        0            2094          Regular solution, 1923 K point, Wood and Wade\n     \
+          \                              (2013)\nFeO     0.373        399.1         Ban-Ya (1993)\n        0.025\
+          \        −141.8        MAGMA code\n        0.282        49.7          FactSage\nFe2O3 −1.2867 1336.0 \
+          \              FactSage\nGa2O3 0              −6314         Interpolated from log g vs OB using Al2O3\
+          \ and\n                                   In2O3\nGeO2 3.669           −7886         Sossi et al. (2019)\n\
+          \        0            −1601         Regular solution, 1673 K point, Sossi et al. (2019)\n        0.8692\
+          \       0             g(GeO2) = 7.4, FactSage\n        −0.010       −580.4        g(GeO2) = g(SiO2) from\
+          \ FactSage\n\n\n\n                                          2\n\fIn2O3   0          −6534.2     Regular\
+          \ solution, 1923 K point, Wood and Wade\n                               (2013)\nK2 O    0.8218     −18774.\
+          \     pMELTS, BSE 2000-3000 K\n        −1.64      −15671.2    MAGMA code\n        −1.13      −16818.8\
+          \    FactSage\n        0          −12239      Regular solution, 1673 K point, Sossi et al. (2019)\nLi2O\
+          \    −3.1647    −7945.375   FactSage 1800−2200 K CMAS+FeO\n        0          −2046.      Regular solution,\
+          \ 1573 K point, Nassarella and\n                               Fruehan (1992)\n        0          853.7\
+          \       Regular solution, 1673 K, fO2 = 10-8 bar point,\n                               Sossi et al. (2019)\n\
+          \        0          3973.       Regular solution, 1673 K, fO2 = air point, Sossi et\n                \
+          \               al. (2019)\nMgO     0.09574    −1774.577   Ban-Ya (1993)\n        0.021      −1800.3 \
+          \    MAGMA code\n        0.565      −2794.3     FactSage\nMnO     0          672.096     Ban-Ya (1993)\n\
+          \        1.068      −2787.3     FactSage\nMoO2    0.187      681.0       Geometric mean of FeO and TiO2,\
+          \ Ban-Ya (1993)\nMoO3    0.7494     −347.091    Set log g(MoO3) = log g(WO3) + log(4)\nNa2O    1.19437\
+          \    −11521.64   Ban-Ya (1993)\n        0.573      −13034.2    MAGMA code\n        −0.083     −13634.1\
+          \    FactSage\n        0          −10039      Regular solution, 1673 K point, Sossi et al. (2019)\nNiO\
+          \     0.352      114.05      FactSage\nP2O5    −12.0506   4076.293    Ban-Ya (1993)\n        1.8919  \
+          \   −25111.69   FactSage\n        1.75       −26270      Suito (1981)\nPbO     0.7172     −1863.825  \
+          \ FactSage 1800−2200 K\n        0          −1265       Regular solution, 1923 K point, Wood and Wade\n\
+          \                               (2013)\n        0          −689        PbO(liq) = Pb(g) + ½O2(g), 1673\
+          \ K, Sossi et al.\n                               (2019)\n      0            −1320       PbO (liq) = PbO\
+          \ (g), 1673 K, Sossi et al. (2019)\nRb2O 0             −13,400     Regular solution, 1673 K point, Sossi\
+          \ et al. (2019)\nSb2O3 3.4014       −26309.08   Set = As2O3, FactSage\nSiO2  0.14730      −347.091   \
+          \ Ban-Ya (1993)\n      −0.320       −929.6      MAGMA code\n      −0.010       −580.4      FactSage\n\
+          SnO   0.470        −90.4       FactSage 1800−2200 K CMAS+FeO\nSnO2 0.86923       0           Set = GeO2,\
+          \ FactSage\nTiO2  0            963.090     Ban-Ya (1993)\n      −0.305       −964.6      MAGMA code\n\
+          \      −1.407       3073.5      FactSage\nTi2O3 −2.432       289.76      FactSage\nTl2O  0           \
+          \ −13145      Basicity modified Rb2O value\n\n\n                                       3\n\fTl2O3   −1.2867\
+          \   1336.0      Set = Fe2O3, FactSage\nVO      0.373     399.1       Set = FeO, Ban-Ya (1993)\nV2O3  \
+          \  −1.1319   −16818.75   Set = Ti2O3, FactSage, Pistorius (2006)\nWO3     0.14730   −347.091    Set =\
+          \ SiO2, Ban-Ya (1993)\nZnO     1.126     −1868.7     FactSage 1800−2200 K, CMAS+FeO\n        3.624   \
+          \  −7061.6     E1 composition, Reyes and Gaskell (1983)\n        4.161     −7488.1     1573 – 1823 K,\
+          \ Sossi et al. (2019)\n        0         −51.65      MAGMA code, Visscher and Fegley (2013)\n\n\n\n\n\
+          \                                     4"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_04_model
+      type: transition_point
+      locator:
+        page: 66
+        table: '4'
+        note: PDF pages 66; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t04.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - quantity: Dry
+          log_P_-6: '2159'
+          log_P_-4: '2498'
+          log_P_-2: '2960'
+          log_P_0: '3645'
+          log_P_1: '4151'
+          log_P_2: '4894'
+        - quantity: Wet
+          log_P_-6: '2158'
+          log_P_-4: '2496'
+          log_P_-2: '2949'
+          log_P_0: '3619'
+          log_P_1: '4113'
+          log_P_2: '4837'
+        - quantity: FactSage
+          log_P_-6: '2161'
+          log_P_-4: '2499'
+          log_P_-2: '2964'
+          log_P_0: '3683'
+          log_P_1: '4272'
+          log_P_2: '5172'
+        - quantity: GRAINS
+          log_P_-6: '2150'
+          log_P_-4: '2458'
+          log_P_-2: '2923'
+          log_P_0: '3544'
+          log_P_1: '3979'
+          log_P_2: '4581'
+        - quantity: fO2_bar_a
+          log_P_-6: 4.4×10-8
+          log_P_-4: 7.3×10-6
+          log_P_-2: 1.1×10-3
+          log_P_0: '0.126'
+          log_P_1: '1.23'
+          log_P_2: '11.3'
+        quote_as_printed: "Table 4. Condensation curve for bulk silicate Earth material\nlog P         -6      \
+          \  -4         -2         0      1       2\nDry          2159      2498       2960      3645 4151 4894\n\
+          Wet          2158      2496       2949      3619 4113 4837\nFactSage     2161      2499       2964   \
+          \   3683 4272 5172\nGRAINS       2150      2458       2923      3544 3979 4581\n\nfO2 (bar)a 4.4×10-8\
+          \ 7.3×10-6 1.1×10-3 0.126 1.23 11.3\naThe fO is identical within ≤5% in the dry and wet BSE models.\n\
+          \       2\n\n\n\n\n                              6"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_06_model
+      type: transition_point
+      locator:
+        page: 68
+        table: '6'
+        note: PDF pages 68; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t06.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - element: Calcium
+          log_P_bar: '-6'
+          BanYa: '2159'
+          BY_wet: '2158'
+          MAGMA: '2090'
+          FactSage: '2065'
+          Ideal_Lock: –
+          Ideal_this_work: '1880'
+        - element: Calcium
+          log_P_bar: '-4'
+          BanYa: '2498'
+          BY_wet: '2496'
+          MAGMA: '2461'
+          FactSage: '2411'
+          Ideal_Lock: '2304'
+          Ideal_this_work: '2216'
+        - element: Calcium
+          log_P_bar: '-2'
+          BanYa: '2960'
+          BY_wet: '2949'
+          MAGMA: '2956'
+          FactSage: '2897'
+          Ideal_Lock: '2678'
+          Ideal_this_work: '2700'
+        - element: Calcium
+          log_P_bar: '0'
+          BanYa: '3645'
+          BY_wet: '3619'
+          MAGMA: '3640'
+          FactSage: '3633'
+          Ideal_Lock: '3426'
+          Ideal_this_work: '3448'
+        - element: Calcium
+          log_P_bar: '2'
+          BanYa: '4894'
+          BY_wet: '4837'
+          MAGMA: '4893'
+          FactSage: '4884'
+          Ideal_Lock: '4581'
+          Ideal_this_work: '4758'
+        - element: Aluminum
+          log_P_bar: '-6'
+          BanYa: '2159'
+          BY_wet: '2158'
+          MAGMA: '2157'
+          FactSage: '2159'
+          Ideal_Lock: –
+          Ideal_this_work: '2134'
+        - element: Aluminum
+          log_P_bar: '-4'
+          BanYa: '2498'
+          BY_wet: '2496'
+          MAGMA: '2495'
+          FactSage: '2498'
+          Ideal_Lock: '2429'
+          Ideal_this_work: '2460'
+        - element: Aluminum
+          log_P_bar: '-2'
+          BanYa: '2960'
+          BY_wet: '2949'
+          MAGMA: '2956'
+          FactSage: '2961'
+          Ideal_Lock: '2885'
+          Ideal_this_work: '2901'
+        - element: Aluminum
+          log_P_bar: '0'
+          BanYa: '3645'
+          BY_wet: '3619'
+          MAGMA: '3641'
+          FactSage: '3648'
+          Ideal_Lock: '3496'
+          Ideal_this_work: '3555'
+        - element: Aluminum
+          log_P_bar: '2'
+          BanYa: '4894'
+          BY_wet: '4837'
+          MAGMA: '4913'
+          FactSage: '4901'
+          Ideal_Lock: '4581'
+          Ideal_this_work: '4734'
+        - element: Magnesium
+          log_P_bar: '-6'
+          BanYa: '1866'
+          BY_wet: '1865'
+          MAGMA: '1895'
+          FactSage: '1871'
+          Ideal_Lock: –
+          Ideal_this_work: '1817'
+        - element: Magnesium
+          log_P_bar: '-4'
+          BanYa: '2198'
+          BY_wet: '2197'
+          MAGMA: '2228'
+          FactSage: '2197'
+          Ideal_Lock: '2157'
+          Ideal_this_work: '2135'
+        - element: Magnesium
+          log_P_bar: '-2'
+          BanYa: '2678'
+          BY_wet: '2677'
+          MAGMA: '2712'
+          FactSage: '2663'
+          Ideal_Lock: '2602'
+          Ideal_this_work: '2592'
+        - element: Magnesium
+          log_P_bar: '0'
+          BanYa: '3417'
+          BY_wet: '3415'
+          MAGMA: '3467'
+          FactSage: '3368'
+          Ideal_Lock: '3330'
+          Ideal_this_work: '3303'
+        - element: Magnesium
+          log_P_bar: '2'
+          BanYa: '4721'
+          BY_wet: '4719'
+          MAGMA: '4822'
+          FactSage: '4570'
+          Ideal_Lock: '4581'
+          Ideal_this_work: '4561'
+        - element: Silicon
+          log_P_bar: '-6'
+          BanYa: '1853'
+          BY_wet: '1852'
+          MAGMA: '1895'
+          FactSage: '1868'
+          Ideal_Lock: –
+          Ideal_this_work: '1820'
+        - element: Silicon
+          log_P_bar: '-4'
+          BanYa: '2159'
+          BY_wet: '2157'
+          MAGMA: '2221'
+          FactSage: '2181'
+          Ideal_Lock: '2124'
+          Ideal_this_work: '2132'
+        - element: Silicon
+          log_P_bar: '-2'
+          BanYa: '2586'
+          BY_wet: '2585'
+          MAGMA: '2683'
+          FactSage: '2619'
+          Ideal_Lock: '2573'
+          Ideal_this_work: '2572'
+        - element: Silicon
+          log_P_bar: '0'
+          BanYa: '3233'
+          BY_wet: '3230'
+          MAGMA: '3386'
+          FactSage: '3284'
+          Ideal_Lock: '3235'
+          Ideal_this_work: '3228'
+        - element: Silicon
+          log_P_bar: '2'
+          BanYa: '4334'
+          BY_wet: '4327'
+          MAGMA: '4608'
+          FactSage: '4425'
+          Ideal_Lock: '4352'
+          Ideal_this_work: '4341'
+        - element: Iron
+          log_P_bar: '-6'
+          BanYa: '1818'
+          BY_wet: '1814'
+          MAGMA: '1871'
+          FactSage: '1832'
+          Ideal_Lock: –
+          Ideal_this_work: '1813'
+        - element: Iron
+          log_P_bar: '-4'
+          BanYa: '2138'
+          BY_wet: '2135'
+          MAGMA: '2208'
+          FactSage: '2148'
+          Ideal_Lock: '2120'
+          Ideal_this_work: '2131'
+        - element: Iron
+          log_P_bar: '-2'
+          BanYa: '2581'
+          BY_wet: '2579'
+          MAGMA: '2679'
+          FactSage: '2597'
+          Ideal_Lock: '2584'
+          Ideal_this_work: '2584'
+        - element: Iron
+          log_P_bar: '0'
+          BanYa: '3284'
+          BY_wet: '3282'
+          MAGMA: '3423'
+          FactSage: '3318'
+          Ideal_Lock: '3320'
+          Ideal_this_work: '3303'
+        - element: Iron
+          log_P_bar: '2'
+          BanYa: '4599'
+          BY_wet: '4596'
+          MAGMA: '4812'
+          FactSage: '4657'
+          Ideal_Lock: '4581'
+          Ideal_this_work: '4627'
+        quote_as_printed: "Table 6. Ca, Al, Mg, Si, and Fe 50% condensation temperatures\n                     \
+          \                  Calcium\n    log P                  BY                           Ideal       Ideal\n\
+          \               BanYa              MAGMA FactSage\n   (bar)                   wet                    \
+          \     (Lock)    (this work)\n      -6       2159       2158     2090      2065         –         1880\n\
+          \      -4       2498       2496     2461      2411       2304        2216\n      -2       2960       2949\
+          \     2956      2897       2678        2700\n      0        3645       3619     3640      3633       3426\
+          \        3448\n      2        4894       4837     4893      4884       4581        4758\n            \
+          \                          Aluminum\n    log P                  BY                           Ideal   \
+          \ Ideal (this\n               BanYa              MAGMA FactSage\n   (bar)                   wet      \
+          \                   (Lock)      work)\n      -6       2159       2158     2157      2159         –   \
+          \     2134\n      -4       2498       2496     2495      2498       2429       2460\n      -2       2960\
+          \       2949     2956      2961       2885       2901\n      0        3645       3619     3641      3648\
+          \       3496       3555\n      2        4894       4837     4913      4901       4581       4734\n   \
+          \                                   Magnesium\n    log P                  BY                         \
+          \  Ideal    Ideal (this\n               BanYa              MAGMA FactSage\n   (bar)                  \
+          \ wet                         (Lock)      work)\n      -6       1866       1865     1895      1871   \
+          \      –        1817\n      -4       2198       2197     2228      2197       2157       2135\n      -2\
+          \       2678       2677     2712      2663       2602       2592\n      0        3417       3415     3467\
+          \      3368       3330       3303\n      2        4721       4719     4822      4570       4581      \
+          \ 4561\n                                        Silicon\n    log P                  BY               \
+          \            Ideal    Ideal (this\n               BanYa              MAGMA FactSage\n   (bar)        \
+          \           wet                         (Lock)      work)\n      -6       1853       1852     1895   \
+          \   1868         –        1820\n      -4       2159       2157     2221      2181       2124       2132\n\
+          \      -2       2586       2585     2683      2619       2573       2572\n      0        3233       3230\
+          \     3386      3284       3235       3228\n      2        4334       4327     4608      4425       4352\
+          \       4341\n                                         Iron\n    log P                  BY           \
+          \                Ideal    Ideal (this\n               BanYa              MAGMA FactSage\n   (bar)    \
+          \               wet                         (Lock)      work)\n      -6       1818       1814     1871\
+          \      1832         –        1813\n      -4       2138       2135     2208      2148       2120      \
+          \ 2131\n      -2       2581       2579     2679      2597       2584       2584\n      0        3284 \
+          \      3282     3423      3318       3320       3303\n      2        4599       4596     4812      4657\
+          \       4581       4627\nSee text for details.\n\n\n\n\n                                        8"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_07_model
+      type: transition_point
+      locator:
+        page: 69
+        table: '7'
+        note: PDF pages 69; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t07.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log_P_bar: '-6'
+          BanYa: '1882'
+          MAGMA: '1990'
+          FactSage: '1896'
+          Ideal_Lock: –
+          Ideal_this_work: '1879'
+        - log_P_bar: '-4'
+          BanYa: '2213'
+          MAGMA: '2318'
+          FactSage: '2239'
+          Ideal_Lock: '2129'
+          Ideal_this_work: '2192'
+        - log_P_bar: '-2'
+          BanYa: '2690'
+          MAGMA: '2803'
+          FactSage: '2744'
+          Ideal_Lock: '2649'
+          Ideal_this_work: '2650'
+        - log_P_bar: '0'
+          BanYa: '3433'
+          MAGMA: '3580'
+          FactSage: '3558'
+          Ideal_Lock: '3388'
+          Ideal_this_work: '3378'
+        - log_P_bar: '2'
+          BanYa: '4778'
+          MAGMA: '4913'
+          FactSage: '4894'
+          Ideal_Lock: '4581'
+          Ideal_this_work: '4694'
+        quote_as_printed: "Table 7. Ti 50% condensation temperatures – different activity coefficient models\n \
+          \ log P (bar) BanYa MAGMA FactSage Ideal (Lock)                 Ideal (this work)\n       -6         1882\
+          \   1990       1896             –                 1879\n       -4         2213   2318       2239     \
+          \      2129                2192\n       -2         2690   2803       2744           2649             \
+          \   2650\n        0         3433   3580       3558           3388                3378\n        2     \
+          \    4778   4913       4894           4581                4694\nSee text for details."
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_08_model
+      type: transition_point
+      locator:
+        page: 69
+        table: '8'
+        note: PDF pages 69; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t08.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log_P_bar: '-6'
+          BanYa: '1807'
+          FactSage: '1835'
+          Ideal_Lock: –
+          Ideal_this_work: '1808'
+        - log_P_bar: '-4'
+          BanYa: '2134'
+          FactSage: '2149'
+          Ideal_Lock: '2111'
+          Ideal_this_work: '2127'
+        - log_P_bar: '-2'
+          BanYa: '2579'
+          FactSage: '2594'
+          Ideal_Lock: '2573'
+          Ideal_this_work: '2574'
+        - log_P_bar: '0'
+          BanYa: '3287'
+          FactSage: '3286'
+          Ideal_Lock: '3275'
+          Ideal_this_work: '3279'
+        - log_P_bar: '2'
+          BanYa: '4597'
+          FactSage: '4497'
+          Ideal_Lock: '4487'
+          Ideal_this_work: '4563'
+        quote_as_printed: "Table 8. Mn 50% condensation temperatures – different activity coefficient\n models\n\
+          \  log P (bar)       BanYa  FactSage    Ideal (Lock)        Ideal (this work)\n       -6           1807\
+          \    1835             –                    1808\n       -4           2134    2149           2111     \
+          \              2127\n       -2           2579    2594           2573                   2574\n        0\
+          \           3287    3286           3275                   3279\n        2           4597    4497     \
+          \      4487                   4563\nSee text for details."
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_09_model
+      type: transition_point
+      locator:
+        page: 69
+        table: '9'
+        note: PDF pages 69; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t09.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log_P_bar: '-6'
+          FactSage: '1803'
+          FS_wet: '1798'
+          Ideal_Lock: –
+          Ideal_this_work: '1802'
+        - log_P_bar: '-4'
+          FactSage: '2121'
+          FS_wet: '2115'
+          Ideal_Lock: '2106'
+          Ideal_this_work: '2113'
+        - log_P_bar: '-2'
+          FactSage: '2554'
+          FS_wet: '2547'
+          Ideal_Lock: '2534'
+          Ideal_this_work: '2540'
+        - log_P_bar: 0*
+          FactSage: '3196'
+          FS_wet: '3188'
+          Ideal_Lock: '3154'
+          Ideal_this_work: '3173'
+        - log_P_bar: '2'
+          FactSage: '4299'
+          FS_wet: '4290'
+          Ideal_Lock: '4199'
+          Ideal_this_work: '4253'
+        quote_as_printed: "Table 9. Cr 50% condensation temperatures – FactSage and Ideal\n   log P (bar)     FactSage\
+          \       FS (wet)   Ideal (Lock)    Ideal (this work)\n        -6           1803            1798      \
+          \    –               1802\n        -4           2121            2115        2106              2113\n \
+          \       -2           2554            2547        2534              2540\n        0 *          3196   \
+          \         3188        3154              3173\n         2           4299            4290        4199  \
+          \            4253\n *Ivanov et al. (2022) give a 50% condensation temperature of 3346 K at 1 bar\n\n total\
+          \ pressure. See text for details."
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_10_model
+      type: transition_point
+      locator:
+        page: 69
+        table: '10'
+        note: PDF pages 69; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t10.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log_P_bar: '-6'
+          BanYa: '1477'
+          MAGMA: '1569'
+          FactSage: '1627'
+          Sossi: '1488'
+          Ideal_Lock: –
+          Ideal_this_work: '1102'
+        - log_P_bar: '-4'
+          BanYa: '1820'
+          MAGMA: '1942'
+          FactSage: '2013'
+          Sossi: '1853'
+          Ideal_Lock: '1583'
+          Ideal_this_work: '1364'
+        - log_P_bar: '-2'
+          BanYa: '2373'
+          MAGMA: '2486'
+          FactSage: '2527'
+          Sossi: '2436'
+          Ideal_Lock: '1800'
+          Ideal_this_work: '1809'
+        - log_P_bar: '0'
+          BanYa: '3154'
+          MAGMA: '3184'
+          FactSage: '3199'
+          Sossi: '3176'
+          Ideal_Lock: '2469'
+          Ideal_this_work: '2743'
+        - log_P_bar: '2'
+          BanYa: '4276'
+          MAGMA: '4324'
+          FactSage: '4426'
+          Sossi: '4330'
+          Ideal_Lock: '3772'
+          Ideal_this_work: '4223'
+        quote_as_printed: "Table 10. Na 50% condensation temperatures – real and ideal solution\n  log P (bar) BanYa\
+          \ MAGMA FactSage Sossi Ideal (Lock) Ideal (this work)\n       -6       1477   1569      1627    1488 \
+          \         –              1102\n       -4       1820   1942      2013    1853        1583             1364\n\
+          \       -2       2373   2486      2527    2436        1800             1809\n       0        3154   3184\
+          \      3199    3176        2469             2743\n       2        4276   4324      4426    4330      \
+          \  3772             4223\nSee text for details.\n\n\n\n\n                                         9"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_11_model
+      type: transition_point
+      locator:
+        page: 70
+        table: '11'
+        note: PDF pages 70; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t11.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log_P_bar: '-6'
+          MELTS: '1528'
+          MAGMA: '1574'
+          FactSage: '1564'
+          Sossi: '1441'
+          Ideal_Lock: –
+          Ideal_this_work: '1021'
+        - log_P_bar: '-4'
+          MELTS: '1863'
+          MAGMA: '1954'
+          FactSage: '1930'
+          Sossi: '1775'
+          Ideal_Lock: <1500
+          Ideal_this_work: '1267'
+        - log_P_bar: '-2'
+          MELTS: '2403'
+          MAGMA: '2550'
+          FactSage: '2485'
+          Sossi: '2321'
+          Ideal_Lock: '1752'
+          Ideal_this_work: '1691'
+        - log_P_bar: '0'
+          MELTS: '3161'
+          MAGMA: '3339'
+          FactSage: '3187'
+          Sossi: '3140'
+          Ideal_Lock: '2297'
+          Ideal_this_work: '2699'
+        - log_P_bar: '2'
+          MELTS: '4286'
+          MAGMA: '4648'
+          FactSage: '4410'
+          Sossi: '4263'
+          Ideal_Lock: '3807'
+          Ideal_this_work: '4223'
+        quote_as_printed: "Table 11. K 50% condensation temperatures – different activity coefficient models\n log\
+          \ P (bar) MELTS MAGMA FactSage Sossi Ideal (Lock) Ideal (this work)\n      -6        1528   1574     \
+          \ 1564    1441          –                1021\n      -4        1863   1954      1930    1775       <1500\
+          \               1267\n      -2        2403   2550      2485    2321        1752               1691\n \
+          \     0         3161   3339      3187    3140        2297               2699\n      2         4286   4648\
+          \      4410    4263        3807               4223\nSee text for details."
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_12_model
+      type: transition_point
+      locator:
+        page: 70
+        table: '12'
+        note: PDF pages 70; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t12.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log_P_bar: '-6'
+          FactSage: '1793'
+          NF92: '1499'
+          Sossi_A: '1463'
+          Sossi_B: '1447'
+          Ideal: '1422'
+        - log_P_bar: '-4'
+          FactSage: '2122'
+          NF92: '1819'
+          Sossi_A: '1794'
+          Sossi_B: '1775'
+          Ideal: '1694'
+        - log_P_bar: '-2'
+          FactSage: '2564'
+          NF92: '2346'
+          Sossi_A: '2326'
+          Sossi_B: '2304'
+          Ideal: '2100'
+        - log_P_bar: '0'
+          FactSage: '3242'
+          NF92: '3135'
+          Sossi_A: '3127'
+          Sossi_B: '3119'
+          Ideal: '2801'
+        - log_P_bar: '2'
+          FactSage: '4493'
+          NF92: '4238'
+          Sossi_A: '4233'
+          Sossi_B: '4228'
+          Ideal: '4205'
+        quote_as_printed: "Table 12. Li 50% condensation temperatures – real and ideal models\n   log P (bar)  \
+          \    FactSage          NF92      Sossi-A         Sossi-B        Ideal\n        -6            1793    \
+          \        1499       1463            1447          1422\n        -4            2122            1819   \
+          \    1794            1775          1694\n        -2            2564            2346       2326       \
+          \     2304          2100\n         0            3242            3135       3127            3119      \
+          \    2801\n         2            4493            4238       4233            4228          4205\n NF-92:\
+          \ Nassaralla and Fruehan (1992). Sossi-A: LiO.5 g = 1.8, Sossi-B: LiO.5 g = 15.4,\n both at 1673 K from\
+          \ Sossi et al. (2019)."
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_13_model
+      type: transition_point
+      locator:
+        page: 70
+        table: '13'
+        note: PDF pages 70; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t13.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log_P_bar: −6
+          real_Rb: '1439'
+          real_Cs_1: '1416'
+          real_Cs_2: '1371'
+          ideal_Rb: '1024'
+          ideal_Cs: '626'
+        - log_P_bar: −4
+          real_Rb: '1772'
+          real_Cs_1: '1746'
+          real_Cs_2: '1702'
+          ideal_Rb: '1270'
+          ideal_Cs: '864'
+        - log_P_bar: −2
+          real_Rb: '2305'
+          real_Cs_1: '2270'
+          real_Cs_2: '2227'
+          ideal_Rb: '1658'
+          ideal_Cs: '1426'
+        - log_P_bar: '0'
+          real_Rb: '3122'
+          real_Cs_1: '3108'
+          real_Cs_2: '3088'
+          ideal_Rb: '2464'
+          ideal_Cs: '2802'
+        - log_P_bar: '2'
+          real_Rb: '4230'
+          real_Cs_1: '4221'
+          real_Cs_2: '4218'
+          ideal_Rb: '4172'
+          ideal_Cs: '3718'
+        quote_as_printed: "Table 13. Rb, Cs 50% condensation temperatures – real and Ideal\n                   \
+          \                   real                        ideal\n     log P (bar)         Rb           Cs-1    \
+          \   Cs-2        Rb            Cs\n          −6            1439         1416       1371        1024   \
+          \       626\n          −4            1772         1746       1702        1270          864\n         \
+          \ −2            2305         2270       2227        1658         1426\n          0             3122  \
+          \       3108       3088        2464         2802\n          2             4230         4221       4218\
+          \        4172         3718\n  Real solution models: Cs-1: log g = −0.083 − 13,634.1/T. Cs-2: log g = −12,144/T"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_14_model
+      type: transition_point
+      locator:
+        page: 70
+        table: '14'
+        note: PDF pages 70; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t14.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log_P_bar: '-6'
+          Be: '2101'
+          Mg: '1817'
+          Ca: '1880'
+          Sr: '1866'
+          Ba: '1791'
+        - log_P_bar: '-4'
+          Be: '2466'
+          Mg: '2135'
+          Ca: '2216'
+          Sr: '2203'
+          Ba: '2124'
+        - log_P_bar: '-2'
+          Be: '2960'
+          Mg: '2592'
+          Ca: '2700'
+          Sr: '2695'
+          Ba: '2571'
+        - log_P_bar: '0'
+          Be: '3645'
+          Mg: '3303'
+          Ca: '3448'
+          Sr: '3473'
+          Ba: '3303'
+        - log_P_bar: '2'
+          Be: '4894'
+          Mg: '4561'
+          Ca: '4758'
+          Sr: '4894'
+          Ba: '4794'
+        quote_as_printed: "Table 14. Alkaline Earth 50% condensation temperatures – ideal solution\n        log\
+          \ P (bar)         Be       Mg          Ca       Sr          Ba\n             -6           2101      1817\
+          \       1880      1866        1791\n             -4           2466      2135       2216      2203    \
+          \    2124\n             -2           2960      2592       2700      2695        2571\n              0\
+          \           3645      3303       3448      3473        3303\n              2           4894      4561\
+          \       4758      4894        4794\n\n\n\n\n                                          10"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_15_model
+      type: transition_point
+      locator:
+        page: 71
+        table: '15'
+        note: PDF pages 71; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t15.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log_P_bar: '-6'
+          Sc: '2054'
+          Y: '2060'
+          Ti: '1879'
+          Zr: '2159'
+          Hf: '2159'
+          Th: '2067'
+          U: '1805'
+          Pu: '1924'
+        - log_P_bar: '-4'
+          Sc: '2352'
+          Y: '2350'
+          Ti: '2192'
+          Zr: '2498'
+          Hf: '2498'
+          Th: '2371'
+          U: '2129'
+          Pu: '2253'
+        - log_P_bar: '-2'
+          Sc: '2771'
+          Y: '2759'
+          Ti: '2650'
+          Zr: '2960'
+          Hf: '2961'
+          Th: '2806'
+          U: '2568'
+          Pu: '2733'
+        - log_P_bar: '0'
+          Sc: '3444'
+          Y: '3430'
+          Ti: '3378'
+          Zr: '3645'
+          Hf: '3646'
+          Th: '3520'
+          U: '3275'
+          Pu: '3459'
+        - log_P_bar: '2'
+          Sc: '4614'
+          Y: '4578'
+          Ti: '4694'
+          Zr: '4894'
+          Hf: '4900'
+          Th: '4837'
+          U: '4792'
+          Pu: '4685'
+        quote_as_printed: "Table 15. Sc, Y, Ti, Zr, Hf, Th, U, Pu 50% condensation temperatures – ideal\nsolution\n\
+          \ log P (bar)       Sc         Y        Ti     Zr      Hf      Th        U       Pu\n      -6        \
+          \ 2054 2060 1879 2159 2159 2067 1805                            1924\n      -4         2352 2350 2192\
+          \ 2498 2498 2371 2129                            2253\n      -2         2771 2759 2650 2960 2961 2806\
+          \ 2568                            2733\n       0         3444 3430 3378 3645 3646 3520 3275          \
+          \                  3459\n       2         4614 4578 4694 4894 4900 4837 4792                         \
+          \   4685"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_16_model
+      type: transition_point
+      locator:
+        page: 71
+        table: '16'
+        note: PDF pages 71; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t16.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log_P_bar: '-6'
+          La: '1850'
+          Ce_a: '1808'
+          Pr: '1841'
+          Nd: '1857'
+          Sm: '1864'
+          Eu_b: '1934'
+          Gd: '1910'
+          Tb: '1964'
+          Dy: '1956'
+          Ho: '1952'
+          Er: '1994'
+          Tm: '2017'
+          Yb: '1958'
+          Lu: '2012'
+        - log_P_bar: '-4'
+          La: '2147'
+          Ce_a: '2122'
+          Pr: '2141'
+          Nd: '2159'
+          Sm: '2167'
+          Eu_b: '2293'
+          Gd: '2207'
+          Tb: '2256'
+          Dy: '2242'
+          Ho: '2236'
+          Er: '2276'
+          Tm: '2288'
+          Yb: '2264'
+          Lu: '2286'
+        - log_P_bar: '-2'
+          La: '2565'
+          Ce_a: '2564'
+          Pr: '2562'
+          Nd: '2578'
+          Sm: '2584'
+          Eu_b: '2825'
+          Gd: '2624'
+          Tb: '2690'
+          Dy: '2673'
+          Ho: '2662'
+          Er: '2694'
+          Tm: '2733'
+          Yb: '2699'
+          Lu: '2694'
+        - log_P_bar: '0'
+          La: '3195'
+          Ce_a: '3229'
+          Pr: '3193'
+          Nd: '3209'
+          Sm: '3214'
+          Eu_b: '3645'
+          Gd: '3237'
+          Tb: '3342'
+          Dy: '3300'
+          Ho: '3277'
+          Er: '3327'
+          Tm: '3365'
+          Yb: '3341'
+          Lu: '3310'
+        - log_P_bar: '2'
+          La: '4270'
+          Ce_a: '4514'
+          Pr: '4268'
+          Nd: '4285'
+          Sm: '4280'
+          Eu_b: '4894'
+          Gd: '4289'
+          Tb: '4433'
+          Dy: '4350'
+          Ho: '4320'
+          Er: '4370'
+          Tm: '4384'
+          Yb: '4374'
+          Lu: '4333'
+        quote_as_printed: "Table 16. REE 50% condensation temperatures – ideal solution\n         log P (bar)  \
+          \ La    Cea   Pr      Nd    Sm      Eub     Gd\n              -6     1850 1808 1841 1857 1864 1934 1910\n\
+          \              -4     2147 2122 2141 2159 2167 2293 2207\n              -2     2565 2564 2562 2578 2584\
+          \ 2825 2624\n               0     3195 3229 3193 3209 3214 3645 3237\n               2     4270 4514 4268\
+          \ 4285 4280 4894 4289\n\n         log P (bar)    Tb     Dy     Ho       Er     Tm      Yb      Lu\n  \
+          \            -6       1964 1956 1952         1994   2017    1958    2012\n              -4       2256\
+          \ 2242 2236         2276   2288    2264    2286\n              -2       2690 2673 2662         2694  \
+          \ 2733    2699    2694\n               0       3342 3300 3277         3327   3365    3341    3310\n  \
+          \             2       4433 4350 4320         4370   4384    4374    4333\n         aIdeal solution of\
+          \ CeO and Ce O\n                               2      2 3\n         bIdeal solution of EuO and Eu O\n\
+          \                                      2 3"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_17_model
+      type: transition_point
+      locator:
+        page: 71
+        table: '17'
+        note: PDF pages 71; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t17.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log_P_bar: '-6'
+          V_real: '1729'
+          V_ideal: '1610'
+          Nb_ideal: '1858'
+          Ta_ideal: '1828'
+        - log_P_bar: '-4'
+          V_real: '2072'
+          V_ideal: '2043'
+          Nb_ideal: '2181'
+          Ta_ideal: '2124'
+        - log_P_bar: '-2'
+          V_real: '2533'
+          V_ideal: '2532'
+          Nb_ideal: '2654'
+          Ta_ideal: '2537'
+        - log_P_bar: '0'
+          V_real: '3190'
+          V_ideal: '3197'
+          Nb_ideal: '3410'
+          Ta_ideal: '3160'
+        - log_P_bar: '2'
+          V_real: '4354'
+          V_ideal: '4417'
+          Nb_ideal: '4825'
+          Ta_ideal: '4243'
+        quote_as_printed: "Table 17. Group 5 (V, Nb, Ta) 50% condensation temperatures\n          log P (bar) V\
+          \ (real) V (ideal) Nb (ideal) Ta (ideal)\n               -6        1729        1610       1858       \
+          \ 1828\n               -4        2072        2043       2181        2124\n               -2        2533\
+          \        2532       2654        2537\n                0        3190        3197       3410        3160\n\
+          \                2        4354        4417       4825        4243\n\n\n\n\n                          \
+          \              11"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_18_model
+      type: transition_point
+      locator:
+        page: 72
+        table: '18'
+        note: PDF pages 72; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t18.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log P (bar): '-6'
+          Real solution Cr: '1803'
+          Real solution Mo: '1527'
+          Real solution W: '1846'
+          Ideal solution Cr: '1802'
+          Ideal solution Mo: '1640'
+          Ideal solution W: '1815'
+        - log P (bar): '-4'
+          Real solution Cr: '2121'
+          Real solution Mo: '1921'
+          Real solution W: '2160'
+          Ideal solution Cr: '2113'
+          Ideal solution Mo: '2058'
+          Ideal solution W: '2132'
+        - log P (bar): '-2'
+          Real solution Cr: '2554'
+          Real solution Mo: '2496'
+          Real solution W: '2618'
+          Ideal solution Cr: '2540'
+          Ideal solution Mo: '2539'
+          Ideal solution W: '2584'
+        - log P (bar): 0*
+          Real solution Cr: '3196'
+          Real solution Mo: '3186'
+          Real solution W: '3356'
+          Ideal solution Cr: '3173'
+          Ideal solution Mo: '3211'
+          Ideal solution W: '3303'
+        - log P (bar): '2'
+          Real solution Cr: '4299'
+          Real solution Mo: '4376'
+          Real solution W: '4708'
+          Ideal solution Cr: '4253'
+          Ideal solution Mo: '4511'
+          Ideal solution W: '4625'
+        quote_as_printed: "Table 18. Group 6 (Cr, Mo, W) 50% condensation temperatures – real and ideal\nsolution\n\
+          \                           Real solution                    Ideal solution\n  log P (bar)        Cr \
+          \        Mo          W          Cr         Mo        W\n       -6          1803        1527        1846\
+          \     1802        1640       1815\n       -4          2121        1921        2160     2113        2058\
+          \       2132\n       -2          2554        2496        2618     2540        2539       2584\n      \
+          \ 0*          3196        3186        3356     3173        3211       3303\n        2          4299  \
+          \      4376        4708     4253        4511       4625\n*Ivanov et al. (2022) report 3346 K (Cr), 3385\
+          \ K (Mo), and 3337 K (W) 50%\n\ncondensation temperatures at one bar total pressure."
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_19_model
+      type: transition_point
+      locator:
+        page: 72
+        table: '19'
+        note: PDF pages 72; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t19.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - BSE: Dry
+          log P (bar): '-6'
+          Re: '755'
+          Ru: '1003'
+          Os: '855'
+          Rh: '1451'
+          Ir: '1491'
+          Pd: '1091'
+          Pt: '1464'
+          Au: '1100'
+        - BSE: Dry
+          log P (bar): '-4'
+          Re: '1380'
+          Ru: '1089'
+          Os: '1480'
+          Rh: '1681'
+          Ir: '1761'
+          Pd: '1197'
+          Pt: '1772'
+          Au: '1245'
+        - BSE: Dry
+          log P (bar): '-2'
+          Re: '2301'
+          Ru: '1183'
+          Os: '2307'
+          Rh: '1743'
+          Ir: '1115'
+          Pd: '1328'
+          Pt: '2080'
+          Au: '1440'
+        - BSE: Dry
+          log P (bar): '0'
+          Re: '3100'
+          Ru: '1268'
+          Os: '3064'
+          Rh: '1752'
+          Ir: '1211'
+          Pd: '1490'
+          Pt: '2247'
+          Au: '1713'
+        - BSE: Dry
+          log P (bar): '2'
+          Re: '4188'
+          Ru: '1312'
+          Os: '4236'
+          Rh: '1754'
+          Ir: '1333'
+          Pd: '1701'
+          Pt: '2271'
+          Au: '2114'
+        - BSE: Wet
+          log P (bar): '-6'
+          Re: '1518'
+          Ru: '1498'
+          Os: '1618'
+          Rh: '1360'
+          Ir: '1633'
+          Pd: '1043'
+          Pt: '1408'
+          Au: '686'
+        - BSE: Wet
+          log P (bar): '-4'
+          Re: '1750'
+          Ru: '1679'
+          Os: '1850'
+          Rh: '1517'
+          Ir: '1807'
+          Pd: '1169'
+          Pt: '1538'
+          Au: '734'
+        - BSE: Wet
+          log P (bar): '-2'
+          Re: '2146'
+          Ru: '1957'
+          Os: '2152'
+          Rh: '1712'
+          Ir: '2039'
+          Pd: '1331'
+          Pt: '1673'
+          Au: '824'
+        - BSE: Wet
+          log P (bar): '0'
+          Re: '2611'
+          Ru: '2301'
+          Os: '2575'
+          Rh: '1946'
+          Ir: '2347'
+          Pd: '1539'
+          Pt: '1822'
+          Au: '940'
+        - BSE: Wet
+          log P (bar): '2'
+          Re: '3036'
+          Ru: '2718'
+          Os: '3084'
+          Rh: '2224'
+          Ir: '2739'
+          Pd: '1794'
+          Pt: '1994'
+          Au: '1094'
+        quote_as_printed: "Table 19. Noble metal 50% condensation temperatures\n                               \
+          \    Dry BSE\n      log P (bar) Re      Ru     Os     Rh     Ir    Pd   Pt          Au\n           -6\
+          \      755 1003 855 1451 1491 1091 1464                  1100\n           -4     1380 1089 1480 1681 1761\
+          \ 1197 1772                 1245\n           -2     2301 1183 2307 1743 1115 1328 2080               \
+          \  1440\n            0     3100 1268 3064 1752 1211 1490 2247                 1713\n            2    \
+          \ 4188 1312 4236 1754 1333 1701 2271                 2114\n                                  Wet BSE\n\
+          \      log P (bar) Re      Ru     Os     Rh     Ir    Pd   Pt          Au\n           -6     1518 1498\
+          \ 1618 1360 1633 1043 1408                 686\n           -4     1750 1679 1850 1517 1807 1169 1538 \
+          \                734\n           -2     2146 1957 2152 1712 2039 1331 1673                 824\n     \
+          \       0     2611 2301 2575 1946 2347 1539 1822                 940\n            2     3036 2718 3084\
+          \ 2224 2739 1794 1994                 1094"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_20_model
+      type: transition_point
+      locator:
+        page: 72
+        table: '20'
+        note: PDF pages 72; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t20.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log P (bar): '-6'
+          Cobalt FactSage: '1781'
+          Cobalt ideal: '1794'
+          Nickel FactSage: '1722'
+          Nickel ideal: '1755'
+        - log P (bar): '-4'
+          Cobalt FactSage: '2112'
+          Cobalt ideal: '2118'
+          Nickel FactSage: '2051'
+          Nickel ideal: '2085'
+        - log P (bar): '-2'
+          Cobalt FactSage: '2557'
+          Cobalt ideal: '2560'
+          Nickel FactSage: '2503'
+          Nickel ideal: '2530'
+        - log P (bar): '0'
+          Cobalt FactSage: '3225'
+          Cobalt ideal: '3239'
+          Nickel FactSage: '3166'
+          Nickel ideal: '3181'
+        - log P (bar): '2'
+          Cobalt FactSage: '4474'
+          Cobalt ideal: '4508'
+          Nickel FactSage: '4262'
+          Nickel ideal: '4287'
+        quote_as_printed: "Table 20. Co, Ni 50% condensation temperatures – real and ideal solution\n          \
+          \                     Cobalt                    Nickel\n      log P (bar)        FactSage       ideal\
+          \    FactSage        ideal\n           -6              1781        1794        1722          1755\n  \
+          \         -4              2112        2118        2051          2085\n           -2              2557\
+          \        2560        2503          2530\n            0              3225        3239        3166     \
+          \     3181\n            2              4474        4508        4262          4287\n\n\n\n\n          \
+          \                             12"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_21_model
+      type: transition_point
+      locator:
+        page: 73
+        table: '21'
+        note: PDF pages 73; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t21.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log P (bar): '-6'
+          Cu-1: '1452'
+          Cu-2: '1428'
+          Cu-3: '1421'
+          Cu-4: '1441'
+          Ideal: '1454'
+        - log P (bar): '-4'
+          Cu-1: '1783'
+          Cu-2: '1759'
+          Cu-3: '1752'
+          Cu-4: '1771'
+          Ideal: '1786'
+        - log P (bar): '-2'
+          Cu-1: '2317'
+          Cu-2: '2291'
+          Cu-3: '2285'
+          Cu-4: '2303'
+          Ideal: '2320'
+        - log P (bar): '0'
+          Cu-1: '3127'
+          Cu-2: '3119'
+          Cu-3: '3117'
+          Cu-4: '3122'
+          Ideal: '3128'
+        - log P (bar): '2'
+          Cu-1: '4236'
+          Cu-2: '4231'
+          Cu-3: '4231'
+          Cu-4: '4233'
+          Ideal: '4236'
+        quote_as_printed: "Table 21. Copper 50% condensation temperatures – real and ideal solution\n  log P (bar)\
+          \          Cu-1      Cu-2         Cu-3         Cu-4       Ideal\n       -6             1452       1428\
+          \         1421        1441        1454\n       -4             1783       1759         1752        1771\
+          \        1786\n       -2             2317       2291         2285        2303        2320\n        0 \
+          \            3127       3119         3117        3122        3128\n        2             4236       4231\
+          \         4231        4233        4236\nCu real solution models: (1) Altman (1978). (2) Holzheid and Lodders\
+          \ (2001). (3)\nSossi et al (2019). (4) Wood and Wade (2013). See text for details."
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_22_model
+      type: transition_point
+      locator:
+        page: 73
+        table: '22'
+        note: PDF pages 73; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t22.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log P (bar): '-6'
+          ideal: '1035'
+          Ag-1: '1056'
+          Ag-2: '910'
+        - log P (bar): '-4'
+          ideal: '1257'
+          Ag-1: '1283'
+          Ag-2: '1104'
+        - log P (bar): '-2'
+          ideal: '1612'
+          Ag-1: '1645'
+          Ag-2: '1410'
+        - log P (bar): '0'
+          ideal: '2266'
+          Ag-1: '2315'
+          Ag-2: '1974'
+        - log P (bar): '2'
+          ideal: '3819'
+          Ag-1: '3876'
+          Ag-2: '3372'
+        quote_as_printed: "Table 22. Silver 50% condensation temperatures – real and ideal solution\n     log P\
+          \ (bar)             ideal                 Ag-1                 Ag-2\n          -6                1035\
+          \                   1056                  910\n          -4                1257                   1283\
+          \                 1104\n          -2                1612                   1645                 1410\n\
+          \          0                 2266                   2315                 1974\n          2           \
+          \      3819                   3876                 3372\nReal solution models: (1) log g = −582.0/T Sossi\
+          \ et al. (2019) 1673 K point. (2) log\ng = log g(Cu2O) = 3582.8/T, Sossi et al. (2019) Cu2O 1673 K point.\
+          \ See text for\ndetails."
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_23_model
+      type: transition_point
+      locator:
+        page: 73
+        table: '23'
+        note: PDF pages 73; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t23.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log P (bar): '-6'
+          Zn-1: '1453'
+          Zn-2: '1451'
+          Zn-3: '1467'
+          Zn-4: '1463'
+          ideal: '1450'
+        - log P (bar): '-4'
+          Zn-1: '1785'
+          Zn-2: '1787'
+          Zn-3: '1793'
+          Zn-4: '1787'
+          ideal: '1787'
+        - log P (bar): '-2'
+          Zn-1: '2319'
+          Zn-2: '2330'
+          Zn-3: '2309'
+          Zn-4: '2288'
+          ideal: '2330'
+        - log P (bar): '0'
+          Zn-1: '3129'
+          Zn-2: '3137'
+          Zn-3: '3103'
+          Zn-4: '3065'
+          ideal: '3132'
+        - log P (bar): '2'
+          Zn-1: '4242'
+          Zn-2: '4259'
+          Zn-3: '4223'
+          Zn-4: '4213'
+          ideal: '4256'
+        quote_as_printed: "Table 23. Zinc 50% condensation temperatures - real and ideal solution\n    log P (bar)\
+          \         Zn-1       Zn-2        Zn-3         Zn-4         ideal\n         -6             1453       1451\
+          \        1467         1463         1450\n         -4             1785       1787        1793         1787\
+          \         1787\n         -2             2319       2330        2309         2288         2330\n      \
+          \    0             3129       3137        3103         3065         3132\n          2             4242\
+          \       4259        4223         4213         4256\nModels:(1) FactSage. (2) MAGMA. (3) Reyes and Gaskell\
+          \ (1983). (4) Sossi et al.\n(2019)."
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_24_model
+      type: transition_point
+      locator:
+        page: 73
+        table: '24'
+        note: PDF pages 73; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t24.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log P (bar): −6
+          Real: '1361'
+          Ideal: '1262'
+        - log P (bar): −4
+          Real: '1733'
+          Ideal: '1638'
+        - log P (bar): −2
+          Real: '2296'
+          Ideal: '2254'
+        - log P (bar): '0'
+          Real: '3125'
+          Ideal: '3120'
+        - log P (bar): '2'
+          Real: '4246'
+          Ideal: '4240'
+        quote_as_printed: "Table 24. Cd 50% condensation temperatures - real and ideal\n                       \
+          \   solution\n    log P (bar)             Real                  Ideal\n        −6                  1361\
+          \                  1262\n        −4                  1733                  1638\n        −2          \
+          \        2296                  2254\n         0                  3125                  3120\n        \
+          \ 2                  4246                  4240\n\n\n\n\n                                         13"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_25_model
+      type: transition_point
+      locator:
+        page: 74
+        table: '25'
+        note: PDF pages 74; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t25.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - solution: Ideal
+          log P (bar): '-6'
+          B: '1113'
+          Al: '2134'
+          Ga: '1615'
+          In: '1446'
+          Tl: '924'
+        - solution: Ideal
+          log P (bar): '-4'
+          B: '1355'
+          Al: '2460'
+          Ga: '1891'
+          In: '1757'
+          Tl: '1137'
+        - solution: Ideal
+          log P (bar): '-2'
+          B: '1756'
+          Al: '2952'
+          Ga: '2350'
+          In: '2205'
+          Tl: '1490'
+        - solution: Ideal
+          log P (bar): '0'
+          B: '2574'
+          Al: '3632'
+          Ga: '3127'
+          In: '2890'
+          Tl: '2209'
+        - solution: Ideal
+          log P (bar): '2'
+          B: '4193'
+          Al: '4825'
+          Ga: '4228'
+          In: '4057'
+          Tl: '4064'
+        - solution: Real
+          log P (bar): '-6'
+          B: '1447'
+          Al: '2159'
+          Ga: '1739'
+          In: '1473'
+          Tl: '1405'
+        - solution: Real
+          log P (bar): '-4'
+          B: '1784'
+          Al: '2498'
+          Ga: '2033'
+          In: '1789'
+          Tl: '1729'
+        - solution: Real
+          log P (bar): '-2'
+          B: '2336'
+          Al: '2960'
+          Ga: '2452'
+          In: '2299'
+          Tl: '2252'
+        - solution: Real
+          log P (bar): '0'
+          B: '3147'
+          Al: '3645'
+          Ga: '3143'
+          In: '3070'
+          Tl: '3106'
+        - solution: Real
+          log P (bar): '2'
+          B: '4281'
+          Al: '4894'
+          Ga: '4238'
+          In: '4206'
+          Tl: '4223'
+        quote_as_printed: "Table 25. Group 13 (B, Al, Ga, In, Tl) 50% condensation temperatures\n              \
+          \                     Ideal solution\n         log P (bar)        B            Al        Ga        In\
+          \        Tl\n              -6          1113         2134       1615     1446       924\n             \
+          \ -4          1355         2460       1891     1757      1137\n              -2          1756        \
+          \ 2952       2350     2205      1490\n              0           2574         3632       3127     2890\
+          \      2209\n              2           4193         4825       4228     4057      4064\n             \
+          \                      Real solution\n         log P (bar)        B            Al        Ga        In\
+          \        Tl\n              -6          1447         2159       1739     1473      1405\n             \
+          \ -4          1784         2498       2033     1789      1729\n              -2          2336        \
+          \ 2960       2452     2299      2252\n              0           3147         3645       3143     3070\
+          \      3106\n              2           4281         4894       4238     4206      4223"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_27_model
+      type: transition_point
+      locator:
+        page: 74
+        table: '27'
+        note: PDF pages 74; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t27.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log P (bar): '-6'
+          Ge-1: '1464'
+          Ge-2: '1423'
+          Ge-3: '1449'
+          Ge-4: '1456'
+          Ideal: '1445'
+        - log P (bar): '-4'
+          Ge-1: '1781'
+          Ge-2: '1725'
+          Ge-3: '1775'
+          Ge-4: '1783'
+          Ideal: '1768'
+        - log P (bar): '-2'
+          Ge-1: '2269'
+          Ge-2: '2195'
+          Ge-3: '2296'
+          Ge-4: '2260'
+          Ideal: '2283'
+        - log P (bar): '0'
+          Ge-1: '2960'
+          Ge-2: '2992'
+          Ge-3: '3113'
+          Ge-4: '3118'
+          Ideal: '3107'
+        - log P (bar): '2'
+          Ge-1: '4072'
+          Ge-2: '4212'
+          Ge-3: '4224'
+          Ge-4: '4227'
+          Ideal: '4222'
+        quote_as_printed: "Table 27. Ge 50% condensation temperatures - real and ideal solution\n log P (bar)  \
+          \    Ge-1           Ge-2           Ge-3            Ge-4         Ideal\n      -6          1464        \
+          \   1423           1449           1456          1445\n      -4          1781           1725          \
+          \ 1775           1783          1768\n      -2          2269           2195           2296           2260\
+          \          2283\n      0           2960           2992           3113           3118          3107\n \
+          \     2           4072           4212           4224           4227          4222\nGe real solution models:\
+          \ (1) Sossi et al. (2019). (2) FactSage. (3) g(GeO2) = g(SiO2).\n(4) Regular solution fit to 1673 K point\
+          \ of Sossi et al. (2019).\n\n\n\n\n                                          14"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_28_model
+      type: transition_point
+      locator:
+        page: 75
+        table: '28'
+        note: PDF pages 75; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t28.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log P (bar): −6
+          Sn-1: '1461'
+          Sn-2: '1478'
+          Pb-1: '1448'
+          Pb-2: '1452'
+          Pb-3: '1448'
+          Pb-4: '1452'
+          Pb-5: '1442'
+        - log P (bar): −4
+          Sn-1: '1791'
+          Sn-2: '1805'
+          Pb-1: '1782'
+          Pb-2: '1789'
+          Pb-3: '1784'
+          Pb-4: '1789'
+          Pb-5: '1778'
+        - log P (bar): −2
+          Sn-1: '2333'
+          Sn-2: '2350'
+          Pb-1: '2324'
+          Pb-2: '2336'
+          Pb-3: '2329'
+          Pb-4: '2337'
+          Pb-5: '2322'
+        - log P (bar): '0'
+          Sn-1: '3138'
+          Sn-2: '3148'
+          Pb-1: '3134'
+          Pb-2: '3138'
+          Pb-3: '3140'
+          Pb-4: '3144'
+          Pb-5: '3136'
+        - log P (bar): '2'
+          Sn-1: '4254'
+          Sn-2: '4273'
+          Pb-1: '4250'
+          Pb-2: '4272'
+          Pb-3: '4265'
+          Pb-4: '4273'
+          Pb-5: '4258'
+        quote_as_printed: "Table 28. Sn and Pb 50% condensation temperatures - real and ideal solution\nlog P (bar)\
+          \     Sn-1        Sn-2      Pb-1      Pb-2     Pb-3        Pb-4      Pb-5\n    −6          1461      \
+          \ 1478       1448      1452     1448       1452       1442\n    −4          1791       1805       1782\
+          \      1789     1784       1789       1778\n    −2          2333       2350       2324      2336     2329\
+          \       2337       2322\n     0          3138       3148       3134      3138     3140       3144    \
+          \   3136\n     2          4254       4273       4250      4272     4265       4273       4258\nSn-1: real.\
+          \ Sn-2: ideal. Pb-1: FactSage. Pb-2: Wood and Wade (2013) log g =\n−1265/T. Pb-3: Sossi et al. (2019)\
+          \ log g = −689/T. Pb-4: Sossi et al. (2019) log g =\n−1320/T. Pb-5: ideal."
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_29_model
+      type: transition_point
+      locator:
+        page: 75
+        table: '29'
+        note: PDF pages 75; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t29.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log P (bar): −6
+          P2O5 – 1: '1583'
+          P2O5 – 2: '1737'
+          P2O5 - 3: '1761'
+          As2O3: '1544'
+          Sb2O3: '1552'
+          Bi2O3: '1461'
+        - log P (bar): −4
+          P2O5 – 1: '1948'
+          P2O5 – 2: '1996'
+          P2O5 - 3: '2028'
+          As2O3: '1804'
+          Sb2O3: '1804'
+          Bi2O3: '1781'
+        - log P (bar): −2
+          P2O5 – 1: '2474'
+          P2O5 – 2: '2376'
+          P2O5 - 3: '2400'
+          As2O3: '2302'
+          Sb2O3: '2293'
+          Bi2O3: '2291'
+        - log P (bar): '0'
+          P2O5 – 1: '3176'
+          P2O5 – 2: '3082'
+          P2O5 - 3: '3103'
+          As2O3: '2958'
+          Sb2O3: '2870'
+          Bi2O3: '3072'
+        - log P (bar): '2'
+          P2O5 – 1: '4322'
+          P2O5 – 2: '4084'
+          P2O5 - 3: '4126'
+          As2O3: '3831'
+          Sb2O3: '3619'
+          Bi2O3: '4211'
+        quote_as_printed: "Table 29. Group 15 (P, As, Sb, Bi) 50% condensation temperatures - real solution\n  log\
+          \ P\n             P2O5 – 1 P2O5 – 2 P2O5 - 3          As2O3       Sb2O3          Bi2O3\n  (bar)\n   −6\
+          \          1583        1737       1761       1544         1552          1461\n   −4          1948    \
+          \    1996       2028       1804         1804          1781\n   −2          2474        2376       2400\
+          \       2302         2293          2291\n    0          3176        3082       3103       2958       \
+          \  2870          3072\n    2          4322        4084       4126       3831         3619          4211\n\
+          Real solution models for P2O5:(1) Ban-Ya (1993). (2) FactSage. (3) Suito et al.\n(1981)."
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_30_model
+      type: transition_point
+      locator:
+        page: 75
+        table: '30'
+        note: PDF pages 75; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t30.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log P (bar): −6
+          As2O3: '1200'
+          Sb2O3: '1237'
+          Bi2O3: '1109'
+        - log P (bar): −4
+          As2O3: '1407'
+          Sb2O3: '1439'
+          Bi2O3: '1336'
+        - log P (bar): −2
+          As2O3: '1702'
+          Sb2O3: '1720'
+          Bi2O3: '1691'
+        - log P (bar): '0'
+          As2O3: '2159'
+          Sb2O3: '2131'
+          Bi2O3: '2336'
+        - log P (bar): '2'
+          As2O3: '2949'
+          Sb2O3: '2796'
+          Bi2O3: '3770'
+        quote_as_printed: "Table 30. As, Sb, Bi 50% condensation temperatures - ideal solution\n             log\
+          \ P (bar)           As2O3         Sb2O3           Bi2O3\n                 −6                1200     \
+          \     1237            1109\n                 −4                1407          1439            1336\n  \
+          \               −2                1702          1720            1691\n                  0            \
+          \    2159          2131            2336\n                  2                2949          2796       \
+          \     3770"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_31_model
+      type: transition_point
+      locator:
+        page: 75
+        table: '31'
+        note: PDF pages 75; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t31.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - log P (bar): −6
+          Real: '1858'
+          Ideal: '1819'
+        - log P (bar): −4
+          Real: '2173'
+          Ideal: '2134'
+        - log P (bar): −2
+          Real: '2617'
+          Ideal: '2581'
+        - log P (bar): 0*
+          Real: '3294'
+          Ideal: '3260'
+        - log P (bar): '2'
+          Real: '4463'
+          Ideal: '4427'
+        quote_as_printed: "Table 31. Oxygen 50% condensation temperatures - real and ideal solution\n       log\
+          \ P (bar)                      Real                      Ideal\n            −6                       \
+          \   1858                      1819\n            −4                          2173                     \
+          \ 2134\n            −2                          2617                      2581\n             0*      \
+          \                   3294                      3260\n             2                          4463     \
+          \                 4427\n*Ivanov et al. (2022) give 3409 K for 50% condensation of oxygen at one bar total\n\
+          \npressure.\n\n\n\n\n                                         15"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
+    - observation_id: fegley_2023_table_32_model
+      type: transition_point
+      locator:
+        page: 76
+        table: '32'
+        note: PDF pages 76, 77, 78; printed table-section pagination differs.
+        source_path: tables/fegley-2023-chemical-equilibrium-calculations-bu/t32.csv
+      phase: BSE_equilibrium_gas_melt
+      regime: thermochemical_equilibrium_model
+      units: as_printed_in_table_headers_and_notes
+      values:
+        method_class: model_derived
+        evidence_class: thermodynamic_model_parameter
+        measurement_kind: model
+        quantity: tabulated_equilibrium_condensation_model
+        rows_as_printed:
+        - Z: '3'
+          Symbol: Li
+          T50/K: '2122'
+          T-range: 1775-2122
+          Gas: Li
+          M/MO: '65'
+          M/M+: '4300'
+        - Z: '11'
+          Symbol: Na
+          T50/K: '1820'
+          T-range: 1820-2013
+          Gas: Na
+          M/MO: '1200'
+          M/M+: '46300'
+        - Z: '19'
+          Symbol: K
+          T50/K: '1863'
+          T-range: 1863-1954
+          Gas: K
+          M/MO: '1300'
+          M/M+: '190'
+        - Z: '37'
+          Symbol: Rb
+          T50/K: '1772'
+          T-range: '1772'
+          Gas: Rb
+          M/MO: '400'
+          M/M+: '100'
+        - Z: '55'
+          Symbol: Cs
+          T50/K: '1746'
+          T-range: 1702-1746
+          Gas: Cs
+          M/MO: '160'
+          M/M+: '20'
+        - Z: '4'
+          Symbol: Be
+          T50/K: '2466'
+          T-range: –
+          Gas: Be
+          M/MO: '9'
+          M/M+: 1.1×10^9
+        - Z: '12'
+          Symbol: Mg
+          T50/K: '2198'
+          T-range: 2197-2228
+          Gas: Mg
+          M/MO: '20'
+          M/M+: 1.8×10^7
+        - Z: '20'
+          Symbol: Ca
+          T50/K: '2498'
+          T-range: 2411-2498*
+          Gas: Ca
+          M/MO: '50'
+          M/M+: '260'
+        - Z: '38'
+          Symbol: Sr
+          T50/K: '2203'
+          T-range: –
+          Gas: Sr
+          M/MO: '8'
+          M/M+: '35'
+        - Z: '56'
+          Symbol: Ba
+          T50/K: '2124'
+          T-range: –
+          Gas: BaO
+          M/MO: 7.9×10^-4
+          M/M+: '330'
+        - Z: '21'
+          Symbol: Sc
+          T50/K: '2352'
+          T-range: –
+          Gas: ScO
+          M/MO: 5.5×10^-5
+          M/M+: '9700'
+        - Z: '39'
+          Symbol: Y
+          T50/K: '2350'
+          T-range: –
+          Gas: YO
+          M/MO: 6.2×10^-6
+          M/M+: 2,800
+        - Z: '57'
+          Symbol: La
+          T50/K: '2147'
+          T-range: –
+          Gas: LaO
+          M/MO: 5.4×10^-9
+          M/M+: 1,400
+        - Z: '22'
+          Symbol: Ti
+          T50/K: '2213'
+          T-range: 2213-2318
+          Gas: TiO2
+          M/MO: 1.5×10^-5
+          M/M+: 1.8×10^5
+        - Z: '40'
+          Symbol: Zr
+          T50/K: '2498'
+          T-range: –
+          Gas: ZrO2
+          M/MO: 2.4×10^-5
+          M/M+: 8.0×10^3
+        - Z: '72'
+          Symbol: Hf
+          T50/K: '2498'
+          T-range: –
+          Gas: HfO‡
+          M/MO: 1.4×10^-6
+          M/M+: 1.3×10^4
+        - Z: '23'
+          Symbol: V
+          T50/K: '2072'
+          T-range: –
+          Gas: VO2
+          M/MO: 5.2×10^-5
+          M/M+: 1.4×10^7
+        - Z: '41'
+          Symbol: Nb
+          T50/K: '2181'
+          T-range: –
+          Gas: NbO2
+          M/MO: 8.4×10^-8
+          M/M+: 1.3×10^6
+        - Z: '73'
+          Symbol: Ta
+          T50/K: '2124'
+          T-range: –
+          Gas: TaO2
+          M/MO: 3.7×10^-10
+          M/M+: 1.3×10^9
+        - Z: '24'
+          Symbol: Cr
+          T50/K: '2121'
+          T-range: –
+          Gas: CrO2
+          M/MO: '0.2'
+          M/M+: 5.0×10^6
+        - Z: '42'
+          Symbol: Mo
+          T50/K: '1921'
+          T-range: –
+          Gas: MoO3
+          M/MO: 1.9×10^-4
+          M/M+: 3.1×10^9
+        - Z: '74'
+          Symbol: W
+          T50/K: '2160'
+          T-range: –
+          Gas: WO3
+          M/MO: 1.8×10^-6
+          M/M+: 4.7×10^8
+        - Z: '25'
+          Symbol: Mn
+          T50/K: '2134'
+          T-range: 2134-2149
+          Gas: Mn
+          M/MO: '5'
+          M/M+: 7.4×10^7
+        - Z: '75'
+          Symbol: Re
+          T50/K: '1559'
+          T-range: –
+          Gas: Re2O7
+          M/MO: 6.8×10^-9
+          M/M+: 1.3×10^13
+        - Z: '26'
+          Symbol: Fe
+          T50/K: '2138'
+          T-range: 2138-2208
+          Gas: Fe
+          M/MO: '6'
+          M/M+: 5.6×10^8
+        - Z: '44'
+          Symbol: Ru
+          T50/K: '1089'
+          T-range: –
+          Gas: RuO3
+          M/MO: 4.4×10^-9
+          M/M+: 8.6×10^16
+        - Z: '76'
+          Symbol: Os
+          T50/K: '1404'
+          T-range: –
+          Gas: OsO4
+          M/MO: 9.4×10^-8
+          M/M+: 7.5×10^16
+        - Z: '27'
+          Symbol: Co
+          T50/K: '2112'
+          T-range: –
+          Gas: Co
+          M/MO: '30'
+          M/M+: 2.9×10^9
+        - Z: '45'
+          Symbol: Rh
+          T50/K: '1681'
+          T-range: –
+          Gas: RhO2
+          M/MO: '0.6'
+          M/M+: 9.7×10^11
+        - Z: '77'
+          Symbol: Ir
+          T50/K: '1761'
+          T-range: –
+          Gas: Ir2O3
+          M/MO: '0.8'
+          M/M+: –
+        - Z: '28'
+          Symbol: Ni
+          T50/K: '2051'
+          T-range: –
+          Gas: Ni
+          M/MO: '120'
+          M/M+: 1.4×10^10
+        - Z: '46'
+          Symbol: Pd
+          T50/K: '1197'
+          T-range: –
+          Gas: PdO
+          M/MO: 6.8×10^-3
+          M/M+: 1.3×10^19
+        - Z: '78'
+          Symbol: Pt
+          T50/K: '1772'
+          T-range: –
+          Gas: Pt
+          M/MO: '25'
+          M/M+: –
+        - Z: '29'
+          Symbol: Cu
+          T50/K: '1783'
+          T-range: 1752-1783
+          Gas: Cu
+          M/MO: 1,500
+          M/M+: 1.3×10^12
+        - Z: '47'
+          Symbol: Ag
+          T50/K: '1283'
+          T-range: 1104-1283
+          Gas: Ag
+          M/MO: 5.6×10^4
+          M/M+: 8.0×10^15
+        - Z: '79'
+          Symbol: Au
+          T50/K: '1245'
+          T-range: –
+          Gas: Au
+          M/MO: 5.6×10^4
+          M/M+: 1.1×10^23
+        - Z: '30'
+          Symbol: Zn
+          T50/K: '1785'
+          T-range: 1785-1793
+          Gas: Zn
+          M/MO: 1.1×10^7
+          M/M+: 8.5×10^15
+        - Z: '48'
+          Symbol: Cd
+          T50/K: '1733'
+          T-range: –
+          Gas: Cd
+          M/MO: 3.0×10^4
+          M/M+: 3.2×10^15
+        - Z: '80'
+          Symbol: Hg
+          T50/K: '393'
+          T-range: –
+          Gas: Hg
+          M/MO: 1.5×10^8
+          M/M+: 1.7×10^86
+        - Z: '5'
+          Symbol: B
+          T50/K: '1784'
+          T-range: –
+          Gas: NaBO2
+          M/MO: 1.2×10^-11
+          M/M+: 1.1×10^14
+        - Z: '13'
+          Symbol: Al
+          T50/K: 2498*
+          T-range: 2495-2498
+          Gas: AlO
+          M/MO: '0.6'
+          M/M+: 1,500
+        - Z: '31'
+          Symbol: Ga
+          T50/K: '2033'
+          T-range: –
+          Gas: Ga
+          M/MO: '32'
+          M/M+: 1.3×10^6
+        - Z: '49'
+          Symbol: In
+          T50/K: '1789'
+          T-range: –
+          Gas: In
+          M/MO: '32'
+          M/M+: 5.5×10^6
+        - Z: '81'
+          Symbol: Tl
+          T50/K: '1729'
+          T-range: –
+          Gas: Tl
+          M/MO: 1,900
+          M/M+: 5.4×10^7
+        - Z: '14'
+          Symbol: Si
+          T50/K: '2159'
+          T-range: 2159-2221
+          Gas: SiO
+          M/MO: 2.3×10^-8
+          M/M+: 2.2×10^9
+        - Z: '32'
+          Symbol: Ge
+          T50/K: '1781'
+          T-range: 1725-1783
+          Gas: GeO
+          M/MO: 2.4×10^-7
+          M/M+: 3.2×10^12
+        - Z: '50'
+          Symbol: Sn
+          T50/K: '1791'
+          T-range: –
+          Gas: SnO
+          M/MO: 4.4×10^-4
+          M/M+: 4.8×10^10
+        - Z: '82'
+          Symbol: Pb
+          T50/K: '1782'
+          T-range: 1782-1789
+          Gas: Pb
+          M/MO: '4'
+          M/M+: 4.5×10^10
+        - Z: '15'
+          Symbol: P
+          T50/K: '1948'
+          T-range: 1948-2028
+          Gas: PO2
+          M/MO: 3.6×10^-5
+          M/M+: 2.6×10^17
+        - Z: '33'
+          Symbol: As
+          T50/K: '1804'
+          T-range: –
+          Gas: AsO
+          M/MO: 4.8×10^-2
+          M/M+: 9.8×10^17
+        - Z: '51'
+          Symbol: Sb
+          T50/K: '1804'
+          T-range: –
+          Gas: SbO
+          M/MO: '0.25'
+          M/M+: 5.2×10^14
+        - Z: '83'
+          Symbol: Bi
+          T50/K: '1781'
+          T-range: –
+          Gas: Bi
+          M/MO: '110'
+          M/M+: 1.5×10^11
+        - Z: '8'
+          Symbol: O
+          T50/K: '2173'
+          T-range: –
+          Gas: O2
+          M/MO: '0.5'
+          M/M+: 9.9×10^21
+        - Z: '58'
+          Symbol: Ce
+          T50/K: '2122'
+          T-range: –
+          Gas: CeO2
+          M/MO: 3.1×10^-9
+          M/M+: –
+        - Z: '59'
+          Symbol: Pr
+          T50/K: '2141'
+          T-range: –
+          Gas: PrO
+          M/MO: 3.5×10^-8
+          M/M+: ''
+        - Z: '60'
+          Symbol: Nd
+          T50/K: '2159'
+          T-range: –
+          Gas: NdO
+          M/MO: 4.7×10^-7
+          M/M+: ''
+        - Z: '62'
+          Symbol: Sm
+          T50/K: '2167'
+          T-range: –
+          Gas: SmO
+          M/MO: 8.1×10^-4
+          M/M+: ''
+        - Z: '63'
+          Symbol: Eu
+          T50/K: 2293†
+          T-range: –
+          Gas: EuO
+          M/MO: '0.14'
+          M/M+: ''
+        - Z: '64'
+          Symbol: Gd
+          T50/K: '2207'
+          T-range: –
+          Gas: GdO
+          M/MO: 7.1×10^-7
+          M/M+: ''
+        - Z: '65'
+          Symbol: Tb
+          T50/K: '2256'
+          T-range: –
+          Gas: TbO
+          M/MO: 3.5×10^-6
+          M/M+: ''
+        - Z: '66'
+          Symbol: Dy
+          T50/K: '2242'
+          T-range: –
+          Gas: DyO
+          M/MO: 2.7×10^-4
+          M/M+: ''
+        - Z: '67'
+          Symbol: Ho
+          T50/K: '2236'
+          T-range: –
+          Gas: HoO
+          M/MO: 1.2×10^-4
+          M/M+: ''
+        - Z: '68'
+          Symbol: Er
+          T50/K: '2276'
+          T-range: –
+          Gas: ErO
+          M/MO: 1.0×10^-4
+          M/M+: ''
+        - Z: '69'
+          Symbol: Tm
+          T50/K: '2288'
+          T-range: –
+          Gas: TmO
+          M/MO: 2.5×10^-2
+          M/M+: ''
+        - Z: '70'
+          Symbol: Yb
+          T50/K: '2264'
+          T-range: –
+          Gas: Yb
+          M/MO: '2.9'
+          M/M+: ''
+        - Z: '71'
+          Symbol: Lu
+          T50/K: '2286'
+          T-range: –
+          Gas: LuO
+          M/MO: 1.7×10^-5
+          M/M+: ''
+        - Z: '90'
+          Symbol: Th
+          T50/K: '2371'
+          T-range: –
+          Gas: ThO2
+          M/MO: 6.4×10^-9
+          M/M+: '960'
+        - Z: '92'
+          Symbol: U
+          T50/K: '2129'
+          T-range: –
+          Gas: UO3
+          M/MO: 1.6×10^-8
+          M/M+: 8.4×10^4
+        - Z: '94'
+          Symbol: Pu
+          T50/K: '2253'
+          T-range: –
+          Gas: PuO2
+          M/MO: 2.8×10^-6
+          M/M+: '250'
+        quote_as_printed: "Table 32. Dry BSE material chemistry at 10-4 bar\n Z   Symbol    T50/K       T-range\
+          \        Gas        M/MO        M/M+\n 3     Li       2122      1775-2122        Li          65      \
+          \  4300\n11     Na       1820      1820-2013       Na         1200        46300\n19     K        1863\
+          \      1863-1954        K         1300         190\n37     Rb       1772        1772          Rb     \
+          \     400         100\n55     Cs       1746      1702-1746       Cs          160          20\n\n 4   \
+          \  Be        2466         –           Be            9       1.1×109\n12     Mg        2198     2197-2228\
+          \       Mg           20       1.8×107\n                            2411-\n20     Ca        2498      \
+          \                Ca          50         260\n                            2498*\n38     Sr        2203\
+          \         –            Sr          8           35\n56     Ba        2124         –           BaO     \
+          \  7.9×10-4      330\n\n21     Sc        2352          –          ScO       5.5×10-5     9700\n39    \
+          \ Y         2350          –          YO        6.2×10-6     2,800\n57     La        2147          –  \
+          \        LaO       5.4×10-9     1,400\n\n22     Ti        2213     2213-2318       TiO2      1.5×10-5\
+          \    1.8×105\n40     Zr        2498         –           ZrO2      2.4×10-5    8.0×103\n72     Hf     \
+          \   2498         –           HfO‡      1.4×10-6    1.3×104\n\n23     V         2072          –       \
+          \  VO2        5.2×10-5    1.4×107\n41     Nb        2181          –         NbO2       8.4×10-8    1.3×106\n\
+          73     Ta        2124          –         TaO2       3.7×10-10   1.3×109\n\n24     Cr        2121     \
+          \     –         CrO2          0.2      5.0×106\n42     Mo        1921          –         MoO3       1.9×10-4\
+          \    3.1×109\n74     W         2160          –         WO3        1.8×10-6    4.7×108\n\n25     Mn   \
+          \     2134     2134-2149       Mn           5        7.4×107\n75     Re        1559         –        \
+          \  Re2O7      6.8×10-9    1.3×1013\n\n26     Fe        2138     2138-2208       Fe           6       \
+          \ 5.6×108\n44     Ru        1089         –          RuO3       4.4×10-9    8.6×1016\n76     Os       \
+          \ 1404         –          OsO4       9.4×10-8    7.5×1016\n\n27     Co        2112          –        \
+          \  Co           30       2.9×109\n45     Rh        1681          –         RhO2          0.6      9.7×1011\n\
+          77     Ir        1761          –         Ir2O3         0.8          –\n\n28     Ni        2051       \
+          \   –           Ni         120       1.4×1010\n46     Pd        1197          –          PdO       6.8×10-3\
+          \    1.3×1019\n\n\n\n                                   16\n\f78       Pt         1772         –     \
+          \       Pt           25          –\n29       Cu         1783     1752-1783        Cu         1,500   \
+          \  1.3×1012\n47       Ag         1283     1104-1283        Ag        5.6×104    8.0×1015\n79       Au\
+          \         1245         –            Au        5.6×104    1.1×1023\n\n30       Zn         1785     1785-1793\
+          \        Zn        1.1×107    8.5×1015\n48       Cd         1733         –            Cd        3.0×104\
+          \    3.2×1015\n80       Hg          393         –            Hg        1.5×108    1.7×1086\n\n 5     \
+          \   B         1784         –          NaBO2      1.2×10-11   1.1×1014\n13        Al        2498*    2495-2498\
+          \       AlO          0.6       1,500\n31        Ga        2033         –           Ga            32  \
+          \    1.3×106\n49        In        1789         –            In           32      5.5×106\n81        Tl\
+          \        1729         –            Tl         1,900     5.4×107\n\n14        Si        2159     2159-2221\
+          \       SiO       2.3×10-8    2.2×109\n32        Ge        1781     1725-1783       GeO       2.4×10-7\
+          \    3.2×1012\n50        Sn        1791         –           SnO       4.4×10-4    4.8×1010\n82       \
+          \ Pb        1782     1782-1789        Pb          4        4.5×1010\n\n15        P         1948     1948-2028\
+          \       PO2       3.6×10-5    2.6×1017\n33        As        1804         –           AsO       4.8×10-2\
+          \    9.8×1017\n51        Sb        1804         –           SbO         0.25      5.2×1014\n83       \
+          \ Bi        1781         –            Bi         110       1.5×1011\n\n 8        O         2173      \
+          \    –           O2          0.5      9.9×1021\n\n58       Ce        2122           –          CeO2  \
+          \    3.1×10-9       –\n59       Pr        2141           –          PrO       3.5×10-8\n60       Nd  \
+          \      2159           –          NdO       4.7×10-7\n62       Sm        2167           –          SmO\
+          \       8.1×10-4\n63       Eu        2293†          –          EuO         0.14\n64       Gd        2207\
+          \           –          GdO       7.1×10-7\n65       Tb        2256           –          TbO       3.5×10-6\n\
+          66       Dy        2242           –          DyO       2.7×10-4\n67       Ho        2236           – \
+          \         HoO       1.2×10-4\n68       Er        2276           –          ErO       1.0×10-4\n69    \
+          \   Tm        2288           –          TmO       2.5×10-2\n70       Yb        2264           –      \
+          \     Yb          2.9\n71       Lu        2286           –          LuO       1.7×10-5\n\n 90        Th\
+          \        2371           –          ThO2     6.4×10-9     960\n 92        U         2129           –  \
+          \        UO3      1.6×10-8   8.4×104\n 94        Pu        2253           –          PuO2     2.8×10-6\
+          \     250\n*Greater than 50% condensed where melt initially forms.\n†Ideal solution of EuO + Eu2O3 in\
+          \ the BSE melt\n\n\n                                      17\n\f‡HfO/HfO2 = 1.01, see text.\nNotes: Columns\
+          \ list atomic number (Z), element symbol, nominal 50%\ncondensation temperature, the range of 50% condensation\
+          \ temperatures for the\navailable activity coefficients, the major gas at the 50% condensation\ntemperature,\
+          \ the molar ratio of monatomic gas to monoxide gas, and the molar\nratio of monatomic gas to singly ionized\
+          \ monatomic gas. Dashes indicate missing\ndata; for example, the T-range column is blank for many elements\
+          \ where ideal\nsolution calculations were done or where only one activity coefficient estimate\nwas available.\
+          \ There are no data in the CONDOR code for computing the M/M+\nratios for Ce to Lu.\n\n\n\n\n        \
+          \                               18"
+      uncertainty:
+        note: Retained verbatim in quoted table text and printed cells; no uncertainty inferred.
