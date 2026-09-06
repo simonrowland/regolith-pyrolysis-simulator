@@ -1,0 +1,184 @@
+{
+  "record_id": "reference-p018-01",
+  "table_kind": "reference_state_298K",
+  "pdf_page": 24,
+  "page": 18,
+  "table_number": null,
+  "table_title_raw": "THERMODYNAMIC PROPERTIES OF OXIDE AND HYDROXIDE MINERALS AT 298.15 K",
+  "name_as_published": "DISOO lllll MOIIOX IDE",
+  "formula_as_published": "NazO",
+  "phase_as_published": [],
+  "header_and_units_raw": "     NAME AND FORJIJLA                     WEIGHT     ENTROPY       VOLlJE   ENTHALPY       FREE     LOG(K)    REFERENCES\n                                                                                           ENERGY\n                                                          s•         v•        A.M.         A.Q·\n                                            I       J•110l\"1 •K\"1    c.iJ    kJ •110l\"1   kJ·110r'             s   H/G    c\n",
+  "source_text": "     DISOO lllll MOIIOX IDE                61.979         75.3      25.88      -414.8      -376.0     65.87   67 302 67\n     NazO                                                  0.8       0.08         0.3         0.4      0.07      419 115",
+  "rows": [
+    {
+      "label_raw": "DISOO lllll MOIIOX IDE",
+      "cells": {
+        "weight": {
+          "raw": "61.979",
+          "value": 61.979,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 43,
+          "end_offset": 49
+        },
+        "entropy": {
+          "raw": "75.3",
+          "value": 75.3,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 58,
+          "end_offset": 62
+        },
+        "volume": {
+          "raw": "25.88",
+          "value": 25.88,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 68,
+          "end_offset": 73
+        },
+        "formation_enthalpy": {
+          "raw": "-414.8",
+          "value": -414.8,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 79,
+          "end_offset": 85
+        },
+        "formation_gibbs": {
+          "raw": "-376.0",
+          "value": -376.0,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 91,
+          "end_offset": 97
+        },
+        "log_kf": {
+          "raw": "65.87",
+          "value": 65.87,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 102,
+          "end_offset": 107
+        },
+        "references_unresolved": {
+          "raw": "67 302 67",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 110,
+          "end_offset": 119,
+          "spans_columns": [
+            "reference_entropy",
+            "reference_enthalpy_gibbs",
+            "reference_heat_capacity"
+          ],
+          "column_assignment": "unresolved OCR column collapse"
+        }
+      },
+      "source_line_index": 0
+    },
+    {
+      "label_raw": "NazO",
+      "cells": {
+        "weight": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "entropy": {
+          "raw": "0.8",
+          "value": 0.8,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 59,
+          "end_offset": 62
+        },
+        "volume": {
+          "raw": "0.08",
+          "value": 0.08,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 69,
+          "end_offset": 73
+        },
+        "formation_enthalpy": {
+          "raw": "0.3",
+          "value": 0.3,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 82,
+          "end_offset": 85
+        },
+        "formation_gibbs": {
+          "raw": "0.4",
+          "value": 0.4,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 94,
+          "end_offset": 97
+        },
+        "log_kf": {
+          "raw": "0.07",
+          "value": 0.07,
+          "ocr_suspect": true,
+          "ocr_check": "machine_token_agreement_row_unverified",
+          "start_offset": 103,
+          "end_offset": 107
+        },
+        "references_unresolved": {
+          "raw": "419 115",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "machine_disagreement",
+          "start_offset": 113,
+          "end_offset": 120,
+          "spans_columns": [
+            "reference_entropy",
+            "reference_enthalpy_gibbs",
+            "reference_heat_capacity"
+          ],
+          "column_assignment": "unresolved OCR column collapse"
+        }
+      },
+      "source_line_index": 1
+    }
+  ],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [
+    {
+      "identity": "delta_f_G + R*T*ln(10)*log_Kf = 0",
+      "residual_kJ_per_mol": -0.013414068002475688,
+      "rounding_tolerance_kJ_per_mol": 0.08854004751267629,
+      "disagreement": false
+    }
+  ],
+  "ambiguities": [
+    "reference_enthalpy_gibbs: unparsed printed OCR token '302 67'",
+    "Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C",
+    "reference_enthalpy_gibbs: unparsed printed OCR token '419 115'",
+    "Reference columns collapsed by OCR at source line 2; preserve raw span without assigning reference IDs to S/HG/C",
+    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
+  ],
+  "temperature_grid": [
+    {
+      "raw": "298.15",
+      "value": 298.15,
+      "ocr_suspect": true,
+      "ocr_check": "machine_token_agreement_row_unverified"
+    }
+  ],
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "source_line_start": 11,
+  "source_line_end": 12
+}
