@@ -904,7 +904,7 @@ def harvest(page_dir: Path | None = None, output: Path = COMPILATION_ROOT) -> di
     census = {
         "toc_named_tables": 3,
         "properties_298k_substances": len(recs_298),
-        "high_temperature_substance_tables": 211,
+        "high_temperature_substance_tables": 212,
         "total": len(entries),
         "transcribed": n_tr,
         "untranscribed_count": n_un,
