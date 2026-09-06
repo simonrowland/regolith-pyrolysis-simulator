@@ -1,0 +1,92 @@
+{
+  "record_id": "high-temperature-p176",
+  "source_id": "robie-hemingway-1995-usgs-b2131",
+  "compilation_role": {
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable"
+  },
+  "table_kind": "high_temperature",
+  "table_number": null,
+  "page": 176,
+  "pdf_page": 182,
+  "name_as_published": "DIBORON TRIOXIDE",
+  "formula_as_published": "s 2 o3",
+  "phase_as_published": "Hexagonal crystals 298.15 to melting point 723 K.",
+  "heading_as_published": "DIBORON TRIOXIDE                                                               Formula wt   69.620\n\n\n\ns 2 o3 :   Hexagonal crystals 298.15 to melting point 723 K.",
+  "footer_as_published": "",
+  "column_order": [
+    "temperature",
+    "cp",
+    "entropy",
+    "enthalpy_function",
+    "gibbs_function",
+    "formation_enthalpy",
+    "formation_gibbs",
+    "log_kf"
+  ],
+  "units_as_published": [],
+  "metadata": [
+    {
+      "section": "heading",
+      "raw": "DIBORON TRIOXIDE                                                               Formula wt   69.620",
+      "raster_reading": "DIBORON TRIOXIDE Formula wt 69.620",
+      "tokens": [
+        {
+          "raw": "69.620",
+          "value": 69.62,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      ]
+    },
+    {
+      "section": "heading",
+      "raw": "s 2 o3 :   Hexagonal crystals 298.15 to melting point 723 K.",
+      "raster_reading": "B203: Hexagonal crystals 298.15 to melting point 723 K.",
+      "tokens": [
+        {
+          "raw": "2",
+          "value": 2.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "o3",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement"
+        },
+        {
+          "raw": "298.15",
+          "value": 298.15,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        },
+        {
+          "raw": "723",
+          "value": 723.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_agreement"
+        }
+      ]
+    }
+  ],
+  "rows": [],
+  "ambiguities": [
+    {
+      "kind": "untranscribed",
+      "reason": "temperature table absent from OCR text layer"
+    },
+    {
+      "kind": "metadata_ocr_suspect",
+      "metadata_index": 1,
+      "tokens": [
+        "2",
+        "o3"
+      ]
+    }
+  ],
+  "transcription_status": "untranscribed"
+}
