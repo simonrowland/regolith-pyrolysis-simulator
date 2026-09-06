@@ -1,0 +1,123 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0203",
+  "census_id": "high-temperature-printed-page-229",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "TBIIBI Ul OIIDI",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "187.916",
+    "value": 187.916,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      235
+    ],
+    "printed_pages": [
+      229
+    ],
+    "pdftotext_layout_page_file": "page-235.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer"
+  ],
+  "title_line_as_published": "TBIIBI Ul OIIDI                                                                    rOBIULl IIIGHT    187.916",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "               Crystals 298.15 to             900 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 rOIIlTIOI r101 TBI BLBIBITS",
+    "                                                                                         GIBBS",
+    "TBIP.    ca;-a; 98 )IT      so",
+    "                             T      -( a;-s;98 )/T        cop     BITBlLPI            raBB IlliG!     Log 'f",
+    "  K         J/aol•K      J/aol•l      J/aol•l          J/aol•l           ltJ/aol        ltJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/aol•l",
+    "negative_gibbs_function": "J/aol•l",
+    "heat_capacity": "J/aol•l",
+    "formation_enthalpy": "ltJ/aol",
+    "formation_gibbs_energy": "ltJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 7,
+  "uncertainty_line_as_published": "UICBIITIIITI                11.20             4.20                         11.180          4. 200      0.736",
+  "uncertainty_values": [
+    {
+      "as_published": "11.20",
+      "value": 11.2,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4.20",
+      "value": 4.2,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "11.180",
+      "value": 11.18,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "4. 200",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.736",
+      "value": 0.736,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer",
+      "detector_only": false
+    }
+  ]
+}

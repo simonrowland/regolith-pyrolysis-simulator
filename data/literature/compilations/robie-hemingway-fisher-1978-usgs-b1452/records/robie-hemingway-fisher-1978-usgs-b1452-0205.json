@@ -1,0 +1,135 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0205",
+  "census_id": "high-temperature-printed-page-231",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "TIT111IUII OIIDB",
+  "formula_as_published": "TiO",
+  "phase_state_as_published": [
+    "llpha crystals 298.15 to 1265 1.                    Beta crystals 1265 to 1800 1."
+  ],
+  "description_lines_as_published": [
+    "TiO:       llpha crystals 298.15 to 1265 1.                    Beta crystals 1265 to 1800 1."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "63.899",
+    "value": 63.899,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      237
+    ],
+    "printed_pages": [
+      231
+    ],
+    "pdftotext_layout_page_file": "page-237.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 32"
+  ],
+  "title_line_as_published": "TIT111IUII OIIDB                                                                       POIIIULA IIEIGHT     63.899",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "TiO:       llpha crystals 298.15 to 1265 1.                    Beta crystals 1265 to 1800 1.",
+    "--------------------------------------------------------------------------------",
+    "                                                 POBBATIOI PIOft THE BLEftBITS",
+    "                                                                                             GIBBS",
+    "TBIJP.      (a;-a; 98 )/T       so",
+    "                                 T       -< G;-a~ 98 )/T        cop     EITHALPI          FlEE BIBIGI       Log Kf",
+    "  p;         J/aol•K        J/aol•l        .J/aol•K          J/aol•K          kJ/aol         kJ/aol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "p;",
+    "enthalpy_function": "J/aol•K",
+    "entropy": "J/aol•l",
+    "negative_gibbs_function": ".J/aol•K",
+    "heat_capacity": "J/aol•K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 18,
+  "uncertainty_line_as_published": "UHCEBTUITI                      2.10                2.10                        12.550         12.550        2.199",
+  "uncertainty_values": [
+    {
+      "as_published": "2.10",
+      "value": 2.1,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.10",
+      "value": 2.1,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "12.550",
+      "value": 12.55,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "12.550",
+      "value": 12.55,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "2.199",
+      "value": 2.199,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "TiO:       llpha crystals 298.15 to 1265 1.                    Beta crystals 1265 to 1800 1."
+  ],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY EQUATIOHS",
+    "             52.&6] + 5.0219x1o-z               r          2.0349x10~   T-0·5",
+    "              (EQUATIOB VALID FBOII                 298- 1265 K}",
+    " c;        41.441 + 1.78&7xto-z T",
+    "              (EQUATIOII VALID FROB 1265 -                  1800 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 32",
+      "detector_only": false
+    }
+  ]
+}

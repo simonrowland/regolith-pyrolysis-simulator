@@ -1,0 +1,140 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0208",
+  "census_id": "high-temperature-printed-page-234",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "DITITANIUM TRIOXIDE",
+  "formula_as_published": "Ti 2 0",
+  "phase_state_as_published": [
+    "s:    Alpha crystals 298.15 to 470 K.               Beta crystals 470 to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "Ti 2 0:s:    Alpha crystals 298.15 to 470 K.               Beta crystals 470 to 1800 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "143.798",
+    "value": 143.798,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      240
+    ],
+    "printed_pages": [
+      234
+    ],
+    "pdftotext_layout_page_file": "page-240.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 34, 36"
+  ],
+  "title_line_as_published": "DITITANIUM TRIOXIDE                                                              FORMULA WEIGHT     143.798",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Ti 2 0:s:    Alpha crystals 298.15 to 470 K.               Beta crystals 470 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FOBUTIO!f FROM THE ELEI!EIITS",
+    "                                                                                       GIBBS",
+    "TEMP.       < u;-H~ 98 )/T      soT     -(G;-u~ 98 )/T      cop     ElfTHALPY       FREE ENERGY      Log Kf",
+    "              J;aol•K        J/aol•K      J/aol•K        Jtaol• K       kJ;aol         kJjaol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "J;aol•K",
+    "entropy": "J/aol•K",
+    "negative_gibbs_function": "J/aol•K",
+    "heat_capacity": "Jtaol• K",
+    "formation_enthalpy": "kJ;aol",
+    "formation_gibbs_energy": "kJjaol",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 19,
+  "uncertainty_line_as_published": "UIICEBTAI NTY                   0.21            0.21                      8.368          a. no        1.466",
+  "uncertainty_values": [
+    {
+      "as_published": "0.21",
+      "value": 0.21,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "0.21",
+      "value": 0.21,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "8.368",
+      "value": 8.368,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "a. no",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1.466",
+      "value": 1.466,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Ti 2 0:s:    Alpha crystals 298.15 to 470 K.               Beta crystals 470 to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "MELTING POINT                   .2115      K             BOILING POINT                                K",
+    "ENTHALPY OF MELTIIfG            104.600 kJ               ElfTHALPY OF VAPORIZATION                    kJ",
+    "                                 14.088 kJ               MOLlB VOLUME                        3.1430 J/bar",
+    "                                                                                            31.430 ca 3",
+    "TRANSITIONS IN B&PEBEHCE STATE ELIM!IfTS",
+    "      TITANIUM ••• ALPHA-BETA 1155, 8. P. 1943 K.",
+    "HEAT CAPACITY EQUATION",
+    "            1.4861x10Z +       J.2861x10-3 T -  .27.026 T-o·s",
+    "               (EQUATIOV VALID FROM       470- 1800 K)",
+    "REFEREHCE         J3             JJ                                         JJ                     COMPILED",
+    "                 176                                                                                8- 2-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 34, 36",
+      "detector_only": false
+    }
+  ]
+}
