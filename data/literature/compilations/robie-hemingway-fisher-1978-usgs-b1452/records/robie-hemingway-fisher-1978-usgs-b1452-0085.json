@@ -1,0 +1,131 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0085",
+  "census_id": "high-temperature-printed-page-111",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "VANADIUI'I (REFERENCE STATE)",
+  "formula_as_published": "V",
+  "phase_state_as_published": [
+    "Body-centered cubic crystals 298.15 to aelting point 2175"
+  ],
+  "description_lines_as_published": [
+    "V:       Body-centered cubic crystals 298.15 to aelting point 2175"
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "50.941",
+    "value": 50.941,
+    "ocr_suspect": false,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      117
+    ],
+    "printed_pages": [
+      111
+    ],
+    "pdftotext_layout_page_file": "page-117.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 15"
+  ],
+  "title_line_as_published": "VANADIUI'I (REFERENCE STATE)                                                         FORI'IU LA II E.IGHT       50.941",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "V:       Body-centered cubic crystals 298.15 to aelting point 2175",
+    "--------------------------------------------------------------------------------",
+    "                                                                        FORI'IATIDN FROI'I THE ELEI!ENTS",
+    "                                                                                          GIBBS",
+    "            ( H;-H ~   98 )/T              -(G;-H~ 98 )/T"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "",
+    "entropy": "",
+    "negative_gibbs_function": "",
+    "heat_capacity": "",
+    "formation_enthalpy": "",
+    "formation_gibbs_energy": "",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 17,
+  "uncertainty_line_as_published": "             J/mol•K            J/aol• K     Jjmol•K        Jjmol•K         kJ/mol           kJ/11101",
+  "uncertainty_values": [
+    {
+      "as_published": "J/aol• K",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "Jjmol•K",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "Jjmol•K",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "kJ/mol",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "kJ/11101",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "V:       Body-centered cubic crystals 298.15 to aelting point 2175"
+  ],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY          EVUATIDN",
+    "           20.403 +       2.8000x10- 3       T",
+    "          -2.9947x10S T 2",
+    "              (EQUATION          VALID FROII        298-   1800 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 15",
+      "detector_only": false
+    }
+  ]
+}
