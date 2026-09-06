@@ -1,0 +1,105 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0348",
+  "census_id": "high-temperature-printed-page-374",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "lOLLI STOll 'lB",
+  "formula_as_published": null,
+  "phase_state_as_published": [],
+  "description_lines_as_published": [],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "116. 164",
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": []
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      380
+    ],
+    "printed_pages": [
+      374
+    ],
+    "pdftotext_layout_page_file": "page-380.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "untranscribed",
+  "untranscribed_reasons": [
+    "required formula line is absent from the OCR text layer",
+    "14 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 21, 26, 30, 31, 32, 35, 37, 40, 43, 44, 45, 46, 47"
+  ],
+  "title_line_as_published": "lOLLI STOll 'lB                                                                  POl !U L1 IIBIGHT        116. 164",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "            crystals 298.15 to 11t00 K.               Pseudowollastonite is the stable phase",
+    "            aboYe 1398 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                  POil!lTIOI PIOII THE OIIDBS",
+    "                                                                                          GIBBS",
+    "TEIIP.    ( a;-H; 98 )/T      so      -(~-a; 98 )/T       cop     EITBALPY             FREE EIBIGY         Loq   It",
+    "  K         J/aol•K",
+    "                               '",
+    "                           J/aol•K      J/aol•K       J/aol•K           kJtaol            kJtaol",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "",
+    "enthalpy_function": "",
+    "entropy": "",
+    "negative_gibbs_function": "",
+    "heat_capacity": "",
+    "formation_enthalpy": "",
+    "formation_gibbs_energy": "",
+    "log_kf": ""
+  },
+  "temperature_grid": [],
+  "rows": [],
+  "row_count": 0,
+  "detected_data_row_count": 16,
+  "uncertainty_line_as_published": "",
+  "uncertainty_values": [],
+  "reference_state_notes_as_published": [],
+  "auxiliary_lines_as_published": [
+    "I!ELTIIfG POINT                                        BOIL I lfG POIIT                                     J(",
+    "ENTHALPY OF IIELTIBG                     ltJ           ENTHALPY OF VlPOBIZATIOif                            kJ",
+    "                                         kJ            I!OLlB VOLUI!B                          3.9930 J/bar",
+    "                                                                                              39.930 ca 3",
+    "TRANSITIONS IB BEP'EBEBCE STATE OXIDES",
+    "  Si0 2 • • • • • • • ALPHA- BETA TBAISITIOI 844 I.",
+    "HEAT CAPACITY EQUATION",
+    "         1.1125x102 + 1.437Jx1o-z T      16.936 T-o·s",
+    "            (EQUATIOI VALID FRO!! 298 - 1400 K)"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "untranscribed_table",
+      "reason": "required formula line is absent from the OCR text layer; 14 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 21, 26, 30, 31, 32, 35, 37, 40, 43, 44, 45, 46, 47",
+      "detector_only": false
+    }
+  ]
+}
