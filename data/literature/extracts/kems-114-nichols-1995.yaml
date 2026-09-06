@@ -1,0 +1,873 @@
+schema_version: literature_extract.v1
+source_id: kems-114-nichols-1995
+source:
+  citation: >-
+    Nichols Jr., R. H., Wasserburg, G. J. & Grimley, R. T. (1995),
+    "Evaporation of forsterite: identification of gas-phase species via
+    Knudsen cell mass spectrometry", Lunar and Planetary Science XXVI,
+    1047–1048. LPI abstract 1524. ADS bibcode 1995LPI....26.1047N.
+  doi: null
+  url: https://www.lpi.usra.edu/meetings/lpsc1995/pdf/1524.pdf
+  year: 1995
+  bibcode: 1995LPI....26.1047N
+  lpi_abstract: "1524"
+extraction:
+  method: >-
+    Official LPI OA PDF (HTTP 200, application/pdf). Scanned pages
+    (Acrobat Paper Capture). pdftotext -layout OCR is dirty (furnace
+    misread as hrnace; Fo90 as Fow; I+T as I'T). Every numeric value
+    certified against 200/400 dpi page renders, not the OCR layer.
+    No numbered tables exist (true absence). Figure 1 printed slope
+    labels and Figure 1–2 axis ticks transcribed from the render.
+    I+T and ion-ratio point series listed figure-only (not digitised:
+    no printed point coordinates). Second-law slopes labelled
+    model_derived. No MinerU. No unit conversion except T_C+273.15
+    where shown. Measured species identification kept distinct from
+    fitted slopes and from Porter et al. 1955 literature comparison.
+  date: '2026-09-06'
+  worker: wave-W2-kems-114-nichols-1995
+  provenance_path: docs-private/research/2026-09-06-wave-2/W2-kems-114-nichols-1995/kems-114-nichols-1995/
+review_status: draft
+fidelity_samples:
+  - species: SiO
+    observable: psat_series
+    observation_id: nichols_1995_fig1_sio_slope_second_law
+    field: SiO_slope_as_printed
+    value: -2.13
+    locator:
+      page: 2
+      published_page: 1048
+      figure: "1"
+      note: "Figure 1 printed annotation: SiO slope = -2.13(4)"
+  - species: Mg
+    observable: psat_series
+    observation_id: nichols_1995_fig1_mg_slope_second_law
+    field: Mg_slope_as_printed
+    value: 2.76
+    locator:
+      page: 2
+      published_page: 1048
+      figure: "1"
+      note: "Figure 1 printed annotation: Mg slope = 2.76(1) (minus not printed)"
+  - species: SiO2
+    observable: psat_series
+    observation_id: nichols_1995_fig1_sio2_slope_second_law
+    field: SiO2_slope_as_printed
+    value: -2.7
+    locator:
+      page: 2
+      published_page: 1048
+      figure: "1"
+      note: "Figure 1 printed annotation: SiO2 slope = -2.7(8)"
+  - species: Mg
+    observable: rate_series
+    observation_id: nichols_1995_mg_detected_kems
+    field: sample_mass_mg
+    value: 25
+    locator:
+      page: 1
+      published_page: 1047
+      paragraph: results
+      note: "The present sample of forsterite (Fo90, 25 mg, 100-200 μm)"
+  - species: MgO
+    observable: rate_series
+    observation_id: nichols_1995_mgo_not_detected
+    field: nondetect_percent_relative_to_Mg_and_SiO
+    value: 0.1
+    locator:
+      page: 1
+      published_page: 1047
+      paragraph: results
+      note: "not detected at the 0.1% level relative to Mg and SiO"
+  - species: SiO
+    observable: rate_series
+    observation_id: nichols_1995_sio_detected_kems
+    field: T_low_K
+    value: 1675.0
+    locator:
+      page: 1
+      published_page: 1047
+      paragraph: results
+      note: "dominant species detected in the equilibrium gas-phase between 1675-1875 K"
+species:
+  Mg:
+    observations:
+    - observation_id: nichols_1995_mg_detected_kems
+      type: rate_series
+      locator:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
+        note: >-
+          Results paragraph, printed p.1047. Mg, Fe, and SiO dominant
+          1675-1875 K. Absolute pressures not determined; P proportional
+          to I+T (sentence continues onto p.1048).
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: "present sample of forsterite (Fo90, 25 mg, 100-200 μm)"
+      standard_state: KEMS ion signal of Mg over Fo90 in Knudsen configuration
+      regime: kems_effusion
+      units: as published (I+T proportional to partial pressure; no absolute P)
+      values:
+        quantity: species_detected_absolute_P_not_tabulated
+        method_class: measured_direct
+        system_class: solid_solution_silicate
+        gas_species: Mg(g)
+        forsterite_composition_as_printed: Fo90
+        sample_mass_mg: 25
+        grain_size_um_low: 100
+        grain_size_um_high: 200
+        T_low_K: 1675.0
+        T_high_K: 1875.0
+        sequential_heating_T_low_K_tilde: 1475.0
+        sequential_heating_T_high_K: 1875.0
+        hold_minutes_low: 30
+        hold_minutes_high: 600
+        mass_peaks_monitored_up_to: 40
+        T_step_K_low: 20
+        T_step_K_high: 50
+        cycles_up_to: 5
+        furnace_T_above_K: 2100.0
+        furnace_stability_plus_minus_K: 2.0
+        configuration_this_work: Knudsen
+        configurations_available:
+        - Knudsen
+        - Langmuir
+        congruent_evaporation_as_printed: >-
+          The reproducibility of the peak intensities at a lower
+          temperature after having previously cycled the sample to
+          higher temperatures indicates that forsterite evaporates
+          congruently at equilibrium
+        depletion_above_K: 1875.0
+        absolute_P_as_printed: >-
+          While accurate determination of absolute pressures is not
+          possible for most evaporated species [cf 5], the partial
+          pressure of a given species effusing from a Knudsen cell is
+          proportional to I+T
+        shutter_blank: >-
+          Blank measurements were performed at each temperature step by
+          means of a shutter mounted between the cell vacuum chamber and
+          the vacuum chamber containing the ion source
+        ionization: electron-impact ionization source and quadrupole mass spectrometer
+        missing_for_motzfeldt:
+        - numeric_orifice_diameter
+        - numeric_clausing_factor
+        - sample_surface_area
+        - cell_material
+        - cell_internal_diameter
+        table_csv: tables/kems-114-nichols-1995/f1.csv
+        quotes:
+          sample_mass_mg:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "The present sample of forsterite (Fo90, 25 mg, 100-200 μm) was sequentially heated"
+          grain_size_um_low:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "Fo90, 25 mg, 100-200 μm"
+          grain_size_um_high:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "Fo90, 25 mg, 100-200 μm"
+          T_low_K:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "Mg, Fe, and SiO are the dominant species detected in the equilibrium gas-phase between 1675-1875 K"
+          T_high_K:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "between 1675-1875 K"
+          sequential_heating_T_low_K_tilde:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "sequentially heated to a given temperature between ~1475-1875 K, in the Knudsen configuration"
+          sequential_heating_T_high_K:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "between ~1475-1875 K"
+          hold_minutes_low:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "held at each temperature for 30-600 minutes while up to 40 mass peaks were monitored"
+          hold_minutes_high:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "30-600 minutes"
+          mass_peaks_monitored_up_to:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "up to 40 mass peaks were monitored"
+          T_step_K_low:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "Data were acquired at 20-50 K intervals"
+          T_step_K_high:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "20-50 K intervals"
+          cycles_up_to:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "this process was repeated at each step up to five times while cycling the temperature up and down in the range"
+          furnace_T_above_K:
+            page: 1
+            published_page: 1047
+            paragraph: introduction
+            printed: "The furnace can presently be operated up to temperatures above 2100 K (stable to ±2 K)"
+          furnace_stability_plus_minus_K:
+            page: 1
+            published_page: 1047
+            paragraph: introduction
+            printed: "above 2100 K (stable to ±2 K)"
+          depletion_above_K:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "Above 1875 K the vapor pressure was so high that there was a major depletion in the reservoir"
+      uncertainty:
+        note: >-
+          Temperatures cited are approximate and might be shifted with more
+          refined calibration (p.1047). Furnace stable to ±2 K. No sigma
+          printed on sample mass or grain-size bounds.
+    - observation_id: nichols_1995_fig1_mg_IT_figure_only
+      type: rate_series
+      locator:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: "1"
+        note: Figure 1 van't Hoff plot of log(I+T) vs 1e4/T; Mg series
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90 Knudsen configuration
+      standard_state: I+T proportional to Mg partial pressure (authors p.1048)
+      regime: kems_effusion
+      units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
+      values:
+        quantity: I_T_vs_1_over_T
+        method_class: measured_direct
+        gas_species: Mg(g)
+        admission_status: figure_only
+        status: typed_refusal
+        reason: >-
+          Mg I+T points exist only as Figure 1 filled squares. Coordinates
+          are not tabulated. Not digitised this round (no printed quote for
+          any point). Axis ticks and printed slope are extracted separately.
+        semantics: bound_not_point_ordering
+        x_axis_as_printed: 1.0E+4/T(K)
+        x_min: 5.2
+        x_max: 6.4
+        y_axis_as_printed: LOG(Ion Intensity(mV)*T(K))
+        y_min: 3.0
+        y_max: 7.5
+        symbol_as_read: filled_squares
+        each_point: average of up to five measurements at a given temperature
+        table_csv: tables/kems-114-nichols-1995/f1.csv
+        quotes:
+          x_min:
+            page: 2
+            published_page: 1048
+            figure: "1"
+            printed: "5.2"
+          x_max:
+            page: 2
+            published_page: 1048
+            figure: "1"
+            printed: "6.4"
+          y_min:
+            page: 2
+            published_page: 1048
+            figure: "1"
+            printed: "3.0"
+          y_max:
+            page: 2
+            published_page: 1048
+            figure: "1"
+            printed: "7.5"
+      uncertainty:
+        note: not applicable to undigitised points; caption says each point is an average of up to five measurements
+    - observation_id: nichols_1995_fig1_mg_slope_second_law
+      type: psat_series
+      locator:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: "1"
+        note: "Figure 1 printed annotation: Mg slope = 2.76(1)"
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90
+      standard_state: second-law slope of log10(I+T) vs 1e4/T for Mg
+      regime: kems_effusion
+      units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
+      values:
+        quantity: vant_hoff_log_IT_slope
+        method_class: model_derived
+        evidence_kind: model
+        fit: second_law_linear_slope_on_figure
+        gas_species: Mg(g)
+        Mg_slope_as_printed: 2.76
+        Mg_slope_parenthetical: 1
+        Mg_slope_printed_string: "slope = 2.76(1)"
+        minus_sign_printed: absent_on_label
+        note: >-
+          Second-law fit printed on Figure 1, not an instrument reading.
+          Authors (p.1048) state that slopes would yield an enthalpy for
+          Mg2SiO4(s) <=> 2Mg(g)+SiO(g)+3O(g) but such enthalpies cannot
+          be calculated at the present time (incomplete knowledge of
+          O2(g) <=> 2O(g) and other reactions). Do not convert this slope
+          to ΔH. The Mg label is printed without a minus; the plotted Mg
+          line declines with 1e4/T. Value stored as printed 2.76, not
+          sign-corrected. Battery must refuse as model_output_not_measurement.
+        table_csv: tables/kems-114-nichols-1995/f1.csv
+        quotes:
+          Mg_slope_as_printed:
+            page: 2
+            published_page: 1048
+            figure: "1"
+            printed: "Mg slope = 2.76(1)"
+          Mg_slope_parenthetical:
+            page: 2
+            published_page: 1048
+            figure: "1"
+            printed: "2.76(1)"
+      uncertainty:
+        Mg_slope_parenthetical: 1
+        note: parenthetical (1) as printed on last digit of 2.76; not converted to ±0.01
+    - observation_id: nichols_1995_fig2_mg_fe_ratio_figure_only
+      type: rate_series
+      locator:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: "2"
+        note: Figure 2 I+(Mg)/(I+(Mg)+I+(Fe)) vs T(C)
+      T_range_K: [1673.15, 1873.15]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90
+      standard_state: ion-intensity ratio I+(Mg)/(I+(Mg)+I+(Fe)); not ionization-cross-section corrected
+      regime: kems_effusion
+      units: ion intensity ratio vs T(C) as printed
+      values:
+        quantity: ion_intensity_ratio_Mg_Fe_figure_only
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: >-
+          Figure 2 points are not tabulated. Not digitised (no printed
+          coordinate quotes). Axis ticks transcribed. Caption: plotted
+          ordinate values are probably slightly different from Mg/(Mg+Fe)
+          due to unknown relative ionization cross sections of Mg and Fe.
+        semantics: bound_not_point_ordering
+        ratio_definition_as_printed: I+(Mg)/(I+(Mg)+I+(Fe))
+        x_axis_as_printed: T(C)
+        T_C_min: 1400
+        T_C_max: 1600
+        T_K_min_from_C: 1673.15
+        T_K_max_from_C: 1873.15
+        T_K_conversion: T_K = T_C + 273.15
+        y_min: 0.85
+        y_max: 1.00
+        caption_trend: >-
+          At higher temperatures the gas-phase becomes more forsteritic
+          due to the volatility of Fe
+        table_csv: tables/kems-114-nichols-1995/f2.csv
+        quotes:
+          T_C_min:
+            page: 2
+            published_page: 1048
+            figure: "2"
+            printed: "1400"
+          T_C_max:
+            page: 2
+            published_page: 1048
+            figure: "2"
+            printed: "1600"
+          y_min:
+            page: 2
+            published_page: 1048
+            figure: "2"
+            printed: "0.85"
+          y_max:
+            page: 2
+            published_page: 1048
+            figure: "2"
+            printed: "1.00"
+          T_K_min_from_C:
+            page: 2
+            published_page: 1048
+            figure: "2"
+            printed: "1400"
+            conversion: "1673.15 = 1400 + 273.15"
+          T_K_max_from_C:
+            page: 2
+            published_page: 1048
+            figure: "2"
+            printed: "1600"
+            conversion: "1873.15 = 1600 + 273.15"
+      uncertainty:
+        note: error bars are drawn on Figure 2; numeric sigma not printed
+  Fe:
+    observations:
+    - observation_id: nichols_1995_fe_detected_kems
+      type: rate_series
+      locator:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
+        note: Mg, Fe, and SiO are the dominant species 1675-1875 K
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90
+      standard_state: KEMS ion signal of Fe over Fo90 in Knudsen configuration
+      regime: kems_effusion
+      units: as published (I+T proportional to partial pressure; no absolute P)
+      values:
+        quantity: species_detected_absolute_P_not_tabulated
+        method_class: measured_direct
+        gas_species: Fe(g)
+        T_low_K: 1675.0
+        T_high_K: 1875.0
+        similar_vant_hoff_as_printed: "a similar plot is obtained for Fe"
+        similar_vant_hoff_printed_on: absent_figure_true_absence
+        note: >-
+          Fe is a dominant detected species. Authors say a similar van't
+          Hoff plot is obtained for Fe; that plot is not printed. Do not
+          invent Fe I+T points. Absolute P not determined.
+        quotes:
+          T_low_K:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "Mg, Fe, and SiO are the dominant species detected in the equilibrium gas-phase between 1675-1875 K"
+          T_high_K:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "between 1675-1875 K"
+      uncertainty:
+        note: temperatures approximate as stated on p.1047
+  SiO:
+    observations:
+    - observation_id: nichols_1995_sio_detected_kems
+      type: rate_series
+      locator:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
+        note: SiO dominant Si-bearing species; summary p.1048 repeats 1675-1875 K
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90
+      standard_state: KEMS ion signal of SiO over Fo90 in Knudsen configuration
+      regime: kems_effusion
+      units: as published (I+T proportional to partial pressure; no absolute P)
+      values:
+        quantity: species_detected_absolute_P_not_tabulated
+        method_class: measured_direct
+        gas_species: SiO(g)
+        T_low_K: 1675.0
+        T_high_K: 1875.0
+        summary_as_printed: >-
+          SiO is clearly the most abundant Si-species in the equilibrium
+          vapor of forsterite between 1675 and 1875 K
+        other_Si_oxides_not_detected:
+        - SiO3
+        - SiO4
+        quotes:
+          T_low_K:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "Mg, Fe, and SiO are the dominant species detected in the equilibrium gas-phase between 1675-1875 K"
+          T_high_K:
+            page: 2
+            published_page: 1048
+            paragraph: summary
+            printed: "SiO is clearly the most abundant Si-species in the equilibrium vapor of forsterite between 1675 and 1875 K"
+      uncertainty:
+        note: temperatures approximate as stated on p.1047
+    - observation_id: nichols_1995_fig1_sio_IT_figure_only
+      type: rate_series
+      locator:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: "1"
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90
+      standard_state: I+T proportional to SiO partial pressure
+      regime: kems_effusion
+      units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
+      values:
+        quantity: I_T_vs_1_over_T
+        method_class: measured_direct
+        gas_species: SiO(g)
+        admission_status: figure_only
+        status: typed_refusal
+        reason: SiO I+T points exist only as Figure 1 filled circles. Not tabulated. Not digitised.
+        semantics: bound_not_point_ordering
+        symbol_as_read: filled_circles
+        table_csv: tables/kems-114-nichols-1995/f1.csv
+      uncertainty:
+        note: not applicable to undigitised points
+    - observation_id: nichols_1995_fig1_sio_slope_second_law
+      type: psat_series
+      locator:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: "1"
+        note: "Figure 1 printed annotation: SiO slope = -2.13(4)"
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90
+      standard_state: second-law slope of log10(I+T) vs 1e4/T for SiO
+      regime: kems_effusion
+      units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
+      values:
+        quantity: vant_hoff_log_IT_slope
+        method_class: model_derived
+        evidence_kind: model
+        fit: second_law_linear_slope_on_figure
+        gas_species: SiO(g)
+        SiO_slope_as_printed: -2.13
+        SiO_slope_parenthetical: 4
+        SiO_slope_printed_string: "slope = -2.13(4)"
+        note: >-
+          Second-law fit printed on Figure 1, not an instrument reading.
+          Authors decline to convert slopes to enthalpies (p.1048).
+          Battery must refuse as model_output_not_measurement.
+        table_csv: tables/kems-114-nichols-1995/f1.csv
+        quotes:
+          SiO_slope_as_printed:
+            page: 2
+            published_page: 1048
+            figure: "1"
+            printed: "SiO slope = -2.13(4)"
+          SiO_slope_parenthetical:
+            page: 2
+            published_page: 1048
+            figure: "1"
+            printed: "-2.13(4)"
+      uncertainty:
+        SiO_slope_parenthetical: 4
+        note: parenthetical (4) as printed on last digit of -2.13; not converted to ±0.04
+  SiO2:
+    observations:
+    - observation_id: nichols_1995_sio2_detected_kems
+      type: rate_series
+      locator:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90
+      standard_state: KEMS ion signal of SiO2 over Fo90; higher-T end of 1675-1875 K
+      regime: kems_effusion
+      units: abundance relative to SiO (not absolute P)
+      values:
+        quantity: species_detected_absolute_P_not_tabulated
+        method_class: measured_direct
+        gas_species: SiO2(g)
+        T_low_K: 1675.0
+        T_high_K: 1875.0
+        this_work_as_printed: >-
+          SiO2 is observed at the higher temperatures of this range, but
+          only in an abundance relative to SiO similar to those observed
+          by [9] for solid SiO2
+        porter_1955_literature_not_this_work:
+          citation: Porter et al. (1955) J. Chem. Phys. 23, 216
+          statement_as_printed: >-
+            SiO is the principal gas-phase species in equilibrium and is
+            at least 200-300x more abundant than SiO2 between 1800-1900 K
+          T_low_K: 1800.0
+          T_high_K: 1900.0
+          abundance_ratio_low: 200
+          abundance_ratio_high: 300
+          class: literature_comparison
+          note: These 200-300x / 1800-1900 K numbers are Porter et al. on solid SiO2, not this Fo90 experiment.
+        quotes:
+          T_low_K:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "SiO2 is observed at the higher temperatures of this range"
+          porter_1955_literature_not_this_work.T_low_K:
+            page: 1
+            published_page: 1047
+            paragraph: motivation
+            printed: "at least 200-300x more abundant than SiO2 between 1800-1900 K"
+          porter_1955_literature_not_this_work.abundance_ratio_low:
+            page: 1
+            published_page: 1047
+            paragraph: motivation
+            printed: "at least 200-300x more abundant than SiO2 between 1800-1900 K"
+          porter_1955_literature_not_this_work.abundance_ratio_high:
+            page: 1
+            published_page: 1047
+            paragraph: motivation
+            printed: "200-300x"
+      uncertainty:
+        note: this-work SiO2/SiO ratio not printed as a number; only "similar to those observed by [9]"
+    - observation_id: nichols_1995_fig1_sio2_IT_figure_only
+      type: rate_series
+      locator:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: "1"
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90
+      standard_state: I+T proportional to SiO2 partial pressure
+      regime: kems_effusion
+      units: log10(ion intensity mV * T K) vs 1.0E+4/T(K)
+      values:
+        quantity: I_T_vs_1_over_T
+        method_class: measured_direct
+        gas_species: SiO2(g)
+        admission_status: figure_only
+        status: typed_refusal
+        reason: SiO2 I+T points exist only as Figure 1 open squares with error bars. Not tabulated. Not digitised.
+        semantics: bound_not_point_ordering
+        symbol_as_read: open_squares_with_error_bars
+        table_csv: tables/kems-114-nichols-1995/f1.csv
+      uncertainty:
+        note: error bars drawn on SiO2 points; numeric sigma not printed
+    - observation_id: nichols_1995_fig1_sio2_slope_second_law
+      type: psat_series
+      locator:
+        page: 2
+        published_page: 1048
+        pdf_page_index: 2
+        figure: "1"
+        note: "Figure 1 printed annotation: SiO2 slope = -2.7(8)"
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90
+      standard_state: second-law slope of log10(I+T) vs 1e4/T for SiO2
+      regime: kems_effusion
+      units: d log10(I+T) / d(1.0E+4/T) as printed on Figure 1
+      values:
+        quantity: vant_hoff_log_IT_slope
+        method_class: model_derived
+        evidence_kind: model
+        fit: second_law_linear_slope_on_figure
+        gas_species: SiO2(g)
+        SiO2_slope_as_printed: -2.7
+        SiO2_slope_parenthetical: 8
+        SiO2_slope_printed_string: "slope = -2.7(8)"
+        note: >-
+          Second-law fit printed on Figure 1, not an instrument reading.
+          Authors decline to convert slopes to enthalpies (p.1048).
+          Battery must refuse as model_output_not_measurement.
+        table_csv: tables/kems-114-nichols-1995/f1.csv
+        quotes:
+          SiO2_slope_as_printed:
+            page: 2
+            published_page: 1048
+            figure: "1"
+            printed: "SiO2 slope = -2.7(8)"
+          SiO2_slope_parenthetical:
+            page: 2
+            published_page: 1048
+            figure: "1"
+            printed: "-2.7(8)"
+      uncertainty:
+        SiO2_slope_parenthetical: 8
+        note: parenthetical (8) as printed on last digit of -2.7; not converted to ±0.8
+  MgO:
+    observations:
+    - observation_id: nichols_1995_mgo_not_detected
+      type: rate_series
+      locator:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90
+      standard_state: non-detection of MgO(g) and other Mg/Fe oxides relative to Mg and SiO
+      regime: kems_effusion
+      units: percent of Mg and SiO ion signal (relative)
+      values:
+        quantity: not_reported_among_detected_species
+        method_class: measured_direct
+        gas_species: MgO(g)
+        admission_status: bound_not_point
+        semantics: bound_not_point_ordering
+        nondetect_percent_relative_to_Mg_and_SiO: 0.1
+        also_not_detected:
+        - SiO3
+        - SiO4
+        - other_oxides_of_Mg_and_Fe
+        as_printed: >-
+          Other oxides of Si (SiO3 and SiO4) and of Mg and Fe, in
+          particular MgO, were not detected at the 0.1% level relative
+          to Mg and SiO
+        quotes:
+          nondetect_percent_relative_to_Mg_and_SiO:
+            page: 1
+            published_page: 1047
+            paragraph: results
+            printed: "were not detected at the 0.1% level relative to Mg and SiO"
+      uncertainty:
+        note: 0.1% is the printed non-detection level; no further sigma
+  O:
+    observations:
+    - observation_id: nichols_1995_o_abundant_not_quantitative
+      type: rate_series
+      locator:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90
+      standard_state: O(g) detected; not quantitative
+      regime: kems_effusion
+      units: not quantitative
+      values:
+        quantity: species_detected_absolute_P_not_tabulated
+        method_class: measured_direct
+        gas_species: O(g)
+        as_printed: >-
+          Oxygen was also abundant as O and O2, but high background
+          signals prevented quantitative measurements
+        quantitative: absent
+        reason: high background signals prevented quantitative measurements
+      uncertainty:
+        note: not quantitative; no sigma printed
+  O2:
+    observations:
+    - observation_id: nichols_1995_o2_abundant_not_quantitative
+      type: rate_series
+      locator:
+        page: 1
+        published_page: 1047
+        pdf_page_index: 1
+        paragraph: results
+      T_range_K: [1675.0, 1875.0]
+      phase: vapor_over_Fo90_forsterite
+      condensed_form:
+        state: crystalline
+        polymorph_name: forsterite
+        metastable: false
+        solution_character: solid_solution
+        basis: explicit_author
+        note: Fo90
+      standard_state: O2(g) detected; not quantitative
+      regime: kems_effusion
+      units: not quantitative
+      values:
+        quantity: species_detected_absolute_P_not_tabulated
+        method_class: measured_direct
+        gas_species: O2(g)
+        as_printed: >-
+          Oxygen was also abundant as O and O2, but high background
+          signals prevented quantitative measurements
+        quantitative: absent
+        reason: high background signals prevented quantitative measurements
+        enthalpy_blocker_as_printed: "O2(g) <=> 2O(g)"
+      uncertainty:
+        note: not quantitative; no sigma printed
