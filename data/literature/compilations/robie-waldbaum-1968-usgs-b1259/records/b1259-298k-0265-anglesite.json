@@ -1,0 +1,150 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-waldbaum-1968-usgs-b1259",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "table_kind": "properties_298k",
+  "table_number_as_published": null,
+  "group_as_published": "Sulfates and borates",
+  "pdf_page": 28,
+  "page": 22,
+  "name_as_published": "Anglesite",
+  "formula_as_published": "PbS04",
+  "formula": "PbS04",
+  "phase": "",
+  "state_note_as_published": "",
+  "gram_formula_weight": {
+    "as_published": "303.252",
+    "value": 303.252,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "units_as_published": {
+    "entropy": "cal deg^-1 gfw^-1",
+    "molar_volume": "cm^3",
+    "delta_f_H": "cal gfw^-1",
+    "delta_f_G": "cal gfw^-1",
+    "log_Kf": "dimensionless"
+  },
+  "entropy": {
+    "as_published": "35.51",
+    "value": 35.51,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "molar_volume": {
+    "as_published": "47.95",
+    "value": 47.95,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "delta_f_H": {
+    "as_published": "-219891",
+    "value": -219891.0,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "delta_f_G": {
+    "as_published": "-194360",
+    "value": -194360.0,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "log_Kf": {
+    "as_published": "142.470",
+    "value": 142.47,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "references_as_published": [
+    "41",
+    "159",
+    "74"
+  ],
+  "uncertainty_line_tokens": [
+    "PbS04",
+    "±",
+    ".07",
+    "±",
+    ".06",
+    "±",
+    "260",
+    "±",
+    "250",
+    "±",
+    ".183"
+  ],
+  "source_layout_lines": [
+    "Anglesite            303.252     35.51          47.95        -219891    -194360    142.470       41      159          74",
+    "PbS04                            ± .07          ± .06        ±   260    ±   250    ± .183"
+  ],
+  "source_column_spans": {
+    "entropy": {
+      "source_span": [
+        30,
+        42
+      ],
+      "source_line_index": 0
+    },
+    "molar_volume": {
+      "source_span": [
+        42,
+        57
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_H": {
+      "source_span": [
+        57,
+        69
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_G": {
+      "source_span": [
+        69,
+        81
+      ],
+      "source_line_index": 0
+    },
+    "log_Kf": {
+      "source_span": [
+        81,
+        94
+      ],
+      "source_line_index": 0
+    },
+    "gram_formula_weight": {
+      "source_span": [
+        21,
+        30
+      ],
+      "source_line_index": 0
+    }
+  },
+  "row_count": 1,
+  "identity_disagreements": [],
+  "ambiguities": [],
+  "record_id": "b1259-298k-0265-anglesite",
+  "source": {
+    "database": "USGS Bulletin 1259, Robie & Waldbaum 1968",
+    "citation": "Robie, R. A. and Waldbaum, D. R., 1968, Thermodynamic properties of minerals and related substances at 298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure and at higher temperatures: U.S. Geological Survey Bulletin 1259, 256 p.",
+    "doi": "10.3133/b1259",
+    "official_url": "https://pubs.usgs.gov/bul/1259/report.pdf",
+    "licence": "United States government work. USGS numbered series; public domain in the United States. Fetched from the official pubs.usgs.gov host.",
+    "sha256": "013abbde1aef291c7492f2eaf7ab552619699e558d741ae5f39a87830e080e83",
+    "retrieved_at": "2026-09-06"
+  }
+}

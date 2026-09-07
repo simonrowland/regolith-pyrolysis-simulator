@@ -16,7 +16,7 @@
   "name_as_published": "SYLVITE",
   "formula_as_published": "KC1",
   "formula": "KC1",
-  "phase": "168 THERMODYNAMIC PROPERTIES OF MINERALS Crystals 298.15° to melting point 1044°K. Liquid 1044° to fictive boiling point 1750°K. Ideal gas (monomer) 1750° to",
+  "phase": "Crystals 298.15° to melting point 1044°K. Liquid 1044° to fictive boiling point 1750°K. Ideal gas (monomer) 1750° to 2000°K.",
   "gram_formula_weight": {
     "as_published": "74.555",
     "value": 74.555,
@@ -44,17 +44,156 @@
   },
   "rows": [
     {
-      "kind": "data",
-      "column_token_count": 7,
+      "kind": "grid_refusal",
+      "source_layout_line": "1 trtr«            H     n",
+      "column_token_count": 2,
       "temperature": {
-        "as_published": "298.15",
-        "value": 298.15,
+        "as_published": "1",
+        "value": 1.0,
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
       },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          1
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          26
+        ]
+      },
       "H_minus_H298": {
-        "as_published": "0.000",
+        "as_published": "H     n",
+        "value": null,
+        "ocr_suspect": true,
+        "footnote_markers": [],
+        "ocr_reasons": [
+          "letter_in_numeric_token",
+          "not_numeric"
+        ]
+      },
+      "entropy": {
+        "as_published": "",
+        "value": null,
+        "ocr_suspect": true,
+        "footnote_markers": [],
+        "ocr_reasons": [
+          "column_absent_in_ocr"
+        ]
+      },
+      "gibbs_function": {
+        "as_published": "",
+        "value": null,
+        "ocr_suspect": true,
+        "footnote_markers": [],
+        "ocr_reasons": [
+          "column_absent_in_ocr"
+        ]
+      },
+      "delta_f_H": {
+        "as_published": "",
+        "value": null,
+        "ocr_suspect": true,
+        "footnote_markers": [],
+        "ocr_reasons": [
+          "column_absent_in_ocr"
+        ]
+      },
+      "delta_f_G": {
+        "as_published": "",
+        "value": null,
+        "ocr_suspect": true,
+        "footnote_markers": [],
+        "ocr_reasons": [
+          "column_absent_in_ocr"
+        ]
+      },
+      "log_Kf": {
+        "as_published": "",
+        "value": null,
+        "ocr_suspect": true,
+        "footnote_markers": [],
+        "ocr_reasons": [
+          "column_absent_in_ocr"
+        ]
+      },
+      "ocr_suspect_row": true,
+      "missing_columns": [
+        "entropy",
+        "gibbs_function",
+        "delta_f_H",
+        "delta_f_G",
+        "log_Kf"
+      ],
+      "grid_refusal_reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
+    },
+    {
+      "kind": "grid_refusal",
+      "source_layout_line": " 298. 15 0.000                   19.73             19.73          -104.370        -97.693    71.611",
+      "column_token_count": 7,
+      "temperature": {
+        "as_published": "298. 15",
+        "value": null,
+        "ocr_suspect": true,
+        "footnote_markers": [],
+        "ocr_reasons": [
+          "non_clean_numberish"
+        ]
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          8
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
+      },
+      "H_minus_H298": {
+        "as_published": "0",
         "value": 0.0,
         "ocr_suspect": false,
         "footnote_markers": [],
@@ -94,10 +233,43 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
-      }
+      },
+      "ocr_suspect_row": true,
+      "grid_refusal_reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
     },
     {
       "kind": "uncertainty",
+      "source_layout_line": "UNCERTAINTY                       0.04              O.C4             0.200          0.210     0.154",
+      "source_column_spans": {
+        "temperature": [
+          0,
+          13
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
+      },
       "entropy": {
         "as_published": "0.04",
         "value": 0.04,
@@ -139,6 +311,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": " 400                    1.272    23.40             20.22          -104.847        -95.321    52.081",
       "column_token_count": 7,
       "temperature": {
         "as_published": "400",
@@ -146,6 +319,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "1.272",
@@ -192,6 +395,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": " 500                    2.561    26.27             21.15          -104.728        -92.950    40.628",
       "column_token_count": 7,
       "temperature": {
         "as_published": "500",
@@ -199,6 +403,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "2.561",
@@ -245,6 +479,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": " 600                    3.889    28.69             22.21          -104.560        -90.608    33.004",
       "column_token_count": 7,
       "temperature": {
         "as_published": "600",
@@ -252,6 +487,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "3.889",
@@ -298,6 +563,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": " 700                    5.254    30.80             ?3.29          -104.350        -88.304    27.570",
       "column_token_count": 7,
       "temperature": {
         "as_published": "700",
@@ -305,6 +571,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "5.254",
@@ -353,6 +649,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": " 800                    6.664    32.68             24.35          -104.095        -86.027    23.502",
       "column_token_count": 7,
       "temperature": {
         "as_published": "800",
@@ -360,6 +657,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "6.664",
@@ -406,6 +733,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": " 900                    8.132    34.41             25.37          -103.784        -83.788    20.346",
       "column_token_count": 7,
       "temperature": {
         "as_published": "900",
@@ -413,6 +741,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "8.132",
@@ -459,6 +817,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1000                    9.681    36.04             26.36          -103.403        -81.585    17.830",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1000",
@@ -466,6 +825,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "9.681",
@@ -512,6 +901,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1044                   10.399    36.74             26.78          -122.242        -80.614    16.876",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1044",
@@ -519,6 +909,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "10.399",
@@ -565,6 +985,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1044                   16.681    42.76             26.78          -115.960        -80.614    16.876",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1044",
@@ -572,6 +993,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "16.681",
@@ -618,6 +1069,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1100                   17.665    43.68             27.62          -115.505        -78.742    15.645",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1100",
@@ -625,6 +1077,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "17.665",
@@ -671,6 +1153,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1200                   19.424    45.21             29.02          -114.693        -75.435    13.739",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1200",
@@ -678,6 +1161,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "19.424",
@@ -724,6 +1237,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1300                   21.183    46.62             30.33          -113.882        -72.200    12.138",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1300",
@@ -731,6 +1245,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "21.183",
@@ -777,6 +1321,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1400                   22.942    47.92             31.53          -113.072        -69.018    10.774",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1400",
@@ -784,6 +1329,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "22.942",
@@ -830,6 +1405,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1500                   24.701    49.13             32.66          -112.263        -65.894     9.601",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1500",
@@ -837,6 +1413,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "24.701",
@@ -883,6 +1489,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1600                   26.460    50.27             33.73          -111.455        -62.837     8.583",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1600",
@@ -890,6 +1497,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "26.460",
@@ -936,6 +1573,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1700                   28.219    51.33             34.73          -110.648        -59.813     7.689",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1700",
@@ -943,6 +1581,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "28.219",
@@ -989,6 +1657,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1750                   29.099    51.85             35.22          -110.245        -58.320     7.283",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1750",
@@ -996,6 +1665,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "29.099",
@@ -1042,6 +1741,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1750                   66.239    73.07             35.22           -73.105        -58.320     7.283",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1750",
@@ -1049,6 +1749,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "66.239",
@@ -1095,6 +1825,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1800                   66.703    73.33             36.27           -73.118        -57.911     7.031",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1800",
@@ -1102,6 +1833,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "66.703",
@@ -1148,6 +1909,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "1900                   67.630    73.83             38.24           -73.147        -57.063     6.564",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1900",
@@ -1155,6 +1917,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "67.630",
@@ -1201,6 +1993,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "2000                   68.559    74.30             40.02           -73.175        -56.202     6.141",
       "column_token_count": 7,
       "temperature": {
         "as_published": "2000",
@@ -1208,6 +2001,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          31
+        ],
+        "entropy": [
+          31,
+          44
+        ],
+        "gibbs_function": [
+          44,
+          61
+        ],
+        "delta_f_H": [
+          61,
+          78
+        ],
+        "delta_f_G": [
+          78,
+          91
+        ],
+        "log_Kf": [
+          91,
+          99
+        ]
       },
       "H_minus_H298": {
         "as_published": "68.559",
@@ -1253,8 +2076,21 @@
       }
     }
   ],
-  "row_count": 22,
-  "ocr_suspect_token_count": 1,
+  "row_count": 23,
+  "lookup_grid_count": 21,
+  "grid_refusals": [
+    {
+      "raw_temperature_token": "1",
+      "source_layout_line": "1 trtr«            H     n",
+      "reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
+    },
+    {
+      "raw_temperature_token": "298. 15",
+      "source_layout_line": " 298. 15 0.000                   19.73             19.73          -104.370        -97.693    71.611",
+      "reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
+    }
+  ],
+  "ocr_suspect_token_count": 8,
   "identity_disagreements": [],
   "ambiguities": [],
   "record_id": "b1259-ht-0143-sylvite",

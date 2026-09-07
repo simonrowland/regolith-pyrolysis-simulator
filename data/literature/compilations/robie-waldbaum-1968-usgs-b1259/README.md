@@ -13,7 +13,7 @@ produces **no** battery scoring rows
 - **Licence:** United States government work. USGS numbered series; public domain in the United States.
 - **Local PDF sha256:** `013abbde1aef291c7492f2eaf7ab552619699e558d741ae5f39a87830e080e83` (9 819 644 bytes, 262 PDF pages). The PDF is held in the literature corpus and is **not** copied into this repository.
 - **Access date:** 2026-09-06
-- **Text source:** `pdftotext -layout` OCR text layer, page by page. MinerU markdown was not present at ingest.
+- **Text source:** `source/layout.txt`, a deterministic form-feed-delimited `pdftotext -layout` derivative of all 262 PDF pages. MinerU markdown was not present at ingest.
 
 ## Native structure (no conversion)
 
@@ -27,13 +27,14 @@ produces **no** battery scoring rows
 
 No unit conversion, no rounding, no gap filling, no interpolation. Footnote markers stay on the token. Identity relations (gef ≈ S − 1000(H−H298)/T and ΔfG vs log Kf) are **detectors** listed under `identity_disagreements` / `ambiguities`; they are never used to rewrite a number.
 
-OCR tokens with letter/digit confusions (O/0, C/0, l/1, dropped or shifted decimal, merged columns) are stored with `ocr_suspect: true` and the raw token. They are not corrected.
+OCR tokens with letter/digit confusions (O/0, C/0, l/1, dropped or shifted decimal, merged columns) are stored with `ocr_suspect: true` and the raw token. Image-proven corrections retain `layout_as_extracted`, carry a `correction_id`, and close to the manifest's page-and-quote correction ledger.
 
 ## Known gaps
 
 - PDF page 125 (bulletin p. 119) is rotated 180°; the OCR text layer is inverted glyphs. The high-T table between Li2O and brucite is **untranscribed**.
-- The 298.15 K typeset tables are ragged OCR; several header fragments were rejected rather than guessed. Abstract claims 50 elements + 285 minerals; this ingest keeps every recovered substance row.
+- The 298.15 K fixed-column census is 334 substance rows across PDF pp. 17–31 (`24, 24, 24, 24, 25, 24, 24, 24, 21, 23, 21, 22, 23, 23, 8`). Header fragments are rejected by column alignment, not token value.
 - High-T computer printout OCR regularly confuses O/0 and C/0 (`10.2CO`, `18.0CO`).
+- A high-T temperature enters the lookup grid only from a clean T-column token or a manifest-listed page-image correction. Ambiguous rows remain present as `grid_refusal` rows.
 
 ## Loading and permitted use
 

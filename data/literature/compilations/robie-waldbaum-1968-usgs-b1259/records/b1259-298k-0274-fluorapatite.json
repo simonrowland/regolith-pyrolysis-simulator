@@ -1,0 +1,155 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-waldbaum-1968-usgs-b1259",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "table_kind": "properties_298k",
+  "table_number_as_published": null,
+  "group_as_published": "Phosphates, molybdates, and tungstates",
+  "pdf_page": 28,
+  "page": 22,
+  "name_as_published": "Fluorapatite",
+  "formula_as_published": "Ca 5 (P04 ) 3 F",
+  "formula": "Ca 5 (P04 ) 3 F",
+  "phase": "",
+  "state_note_as_published": "",
+  "gram_formula_weight": {
+    "as_published": "504.313",
+    "value": 504.313,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "units_as_published": {
+    "entropy": "cal deg^-1 gfw^-1",
+    "molar_volume": "cm^3",
+    "delta_f_H": "cal gfw^-1",
+    "delta_f_G": "cal gfw^-1",
+    "log_Kf": "dimensionless"
+  },
+  "entropy": {
+    "as_published": "92. 70",
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": [],
+    "ocr_reasons": [
+      "non_clean_numberish"
+    ]
+  },
+  "molar_volume": {
+    "as_published": "157.56",
+    "value": 157.56,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "delta_f_H": {
+    "as_published": "",
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": [],
+    "ocr_reasons": [
+      "blank_as_published"
+    ]
+  },
+  "delta_f_G": {
+    "as_published": "",
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": [],
+    "ocr_reasons": [
+      "blank_as_published"
+    ]
+  },
+  "log_Kf": {
+    "as_published": "",
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": [],
+    "ocr_reasons": [
+      "blank_as_published"
+    ]
+  },
+  "references_as_published": [
+    "78",
+    "74"
+  ],
+  "uncertainty_line_tokens": [
+    "5",
+    "(P04",
+    "3",
+    "±",
+    ".40",
+    "±",
+    ".12"
+  ],
+  "source_layout_lines": [
+    "Fluorapatite         504.313     92. 70        157.56                                            78                   74",
+    "Ca 5 (P04 ) 3 F                  ± .40         ± .12"
+  ],
+  "source_column_spans": {
+    "entropy": {
+      "source_span": [
+        30,
+        42
+      ],
+      "source_line_index": 0
+    },
+    "molar_volume": {
+      "source_span": [
+        42,
+        57
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_H": {
+      "source_span": [
+        57,
+        69
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_G": {
+      "source_span": [
+        69,
+        81
+      ],
+      "source_line_index": 0
+    },
+    "log_Kf": {
+      "source_span": [
+        81,
+        94
+      ],
+      "source_line_index": 0
+    },
+    "gram_formula_weight": {
+      "source_span": [
+        21,
+        30
+      ],
+      "source_line_index": 0
+    }
+  },
+  "row_count": 1,
+  "identity_disagreements": [],
+  "ambiguities": [
+    "ocr_suspect_token_retained_uncorrected"
+  ],
+  "record_id": "b1259-298k-0274-fluorapatite",
+  "source": {
+    "database": "USGS Bulletin 1259, Robie & Waldbaum 1968",
+    "citation": "Robie, R. A. and Waldbaum, D. R., 1968, Thermodynamic properties of minerals and related substances at 298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure and at higher temperatures: U.S. Geological Survey Bulletin 1259, 256 p.",
+    "doi": "10.3133/b1259",
+    "official_url": "https://pubs.usgs.gov/bul/1259/report.pdf",
+    "licence": "United States government work. USGS numbered series; public domain in the United States. Fetched from the official pubs.usgs.gov host.",
+    "sha256": "013abbde1aef291c7492f2eaf7ab552619699e558d741ae5f39a87830e080e83",
+    "retrieved_at": "2026-09-06"
+  }
+}

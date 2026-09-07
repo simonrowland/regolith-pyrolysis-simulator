@@ -1,0 +1,149 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-waldbaum-1968-usgs-b1259",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "table_kind": "properties_298k",
+  "table_number_as_published": null,
+  "group_as_published": "Ox des and hyd roxides",
+  "pdf_page": 22,
+  "page": 16,
+  "name_as_published": "Carbon Monoxide",
+  "formula_as_published": "CO",
+  "formula": "CO",
+  "phase": "Ideal gas",
+  "state_note_as_published": "",
+  "gram_formula_weight": {
+    "as_published": "28.011",
+    "value": 28.011,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "units_as_published": {
+    "entropy": "cal deg^-1 gfw^-1",
+    "molar_volume": "cm^3",
+    "delta_f_H": "cal gfw^-1",
+    "delta_f_G": "cal gfw^-1",
+    "log_Kf": "dimensionless"
+  },
+  "entropy": {
+    "as_published": "47.219",
+    "value": 47.219,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "molar_volume": {
+    "as_published": "24465.0",
+    "value": 24465.0,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "delta_f_H": {
+    "as_published": "-26416",
+    "value": -26416.0,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "delta_f_G": {
+    "as_published": "-32781",
+    "value": -32781.0,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "log_Kf": {
+    "as_published": "24.029",
+    "value": 24.029,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "references_as_published": [
+    "158",
+    "158",
+    "148"
+  ],
+  "uncertainty_line_tokens": [
+    "±",
+    ".010",
+    "±",
+    "3.4",
+    "±",
+    "20",
+    "±",
+    "30",
+    "±",
+    ".022"
+  ],
+  "source_layout_lines": [
+    "Carbon Monoxide      28.011      47.219 24465.0                -26416           -32781       24.029    158          158    148",
+    "CO (Ideal gas)                   ± .010 ±   3.4                ±   20           ±   30       ± .022"
+  ],
+  "source_column_spans": {
+    "entropy": {
+      "source_span": [
+        30,
+        40
+      ],
+      "source_line_index": 0
+    },
+    "molar_volume": {
+      "source_span": [
+        40,
+        59
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_H": {
+      "source_span": [
+        59,
+        72
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_G": {
+      "source_span": [
+        72,
+        88
+      ],
+      "source_line_index": 0
+    },
+    "log_Kf": {
+      "source_span": [
+        88,
+        103
+      ],
+      "source_line_index": 0
+    },
+    "gram_formula_weight": {
+      "source_span": [
+        21,
+        30
+      ],
+      "source_line_index": 0
+    }
+  },
+  "row_count": 1,
+  "identity_disagreements": [],
+  "ambiguities": [],
+  "record_id": "b1259-298k-0132-carbon-monoxide",
+  "source": {
+    "database": "USGS Bulletin 1259, Robie & Waldbaum 1968",
+    "citation": "Robie, R. A. and Waldbaum, D. R., 1968, Thermodynamic properties of minerals and related substances at 298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure and at higher temperatures: U.S. Geological Survey Bulletin 1259, 256 p.",
+    "doi": "10.3133/b1259",
+    "official_url": "https://pubs.usgs.gov/bul/1259/report.pdf",
+    "licence": "United States government work. USGS numbered series; public domain in the United States. Fetched from the official pubs.usgs.gov host.",
+    "sha256": "013abbde1aef291c7492f2eaf7ab552619699e558d741ae5f39a87830e080e83",
+    "retrieved_at": "2026-09-06"
+  }
+}

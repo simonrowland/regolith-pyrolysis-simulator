@@ -1,0 +1,153 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-waldbaum-1968-usgs-b1259",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "table_kind": "properties_298k",
+  "table_number_as_published": null,
+  "group_as_published": "Ortho and ring structure silicates",
+  "pdf_page": 29,
+  "page": 23,
+  "name_as_published": "Akermanite",
+  "formula_as_published": "Ca 2 MgSi20 7",
+  "formula": "Ca 2 MgSi20 7",
+  "phase": "",
+  "state_note_as_published": "",
+  "gram_formula_weight": {
+    "as_published": "272.640",
+    "value": 272.64,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "units_as_published": {
+    "entropy": "cal deg^-1 gfw^-1",
+    "molar_volume": "cm^3",
+    "delta_f_H": "cal gfw^-1",
+    "delta_f_G": "cal gfw^-1",
+    "log_Kf": "dimensionless"
+  },
+  "entropy": {
+    "as_published": "50.03",
+    "value": 50.03,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "molar_volume": {
+    "as_published": "92.81",
+    "value": 92.81,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "delta_f_H": {
+    "as_published": "-926510",
+    "value": -926510.0,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "delta_f_G": {
+    "as_published": "-879353",
+    "value": -879353.0,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "log_Kf": {
+    "as_published": "644.583",
+    "value": 644.583,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "references_as_published": [
+    "172",
+    "116",
+    "122",
+    "75"
+  ],
+  "uncertainty_line_tokens": [
+    "2",
+    "7",
+    "±",
+    ".50",
+    "±",
+    ".09",
+    "±",
+    "1070",
+    "±",
+    "1090",
+    "±",
+    ".799",
+    "75"
+  ],
+  "source_layout_lines": [
+    "Akermanite                 272.640     50.03         92.81       -926510      -879353      644.583        172   116        122",
+    "Ca 2 MgSi20 7                          ± .50         ± .09       ± 1070       ± 1090       ± .799                75"
+  ],
+  "source_column_spans": {
+    "entropy": {
+      "source_span": [
+        36,
+        48
+      ],
+      "source_line_index": 0
+    },
+    "molar_volume": {
+      "source_span": [
+        48,
+        61
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_H": {
+      "source_span": [
+        61,
+        75
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_G": {
+      "source_span": [
+        75,
+        88
+      ],
+      "source_line_index": 0
+    },
+    "log_Kf": {
+      "source_span": [
+        88,
+        104
+      ],
+      "source_line_index": 0
+    },
+    "gram_formula_weight": {
+      "source_span": [
+        27,
+        36
+      ],
+      "source_line_index": 0
+    }
+  },
+  "row_count": 1,
+  "identity_disagreements": [],
+  "ambiguities": [],
+  "record_id": "b1259-298k-0293-akermanite",
+  "source": {
+    "database": "USGS Bulletin 1259, Robie & Waldbaum 1968",
+    "citation": "Robie, R. A. and Waldbaum, D. R., 1968, Thermodynamic properties of minerals and related substances at 298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure and at higher temperatures: U.S. Geological Survey Bulletin 1259, 256 p.",
+    "doi": "10.3133/b1259",
+    "official_url": "https://pubs.usgs.gov/bul/1259/report.pdf",
+    "licence": "United States government work. USGS numbered series; public domain in the United States. Fetched from the official pubs.usgs.gov host.",
+    "sha256": "013abbde1aef291c7492f2eaf7ab552619699e558d741ae5f39a87830e080e83",
+    "retrieved_at": "2026-09-06"
+  }
+}

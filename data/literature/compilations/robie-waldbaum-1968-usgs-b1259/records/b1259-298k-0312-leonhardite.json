@@ -1,0 +1,149 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-waldbaum-1968-usgs-b1259",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "table_kind": "properties_298k",
+  "table_number_as_published": null,
+  "group_as_published": "Frame work structure silicates",
+  "pdf_page": 30,
+  "page": 24,
+  "name_as_published": "Leonhardite",
+  "formula_as_published": "Ca       A1       <5i O       . 7H f~\\",
+  "formula": "Ca       A1       <5i O       . 7H f~\\",
+  "phase": "",
+  "state_note_as_published": "",
+  "gram_formula_weight": {
+    "as_published": "922.867",
+    "value": 922.867,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "units_as_published": {
+    "entropy": "cal deg^-1 gfw^-1",
+    "molar_volume": "cm^3",
+    "delta_f_H": "cal gfw^-1",
+    "delta_f_G": "cal gfw^-1",
+    "log_Kf": "dimensionless"
+  },
+  "entropy": {
+    "as_published": "220.4",
+    "value": 220.4,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "molar_volume": {
+    "as_published": "404.4",
+    "value": 404.4,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "delta_f_H": {
+    "as_published": "-3397535",
+    "value": -3397535.0,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "delta_f_G": {
+    "as_published": "-3146948",
+    "value": -3146948.0,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "log_Kf": {
+    "as_published": "2306.773",
+    "value": 2306.773,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "references_as_published": [
+    "87",
+    "6"
+  ],
+  "uncertainty_line_tokens": [
+    "A1",
+    "<5i",
+    "7H",
+    "±2.6",
+    "±2.0",
+    "±",
+    "2500",
+    "±",
+    "2700",
+    "±",
+    "1.979"
+  ],
+  "source_layout_lines": [
+    "Leonhardite                              922.867    220.4                 404.4      -3397535      -3146948       2306.773     87         6",
+    "Ca       A1       <5i O       . 7H f~\\              ±2.6                  ±2.0       ±   2500      ±   2700       ± 1.979"
+  ],
+  "source_column_spans": {
+    "entropy": {
+      "source_span": [
+        51,
+        66
+      ],
+      "source_line_index": 0
+    },
+    "molar_volume": {
+      "source_span": [
+        66,
+        83
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_H": {
+      "source_span": [
+        83,
+        96
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_G": {
+      "source_span": [
+        96,
+        110
+      ],
+      "source_line_index": 0
+    },
+    "log_Kf": {
+      "source_span": [
+        110,
+        126
+      ],
+      "source_line_index": 0
+    },
+    "gram_formula_weight": {
+      "source_span": [
+        41,
+        51
+      ],
+      "source_line_index": 0
+    }
+  },
+  "row_count": 1,
+  "identity_disagreements": [],
+  "ambiguities": [],
+  "record_id": "b1259-298k-0312-leonhardite",
+  "source": {
+    "database": "USGS Bulletin 1259, Robie & Waldbaum 1968",
+    "citation": "Robie, R. A. and Waldbaum, D. R., 1968, Thermodynamic properties of minerals and related substances at 298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure and at higher temperatures: U.S. Geological Survey Bulletin 1259, 256 p.",
+    "doi": "10.3133/b1259",
+    "official_url": "https://pubs.usgs.gov/bul/1259/report.pdf",
+    "licence": "United States government work. USGS numbered series; public domain in the United States. Fetched from the official pubs.usgs.gov host.",
+    "sha256": "013abbde1aef291c7492f2eaf7ab552619699e558d741ae5f39a87830e080e83",
+    "retrieved_at": "2026-09-06"
+  }
+}

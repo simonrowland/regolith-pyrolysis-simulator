@@ -14,9 +14,9 @@
   "pdf_page": 100,
   "page": 94,
   "name_as_published": "BOEHMITE",
-  "formula_as_published": "AIO(OH)",
-  "formula": "AIO(OH)",
-  "phase": "94 THERMODYNAMIC PROPERTIES OF MINERALS Crystals 298.15° to 500°K.",
+  "formula_as_published": "AlO(OH)",
+  "formula": "AlO(OH)",
+  "phase": "Crystals 298.15° to 500°K.",
   "gram_formula_weight": {
     "as_published": "59.988",
     "value": 59.988,
@@ -41,6 +41,7 @@
   "rows": [
     {
       "kind": "data",
+      "source_layout_line": " 298.15  0.000                 11.58        11.58        235.500        217.674    159.559",
       "column_token_count": 7,
       "temperature": {
         "as_published": "298.15",
@@ -48,6 +49,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          7
+        ],
+        "H_minus_H298": [
+          9,
+          14
+        ],
+        "entropy": [
+          28,
+          40
+        ],
+        "gibbs_function": [
+          40,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          68
+        ],
+        "delta_f_G": [
+          68,
+          81
+        ],
+        "log_Kf": [
+          81,
+          90
+        ]
       },
       "H_minus_H298": {
         "as_published": "0.000",
@@ -71,18 +102,22 @@
         "ocr_reasons": []
       },
       "delta_f_H": {
-        "as_published": "235.500",
-        "value": 235.5,
+        "as_published": "-235.500",
+        "value": -235.5,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "235.500",
+        "correction_id": "b1259-p100-delta_f_H-01"
       },
       "delta_f_G": {
-        "as_published": "217.674",
-        "value": 217.674,
+        "as_published": "-217.674",
+        "value": -217.674,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "217.674",
+        "correction_id": "b1259-p100-delta_f_G-01"
       },
       "log_Kf": {
         "as_published": "159.559",
@@ -91,13 +126,41 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "logKf_identity |logK+1000 dG/(RT ln10)|=319.1179 at T=298.15"
-      ],
       "ocr_suspect_row": true
     },
     {
       "kind": "uncertainty",
+      "source_layout_line": "UNCERTAINTY                     0.05         0.05          3.500          3.510      2.573",
+      "source_column_spans": {
+        "temperature": [
+          0,
+          14
+        ],
+        "H_minus_H298": [
+          14,
+          28
+        ],
+        "entropy": [
+          28,
+          40
+        ],
+        "gibbs_function": [
+          40,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          68
+        ],
+        "delta_f_G": [
+          68,
+          81
+        ],
+        "log_Kf": [
+          81,
+          90
+        ]
+      },
       "entropy": {
         "as_published": "0.05",
         "value": 0.05,
@@ -136,6 +199,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "    400              1.558     16. 06       12.16       235.629         211.667    115.649",
       "column_token_count": 7,
       "temperature": {
         "as_published": "400",
@@ -143,6 +207,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          4,
+          7
+        ],
+        "H_minus_H298": [
+          14,
+          28
+        ],
+        "entropy": [
+          28,
+          40
+        ],
+        "gibbs_function": [
+          40,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          68
+        ],
+        "delta_f_G": [
+          68,
+          81
+        ],
+        "log_Kf": [
+          81,
+          90
+        ]
       },
       "H_minus_H298": {
         "as_published": "1.558",
@@ -152,11 +246,13 @@
         "ocr_reasons": []
       },
       "entropy": {
-        "as_published": "16.06",
-        "value": 16.06,
-        "ocr_suspect": false,
+        "as_published": "16. 06",
+        "value": null,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "non_clean_numberish"
+        ]
       },
       "gibbs_function": {
         "as_published": "12.16",
@@ -166,18 +262,22 @@
         "ocr_reasons": []
       },
       "delta_f_H": {
-        "as_published": "235.629",
-        "value": 235.629,
+        "as_published": "-235.629",
+        "value": -235.629,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "235.629",
+        "correction_id": "b1259-p100-delta_f_H-03"
       },
       "delta_f_G": {
-        "as_published": "211.667",
-        "value": 211.667,
+        "as_published": "-211.667",
+        "value": -211.667,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "211.667",
+        "correction_id": "b1259-p100-delta_f_G-03"
       },
       "log_Kf": {
         "as_published": "115.649",
@@ -186,13 +286,11 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "logKf_identity |logK+1000 dG/(RT ln10)|=231.2982 at T=400.0"
-      ],
       "ocr_suspect_row": true
     },
     {
       "kind": "data",
+      "source_layout_line": "    500              3.425     20.20        13.35        235.474        205.550     89.846",
       "column_token_count": 7,
       "temperature": {
         "as_published": "500",
@@ -200,6 +298,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          4,
+          7
+        ],
+        "H_minus_H298": [
+          14,
+          28
+        ],
+        "entropy": [
+          28,
+          40
+        ],
+        "gibbs_function": [
+          40,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          68
+        ],
+        "delta_f_G": [
+          68,
+          81
+        ],
+        "log_Kf": [
+          81,
+          90
+        ]
       },
       "H_minus_H298": {
         "as_published": "3.425",
@@ -223,18 +351,22 @@
         "ocr_reasons": []
       },
       "delta_f_H": {
-        "as_published": "235.474",
-        "value": 235.474,
+        "as_published": "-235.474",
+        "value": -235.474,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "235.474",
+        "correction_id": "b1259-p100-delta_f_H-04"
       },
       "delta_f_G": {
-        "as_published": "205.550",
-        "value": 205.55,
+        "as_published": "-205.550",
+        "value": -205.55,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "205.550",
+        "correction_id": "b1259-p100-delta_f_G-04"
       },
       "log_Kf": {
         "as_published": "89.846",
@@ -243,23 +375,76 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "logKf_identity |logK+1000 dG/(RT ln10)|=179.6916 at T=500.0"
-      ],
       "ocr_suspect_row": true
     }
   ],
   "row_count": 3,
-  "ocr_suspect_token_count": 0,
-  "identity_disagreements": [
-    "logKf_identity |logK+1000 dG/(RT ln10)|=319.1179 at T=298.15",
-    "logKf_identity |logK+1000 dG/(RT ln10)|=231.2982 at T=400.0",
-    "logKf_identity |logK+1000 dG/(RT ln10)|=179.6916 at T=500.0"
-  ],
+  "lookup_grid_count": 3,
+  "grid_refusals": [],
+  "ocr_suspect_token_count": 1,
+  "identity_disagreements": [],
   "ambiguities": [
     "logKf_identity |logK+1000 dG/(RT ln10)|=319.1179 at T=298.15",
     "logKf_identity |logK+1000 dG/(RT ln10)|=231.2982 at T=400.0",
     "logKf_identity |logK+1000 dG/(RT ln10)|=179.6916 at T=500.0"
+  ],
+  "corrections": [
+    {
+      "correction_id": "b1259-p100-formula_as_published",
+      "pdf_page": 100,
+      "field": "formula_as_published",
+      "layout_as_extracted": "AIO(OH)",
+      "printed_token": "AlO(OH)",
+      "evidence": "PDF page 100 image visibly prints 'AlO(OH)'"
+    },
+    {
+      "correction_id": "b1259-p100-delta_f_H-01",
+      "pdf_page": 100,
+      "field": "delta_f_H",
+      "layout_as_extracted": "235.500",
+      "printed_token": "-235.500",
+      "evidence": "PDF page 100 image visibly prints the leading minus sign in -235.500"
+    },
+    {
+      "correction_id": "b1259-p100-delta_f_G-01",
+      "pdf_page": 100,
+      "field": "delta_f_G",
+      "layout_as_extracted": "217.674",
+      "printed_token": "-217.674",
+      "evidence": "PDF page 100 image visibly prints the leading minus sign in -217.674"
+    },
+    {
+      "correction_id": "b1259-p100-delta_f_H-03",
+      "pdf_page": 100,
+      "field": "delta_f_H",
+      "layout_as_extracted": "235.629",
+      "printed_token": "-235.629",
+      "evidence": "PDF page 100 image visibly prints the leading minus sign in -235.629"
+    },
+    {
+      "correction_id": "b1259-p100-delta_f_G-03",
+      "pdf_page": 100,
+      "field": "delta_f_G",
+      "layout_as_extracted": "211.667",
+      "printed_token": "-211.667",
+      "evidence": "PDF page 100 image visibly prints the leading minus sign in -211.667"
+    },
+    {
+      "correction_id": "b1259-p100-delta_f_H-04",
+      "pdf_page": 100,
+      "field": "delta_f_H",
+      "layout_as_extracted": "235.474",
+      "printed_token": "-235.474",
+      "evidence": "PDF page 100 image visibly prints the leading minus sign in -235.474"
+    },
+    {
+      "correction_id": "b1259-p100-delta_f_G-04",
+      "pdf_page": 100,
+      "field": "delta_f_G",
+      "layout_as_extracted": "205.550",
+      "printed_token": "-205.550",
+      "evidence": "PDF page 100 image visibly prints the leading minus sign in -205.550"
+    }
   ],
   "record_id": "b1259-ht-0069-boehmite",
   "source": {

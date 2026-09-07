@@ -16,7 +16,7 @@
   "name_as_published": "DOLOMITE",
   "formula_as_published": "CaMg(C0 3 )",
   "formula": "CaMg(C0 3 )",
-  "phase": "PROPERTIES AT HIGH TEMPERATURES 183 Crystals 298.15° to 1000°K.",
+  "phase": "Crystals 298.15° to 1000°K.",
   "gram_formula_weight": {
     "as_published": "184.411",
     "value": 184.411,
@@ -40,7 +40,132 @@
   },
   "rows": [
     {
+      "kind": "grid_refusal",
+      "source_layout_line": " 29R.15 0.000                        37.09             37.09               -557.613       -518.734    380.241",
+      "column_token_count": 6,
+      "temperature": {
+        "as_published": "29R.15",
+        "value": null,
+        "ocr_suspect": true,
+        "footnote_markers": [],
+        "ocr_reasons": [
+          "letter_in_numeric_token",
+          "non_clean_numberish"
+        ]
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          7
+        ],
+        "H_minus_H298": [
+          13,
+          33
+        ],
+        "entropy": [
+          33,
+          48
+        ],
+        "gibbs_function": [
+          48,
+          67
+        ],
+        "delta_f_H": [
+          67,
+          86
+        ],
+        "delta_f_G": [
+          86,
+          100
+        ],
+        "log_Kf": [
+          100,
+          109
+        ]
+      },
+      "H_minus_H298": {
+        "as_published": "",
+        "value": null,
+        "ocr_suspect": true,
+        "footnote_markers": [],
+        "ocr_reasons": [
+          "column_absent_in_ocr"
+        ]
+      },
+      "entropy": {
+        "as_published": "37.09",
+        "value": 37.09,
+        "ocr_suspect": false,
+        "footnote_markers": [],
+        "ocr_reasons": []
+      },
+      "gibbs_function": {
+        "as_published": "37.09",
+        "value": 37.09,
+        "ocr_suspect": false,
+        "footnote_markers": [],
+        "ocr_reasons": []
+      },
+      "delta_f_H": {
+        "as_published": "-557.613",
+        "value": -557.613,
+        "ocr_suspect": false,
+        "footnote_markers": [],
+        "ocr_reasons": []
+      },
+      "delta_f_G": {
+        "as_published": "-518.734",
+        "value": -518.734,
+        "ocr_suspect": false,
+        "footnote_markers": [],
+        "ocr_reasons": []
+      },
+      "log_Kf": {
+        "as_published": "380.241",
+        "value": 380.241,
+        "ocr_suspect": false,
+        "footnote_markers": [],
+        "ocr_reasons": []
+      },
+      "ocr_suspect_row": true,
+      "missing_columns": [
+        "H_minus_H298"
+      ],
+      "grid_refusal_reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
+    },
+    {
       "kind": "uncertainty",
+      "source_layout_line": "UNCERTAINTY                           0.07              O.C7                  0.520          0.530      0.388",
+      "source_column_spans": {
+        "temperature": [
+          0,
+          13
+        ],
+        "H_minus_H298": [
+          13,
+          33
+        ],
+        "entropy": [
+          33,
+          48
+        ],
+        "gibbs_function": [
+          48,
+          67
+        ],
+        "delta_f_H": [
+          67,
+          86
+        ],
+        "delta_f_G": [
+          86,
+          100
+        ],
+        "log_Kf": [
+          100,
+          109
+        ]
+      },
       "entropy": {
         "as_published": "0.07",
         "value": 0.07,
@@ -82,6 +207,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": " 400                    4.150        49. Cl            38.63               -557.406       -505.468    276.174",
       "column_token_count": 7,
       "temperature": {
         "as_published": "400",
@@ -89,6 +215,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          33
+        ],
+        "entropy": [
+          33,
+          48
+        ],
+        "gibbs_function": [
+          48,
+          67
+        ],
+        "delta_f_H": [
+          67,
+          86
+        ],
+        "delta_f_G": [
+          86,
+          100
+        ],
+        "log_Kf": [
+          100,
+          109
+        ]
       },
       "H_minus_H298": {
         "as_published": "4.150",
@@ -98,11 +254,14 @@
         "ocr_reasons": []
       },
       "entropy": {
-        "as_published": "49.",
-        "value": 49.0,
-        "ocr_suspect": false,
+        "as_published": "49. Cl",
+        "value": null,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "letter_in_numeric_token",
+          "non_clean_numberish"
+        ]
       },
       "gibbs_function": {
         "as_published": "38.63",
@@ -135,6 +294,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": " 500                    8.743        59.24             41.75               -556.968       -492.535    215.286",
       "column_token_count": 7,
       "temperature": {
         "as_published": "500",
@@ -142,6 +302,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          33
+        ],
+        "entropy": [
+          33,
+          48
+        ],
+        "gibbs_function": [
+          48,
+          67
+        ],
+        "delta_f_H": [
+          67,
+          86
+        ],
+        "delta_f_G": [
+          86,
+          100
+        ],
+        "log_Kf": [
+          100,
+          109
+        ]
       },
       "H_minus_H298": {
         "as_published": "8.743",
@@ -187,7 +377,97 @@
       }
     },
     {
+      "kind": "grid_refusal",
+      "source_layout_line": " 6CO                   13.752        68.37             45.45               -556.371       -479.704    174.732",
+      "column_token_count": 7,
+      "temperature": {
+        "as_published": "6CO",
+        "value": null,
+        "ocr_suspect": true,
+        "footnote_markers": [],
+        "ocr_reasons": [
+          "letter_in_numeric_token",
+          "non_clean_numberish"
+        ]
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          33
+        ],
+        "entropy": [
+          33,
+          48
+        ],
+        "gibbs_function": [
+          48,
+          67
+        ],
+        "delta_f_H": [
+          67,
+          86
+        ],
+        "delta_f_G": [
+          86,
+          100
+        ],
+        "log_Kf": [
+          100,
+          109
+        ]
+      },
+      "H_minus_H298": {
+        "as_published": "13.752",
+        "value": 13.752,
+        "ocr_suspect": false,
+        "footnote_markers": [],
+        "ocr_reasons": []
+      },
+      "entropy": {
+        "as_published": "68.37",
+        "value": 68.37,
+        "ocr_suspect": false,
+        "footnote_markers": [],
+        "ocr_reasons": []
+      },
+      "gibbs_function": {
+        "as_published": "45.45",
+        "value": 45.45,
+        "ocr_suspect": false,
+        "footnote_markers": [],
+        "ocr_reasons": []
+      },
+      "delta_f_H": {
+        "as_published": "-556.371",
+        "value": -556.371,
+        "ocr_suspect": false,
+        "footnote_markers": [],
+        "ocr_reasons": []
+      },
+      "delta_f_G": {
+        "as_published": "-479.704",
+        "value": -479.704,
+        "ocr_suspect": false,
+        "footnote_markers": [],
+        "ocr_reasons": []
+      },
+      "log_Kf": {
+        "as_published": "174.732",
+        "value": 174.732,
+        "ocr_suspect": false,
+        "footnote_markers": [],
+        "ocr_reasons": []
+      },
+      "ocr_suspect_row": true,
+      "grid_refusal_reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
+    },
+    {
       "kind": "data",
+      "source_layout_line": " 700                   19.121        76.63             49.31               -555.645       -466.972    145.795",
       "column_token_count": 7,
       "temperature": {
         "as_published": "700",
@@ -195,6 +475,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          33
+        ],
+        "entropy": [
+          33,
+          48
+        ],
+        "gibbs_function": [
+          48,
+          67
+        ],
+        "delta_f_H": [
+          67,
+          86
+        ],
+        "delta_f_G": [
+          86,
+          100
+        ],
+        "log_Kf": [
+          100,
+          109
+        ]
       },
       "H_minus_H298": {
         "as_published": "19.121",
@@ -241,6 +551,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": " 300                   24.797        84.21             53.21               -554.838       -454.372    124.128",
       "column_token_count": 7,
       "temperature": {
         "as_published": "300",
@@ -248,6 +559,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          33
+        ],
+        "entropy": [
+          33,
+          48
+        ],
+        "gibbs_function": [
+          48,
+          67
+        ],
+        "delta_f_H": [
+          67,
+          86
+        ],
+        "delta_f_G": [
+          86,
+          100
+        ],
+        "log_Kf": [
+          100,
+          109
+        ]
       },
       "H_minus_H298": {
         "as_published": "24.797",
@@ -299,13 +640,44 @@
     },
     {
       "kind": "data",
-      "column_token_count": 8,
+      "source_layout_line": " 900                   30.709        91.17             57. C5              -553.923       -441.860    107.298",
+      "column_token_count": 7,
       "temperature": {
         "as_published": "900",
         "value": 900.0,
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          33
+        ],
+        "entropy": [
+          33,
+          48
+        ],
+        "gibbs_function": [
+          48,
+          67
+        ],
+        "delta_f_H": [
+          67,
+          86
+        ],
+        "delta_f_G": [
+          86,
+          100
+        ],
+        "log_Kf": [
+          100,
+          109
+        ]
       },
       "H_minus_H298": {
         "as_published": "30.709",
@@ -322,14 +694,7 @@
         "ocr_reasons": []
       },
       "gibbs_function": {
-        "as_published": "57.",
-        "value": 57.0,
-        "ocr_suspect": false,
-        "footnote_markers": [],
-        "ocr_reasons": []
-      },
-      "delta_f_H": {
-        "as_published": "C5",
+        "as_published": "57. C5",
         "value": null,
         "ocr_suspect": true,
         "footnote_markers": [],
@@ -338,30 +703,31 @@
           "non_clean_numberish"
         ]
       },
-      "delta_f_G": {
+      "delta_f_H": {
         "as_published": "-553.923",
         "value": -553.923,
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "log_Kf": {
+      "delta_f_G": {
         "as_published": "-441.860",
         "value": -441.86,
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "ocr_suspect_row": true,
-      "extra_tokens": [
-        "107.298"
-      ],
-      "identity_disagreements": [
-        "logKf_identity |logK+1000 dG/(RT ln10)|=576.3705 at T=900.0"
-      ]
+      "log_Kf": {
+        "as_published": "107.298",
+        "value": 107.298,
+        "ocr_suspect": false,
+        "footnote_markers": [],
+        "ocr_reasons": []
+      }
     },
     {
       "kind": "data",
+      "source_layout_line": "1000                   36.760        97.53             60.77               -555.182       -429.266     93.816",
       "column_token_count": 7,
       "temperature": {
         "as_published": "1000",
@@ -369,6 +735,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          0,
+          4
+        ],
+        "H_minus_H298": [
+          13,
+          33
+        ],
+        "entropy": [
+          33,
+          48
+        ],
+        "gibbs_function": [
+          48,
+          67
+        ],
+        "delta_f_H": [
+          67,
+          86
+        ],
+        "delta_f_G": [
+          86,
+          100
+        ],
+        "log_Kf": [
+          100,
+          109
+        ]
       },
       "H_minus_H298": {
         "as_published": "36.760",
@@ -414,17 +810,28 @@
       }
     }
   ],
-  "row_count": 6,
-  "ocr_suspect_token_count": 1,
+  "row_count": 8,
+  "lookup_grid_count": 6,
+  "grid_refusals": [
+    {
+      "raw_temperature_token": "29R.15",
+      "source_layout_line": " 29R.15 0.000                        37.09             37.09               -557.613       -518.734    380.241",
+      "reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
+    },
+    {
+      "raw_temperature_token": "6CO",
+      "source_layout_line": " 6CO                   13.752        68.37             45.45               -556.371       -479.704    174.732",
+      "reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
+    }
+  ],
+  "ocr_suspect_token_count": 5,
   "identity_disagreements": [
     "gef_identity |gef-(S-1000H/T)|=51.6567 at T=300.0",
-    "logKf_identity |logK+1000 dG/(RT ln10)|=206.8808 at T=300.0",
-    "logKf_identity |logK+1000 dG/(RT ln10)|=576.3705 at T=900.0"
+    "logKf_identity |logK+1000 dG/(RT ln10)|=206.8808 at T=300.0"
   ],
   "ambiguities": [
     "gef_identity |gef-(S-1000H/T)|=51.6567 at T=300.0",
-    "logKf_identity |logK+1000 dG/(RT ln10)|=206.8808 at T=300.0",
-    "logKf_identity |logK+1000 dG/(RT ln10)|=576.3705 at T=900.0"
+    "logKf_identity |logK+1000 dG/(RT ln10)|=206.8808 at T=300.0"
   ],
   "record_id": "b1259-ht-0158-dolomite",
   "source": {

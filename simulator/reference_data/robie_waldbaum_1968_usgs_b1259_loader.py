@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import statistics
 import subprocess
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -51,6 +52,129 @@ HEADER_WEIGHT = re.compile(
     r"(?P<gfw>\S+)",
     re.I,
 )
+IMAGE_VERIFIED_METADATA = {
+    91: {"phase": "Crystals 298.15° to 1000°K."},
+    96: {
+        "phase": (
+            "α crystals 298.15° to 875°K. β crystals 875° to melting point 1153°K. "
+            "Liquid 1153° to 1200°K."
+        )
+    },
+    100: {"formula_as_published": "AlO(OH)"},
+    109: {
+        "name_as_published": "PORTLANDITE",
+        "formula_as_published": "Ca(OH)2",
+        "phase": "Crystals 298.15° to 700°K.",
+    },
+    134: {"name_as_published": "BUNSENITE"},
+    145: {"phase": "α tridymite 298.15° to 390°K. β tridymite 390° to 2000°K."},
+    153: {"phase": "Crystals 298.15° to 1300°K."},
+    206: {"formula_as_published": "Ca5(PO4)3OH"},
+    233: {"phase": "Crystals 298.15° to 1400°K."},
+    237: {"phase": "Crystals 298.15° to 1400°K."},
+    238: {"phase": "Crystals 298.15° to 1400°K."},
+}
+IMAGE_VERIFIED_LAYOUT_RAWS = {
+    (91, "phase"): "Crystals 298.15° to 1000°K.",
+    (96, "phase"): (
+        "a crystals 298.15° to 875°K.       0 crystals 875° to melting\n\n"
+        "                   point 1153°K.     Liquid 1153° to 1200°K."
+    ),
+    (109, "phase"): "Crystals 298.15° to 700°K.",
+    (134, "name_as_published"): "8UNSENITE",
+    (145, "phase"): "a tridymite 298. 15° to 390°K.       & tridymite 390° to 2000°K.",
+    (153, "phase"): "Crystals 298. 15°' to 1300°K.",
+    (233, "phase"): "Crystals 298.15° to 1400°K.",
+    (237, "phase"): "Crystals 298.15° to 1400°K.",
+    (238, "phase"): "Crystals 298.15° to 1400°K.",
+}
+IMAGE_VERIFIED_TEMPERATURES = {
+    109: {"AGO": "400", "(SOO": "600"},
+    145: {"20CO": "2000"},
+    162: {"15CO": "1500"},
+    165: {"6CO": "600", "12CO": "1200"},
+    206: [str(value) for value in range(400, 1501, 100)],
+}
+IMAGE_VERIFIED_298K_IDENTITIES = {
+    'Al\'H"1" aqueous ion': ("Al+++ aqueous ion", "Al+++", 17),
+    'Ca"1"1" aqueous ion': ("Ca++ aqueous ion", "Ca++", 17),
+    'Cc"1"*"*" aqueous ion': ("Ce+++ aqueous ion", "Ce+++", 17),
+    "Hg2+* aqueous ion": ("Hg₂++ aqueous ion", "Hg₂++", 18),
+    'K"1" aqueous ion': ("K+ aqueous ion", "K+", 18),
+    'U"1"1"1"1" aqueous ion': ("U++++ aqueous ion", "U++++", 20),
+    "V 1 ' ' aqueous ion": ("V+++ aqueous ion", "V+++", 20),
+    'Zn"1"1" aqueous ion': ("Zn++ aqueous ion", "Zn++", 20),
+}
+IMAGE_VERIFIED_CELLS = {
+    50: [(1700, 1, "delta_f_H", ".000")],
+    70: [(1900, 1, "gibbs_function", "63.04")],
+    85: [
+        (900, 1, "gibbs_function", "50.09"),
+        (1600, 1, "gibbs_function", "55.02"),
+    ],
+    91: [
+        (500, 1, "delta_f_H", "-43.056"),
+        (600, 1, "delta_f_H", "-43.788"),
+        (700, 1, "delta_f_H", "-44.418"),
+        (900, 1, "delta_f_H", "-71.064"),
+        (1000, 1, "delta_f_H", "-71.136"),
+    ],
+    96: [
+        (500, 1, "log_Kf", "10.691"),
+        (800, 1, "delta_f_H", "-41.603"),
+        (800, 1, "delta_f_G", "-23.337"),
+        (800, 1, "log_Kf", "6.375"),
+    ],
+    107: [(298.15, 1, "gibbs_function", "51.06")],
+    132: [(1500, 1, "gibbs_function", "66.04")],
+    146: [(1700, 1, "entropy", "36.03")],
+    165: [(2000, 1, "gibbs_function", "66.06")],
+    168: [
+        (703, 1, "H_minus_H298", "6.330"),
+        (703, 1, "log_Kf", "5.792"),
+    ],
+    180: [
+        (1424, 2, "entropy", "48.05"),
+        (1691, 1, "gibbs_function", "34.02"),
+    ],
+    181: [
+        (298.15, 1, "delta_f_H", "-268.700"),
+        (298.15, 1, "delta_f_G", "-256.008"),
+    ],
+    191: [
+        (temperature, 1, field, printed)
+        for temperature, delta_h, delta_g in (
+            (298.15, "-212.521", "-195.045"),
+            (400, "-212.387", "-189.094"),
+            (500, "-212.107", "-183.298"),
+            (600, "-211.878", "-177.631"),
+            (700, "-211.470", "-171.883"),
+        )
+        for field, printed in (("delta_f_H", delta_h), ("delta_f_G", delta_g))
+    ],
+    209: [
+        (298.15, 1, "delta_f_H", "-619.390"),
+        (298.15, 1, "delta_f_G", "-584.134"),
+    ],
+}
+EXPECTED_298K_PAGE_COUNTS = (24, 24, 24, 24, 25, 24, 24, 24, 21, 23, 21, 22, 23, 23, 8)
+PRINTED_PHASE_LABELS = {
+    "Black",
+    "Crystal",
+    "Dimeric",
+    "Fictive",
+    "Hexagonal",
+    "Ideal gas",
+    "Liquid",
+    "Metastable",
+    "Quartz form",
+    "Red",
+    "Red V",
+    "Rhombohedral",
+    "Weal gas",
+    "White",
+    "Yellow",
+}
 
 
 class TemperatureNotOnPrintedGrid(LookupError):
@@ -76,29 +200,45 @@ def _is_numberish(tok: str) -> bool:
     return digits >= 1 and letters <= 3 and not t.isalpha()
 
 
-def _merge_split_decimals(tokens: list[str]) -> list[str]:
-    out: list[str] = []
+def _token_spans(line: str) -> list[tuple[int, int, str]]:
+    return [(match.start(), match.end(), match.group()) for match in re.finditer(r"\S+", line)]
+
+
+def _group_split_decimal_spans(
+    line: str, spans: list[tuple[int, int, str]]
+) -> list[tuple[int, int, str]]:
+    """Keep split OCR decimals as one raw, suspect cell without silently repairing them."""
+    grouped: list[tuple[int, int, str]] = []
     i = 0
-    while i < len(tokens):
-        tok = tokens[i]
-        nxt = tokens[i + 1] if i + 1 < len(tokens) else None
-        if nxt is not None:
-            if tok.endswith(".") and re.fullmatch(r"\d+[A-Za-z]?", nxt):
-                out.append(tok + nxt)
-                i += 2
-                continue
-            if (
-                _is_numberish(tok)
-                and "." not in tok
-                and nxt.startswith(".")
-                and _is_numberish(nxt)
+    while i < len(spans):
+        start, end, token = spans[i]
+        if i + 1 < len(spans):
+            next_start, next_end, next_token = spans[i + 1]
+            close = next_start - end <= 3
+            if close and (
+                (token.endswith(".") and re.fullmatch(r"\d+[A-Za-z]?", next_token))
+                or (_is_numberish(token) and next_token.startswith(".") and _is_numberish(next_token))
             ):
-                out.append(tok + nxt)
+                grouped.append((start, next_end, line[start:next_end]))
                 i += 2
                 continue
-        out.append(tok)
+        grouped.append((start, end, token))
         i += 1
-    return out
+    return grouped
+
+
+def _cell(raw: str, blank_reason: str = "blank_as_published") -> dict:
+    return inspect_token(raw) if raw else _empty_cell(blank_reason)
+
+
+def _avoid_splitting_token(line: str, boundary: int) -> int:
+    if boundary <= 0 or boundary >= len(line):
+        return boundary
+    if line[boundary - 1].isspace() or line[boundary].isspace():
+        return boundary
+    while boundary > 0 and not line[boundary - 1].isspace():
+        boundary -= 1
+    return boundary
 
 
 def inspect_token(raw: str) -> dict:
@@ -169,6 +309,135 @@ def _identity_notes(row: dict) -> list[str]:
     return notes
 
 
+def _image_correction(
+    record: dict, cell: dict, field: str, printed: str, quote: str, ordinal: int
+) -> None:
+    correction_id = f"b1259-p{record['pdf_page']}-{field}-{ordinal:02d}"
+    raw = cell.get("as_published", "")
+    cell.update(
+        {
+            "layout_as_extracted": raw,
+            "as_published": printed,
+            "value": float(Decimal(printed)),
+            "ocr_suspect": False,
+            "ocr_reasons": [],
+            "correction_id": correction_id,
+        }
+    )
+    record.setdefault("corrections", []).append(
+        {
+            "correction_id": correction_id,
+            "pdf_page": record["pdf_page"],
+            "field": field,
+            "layout_as_extracted": raw,
+            "printed_token": printed,
+            "evidence": quote,
+        }
+    )
+
+
+def _apply_image_verified_corrections(record: dict) -> None:
+    pdf_page = record["pdf_page"]
+    metadata = IMAGE_VERIFIED_METADATA.get(pdf_page, {})
+    for field, printed in metadata.items():
+        raw = record.get(field, "")
+        record[field] = printed
+        if field == "formula_as_published":
+            record["formula"] = printed
+        record.setdefault("corrections", []).append(
+            {
+                "correction_id": f"b1259-p{pdf_page}-{field}",
+                "pdf_page": pdf_page,
+                "field": field,
+                "layout_as_extracted": IMAGE_VERIFIED_LAYOUT_RAWS.get(
+                    (pdf_page, field), raw
+                ),
+                "printed_token": printed,
+                "evidence": f"PDF page {pdf_page} image visibly prints {printed!r}",
+            }
+        )
+
+    temperature_spec = IMAGE_VERIFIED_TEMPERATURES.get(pdf_page)
+    blank_temperatures = iter(temperature_spec if isinstance(temperature_spec, list) else [])
+    for ordinal, row in enumerate(record.get("rows") or [], 1):
+        if row.get("kind") not in {"data", "grid_refusal"}:
+            continue
+        temperature = row.get("temperature") or {}
+        raw_temperature = temperature.get("as_published", "")
+        printed_temperature = None
+        if isinstance(temperature_spec, dict):
+            printed_temperature = temperature_spec.get(raw_temperature)
+        elif isinstance(temperature_spec, list) and row.get("kind") == "grid_refusal" and not raw_temperature:
+            printed_temperature = next(blank_temperatures, None)
+        if printed_temperature:
+            _image_correction(
+                record,
+                temperature,
+                "temperature",
+                printed_temperature,
+                f"PDF page {pdf_page} image visibly prints T={printed_temperature} K on this row",
+                ordinal,
+            )
+            row["kind"] = "data"
+            row.pop("grid_refusal_reason", None)
+
+        if pdf_page in {100, 109, 206}:
+            for field in ("delta_f_H", "delta_f_G"):
+                cell = row.get(field) or {}
+                if cell.get("value") is not None and cell["value"] > 0 and not cell.get("ocr_suspect"):
+                    printed = f"-{cell['as_published']}"
+                    _image_correction(
+                        record,
+                        cell,
+                        field,
+                        printed,
+                        f"PDF page {pdf_page} image visibly prints the leading minus sign in {printed}",
+                        ordinal,
+                    )
+
+    occurrence_by_temperature: dict[float, int] = {}
+    for ordinal, row in enumerate(record.get("rows") or [], 1):
+        if row.get("kind") not in {"data", "grid_refusal"}:
+            continue
+        temperature = (row.get("temperature") or {}).get("value")
+        if temperature is None:
+            continue
+        occurrence_by_temperature[temperature] = occurrence_by_temperature.get(temperature, 0) + 1
+        occurrence = occurrence_by_temperature[temperature]
+        for wanted_t, wanted_occurrence, field, printed in IMAGE_VERIFIED_CELLS.get(pdf_page, []):
+            if temperature == wanted_t and occurrence == wanted_occurrence:
+                _image_correction(
+                    record,
+                    row[field],
+                    field,
+                    printed,
+                    f"PDF page {pdf_page} image visibly prints {field}={printed} at T={wanted_t} K",
+                    ordinal,
+                )
+
+    rows = [row for row in record.get("rows") or [] if row.get("kind") in {"data", "grid_refusal"}]
+    record["row_count"] = len(rows)
+    record["lookup_grid_count"] = sum(row.get("kind") == "data" for row in rows)
+    record["grid_refusals"] = [
+        {
+            "raw_temperature_token": (row.get("temperature") or {}).get("as_published", ""),
+            "source_layout_line": row.get("source_layout_line", ""),
+            "reason": row.get("grid_refusal_reason"),
+        }
+        for row in rows
+        if row.get("kind") == "grid_refusal"
+    ]
+    identity: list[str] = []
+    for row in rows:
+        notes = _identity_notes(row)
+        if notes:
+            row["identity_disagreements"] = notes
+            identity.extend(notes)
+        else:
+            row.pop("identity_disagreements", None)
+    record["identity_disagreements"] = identity
+
+
 def _clean_name(name: str) -> str:
     name = re.sub(r"\s+", " ", name).strip(" .")
     name = re.sub(r"^\d+\s+", "", name)
@@ -177,52 +446,217 @@ def _clean_name(name: str) -> str:
     return name.strip(" .")
 
 
+def _high_t_column_ranges(lines: list[str]) -> dict[str, tuple[int, int | None]]:
+    """Derive fixed table columns from complete rows, independent of row assignment."""
+    candidates: list[list[tuple[int, int, str]]] = []
+    partial_candidates: list[list[tuple[int, int, str]]] = []
+    in_table = False
+    for line in lines:
+        if re.search(r"FORMATION FROM", line, re.I) or (
+            re.search(r"T\s+2(?:9|<)8", line, re.I)
+            and re.search(r"ENTHALPY|FREE ENERGY|LOG K", line, re.I)
+        ):
+            in_table = True
+            continue
+        if not in_table:
+            continue
+        spans = _group_split_decimal_spans(line, _token_spans(line))
+        numeric = [span for span in spans if _is_numberish(span[2])]
+        if numeric and numeric[0][0] <= 8 and 2 <= len(numeric) <= len(HIGH_T_COLUMNS):
+            partial_candidates.append(numeric)
+            if len(numeric) == len(HIGH_T_COLUMNS):
+                candidates.append(numeric)
+    if candidates:
+        boundaries = [
+            int(statistics.median((row[index][1] + row[index + 1][0]) // 2 for row in candidates))
+            for index in range(len(HIGH_T_COLUMNS) - 1)
+        ]
+    else:
+        header = next(
+            (line for line in lines if re.search(r"TEMP\.", line, re.I) and re.search(r"H\s*-H", line, re.I)),
+            "",
+        )
+        formation = next(
+            (
+                line
+                for line in lines
+                if re.search(r"ENTHALPY", line, re.I)
+                and re.search(r"FREE ENERGY", line, re.I)
+                and re.search(r"LOG K", line, re.I)
+            ),
+            "",
+        )
+        h_match = re.search(r"H\s*-H", header, re.I)
+        g_match = re.search(r"-\S*G", header, re.I)
+        between_h_and_g = header[h_match.end() : g_match.start()] if h_match and g_match else ""
+        s_match = re.search(r"\S+", between_h_and_g)
+        enthalpy_match = re.search(r"ENTHALPY", formation, re.I)
+        free_match = re.search(r"FREE ENERGY", formation, re.I)
+        logk_match = re.search(r"LOG K", formation, re.I)
+        anchors: list[int | None] = [None] * len(HIGH_T_COLUMNS)
+        anchors[0] = 0
+        if partial_candidates:
+            widths = [len(row) for row in partial_candidates]
+            widest = max(set(widths), key=lambda width: (widths.count(width), -width))
+            widest_rows = [row for row in partial_candidates if len(row) == widest]
+            for index in range(widest):
+                anchors[index] = int(statistics.median(row[index][0] for row in widest_rows))
+        if h_match:
+            anchors[1] = anchors[1] if anchors[1] is not None else h_match.start()
+        if s_match and h_match:
+            anchors[2] = anchors[2] if anchors[2] is not None else h_match.end() + s_match.start()
+        if g_match:
+            anchors[3] = anchors[3] if anchors[3] is not None else g_match.start()
+        t298_matches = list(re.finditer(r"\bT\s+2(?:9|<)8\b", formation, re.I))
+        if len(t298_matches) >= 2:
+            if anchors[1] is None:
+                anchors[1] = t298_matches[0].start()
+            if anchors[3] is None:
+                anchors[3] = t298_matches[1].start()
+            middle_t = re.search(
+                r"\bT\b",
+                formation[t298_matches[0].end() : t298_matches[1].start()],
+                re.I,
+            )
+            if middle_t and anchors[2] is None:
+                anchors[2] = t298_matches[0].end() + middle_t.start()
+        for index, match in ((4, enthalpy_match), (5, free_match), (6, logk_match)):
+            if match and anchors[index] is None:
+                anchors[index] = match.start()
+        if any(anchor is None for anchor in anchors):
+            raise ValueError("could not derive fixed high-temperature table columns")
+        numeric_anchors = [int(anchor) for anchor in anchors if anchor is not None]
+        boundaries = []
+        for index in range(len(HIGH_T_COLUMNS) - 1):
+            if partial_candidates and index < widest - 1:
+                boundary = int(
+                    statistics.median(
+                        (row[index][1] + row[index + 1][0]) // 2 for row in widest_rows
+                    )
+                )
+            elif partial_candidates and index == widest - 1:
+                boundary = int(
+                    statistics.median(
+                        (row[index][1] + numeric_anchors[index + 1]) // 2
+                        for row in widest_rows
+                    )
+                )
+            else:
+                boundary = (numeric_anchors[index] + numeric_anchors[index + 1]) // 2
+            boundaries.append(boundary)
+    starts = [0, *boundaries]
+    ends: list[int | None] = [*boundaries, None]
+    return dict(zip(HIGH_T_COLUMNS, zip(starts, ends)))
+
+
 def _parse_high_t_rows(lines: list[str]) -> tuple[list[dict], list[str]]:
     rows: list[dict] = []
     identity: list[str] = []
+    column_ranges = _high_t_column_ranges(lines)
+    in_table = False
     for ln in lines:
-        if re.match(r"^\s*(?:MELTING|BOILING)\s+POINT\b", ln, re.I) and re.search(
-            r"(?:DEG|OEG|DEC|PEG)\s*K", ln, re.I
+        if in_table and re.search(r"\b(?:MELTING|BOILING)\s+POINT\b", ln, re.I):
+            break
+        if in_table and (
+            re.match(r"^\s*HEAT OF (?:FUSION|VAPOR)", ln, re.I)
+            or re.search(r"\bMOLAR VOLUME\b", ln, re.I)
         ):
             break
-        if re.match(r"^\s*HEAT OF (?:FUSION|VAPOR)", ln, re.I):
+        if in_table and re.match(
+            r"^\s*(?:REFERENCES?|RFFERENCCS|COMPILED|TRANSITIONS IN REFERENCE)\b", ln, re.I
+        ):
             break
-        if re.match(r"^\s*(?:REFERENCES?|RFFERENCCS|COMPILED|TRANSITIONS IN REFERENCE)\b", ln, re.I):
-            break
-        tokens = _merge_split_decimals(ln.split())
-        if not tokens:
+        if re.search(r"FORMATION FROM", ln, re.I) or (
+            re.search(r"T\s+2(?:9|<)8", ln, re.I)
+            and re.search(r"ENTHALPY|FREE ENERGY|LOG K", ln, re.I)
+        ):
+            in_table = True
             continue
-        if tokens[0].upper().startswith("UNCERT"):
-            nums = [t for t in tokens[1:] if _is_numberish(t)]
-            fields = ("entropy", "gibbs_function", "delta_f_H", "delta_f_G", "log_Kf")
-            row = {"kind": "uncertainty"}
-            for field, tok in zip(fields, nums):
-                row[field] = inspect_token(tok)
+        if not in_table:
+            continue
+        spans = _group_split_decimal_spans(ln, _token_spans(ln))
+        if not spans:
+            continue
+        if spans[0][2].upper().startswith("UNCERT"):
+            row = {
+                "kind": "uncertainty",
+                "source_layout_line": ln,
+                "source_column_spans": {
+                    field: [start, len(ln) if end is None else end]
+                    for field, (start, end) in column_ranges.items()
+                },
+            }
+            for field in HIGH_T_COLUMNS[1:]:
+                start, end = column_ranges[field]
+                raw = ln[start:end].strip()
+                if raw:
+                    row[field] = inspect_token(raw)
             rows.append(row)
             continue
-        nums = [t for t in tokens if _is_numberish(t)]
-        if len(nums) < 4:
+
+        first_start, first_end, first_token = spans[0]
+        leading_temperature = first_start <= 8
+        numeric_spans = [span for span in spans if _is_numberish(span[2])]
+        if not leading_temperature and len(numeric_spans) < 5:
             continue
-        t0 = nums[0]
-        t_cell = inspect_token(t0)
-        T = t_cell["value"]
-        if T is None:
+
+        value_spans = [span for span in spans[1:] if _is_numberish(span[2])] if leading_temperature else numeric_spans
+        temperature_raw = first_token if leading_temperature else ""
+        if (
+            leading_temperature
+            and inspect_token(temperature_raw)["value"] is None
+            and len(value_spans) < 3
+        ):
             continue
-        if T < 50 or T > 2500:
-            continue
-        if T < 250 and "." not in t0 and abs(T - 298.15) > 1:
-            continue
-        row = {"kind": "data", "column_token_count": len(nums)}
-        for col, tok in zip(HIGH_T_COLUMNS, nums):
-            row[col] = inspect_token(tok)
-        if len(nums) < 7:
+        t_cell = _cell(temperature_raw, "temperature_absent_in_ocr_layout")
+        T = t_cell.get("value")
+        clean_temperature = (
+            T is not None
+            and not t_cell.get("ocr_suspect")
+            and 50 <= T <= 2500
+            and not (T < 250 and "." not in temperature_raw and abs(T - 298.15) > 1)
+        )
+        row = {
+            "kind": "data" if clean_temperature else "grid_refusal",
+            "source_layout_line": ln,
+            "column_token_count": 0,
+            "temperature": t_cell,
+            "source_column_spans": {
+                field: [start, len(ln) if end is None else end]
+                for field, (start, end) in column_ranges.items()
+            },
+        }
+        if leading_temperature:
+            row["source_column_spans"]["temperature"] = [first_start, first_end]
+        for col in HIGH_T_COLUMNS[1:]:
+            start, end = column_ranges[col]
+            raw = ln[start:end].strip()
+            row[col] = _cell(raw, "column_absent_in_ocr")
+        if (
+            leading_temperature
+            and T is not None
+            and abs(T - 298.15) < 0.01
+            and value_spans
+            and value_spans[0][0] <= 12
+        ):
+            start, end, raw = value_spans[0]
+            row["H_minus_H298"] = inspect_token(raw)
+            row["source_column_spans"]["H_minus_H298"] = [start, end]
+        row["column_token_count"] = sum(
+            bool((row.get(col) or {}).get("as_published")) for col in HIGH_T_COLUMNS
+        )
+        missing_columns = [
+            col for col in HIGH_T_COLUMNS[1:] if not row[col]["as_published"]
+        ]
+        if missing_columns:
             row["ocr_suspect_row"] = True
-            row["missing_columns"] = list(HIGH_T_COLUMNS[len(nums) :])
-            for col in HIGH_T_COLUMNS[len(nums) :]:
-                row[col] = _empty_cell("column_absent_in_ocr")
-        if len(nums) > 7:
+            row["missing_columns"] = missing_columns
+        if not clean_temperature:
             row["ocr_suspect_row"] = True
-            row["extra_tokens"] = nums[7:]
+            row["grid_refusal_reason"] = (
+                "temperature token is absent or ambiguous in the OCR layout; "
+                "row is retained but not admitted to lookup"
+            )
         notes = _identity_notes(row)
         if notes:
             row["identity_disagreements"] = notes
@@ -253,6 +687,7 @@ def parse_high_t_page(pdf_page: int, text: str) -> dict:
             if CLEAN_NUMBER.fullmatch(s) and 1 < float(s) < 1000:
                 gfw = inspect_token(s)
                 break
+    after_header = False
     for ln in lines:
         if HEADER_WEIGHT.search(ln):
             after_header = True
@@ -271,7 +706,7 @@ def parse_high_t_page(pdf_page: int, text: str) -> dict:
             note = re.sub(r"\s+", " ", right).strip()
             if note:
                 phase_notes.append(note)
-        elif after_header or gfw:
+        elif after_header:
             if not re.search(r"FORMATION|TEMP\.|DEG K|OEG K|GRAM FORMULA", s, re.I):
                 phase_notes.append(re.sub(r"\s+", " ", s))
         if formula and len(phase_notes) >= 3:
@@ -294,7 +729,17 @@ def parse_high_t_page(pdf_page: int, text: str) -> dict:
     refs = re.findall(r"REFERENCES?\s+([0-9][0-9\s]+)", blob, re.I)
     if refs:
         footer["references_as_published"] = " ".join(refs[0].split())
-    data_rows = [r for r in rows if r.get("kind") == "data"]
+    data_rows = [r for r in rows if r.get("kind") in {"data", "grid_refusal"}]
+    lookup_rows = [r for r in rows if r.get("kind") == "data"]
+    grid_refusals = [
+        {
+            "raw_temperature_token": (r.get("temperature") or {}).get("as_published", ""),
+            "source_layout_line": r.get("source_layout_line", ""),
+            "reason": r.get("grid_refusal_reason"),
+        }
+        for r in rows
+        if r.get("kind") == "grid_refusal"
+    ]
     ambiguities = list(identity)
     if not name:
         ambiguities.append("name_header_absent_or_truncated_in_ocr; not inferred from neighbors")
@@ -306,7 +751,7 @@ def parse_high_t_page(pdf_page: int, text: str) -> dict:
         for col in HIGH_T_COLUMNS
         if r.get(col, {}).get("ocr_suspect")
     )
-    return {
+    record = {
         "schema_version": SCHEMA_VERSION,
         "source_id": SOURCE_ID,
         "compilation_role": ROLE,
@@ -331,10 +776,14 @@ def parse_high_t_page(pdf_page: int, text: str) -> dict:
         "footer": footer,
         "rows": rows,
         "row_count": len(data_rows),
+        "lookup_grid_count": len(lookup_rows),
+        "grid_refusals": grid_refusals,
         "ocr_suspect_token_count": ocr_n,
         "identity_disagreements": identity,
         "ambiguities": ambiguities,
     }
+    _apply_image_verified_corrections(record)
+    return record
 
 
 def _298k_identity(dG: float | None, logk: float | None) -> str | None:
@@ -348,6 +797,144 @@ def _298k_identity(dG: float | None, logk: float | None) -> str | None:
     return None
 
 
+def _is_298k_main_line(line: str) -> bool:
+    if not line or len(line) - len(line.lstrip()) > 2:
+        return False
+    if re.search(
+        r"Name and formula|PROPERTIES AT 298|THERMODYNAMIC PROPERTIES|References|"
+        r"Gram\s+formula|Entropy|Std\.|UNCERTAINTY",
+        line,
+        re.I,
+    ):
+        return False
+    prefix = line[:40]
+    spans = _group_split_decimal_spans(line, _token_spans(line))
+    if "aqueous ion" in prefix.lower():
+        return len([span for span in spans if _is_numberish(span[2])]) >= 2
+    return any(
+        18 <= start <= 46
+        and _is_numberish(token)
+        and re.search(r"[A-Za-z]{3,}", line[:start])
+        and line[max(0, start - 4) : start].isspace()
+        for start, _, token in spans
+    )
+
+
+def _298k_gfw_span(line: str, anchor: int) -> tuple[int, int, str] | None:
+    return next(
+        (
+            span
+            for span in _group_split_decimal_spans(line, _token_spans(line))
+            if abs(span[0] - anchor) <= 6
+            and _is_numberish(span[2])
+            and not span[2].startswith("±")
+            and line[max(0, span[0] - 2) : span[0]].isspace()
+        ),
+        None,
+    )
+
+
+def _is_298k_aligned_main(line: str, gfw_anchor: int) -> bool:
+    if not _is_298k_main_line(line):
+        return False
+    if "aqueous ion" in line[:45].lower():
+        return True
+    return _298k_gfw_span(line, gfw_anchor) is not None
+
+
+def _298k_layout(lines: list[str]) -> tuple[list[int], list[int], int]:
+    reference_positions = []
+    for line in lines[:16]:
+        match = re.search(r"re[fl].?erenc", line, re.I)
+        if match:
+            reference_positions.append(match.start())
+    reference_start = int(statistics.median(reference_positions)) if reference_positions else 110
+    candidates: list[list[tuple[int, int, str]]] = []
+    for line in lines:
+        if not _is_298k_main_line(line) or "aqueous ion" in line[:40].lower():
+            continue
+        spans = _group_split_decimal_spans(line, _token_spans(line))
+        gfw_index = next(
+            (
+                index
+                for index, (start, _, token) in enumerate(spans)
+                if 18 <= start <= 46
+                and _is_numberish(token)
+                and line[max(0, start - 4) : start].isspace()
+            ),
+            None,
+        )
+        if gfw_index is None:
+            continue
+        value_spans = [
+            span
+            for span in spans[gfw_index:]
+            if span[0] < reference_start and _is_numberish(span[2])
+        ]
+        starts = [span[0] for span in value_spans]
+        if len(starts) >= 6 and all(b - a >= 5 for a, b in zip(starts[:6], starts[1:6])):
+            candidates.append(value_spans[:6])
+    if not candidates:
+        raise ValueError("could not locate the six printed 298.15 K value columns")
+    anchors = [int(statistics.median(row[index][0] for row in candidates)) for index in range(6)]
+    boundaries = [
+        int(statistics.median((row[index][1] + row[index + 1][0]) // 2 for row in candidates))
+        for index in range(5)
+    ]
+    log_end = int(statistics.median(row[5][1] for row in candidates))
+    reference_boundary = (log_end + reference_start) // 2
+    return anchors, boundaries, reference_boundary
+
+
+def _phase_and_formula(raw: str, name: str) -> tuple[str, str]:
+    raw = raw.strip()
+    if "aqueous ion" in name.lower():
+        formula = re.sub(r"\s+aqueous ion\s*$", "", name, flags=re.I).strip()
+        return formula, "aqueous ion"
+    match = re.search(r"\(([^()]*)\)\s*$", raw)
+    if match and match.group(1).strip() in PRINTED_PHASE_LABELS:
+        phase = match.group(1).strip()
+        formula = raw[: match.start()].strip()
+    else:
+        phase = ""
+        formula = raw
+    return formula, phase
+
+
+def _apply_298k_image_verified_identity(record: dict) -> None:
+    raw_name = record["name_as_published"]
+    correction = IMAGE_VERIFIED_298K_IDENTITIES.get(raw_name)
+    if correction is None:
+        return
+    printed_name, printed_formula, pdf_page = correction
+    raw_formula = record["formula_as_published"]
+    raw_state_note = record.get("state_note_as_published", "")
+    record.update(
+        {
+            "name_as_published": printed_name,
+            "formula_as_published": printed_formula,
+            "formula": printed_formula,
+            "phase": "aqueous ion",
+            "state_note_as_published": "Std. state, m = 1",
+        }
+    )
+    for field, raw, printed in (
+        ("name_as_published", raw_name, printed_name),
+        ("formula_as_published", raw_formula, printed_formula),
+        ("state_note_as_published", raw_state_note, "Std. state, m = 1"),
+    ):
+        record.setdefault("corrections", []).append(
+            {
+                "correction_id": f"b1259-p{pdf_page}-{_slug(printed_name, 'ion')}-{field}",
+                "pdf_page": pdf_page,
+                "field": field,
+                "layout_as_extracted": raw,
+                "printed_token": printed,
+                "evidence": f"PDF page {pdf_page} image visibly prints {printed!r}",
+            }
+        )
+
+
 def parse_298k_pages(pages: dict[int, str]) -> list[dict]:
     records: list[dict] = []
     current_group = ""
@@ -355,6 +942,7 @@ def parse_298k_pages(pages: dict[int, str]) -> list[dict]:
     for pdf_page in range(17, 32):
         bulletin_page = pdf_page - 6
         lines = pages[pdf_page].splitlines()
+        anchors, boundaries, reference_boundary = _298k_layout(lines)
         i = 0
         while i < len(lines):
             ln = lines[i]
@@ -373,83 +961,97 @@ def parse_298k_pages(pages: dict[int, str]) -> list[dict]:
                 continue
             if s.startswith("Std.") or s.startswith("±") or s.startswith("t "):
                 continue
-            tokens = _merge_split_decimals(s.split())
-            num_idx = [j for j, t in enumerate(tokens) if _is_numberish(t)]
-            if len(num_idx) < 2:
+            if not _is_298k_aligned_main(ln, anchors[0]):
                 continue
-            name_tokens = tokens[: num_idx[0]]
-            if not name_tokens:
-                continue
-            if name_tokens[0] in {"Ag", "Al", "As", "Au", "B", "Ba", "Be", "Bi", "C", "Ca"} and len(name_tokens) == 1:
-                # formula-only continuation
-                continue
-            name = " ".join(name_tokens)
-            if re.match(
-                r"^(Gram|weight|rormula|formula|Entropy|Name|Log|References|Std\.|"
-                r"[</tT]\\|os|I x|Kf\.|AH°)",
-                name,
-                re.I,
-            ):
-                continue
-            if not re.search(r"[A-Za-z]{3,}", name) and "aqueous" not in name.lower():
-                continue
-            nums = [tokens[j] for j in num_idx]
-            formula = ""
-            unc_tokens: list[str] = []
-            if i < len(lines):
-                nxt = lines[i].strip()
-                ntoks = nxt.split()
-                if ntoks and (nxt.startswith("±") or "±" in nxt or ntoks[0][0].isalpha() or ntoks[0][0] in "A"):
-                    # formula / uncertainty line
-                    formula_parts = []
-                    for t in ntoks:
-                        if t.startswith("±") or t in {"±"} or _is_numberish(t) or t in {".", "t"}:
-                            unc_tokens.append(t)
-                        else:
-                            if not unc_tokens:
-                                formula_parts.append(t)
-                    formula = " ".join(formula_parts)
-                    i += 1
-            cells = [inspect_token(t) for t in nums]
-            gfw = cells[0] if cells else _empty_cell("missing")
-            rest = cells[1:]
-            assigned = {
-                "entropy": _empty_cell("blank_as_published"),
-                "molar_volume": _empty_cell("blank_as_published"),
-                "delta_f_H": _empty_cell("blank_as_published"),
-                "delta_f_G": _empty_cell("blank_as_published"),
-                "log_Kf": _empty_cell("blank_as_published"),
-            }
-            refs: list[str] = []
-            # Gases have V ~ 24465; aqueous ions often skip S, V, dH.
-            values_only = []
-            ref_only = []
-            for cell in rest:
-                v = cell["value"]
-                if v is not None and (v > 250 or (v > 40 and cell["as_published"].isdigit())):
-                    # likely a reference number if integer 1-250 and trailing
-                    pass
-                if (
-                    v is not None
-                    and v == int(v)
-                    and 1 <= v <= 250
-                    and "." not in cell["as_published"]
-                ):
-                    ref_only.append(cell["as_published"])
-                else:
-                    values_only.append(cell)
-            refs = ref_only
+            spans = _group_split_decimal_spans(ln, _token_spans(ln))
+            row_boundaries = [_avoid_splitting_token(ln, boundary) for boundary in boundaries]
+            row_reference_boundary = _avoid_splitting_token(ln, reference_boundary)
+            gfw_span = _298k_gfw_span(ln, anchors[0])
+            name_end = gfw_span[0] if gfw_span else row_boundaries[0]
+            name = re.sub(r"\s+", " ", ln[:name_end]).strip()
+            gfw_raw = ln[gfw_span[0] : row_boundaries[0]].strip() if gfw_span else ""
+            value_ranges = [
+                (row_boundaries[0], row_boundaries[1]),
+                (row_boundaries[1], row_boundaries[2]),
+                (row_boundaries[2], row_boundaries[3]),
+                (row_boundaries[3], row_boundaries[4]),
+                (row_boundaries[4], row_reference_boundary),
+            ]
             keys = ["entropy", "molar_volume", "delta_f_H", "delta_f_G", "log_Kf"]
-            if "aqueous" in name.lower():
-                # typically gfw, dG, logK
-                if len(values_only) >= 2:
-                    assigned["delta_f_G"] = values_only[-2] if len(values_only) >= 2 else values_only[0]
-                    assigned["log_Kf"] = values_only[-1]
-                    if len(values_only) >= 3:
-                        assigned["delta_f_H"] = values_only[-3]
+            assigned = {
+                key: _cell(ln[start:end].strip())
+                for key, (start, end) in zip(keys, value_ranges)
+            }
+            source_column_spans = {
+                key: {"source_span": [start, end], "source_line_index": 0}
+                for key, (start, end) in zip(keys, value_ranges)
+            }
+            if gfw_span:
+                gfw = _cell(gfw_raw, "gram_formula_weight_blank_as_published")
+                source_column_spans["gram_formula_weight"] = {
+                    "source_span": [gfw_span[0], row_boundaries[0]],
+                    "source_line_index": 0,
+                }
             else:
-                for key, cell in zip(keys, values_only):
-                    assigned[key] = cell
+                gfw = _empty_cell("gram_formula_weight_blank_as_published")
+            reference_text = ln[row_reference_boundary:]
+            refs = [token for _, _, token in _token_spans(reference_text) if token]
+
+            continuation = ""
+            if i < len(lines) and lines[i].strip() and not _is_298k_aligned_main(
+                lines[i], anchors[0]
+            ):
+                continuation = lines[i]
+                i += 1
+            extra_continuation = ""
+            state_note_line = continuation if re.match(r"^\s*Std[.;]?\s+state", continuation, re.I) else ""
+            if (
+                "aqueous ion" in name.lower()
+                and not state_note_line
+                and i < len(lines)
+                and re.match(r"^\s*Std[.;]?\s+state", lines[i], re.I)
+            ):
+                extra_continuation = lines[i]
+                state_note_line = extra_continuation
+                i += 1
+            gfw_from_continuation = False
+            if not gfw_raw and continuation.strip() and not re.search(r"[A-Za-z]", continuation):
+                continuation_spans = _group_split_decimal_spans(
+                    continuation, _token_spans(continuation)
+                )
+                continuation_gfw = next(
+                    (
+                        span
+                        for span in continuation_spans
+                        if abs(span[0] - anchors[0]) <= 6 and _is_numberish(span[2])
+                    ),
+                    None,
+                )
+                if continuation_gfw:
+                    gfw_raw = continuation_gfw[2]
+                    gfw = _cell(gfw_raw)
+                    source_column_spans["gram_formula_weight"] = {
+                        "source_span": [continuation_gfw[0], continuation_gfw[1]],
+                        "source_line_index": 1,
+                    }
+                    gfw_from_continuation = True
+            formula_region = continuation[: boundaries[0]].strip()
+            if gfw_from_continuation:
+                formula_region = ""
+            formula_region = re.split(r"\s{2,}(?=[±t])", formula_region, maxsplit=1)[0].strip()
+            formula, phase = _phase_and_formula(formula_region, name)
+            uncertainty_line = state_note_line or continuation
+            unc_tokens = [
+                token
+                for _, _, token in _token_spans(uncertainty_line)
+                if token.startswith("±") or token == "±" or _is_numberish(token)
+            ]
+            refs.extend(token for _, _, token in _token_spans(continuation[reference_boundary:]))
+            if extra_continuation:
+                refs.extend(
+                    token
+                    for _, _, token in _token_spans(extra_continuation[reference_boundary:])
+                )
             note = _298k_identity(assigned["delta_f_G"]["value"], assigned["log_Kf"]["value"])
             ambiguities = []
             if note:
@@ -457,8 +1059,7 @@ def parse_298k_pages(pages: dict[int, str]) -> list[dict]:
             if any(assigned[k]["ocr_suspect"] for k in keys) or gfw["ocr_suspect"]:
                 ambiguities.append("ocr_suspect_token_retained_uncorrected")
             seq += 1
-            records.append(
-                {
+            record = {
                     "schema_version": SCHEMA_VERSION,
                     "source_id": SOURCE_ID,
                     "compilation_role": ROLE,
@@ -470,7 +1071,10 @@ def parse_298k_pages(pages: dict[int, str]) -> list[dict]:
                     "name_as_published": name,
                     "formula_as_published": formula,
                     "formula": formula,
-                    "phase": name,
+                    "phase": phase,
+                    "state_note_as_published": (
+                        state_note_line[: boundaries[0]].strip() if state_note_line else ""
+                    ),
                     "gram_formula_weight": gfw,
                     "units_as_published": {
                         "entropy": "cal deg^-1 gfw^-1",
@@ -486,12 +1090,17 @@ def parse_298k_pages(pages: dict[int, str]) -> list[dict]:
                     "log_Kf": assigned["log_Kf"],
                     "references_as_published": refs,
                     "uncertainty_line_tokens": unc_tokens,
+                    "source_layout_lines": [
+                        line for line in (ln, continuation, extra_continuation) if line
+                    ],
+                    "source_column_spans": source_column_spans,
                     "row_count": 1,
                     "identity_disagreements": [note] if note else [],
                     "ambiguities": ambiguities,
                     "_seq": seq,
                 }
-            )
+            _apply_298k_image_verified_identity(record)
+            records.append(record)
     return records
 
 
@@ -679,6 +1288,18 @@ def lookup(record: dict, temperature: float) -> list[dict]:
         if printed == want:
             hits.append(row)
     if not hits:
+        refusals = record.get("grid_refusals") or []
+        if refusals:
+            details = "; ".join(
+                f"raw={item.get('raw_temperature_token')!r}: {item.get('reason')}"
+                for item in refusals[:3]
+            )
+            if len(refusals) > 3:
+                details += f"; and {len(refusals) - 3} more"
+            raise TemperatureNotOnPrintedGrid(
+                f"{record.get('record_id')}: T={temperature} cannot be admitted from the "
+                f"printed grid because source temperature tokens are ambiguous ({details})"
+            )
         raise TemperatureNotOnPrintedGrid(
             f"{record.get('record_id')}: T={temperature} is not a printed grid point "
             "(no interpolation, no extrapolation, no zero default)"
@@ -700,6 +1321,125 @@ def load_records(root: Path = COMPILATION_ROOT):
         if record["compilation_role"]["battery_refusal"] != ROLE["battery_refusal"]:
             raise ValueError(f"compilation_role mismatch: {entry['path']}")
         yield record
+
+
+def validate_record_source_tokens(record: dict, page_text: str) -> int:
+    """Verify every stored raw numeric token at its exact source layout column."""
+    def check_cell(cell: dict, source_lines: list[str], locator: object) -> int:
+        raw = cell.get("layout_as_extracted", cell.get("as_published", ""))
+        if not raw:
+            return 0
+        if isinstance(locator, list):
+            span = locator
+            line_index = 0
+        elif isinstance(locator, dict):
+            span = locator.get("source_span")
+            line_index = locator.get("source_line_index", 0)
+        else:
+            span = None
+            line_index = 0
+        if (
+            not isinstance(span, list)
+            or len(span) != 2
+            or not all(isinstance(value, int) for value in span)
+            or not isinstance(line_index, int)
+            or not 0 <= line_index < len(source_lines)
+        ):
+            raise ValueError(
+                f"{record.get('record_id')}: raw token {raw!r} has no source column locator "
+                f"for PDF page {record.get('pdf_page')}"
+            )
+        observed = source_lines[line_index][span[0] : span[1]].strip()
+        if observed != raw:
+            raise ValueError(
+                f"{record.get('record_id')}: raw token {raw!r} does not match PDF page "
+                f"{record.get('pdf_page')} layout column token {observed!r}"
+            )
+        return 1
+
+    checked = 0
+    if record.get("table_kind") == "properties_298k":
+        source_lines = record.get("source_layout_lines") or []
+        if not source_lines or any(line not in page_text for line in source_lines):
+            raise ValueError(f"{record.get('record_id')}: source layout line missing from page")
+        page_lines = page_text.splitlines()
+        anchors, boundaries, reference_boundary = _298k_layout(page_lines)
+        main = source_lines[0]
+        row_boundaries = [_avoid_splitting_token(main, boundary) for boundary in boundaries]
+        row_reference_boundary = _avoid_splitting_token(main, reference_boundary)
+        value_ranges = [
+            (row_boundaries[0], row_boundaries[1]),
+            (row_boundaries[1], row_boundaries[2]),
+            (row_boundaries[2], row_boundaries[3]),
+            (row_boundaries[3], row_boundaries[4]),
+            (row_boundaries[4], row_reference_boundary),
+        ]
+        gfw_span = _298k_gfw_span(main, anchors[0])
+        derived_locators: dict[str, object] = {
+            field: {"source_span": list(span), "source_line_index": 0}
+            for field, span in zip(
+                ("entropy", "molar_volume", "delta_f_H", "delta_f_G", "log_Kf"),
+                value_ranges,
+            )
+        }
+        if gfw_span:
+            derived_locators["gram_formula_weight"] = {
+                "source_span": [gfw_span[0], row_boundaries[0]],
+                "source_line_index": 0,
+            }
+        elif len(source_lines) > 1:
+            continuation_spans = _group_split_decimal_spans(
+                source_lines[1], _token_spans(source_lines[1])
+            )
+            continuation_gfw = next(
+                (
+                    span
+                    for span in continuation_spans
+                    if abs(span[0] - anchors[0]) <= 6 and _is_numberish(span[2])
+                ),
+                None,
+            )
+            if continuation_gfw:
+                derived_locators["gram_formula_weight"] = {
+                    "source_span": [continuation_gfw[0], continuation_gfw[1]],
+                    "source_line_index": 1,
+                }
+        cells = [record.get("gram_formula_weight") or {}]
+        cells.extend(record.get(key) or {} for key in ("entropy", "molar_volume", "delta_f_H", "delta_f_G", "log_Kf"))
+        fields = ("gram_formula_weight", "entropy", "molar_volume", "delta_f_H", "delta_f_G", "log_Kf")
+        for field, cell in zip(fields, cells):
+            checked += check_cell(cell, source_lines, derived_locators.get(field))
+    elif record.get("table_kind") == "high_temperature":
+        if not record.get("rows"):
+            return checked
+        column_ranges = _high_t_column_ranges(page_text.splitlines())
+        for row in record.get("rows") or []:
+            line = row.get("source_layout_line")
+            if not line:
+                continue
+            if line not in page_text:
+                raise ValueError(f"{record.get('record_id')}: source layout row missing from page")
+            spans = _group_split_decimal_spans(line, _token_spans(line))
+            numeric_spans = [span for span in spans if _is_numberish(span[2])]
+            for column in HIGH_T_COLUMNS:
+                if column == "temperature" and numeric_spans and numeric_spans[0][0] <= 8:
+                    start, end, _ = numeric_spans[0]
+                elif (
+                    column == "H_minus_H298"
+                    and len(numeric_spans) > 1
+                    and numeric_spans[0][0] <= 8
+                    and inspect_token(numeric_spans[0][2]).get("value") == 298.15
+                    and numeric_spans[1][0] <= 12
+                ):
+                    start, end, _ = numeric_spans[1]
+                else:
+                    start, end = column_ranges[column]
+                checked += check_cell(
+                    row.get(column) or {},
+                    [line],
+                    [start, len(line) if end is None else end],
+                )
+    return checked
 
 
 def _slug(text: str, fallback: str) -> str:
@@ -742,8 +1482,7 @@ def _pdf_paths() -> list[Path]:
 
 def ensure_page_texts(page_dir: Path) -> Path:
     page_dir.mkdir(parents=True, exist_ok=True)
-    sample = page_dir / "page-032.txt"
-    if sample.is_file():
+    if all((page_dir / f"page-{index:03d}.txt").is_file() for index in range(1, 263)):
         return page_dir
     pdf = next((p for p in _pdf_paths() if p.is_file()), None)
     if pdf is None:
@@ -764,6 +1503,11 @@ def harvest(page_dir: Path | None = None, output: Path = COMPILATION_ROOT) -> di
         for i in range(1, 263)
         if (page_dir / f"page-{i:03d}.txt").is_file()
     }
+    layout_text = "\f".join(pages[index].rstrip("\f") for index in range(1, 263)) + "\f"
+    layout_path = output / "source/layout.txt"
+    layout_path.parent.mkdir(parents=True, exist_ok=True)
+    layout_path.write_text(layout_text, encoding="utf-8")
+    layout_sha256 = hashlib.sha256(layout_text.encode("utf-8")).hexdigest()
     records_dir = output / "records"
     if records_dir.exists():
         for old in records_dir.glob("*.json"):
@@ -774,8 +1518,10 @@ def harvest(page_dir: Path | None = None, output: Path = COMPILATION_ROOT) -> di
     untranscribed = []
     identity_all = []
     ocr_examples = []
+    corrections_all = []
 
     def add_entry(record: dict, filename: str) -> None:
+        corrections_all.extend(record.get("corrections") or [])
         record["source"] = source
         path = records_dir / filename
         digest = _write_json(path, record)
@@ -817,6 +1563,14 @@ def harvest(page_dir: Path | None = None, output: Path = COMPILATION_ROOT) -> di
     print("PROGRESS table 3 critical-summaries page=6 rows=%s" % t3["row_count"])
 
     recs_298 = parse_298k_pages(pages)
+    actual_298k_page_counts = tuple(
+        sum(record["pdf_page"] == pdf_page for record in recs_298)
+        for pdf_page in range(17, 32)
+    )
+    if actual_298k_page_counts != EXPECTED_298K_PAGE_COUNTS:
+        raise ValueError(
+            f"298.15 K source census mismatch: {actual_298k_page_counts} != {EXPECTED_298K_PAGE_COUNTS}"
+        )
     for rec in recs_298:
         seq = rec.pop("_seq")
         rec["record_id"] = f"b1259-298k-{seq:04d}-{_slug(rec['name_as_published'], 'substance')}"
@@ -944,7 +1698,12 @@ def harvest(page_dir: Path | None = None, output: Path = COMPILATION_ROOT) -> di
                 "path": "corpus PDF (not copied into this repository)",
                 "sha256": PDF_SHA256,
                 "official_url": PDF_URL,
-            }
+            },
+            {
+                "path": "source/layout.txt",
+                "sha256": layout_sha256,
+                "generated_by": "pdftotext -layout, one form-feed-delimited page per PDF page",
+            },
         ],
         "corpus_status": {
             "scope": "every numeric table in USGS Bulletin 1259",
@@ -965,6 +1724,7 @@ def harvest(page_dir: Path | None = None, output: Path = COMPILATION_ROOT) -> di
             "identity_disagreement_count": len(identity_all),
             "ocr_suspect_examples": ocr_examples,
         },
+        "corrections": corrections_all,
         "entries": entries,
     }
     (output / "manifest.yaml").write_text(

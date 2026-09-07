@@ -16,7 +16,7 @@
   "name_as_published": "AMMONIA-NITER",
   "formula_as_published": "NH NO,",
   "formula": "NH NO,",
-  "phase": "PROPERTIES AT HIGH TEMPERATURES 189 Ammonia-niter undergoes phase changes at 305.3°, 357.4°, 398.4°K. It melts at 442.8°K.",
+  "phase": "Ammonia-niter undergoes phase changes at 305.3°, 357.4°, 398.4°K. It melts at 442.8°K.",
   "gram_formula_weight": {
     "as_published": "80.043",
     "value": 80.043,
@@ -42,7 +42,8 @@
   "rows": [
     {
       "kind": "data",
-      "column_token_count": 7,
+      "source_layout_line": " 293.15 0.000                   36.11       36/11        -87.373        -43.971     32.232",
+      "column_token_count": 6,
       "temperature": {
         "as_published": "293.15",
         "value": 293.15,
@@ -50,12 +51,44 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          7
+        ],
+        "H_minus_H298": [
+          13,
+          28
+        ],
+        "entropy": [
+          28,
+          40
+        ],
+        "gibbs_function": [
+          40,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          68
+        ],
+        "delta_f_G": [
+          68,
+          81
+        ],
+        "log_Kf": [
+          81,
+          90
+        ]
+      },
       "H_minus_H298": {
-        "as_published": "0.000",
-        "value": 0.0,
-        "ocr_suspect": false,
+        "as_published": "",
+        "value": null,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "column_absent_in_ocr"
+        ]
       },
       "entropy": {
         "as_published": "36.11",
@@ -94,13 +127,47 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
+      "ocr_suspect_row": true,
+      "missing_columns": [
+        "H_minus_H298"
+      ],
       "identity_disagreements": [
         "logKf_identity |logK+1000 dG/(RT ln10)|=0.5493 at T=293.15"
-      ],
-      "ocr_suspect_row": true
+      ]
     },
     {
       "kind": "uncertainty",
+      "source_layout_line": "UNCERTAINTY                      0.05        0.05          0.200          0.210      0.154",
+      "source_column_spans": {
+        "temperature": [
+          0,
+          13
+        ],
+        "H_minus_H298": [
+          13,
+          28
+        ],
+        "entropy": [
+          28,
+          40
+        ],
+        "gibbs_function": [
+          40,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          68
+        ],
+        "delta_f_G": [
+          68,
+          81
+        ],
+        "log_Kf": [
+          81,
+          90
+        ]
+      },
       "entropy": {
         "as_published": "0.05",
         "value": 0.05,
@@ -139,6 +206,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "    400             4.900       49.94       37.69        -85.683        -29.284     16.000",
       "column_token_count": 7,
       "temperature": {
         "as_published": "400",
@@ -146,6 +214,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          4,
+          7
+        ],
+        "H_minus_H298": [
+          13,
+          28
+        ],
+        "entropy": [
+          28,
+          40
+        ],
+        "gibbs_function": [
+          40,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          68
+        ],
+        "delta_f_G": [
+          68,
+          81
+        ],
+        "log_Kf": [
+          81,
+          90
+        ]
       },
       "H_minus_H298": {
         "as_published": "4.900",
@@ -192,6 +290,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "    500            10.360       62.20       41.48        -83.420        -15.486      6.769",
       "column_token_count": 7,
       "temperature": {
         "as_published": "500",
@@ -199,6 +298,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          4,
+          7
+        ],
+        "H_minus_H298": [
+          13,
+          28
+        ],
+        "entropy": [
+          28,
+          40
+        ],
+        "gibbs_function": [
+          40,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          68
+        ],
+        "delta_f_G": [
+          68,
+          81
+        ],
+        "log_Kf": [
+          81,
+          90
+        ]
       },
       "H_minus_H298": {
         "as_published": "10.360",
@@ -245,7 +374,9 @@
     }
   ],
   "row_count": 3,
-  "ocr_suspect_token_count": 1,
+  "lookup_grid_count": 3,
+  "grid_refusals": [],
+  "ocr_suspect_token_count": 2,
   "identity_disagreements": [
     "logKf_identity |logK+1000 dG/(RT ln10)|=0.5493 at T=293.15"
   ],

@@ -1,0 +1,152 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-waldbaum-1968-usgs-b1259",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "table_kind": "properties_298k",
+  "table_number_as_published": null,
+  "group_as_published": "Oxides and hydroxides",
+  "pdf_page": 23,
+  "page": 17,
+  "name_as_published": "Bunsenite",
+  "formula_as_published": "NiO",
+  "formula": "NiO",
+  "phase": "",
+  "state_note_as_published": "",
+  "gram_formula_weight": {
+    "as_published": "74. 709",
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": [],
+    "ocr_reasons": [
+      "non_clean_numberish"
+    ]
+  },
+  "units_as_published": {
+    "entropy": "cal deg^-1 gfw^-1",
+    "molar_volume": "cm^3",
+    "delta_f_H": "cal gfw^-1",
+    "delta_f_G": "cal gfw^-1",
+    "log_Kf": "dimensionless"
+  },
+  "entropy": {
+    "as_published": "9.08",
+    "value": 9.08,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "molar_volume": {
+    "as_published": "10.97",
+    "value": 10.97,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "delta_f_H": {
+    "as_published": "-57300",
+    "value": -57300.0,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "delta_f_G": {
+    "as_published": "-50574",
+    "value": -50574.0,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "log_Kf": {
+    "as_published": "37.072",
+    "value": 37.072,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "ocr_reasons": []
+  },
+  "references_as_published": [
+    "78",
+    "18",
+    "74"
+  ],
+  "uncertainty_line_tokens": [
+    "±.04",
+    "±",
+    ".02",
+    "±",
+    "100",
+    "±",
+    "110",
+    "±",
+    ".081"
+  ],
+  "source_layout_lines": [
+    "Bunsenite               74. 709      9.08         10.97      -57300        -50574      37.072       78         18        74",
+    "NiO                                  ±.04         ± .02      ± 100         ± 110       ± .081"
+  ],
+  "source_column_spans": {
+    "entropy": {
+      "source_span": [
+        33,
+        46
+      ],
+      "source_line_index": 0
+    },
+    "molar_volume": {
+      "source_span": [
+        46,
+        58
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_H": {
+      "source_span": [
+        58,
+        71
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_G": {
+      "source_span": [
+        71,
+        84
+      ],
+      "source_line_index": 0
+    },
+    "log_Kf": {
+      "source_span": [
+        84,
+        100
+      ],
+      "source_line_index": 0
+    },
+    "gram_formula_weight": {
+      "source_span": [
+        24,
+        33
+      ],
+      "source_line_index": 0
+    }
+  },
+  "row_count": 1,
+  "identity_disagreements": [],
+  "ambiguities": [
+    "ocr_suspect_token_retained_uncorrected"
+  ],
+  "record_id": "b1259-298k-0169-bunsenite",
+  "source": {
+    "database": "USGS Bulletin 1259, Robie & Waldbaum 1968",
+    "citation": "Robie, R. A. and Waldbaum, D. R., 1968, Thermodynamic properties of minerals and related substances at 298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure and at higher temperatures: U.S. Geological Survey Bulletin 1259, 256 p.",
+    "doi": "10.3133/b1259",
+    "official_url": "https://pubs.usgs.gov/bul/1259/report.pdf",
+    "licence": "United States government work. USGS numbered series; public domain in the United States. Fetched from the official pubs.usgs.gov host.",
+    "sha256": "013abbde1aef291c7492f2eaf7ab552619699e558d741ae5f39a87830e080e83",
+    "retrieved_at": "2026-09-06"
+  }
+}

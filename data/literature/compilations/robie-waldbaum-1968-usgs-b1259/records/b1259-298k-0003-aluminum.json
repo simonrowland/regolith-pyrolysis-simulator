@@ -17,7 +17,8 @@
   "name_as_published": "Aluminum",
   "formula_as_published": "Al",
   "formula": "Al",
-  "phase": "Aluminum",
+  "phase": "",
+  "state_note_as_published": "",
   "gram_formula_weight": {
     "as_published": "26.982",
     "value": 26.982,
@@ -54,35 +55,80 @@
     "ocr_reasons": []
   },
   "delta_f_G": {
-    "as_published": "0.000",
+    "as_published": "0",
     "value": 0.0,
     "ocr_suspect": false,
     "footnote_markers": [],
     "ocr_reasons": []
   },
   "log_Kf": {
-    "as_published": "",
-    "value": null,
-    "ocr_suspect": true,
+    "as_published": ".000",
+    "value": 0.0,
+    "ocr_suspect": false,
     "footnote_markers": [],
-    "ocr_reasons": [
-      "blank_as_published"
-    ]
+    "ocr_reasons": []
   },
   "references_as_published": [
     "68",
-    "148"
+    "148",
+    "159"
   ],
   "uncertainty_line_tokens": [
     "±.02",
     "±.0005",
     "159"
   ],
+  "source_layout_lines": [
+    "Aluminum                 26.982        6.77             9.9993            0              0       .000      68                   148",
+    "Al                                     ±.02             ±.0005                                            159"
+  ],
+  "source_column_spans": {
+    "entropy": {
+      "source_span": [
+        34,
+        48
+      ],
+      "source_line_index": 0
+    },
+    "molar_volume": {
+      "source_span": [
+        48,
+        66
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_H": {
+      "source_span": [
+        66,
+        81
+      ],
+      "source_line_index": 0
+    },
+    "delta_f_G": {
+      "source_span": [
+        81,
+        93
+      ],
+      "source_line_index": 0
+    },
+    "log_Kf": {
+      "source_span": [
+        93,
+        106
+      ],
+      "source_line_index": 0
+    },
+    "gram_formula_weight": {
+      "source_span": [
+        25,
+        34
+      ],
+      "source_line_index": 0
+    }
+  },
   "row_count": 1,
   "identity_disagreements": [],
-  "ambiguities": [
-    "ocr_suspect_token_retained_uncorrected"
-  ],
+  "ambiguities": [],
   "record_id": "b1259-298k-0003-aluminum",
   "source": {
     "database": "USGS Bulletin 1259, Robie & Waldbaum 1968",

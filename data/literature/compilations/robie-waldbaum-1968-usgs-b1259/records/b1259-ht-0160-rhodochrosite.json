@@ -16,7 +16,7 @@
   "name_as_published": "RHODOCHROSITE",
   "formula_as_published": "MnCO",
   "formula": "MnCO",
-  "phase": "PROPERTIES AT HIGH TEMPERATURES 185 Crystals 298.15° to 700°K.",
+  "phase": "Crystals 298.15° to 700°K.",
   "gram_formula_weight": {
     "as_published": "114.947",
     "value": 114.947,
@@ -41,6 +41,7 @@
   "rows": [
     {
       "kind": "data",
+      "source_layout_line": " 298.15  0.000                    23.90       23.90     212.521        195.045    142.971",
       "column_token_count": 7,
       "temperature": {
         "as_published": "298.15",
@@ -48,6 +49,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          1,
+          7
+        ],
+        "H_minus_H298": [
+          9,
+          14
+        ],
+        "entropy": [
+          30,
+          42
+        ],
+        "gibbs_function": [
+          42,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          67
+        ],
+        "delta_f_G": [
+          67,
+          80
+        ],
+        "log_Kf": [
+          80,
+          89
+        ]
       },
       "H_minus_H298": {
         "as_published": "0.000",
@@ -71,18 +102,22 @@
         "ocr_reasons": []
       },
       "delta_f_H": {
-        "as_published": "212.521",
-        "value": 212.521,
+        "as_published": "-212.521",
+        "value": -212.521,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "212.521",
+        "correction_id": "b1259-p191-delta_f_H-01"
       },
       "delta_f_G": {
-        "as_published": "195.045",
-        "value": 195.045,
+        "as_published": "-195.045",
+        "value": -195.045,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "195.045",
+        "correction_id": "b1259-p191-delta_f_G-01"
       },
       "log_Kf": {
         "as_published": "142.971",
@@ -91,13 +126,41 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "logKf_identity |logK+1000 dG/(RT ln10)|=285.9424 at T=298.15"
-      ],
       "ocr_suspect_row": true
     },
     {
       "kind": "uncertainty",
+      "source_layout_line": "UNCERTAINTY                        0.50        0.50       0.290          0.330      0.242",
+      "source_column_spans": {
+        "temperature": [
+          0,
+          14
+        ],
+        "H_minus_H298": [
+          14,
+          30
+        ],
+        "entropy": [
+          30,
+          42
+        ],
+        "gibbs_function": [
+          42,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          67
+        ],
+        "delta_f_G": [
+          67,
+          80
+        ],
+        "log_Kf": [
+          80,
+          89
+        ]
+      },
       "entropy": {
         "as_published": "0.50",
         "value": 0.5,
@@ -136,6 +199,7 @@
     },
     {
       "kind": "data",
+      "source_layout_line": "    400              2.160        30.12       24.72     212.387        189.094    103.316",
       "column_token_count": 7,
       "temperature": {
         "as_published": "400",
@@ -143,6 +207,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          4,
+          7
+        ],
+        "H_minus_H298": [
+          14,
+          30
+        ],
+        "entropy": [
+          30,
+          42
+        ],
+        "gibbs_function": [
+          42,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          67
+        ],
+        "delta_f_G": [
+          67,
+          80
+        ],
+        "log_Kf": [
+          80,
+          89
+        ]
       },
       "H_minus_H298": {
         "as_published": "2.160",
@@ -166,18 +260,22 @@
         "ocr_reasons": []
       },
       "delta_f_H": {
-        "as_published": "212.387",
-        "value": 212.387,
+        "as_published": "-212.387",
+        "value": -212.387,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "212.387",
+        "correction_id": "b1259-p191-delta_f_H-03"
       },
       "delta_f_G": {
-        "as_published": "189.094",
-        "value": 189.094,
+        "as_published": "-189.094",
+        "value": -189.094,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "189.094",
+        "correction_id": "b1259-p191-delta_f_G-03"
       },
       "log_Kf": {
         "as_published": "103.316",
@@ -186,13 +284,11 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "logKf_identity |logK+1000 dG/(RT ln10)|=206.6319 at T=400.0"
-      ],
       "ocr_suspect_row": true
     },
     {
       "kind": "data",
+      "source_layout_line": "    500              4.550        35.44       26.34     212.107        183.298     80.119",
       "column_token_count": 7,
       "temperature": {
         "as_published": "500",
@@ -200,6 +296,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          4,
+          7
+        ],
+        "H_minus_H298": [
+          14,
+          30
+        ],
+        "entropy": [
+          30,
+          42
+        ],
+        "gibbs_function": [
+          42,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          67
+        ],
+        "delta_f_G": [
+          67,
+          80
+        ],
+        "log_Kf": [
+          80,
+          89
+        ]
       },
       "H_minus_H298": {
         "as_published": "4.550",
@@ -223,18 +349,22 @@
         "ocr_reasons": []
       },
       "delta_f_H": {
-        "as_published": "212.107",
-        "value": 212.107,
+        "as_published": "-212.107",
+        "value": -212.107,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "212.107",
+        "correction_id": "b1259-p191-delta_f_H-04"
       },
       "delta_f_G": {
-        "as_published": "183.298",
-        "value": 183.298,
+        "as_published": "-183.298",
+        "value": -183.298,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "183.298",
+        "correction_id": "b1259-p191-delta_f_G-04"
       },
       "log_Kf": {
         "as_published": "80.119",
@@ -243,13 +373,11 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "logKf_identity |logK+1000 dG/(RT ln10)|=160.2383 at T=500.0"
-      ],
       "ocr_suspect_row": true
     },
     {
       "kind": "data",
+      "source_layout_line": "    600              7.095        40.07       28.24     211.878        177.631     64.702",
       "column_token_count": 7,
       "temperature": {
         "as_published": "600",
@@ -257,6 +385,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          4,
+          7
+        ],
+        "H_minus_H298": [
+          14,
+          30
+        ],
+        "entropy": [
+          30,
+          42
+        ],
+        "gibbs_function": [
+          42,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          67
+        ],
+        "delta_f_G": [
+          67,
+          80
+        ],
+        "log_Kf": [
+          80,
+          89
+        ]
       },
       "H_minus_H298": {
         "as_published": "7.095",
@@ -280,18 +438,22 @@
         "ocr_reasons": []
       },
       "delta_f_H": {
-        "as_published": "211.878",
-        "value": 211.878,
+        "as_published": "-211.878",
+        "value": -211.878,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "211.878",
+        "correction_id": "b1259-p191-delta_f_H-05"
       },
       "delta_f_G": {
-        "as_published": "177.631",
-        "value": 177.631,
+        "as_published": "-177.631",
+        "value": -177.631,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "177.631",
+        "correction_id": "b1259-p191-delta_f_G-05"
       },
       "log_Kf": {
         "as_published": "64.702",
@@ -300,13 +462,11 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "logKf_identity |logK+1000 dG/(RT ln10)|=129.4039 at T=600.0"
-      ],
       "ocr_suspect_row": true
     },
     {
       "kind": "data",
+      "source_layout_line": "    700              9.800        44.24       30.24     211.470        171.883     53.664",
       "column_token_count": 7,
       "temperature": {
         "as_published": "700",
@@ -314,6 +474,36 @@
         "ocr_suspect": false,
         "footnote_markers": [],
         "ocr_reasons": []
+      },
+      "source_column_spans": {
+        "temperature": [
+          4,
+          7
+        ],
+        "H_minus_H298": [
+          14,
+          30
+        ],
+        "entropy": [
+          30,
+          42
+        ],
+        "gibbs_function": [
+          42,
+          53
+        ],
+        "delta_f_H": [
+          53,
+          67
+        ],
+        "delta_f_G": [
+          67,
+          80
+        ],
+        "log_Kf": [
+          80,
+          89
+        ]
       },
       "H_minus_H298": {
         "as_published": "9.800",
@@ -337,18 +527,22 @@
         "ocr_reasons": []
       },
       "delta_f_H": {
-        "as_published": "211.470",
-        "value": 211.47,
+        "as_published": "-211.470",
+        "value": -211.47,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "211.470",
+        "correction_id": "b1259-p191-delta_f_H-06"
       },
       "delta_f_G": {
-        "as_published": "171.883",
-        "value": 171.883,
+        "as_published": "-171.883",
+        "value": -171.883,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "171.883",
+        "correction_id": "b1259-p191-delta_f_G-06"
       },
       "log_Kf": {
         "as_published": "53.664",
@@ -357,27 +551,102 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "logKf_identity |logK+1000 dG/(RT ln10)|=107.3281 at T=700.0"
-      ],
       "ocr_suspect_row": true
     }
   ],
   "row_count": 5,
+  "lookup_grid_count": 5,
+  "grid_refusals": [],
   "ocr_suspect_token_count": 0,
-  "identity_disagreements": [
-    "logKf_identity |logK+1000 dG/(RT ln10)|=285.9424 at T=298.15",
-    "logKf_identity |logK+1000 dG/(RT ln10)|=206.6319 at T=400.0",
-    "logKf_identity |logK+1000 dG/(RT ln10)|=160.2383 at T=500.0",
-    "logKf_identity |logK+1000 dG/(RT ln10)|=129.4039 at T=600.0",
-    "logKf_identity |logK+1000 dG/(RT ln10)|=107.3281 at T=700.0"
-  ],
+  "identity_disagreements": [],
   "ambiguities": [
     "logKf_identity |logK+1000 dG/(RT ln10)|=285.9424 at T=298.15",
     "logKf_identity |logK+1000 dG/(RT ln10)|=206.6319 at T=400.0",
     "logKf_identity |logK+1000 dG/(RT ln10)|=160.2383 at T=500.0",
     "logKf_identity |logK+1000 dG/(RT ln10)|=129.4039 at T=600.0",
     "logKf_identity |logK+1000 dG/(RT ln10)|=107.3281 at T=700.0"
+  ],
+  "corrections": [
+    {
+      "correction_id": "b1259-p191-delta_f_H-01",
+      "pdf_page": 191,
+      "field": "delta_f_H",
+      "layout_as_extracted": "212.521",
+      "printed_token": "-212.521",
+      "evidence": "PDF page 191 image visibly prints delta_f_H=-212.521 at T=298.15 K"
+    },
+    {
+      "correction_id": "b1259-p191-delta_f_G-01",
+      "pdf_page": 191,
+      "field": "delta_f_G",
+      "layout_as_extracted": "195.045",
+      "printed_token": "-195.045",
+      "evidence": "PDF page 191 image visibly prints delta_f_G=-195.045 at T=298.15 K"
+    },
+    {
+      "correction_id": "b1259-p191-delta_f_H-03",
+      "pdf_page": 191,
+      "field": "delta_f_H",
+      "layout_as_extracted": "212.387",
+      "printed_token": "-212.387",
+      "evidence": "PDF page 191 image visibly prints delta_f_H=-212.387 at T=400 K"
+    },
+    {
+      "correction_id": "b1259-p191-delta_f_G-03",
+      "pdf_page": 191,
+      "field": "delta_f_G",
+      "layout_as_extracted": "189.094",
+      "printed_token": "-189.094",
+      "evidence": "PDF page 191 image visibly prints delta_f_G=-189.094 at T=400 K"
+    },
+    {
+      "correction_id": "b1259-p191-delta_f_H-04",
+      "pdf_page": 191,
+      "field": "delta_f_H",
+      "layout_as_extracted": "212.107",
+      "printed_token": "-212.107",
+      "evidence": "PDF page 191 image visibly prints delta_f_H=-212.107 at T=500 K"
+    },
+    {
+      "correction_id": "b1259-p191-delta_f_G-04",
+      "pdf_page": 191,
+      "field": "delta_f_G",
+      "layout_as_extracted": "183.298",
+      "printed_token": "-183.298",
+      "evidence": "PDF page 191 image visibly prints delta_f_G=-183.298 at T=500 K"
+    },
+    {
+      "correction_id": "b1259-p191-delta_f_H-05",
+      "pdf_page": 191,
+      "field": "delta_f_H",
+      "layout_as_extracted": "211.878",
+      "printed_token": "-211.878",
+      "evidence": "PDF page 191 image visibly prints delta_f_H=-211.878 at T=600 K"
+    },
+    {
+      "correction_id": "b1259-p191-delta_f_G-05",
+      "pdf_page": 191,
+      "field": "delta_f_G",
+      "layout_as_extracted": "177.631",
+      "printed_token": "-177.631",
+      "evidence": "PDF page 191 image visibly prints delta_f_G=-177.631 at T=600 K"
+    },
+    {
+      "correction_id": "b1259-p191-delta_f_H-06",
+      "pdf_page": 191,
+      "field": "delta_f_H",
+      "layout_as_extracted": "211.470",
+      "printed_token": "-211.470",
+      "evidence": "PDF page 191 image visibly prints delta_f_H=-211.470 at T=700 K"
+    },
+    {
+      "correction_id": "b1259-p191-delta_f_G-06",
+      "pdf_page": 191,
+      "field": "delta_f_G",
+      "layout_as_extracted": "171.883",
+      "printed_token": "-171.883",
+      "evidence": "PDF page 191 image visibly prints delta_f_G=-171.883 at T=700 K"
+    }
   ],
   "record_id": "b1259-ht-0160-rhodochrosite",
   "source": {
