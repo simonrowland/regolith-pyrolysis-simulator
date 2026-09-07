@@ -33,7 +33,12 @@
     "as_published": "182.810",
     "value": 182.81,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 99,
+      "end": 106
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -49,7 +54,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 18, 21, 23, 25, 27, 29, 31, 32"
+    "column-position recovery was not lossless: per-column token counts temperature=8, enthalpy_function=8, entropy=7, negative_gibbs_function=8, heat_capacity=8, formation_enthalpy=1, formation_gibbs_energy=0, log_kf=0"
   ],
   "title_line_as_published": "STUIIIC SULFIDE                                                                 FORftULA WEIGHT    182.810",
   "column_ids": [
@@ -89,13 +94,23 @@
       "as_published": "0.18",
       "value": 0.18,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 29,
+        "end": 33
+      }
     },
     {
       "as_published": "o. 18",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 42,
+        "end": 47
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -124,7 +139,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 18, 21, 23, 25, 27, 29, 31, 32",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=8, enthalpy_function=8, entropy=7, negative_gibbs_function=8, heat_capacity=8, formation_enthalpy=1, formation_gibbs_energy=0, log_kf=0",
       "detector_only": false
     }
   ]

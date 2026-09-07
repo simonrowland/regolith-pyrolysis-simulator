@@ -35,7 +35,12 @@
     "as_published": "87.907",
     "value": 87.907,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 101,
+      "end": 107
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -51,7 +56,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "10 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24, 35, 37, 42, 44, 46, 48, 57, 59"
+    "column-position recovery was not lossless: per-column token counts temperature=22, enthalpy_function=22, entropy=22, negative_gibbs_function=22, heat_capacity=22, formation_enthalpy=22, formation_gibbs_energy=22, log_kf=17"
   ],
   "title_line_as_published": "TROILITE                                                                      FORI!U LA II EIGHT     87.907",
   "column_ids": [
@@ -90,33 +95,58 @@
   "uncertainty_values": [
     {
       "as_published": "0.11",
-      "value": 0.11,
-      "ocr_suspect": false,
-      "footnote_markers": []
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 29,
+        "end": 33
+      }
     },
     {
       "as_published": "o. 17",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 42,
+        "end": 47
+      }
     },
     {
       "as_published": "1. 4611",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 67,
+        "end": 74
+      }
     },
     {
       "as_published": "1. 506",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 87,
+        "end": 93
+      }
     },
     {
       "as_published": "0.2 64",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 102,
+        "end": 108
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -147,7 +177,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "10 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24, 35, 37, 42, 44, 46, 48, 57, 59",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=22, enthalpy_function=22, entropy=22, negative_gibbs_function=22, heat_capacity=22, formation_enthalpy=22, formation_gibbs_energy=22, log_kf=17",
       "detector_only": false
     }
   ]

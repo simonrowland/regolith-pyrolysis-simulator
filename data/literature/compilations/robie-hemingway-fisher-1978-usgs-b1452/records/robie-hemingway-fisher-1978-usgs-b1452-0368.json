@@ -27,7 +27,12 @@
     "as_published": "812.374",
     "value": 812.374,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 105,
+      "end": 112
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 23, 26, 27, 28, 29, 31, 34"
+    "column-position recovery was not lossless: per-column token counts temperature=9, enthalpy_function=10, entropy=10, negative_gibbs_function=10, heat_capacity=10, formation_enthalpy=1, formation_gibbs_energy=10, log_kf=1"
   ],
   "title_line_as_published": "TREI'IOLITE                                                                         FORI'IULA VIIGHT     812.374",
   "column_ids": [
@@ -86,25 +91,45 @@
       "as_published": "1.25",
       "value": 1.25,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 22,
+        "end": 26
+      }
     },
     {
       "as_published": "1.25",
       "value": 1.25,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 22,
+        "end": 26
+      }
     },
     {
       "as_published": "15.200",
       "value": 15.2,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 52,
+        "end": 58
+      }
     },
     {
       "as_published": "15.200",
       "value": 15.2,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 52,
+        "end": 58
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -125,11 +150,11 @@
     "              (EQUATION VALID FROI'I               298 - 1100 K)"
   ],
   "footnote_markers": [],
-  "ocr_suspect": true,
+  "ocr_suspect": false,
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 23, 26, 27, 28, 29, 31, 34",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=9, enthalpy_function=10, entropy=10, negative_gibbs_function=10, heat_capacity=10, formation_enthalpy=1, formation_gibbs_energy=10, log_kf=1",
       "detector_only": false
     }
   ]

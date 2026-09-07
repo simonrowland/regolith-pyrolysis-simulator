@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections import Counter
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -25,12 +26,6 @@ ROLE = {
     "circularity_warning": "Do not validate an engine against a compilation it consumes.",
 }
 _NUMBER_RE = re.compile(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?")
-_FOOTNOTE_SUFFIX_RE = re.compile(
-    r"^(?P<number>[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?)"
-    r"\s+(?P<markers>[*•†‡]+)$"
-)
-
-
 class Bulletin1452LookupError(LookupError):
     """Base class for typed Bulletin 1452 lookup refusals."""
 
@@ -47,6 +42,14 @@ class TemperatureNotInPrintedGridError(Bulletin1452LookupError):
     """The requested temperature is not an exact printed grid value."""
 
 
+class OcrSuspectGridTokenError(Bulletin1452LookupError):
+    """A numeric-looking temperature token failed the printed-form checks."""
+
+
+class OcrSuspectTableValueError(Bulletin1452LookupError):
+    """The requested printed row contains at least one OCR-suspect value."""
+
+
 @dataclass(frozen=True)
 class PublishedNumber:
     """A printed OCR token paired with a parsed float when unambiguous."""
@@ -57,26 +60,28 @@ class PublishedNumber:
     footnote_markers: tuple[str, ...]
 
     @classmethod
-    def from_mapping(cls, item: Mapping[str, Any]) -> "PublishedNumber":
+    def from_mapping(cls, item: Mapping[str, Any], column: str | None = None) -> "PublishedNumber":
         number = cls(
             as_published=str(item["as_published"]),
             value=None if item["value"] is None else float(item["value"]),
             ocr_suspect=bool(item["ocr_suspect"]),
             footnote_markers=tuple(str(marker) for marker in item["footnote_markers"]),
         )
-        number.validate_round_trip()
+        number.validate_round_trip(column)
         return number
 
-    def validate_round_trip(self) -> None:
-        numeric_token = self.as_published
-        suffix = _FOOTNOTE_SUFFIX_RE.fullmatch(numeric_token)
-        if suffix:
-            numeric_token = suffix.group("number")
+    def validate_round_trip(self, column: str | None = None) -> None:
+        numeric_token = self.as_published.strip().strip("*•†‡").strip()
         token_is_numeric = _NUMBER_RE.fullmatch(numeric_token) is not None
+        if token_is_numeric and column == "temperature":
+            parsed_temperature = Decimal(numeric_token)
+            token_is_numeric = Decimal("250") <= parsed_temperature <= Decimal("2500")
         if self.value is None:
-            if token_is_numeric:
+            if token_is_numeric and not self.ocr_suspect:
                 raise ValueError(f"numeric token lost its parsed value: {self.as_published!r}")
             return
+        if self.ocr_suspect:
+            raise ValueError(f"OCR-suspect token was admitted as numeric: {self.as_published!r}")
         if not token_is_numeric:
             raise ValueError(f"parsed value repairs an OCR token: {self.as_published!r}")
         try:
@@ -121,7 +126,7 @@ def iter_published_numbers(record: Mapping[str, Any]) -> Iterator[PublishedNumbe
         yield PublishedNumber.from_mapping(item)
     for row in record["rows"]:
         for column in record["column_ids"]:
-            yield PublishedNumber.from_mapping(row["cells"][column])
+            yield PublishedNumber.from_mapping(row["cells"][column], column)
 
 
 def validate_record_round_trip(record: Mapping[str, Any]) -> None:
@@ -169,7 +174,26 @@ def lookup_temperature(
         and Decimal(str(row["cells"]["temperature"]["value"])) == requested
     )
     if matches:
+        suspect = tuple(
+            column
+            for row in matches
+            for column, cell in row["cells"].items()
+            if cell["ocr_suspect"]
+        )
+        if suspect:
+            raise OcrSuspectTableValueError(
+                f"{record_id} at {temperature!r} contains OCR-suspect columns: {suspect}"
+            )
         return matches
+    for row in record["rows"]:
+        cell = row["cells"]["temperature"]
+        if not cell["ocr_suspect"]:
+            continue
+        raw = cell["as_published"].strip().strip("*•†‡").strip()
+        if _NUMBER_RE.fullmatch(raw) and Decimal(raw) == requested:
+            raise OcrSuspectGridTokenError(
+                f"{temperature!r} matches OCR-suspect temperature token {raw!r} in {record_id}"
+            )
     available = tuple(
         row["cells"]["temperature"]["as_published"]
         for row in record["rows"]
@@ -179,3 +203,34 @@ def lookup_temperature(
         f"{temperature!r} is not an exact printed temperature for {record_id}; "
         f"available parsed grid tokens: {available}"
     )
+
+
+def feedstock_coverage(records: list[dict[str, Any]]) -> dict[str, int]:
+    """Count compilation records containing each element declared by feedstocks."""
+
+    from simulator.accounting.formulas import load_species_formulas, resolve_species_formula
+
+    registry = load_species_formulas(ROOT / "data" / "species_catalog.yaml")
+    feedstocks = yaml.safe_load((ROOT / "data" / "feedstocks.yaml").read_text(encoding="utf-8"))
+    elements = set()
+    for feedstock in feedstocks.values():
+        for species in feedstock.get("composition_wt_pct", {}):
+            local = feedstock.get("stage0_formula_inventory", {}).get(species, {})
+            formula = local.get("template_formula", species)
+            elements.update(resolve_species_formula(formula, registry).elements)
+    folded_symbols = {element.casefold(): element for element in elements}
+
+    def formula_elements(formula: str) -> set[str]:
+        """Read element symbols without silently repairing the published formula."""
+
+        found = set(re.findall(r"[A-Z][a-z]?", formula)) & elements
+        for token in re.findall(r"[A-Za-z]+", formula):
+            if token.islower() and token.casefold() in folded_symbols:
+                found.add(folded_symbols[token.casefold()])
+        return found
+
+    counts: Counter[str] = Counter()
+    for record in records:
+        formula = record.get("formula_as_published") or ""
+        counts.update(formula_elements(formula))
+    return {element: counts[element] for element in sorted(elements)}

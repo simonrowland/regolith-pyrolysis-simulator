@@ -27,7 +27,12 @@
     "as_published": "181.861",
     "value": 181.861,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 103,
+      "end": 110
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "16 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 22, 23, 24, 25, 26, 27, 29, 31, 33, 35, 36, 37, 38, 39, 40"
+    "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=16, entropy=16, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=0, formation_gibbs_energy=0, log_kf=0"
   ],
   "title_line_as_published": "Tll.LITE                                                                             FOBKULA WEIGHT    181.861",
   "column_ids": [
@@ -86,13 +91,23 @@
       "as_published": "o. 84",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 35,
+        "end": 40
+      }
     },
     {
       "as_published": "0.84",
       "value": 0.84,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 52,
+        "end": 56
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -117,7 +132,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "16 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 22, 23, 24, 25, 26, 27, 29, 31, 33, 35, 36, 37, 38, 39, 40",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=16, entropy=16, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=0, formation_gibbs_energy=0, log_kf=0",
       "detector_only": false
     }
   ]

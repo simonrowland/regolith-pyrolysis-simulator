@@ -27,7 +27,12 @@
     "as_published": "184.403",
     "value": 184.403,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 101,
+      "end": 108
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 27, 29, 32, 34"
+    "column-position recovery was not lossless: per-column token counts temperature=10, enthalpy_function=9, entropy=10, negative_gibbs_function=9, heat_capacity=10, formation_enthalpy=9, formation_gibbs_energy=9, log_kf=11"
   ],
   "title_line_as_published": "DOLOftiTE                                                                          FORBULA WEIGHT    184.403",
   "column_ids": [
@@ -86,31 +91,56 @@
       "as_published": "0.29",
       "value": 0.29,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 32,
+        "end": 36
+      }
     },
     {
       "as_published": "0.29",
       "value": 0.29,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 32,
+        "end": 36
+      }
     },
     {
       "as_published": "1. 460",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 76,
+        "end": 82
+      }
     },
     {
       "as_published": "1.670",
       "value": 1.67,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 91,
+        "end": 96
+      }
     },
     {
       "as_published": "0.293",
       "value": 0.293,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 103,
+        "end": 108
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -129,7 +159,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 27, 29, 32, 34",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=10, enthalpy_function=9, entropy=10, negative_gibbs_function=9, heat_capacity=10, formation_enthalpy=9, formation_gibbs_energy=9, log_kf=11",
       "detector_only": false
     }
   ]

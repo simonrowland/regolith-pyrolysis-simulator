@@ -23,7 +23,12 @@
     "as_published": "186.348",
     "value": 186.348,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 102,
+      "end": 109
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -39,8 +44,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "required formula line is absent from the OCR text layer",
-    "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 16"
+    "column-position recovery was not lossless: per-column token counts temperature=9, enthalpy_function=8, entropy=8, negative_gibbs_function=9, heat_capacity=9, formation_enthalpy=8, formation_gibbs_energy=8, log_kf=9"
   ],
   "title_line_as_published": "TEBBIUB OXIDE                                                                       FOBBULl IBIGBT    186.348",
   "column_ids": [
@@ -85,11 +89,11 @@
     "                                                                                                      8-18-76"
   ],
   "footnote_markers": [],
-  "ocr_suspect": true,
+  "ocr_suspect": false,
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "required formula line is absent from the OCR text layer; 1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 16",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=9, enthalpy_function=8, entropy=8, negative_gibbs_function=9, heat_capacity=9, formation_enthalpy=8, formation_gibbs_energy=8, log_kf=9",
       "detector_only": false
     }
   ]

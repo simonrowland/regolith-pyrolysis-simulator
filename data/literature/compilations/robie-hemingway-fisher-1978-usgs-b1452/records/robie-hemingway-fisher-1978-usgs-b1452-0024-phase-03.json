@@ -1,0 +1,464 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0024-phase-03",
+  "census_id": "high-temperature-printed-page-050",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "DYSPBOSIU~",
+  "formula_as_published": "Dy",
+  "phase_state_as_published": [
+    "Alpha crystals (.hexagonal close packed) 298.15 to 1657 K. Beta crystals",
+    "         (body-centered cubic) 1657 to aelting point 1682 K.   Liquid 1682 to",
+    "         1800 K."
+  ],
+  "description_lines_as_published": [
+    "Dy:      Alpha crystals (.hexagonal close packed) 298.15 to 1657 K. Beta crystals",
+    "         (body-centered cubic) 1657 to aelting point 1682 K.   Liquid 1682 to",
+    "         1800 K."
+  ],
+  "formation_basis_header_as_published": "",
+  "formula_weight": {
+    "as_published": "162.500",
+    "value": 162.5,
+    "ocr_suspect": false,
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 5,
+      "start": 108,
+      "end": 115
+    }
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      56
+    ],
+    "printed_pages": [
+      50
+    ],
+    "pdftotext_layout_page_file": "page-056.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "transcribed",
+  "untranscribed_reasons": [],
+  "title_line_as_published": "DYSPBOSIU~      (REFERENCE STATE)                                                      FOBIIULA II EIGHT    162.500",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "Dy:      Alpha crystals (.hexagonal close packed) 298.15 to 1657 K. Beta crystals",
+    "         (body-centered cubic) 1657 to aelting point 1682 K.   Liquid 1682 to",
+    "         1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORIIlTIOII I' BOll THE ELEMENTS",
+    "                                                                                              GIBBS",
+    "                                 so                              cop",
+    "TEIIP.    ( H~-H~    98 )/T        T      -(G;-H~ 98 )/T                  EIITHALPY       PBEE ENERGY        Log Kf",
+    "  K           Jjaol•K         J/11ol• K     J;aol• K         J/aol• K         kJ/aol          kJ/1101",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "Jjaol•K",
+    "entropy": "J/11ol• K",
+    "negative_gibbs_function": "J;aol• K",
+    "heat_capacity": "J/aol• K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/1101",
+    "log_kf": ""
+  },
+  "temperature_grid": [
+    {
+      "as_published": "1682",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1700",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1800",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    }
+  ],
+  "rows": [
+    {
+      "source_text_line": 41,
+      "source_text_spans": {
+        "temperature": {
+          "line": 41,
+          "start": 0,
+          "end": 4
+        },
+        "enthalpy_function": {
+          "line": 41,
+          "start": 10,
+          "end": 16
+        },
+        "entropy": {
+          "line": 41,
+          "start": 20,
+          "end": 26
+        },
+        "negative_gibbs_function": {
+          "line": 41,
+          "start": 30,
+          "end": 36
+        },
+        "heat_capacity": {
+          "line": 41,
+          "start": 40,
+          "end": 45
+        },
+        "formation_enthalpy": {
+          "line": 41,
+          "start": 54,
+          "end": 59
+        },
+        "formation_gibbs_energy": {
+          "line": 41,
+          "start": 66,
+          "end": 72
+        },
+        "log_kf": {
+          "line": 41,
+          "start": 76,
+          "end": 80
+        }
+      },
+      "cells": {
+        "temperature": {
+          "as_published": "1682",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "37.124",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "138.91",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "101.76",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "49.92",
+          "value": 49.92,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": "• OOu",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "•"
+          ]
+        },
+        "formation_gibbs_energy": {
+          "as_published": ".(JO(J",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "log_kf": {
+          "as_published": ".ooo",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 42,
+      "source_text_spans": {
+        "temperature": {
+          "line": 42,
+          "start": 0,
+          "end": 4
+        },
+        "enthalpy_function": {
+          "line": 42,
+          "start": 15,
+          "end": 24
+        },
+        "entropy": {
+          "line": 42,
+          "start": 31,
+          "end": 37
+        },
+        "negative_gibbs_function": {
+          "line": 42,
+          "start": 46,
+          "end": 52
+        },
+        "heat_capacity": {
+          "line": 42,
+          "start": 62,
+          "end": 67
+        },
+        "formation_enthalpy": {
+          "line": 42,
+          "start": 82,
+          "end": 86
+        },
+        "formation_gibbs_energy": {
+          "line": 42,
+          "start": 97,
+          "end": 101
+        },
+        "log_kf": {
+          "line": 42,
+          "start": 111,
+          "end": 115
+        }
+      },
+      "cells": {
+        "temperature": {
+          "as_published": "1700",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "3 7. 2 57",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "139.41",
+          "value": 139.41,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "102.15",
+          "value": 102.15,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "49.91",
+          "value": 49.91,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": ".ooo",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "formation_gibbs_energy": {
+          "as_published": ".000",
+          "value": 0.0,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "log_kf": {
+          "as_published": ".000",
+          "value": 0.0,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 43,
+      "source_text_spans": {
+        "temperature": {
+          "line": 43,
+          "start": 0,
+          "end": 4
+        },
+        "enthalpy_function": {
+          "line": 43,
+          "start": 15,
+          "end": 21
+        },
+        "entropy": {
+          "line": 43,
+          "start": 31,
+          "end": 37
+        },
+        "negative_gibbs_function": {
+          "line": 43,
+          "start": 46,
+          "end": 52
+        },
+        "heat_capacity": {
+          "line": 43,
+          "start": 62,
+          "end": 67
+        },
+        "formation_enthalpy": {
+          "line": 43,
+          "start": 82,
+          "end": 87
+        },
+        "formation_gibbs_energy": {
+          "line": 43,
+          "start": 97,
+          "end": 101
+        },
+        "log_kf": {
+          "line": 43,
+          "start": 111,
+          "end": 116
+        }
+      },
+      "cells": {
+        "temperature": {
+          "as_published": "1800",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "37.960",
+          "value": 37.96,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "142.29",
+          "value": 142.29,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "104.33",
+          "value": 104.33,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "49.91",
+          "value": 49.91,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": "• 000",
+          "value": 0.0,
+          "ocr_suspect": false,
+          "footnote_markers": [
+            "•"
+          ]
+        },
+        "formation_gibbs_energy": {
+          "as_published": ".ooo",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "log_kf": {
+          "as_published": ".OO(J",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    }
+  ],
+  "row_count": 3,
+  "detected_data_row_count": 20,
+  "uncertainty_line_as_published": "UNCEBTAI NTY                     0.84              (1.84",
+  "uncertainty_values": [
+    {
+      "as_published": "0.84",
+      "value": 0.84,
+      "ocr_suspect": false,
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 33,
+        "end": 37
+      }
+    },
+    {
+      "as_published": "(1.84",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 51,
+        "end": 56
+      }
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "Dy:      Alpha crystals (.hexagonal close packed) 298.15 to 1657 K. Beta crystals",
+    "         (body-centered cubic) 1657 to aelting point 1682 K.   Liquid 1682 to",
+    "         1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "IIELTING POINT                   1682                        BOI LIIIG   POI NT                    2835",
+    "ENTHALPY OF       ~LTING           11.058 kJ                 ENTHALPY OF VAPORIZATION              230.(195 kJ",
+    "                                       8. 866 kJ             IIOLAR VOLUIIE                         1.9010 J/bar",
+    "                                                                                                   19.010 cm 3",
+    "TRANSITIONS IN          REFEREICE STATE ELEIIENTS",
+    "HEAT CAPACITY EQUATION",
+    "         45.108-           2.7561x1o-z T              2.0181110-S TZ",
+    "               (EQUATION VALID FROII               298- 1657 K)",
+    "REI'EREIICE       107             107                                                                      COIIPILED",
+    "                                                                                                            4-27-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [
+    {
+      "kind": "thermodynamic_identity_disagreement",
+      "detector_only": true,
+      "row": 1,
+      "temperature_as_published": "1682",
+      "check": "negative_gibbs_function = entropy - enthalpy_function",
+      "observed": 101.76,
+      "calculated": 101.786,
+      "residual": -0.02599999999999625
+    }
+  ],
+  "phase_segment": {
+    "ordinal": 3,
+    "count_on_printed_page": 3,
+    "row_start": 18,
+    "row_stop": 20,
+    "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
+  }
+}

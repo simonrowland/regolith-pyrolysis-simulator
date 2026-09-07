@@ -23,7 +23,12 @@
     "as_published": "69.618",
     "value": 69.618,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 102,
+      "end": 108
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -39,7 +44,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "required formula line is absent from the OCR text layer"
+    "column-position recovery was not lossless: per-column token counts temperature=19, enthalpy_function=18, entropy=18, negative_gibbs_function=19, heat_capacity=19, formation_enthalpy=18, formation_gibbs_energy=18, log_kf=20"
   ],
   "title_line_as_published": "BORIC OXIDE                                                                      FORIIULA WEIGHT      69.618",
   "column_ids": [
@@ -82,31 +87,56 @@
       "as_published": "0.03",
       "value": 0.03,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 31,
+        "end": 35
+      }
     },
     {
       "as_published": "0.03",
       "value": 0.03,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 31,
+        "end": 35
+      }
     },
     {
       "as_published": "1.400",
       "value": 1.4,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 75,
+        "end": 80
+      }
     },
     {
       "as_published": "1. 715",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 92,
+        "end": 98
+      }
     },
     {
       "as_published": "(1.300",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 103,
+        "end": 109
+      }
     }
   ],
   "reference_state_notes_as_published": [],
@@ -128,7 +158,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "required formula line is absent from the OCR text layer",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=19, enthalpy_function=18, entropy=18, negative_gibbs_function=19, heat_capacity=19, formation_enthalpy=18, formation_gibbs_energy=18, log_kf=20",
       "detector_only": false
     }
   ]

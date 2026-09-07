@@ -27,7 +27,12 @@
     "as_published": "64.120",
     "value": 64.12,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 108,
+      "end": 114
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27, 32, 34"
+    "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=16, entropy=16, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=15, formation_gibbs_energy=15, log_kf=14"
   ],
   "title_line_as_published": "Dll TOll IC SULFUR                                                                   FOBIIU LA II EIGHT     64.120",
   "column_ids": [
@@ -86,31 +91,56 @@
       "as_published": "0.05",
       "value": 0.05,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 32,
+        "end": 36
+      }
     },
     {
       "as_published": "0.05",
       "value": 0.05,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 32,
+        "end": 36
+      }
     },
     {
       "as_published": "0.500",
       "value": 0.5,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 78,
+        "end": 83
+      }
     },
     {
       "as_published": "0.669",
       "value": 0.669,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 95,
+        "end": 100
+      }
     },
     {
       "as_published": "0.117",
       "value": 0.117,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 109,
+        "end": 114
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -130,11 +160,11 @@
     "               (EQUATION VALID FRO!!             298 -    1800 K)"
   ],
   "footnote_markers": [],
-  "ocr_suspect": true,
+  "ocr_suspect": false,
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27, 32, 34",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=16, entropy=16, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=15, formation_gibbs_energy=15, log_kf=14",
       "detector_only": false
     }
   ]

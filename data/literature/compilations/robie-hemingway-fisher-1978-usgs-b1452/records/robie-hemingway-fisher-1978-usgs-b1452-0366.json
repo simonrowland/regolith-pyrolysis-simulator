@@ -27,7 +27,12 @@
     "as_published": "202.140",
     "value": 202.14,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 103,
+      "end": 110
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "10 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 20, 24, 25, 27, 28, 30, 33, 35, 36, 37"
+    "column-position recovery was not lossless: per-column token counts temperature=11, enthalpy_function=11, entropy=11, negative_gibbs_function=11, heat_capacity=11, formation_enthalpy=7, formation_gibbs_energy=8, log_kf=2"
   ],
   "title_line_as_published": "JADEITE                                                                             FOR!IOLl WEIGHT    202.140",
   "column_ids": [
@@ -87,25 +92,45 @@
       "as_published": "1. 25",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 22,
+        "end": 27
+      }
     },
     {
       "as_published": "1.25",
       "value": 1.25,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 32,
+        "end": 36
+      }
     },
     {
       "as_published": "2.380",
       "value": 2.38,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 53,
+        "end": 58
+      }
     },
     {
       "as_published": "2.400",
       "value": 2.4,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 65,
+        "end": 70
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -123,7 +148,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "10 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 20, 24, 25, 27, 28, 30, 33, 35, 36, 37",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=11, enthalpy_function=11, entropy=11, negative_gibbs_function=11, heat_capacity=11, formation_enthalpy=7, formation_gibbs_energy=8, log_kf=2",
       "detector_only": false
     }
   ]

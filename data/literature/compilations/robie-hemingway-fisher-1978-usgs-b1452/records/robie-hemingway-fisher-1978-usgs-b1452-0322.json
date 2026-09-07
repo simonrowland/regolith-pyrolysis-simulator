@@ -29,7 +29,12 @@
     "as_published": "172o244",
     "value": null,
     "ocr_suspect": true,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 109,
+      "end": 116
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -45,7 +50,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "35 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 21, 26, 28, 32, 34, 35, 36, 38, 39, 49, 52, 54, 57, 59, 60, 61, 62, 63, 64, 65, 67, 69, 70, 72, 73, 74, 75, 76, 77, 79, 80, 82, 83, 85, 86"
+    "column-position recovery was not lossless: per-column token counts temperature=14, enthalpy_function=7, entropy=13, negative_gibbs_function=14, heat_capacity=22, formation_enthalpy=17, formation_gibbs_energy=9, log_kf=3"
   ],
   "title_line_as_published": "LlRNITE                                                                              FORIIULA WEIGHT         172o244",
   "column_ids": [
@@ -111,7 +116,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "35 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 21, 26, 28, 32, 34, 35, 36, 38, 39, 49, 52, 54, 57, 59, 60, 61, 62, 63, 64, 65, 67, 69, 70, 72, 73, 74, 75, 76, 77, 79, 80, 82, 83, 85, 86",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=14, enthalpy_function=7, entropy=13, negative_gibbs_function=14, heat_capacity=22, formation_enthalpy=17, formation_gibbs_energy=9, log_kf=3",
       "detector_only": false
     }
   ]

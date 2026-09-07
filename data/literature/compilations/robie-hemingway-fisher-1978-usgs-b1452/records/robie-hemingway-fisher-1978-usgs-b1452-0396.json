@@ -23,7 +23,12 @@
     "as_published": "379.268",
     "value": 379.268,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 103,
+      "end": 110
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -39,8 +44,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "required formula line is absent from the OCR text layer",
-    "6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 16, 20, 22, 26, 31, 76"
+    "column-position recovery was not lossless: per-column token counts temperature=6, enthalpy_function=7, entropy=5, negative_gibbs_function=5, heat_capacity=5, formation_enthalpy=5, formation_gibbs_energy=6, log_kf=5"
   ],
   "title_line_as_published": "!lLC                                                                               roaau£&   IBIGB~    379.268",
   "column_ids": [
@@ -78,11 +82,11 @@
   "reference_state_notes_as_published": [],
   "auxiliary_lines_as_published": [],
   "footnote_markers": [],
-  "ocr_suspect": true,
+  "ocr_suspect": false,
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "required formula line is absent from the OCR text layer; 6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 16, 20, 22, 26, 31, 76",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=6, enthalpy_function=7, entropy=5, negative_gibbs_function=5, heat_capacity=5, formation_enthalpy=5, formation_gibbs_energy=6, log_kf=5",
       "detector_only": false
     }
   ]

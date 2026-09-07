@@ -31,9 +31,14 @@
   "formation_basis_header_as_published": "PORISATIOII FRO!! THE .li:LEISEIITS",
   "formula_weight": {
     "as_published": "183.511",
-    "value": 183.511,
-    "ocr_suspect": false,
-    "footnote_markers": []
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 100,
+      "end": 107
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -49,7 +54,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "14 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 18, 23, 25, 26, 27, 29, 31, 33, 34, 35, 37, 38, 41, 43"
+    "column-position recovery was not lossless: per-column token counts temperature=14, enthalpy_function=14, entropy=14, negative_gibbs_function=0, heat_capacity=14, formation_enthalpy=0, formation_gibbs_energy=0, log_kf=0"
   ],
   "title_line_as_published": "CHALCOPYRITE                                                                   FORMULA   WEIGHT     183.511",
   "column_ids": [
@@ -114,7 +119,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "14 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 18, 23, 25, 26, 27, 29, 31, 33, 34, 35, 37, 38, 41, 43",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=14, enthalpy_function=14, entropy=14, negative_gibbs_function=0, heat_capacity=14, formation_enthalpy=0, formation_gibbs_energy=0, log_kf=0",
       "detector_only": false
     }
   ]

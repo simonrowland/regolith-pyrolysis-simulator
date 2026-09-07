@@ -27,7 +27,12 @@
     "as_published": "394.078",
     "value": 394.078,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 98,
+      "end": 105
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 31, 33, 41, 43, 44, 45"
+    "column-position recovery was not lossless: per-column token counts temperature=18, enthalpy_function=18, entropy=18, negative_gibbs_function=18, heat_capacity=18, formation_enthalpy=14, formation_gibbs_energy=14, log_kf=14"
   ],
   "title_line_as_published": "YTTEBBIOS SBSQOIOllDB (CUBIC)                                                   POBBOLA WEIGHT    394.078",
   "column_ids": [
@@ -86,31 +91,56 @@
       "as_published": "0.85",
       "value": 0.85,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 30,
+        "end": 34
+      }
     },
     {
       "as_published": "0.85",
       "value": 0.85,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 30,
+        "end": 34
+      }
     },
     {
       "as_published": "0.850",
       "value": 0.85,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 73,
+        "end": 78
+      }
     },
     {
       "as_published": "0.850",
       "value": 0.85,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 73,
+        "end": 78
+      }
     },
     {
       "as_published": "0.149",
       "value": 0.149,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 100,
+        "end": 105
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -130,11 +160,11 @@
     "                                                                                                  8-11-76"
   ],
   "footnote_markers": [],
-  "ocr_suspect": true,
+  "ocr_suspect": false,
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 31, 33, 41, 43, 44, 45",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=18, enthalpy_function=18, entropy=18, negative_gibbs_function=18, heat_capacity=18, formation_enthalpy=14, formation_gibbs_energy=14, log_kf=14",
       "detector_only": false
     }
   ]

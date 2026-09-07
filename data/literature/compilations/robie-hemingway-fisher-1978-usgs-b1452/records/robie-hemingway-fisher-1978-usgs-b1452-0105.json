@@ -33,7 +33,12 @@
     "as_published": "90.760",
     "value": 90.76,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 108,
+      "end": 114
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -49,7 +54,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 25"
+    "column-position recovery was not lossless: per-column token counts temperature=5, enthalpy_function=5, entropy=4, negative_gibbs_function=5, heat_capacity=5, formation_enthalpy=4, formation_gibbs_energy=5, log_kf=4"
   ],
   "title_line_as_published": "IIILLEBITI                                                                              POBIIULA lEIGHT     90.760",
   "column_ids": [
@@ -91,31 +96,56 @@
       "as_published": "4. 18",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 31,
+        "end": 36
+      }
     },
     {
       "as_published": "4.18",
       "value": 4.18,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 51,
+        "end": 55
+      }
     },
     {
       "as_published": "4.184",
-      "value": 4.184,
-      "ocr_suspect": false,
-      "footnote_markers": []
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 81,
+        "end": 86
+      }
     },
     {
       "as_published": "4.393",
-      "value": 4.393,
-      "ocr_suspect": false,
-      "footnote_markers": []
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 96,
+        "end": 101
+      }
     },
     {
       "as_published": "0.710",
-      "value": 0.71,
-      "ocr_suspect": false,
-      "footnote_markers": []
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 110,
+        "end": 115
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -136,7 +166,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 25",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=5, enthalpy_function=5, entropy=4, negative_gibbs_function=5, heat_capacity=5, formation_enthalpy=4, formation_gibbs_energy=5, log_kf=4",
       "detector_only": false
     }
   ]

@@ -25,9 +25,14 @@
   "formation_basis_header_as_published": "",
   "formula_weight": {
     "as_published": "81.379",
-    "value": 81.379,
-    "ocr_suspect": false,
-    "footnote_markers": []
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 101,
+      "end": 107
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "5 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28, 35, 37, 71"
+    "column-position recovery was not lossless: per-column token counts temperature=17, enthalpy_function=16, entropy=17, negative_gibbs_function=16, heat_capacity=17, formation_enthalpy=16, formation_gibbs_energy=17, log_kf=17"
   ],
   "title_line_as_published": "ZIHCITE                                                                           POBIULl &BIGHT     81.379",
   "column_ids": [
@@ -86,31 +91,56 @@
       "as_published": "0.40",
       "value": 0.4,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 31,
+        "end": 35
+      }
     },
     {
       "as_published": "0.40",
       "value": 0.4,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 31,
+        "end": 35
+      }
     },
     {
       "as_published": "0.270",
       "value": 0.27,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 75,
+        "end": 80
+      }
     },
     {
       "as_published": "0.300",
       "value": 0.3,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 90,
+        "end": 95
+      }
     },
     {
       "as_published": "0.053",
       "value": 0.053,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 102,
+        "end": 107
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -122,7 +152,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "5 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 26, 28, 35, 37, 71",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=17, enthalpy_function=16, entropy=17, negative_gibbs_function=16, heat_capacity=17, formation_enthalpy=16, formation_gibbs_energy=17, log_kf=17",
       "detector_only": false
     }
   ]

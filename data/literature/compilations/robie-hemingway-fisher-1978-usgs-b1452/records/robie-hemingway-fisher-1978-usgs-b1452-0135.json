@@ -27,7 +27,12 @@
     "as_published": "351.918",
     "value": 351.918,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 104,
+      "end": 111
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "5 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 18, 25, 27, 37, 39"
+    "column-position recovery was not lossless: per-column token counts temperature=18, enthalpy_function=18, entropy=18, negative_gibbs_function=18, heat_capacity=18, formation_enthalpy=18, formation_gibbs_energy=18, log_kf=16"
   ],
   "title_line_as_published": "EUROPIUft SESQUIOXIDE (ftONOCLINIC)                                                 FOBftULA WEIGHT     351.918",
   "column_ids": [
@@ -86,31 +91,56 @@
       "as_published": "8. so",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 32,
+        "end": 37
+      }
     },
     {
       "as_published": "8.50",
       "value": 8.5,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 48,
+        "end": 52
+      }
     },
     {
       "as_published": "8.110~",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 76,
+        "end": 82
+      }
     },
     {
       "as_published": "8.400",
       "value": 8.4,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 95,
+        "end": 100
+      }
     },
     {
       "as_published": "1. 472",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 106,
+        "end": 112
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -134,7 +164,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "5 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 18, 25, 27, 37, 39",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=18, enthalpy_function=18, entropy=18, negative_gibbs_function=18, heat_capacity=18, formation_enthalpy=18, formation_gibbs_energy=18, log_kf=16",
       "detector_only": false
     }
   ]

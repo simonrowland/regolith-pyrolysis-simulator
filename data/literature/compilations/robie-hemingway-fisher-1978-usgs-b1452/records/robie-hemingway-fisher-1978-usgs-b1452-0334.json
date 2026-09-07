@@ -27,7 +27,12 @@
     "as_published": "196.063",
     "value": 196.063,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 105,
+      "end": 112
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "18 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 17, 19, 21, 25, 29, 46, 49, 52, 54, 55, 56, 57, 58, 60, 61, 63, 64, 65"
+    "column-position recovery was not lossless: per-column token counts temperature=17, enthalpy_function=17, entropy=16, negative_gibbs_function=15, heat_capacity=17, formation_enthalpy=15, formation_gibbs_energy=16, log_kf=6"
   ],
   "title_line_as_published": "TITliiTI ( SPREIE)                                                              POBBULl WBIGRt           196.063",
   "column_ids": [
@@ -91,11 +96,11 @@
     "                                                                          253                         1- 9-76"
   ],
   "footnote_markers": [],
-  "ocr_suspect": true,
+  "ocr_suspect": false,
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "18 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 17, 19, 21, 25, 29, 46, 49, 52, 54, 55, 56, 57, 58, 60, 61, 63, 64, 65",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=17, enthalpy_function=17, entropy=16, negative_gibbs_function=15, heat_capacity=17, formation_enthalpy=15, formation_gibbs_energy=16, log_kf=6",
       "detector_only": false
     }
   ]

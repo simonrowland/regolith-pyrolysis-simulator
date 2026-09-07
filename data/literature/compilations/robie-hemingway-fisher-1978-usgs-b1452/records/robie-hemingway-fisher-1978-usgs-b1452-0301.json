@@ -35,7 +35,12 @@
     "as_published": "115.104",
     "value": 115.104,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 97,
+      "end": 104
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -51,7 +56,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "7 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 17, 19, 23, 24, 26, 27, 28"
+    "column-position recovery was not lossless: per-column token counts temperature=6, enthalpy_function=6, entropy=6, negative_gibbs_function=0, heat_capacity=6, formation_enthalpy=0, formation_gibbs_energy=0, log_kf=0"
   ],
   "title_line_as_published": "l!!OIIU! BXSOLPlTE                                                             PO&BULl lEIGHT    115.104",
   "column_ids": [
@@ -96,11 +101,11 @@
   ],
   "auxiliary_lines_as_published": [],
   "footnote_markers": [],
-  "ocr_suspect": true,
+  "ocr_suspect": false,
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "7 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 17, 19, 23, 24, 26, 27, 28",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=6, enthalpy_function=6, entropy=6, negative_gibbs_function=0, heat_capacity=6, formation_enthalpy=0, formation_gibbs_energy=0, log_kf=0",
       "detector_only": false
     }
   ]

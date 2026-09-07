@@ -25,9 +25,14 @@
   "formation_basis_header_as_published": "",
   "formula_weight": {
     "as_published": "219.199",
-    "value": 219.199,
-    "ocr_suspect": false,
-    "footnote_markers": []
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 100,
+      "end": 107
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 27, 29"
+    "column-position recovery was not lossless: per-column token counts temperature=11, enthalpy_function=10, entropy=11, negative_gibbs_function=10, heat_capacity=11, formation_enthalpy=10, formation_gibbs_energy=10, log_kf=12"
   ],
   "title_line_as_published": "PLATTNERITE                                                                        FORRULA WEIGHT   219.199",
   "column_ids": [
@@ -87,31 +92,56 @@
       "as_published": "0.42",
       "value": 0.42,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 31,
+        "end": 35
+      }
     },
     {
       "as_published": "u.42",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 48,
+        "end": 52
+      }
     },
     {
       "as_published": "2.929",
       "value": 2.929,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 76,
+        "end": 81
+      }
     },
     {
       "as_published": "3.000",
       "value": 3.0,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 91,
+        "end": 96
+      }
     },
     {
       "as_published": "0.526",
       "value": 0.526,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 103,
+        "end": 108
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -136,7 +166,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 27, 29",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=11, enthalpy_function=10, entropy=11, negative_gibbs_function=10, heat_capacity=11, formation_enthalpy=10, formation_gibbs_energy=10, log_kf=12",
       "detector_only": false
     }
   ]

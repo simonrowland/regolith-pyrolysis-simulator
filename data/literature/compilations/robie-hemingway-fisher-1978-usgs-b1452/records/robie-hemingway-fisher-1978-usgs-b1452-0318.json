@@ -21,9 +21,14 @@
   "formation_basis_header_as_published": "",
   "formula_weight": {
     "as_published": "162.0117",
-    "value": 162.0117,
-    "ocr_suspect": false,
-    "footnote_markers": []
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 97,
+      "end": 105
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -39,8 +44,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "required formula line is absent from the OCR text layer",
-    "9 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 21, 22, 23, 25, 26, 27, 29, 32, 67"
+    "column-position recovery was not lossless: per-column token counts temperature=13, enthalpy_function=13, entropy=13, negative_gibbs_function=13, heat_capacity=13, formation_enthalpy=14, formation_gibbs_energy=13, log_kf=11"
   ],
   "title_line_as_published": "SILLUliiTI                                                                     POIIULl IIIGBT    162.0117",
   "column_ids": [
@@ -83,25 +87,45 @@
       "as_published": "o. 42",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 22,
+        "end": 27
+      }
     },
     {
       "as_published": "0.112",
-      "value": 0.112,
-      "ocr_suspect": false,
-      "footnote_markers": []
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 32,
+        "end": 37
+      }
     },
     {
       "as_published": "0.590",
       "value": 0.59,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 53,
+        "end": 58
+      }
     },
     {
       "as_published": "0.600",
       "value": 0.6,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 65,
+        "end": 70
+      }
     }
   ],
   "reference_state_notes_as_published": [],
@@ -111,7 +135,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "required formula line is absent from the OCR text layer; 9 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 21, 22, 23, 25, 26, 27, 29, 32, 67",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=13, enthalpy_function=13, entropy=13, negative_gibbs_function=13, heat_capacity=13, formation_enthalpy=14, formation_gibbs_energy=13, log_kf=11",
       "detector_only": false
     }
   ]

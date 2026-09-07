@@ -23,7 +23,12 @@
     "as_published": "201.960",
     "value": 201.96,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 110,
+      "end": 117
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -39,8 +44,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "required formula line is absent from the OCR text layer",
-    "12 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24, 25, 27, 28, 29, 31, 32, 33, 34, 35, 46"
+    "column-position recovery was not lossless: per-column token counts temperature=14, enthalpy_function=13, entropy=13, negative_gibbs_function=13, heat_capacity=13, formation_enthalpy=17, formation_gibbs_energy=13, log_kf=8"
   ],
   "title_line_as_published": "TEPBBOITE                                                                             FOBIIULl lEIGHT         201.960",
   "column_ids": [
@@ -92,11 +96,11 @@
     "                                                                               1 11                           7-15-76"
   ],
   "footnote_markers": [],
-  "ocr_suspect": true,
+  "ocr_suspect": false,
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "required formula line is absent from the OCR text layer; 12 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24, 25, 27, 28, 29, 31, 32, 33, 34, 35, 46",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=14, enthalpy_function=13, entropy=13, negative_gibbs_function=13, heat_capacity=13, formation_enthalpy=17, formation_gibbs_energy=13, log_kf=8",
       "detector_only": false
     }
   ]

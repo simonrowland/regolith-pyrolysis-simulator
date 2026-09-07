@@ -27,7 +27,12 @@
     "as_published": "108.906",
     "value": 108.906,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 102,
+      "end": 109
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 46"
+    "column-position recovery was not lossless: per-column token counts temperature=17, enthalpy_function=17, entropy=17, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=17, formation_gibbs_energy=17, log_kf=17"
   ],
   "title_line_as_published": "HIOBIUB BOKOIIDE                                                                  FOBSULA WEIGHT      108.906",
   "column_ids": [
@@ -86,31 +91,56 @@
       "as_published": "8.40",
       "value": 8.4,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 29,
+        "end": 33
+      }
     },
     {
       "as_published": "8.40",
       "value": 8.4,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 29,
+        "end": 33
+      }
     },
     {
       "as_published": "12.550",
       "value": 12.55,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 72,
+        "end": 78
+      }
     },
     {
       "as_published": "1.2. 550",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 89,
+        "end": 97
+      }
     },
     {
       "as_published": "2.199",
       "value": 2.199,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 104,
+        "end": 109
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -128,7 +158,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "1 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 46",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=17, enthalpy_function=17, entropy=17, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=17, formation_gibbs_energy=17, log_kf=17",
       "detector_only": false
     }
   ]

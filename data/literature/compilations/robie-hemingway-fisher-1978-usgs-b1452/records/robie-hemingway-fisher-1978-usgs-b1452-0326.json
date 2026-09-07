@@ -23,7 +23,12 @@
     "as_published": "274.206",
     "value": 274.206,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 5,
+      "start": 106,
+      "end": 113
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -39,8 +44,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "required formula line is absent from the OCR text layer",
-    "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 28, 30, 32, 33, 36, 43, 46"
+    "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=16, entropy=16, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=15, formation_gibbs_energy=18, log_kf=16"
   ],
   "title_line_as_published": "GEHLENITE                                                                       FOI!IIULA   WEIGHT        274.206",
   "column_ids": [
@@ -86,25 +90,45 @@
       "as_published": "1. 64",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 24,
+        "start": 30,
+        "end": 35
+      }
     },
     {
       "as_published": "1.64",
       "value": 1.64,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 24,
+        "start": 47,
+        "end": 51
+      }
     },
     {
       "as_published": "3.090",
       "value": 3.09,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 24,
+        "start": 72,
+        "end": 77
+      }
     },
     {
       "as_published": "3. 170",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 24,
+        "start": 92,
+        "end": 98
+      }
     }
   ],
   "reference_state_notes_as_published": [],
@@ -124,7 +148,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "required formula line is absent from the OCR text layer; 8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 28, 30, 32, 33, 36, 43, 46",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=16, entropy=16, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=15, formation_gibbs_energy=18, log_kf=16",
       "detector_only": false
     }
   ]

@@ -35,7 +35,12 @@
     "as_published": "119.967",
     "value": 119.967,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 103,
+      "end": 110
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -51,7 +56,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27"
+    "column-position recovery was not lossless: per-column token counts temperature=5, enthalpy_function=5, entropy=5, negative_gibbs_function=5, heat_capacity=5, formation_enthalpy=5, formation_gibbs_energy=5, log_kf=4"
   ],
   "title_line_as_published": "lllRCAHTE                                                                           FORftULl WEIGHT    119.967",
   "column_ids": [
@@ -91,33 +96,58 @@
   "uncertainty_values": [
     {
       "as_published": "0.11",
-      "value": 0.11,
-      "ocr_suspect": false,
-      "footnote_markers": []
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 30,
+        "end": 34
+      }
     },
     {
       "as_published": "o. 11",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 46,
+        "end": 51
+      }
     },
     {
       "as_published": "2.090",
       "value": 2.09,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 76,
+        "end": 81
+      }
     },
     {
       "as_published": "2.090",
       "value": 2.09,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 76,
+        "end": 81
+      }
     },
     {
       "as_published": "0.366",
       "value": 0.366,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 105,
+        "end": 110
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -149,7 +179,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "2 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=5, enthalpy_function=5, entropy=5, negative_gibbs_function=5, heat_capacity=5, formation_enthalpy=5, formation_gibbs_energy=5, log_kf=4",
       "detector_only": false
     }
   ]

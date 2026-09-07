@@ -25,9 +25,14 @@
   "formation_basis_header_as_published": "",
   "formula_weight": {
     "as_published": "278.333",
-    "value": 278.333,
-    "ocr_suspect": false,
-    "footnote_markers": []
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 106,
+      "end": 113
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 25, 32, 34, 37, 39, 51, 70"
+    "column-position recovery was not lossless: per-column token counts temperature=11, enthalpy_function=11, entropy=11, negative_gibbs_function=11, heat_capacity=11, formation_enthalpy=11, formation_gibbs_energy=11, log_kf=8"
   ],
   "title_line_as_published": "lllSi 3 0 8     GLASS                                                                  POBIIOLA lEIGHT    278.333",
   "column_ids": [
@@ -86,31 +91,56 @@
       "as_published": "1.78",
       "value": 1.78,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 34,
+        "end": 38
+      }
     },
     {
       "as_published": "1. 78",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 50,
+        "end": 55
+      }
     },
     {
       "as_published": "3.370",
       "value": 3.37,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 79,
+        "end": 84
+      }
     },
     {
       "as_published": "3.500",
       "value": 3.5,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 95,
+        "end": 100
+      }
     },
     {
       "as_published": "0.613",
       "value": 0.613,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 109,
+        "end": 114
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -122,7 +152,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "8 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 23, 25, 32, 34, 37, 39, 51, 70",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=11, enthalpy_function=11, entropy=11, negative_gibbs_function=11, heat_capacity=11, formation_enthalpy=11, formation_gibbs_energy=11, log_kf=8",
       "detector_only": false
     }
   ]

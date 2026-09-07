@@ -35,7 +35,12 @@
     "as_published": "119.967",
     "value": 119.967,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 108,
+      "end": 115
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -51,7 +56,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26, 31, 33"
+    "column-position recovery was not lossless: per-column token counts temperature=8, enthalpy_function=8, entropy=8, negative_gibbs_function=8, heat_capacity=8, formation_enthalpy=8, formation_gibbs_energy=8, log_kf=6"
   ],
   "title_line_as_published": "PYRITE                                                                                 FOBIIULA   W~IGHl    119.967",
   "column_ids": [
@@ -93,31 +98,56 @@
       "as_published": "o. 13",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 33,
+        "end": 38
+      }
     },
     {
       "as_published": "0.13",
       "value": 0.13,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 50,
+        "end": 54
+      }
     },
     {
       "as_published": "1.6H",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 79,
+        "end": 83
+      }
     },
     {
       "as_published": "1. 715",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 98,
+        "end": 104
+      }
     },
     {
       "as_published": "0.300",
       "value": 0.3,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 21,
+        "start": 110,
+        "end": 115
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -139,7 +169,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 24, 26, 31, 33",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=8, enthalpy_function=8, entropy=8, negative_gibbs_function=8, heat_capacity=8, formation_enthalpy=8, formation_gibbs_energy=8, log_kf=6",
       "detector_only": false
     }
   ]

@@ -31,9 +31,14 @@
   "formation_basis_header_as_published": "",
   "formula_weight": {
     "as_published": "149.913",
-    "value": 149.913,
-    "ocr_suspect": false,
-    "footnote_markers": []
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 103,
+      "end": 110
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -49,7 +54,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24, 32, 34"
+    "column-position recovery was not lossless: per-column token counts temperature=8, enthalpy_function=8, entropy=8, negative_gibbs_function=8, heat_capacity=8, formation_enthalpy=8, formation_gibbs_energy=8, log_kf=7"
   ],
   "title_line_as_published": "CESIUM HYDROXIDE                                                                     FORMULA WEIGHT    149.913",
   "column_ids": [
@@ -91,31 +96,56 @@
       "as_published": "4.18",
       "value": 4.18,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 35,
+        "end": 39
+      }
     },
     {
       "as_published": "4.18",
       "value": 4.18,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 35,
+        "end": 39
+      }
     },
     {
       "as_published": "0.837",
       "value": 0.837,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 77,
+        "end": 82
+      }
     },
     {
       "as_published": "0.850",
       "value": 0.85,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 93,
+        "end": 98
+      }
     },
     {
       "as_published": "0.149",
       "value": 0.149,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 105,
+        "end": 110
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -133,7 +163,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "4 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 22, 24, 32, 34",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=8, enthalpy_function=8, entropy=8, negative_gibbs_function=8, heat_capacity=8, formation_enthalpy=8, formation_gibbs_energy=8, log_kf=7",
       "detector_only": false
     }
   ]

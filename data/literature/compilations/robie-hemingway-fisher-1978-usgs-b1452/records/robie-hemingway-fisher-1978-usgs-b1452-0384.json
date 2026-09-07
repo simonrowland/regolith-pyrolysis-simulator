@@ -27,7 +27,12 @@
     "as_published": "262.225",
     "value": 262.225,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 98,
+      "end": 105
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -43,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27, 34, 36, 40, 42"
+    "column-position recovery was not lossless: per-column token counts temperature=13, enthalpy_function=12, entropy=13, negative_gibbs_function=12, heat_capacity=13, formation_enthalpy=12, formation_gibbs_energy=13, log_kf=13"
   ],
   "title_line_as_published": "LOlf ALBITE                                                                    FORIIULA WEIGHT    262.225",
   "column_ids": [
@@ -85,33 +90,58 @@
   "uncertainty_values": [
     {
       "as_published": "0.110",
-      "value": 0.11,
-      "ocr_suspect": false,
-      "footnote_markers": []
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 30,
+        "end": 35
+      }
     },
     {
       "as_published": "0.40",
       "value": 0.4,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 46,
+        "end": 50
+      }
     },
     {
       "as_published": "3. 415",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 72,
+        "end": 78
+      }
     },
     {
       "as_published": "3.435",
       "value": 3.435,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 87,
+        "end": 92
+      }
     },
     {
       "as_published": "0.602",
-      "value": 0.602,
-      "ocr_suspect": false,
-      "footnote_markers": []
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 22,
+        "start": 101,
+        "end": 106
+      }
     }
   ],
   "reference_state_notes_as_published": [
@@ -136,7 +166,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "6 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 25, 27, 34, 36, 40, 42",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=13, enthalpy_function=12, entropy=13, negative_gibbs_function=12, heat_capacity=13, formation_enthalpy=12, formation_gibbs_energy=13, log_kf=13",
       "detector_only": false
     }
   ]

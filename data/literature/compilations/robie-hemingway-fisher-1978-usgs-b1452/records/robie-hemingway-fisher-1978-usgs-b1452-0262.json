@@ -23,7 +23,12 @@
     "as_published": "121.847",
     "value": 121.847,
     "ocr_suspect": false,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 102,
+      "end": 109
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -39,7 +44,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "required formula line is absent from the OCR text layer"
+    "column-position recovery was not lossless: per-column token counts temperature=12, enthalpy_function=11, entropy=11, negative_gibbs_function=12, heat_capacity=12, formation_enthalpy=11, formation_gibbs_energy=11, log_kf=12"
   ],
   "title_line_as_published": "VANADIUB DICHLORIDE                                                                POB!OLA WEIGHT     121.847",
   "column_ids": [
@@ -82,31 +87,56 @@
       "as_published": "1.26",
       "value": 1.26,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 30,
+        "end": 34
+      }
     },
     {
       "as_published": "1.26",
       "value": 1.26,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 30,
+        "end": 34
+      }
     },
     {
       "as_published": "8.500",
       "value": 8.5,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 76,
+        "end": 81
+      }
     },
     {
       "as_published": "8. 500",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 91,
+        "end": 97
+      }
     },
     {
       "as_published": "1.489",
       "value": 1.489,
       "ocr_suspect": false,
-      "footnote_markers": []
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 20,
+        "start": 104,
+        "end": 109
+      }
     }
   ],
   "reference_state_notes_as_published": [],
@@ -127,7 +157,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "required formula line is absent from the OCR text layer",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=12, enthalpy_function=11, entropy=11, negative_gibbs_function=12, heat_capacity=12, formation_enthalpy=11, formation_gibbs_energy=11, log_kf=12",
       "detector_only": false
     }
   ]

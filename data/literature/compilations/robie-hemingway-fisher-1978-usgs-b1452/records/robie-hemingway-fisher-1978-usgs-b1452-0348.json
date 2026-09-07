@@ -23,7 +23,12 @@
     "as_published": "116. 164",
     "value": null,
     "ocr_suspect": true,
-    "footnote_markers": []
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 106,
+      "end": 114
+    }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
@@ -39,8 +44,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "untranscribed",
   "untranscribed_reasons": [
-    "required formula line is absent from the OCR text layer",
-    "14 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 21, 26, 30, 31, 32, 35, 37, 40, 43, 44, 45, 46, 47"
+    "column-position recovery was not lossless: per-column token counts temperature=12, enthalpy_function=12, entropy=9, negative_gibbs_function=11, heat_capacity=13, formation_enthalpy=11, formation_gibbs_energy=12, log_kf=9"
   ],
   "title_line_as_published": "lOLLI STOll 'lB                                                                  POl !U L1 IIBIGHT        116. 164",
   "column_ids": [
@@ -98,7 +102,7 @@
   "ambiguities": [
     {
       "kind": "untranscribed_table",
-      "reason": "required formula line is absent from the OCR text layer; 14 temperature rows have ragged, merged, shifted, or missing columns at pdftotext line(s) 19, 21, 26, 30, 31, 32, 35, 37, 40, 43, 44, 45, 46, 47",
+      "reason": "column-position recovery was not lossless: per-column token counts temperature=12, enthalpy_function=12, entropy=9, negative_gibbs_function=11, heat_capacity=13, formation_enthalpy=11, formation_gibbs_energy=12, log_kf=9",
       "detector_only": false
     }
   ]
