@@ -26,6 +26,27 @@ ROLE = {
     "circularity_warning": "Do not validate an engine against a compilation it consumes.",
 }
 _NUMBER_RE = re.compile(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?")
+
+
+def token_has_printed_shape(raw: str, column: str | None = None) -> bool:
+    """Return whether ``raw`` is a numeric token for ``column`` with no glyph stripping.
+
+    Bullets, stray dots, spaces, and letters stay in the token. They mark it
+    OCR-suspect; they are never stripped to admit a different number.
+    """
+
+    numeric_token = raw.strip()
+    if _NUMBER_RE.fullmatch(numeric_token) is None:
+        return False
+    if column == "temperature":
+        try:
+            parsed_temperature = Decimal(numeric_token)
+        except InvalidOperation:
+            return False
+        return Decimal("250") <= parsed_temperature <= Decimal("2500")
+    return True
+
+
 class Bulletin1452LookupError(LookupError):
     """Base class for typed Bulletin 1452 lookup refusals."""
 
@@ -71,14 +92,8 @@ class PublishedNumber:
         return number
 
     def validate_round_trip(self, column: str | None = None) -> None:
-        # The shape check runs on the raw printed token; footnote bullets and
-        # other non-numeric glyphs are OCR artefacts that make the token
-        # ocr_suspect -- they are never stripped to admit a different number.
         numeric_token = self.as_published.strip()
-        token_is_numeric = _NUMBER_RE.fullmatch(numeric_token) is not None
-        if token_is_numeric and column == "temperature":
-            parsed_temperature = Decimal(numeric_token)
-            token_is_numeric = Decimal("250") <= parsed_temperature <= Decimal("2500")
+        token_is_numeric = token_has_printed_shape(self.as_published, column)
         if self.value is None:
             if not self.ocr_suspect:
                 raise ValueError(f"withheld token lacks the suspect flag: {self.as_published!r}")

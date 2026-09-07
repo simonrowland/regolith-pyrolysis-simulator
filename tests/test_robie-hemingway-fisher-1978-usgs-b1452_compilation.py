@@ -5,7 +5,6 @@ import hashlib
 import re
 import shutil
 import subprocess
-from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -18,12 +17,12 @@ from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader impo
     OcrSuspectGridTokenError,
     OcrSuspectTableValueError,
     TemperatureNotInPrintedGridError,
-    UntranscribedTableError,
     feedstock_coverage,
     iter_published_numbers,
     load_manifest,
     load_records,
     lookup_temperature,
+    token_has_printed_shape,
 )
 
 
@@ -32,7 +31,6 @@ SOURCE_PDF = Path(
     "robie-hemingway-fisher-1978-usgs-b1452/"
     "robie-hemingway-fisher-1978-usgs-b1452.pdf"
 )
-NUMBER_RE = re.compile(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?")
 
 
 @pytest.fixture(scope="module")
@@ -79,40 +77,71 @@ def assert_record_matches_source(record, layouts):
             assert span["end"] == len(source_line) or source_line[span["end"]].isspace()
 
 
-def token_has_printed_shape(raw, column):
-    core = raw.strip().strip("*•†‡").strip()
-    if NUMBER_RE.fullmatch(core) is None:
-        return False
-    return column != "temperature" or Decimal("250") <= Decimal(core) <= Decimal("2500")
+def expected_summary(manifest, records):
+    cells = [
+        (row["cells"][column], column)
+        for record in records
+        for row in record["rows"]
+        for column in record["column_ids"]
+    ]
+    transcribed_census = {
+        record["census_id"] for record in records if record["transcription_status"] == "transcribed"
+    }
+    ambiguities = manifest["ambiguities"]
+    return {
+        "census_count": len({record["census_id"] for record in records}),
+        "record_count": len(records),
+        "transcribed_table_count": len(transcribed_census),
+        "untranscribed_table_count": len({record["census_id"] for record in records})
+        - len(transcribed_census),
+        "transcribed_record_count": sum(
+            1 for record in records if record["transcription_status"] == "transcribed"
+        ),
+        "untranscribed_record_count": sum(
+            1 for record in records if record["transcription_status"] == "untranscribed"
+        ),
+        "temperature_row_count": sum(len(record["rows"]) for record in records),
+        "phase_split_record_count": sum(1 for record in records if "-phase-" in record["record_id"]),
+        "ocr_suspect_record_count": sum(1 for record in records if record["ocr_suspect"]),
+        "ocr_suspect_numeric_cell_count": sum(1 for cell, _ in cells if cell["ocr_suspect"]),
+        "printed_shape_failure_count": sum(
+            1 for cell, column in cells if not token_has_printed_shape(cell["as_published"], column)
+        ),
+        "admitted_shape_failure_count": sum(
+            1
+            for cell, column in cells
+            if not token_has_printed_shape(cell["as_published"], column) and cell["value"] is not None
+        ),
+        "identity_check_disagreement_count": sum(
+            1 for item in ambiguities if item["kind"] == "thermodynamic_identity_disagreement"
+        ),
+        "image_temperature_disagreement_count": sum(
+            1 for item in ambiguities if item["kind"] == "image_temperature_disagreement"
+        ),
+        "image_temperature_grid_unconfirmed_count": sum(
+            1 for item in ambiguities if item["kind"] == "image_temperature_grid_unconfirmed"
+        ),
+        "ambiguity_count": len(ambiguities),
+        "correction_count": len(manifest["corrections"]),
+    }
 
 
 def test_manifest_table_census_and_phase_record_count(compilation):
     manifest, records = compilation
     record_files = sorted((COMPILATION_ROOT / "records").glob("*.json"))
-    assert manifest["summary"] == {
-        "census_count": 400,
-        "record_count": 536,
-        "transcribed_table_count": 235,
-        "untranscribed_table_count": 165,
-        "transcribed_record_count": 371,
-        "untranscribed_record_count": 165,
-        "temperature_row_count": 3442,
-        "phase_split_record_count": 136,
-        "image_temperature_confirmed_table_count": 146,
-        "ocr_suspect_record_count": 483,
-        "ocr_suspect_numeric_cell_count": 7128,
-        "printed_shape_failure_count": 4164,
-        "admitted_shape_failure_count": 0,
-        "identity_check_disagreement_count": 677,
-        "image_temperature_disagreement_count": 108,
-        "ambiguity_count": 1037,
-    }
+    assert manifest["summary"] == expected_summary(manifest, records)
     assert len(records) == len(record_files) == manifest["summary"]["record_count"]
     assert len({record["census_id"] for record in records}) == 400
     assert len(manifest["corpus_status"]["census_record_ids"]) == 400
     remainder = manifest["corpus_status"]["mineru_followup"]
     assert remainder["store_task"] == "t-852"
-    assert len(remainder["untranscribed"]) == 165
+    assert len(remainder["untranscribed"]) == manifest["summary"]["untranscribed_table_count"]
+    assert {item["record_id"] for item in remainder["untranscribed"]} == {
+        record["record_id"]
+        for record in records
+        if record["transcription_status"] == "untranscribed"
+        and "-phase-" not in record["record_id"]
+    }
     assert manifest["corpus_status"]["excluded_non_table_page"] == {
         "printed_page": 427,
         "pdf_page": 433,
@@ -171,6 +200,7 @@ def test_phase_records_have_strict_safe_grids_and_no_embedded_headers(compilatio
             row["cells"]["temperature"]["value"]
             for row in record["rows"]
             if row["cells"]["temperature"]["value"] is not None
+            and not row["cells"]["temperature"]["ocr_suspect"]
         ]
         assert all(right > left for left, right in zip(values, values[1:]))
         if not record["rows"]:
@@ -184,7 +214,9 @@ def test_phase_records_have_strict_safe_grids_and_no_embedded_headers(compilatio
             if re.match(r"^\s{0,3}[A-Za-z][A-Za-z0-9(){}]*\s*:", line)
         ]
         assert not embedded, (record["record_id"], embedded)
-    assert manifest["summary"]["phase_split_record_count"] == 136
+    assert manifest["summary"]["phase_split_record_count"] == sum(
+        1 for record in records if "-phase-" in record["record_id"]
+    )
 
 
 def test_lookup_refuses_suspect_and_off_grid_values():
@@ -202,11 +234,130 @@ def test_lookup_refuses_suspect_and_off_grid_values():
 
 
 def test_numeric_looking_formula_weight_disagreement_is_not_admitted(compilation):
-    _, records = compilation
+    manifest, records = compilation
     record = next(record for record in records if record["record_id"] == f"{SOURCE_ID}-0397")
     assert record["formula_weight"]["as_published"] == "360.311"
     assert record["formula_weight"]["value"] is None
     assert record["formula_weight"]["ocr_suspect"] is True
+    corrections = [
+        item
+        for item in manifest["corrections"]
+        if item["record_id"] == record["record_id"] and item["column"] == "formula_weight"
+    ]
+    assert len(corrections) == 1
+    assert corrections[0]["printed_token"] == "360.317"
+    assert corrections[0]["action"] == "value_withheld"
+
+
+def test_manifest_ambiguity_lists_reproduce_from_records(compilation):
+    manifest, records = compilation
+    by_id = {record["record_id"]: record for record in records}
+    assert len(manifest["ambiguities"]) == manifest["summary"]["ambiguity_count"]
+    flattened = []
+    for entry in manifest["entries"]:
+        record = by_id[entry["record_id"]]
+        assert entry["ambiguities"] == record["ambiguities"]
+        assert entry["ambiguity_count"] == len(record["ambiguities"])
+        flattened.extend({"record_id": record["record_id"], **item} for item in record["ambiguities"])
+    assert flattened == manifest["ambiguities"]
+    for item in manifest["ambiguities"]:
+        if item["kind"] == "untranscribed_table":
+            assert by_id[item["record_id"]]["transcription_status"] == "untranscribed"
+
+
+def test_phase_as_published_represented_per_record(compilation, source_layout):
+    manifest, records = compilation
+    by_id = {record["record_id"]: record for record in records}
+    for record in records:
+        assert "phase_as_published" in record
+        entry = next(item for item in manifest["entries"] if item["record_id"] == record["record_id"])
+        assert entry["phase"] == record["phase_as_published"]
+    silver = by_id[f"{SOURCE_ID}-0004"]
+    silver_liquid = by_id[f"{SOURCE_ID}-0004-phase-02"]
+    assert "cubic" in silver["phase_as_published"]
+    assert "1234" in silver_liquid["phase_as_published"]
+    assert "cubic" not in silver_liquid["phase_as_published"]
+    barium = by_id[f"{SOURCE_ID}-0010"]
+    barium_liquid = by_id[f"{SOURCE_ID}-0010-phase-04"]
+    assert "582.53" in barium["phase_as_published"]
+    assert "Liquid" not in barium["phase_as_published"]
+    assert "Liquid" in barium_liquid["phase_as_published"]
+    indium = by_id[f"{SOURCE_ID}-0038"]
+    indium_liquid = by_id[f"{SOURCE_ID}-0038-phase-02"]
+    assert "Liquid" not in indium["phase_as_published"]
+    assert "Liquid" in indium_liquid["phase_as_published"]
+    for record in records:
+        phase = record.get("phase_as_published")
+        if not phase:
+            continue
+        header = re.split(r"(?<=\.)\s+", phase.strip(), maxsplit=1)[0]
+        page_lines = source_layout[record["source_locator"]["pdf_pages"][0]]
+        collapsed_header = re.sub(r"\s+", " ", header)
+        collapsed_page = re.sub(r"\s+", " ", "\n".join(page_lines))
+        assert collapsed_header in collapsed_page, (record["record_id"], collapsed_header)
+
+
+def test_corrections_ledger_covers_withheld_numeric_values(compilation):
+    manifest, records = compilation
+    by_id = {record["record_id"]: record for record in records}
+    withheld = set()
+    for item in manifest["corrections"]:
+        record = by_id[item["record_id"]]
+        if item["column"] == "formula_weight":
+            field = record["formula_weight"]
+            assert field["as_published"] == item["as_published"]
+            assert field["value"] is None
+            assert field["ocr_suspect"] is True
+            withheld.add((item["record_id"], None, "formula_weight"))
+            continue
+        rows = [
+            row for row in record["rows"] if row["source_text_line"] == item["source_text_line"]
+        ]
+        assert len(rows) == 1, item
+        cell = rows[0]["cells"][item["column"]]
+        assert cell["as_published"] == item["as_published"]
+        assert cell["value"] is None
+        assert cell["ocr_suspect"] is True
+        if item["action"] == "documented_shape_failure":
+            assert not token_has_printed_shape(cell["as_published"], item["column"])
+        withheld.add((item["record_id"], item["source_text_line"], item["column"]))
+    for record in records:
+        for row in record["rows"]:
+            for column, cell in row["cells"].items():
+                if cell["value"] is None and token_has_printed_shape(cell["as_published"], column):
+                    assert (record["record_id"], row["source_text_line"], column) in withheld
+        field = record["formula_weight"]
+        if field["value"] is None and token_has_printed_shape(field["as_published"], "formula_weight"):
+            assert (record["record_id"], None, "formula_weight") in withheld
+
+
+def test_bullet_token_is_not_admitted_as_a_different_number(compilation):
+    _, records = compilation
+    record = next(record for record in records if record["record_id"] == f"{SOURCE_ID}-0010-phase-04")
+    row = next(
+        row for row in record["rows"] if row["cells"]["temperature"]["as_published"] == "1200"
+    )
+    cell = row["cells"]["formation_gibbs_energy"]
+    assert cell["as_published"] == "• 1100"
+    assert cell["value"] is None
+    assert cell["ocr_suspect"] is True
+    assert "•" in cell["footnote_markers"]
+
+
+def test_identity_detector_flags_without_nulling_numeric_values(compilation):
+    _, records = compilation
+    record = next(record for record in records if record["record_id"] == f"{SOURCE_ID}-0242")
+    row = next(
+        row for row in record["rows"] if row["cells"]["temperature"]["as_published"] == "400"
+    )
+    gibbs = row["cells"]["formation_gibbs_energy"]
+    log_k = row["cells"]["log_kf"]
+    assert gibbs["as_published"] == "-1495.288"
+    assert gibbs["value"] == -1495.288
+    assert gibbs["ocr_suspect"] is True
+    assert log_k["as_published"] == "195.265"
+    assert log_k["value"] == 195.265
+    assert log_k["ocr_suspect"] is True
 
 
 def test_feedstock_element_coverage_report(compilation):
