@@ -300,8 +300,12 @@ def test_phase_as_published_represented_per_record(compilation, source_layout):
     cobalt_liquid = by_id[f"{SOURCE_ID}-0020-phase-03"]
     assert "Beta crystals" in cobalt_beta["phase_as_published"]
     assert "Liquid" not in cobalt_beta["phase_as_published"]
-    assert "Liquid" in cobalt_liquid["phase_as_published"]
+    assert cobalt_liquid["phase_as_published"] == "Liquid 1768 to 1800 K."
+    assert "curie" not in cobalt_liquid["phase_as_published"].lower()
     assert "Beta crystals" not in cobalt_liquid["phase_as_published"]
+    wo3 = by_id[f"{SOURCE_ID}-0219"]
+    assert _phase_start_count(wo3["phase_as_published"]) == 2
+    assert wo3["phase_span_as_published"] == _phase_clauses(wo3["phase_as_published"])
     for record in records:
         phase = record.get("phase_as_published")
         if not phase:
@@ -372,9 +376,8 @@ def _phase_start_count(text: str | None) -> int:
     return sum(1 for _ in _PHASE_START.finditer(text))
 
 
-def test_split_records_phase_clauses_partition_header(compilation):
-    """Each split record holds one phase slice; siblings cover the header once."""
-    _, records = compilation
+def _assert_split_records_phase_clauses(records):
+    """Each split record holds one phase slice unless it documents a printed span."""
     for members in _split_groups(records).values():
         headers = {record.get("header_as_published") for record in members}
         assert None not in headers
@@ -392,7 +395,10 @@ def test_split_records_phase_clauses_partition_header(compilation):
             assert collapsed_phase in collapsed_header, record["record_id"]
             starts = _phase_start_count(phase)
             owned = [clause for clause in clauses if clause in phase]
+            span = record.get("phase_span_as_published")
             if starts > 1:
+                assert span, record["record_id"]
+                assert list(span) == _phase_clauses(phase), record["record_id"]
                 for sibling in members:
                     if sibling is record:
                         continue
@@ -413,6 +419,33 @@ def test_split_records_phase_clauses_partition_header(compilation):
             for clause in owned:
                 assert clause not in seen, clause
                 seen.append(clause)
+
+
+def test_split_records_phase_clauses_partition_header(compilation):
+    """Each split record holds one phase slice; siblings cover the header once."""
+    _, records = compilation
+    _assert_split_records_phase_clauses(records)
+
+
+def test_exclusive_multi_clause_without_phase_span_is_rejected(compilation):
+    """A second exclusive clause is illegal unless phase_span_as_published lists it."""
+    _, records = compilation
+    mutated = copy.deepcopy(records)
+    target = next(
+        record
+        for record in mutated
+        if record["record_id"] == f"{SOURCE_ID}-0004-phase-02"
+    )
+    extra = "Epsilon crystals {bee) 753 to 913 K."
+    target["phase_as_published"] = target["phase_as_published"].rstrip() + " " + extra
+    parent = _parent_record_id(target["record_id"])
+    for record in mutated:
+        if _parent_record_id(record["record_id"]) == parent:
+            record["header_as_published"] = record["header_as_published"].rstrip() + " " + extra
+    with pytest.raises(AssertionError, match="0004-phase-02"):
+        _assert_split_records_phase_clauses(mutated)
+    target["phase_span_as_published"] = _phase_clauses(target["phase_as_published"])
+    _assert_split_records_phase_clauses(mutated)
 
 
 def test_corrections_ledger_covers_withheld_numeric_values(compilation):

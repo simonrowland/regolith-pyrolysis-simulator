@@ -1552,14 +1552,14 @@ corpus_status:
         negative_gibbs_function=8, heat_capacity=7, formation_enthalpy=8, formation_gibbs_energy=8, log_kf=6'
 summary:
   census_count: 400
-  record_count: 553
+  record_count: 557
   transcribed_table_count: 249
   untranscribed_table_count: 151
-  transcribed_record_count: 402
+  transcribed_record_count: 406
   untranscribed_record_count: 151
   temperature_row_count: 3673
-  phase_split_record_count: 153
-  ocr_suspect_record_count: 501
+  phase_split_record_count: 157
+  ocr_suspect_record_count: 505
   ocr_suspect_numeric_cell_count: 8193
   printed_shape_failure_count: 5123
   admitted_shape_failure_count: 0
@@ -2536,51 +2536,6 @@ ambiguities:
   detector_only: true
   layout_row_count: 28
   image_ocr_row_count: 29
-- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061
-  kind: thermodynamic_identity_disagreement
-  detector_only: true
-  row: 5
-  temperature_as_published: '480'
-  check: negative_gibbs_function = entropy - enthalpy_function
-  observed: 56.28
-  calculated: 56.262
-  residual: 0.018000000000000682
-- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061
-  kind: thermodynamic_identity_disagreement
-  detector_only: true
-  row: 6
-  temperature_as_published: '480'
-  check: negative_gibbs_function = entropy - enthalpy_function
-  observed: 56.28
-  calculated: 56.251999999999995
-  residual: 0.028000000000005798
-- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061
-  kind: thermodynamic_identity_disagreement
-  detector_only: true
-  row: 8
-  temperature_as_published: '588'
-  check: negative_gibbs_function = entropy - enthalpy_function
-  observed: 60.84
-  calculated: 60.812999999999995
-  residual: 0.02700000000000813
-- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061
-  kind: thermodynamic_identity_disagreement
-  detector_only: true
-  row: 9
-  temperature_as_published: '588'
-  check: negative_gibbs_function = entropy - enthalpy_function
-  observed: 60.84
-  calculated: 60.80799999999999
-  residual: 0.03200000000001069
-- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061
-  kind: thermodynamic_identity_disagreement
-  detector_only: true
-  row: 12
-  temperature_as_published: '730'
-  check: negative_gibbs_function = entropy - enthalpy_function
-  observed: 66.53
-  calculated: 66.49900000000001
-  residual: 0.0309999999999917
 - record_id: robie-hemingway-fisher-1978-usgs-b1452-0061-phase-02
   kind: thermodynamic_identity_disagreement
   detector_only: true
@@ -2599,6 +2554,51 @@ ambiguities:
   observed: 67.32
   calculated: 67.336
   residual: -0.016000000000005343
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061-phase-04
+  kind: thermodynamic_identity_disagreement
+  detector_only: true
+  row: 3
+  temperature_as_published: '480'
+  check: negative_gibbs_function = entropy - enthalpy_function
+  observed: 56.28
+  calculated: 56.262
+  residual: 0.018000000000000682
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061-phase-05
+  kind: thermodynamic_identity_disagreement
+  detector_only: true
+  row: 1
+  temperature_as_published: '480'
+  check: negative_gibbs_function = entropy - enthalpy_function
+  observed: 56.28
+  calculated: 56.251999999999995
+  residual: 0.028000000000005798
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061-phase-05
+  kind: thermodynamic_identity_disagreement
+  detector_only: true
+  row: 3
+  temperature_as_published: '588'
+  check: negative_gibbs_function = entropy - enthalpy_function
+  observed: 60.84
+  calculated: 60.812999999999995
+  residual: 0.02700000000000813
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061-phase-06
+  kind: thermodynamic_identity_disagreement
+  detector_only: true
+  row: 1
+  temperature_as_published: '588'
+  check: negative_gibbs_function = entropy - enthalpy_function
+  observed: 60.84
+  calculated: 60.80799999999999
+  residual: 0.03200000000001069
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061-phase-06
+  kind: thermodynamic_identity_disagreement
+  detector_only: true
+  row: 4
+  temperature_as_published: '730'
+  check: negative_gibbs_function = entropy - enthalpy_function
+  observed: 66.53
+  calculated: 66.49900000000001
+  residual: 0.0309999999999917
 - record_id: robie-hemingway-fisher-1978-usgs-b1452-0062
   kind: image_temperature_grid_unconfirmed
   detector_only: true
@@ -11321,7 +11321,7 @@ entries:
   census_id: high-temperature-printed-page-046
   record_kind: substance_temperature_table
   formula: Co
-  phase: "Liquid 1768 to 1800 K.\n        curie point at 1394 K."
+  phase: Liquid 1768 to 1800 K.
   name_as_published: COBALT (REFERENCE STATE)
   source:
     database: USGS Bulletin 1452
@@ -14589,10 +14589,7 @@ entries:
   census_id: high-temperature-printed-page-087
   record_kind: substance_temperature_table
   formula: Pu
-  phase: "Alpha crystals (\u2022onoclinic, si\u2022ple) 298.15 to 395 K.   Beta crystals\n\
-    \         (body-centered \u2022onocliDic) 395 to 1180 K. Ga\u2022aa crystals (face-centered\n\
-    \          orthorho\u2022bic) 480 to 588 K. Delta crystals (face-centered cubic)\
-    \ 588 to\n          730 K."
+  phase: "Alpha crystals (\u2022onoclinic, si\u2022ple) 298.15 to 395 K."
   name_as_published: PLUTONIUft ( BIPEBEHCI STATE)
   source:
     database: USGS Bulletin 1452
@@ -14616,55 +14613,15 @@ entries:
     extraction: pdftotext -layout, one PDF page at a time
   sha256: 3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622
   path: records/robie-hemingway-fisher-1978-usgs-b1452-0061.json
-  row_count: 12
+  row_count: 2
   transcription_status: transcribed
   ocr_suspect: true
-  ambiguity_count: 6
+  ambiguity_count: 1
   ambiguities:
   - kind: image_temperature_grid_unconfirmed
     detector_only: true
     layout_row_count: 28
     image_ocr_row_count: 29
-  - kind: thermodynamic_identity_disagreement
-    detector_only: true
-    row: 5
-    temperature_as_published: '480'
-    check: negative_gibbs_function = entropy - enthalpy_function
-    observed: 56.28
-    calculated: 56.262
-    residual: 0.018000000000000682
-  - kind: thermodynamic_identity_disagreement
-    detector_only: true
-    row: 6
-    temperature_as_published: '480'
-    check: negative_gibbs_function = entropy - enthalpy_function
-    observed: 56.28
-    calculated: 56.251999999999995
-    residual: 0.028000000000005798
-  - kind: thermodynamic_identity_disagreement
-    detector_only: true
-    row: 8
-    temperature_as_published: '588'
-    check: negative_gibbs_function = entropy - enthalpy_function
-    observed: 60.84
-    calculated: 60.812999999999995
-    residual: 0.02700000000000813
-  - kind: thermodynamic_identity_disagreement
-    detector_only: true
-    row: 9
-    temperature_as_published: '588'
-    check: negative_gibbs_function = entropy - enthalpy_function
-    observed: 60.84
-    calculated: 60.80799999999999
-    residual: 0.03200000000001069
-  - kind: thermodynamic_identity_disagreement
-    detector_only: true
-    row: 12
-    temperature_as_published: '730'
-    check: negative_gibbs_function = entropy - enthalpy_function
-    observed: 66.53
-    calculated: 66.49900000000001
-    residual: 0.0309999999999917
 - record_id: robie-hemingway-fisher-1978-usgs-b1452-0061-phase-02
   census_id: high-temperature-printed-page-087
   record_kind: substance_temperature_table
@@ -14718,7 +14675,7 @@ entries:
   census_id: high-temperature-printed-page-087
   record_kind: substance_temperature_table
   formula: Pu
-  phase: "Epsilon crystals {bee) 753 to 913 K.   Liquid 913 to 1800 K."
+  phase: "Epsilon crystals {bee) 753 to 913 K."
   name_as_published: PLUTONIUft ( BIPEBEHCI STATE)
   source:
     database: USGS Bulletin 1452
@@ -14742,10 +14699,183 @@ entries:
     extraction: pdftotext -layout, one PDF page at a time
   sha256: 3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622
   path: records/robie-hemingway-fisher-1978-usgs-b1452-0061-phase-03.json
-  row_count: 14
+  row_count: 4
   transcription_status: transcribed
   ocr_suspect: true
   ambiguity_count: 0
+  ambiguities: []
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061-phase-04
+  census_id: high-temperature-printed-page-087
+  record_kind: substance_temperature_table
+  formula: Pu
+  phase: "Beta crystals\n         (body-centered \u2022onocliDic) 395 to 1180 K."
+  name_as_published: PLUTONIUft ( BIPEBEHCI STATE)
+  source:
+    database: USGS Bulletin 1452
+    citation: 'Robie, R. A., Hemingway, B. S. and Fisher, J. R., 1978 (reprinted 1979),
+      Thermodynamic properties of minerals and related substances at 298.15 K and
+      1 bar (10^5 pascals) pressure and at higher temperatures: U.S. Geological Survey
+      Bulletin 1452, 456 p.'
+    version: 1978; second printing 1979
+    doi: 10.3133/b1452
+    official_url: https://pubs.usgs.gov/bul/1452/report.pdf
+    licence: United States government work; public domain in the United States. Official
+      USGS numbered-series publication.
+    access_date: '2026-09-06'
+  source_locator:
+    source_file: robie-hemingway-fisher-1978-usgs-b1452.pdf
+    pdf_pages:
+    - 93
+    printed_pages:
+    - 87
+    pdftotext_layout_page_file: page-093.txt
+    extraction: pdftotext -layout, one PDF page at a time
+  sha256: 3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622
+  path: records/robie-hemingway-fisher-1978-usgs-b1452-0061-phase-04.json
+  row_count: 3
+  transcription_status: transcribed
+  ocr_suspect: true
+  ambiguity_count: 1
+  ambiguities:
+  - kind: thermodynamic_identity_disagreement
+    detector_only: true
+    row: 3
+    temperature_as_published: '480'
+    check: negative_gibbs_function = entropy - enthalpy_function
+    observed: 56.28
+    calculated: 56.262
+    residual: 0.018000000000000682
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061-phase-05
+  census_id: high-temperature-printed-page-087
+  record_kind: substance_temperature_table
+  formula: Pu
+  phase: "Ga\u2022aa crystals (face-centered\n          orthorho\u2022bic) 480 to 588 K."
+  name_as_published: PLUTONIUft ( BIPEBEHCI STATE)
+  source:
+    database: USGS Bulletin 1452
+    citation: 'Robie, R. A., Hemingway, B. S. and Fisher, J. R., 1978 (reprinted 1979),
+      Thermodynamic properties of minerals and related substances at 298.15 K and
+      1 bar (10^5 pascals) pressure and at higher temperatures: U.S. Geological Survey
+      Bulletin 1452, 456 p.'
+    version: 1978; second printing 1979
+    doi: 10.3133/b1452
+    official_url: https://pubs.usgs.gov/bul/1452/report.pdf
+    licence: United States government work; public domain in the United States. Official
+      USGS numbered-series publication.
+    access_date: '2026-09-06'
+  source_locator:
+    source_file: robie-hemingway-fisher-1978-usgs-b1452.pdf
+    pdf_pages:
+    - 93
+    printed_pages:
+    - 87
+    pdftotext_layout_page_file: page-093.txt
+    extraction: pdftotext -layout, one PDF page at a time
+  sha256: 3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622
+  path: records/robie-hemingway-fisher-1978-usgs-b1452-0061-phase-05.json
+  row_count: 3
+  transcription_status: transcribed
+  ocr_suspect: true
+  ambiguity_count: 2
+  ambiguities:
+  - kind: thermodynamic_identity_disagreement
+    detector_only: true
+    row: 1
+    temperature_as_published: '480'
+    check: negative_gibbs_function = entropy - enthalpy_function
+    observed: 56.28
+    calculated: 56.251999999999995
+    residual: 0.028000000000005798
+  - kind: thermodynamic_identity_disagreement
+    detector_only: true
+    row: 3
+    temperature_as_published: '588'
+    check: negative_gibbs_function = entropy - enthalpy_function
+    observed: 60.84
+    calculated: 60.812999999999995
+    residual: 0.02700000000000813
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061-phase-06
+  census_id: high-temperature-printed-page-087
+  record_kind: substance_temperature_table
+  formula: Pu
+  phase: "Delta crystals (face-centered cubic) 588 to\n          730 K."
+  name_as_published: PLUTONIUft ( BIPEBEHCI STATE)
+  source:
+    database: USGS Bulletin 1452
+    citation: 'Robie, R. A., Hemingway, B. S. and Fisher, J. R., 1978 (reprinted 1979),
+      Thermodynamic properties of minerals and related substances at 298.15 K and
+      1 bar (10^5 pascals) pressure and at higher temperatures: U.S. Geological Survey
+      Bulletin 1452, 456 p.'
+    version: 1978; second printing 1979
+    doi: 10.3133/b1452
+    official_url: https://pubs.usgs.gov/bul/1452/report.pdf
+    licence: United States government work; public domain in the United States. Official
+      USGS numbered-series publication.
+    access_date: '2026-09-06'
+  source_locator:
+    source_file: robie-hemingway-fisher-1978-usgs-b1452.pdf
+    pdf_pages:
+    - 93
+    printed_pages:
+    - 87
+    pdftotext_layout_page_file: page-093.txt
+    extraction: pdftotext -layout, one PDF page at a time
+  sha256: 3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622
+  path: records/robie-hemingway-fisher-1978-usgs-b1452-0061-phase-06.json
+  row_count: 4
+  transcription_status: transcribed
+  ocr_suspect: true
+  ambiguity_count: 2
+  ambiguities:
+  - kind: thermodynamic_identity_disagreement
+    detector_only: true
+    row: 1
+    temperature_as_published: '588'
+    check: negative_gibbs_function = entropy - enthalpy_function
+    observed: 60.84
+    calculated: 60.80799999999999
+    residual: 0.03200000000001069
+  - kind: thermodynamic_identity_disagreement
+    detector_only: true
+    row: 4
+    temperature_as_published: '730'
+    check: negative_gibbs_function = entropy - enthalpy_function
+    observed: 66.53
+    calculated: 66.49900000000001
+    residual: 0.0309999999999917
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0061-phase-07
+  census_id: high-temperature-printed-page-087
+  record_kind: substance_temperature_table
+  formula: Pu
+  phase: Liquid 913 to 1800 K.
+  name_as_published: PLUTONIUft ( BIPEBEHCI STATE)
+  source:
+    database: USGS Bulletin 1452
+    citation: 'Robie, R. A., Hemingway, B. S. and Fisher, J. R., 1978 (reprinted 1979),
+      Thermodynamic properties of minerals and related substances at 298.15 K and
+      1 bar (10^5 pascals) pressure and at higher temperatures: U.S. Geological Survey
+      Bulletin 1452, 456 p.'
+    version: 1978; second printing 1979
+    doi: 10.3133/b1452
+    official_url: https://pubs.usgs.gov/bul/1452/report.pdf
+    licence: United States government work; public domain in the United States. Official
+      USGS numbered-series publication.
+    access_date: '2026-09-06'
+  source_locator:
+    source_file: robie-hemingway-fisher-1978-usgs-b1452.pdf
+    pdf_pages:
+    - 93
+    printed_pages:
+    - 87
+    pdftotext_layout_page_file: page-093.txt
+    extraction: pdftotext -layout, one PDF page at a time
+  sha256: 3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622
+  path: records/robie-hemingway-fisher-1978-usgs-b1452-0061-phase-07.json
+  row_count: 10
+  transcription_status: transcribed
+  ocr_suspect: true
+  ambiguity_count: 0
+  ambiguities:
   ambiguities: []
 - record_id: robie-hemingway-fisher-1978-usgs-b1452-0062
   census_id: high-temperature-printed-page-088

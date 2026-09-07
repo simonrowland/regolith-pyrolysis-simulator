@@ -11,7 +11,7 @@ The bulletin contents identify numbered Tables 1–2 and the thermodynamic
 sections. The resulting 400-table census comprises Table 1 on printed page 3,
 Table 2 on page 4, the 298.15 K summary on pages 12–29, and one unnumbered
 high-temperature substance table on every printed page 30–426. Printed page
-427 was visually checked and is blank. Phase boundaries produce 553 JSON
+427 was visually checked and is blank. Phase boundaries produce 557 JSON
 records from those 400 tables; explicit `untranscribed` records remain where
 the OCR text layer is not losslessly recoverable.
 
@@ -19,7 +19,7 @@ the OCR text layer is not losslessly recoverable.
 
 The PDF was read one page at a time with `pdftotext -layout`; per-page horizontal
 column offsets recover tokens split across layout lines. Of 400 tables, 249
-high-temperature tables are transcribed into 3,673 rows and 402 phase-specific
+high-temperature tables are transcribed into 3,673 rows and 406 phase-specific
 records. The other 151 tables retain page locators and exact per-column failure
 reasons in the `t-852` MinerU follow-up list in `manifest.yaml`. The 298.15 K
 summary and numbered Tables 1–2 remain untranscribed after the same offset and
@@ -34,7 +34,7 @@ image-OCR checks are detectors: they set `ocr_suspect` and list ambiguities,
 and they never null a numeric-shaped value. A value changes only with a
 `corrections` entry that cites a page-image reading. No units are converted, no
 values are rounded, and no gaps are filled. Printed rules and restarted
-temperature grids split 153 additional phase records, each carrying
+temperature grids split 157 additional phase records, each carrying
 `phase_as_published` from its printed header. Formula, title, state description,
 units, uncertainty line, formula weight, auxiliary property/equation lines, PDF
 page, printed page, and source-text line locators are retained when the text
