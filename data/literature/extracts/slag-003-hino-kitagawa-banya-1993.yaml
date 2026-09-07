@@ -1,0 +1,1279 @@
+schema_version: literature_extract.v1
+source_id: slag-003-hino-kitagawa-banya-1993
+source:
+  citation: Hino, M., Kitagawa, S. and Ban-Ya, S. (1993), "Sulphide Capacities of CaO-Al2O3-MgO
+    and CaO-Al2O3-SiO2 Slags", ISIJ International 33(1), 36–42, DOI 10.2355/isijinternational.33.36
+  doi: 10.2355/isijinternational.33.36
+  url: https://doi.org/10.2355/isijinternational.33.36
+  year: 1993
+  corpus_source_id: hino-kitagawa-banya-1993-sulphide
+extraction:
+  method: Manual transcription from 300 dpi pdftoppm renders plus pdftotext -layout of the J-STAGE
+    PDF (regolith-corpus raw/hino-kitagawa-banya-1993-sulphide). No MinerU. Three numbered tables
+    (not four) transcribed from page renders. Tables 1–3 are this study's gas–slag equilibration
+    results. Figures 1–10 recorded figure_only; scatter and iso-Cs labels not digitised. Numbered
+    equations with printed coefficients transcribed. No unit conversion, no rounding, no computing
+    values from other columns, no reading points off plots.
+  date: '2026-09-07'
+  worker: new-extract-hino-sulphide
+  provenance_path: docs-private/research/2026-09-06-deepening/NEW-hino-sulphide-1993.md
+review_status: draft
+fidelity_samples:
+- species: S
+  observable: activity_coefficient
+  observation_id: hino_kitagawa_banya_1993_table1_cao_al2o3_cs
+  field: minus_log_Cs_55_C1
+  value: 2.238
+  locator:
+    published_page: 37
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 heat 55-C1* −log Cs printed 2.238
+- species: S
+  observable: activity_coefficient
+  observation_id: hino_kitagawa_banya_1993_table1_cao_al2o3_cs
+  field: T_K_65_C1
+  value: 1928
+  locator:
+    published_page: 37
+    table: '1'
+    note: Table 1 heat 65-C1* Temp. printed 1928
+- species: S
+  observable: activity_coefficient
+  observation_id: hino_kitagawa_banya_1993_table1_cao_al2o3_cs
+  field: mass_pct_S_55_C1
+  value: 0.526
+  locator:
+    published_page: 37
+    table: '1'
+    note: Table 1 heat 55-C1* S printed 0.526
+- species: S
+  observable: activity_coefficient
+  observation_id: hino_kitagawa_banya_1993_table2_cao_al2o3_mgo_cs
+  field: minus_log_Cs_55_C2
+  value: 2.211
+  locator:
+    published_page: 38
+    table: '2'
+    note: Table 2 heat 55-C2* −log Cs printed 2.211
+- species: S
+  observable: activity_coefficient
+  observation_id: hino_kitagawa_banya_1993_table2_cao_al2o3_mgo_cs
+  field: minus_log_Cs_65_C3
+  value: 1.713
+  locator:
+    published_page: 38
+    table: '2'
+    note: Table 2 heat 65-C3* −log Cs printed 1.713
+- species: S
+  observable: activity_coefficient
+  observation_id: hino_kitagawa_banya_1993_table3_cao_al2o3_sio2_cs
+  field: minus_log_Cs_6_CS2
+  value: 1.962
+  locator:
+    published_page: 39
+    table: '3'
+    note: Table 3 heat 6-CS2* −log Cs printed 1.962
+- species: S
+  observable: activity_coefficient
+  observation_id: hino_kitagawa_banya_1993_table3_cao_al2o3_sio2_cs
+  field: minus_log_Cs_6_4
+  value: 3.472
+  locator:
+    published_page: 39
+    table: '3'
+    note: Table 3 heat 6-4 −log Cs printed 3.472
+- species: O
+  observable: gibbs_table
+  observation_id: hino_kitagawa_banya_1993_eq4_logK3
+  field: A_over_T
+  value: 6070
+  locator:
+    published_page: 40
+    equation: '4'
+    note: Eq. (4) printed 6070/T + 0.210
+- species: S
+  observable: gibbs_table
+  observation_id: hino_kitagawa_banya_1993_eq6_logK5
+  field: A_over_T
+  value: 6535
+  locator:
+    published_page: 40
+    equation: '6'
+    note: Eq. (6) printed 6535/T − 0.964
+- species: Al2O3
+  observable: gibbs_table
+  observation_id: hino_kitagawa_banya_1993_eq9_logK8
+  field: A_over_T
+  value: 64900
+  locator:
+    published_page: 40
+    equation: '9'
+    note: Eq. (9) printed 64 900/T − 20.63
+- species: S
+  observable: gibbs_table
+  observation_id: hino_kitagawa_banya_1993_eq10_logLs
+  field: A_over_T
+  value: 21168
+  locator:
+    published_page: 41
+    equation: '10'
+    note: Eq. (10) printed +21 168/T − 5.703
+- species: S
+  observable: activity_coefficient
+  observation_id: hino_kitagawa_banya_1993_fig10_figure_only
+  field: admission_status
+  value: figure_only
+  locator:
+    published_page: 41
+    figure: '10'
+    note: Fig. 10 LS vs N_MgO, N_SiO2 is figure-only; points not read
+species:
+  S:
+    observations:
+    - observation_id: hino_kitagawa_banya_1993_table1_cao_al2o3_cs
+      type: activity_coefficient
+      locator:
+        published_page: 37
+        pdf_page_index: 2
+        page: 37
+        table: '1'
+        note: Experimental result in CaO–Al2O3 system
+      units: −log Cs dimensionless; slag composition mass%; gas partial pressure 10^5 Pa at room temp.
+      values:
+        quantity: sulphide_capacity_minus_log_Cs
+        method_class: measured_direct
+        composition_basis: mass_percent
+        gas_pressure_units: 10^5 Pa at room temp.
+        definition_as_printed: Cs = (mass%S)(PO2/PS2)^1/2
+        determined_in: present work (gas–slag equilibration)
+        minus_log_Cs_55_C1: 2.238
+        T_K_65_C1: 1928
+        mass_pct_S_55_C1: 0.526
+        runs:
+        - heat_no: '55-C1*'
+          T_K: 1823
+          P_CO: 0.250
+          P_CO2: 0.249
+          P_SO2: 0.010
+          P_Ar: 0.489
+          mass_pct_CaO: 58.17
+          mass_pct_Al2O3: 39.93
+          mass_pct_MgO: 0.14
+          mass_pct_S: 0.526
+          minus_log_Cs: 2.238
+          cao_crucible: true
+          as_printed: '55-C1* 1823 0.250 0.249 0.010 0.489 58.17 39.93 0.14 0.526 2.238'
+        - heat_no: '55-1'
+          T_K: 1822
+          P_CO: 0.248
+          P_CO2: 0.247
+          P_SO2: 0.010
+          P_Ar: 0.485
+          mass_pct_CaO: 54.16
+          mass_pct_Al2O3: 41.86
+          mass_pct_MgO: 0.04
+          mass_pct_S: 0.365
+          minus_log_Cs: 2.399
+          cao_crucible: false
+          as_printed: '55-1 1822 0.248 0.247 0.010 0.485 54.16 41.86 0.04 0.365 2.399'
+        - heat_no: '55-2'
+          T_K: 1822
+          P_CO: 0.248
+          P_CO2: 0.247
+          P_SO2: 0.010
+          P_Ar: 0.483
+          mass_pct_CaO: 48.90
+          mass_pct_Al2O3: 48.50
+          mass_pct_MgO: 0.03
+          mass_pct_S: 0.155
+          minus_log_Cs: 2.769
+          cao_crucible: false
+          as_printed: '55-2 1822 0.248 0.247 0.010 0.483 48.90 48.50 0.03 0.155 2.769'
+        - heat_no: '55-3'
+          T_K: 1822
+          P_CO: 0.248
+          P_CO2: 0.247
+          P_SO2: 0.010
+          P_Ar: 0.485
+          mass_pct_CaO: 43.79
+          mass_pct_Al2O3: 53.63
+          mass_pct_MgO: 0.04
+          mass_pct_S: 0.072
+          minus_log_Cs: 3.105
+          cao_crucible: false
+          as_printed: '55-3 1822 0.248 0.247 0.010 0.485 43.79 53.63 0.04 0.072 3.105'
+        - heat_no: '55-4'
+          T_K: 1823
+          P_CO: 0.167
+          P_CO2: 0.166
+          P_SO2: 0.013
+          P_Ar: 0.652
+          mass_pct_CaO: 38.56
+          mass_pct_Al2O3: 58.21
+          mass_pct_MgO: 0.04
+          mass_pct_S: 0.019
+          minus_log_Cs: 3.748
+          cao_crucible: false
+          as_printed: '55-4 1823 0.167 0.166 0.013 0.652 38.56 58.21 0.04 0.019 3.748'
+        - heat_no: '60-C1*'
+          T_K: 1867
+          P_CO: 0.251
+          P_CO2: 0.250
+          P_SO2: 0.010
+          P_Ar: 0.490
+          mass_pct_CaO: 59.48
+          mass_pct_Al2O3: 39.65
+          mass_pct_MgO: 0.02
+          mass_pct_S: 0.426
+          minus_log_Cs: 2.050
+          cao_crucible: true
+          as_printed: '60-C1* 1867 0.251 0.250 0.010 0.490 59.48 39.65 0.02 0.426 2.050'
+        - heat_no: '60-1'
+          T_K: 1866
+          P_CO: 0.250
+          P_CO2: 0.249
+          P_SO2: 0.010
+          P_Ar: 0.488
+          mass_pct_CaO: 53.98
+          mass_pct_Al2O3: 44.70
+          mass_pct_MgO: 0.03
+          mass_pct_S: 0.239
+          minus_log_Cs: 2.302
+          cao_crucible: false
+          as_printed: '60-1 1866 0.250 0.249 0.010 0.488 53.98 44.70 0.03 0.239 2.302'
+        - heat_no: '60-2'
+          T_K: 1867
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.485
+          mass_pct_CaO: 48.38
+          mass_pct_Al2O3: 50.39
+          mass_pct_MgO: 0.03
+          mass_pct_S: 0.107
+          minus_log_Cs: 2.648
+          cao_crucible: false
+          as_printed: '60-2 1867 0.249 0.248 0.010 0.485 48.38 50.39 0.03 0.107 2.648'
+        - heat_no: '60-3'
+          T_K: 1867
+          P_CO: 0.251
+          P_CO2: 0.250
+          P_SO2: 0.010
+          P_Ar: 0.488
+          mass_pct_CaO: 44.91
+          mass_pct_Al2O3: 54.82
+          mass_pct_MgO: 0.03
+          mass_pct_S: 0.059
+          minus_log_Cs: 2.907
+          cao_crucible: false
+          as_printed: '60-3 1867 0.251 0.250 0.010 0.488 44.91 54.82 0.03 0.059 2.907'
+        - heat_no: '60-4'
+          T_K: 1867
+          P_CO: 0.166
+          P_CO2: 0.166
+          P_SO2: 0.013
+          P_Ar: 0.652
+          mass_pct_CaO: 36.84
+          mass_pct_Al2O3: 61.18
+          mass_pct_MgO: 0.02
+          mass_pct_S: 0.019
+          minus_log_Cs: 3.479
+          cao_crucible: false
+          as_printed: '60-4 1867 0.166 0.166 0.013 0.652 36.84 61.18 0.02 0.019 3.479'
+        - heat_no: '65-C1*'
+          T_K: 1928
+          P_CO: 0.168
+          P_CO2: 0.167
+          P_SO2: 0.013
+          P_Ar: 0.658
+          mass_pct_CaO: 57.61
+          mass_pct_Al2O3: 37.03
+          mass_pct_MgO_as_printed: '—'
+          mass_pct_S: 0.326
+          minus_log_Cs: 1.869
+          cao_crucible: true
+          as_printed: '65-C1* 1928 0.168 0.167 0.013 0.658 57.61 37.03 — 0.326 1.869'
+        - heat_no: '65-1'
+          T_K: 1923
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.487
+          mass_pct_CaO: 53.41
+          mass_pct_Al2O3: 41.38
+          mass_pct_MgO: 0.40
+          mass_pct_S: 0.167
+          minus_log_Cs: 2.093
+          cao_crucible: false
+          as_printed: '65-1 1923 0.249 0.248 0.010 0.487 53.41 41.38 0.40 0.167 2.093'
+        - heat_no: '65-2'
+          T_K: 1922
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.488
+          mass_pct_CaO: 48.65
+          mass_pct_Al2O3: 46.13
+          mass_pct_MgO: 0.05
+          mass_pct_S: 0.076
+          minus_log_Cs: 2.444
+          cao_crucible: false
+          as_printed: '65-2 1922 0.249 0.248 0.010 0.488 48.65 46.13 0.05 0.076 2.444'
+        - heat_no: '65-3'
+          T_K: 1922
+          P_CO: 0.250
+          P_CO2: 0.249
+          P_SO2: 0.010
+          P_Ar: 0.490
+          mass_pct_CaO: 41.71
+          mass_pct_Al2O3: 54.71
+          mass_pct_MgO: 1.49
+          mass_pct_S: 0.033
+          minus_log_Cs: 2.808
+          cao_crucible: false
+          as_printed: '65-3 1922 0.250 0.249 0.010 0.490 41.71 54.71 1.49 0.033 2.808'
+      quote: 'Table 1. Experimental result in CaO–Al2O3 system. Heat No. Temp.(K) P_CO P_CO2 P_SO2 P_Ar CaO Al2O3 MgO S −log Cs. 55-C1* * 1823 0.250 0.249 0.010 0.489 58.17 39.93 0.14 0.526 2.238; 55-1 1822 0.248 0.247 0.010 0.485 54.16 41.86 0.04 0.365 2.399; 55-2 1822 0.248 0.247 0.010 0.483 48.90 48.50 0.03 0.155 2.769; 55-3 1822 0.248 0.247 0.010 0.485 43.79 53.63 0.04 0.072 3.105; 55-4 1823 0.167 0.166 0.013 0.652 38.56 58.21 0.04 0.019 3.748; 60-C1* * 1867 0.251 0.250 0.010 0.490 59.48 39.65 0.02 0.426 2.050; 60-1 1866 0.250 0.249 0.010 0.488 53.98 44.70 0.03 0.239 2.302; 60-2 1867 0.249 0.248 0.010 0.485 48.38 50.39 0.03 0.107 2.648; 60-3 1867 0.251 0.250 0.010 0.488 44.91 54.82 0.03 0.059 2.907; 60-4 1867 0.166 0.166 0.013 0.652 36.84 61.18 0.02 0.019 3.479; 65-C1* * 1928 0.168 0.167 0.013 0.658 57.61 37.03 — 0.326 1.869; 65-1 1923 0.249 0.248 0.010 0.487 53.41 41.38 0.40 0.167 2.093; 65-2 1922 0.249 0.248 0.010 0.488 48.65 46.13 0.05 0.076 2.444; 65-3 1922 0.250 0.249 0.010 0.490 41.71 54.71 1.49 0.033 2.808. * CaO crucible was used. The other samples were melted in Pt crucibles. ** PCO + PCO2 + PSO2 + PAr = PT (Atmospheric pressure).'
+      T_range_K:
+      - 1822.0
+      - 1928.0
+      phase: CaO-Al2O3 slag (homogeneous and CaO-saturated)
+      standard_state: sulphide capacity Cs as defined by Eq. (2)
+      uncertainty:
+        note: The experimental errors of Cs caused by chemical analysis of sulphur are shown
+          (Fig. 2 error bars; not tabulated).
+      equipment:
+        cell_material:
+          value: Pt or CaO crucible (starred heats CaO; others Pt)
+          locator:
+            published_page: 37
+            table: '1'
+            note: footnote * CaO crucible was used. The other samples were melted in Pt crucibles.
+        chamber_pressure:
+          value: PT (Atmospheric pressure)
+          units: as printed
+          locator:
+            published_page: 37
+            table: '1'
+            note: footnote ** PCO + PCO2 + PSO2 + PAr = PT (Atmospheric pressure).
+    - observation_id: hino_kitagawa_banya_1993_table2_cao_al2o3_mgo_cs
+      type: activity_coefficient
+      locator:
+        published_page: 38
+        pdf_page_index: 3
+        page: 38
+        table: '2'
+        note: Experimental result in CaO–Al2O3–MgO system
+      units: −log Cs dimensionless; slag composition mass%; gas partial pressure 10^5 Pa at room temp.
+      values:
+        quantity: sulphide_capacity_minus_log_Cs
+        method_class: measured_direct
+        composition_basis: mass_percent
+        gas_pressure_units: 10^5 Pa at room temp.
+        definition_as_printed: Cs = (mass%S)(PO2/PS2)^1/2
+        determined_in: present work (gas–slag equilibration)
+        minus_log_Cs_55_C2: 2.211
+        minus_log_Cs_65_C3: 1.713
+        runs:
+        - heat_no: '55-C2*'
+          T_K: 1823
+          P_CO: 0.250
+          P_CO2: 0.249
+          P_SO2: 0.010
+          P_Ar: 0.489
+          mass_pct_CaO: 54.71
+          mass_pct_Al2O3: 37.66
+          mass_pct_MgO: 4.13
+          mass_pct_S: 0.560
+          minus_log_Cs: 2.211
+          cao_crucible: true
+          as_printed: '55-C2* 1823 0.250 0.249 0.010 0.489 54.71 37.66 4.13 0.560 2.211'
+        - heat_no: '55-5'
+          T_K: 1822
+          P_CO: 0.248
+          P_CO2: 0.247
+          P_SO2: 0.010
+          P_Ar: 0.483
+          mass_pct_CaO: 50.17
+          mass_pct_Al2O3: 44.06
+          mass_pct_MgO: 3.88
+          mass_pct_S: 0.025
+          minus_log_Cs: 2.567
+          cao_crucible: false
+          as_printed: '55-5 1822 0.248 0.247 0.010 0.483 50.17 44.06 3.88 0.025 2.567'
+        - heat_no: '55-6'
+          T_K: 1822
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.487
+          mass_pct_CaO: 44.06
+          mass_pct_Al2O3: 47.90
+          mass_pct_MgO: 3.48
+          mass_pct_S: 0.120
+          minus_log_Cs: 2.885
+          cao_crucible: false
+          as_printed: '55-6 1822 0.249 0.248 0.010 0.487 44.06 47.90 3.48 0.120 2.885'
+        - heat_no: '55-7'
+          T_K: 1822
+          P_CO: 0.248
+          P_CO2: 0.247
+          P_SO2: 0.010
+          P_Ar: 0.483
+          mass_pct_CaO: 41.35
+          mass_pct_Al2O3: 53.89
+          mass_pct_MgO: 3.10
+          mass_pct_S: 0.042
+          minus_log_Cs: 3.335
+          cao_crucible: false
+          as_printed: '55-7 1822 0.248 0.247 0.010 0.483 41.35 53.89 3.10 0.042 3.335'
+        - heat_no: '55-8'
+          T_K: 1823
+          P_CO: 0.167
+          P_CO2: 0.166
+          P_SO2: 0.013
+          P_Ar: 0.652
+          mass_pct_CaO: 35.55
+          mass_pct_Al2O3: 57.69
+          mass_pct_MgO: 2.80
+          mass_pct_S: 0.022
+          minus_log_Cs: 3.693
+          cao_crucible: false
+          as_printed: '55-8 1823 0.167 0.166 0.013 0.652 35.55 57.69 2.80 0.022 3.693'
+        - heat_no: '55-9'
+          T_K: 1822
+          P_CO: 0.248
+          P_CO2: 0.247
+          P_SO2: 0.010
+          P_Ar: 0.485
+          mass_pct_CaO: 45.96
+          mass_pct_Al2O3: 44.14
+          mass_pct_MgO: 7.97
+          mass_pct_S: 0.203
+          minus_log_Cs: 2.653
+          cao_crucible: false
+          as_printed: '55-9 1822 0.248 0.247 0.010 0.485 45.96 44.14 7.97 0.203 2.653'
+        - heat_no: '55-10'
+          T_K: 1822
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.487
+          mass_pct_CaO: 41.36
+          mass_pct_Al2O3: 48.06
+          mass_pct_MgO: 7.26
+          mass_pct_S: 0.110
+          minus_log_Cs: 2.921
+          cao_crucible: false
+          as_printed: '55-10 1822 0.249 0.248 0.010 0.487 41.36 48.06 7.26 0.110 2.921'
+        - heat_no: '55-11'
+          T_K: 1822
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.487
+          mass_pct_CaO: 37.69
+          mass_pct_Al2O3: 53.84
+          mass_pct_MgO: 6.41
+          mass_pct_S: 0.044
+          minus_log_Cs: 3.318
+          cao_crucible: false
+          as_printed: '55-11 1822 0.249 0.248 0.010 0.487 37.69 53.84 6.41 0.044 3.318'
+        - heat_no: '60-C2*'
+          T_K: 1873
+          P_CO: 0.165
+          P_CO2: 0.164
+          P_SO2: 0.013
+          P_Ar: 0.642
+          mass_pct_CaO: 56.48
+          mass_pct_Al2O3: 39.30
+          mass_pct_MgO: 3.92
+          mass_pct_S: 0.560
+          minus_log_Cs: 2.007
+          cao_crucible: true
+          as_printed: '60-C2* 1873 0.165 0.164 0.013 0.642 56.48 39.30 3.92 0.560 2.007'
+        - heat_no: '60-5'
+          T_K: 1867
+          P_CO: 0.251
+          P_CO2: 0.250
+          P_SO2: 0.010
+          P_Ar: 0.490
+          mass_pct_CaO: 50.93
+          mass_pct_Al2O3: 45.77
+          mass_pct_MgO: 4.28
+          mass_pct_S: 0.217
+          minus_log_Cs: 2.344
+          cao_crucible: false
+          as_printed: '60-5 1867 0.251 0.250 0.010 0.490 50.93 45.77 4.28 0.217 2.344'
+        - heat_no: '60-6'
+          T_K: 1868
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.478
+          mass_pct_CaO: 45.53
+          mass_pct_Al2O3: 51.19
+          mass_pct_MgO: 3.44
+          mass_pct_S: 0.105
+          minus_log_Cs: 2.642
+          cao_crucible: false
+          as_printed: '60-6 1868 0.249 0.248 0.010 0.478 45.53 51.19 3.44 0.105 2.642'
+        - heat_no: '60-7'
+          T_K: 1867
+          P_CO: 0.251
+          P_CO2: 0.250
+          P_SO2: 0.010
+          P_Ar: 0.490
+          mass_pct_CaO: 39.91
+          mass_pct_Al2O3: 55.49
+          mass_pct_MgO: 3.19
+          mass_pct_S: 0.042
+          minus_log_Cs: 3.044
+          cao_crucible: false
+          as_printed: '60-7 1867 0.251 0.250 0.010 0.490 39.91 55.49 3.19 0.042 3.044'
+        - heat_no: '60-8'
+          T_K: 1867
+          P_CO: 0.166
+          P_CO2: 0.166
+          P_SO2: 0.013
+          P_Ar: 0.652
+          mass_pct_CaO: 33.53
+          mass_pct_Al2O3: 61.72
+          mass_pct_MgO: 2.76
+          mass_pct_S: 0.027
+          minus_log_Cs: 3.340
+          cao_crucible: false
+          as_printed: '60-8 1867 0.166 0.166 0.013 0.652 33.53 61.72 2.76 0.027 3.340'
+        - heat_no: '60-C3*'
+          T_K: 1868
+          P_CO: 0.251
+          P_CO2: 0.250
+          P_SO2: 0.010
+          P_Ar: 0.490
+          mass_pct_CaO: 53.73
+          mass_pct_Al2O3: 34.63
+          mass_pct_MgO: 8.56
+          mass_pct_S: 0.425
+          minus_log_Cs: 2.038
+          cao_crucible: true
+          as_printed: '60-C3* 1868 0.251 0.250 0.010 0.490 53.73 34.63 8.56 0.425 2.038'
+        - heat_no: '60-9'
+          T_K: 1868
+          P_CO: 0.250
+          P_CO2: 0.249
+          P_SO2: 0.010
+          P_Ar: 0.485
+          mass_pct_CaO: 45.66
+          mass_pct_Al2O3: 45.01
+          mass_pct_MgO: 9.20
+          mass_pct_S: 0.189
+          minus_log_Cs: 2.405
+          cao_crucible: false
+          as_printed: '60-9 1868 0.250 0.249 0.010 0.485 45.66 45.01 9.20 0.189 2.405'
+        - heat_no: '60-10'
+          T_K: 1867
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.485
+          mass_pct_CaO: 39.61
+          mass_pct_Al2O3: 53.08
+          mass_pct_MgO: 9.56
+          mass_pct_S: 0.093
+          minus_log_Cs: 2.706
+          cao_crucible: false
+          as_printed: '60-10 1867 0.249 0.248 0.010 0.485 39.61 53.08 9.56 0.093 2.706'
+        - heat_no: '60-11'
+          T_K: 1868
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.487
+          mass_pct_CaO: 35.38
+          mass_pct_Al2O3: 56.26
+          mass_pct_MgO: 7.18
+          mass_pct_S: 0.046
+          minus_log_Cs: 3.004
+          cao_crucible: false
+          as_printed: '60-11 1868 0.249 0.248 0.010 0.487 35.38 56.26 7.18 0.046 3.004'
+        - heat_no: '65-C2*'
+          T_K: 1928
+          P_CO: 0.168
+          P_CO2: 0.167
+          P_SO2: 0.013
+          P_Ar: 0.658
+          mass_pct_CaO: 53.87
+          mass_pct_Al2O3: 32.09
+          mass_pct_MgO: 3.65
+          mass_pct_S: 0.400
+          minus_log_Cs: 1.780
+          cao_crucible: true
+          as_printed: '65-C2* 1928 0.168 0.167 0.013 0.658 53.87 32.09 3.65 0.400 1.780'
+        - heat_no: '65-5'
+          T_K: 1923
+          P_CO: 0.251
+          P_CO2: 0.250
+          P_SO2: 0.010
+          P_Ar: 0.489
+          mass_pct_CaO: 49.33
+          mass_pct_Al2O3: 45.06
+          mass_pct_MgO: 3.91
+          mass_pct_S: 0.141
+          minus_log_Cs: 2.169
+          cao_crucible: false
+          as_printed: '65-5 1923 0.251 0.250 0.010 0.489 49.33 45.06 3.91 0.141 2.169'
+        - heat_no: '65-6'
+          T_K: 1924
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.486
+          mass_pct_CaO: 43.42
+          mass_pct_Al2O3: 45.83
+          mass_pct_MgO: 3.55
+          mass_pct_S: 0.065
+          minus_log_Cs: 2.497
+          cao_crucible: false
+          as_printed: '65-6 1924 0.249 0.248 0.010 0.486 43.42 45.83 3.55 0.065 2.497'
+        - heat_no: '65-7'
+          T_K: 1922
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.488
+          mass_pct_CaO: 39.80
+          mass_pct_Al2O3: 52.10
+          mass_pct_MgO: 3.17
+          mass_pct_S: 0.025
+          minus_log_Cs: 2.918
+          cao_crucible: false
+          as_printed: '65-7 1922 0.249 0.248 0.010 0.488 39.80 52.10 3.17 0.025 2.918'
+        - heat_no: '65-C3*'
+          T_K: 1923
+          P_CO: 0.164
+          P_CO2: 0.164
+          P_SO2: 0.013
+          P_Ar: 0.643
+          mass_pct_CaO: 53.57
+          mass_pct_Al2O3: 36.66
+          mass_pct_MgO: 8.97
+          mass_pct_S: 0.492
+          minus_log_Cs: 1.713
+          cao_crucible: true
+          as_printed: '65-C3* 1923 0.164 0.164 0.013 0.643 53.57 36.66 8.97 0.492 1.713'
+        - heat_no: '65-9'
+          T_K: 1924
+          P_CO: 0.250
+          P_CO2: 0.249
+          P_SO2: 0.010
+          P_Ar: 0.488
+          mass_pct_CaO: 42.77
+          mass_pct_Al2O3: 44.23
+          mass_pct_MgO: 7.13
+          mass_pct_S: 0.108
+          minus_log_Cs: 2.264
+          cao_crucible: false
+          as_printed: '65-9 1924 0.250 0.249 0.010 0.488 42.77 44.23 7.13 0.108 2.264'
+        - heat_no: '65-10'
+          T_K: 1924
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.486
+          mass_pct_CaO: 40.87
+          mass_pct_Al2O3: 47.15
+          mass_pct_MgO: 7.05
+          mass_pct_S: 0.060
+          minus_log_Cs: 2.533
+          cao_crucible: false
+          as_printed: '65-10 1924 0.249 0.248 0.010 0.486 40.87 47.15 7.05 0.060 2.533'
+        - heat_no: '65-11'
+          T_K: 1924
+          P_CO: 0.249
+          P_CO2: 0.248
+          P_SO2: 0.010
+          P_Ar: 0.486
+          mass_pct_CaO: 35.96
+          mass_pct_Al2O3: 52.08
+          mass_pct_MgO: 6.22
+          mass_pct_S: 0.028
+          minus_log_Cs: 2.857
+          cao_crucible: false
+          as_printed: '65-11 1924 0.249 0.248 0.010 0.486 35.96 52.08 6.22 0.028 2.857'
+      quote: 'Table 2. Experimental result in CaO–Al2O3–MgO system. Heat No. Temp.(K) P_CO P_CO2 P_SO2 P_Ar CaO Al2O3 MgO S −log Cs. 55-C2* * 1823 0.250 0.249 0.010 0.489 54.71 37.66 4.13 0.560 2.211; 55-5 1822 0.248 0.247 0.010 0.483 50.17 44.06 3.88 0.025 2.567; 55-6 1822 0.249 0.248 0.010 0.487 44.06 47.90 3.48 0.120 2.885; 55-7 1822 0.248 0.247 0.010 0.483 41.35 53.89 3.10 0.042 3.335; 55-8 1823 0.167 0.166 0.013 0.652 35.55 57.69 2.80 0.022 3.693; 55-9 1822 0.248 0.247 0.010 0.485 45.96 44.14 7.97 0.203 2.653; 55-10 1822 0.249 0.248 0.010 0.487 41.36 48.06 7.26 0.110 2.921; 55-11 1822 0.249 0.248 0.010 0.487 37.69 53.84 6.41 0.044 3.318; 60-C2* * 1873 0.165 0.164 0.013 0.642 56.48 39.30 3.92 0.560 2.007; 60-5 1867 0.251 0.250 0.010 0.490 50.93 45.77 4.28 0.217 2.344; 60-6 1868 0.249 0.248 0.010 0.478 45.53 51.19 3.44 0.105 2.642; 60-7 1867 0.251 0.250 0.010 0.490 39.91 55.49 3.19 0.042 3.044; 60-8 1867 0.166 0.166 0.013 0.652 33.53 61.72 2.76 0.027 3.340; 60-C3* * 1868 0.251 0.250 0.010 0.490 53.73 34.63 8.56 0.425 2.038; 60-9 1868 0.250 0.249 0.010 0.485 45.66 45.01 9.20 0.189 2.405; 60-10 1867 0.249 0.248 0.010 0.485 39.61 53.08 9.56 0.093 2.706; 60-11 1868 0.249 0.248 0.010 0.487 35.38 56.26 7.18 0.046 3.004; 65-C2* * 1928 0.168 0.167 0.013 0.658 53.87 32.09 3.65 0.400 1.780; 65-5 1923 0.251 0.250 0.010 0.489 49.33 45.06 3.91 0.141 2.169; 65-6 1924 0.249 0.248 0.010 0.486 43.42 45.83 3.55 0.065 2.497; 65-7 1922 0.249 0.248 0.010 0.488 39.80 52.10 3.17 0.025 2.918; 65-C3* * 1923 0.164 0.164 0.013 0.643 53.57 36.66 8.97 0.492 1.713; 65-9 1924 0.250 0.249 0.010 0.488 42.77 44.23 7.13 0.108 2.264; 65-10 1924 0.249 0.248 0.010 0.486 40.87 47.15 7.05 0.060 2.533; 65-11 1924 0.249 0.248 0.010 0.486 35.96 52.08 6.22 0.028 2.857. * CaO crucible was used. The other samples were melted in Pt crucibles. ** PCO + PCO2 + PSO2 + PAr = PT (Atmospheric pressure).'
+      T_range_K:
+      - 1822.0
+      - 1928.0
+      phase: CaO-Al2O3-MgO slag (homogeneous and CaO-saturated)
+      standard_state: sulphide capacity Cs as defined by Eq. (2)
+      uncertainty:
+        note: experimental errors of Cs are revealed in Fig. 3 (error bars; not tabulated)
+      equipment:
+        cell_material:
+          value: Pt or CaO crucible (starred heats CaO; others Pt)
+          locator:
+            published_page: 38
+            table: '2'
+            note: footnote * CaO crucible was used. The other samples were melted in Pt crucibles.
+        chamber_pressure:
+          value: PT (Atmospheric pressure)
+          units: as printed
+          locator:
+            published_page: 38
+            table: '2'
+            note: footnote ** PCO + PCO2 + PSO2 + PAr = PT (Atmospheric pressure).
+    - observation_id: hino_kitagawa_banya_1993_table3_cao_al2o3_sio2_cs
+      type: activity_coefficient
+      locator:
+        published_page: 39
+        pdf_page_index: 4
+        page: 39
+        table: '3'
+        note: Experimental result in CaO–Al2O3–SiO2 system at 1873 K
+      units: −log Cs dimensionless; slag composition mass%; gas partial pressure 10^5 Pa at room temp.
+      values:
+        quantity: sulphide_capacity_minus_log_Cs
+        method_class: measured_direct
+        composition_basis: mass_percent
+        gas_pressure_units: 10^5 Pa at room temp.
+        definition_as_printed: Cs = (mass%S)(PO2/PS2)^1/2
+        determined_in: present work (gas–slag equilibration)
+        minus_log_Cs_6_CS2: 1.962
+        minus_log_Cs_6_4: 3.472
+        runs:
+        - heat_no: '6-CS2*'
+          T_K: 1873
+          P_CO: 0.247
+          P_CO2: 0.246
+          P_SO2: 0.010
+          P_Ar: 0.483
+          mass_pct_CaO: 56.12
+          mass_pct_Al2O3: 30.04
+          mass_pct_SiO2: 6.92
+          mass_pct_S: 0.467
+          minus_log_Cs: 1.962
+          cao_crucible: true
+          as_printed: '6-CS2* 1873 0.247 0.246 0.010 0.483 56.12 30.04 6.92 0.467 1.962'
+        - heat_no: '6-1'
+          T_K: 1872
+          P_CO: 0.166
+          P_CO2: 0.165
+          P_SO2: 0.013
+          P_Ar: 0.651
+          mass_pct_CaO: 52.68
+          mass_pct_Al2O3: 36.07
+          mass_pct_SiO2: 6.64
+          mass_pct_S: 0.274
+          minus_log_Cs: 2.293
+          cao_crucible: false
+          as_printed: '6-1 1872 0.166 0.165 0.013 0.651 52.68 36.07 6.64 0.274 2.293'
+        - heat_no: '6-2'
+          T_K: 1872
+          P_CO: 0.166
+          P_CO2: 0.165
+          P_SO2: 0.013
+          P_Ar: 0.647
+          mass_pct_CaO: 48.81
+          mass_pct_Al2O3: 42.46
+          mass_pct_SiO2: 6.00
+          mass_pct_S: 0.127
+          minus_log_Cs: 2.624
+          cao_crucible: false
+          as_printed: '6-2 1872 0.166 0.165 0.013 0.647 48.81 42.46 6.00 0.127 2.624'
+        - heat_no: '6-3'
+          T_K: 1872
+          P_CO: 0.165
+          P_CO2: 0.164
+          P_SO2: 0.013
+          P_Ar: 0.646
+          mass_pct_CaO: 42.31
+          mass_pct_Al2O3: 46.22
+          mass_pct_SiO2: 5.39
+          mass_pct_S: 0.053
+          minus_log_Cs: 3.002
+          cao_crucible: false
+          as_printed: '6-3 1872 0.165 0.164 0.013 0.646 42.31 46.22 5.39 0.053 3.002'
+        - heat_no: '6-4'
+          T_K: 1872
+          P_CO: 0.165
+          P_CO2: 0.164
+          P_SO2: 0.013
+          P_Ar: 0.646
+          mass_pct_CaO: 38.85
+          mass_pct_Al2O3: 52.18
+          mass_pct_SiO2: 4.83
+          mass_pct_S: 0.018
+          minus_log_Cs: 3.472
+          cao_crucible: false
+          as_printed: '6-4 1872 0.165 0.164 0.013 0.646 38.85 52.18 4.83 0.018 3.472'
+        - heat_no: '6-CS3*'
+          T_K: 1873
+          P_CO: 0.167
+          P_CO2: 0.166
+          P_SO2: 0.013
+          P_Ar: 0.654
+          mass_pct_CaO: 59.59
+          mass_pct_Al2O3: 24.22
+          mass_pct_SiO2: 10.70
+          mass_pct_S: 0.482
+          minus_log_Cs: 2.040
+          cao_crucible: true
+          as_printed: '6-CS3* 1873 0.167 0.166 0.013 0.654 59.59 24.22 10.70 0.482 2.040'
+        - heat_no: '6-CSS*'
+          T_K: 1873
+          P_CO: 0.167
+          P_CO2: 0.166
+          P_SO2: 0.013
+          P_Ar: 0.654
+          mass_pct_CaO: 55.90
+          mass_pct_Al2O3: 27.09
+          mass_pct_SiO2: 7.79
+          mass_pct_S: 0.163
+          minus_log_Cs: 2.510
+          cao_crucible: true
+          as_printed: '6-CSS* 1873 0.167 0.166 0.013 0.654 55.90 27.09 7.79 0.163 2.510'
+        - heat_no: '6-5'
+          T_K: 1872
+          P_CO: 0.166
+          P_CO2: 0.165
+          P_SO2: 0.013
+          P_Ar: 0.647
+          mass_pct_CaO: 46.76
+          mass_pct_Al2O3: 35.13
+          mass_pct_SiO2: 13.22
+          mass_pct_S: 0.090
+          minus_log_Cs: 2.774
+          cao_crucible: false
+          as_printed: '6-5 1872 0.166 0.165 0.013 0.647 46.76 35.13 13.22 0.090 2.774'
+        - heat_no: '6-6'
+          T_K: 1872
+          P_CO: 0.165
+          P_CO2: 0.164
+          P_SO2: 0.013
+          P_Ar: 0.646
+          mass_pct_CaO: 43.31
+          mass_pct_Al2O3: 40.60
+          mass_pct_SiO2: 11.95
+          mass_pct_S: 0.042
+          minus_log_Cs: 3.101
+          cao_crucible: false
+          as_printed: '6-6 1872 0.165 0.164 0.013 0.646 43.31 40.60 11.95 0.042 3.101'
+        - heat_no: '6-7'
+          T_K: 1872
+          P_CO: 0.166
+          P_CO2: 0.165
+          P_SO2: 0.013
+          P_Ar: 0.647
+          mass_pct_CaO: 38.15
+          mass_pct_Al2O3: 46.80
+          mass_pct_SiO2: 10.75
+          mass_pct_S: 0.020
+          minus_log_Cs: 3.440
+          cao_crucible: false
+          as_printed: '6-7 1872 0.166 0.165 0.013 0.647 38.15 46.80 10.75 0.020 3.440'
+      quote: 'Table 3. Experimental result in CaO–Al2O3–SiO2 system at 1873 K. Heat No. Temp.(K) P_CO P_CO2 P_SO2 P_Ar CaO Al2O3 SiO2 S −log Cs. 6-CS2* * 1873 0.247 0.246 0.010 0.483 56.12 30.04 6.92 0.467 1.962; 6-1 1872 0.166 0.165 0.013 0.651 52.68 36.07 6.64 0.274 2.293; 6-2 1872 0.166 0.165 0.013 0.647 48.81 42.46 6.00 0.127 2.624; 6-3 1872 0.165 0.164 0.013 0.646 42.31 46.22 5.39 0.053 3.002; 6-4 1872 0.165 0.164 0.013 0.646 38.85 52.18 4.83 0.018 3.472; 6-CS3* * 1873 0.167 0.166 0.013 0.654 59.59 24.22 10.70 0.482 2.040; 6-CSS* * 1873 0.167 0.166 0.013 0.654 55.90 27.09 7.79 0.163 2.510; 6-5 1872 0.166 0.165 0.013 0.647 46.76 35.13 13.22 0.090 2.774; 6-6 1872 0.165 0.164 0.013 0.646 43.31 40.60 11.95 0.042 3.101; 6-7 1872 0.166 0.165 0.013 0.647 38.15 46.80 10.75 0.020 3.440. * CaO crucible was used. The other samples were melted in Pt crucibles. ** PCO + PCO2 + PSO2 + PAr = PT (Atmospheric pressure).'
+      T_range_K:
+      - 1872.0
+      - 1873.0
+      phase: CaO-Al2O3-SiO2 slag (homogeneous, CaO- or 2CaO·SiO2-saturated)
+      standard_state: sulphide capacity Cs as defined by Eq. (2)
+      uncertainty:
+        note: experimental errors of Cs are revealed in Fig. 7 (error bars; not tabulated)
+      equipment:
+        cell_material:
+          value: Pt or CaO crucible (starred heats CaO; others Pt)
+          locator:
+            published_page: 39
+            table: '3'
+            note: footnote * CaO crucible was used. The other samples were melted in Pt crucibles.
+        chamber_pressure:
+          value: PT (Atmospheric pressure)
+          units: as printed
+          locator:
+            published_page: 39
+            table: '3'
+            note: footnote ** PCO + PCO2 + PSO2 + PAr = PT (Atmospheric pressure).
+    - observation_id: hino_kitagawa_banya_1993_eq6_logK5
+      type: gibbs_table
+      locator:
+        published_page: 40
+        pdf_page_index: 5
+        page: 40
+        equation: '6'
+        note: log K5 for 1/2 S2(g) = S in liquid iron, cited Steelmaking Data Sourcebook 17)
+      units: log10 K; T in K
+      values:
+        quantity: sulphur_dissolution_in_liquid_iron_logK
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        reaction_as_printed: 1/2 S2(g) = S
+        A_over_T: 6535
+        intercept: -0.964
+        A_over_T_as_printed: '6535/T'
+        intercept_as_printed: '-0.964'
+        equation_as_printed: log K5 = log{aS/PS2^{1/2}} = 6535/T − 0.964
+        cited_as: Steelmaking Data Sourcebook 17)
+      quote: '1/2 S2(g) = S ...............(5). log K5 = log{aS/P^{1/2}_S2} = 6535/T − 0.964^{17} ......(6)'
+      phase: liquid_iron
+      standard_state: dissolved S in liquid iron (Henrian)
+      uncertainty:
+        note: none printed on Eq. (6); compiled from ref. 17
+    - observation_id: hino_kitagawa_banya_1993_eq7_log_S_over_aS
+      type: gibbs_table
+      locator:
+        published_page: 40
+        pdf_page_index: 5
+        page: 40
+        equation: '7'
+        note: obtained from Eqs. (2), (4) and (6)
+      units: log10; T in K
+      values:
+        quantity: slag_metal_sulphur_ratio_from_Cs
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        A_over_T: -465
+        intercept: 1.174
+        A_over_T_as_printed: '−465/T'
+        intercept_as_printed: '+1.174'
+        equation_as_printed: log{(mass%S)/aS} = log Cs − log aO − 465/T + 1.174
+      quote: 'The following equation is obtained from Eqs. (2), (4) and (6). log{(mass%S)/aS} = log Cs − log aO − 465/T + 1.174 ......(7)'
+      phase: slag_metal
+      standard_state: as in Eq. (7)
+      uncertainty:
+        note: none printed on Eq. (7); derived in this paper from cited log K and Eq. (2)
+    - observation_id: hino_kitagawa_banya_1993_eq10_logLs
+      type: gibbs_table
+      locator:
+        published_page: 41
+        pdf_page_index: 6
+        page: 41
+        equation: '10'
+        figure: '10'
+        note: estimated sulphur distribution ratio Ls = (mass%S)/[mass%S]
+      units: log10 Ls; T in K
+      values:
+        quantity: sulphur_distribution_ratio_logLs
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        A_over_T: 21168
+        intercept: -5.703
+        A_over_T_as_printed: '+21 168/T'
+        intercept_as_printed: '−5.703'
+        assumed_sol_Al_mass_pct: 0.01
+        assumed_sol_Al_as_printed: '0.01 mass%'
+        equation_as_printed: log Ls = log Cs − (1/3)log aAl2O3 + (2/3)log[mass%Al] + 21168/T − 5.703
+      quote: 'log Ls = log Cs − (1/3)log aAl2O3 + (2/3)log[mass%Al] + 21 168/T − 5.703 ........(10). The value of [sol Al] was assumed to be 0.01 mass% in the present work.'
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: slag_metal
+      standard_state: Ls = (mass%S)/[mass%S]
+      uncertainty:
+        note: none printed on Eq. (10); aAl2O3 read from literature iso-activity curves (not tabulated here)
+    - observation_id: hino_kitagawa_banya_1993_fig1_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 36
+        pdf_page_index: 1
+        page: 36
+        figure: '1'
+        note: 'Fig. 1. Schematic diagram of experimental apparatus.'
+      units: as plotted (not tabulated)
+      values:
+        quantity: experimental_apparatus_schematic
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '1'
+        caption_as_printed: 'Fig. 1. Schematic diagram of experimental apparatus.'
+      quote: 'Fig. 1. Schematic diagram of experimental apparatus.'
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: hino_kitagawa_banya_1993_fig2_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 37
+        pdf_page_index: 2
+        page: 37
+        figure: '2'
+        note: 'Fig. 2. Sulphide capacities of CaO–Al2O3 slag.'
+      units: as plotted (not tabulated)
+      values:
+        quantity: sulphide_capacity_Cs_vs_N_Al2O3
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '2'
+        caption_as_printed: 'Fig. 2. Sulphide capacities of CaO–Al2O3 slag.'
+        T_range_K_as_plotted: '1773–1923 K (this work 1823, 1873, 1923 K)'
+      quote: 'Fig. 2. Sulphide capacities of CaO–Al2O3 slag.'
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: hino_kitagawa_banya_1993_fig3_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 38
+        pdf_page_index: 3
+        page: 38
+        figure: '3'
+        note: 'Fig. 3. Sulphide capacities of CaO–Al2O3–MgO slag.'
+      units: as plotted (not tabulated)
+      values:
+        quantity: sulphide_capacity_Cs_vs_N_Al2O3
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '3'
+        caption_as_printed: 'Fig. 3. Sulphide capacities of CaO–Al2O3–MgO slag.'
+      quote: 'Fig. 3. Sulphide capacities of CaO–Al2O3–MgO slag.'
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: hino_kitagawa_banya_1993_fig7_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 39
+        pdf_page_index: 4
+        page: 39
+        figure: '7'
+        note: 'Fig. 7. Sulphide capacity of CaO–Al2O3–SiO2 slag at 1873 K.'
+      units: as plotted (not tabulated)
+      values:
+        quantity: sulphide_capacity_Cs_vs_N_Al2O3
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '7'
+        caption_as_printed: 'Fig. 7. Sulphide capacity of CaO–Al2O3–SiO2 slag at 1873 K.'
+        T_K_as_printed: 1873
+      quote: 'Fig. 7. Sulphide capacity of CaO–Al2O3–SiO2 slag at 1873 K.'
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: hino_kitagawa_banya_1993_fig9_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 40
+        pdf_page_index: 5
+        page: 40
+        figure: '9'
+        note: 'Fig. 9. Comparison of the change of sulphide capacity in CaO–Al2O3 slag by addition of MgO or SiO2 at 1873 K.'
+      units: as plotted (not tabulated)
+      values:
+        quantity: sulphide_capacity_Cs_vs_N_MgO_N_SiO2
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '9'
+        caption_as_printed: 'Fig. 9. Comparison of the change of sulphide capacity in CaO–Al2O3 slag by addition of MgO or SiO2 at 1873 K.'
+        T_K_as_printed: 1873
+      quote: 'Fig. 9. Comparison of the change of sulphide capacity in CaO–Al2O3 slag by addition of MgO or SiO2 at 1873 K.'
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: hino_kitagawa_banya_1993_fig10_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 41
+        pdf_page_index: 6
+        page: 41
+        figure: '10'
+        note: 'Fig. 10. Comparison of the change of sulphur distribution ratio between CaO–Al2O3 slag and liquid iron by addition of MgO or SiO2 to the slag at 1873 K.'
+      units: as plotted (not tabulated)
+      values:
+        quantity: sulphur_distribution_ratio_Ls
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '10'
+        caption_as_printed: 'Fig. 10. Comparison of the change of sulphur distribution ratio between CaO–Al2O3 slag and liquid iron by addition of MgO or SiO2 to the slag at 1873 K.'
+        T_K_as_printed: 1873
+        assumed_sol_Al_as_printed: '[sol Al] = 0.01 mass%'
+      quote: 'Fig. 10. Comparison of the change of sulphur distribution ratio between CaO–Al2O3 slag and liquid iron by addition of MgO or SiO2 to the slag at 1873 K.'
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+  O:
+    observations:
+    - observation_id: hino_kitagawa_banya_1993_eq4_logK3
+      type: gibbs_table
+      locator:
+        published_page: 40
+        pdf_page_index: 5
+        page: 40
+        equation: '4'
+        note: log K3 for 1/2 O2(g) = O in liquid iron, cited Steelmaking Data Sourcebook 17)
+      units: log10 K; T in K
+      values:
+        quantity: oxygen_dissolution_in_liquid_iron_logK
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        reaction_as_printed: 1/2 O2(g) = O
+        A_over_T: 6070
+        intercept: 0.210
+        A_over_T_as_printed: '6070/T'
+        intercept_as_printed: '+0.210'
+        equation_as_printed: log K3 = log{aO/PO2^{1/2}} = 6070/T + 0.210
+        cited_as: Steelmaking Data Sourcebook 17)
+      quote: '1/2 O2(g) = O .....................(3). log K3 = log{aO/P^{1/2}_O2} = 6070/T + 0.210^{17} ......(4)'
+      phase: liquid_iron
+      standard_state: dissolved O in liquid iron (Henrian)
+      uncertainty:
+        note: none printed on Eq. (4); compiled from ref. 17
+  Al2O3:
+    observations:
+    - observation_id: hino_kitagawa_banya_1993_eq9_logK8
+      type: gibbs_table
+      locator:
+        published_page: 40
+        pdf_page_index: 5
+        page: 40
+        equation: '9'
+        note: log K8 for 2Al + 3O = (Al2O3), cited Steelmaking Data Sourcebook 17)
+      units: log10 K; T in K
+      values:
+        quantity: aluminium_deoxidation_logK
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        reaction_as_printed: 2Al + 3O = (Al2O3)
+        A_over_T: 64900
+        intercept: -20.63
+        A_over_T_as_printed: '64 900/T'
+        intercept_as_printed: '−20.63'
+        equation_as_printed: log K8 = log[aAl2O3/{aAl^2 · aO^3}] = 64900/T − 20.63
+        cited_as: Steelmaking Data Sourcebook 17)
+      quote: '2Al + 3O = (Al2O3) .....................(8). log K8 = log[aAl2O3/{a^2_Al · a^3_O}] = 64 900/T − 20.63^{17} ......(9)'
+      phase: liquid_iron_equilibrated_with_aluminate_slag
+      standard_state: Al2O3 in slag; Al and O dissolved in liquid iron
+      uncertainty:
+        note: none printed on Eq. (9); compiled from ref. 17
+  MgO:
+    observations:
+    - observation_id: hino_kitagawa_banya_1993_fig4_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 39
+        pdf_page_index: 4
+        page: 39
+        figure: '4'
+        note: 'Fig. 4. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1823 K. ●: experimental composition. Numerical values show −log Cs.'
+      units: as plotted (not tabulated)
+      values:
+        quantity: iso_sulphide_capacity_ternary
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '4'
+        caption_as_printed: 'Fig. 4. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1823 K. ●: experimental composition. Numerical values show −log Cs.'
+        T_K_as_printed: 1823
+      quote: 'Fig. 4. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1823 K. ●: experimental composition. Numerical values show −log Cs.'
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: hino_kitagawa_banya_1993_fig5_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 39
+        pdf_page_index: 4
+        page: 39
+        figure: '5'
+        note: 'Fig. 5. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1873 K. ●: experimental composition. Numerical values show −log Cs.'
+      units: as plotted (not tabulated)
+      values:
+        quantity: iso_sulphide_capacity_ternary
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '5'
+        caption_as_printed: 'Fig. 5. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1873 K. ●: experimental composition. Numerical values show −log Cs.'
+        T_K_as_printed: 1873
+      quote: 'Fig. 5. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1873 K. ●: experimental composition. Numerical values show −log Cs.'
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: hino_kitagawa_banya_1993_fig6_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 39
+        pdf_page_index: 4
+        page: 39
+        figure: '6'
+        note: 'Fig. 6. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1923 K. ●: experimental composition. Numerical values show −log Cs.'
+      units: as plotted (not tabulated)
+      values:
+        quantity: iso_sulphide_capacity_ternary
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '6'
+        caption_as_printed: 'Fig. 6. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1923 K. ●: experimental composition. Numerical values show −log Cs.'
+        T_K_as_printed: 1923
+      quote: 'Fig. 6. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1923 K. ●: experimental composition. Numerical values show −log Cs.'
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+  SiO2:
+    observations:
+    - observation_id: hino_kitagawa_banya_1993_fig8_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 40
+        pdf_page_index: 5
+        page: 40
+        figure: '8'
+        note: 'Fig. 8. Iso-sulphide capacity curves in CaO–Al2O3–SiO2 slag at 1873 K. ●: experimental composition. Numerical values show −log Cs.'
+      units: as plotted (not tabulated)
+      values:
+        quantity: iso_sulphide_capacity_ternary
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '8'
+        caption_as_printed: 'Fig. 8. Iso-sulphide capacity curves in CaO–Al2O3–SiO2 slag at 1873 K. ●: experimental composition. Numerical values show −log Cs.'
+        T_K_as_printed: 1873
+      quote: 'Fig. 8. Iso-sulphide capacity curves in CaO–Al2O3–SiO2 slag at 1873 K. ●: experimental composition. Numerical values show −log Cs.'
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised

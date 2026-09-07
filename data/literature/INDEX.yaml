@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 126
-  extracts: 123
+  sources: 127
+  extracts: 124
   pdfs_present_in_worktree: 44
   extracts_with_private_locators: 37
   pdfs_tracked_99_kems_langmuir: 39
   pdfs_without_extract: 3
-  extracts_without_pdf: 82
+  extracts_without_pdf: 83
   alias_groups_needing_resolution: 30
 gaps:
   pdfs_without_extract:
@@ -102,6 +102,7 @@ gaps:
   - sf04-magma-companion-workbook
   - slag-001-banya-1993
   - slag-002-banya-hino-nagasaka-1993
+  - slag-003-hino-kitagawa-banya-1993
   - sossi-et-al-2019
   - span-wagner-1996-co2-psat
   - wetzel-gail-2013-sio-arrhenius
@@ -552,6 +553,7 @@ gaps:
     source_ids:
     - slag-001-banya-1993
     - slag-002-banya-hino-nagasaka-1993
+    - slag-003-hino-kitagawa-banya-1993
     resolution: owner/controller
   - type: source_id_alias
     key: sossi-2018
@@ -7282,6 +7284,64 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/slag-002-banya-hino-nagasaka-1993.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: 0b3e68761c487cb473e56790c082754c0b16227d
+- source_id: slag-003-hino-kitagawa-banya-1993
+  aliases: []
+  citation: Hino, M., Kitagawa, S. and Ban-Ya, S. (1993), "Sulphide Capacities of CaO-Al2O3-MgO and CaO-Al2O3-SiO2
+    Slags", ISIJ International 33(1), 36–42, DOI 10.2355/isijinternational.33.36
+  doi: 10.2355/isijinternational.33.36
+  report_number: null
+  identifier: 10.2355/isijinternational.33.36
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml
+    review_status: draft
+    rows: 18
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/slag-003-hino-kitagawa-banya-1993/slag-003-hino-kitagawa-banya-1993.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/slag-003-hino-kitagawa-banya-1993/sidecar.yaml
+      present: false
+    text:
+      path: text/slag-003-hino-kitagawa-banya-1993
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/slag-003-hino-kitagawa-banya-1993
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/slag-003-hino-kitagawa-banya-1993.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/slag-003-hino-kitagawa-banya-1993.yaml
       present: false
       error: null
       last_stage: null
