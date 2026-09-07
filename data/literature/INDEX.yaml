@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 124
-  extracts: 121
+  sources: 125
+  extracts: 122
   pdfs_present_in_worktree: 44
   extracts_with_private_locators: 37
   pdfs_tracked_99_kems_langmuir: 39
   pdfs_without_extract: 3
-  extracts_without_pdf: 80
+  extracts_without_pdf: 81
   alias_groups_needing_resolution: 29
 gaps:
   pdfs_without_extract:
@@ -100,6 +100,7 @@ gaps:
   - richter-et-al-2007
   - safarian-engh-2013-si-pure-langmuir
   - sf04-magma-companion-workbook
+  - slag-001-banya-1993
   - sossi-et-al-2019
   - span-wagner-1996-co2-psat
   - wetzel-gail-2013-sio-arrhenius
@@ -7161,6 +7162,64 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
+    commit: 595ecad069f3ab85c89eaeb05521a9a93377ad51
+- source_id: slag-001-banya-1993
+  aliases: []
+  citation: Ban-Ya, Shiro (1993), "Mathematical Expression of Slag-Metal Reactions in Steelmaking Process
+    by Quadratic Formalism Based on the Regular Solution Model", ISIJ International 33(1), 2–11, DOI 10.2355/isijinternational.33.2
+  doi: 10.2355/isijinternational.33.2
+  report_number: null
+  identifier: 10.2355/isijinternational.33.2
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/slag-001-banya-1993.yaml
+    review_status: draft
+    rows: 48
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/slag-001-banya-1993/slag-001-banya-1993.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/slag-001-banya-1993/sidecar.yaml
+      present: false
+    text:
+      path: text/slag-001-banya-1993
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/slag-001-banya-1993
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/slag-001-banya-1993.yaml
+      present: true
+      matches_simulator: true
+    ledger:
+      path: ledger/slag-001-banya-1993.yaml
+      present: true
+      error: null
+      last_stage: extracted
+      date: '2026-09-07'
     commit: 595ecad069f3ab85c89eaeb05521a9a93377ad51
 - source_id: smales-1971-lpsc-12022
   aliases: []

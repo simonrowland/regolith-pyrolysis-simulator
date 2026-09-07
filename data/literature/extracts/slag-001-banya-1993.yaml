@@ -1,0 +1,1800 @@
+schema_version: literature_extract.v1
+source_id: slag-001-banya-1993
+source:
+  citation: Ban-Ya, Shiro (1993), "Mathematical Expression of Slag-Metal Reactions in Steelmaking Process
+    by Quadratic Formalism Based on the Regular Solution Model", ISIJ International 33(1), 2–11, DOI 10.2355/isijinternational.33.2
+  doi: 10.2355/isijinternational.33.2
+  url: https://doi.org/10.2355/isijinternational.33.2
+  year: 1993
+  corpus_source_id: banya-1993-quadratic-formalism-slag-metal
+extraction:
+  method: Manual transcription from 200–300 dpi pdftoppm renders of the J-STAGE PDF (regolith-corpus raw/banya-1993-quadratic-formalism-slag-metal).
+    Tables 1–3 taken from the page-3 render, not MinerU grids or pdftotext-layout (both scramble the two-column
+    table). Equation coefficients from page renders. Figures recorded as figure_only except printed-on-figure
+    equations (Fig. 7, 11, 12). No plot digitisation, no unit conversion, no gap-fill.
+  date: '2026-09-07'
+  worker: new-extract-banya-1993
+  provenance_path: docs-private/research/2026-09-06-deepening/NEW-banya-1993.md
+review_status: draft
+fidelity_samples:
+- species: FeO
+  observable: activity_coefficient
+  observation_id: banya_1993_table1_alpha_ij_major
+  field: alpha_Fe2_Fe3_J
+  value: -18660
+  locator:
+    published_page: 3
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1 Fe2+/Fe3+ cell printed −18 660
+- species: FeO
+  observable: activity_coefficient
+  observation_id: banya_1993_table1_alpha_ij_major
+  field: alpha_Ca_Si_J
+  value: -133890
+  locator:
+    published_page: 3
+    table: '1'
+    note: Table 1 Ca2+/Si4+ cell printed −133 890
+- species: Na2O
+  observable: activity_coefficient
+  observation_id: banya_1993_table2_alpha_ij_other
+  field: alpha_Na_Si_J
+  value: -111290
+  locator:
+    published_page: 3
+    table: '2'
+    note: Table 2 Na+–Si4+ cell printed −111 290
+- species: FeO
+  observable: gibbs_table
+  observation_id: banya_1993_table3_conversion_factors
+  field: FetO_A_J
+  value: -8540
+  locator:
+    published_page: 3
+    table: '3'
+    note: Table 3 FetO conversion A printed −8 540
+- species: FeO
+  observable: gibbs_table
+  observation_id: banya_1993_table3_conversion_factors
+  field: FetO_B_J_per_K
+  value: 7.142
+  locator:
+    published_page: 3
+    table: '3'
+    note: Table 3 FetO conversion B printed +7.142T
+- species: SiO2
+  observable: activity_coefficient
+  observation_id: banya_1993_eq13_gamma_SiO2_quadratic
+  field: alpha_Ca_Si_J
+  value: -133900
+  locator:
+    published_page: 4
+    equation: '13'
+    figure: '2'
+    note: Eq. (13) and Fig. 2 slope print −133 900, not the Table 1 −133 890
+- species: MnO
+  observable: activity_coefficient
+  observation_id: banya_1993_fig7_printed_logK_Mn_fit
+  field: A_over_T
+  value: 7386
+  locator:
+    published_page: 6
+    figure: '7'
+    note: Fig. 7 printed log K_Mn = 7386/T − 3.462
+- species: P2O5
+  observable: activity_coefficient
+  observation_id: banya_1993_fig11_printed_logK_P1_fit
+  field: A_over_T
+  value: 17060
+  locator:
+    published_page: 8
+    figure: '11'
+    note: Fig. 11 printed log K_P1 = 17060/T − 8.510
+- species: P2O5
+  observable: activity_coefficient
+  observation_id: banya_1993_fig12_printed_logK_P2_fit
+  field: intercept
+  value: -0.936
+  locator:
+    published_page: 8
+    figure: '12'
+    note: Fig. 12 printed log K_P2 = 328/T − 0.936
+- species: H2O
+  observable: gibbs_table
+  observation_id: banya_1993_eq47_hydroxyl_dG
+  field: A_J
+  value: -19800
+  locator:
+    published_page: 9
+    equation: '47'
+    note: Eq. (47) ΔG°_H2O = −19 800 + 26.32 T (J)
+- species: FeO
+  observable: activity_coefficient
+  observation_id: banya_1993_fig4_figure_only
+  field: admission_status
+  value: figure_only
+  locator:
+    published_page: 5
+    figure: '4'
+    note: a_FetO ternary is figure-only; points not read
+species:
+  FeO:
+    observations:
+    - observation_id: banya_1993_table1_alpha_ij_major
+      type: activity_coefficient
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Interaction energy αij between major steelmaking-slag cations
+      units: J
+      values:
+        quantity: quadratic_formalism_interaction_energy_alpha_ij
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        oxide_formula_as_published: cation pairs in FetO-CaO-SiO2-MnO-MgO-P2O5-Al2O3 slag
+        composition_basis: cation_fraction
+        reference_state: hypothetical pure liquid of regular nature (R.S.)
+        temperature_dependence: treated as T-independent in the model
+        alpha_Fe2_Fe3_J: -18660
+        alpha_Ca_Si_J: -133890
+        matrix_cations:
+        - Fe2+
+        - Fe3+
+        - Mn2+
+        - Ca2+
+        - Mg2+
+        - Si4+
+        - P5+
+        - Al3+
+        matrix_J:
+          Fe2+:
+            Fe2+: null
+            Fe3+: -18660
+            Mn2+: 7110
+            Ca2+: -31380
+            Mg2+: 33470
+            Si4+: -41840
+            P5+: -31380
+            Al3+: -41000
+          Fe3+:
+            Fe2+: -18660
+            Fe3+: null
+            Mn2+: -56480
+            Ca2+: -95810
+            Mg2+: -2930
+            Si4+: 32640
+            P5+: 14640
+            Al3+: -161080
+          Mn2+:
+            Fe2+: 7110
+            Fe3+: -56480
+            Mn2+: null
+            Ca2+: -92050
+            Mg2+: 61920
+            Si4+: -75310
+            P5+: -84940
+            Al3+: -83680
+          Ca2+:
+            Fe2+: -31380
+            Fe3+: -95810
+            Mn2+: -92050
+            Ca2+: null
+            Mg2+: -100420
+            Si4+: -133890
+            P5+: -251040
+            Al3+: -154810
+          Mg2+:
+            Fe2+: 33470
+            Fe3+: -2930
+            Mn2+: 61920
+            Ca2+: -100420
+            Mg2+: null
+            Si4+: -66940
+            P5+: -37660
+            Al3+: -71130
+          Si4+:
+            Fe2+: -41840
+            Fe3+: 32640
+            Mn2+: -75310
+            Ca2+: -133890
+            Mg2+: -66940
+            Si4+: null
+            P5+: 83680
+            Al3+: -127610
+          P5+:
+            Fe2+: -31380
+            Fe3+: 14640
+            Mn2+: -84940
+            Ca2+: -251040
+            Mg2+: -37660
+            Si4+: 83680
+            P5+: null
+            Al3+: -261500
+          Al3+: &id026
+            Fe2+: -41000
+            Fe3+: -161080
+            Mn2+: -83680
+            Ca2+: -154810
+            Mg2+: -71130
+            Si4+: -127610
+            P5+: -261500
+            Al3+: null
+        matrix_as_printed:
+          Fe2+:
+            Fe2+: —
+            Fe3+: -18 660
+            Mn2+: +7 110
+            Ca2+: -31 380
+            Mg2+: +33 470
+            Si4+: -41 840
+            P5+: -31 380
+            Al3+: -41 000
+          Fe3+:
+            Fe2+: -18 660
+            Fe3+: —
+            Mn2+: -56 480
+            Ca2+: -95 810
+            Mg2+: -2 930
+            Si4+: +32 640
+            P5+: +14 640
+            Al3+: -161 080
+          Mn2+:
+            Fe2+: +7 110
+            Fe3+: -56 480
+            Mn2+: —
+            Ca2+: -92 050
+            Mg2+: +61 920
+            Si4+: -75 310
+            P5+: -84 940
+            Al3+: -83 680
+          Ca2+:
+            Fe2+: -31 380
+            Fe3+: -95 810
+            Mn2+: -92 050
+            Ca2+: —
+            Mg2+: -100 420
+            Si4+: -133 890
+            P5+: -251 040
+            Al3+: -154 810
+          Mg2+:
+            Fe2+: +33 470
+            Fe3+: -2 930
+            Mn2+: +61 920
+            Ca2+: -100 420
+            Mg2+: —
+            Si4+: -66 940
+            P5+: -37 660
+            Al3+: -71 130
+          Si4+:
+            Fe2+: -41 840
+            Fe3+: +32 640
+            Mn2+: -75 310
+            Ca2+: -133 890
+            Si4+: —
+            Mg2+: -66 940
+            P5+: +83 680
+            Al3+: -127 610
+          P5+:
+            Fe2+: -31 380
+            Fe3+: +14 640
+            Mn2+: -84 940
+            Ca2+: -251 040
+            Mg2+: -37 660
+            Si4+: +83 680
+            P5+: —
+            Al3+: -261 500
+          Al3+: &id027
+            Fe2+: -41 000
+            Fe3+: -161 080
+            Mn2+: -83 680
+            Ca2+: -154 810
+            Mg2+: -71 130
+            Si4+: -127 610
+            P5+: -261 500
+            Al3+: —
+        diagonal_printed: —
+      quote: 'Table 1. Interaction energy between cations of major components in steelmaking slag, αij.
+        (J). Fe2+ row: —  -18 660  +7 110  -31 380  +33 470  -41 840  -31 380  -41 000. Fe3+ row: -18
+        660  —  -56 480  -95 810  -2 930  +32 640  +14 640  -161 080. Mn2+ row: +7 110  -56 480  —  -92
+        050  +61 920  -75 310  -84 940  -83 680. Ca2+ row: -31 380  -95 810  -92 050  —  -100 420  -133
+        890  -251 040  -154 810. Mg2+ row: +33 470  -2 930  +61 920  -100 420  —  -66 940  -37 660  -71
+        130. Si4+ row: -41 840  +32 640  -75 310  -133 890  -66 940  —  +83 680  -127 610. P5+ row: -31
+        380  +14 640  -84 940  -251 040  -37 660  +83 680  —  -261 500. Al3+ row: -41 000  -161 080  -83
+        680  -154 810  -71 130  -127 610  -261 500  —.'
+      phase: steelmaking_silicate_slag
+      standard_state: hypothetical pure liquid regular solution; αij is (i cation)-O-(j cation) interaction
+        energy
+      uncertainty:
+        note: none printed on Table 1
+    - observation_id: banya_1993_table3_conversion_factors
+      type: gibbs_table
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '3'
+        note: Conversion factors of activities; ΔG° = A + B T (J)
+      units: J; ΔG° = A + B T
+      values:
+        quantity: activity_reference_state_conversion_deltaG
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        equation_as_printed: ΔG° = A + B T (J)
+        T_in_equation: kelvin
+        FetO_A_J: -8540
+        FetO_B_J_per_K: 7.142
+        rows:
+        - oxide: FeO
+          reaction_as_printed: FetO(l) + (1-t)Fe(s or l) = FeO(R.S.)
+          A_J: -8540
+          B_J_per_K: 7.142
+          A_as_printed: -8 540
+          B_as_printed: +7.142T
+        - &id002
+          oxide: SiO2
+          phase: beta-tridymite
+          reaction_as_printed: SiO2(β-tr) = SiO2(R.S.)
+          A_J: 27150
+          B_J_per_K: -2.054
+          A_as_printed: +27 150
+          B_as_printed: -2.054T
+        - &id003
+          oxide: SiO2
+          phase: beta-cristobalite
+          reaction_as_printed: SiO2(β-cr) = SiO2(R.S.)
+          A_J: 27030
+          B_J_per_K: -1.983
+          A_as_printed: +27 030
+          B_as_printed: -1.983T
+        - &id004
+          oxide: SiO2
+          phase: liquid
+          reaction_as_printed: SiO2(l) = SiO2(R.S.)
+          A_J: 17450
+          B_J_per_K: 2.82
+          B_as_printed_table: +2.820T
+          A_as_printed: +17 450
+          B_as_printed: +2.820T
+        - &id005
+          oxide: MnO
+          phase: solid
+          reaction_as_printed: MnO(s) = MnO(R.S.)
+          A_J: -32470
+          B_J_per_K: 26.143
+          A_as_printed: -32 470
+          B_as_printed: +26.143T
+        - &id006
+          oxide: MnO
+          phase: liquid
+          reaction_as_printed: MnO(l) = MnO(R.S.)
+          A_J: -86860
+          B_J_per_K: 51.465
+          A_as_printed: -86 860
+          B_as_printed: +51.465T
+        - &id001
+          oxide: Na2O
+          reaction_as_printed: Na2O(l) = 2NaO0.5(R.S.)
+          A_J: -185060
+          B_J_per_K: 22.866
+          A_as_printed: -185 060
+          B_as_printed: +22.866T
+          stoichiometry_note: one Na2O(l) to two NaO0.5(R.S.)
+        - &id007
+          oxide: CaO
+          phase: solid
+          reaction_as_printed: CaO(s) = CaO(R.S.)
+          A_J: 18160
+          B_J_per_K: -23.309
+          A_as_printed: +18 160
+          B_as_printed: -23.309T
+        - &id008
+          oxide: CaO
+          phase: liquid
+          reaction_as_printed: CaO(l) = CaO(R.S.)
+          A_J: -40880
+          B_J_per_K: -4.703
+          A_as_printed: -40 880
+          B_as_printed: -4.703T
+        - &id009
+          oxide: MgO
+          phase: solid
+          reaction_as_printed: MgO(s) = MgO(R.S.)
+          A_J: 34350
+          B_J_per_K: -16.736
+          A_as_printed: +34 350
+          B_as_printed: -16.736T
+        - &id010
+          oxide: MgO
+          phase: liquid
+          reaction_as_printed: MgO(l) = MgO(R.S.)
+          A_J: -23300
+          B_J_per_K: 1.833
+          A_as_printed: -23 300
+          B_as_printed: +1.833T
+        - &id011
+          oxide: P2O5
+          reaction_as_printed: P2O5(l) = 2PO2.5(R.S.)
+          A_J: 52720
+          B_J_per_K: -230.706
+          A_as_printed: +52 720
+          B_as_printed: -230.706T
+          stoichiometry_note: one P2O5(l) to two PO2.5(R.S.)
+      quote: Table 3. Conversion factors of activities. FetO(l)+(1−t)Fe(s or l)=FeO(R.S.)  ΔG° = −8 540
+        + 7.142T; SiO2(β-tr)=SiO2(R.S.)  ΔG° = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.)  ΔG° = +27 030
+        − 1.983T; SiO2(l)=SiO2(R.S.)  ΔG° = +17 450 + 2.820T; MnO(s)=MnO(R.S.)  ΔG° = −32 470 + 26.143T;
+        MnO(l)=MnO(R.S.)  ΔG° = −86 860 + 51.465T; Na2O(l)=2NaO0.5(R.S.)  ΔG° = −185 060 + 22.866T; CaO(s)=CaO(R.S.)  ΔG°
+        = +18 160 − 23.309T; CaO(l)=CaO(R.S.)  ΔG° = −40 880 − 4.703T; MgO(s)=MgO(R.S.)  ΔG° = +34 350
+        − 16.736T; MgO(l)=MgO(R.S.)  ΔG° = −23 300 + 1.833T; P2O5(l)=2PO2.5(R.S.)  ΔG° = +52 720 − 230.706T.
+      phase: oxide_melt_reference_state_conversion
+      standard_state: conventional oxide (s or l as printed) to hypothetical R.S. liquid
+      uncertainty:
+        note: none printed on Table 3
+    - observation_id: banya_1993_eq16_oxygen_distribution_dG
+      type: gibbs_table
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        page: 4
+        equation: '16'
+        note: Fe(l)+O=FeO(R.S.)
+      units: J; ΔG° = A + B T
+      values:
+        quantity: oxygen_distribution_deltaG
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        reaction_as_printed: Fe(l) + O = FeO(R.S.)
+        A_J: 128100
+        B_J_per_K: -57.99
+        equation_as_printed: ΔG° = 128 100 − 57.99 T (J)
+      quote: ΔG° = 128 100 − 57.99 T (J)
+      phase: steelmaking_silicate_slag
+      standard_state: FeO(R.S.); oxygen as dissolved O in liquid iron
+      uncertainty:
+        note: none printed on Eq. (16); text later claims oxygen content estimated within ±10%
+    - observation_id: banya_1993_eq17_gamma_FeO_expansion
+      type: activity_coefficient
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        page: 4
+        equation: '17'
+      units: J
+      values:
+        quantity: activity_coefficient_FeO_quadratic_expansion
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        system: FeO-Fe2O3-MnO-SiO2-MgO-CaO
+        composition_basis: cation_fraction
+        equation_as_printed: RT ln γ_FeO = −18 660 X_FeO1.5^2 + 7 110 X_MnO^2 − 41 840 X_SiO2^2 + 33 470
+          X_MgO^2 − 31 380 X_CaO^2 + 44 930 X_FeO1.5·X_MnO − 93 140 X_FeO1.5·X_SiO2 + 17 740 X_FeO1.5·X_MgO
+          + 45 770 X_FeO1.5·X_CaO + 40 580 X_MnO·X_SiO2 − 21 340 X_MnO·X_MgO + 67 780 X_MnO·X_CaO + 58
+          570 X_SiO2·X_MgO + 60 670 X_SiO2·X_CaO + 102 510 X_MgO·X_CaO (J)
+        coeff_X_FeO15_sq: -18660
+        coeff_X_MnO_sq: 7110
+        coeff_X_SiO2_sq: -41840
+        coeff_X_MgO_sq: 33470
+        coeff_X_CaO_sq: -31380
+      quote: RT ln γ_FeO = −18 660 X_FeO1.5^2 + 7 110 X_MnO^2 − 41 840 X_SiO2^2 + 33 470 X_MgO^2 − 31
+        380 X_CaO^2 + 44 930 X_FeO1.5 · X_MnO − 93 140 X_FeO1.5 · X_SiO2 + 17 740 X_FeO1.5 · X_MgO + 45
+        770 X_FeO1.5 · X_CaO + 40 580 X_MnO · X_SiO2 − 21 340 X_MnO · X_MgO + 67 780 X_MnO · X_CaO + 58
+        570 X_SiO2 · X_MgO + 60 670 X_SiO2 · X_CaO + 102 510 X_MgO · X_CaO (J).
+      phase: steelmaking_silicate_slag
+      standard_state: FeO(R.S.)
+      uncertainty:
+        note: none printed on Eq. (17)
+    - observation_id: banya_1993_eq33_a_FetO_l
+      type: activity_coefficient
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        page: 7
+        equation: '33'
+        figure: '9'
+      units: J
+      values:
+        quantity: activity_FetO_liquid_standard_state
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        system: FetO-SiO2-MnO
+        coeff_X_FeO15_sq: 18660
+        coeff_X_SiO2_sq: -41842
+        coeff_X_MnO_sq: -7113
+        conversion_A_J: -8540
+        conversion_B_J_per_K: 7.172
+        table3_discrepancy: Eq. (33) uses −8 540 + 7.172 T and −41 842 / −7 113; Table 3 prints +7.142
+          T and Table 1 prints −41 840 / +7 110. Both retained.
+        equation_as_printed: RT ln a_FetO(l) = 18 660 X_FeO1.5^2 − 41 842 X_SiO2^2 − 7 113 X_MnO^2 − 93
+          140 X_FeO1.5·X_SiO2 + 44 940 X_FeO1.5·X_MnO + 40 590 X_SiO2·X_MnO − 8 540 + 7.172 T (J)
+      quote: RT ln a_FetO(l) = 18 660 X_FeO1.5^2 − 41 842 X_SiO2^2 − 7 113 X_MnO^2 − 93 140 X_FeO1.5 ·
+        X_SiO2 + 44 940 X_FeO1.5 · X_MnO + 40 590 X_SiO2 · X_MnO − 8 540 + 7.172 T (J)
+      T_range_K:
+      - 1723.0
+      - 1723.0
+      phase: FetO-SiO2-MnO slag in equilibrium with solid iron
+      standard_state: conventional liquid FetO
+      uncertainty:
+        note: none printed on Eq. (33)
+    - observation_id: banya_1993_fig3_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        page: 5
+        figure: '3'
+        note: Fig. 3. Estimated values for oxygen contents by regular solution model and the measured
+          values in liquid iron equilibrated with FetO-(CaO+MgO)-SiO2 slags.
+      units: as plotted (not tabulated)
+      values:
+        quantity: oxygen_content_measured_vs_calculated_ppm
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '3'
+        caption_as_printed: Fig. 3. Estimated values for oxygen contents by regular solution model and
+          the measured values in liquid iron equilibrated with FetO-(CaO+MgO)-SiO2 slags.
+      quote: Fig. 3. Estimated values for oxygen contents by regular solution model and the measured values
+        in liquid iron equilibrated with FetO-(CaO+MgO)-SiO2 slags.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: banya_1993_fig4_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        page: 5
+        figure: '4'
+        note: Fig. 4. Estimated values for a_FetO(l) by regular solution model and the measured values
+          in FetO-CaO-SiO2 slags equilibrated with liquid iron at 1873 K.
+      units: as plotted (not tabulated)
+      values:
+        quantity: activity_FetO
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '4'
+        caption_as_printed: Fig. 4. Estimated values for a_FetO(l) by regular solution model and the measured
+          values in FetO-CaO-SiO2 slags equilibrated with liquid iron at 1873 K.
+      quote: Fig. 4. Estimated values for a_FetO(l) by regular solution model and the measured values
+        in FetO-CaO-SiO2 slags equilibrated with liquid iron at 1873 K.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+      T_range_K:
+      - 1873.0
+      - 1873.0
+    - observation_id: banya_1993_fig9_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        page: 7
+        figure: '9'
+        note: Fig. 9. Comparison of calculated a_FetO(l) with the measured one in FetO-SiO2-MnO slags
+          in equilibrium with solid iron at 1723 K.
+      units: as plotted (not tabulated)
+      values:
+        quantity: activity_FetO
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '9'
+        caption_as_printed: Fig. 9. Comparison of calculated a_FetO(l) with the measured one in FetO-SiO2-MnO
+          slags in equilibrium with solid iron at 1723 K.
+      quote: Fig. 9. Comparison of calculated a_FetO(l) with the measured one in FetO-SiO2-MnO slags in
+        equilibrium with solid iron at 1723 K.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+      T_range_K:
+      - 1723.0
+      - 1723.0
+    - observation_id: banya_1993_fig17_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 10
+        pdf_page_index: 9
+        page: 10
+        figure: '17'
+        note: Fig. 17. Correlation between interaction energies and the heats of formation of complex
+          oxides at 298 K.
+      units: as plotted (not tabulated)
+      values:
+        quantity: alpha_ij_Xi_Xj_vs_deltaH298
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '17'
+        caption_as_printed: Fig. 17. Correlation between interaction energies and the heats of formation
+          of complex oxides at 298 K.
+      quote: Fig. 17. Correlation between interaction energies and the heats of formation of complex oxides
+        at 298 K.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: banya_1993_fig18_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 10
+        pdf_page_index: 9
+        page: 10
+        figure: '18'
+        note: Fig. 18. Relation between interaction energies and cation radii.
+      units: as plotted (not tabulated)
+      values:
+        quantity: alpha_Fe2+_M_vs_cation_radius
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '18'
+        caption_as_printed: Fig. 18. Relation between interaction energies and cation radii.
+      quote: Fig. 18. Relation between interaction energies and cation radii.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+  Na2O:
+    observations:
+    - observation_id: banya_1993_table2_alpha_ij_other
+      type: activity_coefficient
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '2'
+        note: Interaction energy αij between cations of other components
+      units: J
+      values:
+        quantity: quadratic_formalism_interaction_energy_alpha_ij
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        composition_basis: cation_fraction
+        reference_state: hypothetical pure liquid of regular nature (R.S.)
+        alpha_Na_Si_J: -111290
+        pairs:
+        - i: Li+
+          j: Si4+
+          alpha_ij_J: -142130
+          as_printed: -142 130
+        - i: Na+
+          j: Fe2+
+          alpha_ij_J: 19250
+          as_printed: +19 250
+        - i: Na+
+          j: Fe3+
+          alpha_ij_J: -74890
+          as_printed: -74 890
+        - i: Na+
+          j: Si4+
+          alpha_ij_J: -111290
+          as_printed: -111 290
+        - i: Na+
+          j: P5+
+          alpha_ij_J: -50210
+          as_printed: -50 210
+        - i: K+
+          j: Si4+
+          alpha_ij_J: -81030
+          as_printed: -81 030
+        - &id021
+          i: Ti4+
+          j: Ca2+
+          alpha_ij_J: -167360
+          as_printed: -167 360
+        - &id022
+          i: Ti4+
+          j: Mn2+
+          alpha_ij_J: -66940
+          as_printed: -66 940
+        - &id023
+          i: Ti4+
+          j: Fe2+
+          alpha_ij_J: -37660
+          as_printed: -37 660
+        - &id024
+          i: Ti4+
+          j: Fe3+
+          alpha_ij_J: 1260
+          as_printed: +1 260
+        - &id025
+          i: Ti4+
+          j: Si4+
+          alpha_ij_J: 104600
+          as_printed: +104 600
+        - &id012
+          i: H+
+          j: Li+
+          alpha_ij_J: 1500
+          as_printed: +1 500
+        - &id013
+          i: H+
+          j: Na+
+          alpha_ij_J: 9750
+          as_printed: +9 750
+        - &id014
+          i: H+
+          j: K+
+          alpha_ij_J: 13520
+          as_printed: +13 520
+        - &id015
+          i: H+
+          j: Mg2+
+          alpha_ij_J: 15800
+          as_printed: +15 800
+        - &id016
+          i: H+
+          j: Ca2+
+          alpha_ij_J: 15100
+          as_printed: +15 100
+        - &id017
+          i: H+
+          j: Mn2+
+          alpha_ij_J: -8230
+          as_printed: -8 230
+        - &id018
+          i: H+
+          j: Al3+
+          alpha_ij_J: -24400
+          as_printed: -24 400
+        - &id019
+          i: H+
+          j: Si4+
+          alpha_ij_J: 30000
+          as_printed: +30 000
+        - &id020
+          i: H+
+          j: P5+
+          alpha_ij_J: 7700
+          as_printed: +7 700
+        pairs_absent_from_table:
+        - Na+–Ca2+
+        - Na+–Mg2+
+        - Na+–Al3+
+        - K+ except K+–Si4+
+        - H+–Fe2+
+        - H+–Fe3+
+      quote: Table 2. Interaction energy between cations of other components. Li+–Si4+ −142 130; Na+–Fe2+
+        +19 250; Na+–Fe3+ −74 890; Na+–Si4+ −111 290; Na+–P5+ −50 210; K+–Si4+ −81 030; Ti4+–Ca2+ −167
+        360; Ti4+–Mn2+ −66 940; Ti4+–Fe2+ −37 660; Ti4+–Fe3+ +1 260; Ti4+–Si4+ +104 600; H+–Li+ +1 500;
+        H+–Na+ +9 750; H+–K+ +13 520; H+–Mg2+ +15 800; H+–Ca2+ +15 100; H+–Mn2+ −8 230; H+–Al3+ −24 400;
+        H+–Si4+ +30 000; H+–P5+ +7 700.
+      phase: silicate_phosphate_aluminate_slag
+      standard_state: hypothetical pure liquid regular solution
+      uncertainty:
+        note: none printed on Table 2
+    - observation_id: banya_1993_table3_Na2O_conversion
+      type: gibbs_table
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '3'
+        note: Table 3 rows for Na2O
+      units: J; ΔG° = A + B T
+      values:
+        quantity: activity_reference_state_conversion_deltaG
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        oxide_formula_as_printed: Na2O
+        A_J: -185060
+        B_J_per_K: 22.866
+        rows:
+        - *id001
+      quote: Na2O(l)=2NaO0.5(R.S.) ΔG° = −185 060 + 22.866T
+      phase: oxide_melt_reference_state_conversion
+      standard_state: conventional oxide to hypothetical R.S. liquid
+      uncertainty:
+        note: none printed on Table 3
+  SiO2:
+    observations:
+    - observation_id: banya_1993_table3_SiO2_conversions
+      type: gibbs_table
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '3'
+        note: Table 3 rows for SiO2
+      units: J; ΔG° = A + B T
+      values:
+        quantity: activity_reference_state_conversion_deltaG
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        oxide_formula_as_printed: SiO2
+        A_J: 27150
+        B_J_per_K: -2.054
+        rows:
+        - *id002
+        - *id003
+        - *id004
+      quote: SiO2(β-tr)=SiO2(R.S.) ΔG° = +27 150 − 2.054T; SiO2(β-cr)=SiO2(R.S.) ΔG° = +27 030 − 1.983T;
+        SiO2(l)=SiO2(R.S.) ΔG° = +17 450 + 2.820T
+      phase: oxide_melt_reference_state_conversion
+      standard_state: conventional oxide to hypothetical R.S. liquid
+      uncertainty:
+        note: none printed on Table 3
+    - observation_id: banya_1993_eq13_gamma_SiO2_quadratic
+      type: activity_coefficient
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        page: 4
+        equation: '13'
+        figure: '2'
+        note: Printed RT ln γ_SiO2 for three reference states; slope α_Ca-Si = −133 900 J
+      units: J
+      values:
+        quantity: activity_coefficient_SiO2_quadratic_formalism
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        system: CaO-SiO2_binary
+        composition_basis: cation_fraction_as_X_SiO2
+        alpha_Ca_Si_J: -133900
+        alpha_Ca_Si_as_printed: -133 900
+        alpha_Ca_Si_table1_J: -133890
+        table1_text_discrepancy: Table 1 prints −133 890; Eq. (13) and the Fig. 2 slope print −133 900.
+          Both retained.
+        RT_ln_gamma_SiO2_RS_J: −133900 (1 − X_SiO2)^2
+        I_prime_liquid_A_J: 17450
+        I_prime_liquid_B_J_per_K: 2.82
+        I_prime_cristobalite_A_J: 27030
+        I_prime_cristobalite_B_J_per_K: -1.98
+        equations_as_printed:
+        - RT ln γ_SiO2(R.S.) = −133 900 (1 − X_SiO2)^2 (J)
+        - RT ln γ_SiO2(l) = −133 900 (1 − X_SiO2)^2 + 17 450 + 2.82 T (J)
+        - RT ln γ_SiO2(crist) = −133 900 (1 − X_SiO2)^2 + 27 030 − 1.98 T (J)
+      quote: A good linear relationship was observed for the values of RT ln γ_SiO2(crist) in the range
+        of liquid state and the interaction energy of α_Ca2+−Si4+ = −133 900 (J) was given from the slope
+        of the line. RT ln γ_SiO2(R.S.) = −133 900 (1 − X_SiO2)^2 (J). RT ln γ_SiO2(l) = −133 900 (1 −
+        X_SiO2)^2 + 17 450 + 2.82 T (J). RT ln γ_SiO2(crist) = −133 900 (1 − X_SiO2)^2 + 27 030 − 1.98
+        T (J).
+      T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: CaO-SiO2_binary_melt
+      standard_state: 'three printed reference states: R.S. hypothetical liquid; supercooled liquid silica;
+        solid cristobalite'
+      uncertainty:
+        note: none printed on Eq. (13)
+    - observation_id: banya_1993_eq6_9_12_silica_gas_slag_dG
+      type: gibbs_table
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        page: 4
+        equation: 6, 9, 12
+        note: Printed ΔG° for SiO2 + 3C = SiC + 2CO with three silica reference states
+      units: J; ΔG° = A + B T
+      values:
+        quantity: gas_slag_silica_reduction_deltaG
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        reaction_as_printed: SiO2 + 3C(s) = SiC(s) + 2CO(g)
+        rows:
+        - equation: 6
+          silica_state: cristobalite
+          A_J: 675700
+          B_J_per_K: -365.7
+          as_printed: ΔG°_SiO2(crist) = 675 700 − 365.7 T (J)
+        - equation: 9
+          silica_state: liquid
+          A_J: 666100
+          B_J_per_K: -360.9
+          as_printed: ΔG°_SiO2(l) = 666 100 − 360.9 T (J)
+        - equation: 12
+          silica_state: R.S.
+          A_J: 648700
+          B_J_per_K: -363.7
+          as_printed: ΔG°_SiO2(R.S.) = 648 700 − 363.7 T (J)
+        - equation: text_between_6_and_7
+          silica_state: SiO2(l)=SiO2(crist)
+          A_J: -9580
+          B_J_per_K: 4.8
+          as_printed: SiO2(l) = SiO2(crist), ΔG° = −9 580 + 4.80 T (J)
+        A_J: 675700
+        B_J_per_K: -365.7
+      quote: ΔG°_SiO2(crist) = 675 700 − 365.7 T (J). SiO2(l) = SiO2(crist), ΔG° = −9 580 + 4.80 T (J).
+        ΔG°_SiO2(l) = 666 100 − 360.9 T (J). ΔG°_SiO2(R.S.) = 648 700 − 363.7 T (J).
+      phase: CaO-SiO2_binary_melt
+      standard_state: as labelled per equation
+      uncertainty:
+        note: none printed
+    - observation_id: banya_1993_eq34_a_SiO2_crist
+      type: activity_coefficient
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        page: 7
+        equation: '34'
+        figure: '8'
+      units: J
+      values:
+        quantity: activity_SiO2_cristobalite
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        system: FetO-SiO2-MnO
+        coeff_X_MnO_sq: -26360
+        coeff_X_FeO_sq: -41842
+        coeff_X_FeO15_sq: 32040
+        conversion_A_J: 27030
+        conversion_B_J_per_K: -1.983
+        equation_as_printed: RT ln a_SiO2(crist) = −26 360 X_MnO^2 − 41 842 X_FeO^2 + 32 040 X_FeO1.5^2
+          − 124 270 X_MnO·X_FeO + 13 510 X_MnO·X_FeO1.5 + 9 456 X_FeO·X_FeO1.5 + 27 030 − 1.983 T (J)
+      quote: RT ln a_SiO2(crist) = −26 360 X_MnO^2 − 41 842 X_FeO^2 + 32 040 X_FeO1.5^2 − 124 270 X_MnO
+        · X_FeO + 13 510 X_MnO · X_FeO1.5 + 9 456 X_FeO · X_FeO1.5 + 27 030 − 1.983 T (J)
+      phase: FetO-SiO2-MnO slag
+      standard_state: solid cristobalite
+      uncertainty:
+        note: none printed on Eq. (34)
+    - observation_id: banya_1993_fig1_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        figure: '1'
+        note: Fig. 1. Coordination number of cation in binary silicate melts.
+      units: as plotted (not tabulated)
+      values:
+        quantity: cation_oxygen_coordination_number
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '1'
+        caption_as_printed: Fig. 1. Coordination number of cation in binary silicate melts.
+      quote: Fig. 1. Coordination number of cation in binary silicate melts.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: banya_1993_fig2_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 4
+        pdf_page_index: 3
+        page: 4
+        figure: '2'
+        note: Fig. 2. Activity coefficient of SiO2 in CaO-SiO2 binary slag at 1823 K.
+      units: as plotted (not tabulated)
+      values:
+        quantity: activity_coefficient_SiO2
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '2'
+        caption_as_printed: Fig. 2. Activity coefficient of SiO2 in CaO-SiO2 binary slag at 1823 K.
+      quote: Fig. 2. Activity coefficient of SiO2 in CaO-SiO2 binary slag at 1823 K.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+      T_range_K:
+      - 1823.0
+      - 1823.0
+    - observation_id: banya_1993_fig8_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        page: 7
+        figure: '8'
+        note: Fig. 8. Comparison of the activities of the components in MnO-SiO2 slags at 1773 K.
+      units: as plotted (not tabulated)
+      values:
+        quantity: activity_MnO_SiO2_binary
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '8'
+        caption_as_printed: Fig. 8. Comparison of the activities of the components in MnO-SiO2 slags at
+          1773 K.
+      quote: Fig. 8. Comparison of the activities of the components in MnO-SiO2 slags at 1773 K.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+      T_range_K:
+      - 1773.0
+      - 1773.0
+  MnO:
+    observations:
+    - observation_id: banya_1993_table3_MnO_conversions
+      type: gibbs_table
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '3'
+        note: Table 3 rows for MnO
+      units: J; ΔG° = A + B T
+      values:
+        quantity: activity_reference_state_conversion_deltaG
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        oxide_formula_as_printed: MnO
+        A_J: -32470
+        B_J_per_K: 26.143
+        rows:
+        - *id005
+        - *id006
+      quote: MnO(s)=MnO(R.S.) ΔG° = −32 470 + 26.143T; MnO(l)=MnO(R.S.) ΔG° = −86 860 + 51.465T
+      phase: oxide_melt_reference_state_conversion
+      standard_state: conventional oxide to hypothetical R.S. liquid
+      uncertainty:
+        note: none printed on Table 3
+    - observation_id: banya_1993_eq27_28_manganese_distribution
+      type: activity_coefficient
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        page: 6
+        equation: 27, 28
+      units: J
+      values:
+        quantity: manganese_distribution_K_and_gamma_MnO
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        reaction_as_printed: FeO(R.S.) + Mn = Fe(l) + MnO(R.S.)
+        dG_A_J: -141400
+        dG_B_J_per_K: 66.28
+        dG_as_printed: ΔG° = −141 400 + 66.28 T (J)
+        coeff_X_FeO_sq: 7110
+        coeff_X_FeO15_sq: -56480
+        coeff_X_SiO2_sq: -75310
+        coeff_X_MgO_sq: 61920
+        coeff_X_CaO_sq: -100420
+        equation_28_as_printed: RT ln γ_MnO(R.S.) = 7 110 X_FeO^2 − 56 480 X_FeO1.5^2 − 75 310 X_SiO2^2
+          + 61 920 X_MgO^2 − 100 420 X_CaO^2 − 30 710 X_FeO·X_FeO1.5 − 26 360 X_FeO·X_SiO2 + 35 560 X_FeO·X_MgO
+          − 53 560 X_FeO·X_CaO − 164 430 X_FeO1.5·X_SiO2 + 8 370 X_FeO1.5·X_MgO − 52 720 X_FeO1.5·X_CaO
+          + 53 550 X_SiO2·X_MgO − 33 470 X_SiO2·X_CaO + 70 290 X_MgO·X_CaO (J)
+      quote: ΔG° = −141 400 + 66.28 T (J). RT ln γ_MnO(R.S.) = 7 110 X_FeO^2 − 56 480 X_FeO1.5^2 − 75
+        310 X_SiO2^2 + 61 920 X_MgO^2 − 100 420 X_CaO^2 − 30 710 X_FeO · X_FeO1.5 − 26 360 X_FeO · X_SiO2
+        + 35 560 X_FeO · X_MgO − 53 560 X_FeO · X_CaO − 164 430 X_FeO1.5 · X_SiO2 + 8 370 X_FeO1.5 · X_MgO
+        − 52 720 X_FeO1.5 · X_CaO + 53 550 X_SiO2 · X_MgO − 33 470 X_SiO2 · X_CaO + 70 290 X_MgO · X_CaO
+        (J).
+      phase: FetO-MnO-CaO-MgO-SiO2 slag
+      standard_state: MnO(R.S.); composition of Fig. 6 within N_FetO < 0.5 and N_SiO2 < 0.5
+      uncertainty:
+        note: none printed on Eqs. (27)–(28)
+    - observation_id: banya_1993_eq32_a_MnO_s
+      type: activity_coefficient
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        page: 6
+        equation: '32'
+      units: J
+      values:
+        quantity: activity_MnO_solid_standard_state
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        system: FetO-SiO2-MnO
+        coeff_X_FeO_sq: 7113
+        coeff_X_FeO15_sq: -56490
+        coeff_X_SiO2_sq: -75320
+        conversion_A_J: -32470
+        conversion_B_J_per_K: 25.04
+        table1_discrepancy: Eq. (32) uses 7 113 / −56 490 / −75 320; Table 1 prints +7 110 / −56 480 /
+          −75 310. Both retained.
+        equation_as_printed: RT ln a_MnO(s) = 7 113 X_FeO^2 − 56 490 X_FeO1.5^2 − 75 320 X_SiO2^2 − 30
+          710 X_FeO·X_FeO1.5 − 26 360 X_FeO·X_SiO2 − 164 440 X_FeO1.5·X_SiO2 − 32 470 + 25.04 T (J)
+      quote: RT ln a_MnO(s) = 7 113 X_FeO^2 − 56 490 X_FeO1.5^2 − 75 320 X_SiO2^2 − 30 710 X_FeO · X_FeO1.5
+        − 26 360 X_FeO · X_SiO2 − 164 440 X_FeO1.5 · X_SiO2 − 32 470 + 25.04 T (J)
+      phase: FetO-SiO2-MnO slag
+      standard_state: solid MnO
+      uncertainty:
+        note: none printed on Eq. (32)
+    - observation_id: banya_1993_fig7_printed_logK_Mn_fit
+      type: activity_coefficient
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        page: 6
+        figure: '7'
+        note: Printed equation on Fig. 7; scatter not digitised
+      units: log10 K_Mn; T in K
+      values:
+        quantity: log_K_Mn_temperature_fit
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        A_over_T: 7386
+        intercept: -3.462
+        equation_as_printed: log K_Mn = 7386 / T − 3.462
+        y_axis_as_printed: log (a_MnO(R.S.) / (a_FeO(R.S.) · a_Mn))
+        x_axis_as_printed: 10^4 / T
+      quote: log K_Mn = 7386 / T − 3.462
+      phase: FetO-MnO-SiO2 with CaO and/or MgO as labelled on Fig. 7
+      standard_state: MnO(R.S.) / FeO(R.S.)
+      uncertainty:
+        note: no sigma printed on the Fig. 7 equation; Eq. (27) is the text counterpart
+    - observation_id: banya_1993_fig6_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        page: 6
+        figure: '6'
+        note: Fig. 6. Relation between equilibrium constant calculated by regular solution model and N_SiO2
+          at 1823 K.
+      units: as plotted (not tabulated)
+      values:
+        quantity: log_K_Mn_vs_N_SiO2
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '6'
+        caption_as_printed: Fig. 6. Relation between equilibrium constant calculated by regular solution
+          model and N_SiO2 at 1823 K.
+      quote: Fig. 6. Relation between equilibrium constant calculated by regular solution model and N_SiO2
+        at 1823 K.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+      T_range_K:
+      - 1823.0
+      - 1823.0
+    - observation_id: banya_1993_fig7_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        page: 6
+        figure: '7'
+        note: Fig. 7. Temperature dependence of equilibrium constant calculated by regular solution model.
+      units: as plotted (not tabulated)
+      values:
+        quantity: log_K_Mn_vs_inverse_T_scatter
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '7'
+        caption_as_printed: Fig. 7. Temperature dependence of equilibrium constant calculated by regular
+          solution model.
+      quote: Fig. 7. Temperature dependence of equilibrium constant calculated by regular solution model.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+  CaO:
+    observations:
+    - observation_id: banya_1993_table3_CaO_conversions
+      type: gibbs_table
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '3'
+        note: Table 3 rows for CaO
+      units: J; ΔG° = A + B T
+      values:
+        quantity: activity_reference_state_conversion_deltaG
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        oxide_formula_as_printed: CaO
+        A_J: 18160
+        B_J_per_K: -23.309
+        rows:
+        - *id007
+        - *id008
+      quote: CaO(s)=CaO(R.S.) ΔG° = +18 160 − 23.309T; CaO(l)=CaO(R.S.) ΔG° = −40 880 − 4.703T
+      phase: oxide_melt_reference_state_conversion
+      standard_state: conventional oxide to hypothetical R.S. liquid
+      uncertainty:
+        note: none printed on Table 3
+  MgO:
+    observations:
+    - observation_id: banya_1993_table3_MgO_conversions
+      type: gibbs_table
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '3'
+        note: Table 3 rows for MgO
+      units: J; ΔG° = A + B T
+      values:
+        quantity: activity_reference_state_conversion_deltaG
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        oxide_formula_as_printed: MgO
+        A_J: 34350
+        B_J_per_K: -16.736
+        rows:
+        - *id009
+        - *id010
+      quote: MgO(s)=MgO(R.S.) ΔG° = +34 350 − 16.736T; MgO(l)=MgO(R.S.) ΔG° = −23 300 + 1.833T
+      phase: oxide_melt_reference_state_conversion
+      standard_state: conventional oxide to hypothetical R.S. liquid
+      uncertainty:
+        note: none printed on Table 3
+  P2O5:
+    observations:
+    - observation_id: banya_1993_table3_P2O5_conversion
+      type: gibbs_table
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '3'
+        note: Table 3 rows for P2O5
+      units: J; ΔG° = A + B T
+      values:
+        quantity: activity_reference_state_conversion_deltaG
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        oxide_formula_as_printed: P2O5
+        A_J: 52720
+        B_J_per_K: -230.706
+        rows:
+        - *id011
+      quote: P2O5(l)=2PO2.5(R.S.) ΔG° = +52 720 − 230.706T
+      phase: oxide_melt_reference_state_conversion
+      standard_state: conventional oxide to hypothetical R.S. liquid
+      uncertainty:
+        note: none printed on Table 3
+    - observation_id: banya_1993_eq37_38_phosphorus_distribution
+      type: activity_coefficient
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        page: 7
+        equation: 37, 38
+      units: J
+      values:
+        quantity: phosphorus_distribution_K_and_gamma_PO2.5
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        reaction_as_printed: P + 2.5 O = (PO2.5)(R.S.)
+        dG_A_J: -326520
+        dG_B_J_per_K: 162.88
+        sigma_J: 13810
+        dG_as_printed: ΔG° = −326 520 + 162.88 T (σ = 13 810) (J)
+        coeff_X_FeO_sq: 31380
+        coeff_X_FeO15_sq: 14640
+        coeff_X_CaO_sq: -251040
+        equation_38_as_printed: RT ln γ_PO2.5(R.S.) = 31 380 X_FeO^2 + 14 640 X_FeO1.5^2 − 251 040 X_CaO^2
+          − 37 660 X_MgO^2 + 83 680 X_SiO2^2 + 1 920 X_FeO·X_FeO1.5 − 251 040 X_FeO·X_CaO − 102 510 X_FeO·X_MgO
+          + 94 140 X_FeO·X_SiO2 − 140 590 X_FeO1.5·X_CaO − 20 090 X_FeO1.5·X_MgO + 65 680 X_FeO1.5·X_SiO2
+          − 188 280 X_CaO·X_MgO − 33 470 X_CaO·X_SiO2 + 112 960 X_MgO·X_SiO2 (J)
+      quote: ΔG° = −326 520 + 162.88 T (σ = 13 810) (J). RT ln γ_PO2.5(R.S.) = 31 380 X_FeO^2 + 14 640
+        X_FeO1.5^2 − 251 040 X_CaO^2 − 37 660 X_MgO^2 + 83 680 X_SiO2^2 + 1 920 X_FeO · X_FeO1.5 − 251
+        040 X_FeO · X_CaO − 102 510 X_FeO · X_MgO + 94 140 X_FeO · X_SiO2 − 140 590 X_FeO1.5 · X_CaO −
+        20 090 X_FeO1.5 · X_MgO + 65 680 X_FeO1.5 · X_SiO2 − 188 280 X_CaO · X_MgO − 33 470 X_CaO · X_SiO2
+        + 112 960 X_MgO · X_SiO2 (J).
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: FeO-Fe2O3-P2O5-SiO2-CaO-MgO slag
+      standard_state: PO2.5(R.S.)
+      uncertainty:
+        sigma_J: 13810
+        note: σ = 13 810 J printed on Eq. (37)
+    - observation_id: banya_1993_eq40_P2_dG
+      type: gibbs_table
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        page: 8
+        equation: '40'
+        figure: '12'
+      units: J; ΔG° = A + B T
+      values:
+        quantity: phosphorus_distribution_P2_deltaG
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        reaction_as_printed: P + 2.5(FeO)(in slag) = (PO2.5)(R.S.) + 2.5 Fe(l)
+        A_J: 6280
+        B_J_per_K: 17.908
+        sigma_J: 13810
+        equation_as_printed: ΔG°_P2 = 6 280 + 17.908 T (σ = 13 810) (J)
+      quote: ΔG°_P2 = 6 280 + 17.908 T (σ = 13 810) (J)
+      phase: FeO-bearing steelmaking slag
+      standard_state: PO2.5(R.S.)
+      uncertainty:
+        sigma_J: 13810
+        note: σ = 13 810 J printed on Eq. (40)
+    - observation_id: banya_1993_eq42_turkdogan_pearson_P2O5
+      type: gibbs_table
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        page: 8
+        equation: '42'
+      units: J; ΔG° = A + B T
+      values:
+        quantity: P2O5_formation_from_solutes_turkdogan_pearson
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        original_source: Turkdogan and Pearson, J. Iron Steel Inst., 175 (1953), 398
+        reaction_as_printed: 2P(1%) + 5O(1%) = P2O5 (pure liquid)
+        A_J: -705420
+        B_J_per_K: 556.472
+        equation_as_printed: ΔG°_41 = −705 420 + 556.472 T (J)
+      quote: ΔG°_41 = −705 420 + 556.472 T (J)
+      phase: pure liquid P2O5
+      standard_state: Henrian 1 mass% P and O in liquid iron to pure liquid P2O5
+      uncertainty:
+        note: quoted from Turkdogan and Pearson 1953; not a Ban-ya measurement
+    - observation_id: banya_1993_fig11_printed_logK_P1_fit
+      type: activity_coefficient
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        page: 8
+        figure: '11'
+        note: Printed equation on Fig. 11; scatter not digitised
+      units: log10 K_P1; T in K
+      values:
+        quantity: log_K_P1_temperature_fit
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        A_over_T: 17060
+        intercept: -8.51
+        sigma_log: 0.4
+        equation_as_printed: log K_P1 = 17060 / T − 8.510 (σ = 0.4)
+      quote: log K_P1 = 17060 / T − 8.510 (σ = 0.4)
+      phase: FeO-FeO1.5-PO2.5 slags saturated with CaO, MgO, SiO2 or combinations as labelled
+      standard_state: PO2.5(R.S.)
+      uncertainty:
+        sigma_log: 0.4
+        note: σ = 0.4 printed on Fig. 11; distinct from σ = 13 810 J on Eq. (37)
+    - observation_id: banya_1993_fig12_printed_logK_P2_fit
+      type: activity_coefficient
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        page: 8
+        figure: '12'
+        note: Printed equation on Fig. 12; scatter not digitised
+      units: log10 K_P2; T in K
+      values:
+        quantity: log_K_P2_temperature_fit
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        A_over_T: 328
+        intercept: -0.936
+        sigma_log: 0.4
+        equation_as_printed: log K_P2 = 328 / T − 0.936 (σ = 0.4)
+      quote: log K_P2 = 328 / T − 0.936 (σ = 0.4)
+      phase: FeO-FeO1.5-PO2.5 slags as labelled on Fig. 12
+      standard_state: PO2.5(R.S.) with FeO in slag
+      uncertainty:
+        sigma_log: 0.4
+        note: σ = 0.4 printed on Fig. 12; distinct from σ = 13 810 J on Eq. (40)
+    - observation_id: banya_1993_fig10_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 7
+        pdf_page_index: 6
+        page: 7
+        figure: '10'
+        note: Fig. 10. Relation between log K_P1 and (X_CaO + X_FeO)/X_PO2.5 in FeO-FeO1.5-PO2.5-CaO slags
+          equilibrated with liquid iron and solid CaO at 1873 K.
+      units: as plotted (not tabulated)
+      values:
+        quantity: log_K_P1_vs_composition
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '10'
+        caption_as_printed: Fig. 10. Relation between log K_P1 and (X_CaO + X_FeO)/X_PO2.5 in FeO-FeO1.5-PO2.5-CaO
+          slags equilibrated with liquid iron and solid CaO at 1873 K.
+      quote: Fig. 10. Relation between log K_P1 and (X_CaO + X_FeO)/X_PO2.5 in FeO-FeO1.5-PO2.5-CaO slags
+        equilibrated with liquid iron and solid CaO at 1873 K.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+      T_range_K:
+      - 1873.0
+      - 1873.0
+    - observation_id: banya_1993_fig11_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        page: 8
+        figure: '11'
+        note: Fig. 11. Temperature dependence of log K_P1.
+      units: as plotted (not tabulated)
+      values:
+        quantity: log_K_P1_vs_inverse_T_scatter
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '11'
+        caption_as_printed: Fig. 11. Temperature dependence of log K_P1.
+      quote: Fig. 11. Temperature dependence of log K_P1.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: banya_1993_fig12_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 8
+        pdf_page_index: 7
+        page: 8
+        figure: '12'
+        note: Fig. 12. Temperature dependence of log K_P2.
+      units: as plotted (not tabulated)
+      values:
+        quantity: log_K_P2_vs_inverse_T_scatter
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '12'
+        caption_as_printed: Fig. 12. Temperature dependence of log K_P2.
+      quote: Fig. 12. Temperature dependence of log K_P2.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: banya_1993_fig13_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        page: 9
+        figure: '13'
+        note: Fig. 13. Relation between calculated and measured phosphorus distribution.
+      units: as plotted (not tabulated)
+      values:
+        quantity: log_Lp_calculated_vs_measured
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '13'
+        caption_as_printed: Fig. 13. Relation between calculated and measured phosphorus distribution.
+      quote: Fig. 13. Relation between calculated and measured phosphorus distribution.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+  Fe2O3:
+    observations:
+    - observation_id: banya_1993_eq23_24_ferrous_ferric
+      type: activity_coefficient
+      locator:
+        published_page: 5
+        pdf_page_index: 4
+        page: 5
+        equation: 23, 24
+        figure: '5'
+      units: J for ΔG°; log10 for Fe3+/Fe2+
+      values:
+        quantity: ferrous_ferric_ratio
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        reaction_as_printed: FeO1.5(R.S.) = FeO(R.S.) + 1/4 O2(g)
+        dG_A_J: 126820
+        dG_B_J_per_K: -53.01
+        dG_as_printed: ΔG° = 126 820 − 53.01 T (J)
+        log10_Fe3_over_Fe2_A_over_T: 6625
+        log10_Fe3_over_Fe2_const: -2.77
+        log10_pO2_coeff: 0.25
+        equation_24_as_printed: log(Fe3+/Fe2+) = 6 625/T − 2.77 + 0.25 log P_O2 + (RT ln γ_FeO − RT ln
+          γ_FeO1.5)/(19.1 T)
+        validity_as_printed: a_FetO < 0.7
+      quote: ΔG° = 126 820 − 53.01 T (J). log(Fe3+/Fe2+) = 6 625/T − 2.77 + 0.25 log P_O2 + (RT ln γ_FeO
+        − RT ln γ_FeO1.5)/(19.1 T). to confirm the validity of the model at the range of a_FetO < 0.7.
+      phase: FetO-CaO and FetO-CaO-SiO2 slags
+      standard_state: FeO(R.S.) and FeO1.5(R.S.)
+      uncertainty:
+        note: 'text: other investigators agree within ±10%; Taylor and Chipman higher than the model'
+    - observation_id: banya_1993_fig5_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 6
+        pdf_page_index: 5
+        page: 6
+        figure: '5'
+        note: Fig. 5. Estimated values for N_Fe2O3 by regular solution model and the measured values in
+          FetO-CaO slags equilibrated with P_CO2 = 1 atm and in FetO-CaO-SiO2 slags equilibrated with
+          iron.
+      units: as plotted (not tabulated)
+      values:
+        quantity: mole_fraction_Fe2O3
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '5'
+        caption_as_printed: Fig. 5. Estimated values for N_Fe2O3 by regular solution model and the measured
+          values in FetO-CaO slags equilibrated with P_CO2 = 1 atm and in FetO-CaO-SiO2 slags equilibrated
+          with iron.
+      quote: Fig. 5. Estimated values for N_Fe2O3 by regular solution model and the measured values in
+        FetO-CaO slags equilibrated with P_CO2 = 1 atm and in FetO-CaO-SiO2 slags equilibrated with iron.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+  H2O:
+    observations:
+    - observation_id: banya_1993_eq47_hydroxyl_dG
+      type: gibbs_table
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        page: 9
+        equation: '47'
+        figure: '14'
+      units: J; ΔG° = A + B T
+      values:
+        quantity: water_vapor_solubility_deltaG
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        reaction_as_printed: 1/2 H2O(g) = HO0.5(R.S.)
+        A_J: -19800
+        B_J_per_K: 26.32
+        equation_as_printed: ΔG°_H2O = −19 800 + 26.32 T (J) (1 430 − 1 873 K)
+      quote: ΔG°_H2O = −19 800 + 26.32 T (J) (1 430 − 1 873 K)
+      T_range_K:
+      - 1430.0
+      - 1873.0
+      phase: binary silicate melts SiO2-MO (MO = CaO, Na2O, K2O, Li2O)
+      standard_state: HO0.5(R.S.)
+      uncertainty:
+        note: none printed on Eq. (47)
+    - observation_id: banya_1993_table2_H_pairs
+      type: activity_coefficient
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '2'
+        note: H+ pairs of Table 2
+      units: J
+      values:
+        quantity: quadratic_formalism_interaction_energy_alpha_ij
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        alpha_H_Si_J: 30000
+        pairs:
+        - *id012
+        - *id013
+        - *id014
+        - *id015
+        - *id016
+        - *id017
+        - *id018
+        - *id019
+        - *id020
+      quote: H+–Li+ +1 500; H+–Na+ +9 750; H+–K+ +13 520; H+–Mg2+ +15 800; H+–Ca2+ +15 100; H+–Mn2+ −8
+        230; H+–Al3+ −24 400; H+–Si4+ +30 000; H+–P5+ +7 700
+      phase: silicate_slag
+      standard_state: HO0.5(R.S.)
+      uncertainty:
+        note: none printed; Table 2 has no H+–Fe2+ or H+–Fe3+ cell
+    - observation_id: banya_1993_fig14_figure_only
+      type: gibbs_table
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        page: 9
+        figure: '14'
+        note: Fig. 14. Temperature dependence of free energy of solution of hydrogen in silicate melts.
+      units: as plotted (not tabulated)
+      values:
+        quantity: deltaG_H2O_vs_T_scatter
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '14'
+        caption_as_printed: Fig. 14. Temperature dependence of free energy of solution of hydrogen in
+          silicate melts.
+      quote: Fig. 14. Temperature dependence of free energy of solution of hydrogen in silicate melts.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+      T_range_K:
+      - 1430.0
+      - 1873.0
+    - observation_id: banya_1993_fig15_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        page: 9
+        figure: '15'
+        note: Fig. 15. Comparison of C_OH' calculated by regular solution model with C_OH' measured in
+          alkaline metal silicate melts.
+      units: as plotted (not tabulated)
+      values:
+        quantity: hydroxyl_capacity_vs_X_MO0.5
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '15'
+        caption_as_printed: Fig. 15. Comparison of C_OH' calculated by regular solution model with C_OH'
+          measured in alkaline metal silicate melts.
+      quote: Fig. 15. Comparison of C_OH' calculated by regular solution model with C_OH' measured in
+        alkaline metal silicate melts.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+    - observation_id: banya_1993_fig16_figure_only
+      type: activity_coefficient
+      locator:
+        published_page: 9
+        pdf_page_index: 8
+        page: 9
+        figure: '16'
+        note: Fig. 16. Comparison of estimated values of C_OH' by regular solution model and the measured
+          values in molten silicate slags.
+      units: as plotted (not tabulated)
+      values:
+        quantity: hydroxyl_capacity_calculated_vs_measured
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Plotted only; no numeric table. Points not read off the figure.
+        semantics: bound_not_point_ordering
+        not_transcribable: true
+        figure: '16'
+        caption_as_printed: Fig. 16. Comparison of estimated values of C_OH' by regular solution model
+          and the measured values in molten silicate slags.
+      quote: Fig. 16. Comparison of estimated values of C_OH' by regular solution model and the measured
+        values in molten silicate slags.
+      phase: silicate_slag
+      standard_state: as in figure caption
+      uncertainty:
+        note: not applicable; figure not digitised
+  K2O:
+    observations:
+    - observation_id: banya_1993_table2_K_Si_alpha
+      type: activity_coefficient
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '2'
+        note: K+–Si4+ cell of Table 2
+      units: J
+      values:
+        quantity: quadratic_formalism_interaction_energy_alpha_ij
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        pair: K+–Si4+
+        alpha_ij_J: -81030
+        as_printed: -81 030
+      quote: K+ –Si4+  −81 030
+      phase: silicate_slag
+      standard_state: hypothetical R.S. liquid
+      uncertainty:
+        note: none printed
+  Li2O:
+    observations:
+    - observation_id: banya_1993_table2_Li_Si_alpha
+      type: activity_coefficient
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '2'
+        note: Li+–Si4+ cell of Table 2
+      units: J
+      values:
+        quantity: quadratic_formalism_interaction_energy_alpha_ij
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        pair: Li+–Si4+
+        alpha_ij_J: -142130
+        as_printed: -142 130
+      quote: Li+ –Si4+  −142 130
+      phase: silicate_slag
+      standard_state: hypothetical R.S. liquid
+      uncertainty:
+        note: none printed
+  TiO2:
+    observations:
+    - observation_id: banya_1993_table2_Ti_pairs
+      type: activity_coefficient
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '2'
+        note: Ti4+ rows of Table 2
+      units: J
+      values:
+        quantity: quadratic_formalism_interaction_energy_alpha_ij
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        alpha_Ti_Si_J: 104600
+        pairs:
+        - *id021
+        - *id022
+        - *id023
+        - *id024
+        - *id025
+      quote: Ti4+–Ca2+ −167 360; Ti4+–Mn2+ −66 940; Ti4+–Fe2+ −37 660; Ti4+–Fe3+ +1 260; Ti4+–Si4+ +104
+        600
+      phase: silicate_slag
+      standard_state: hypothetical R.S. liquid
+      uncertainty:
+        note: none printed
+  Al2O3:
+    observations:
+    - observation_id: banya_1993_table1_Al3_row
+      type: activity_coefficient
+      locator:
+        published_page: 3
+        pdf_page_index: 2
+        page: 3
+        table: '1'
+        note: Al3+ row/column of Table 1
+      units: J
+      values:
+        quantity: quadratic_formalism_interaction_energy_alpha_ij
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        cation: Al3+
+        alpha_Al_Fe2_J: -41000
+        row_J: *id026
+        row_as_printed: *id027
+      quote: 'Al3+ row: −41 000  −161 080  −83 680  −154 810  −71 130  −127 610  −261 500  —'
+      phase: steelmaking_silicate_slag
+      standard_state: hypothetical R.S. liquid
+      uncertainty:
+        note: none printed
