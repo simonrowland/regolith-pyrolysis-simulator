@@ -5,6 +5,7 @@ import re
 
 import pytest
 
+from simulator.reference_data import robie_hemingway_1995_usgs_b2131_loader as b2131_loader
 from simulator.reference_data.robie_hemingway_1995_usgs_b2131_loader import (
     COMPILATION_ROOT,
     PrintedTemperatureUnavailable,
@@ -43,7 +44,10 @@ def test_round_trip_every_record_and_numeric_token():
         for cell in numeric_cells(record):
             assert isinstance(cell["raw"], str)
             if cell["value"] is not None:
-                assert cell["value"] == float(cell.get("numeric_token", cell["raw"]))
+                token = cell.get("printed_token") or cell.get("numeric_token") or cell["raw"]
+                assert cell["value"] == float(token)
+                if cell.get("printed_token"):
+                    assert cell["ocr_suspect"]
             elif cell["raw"].strip():
                 assert cell["ocr_suspect"]
 
@@ -239,3 +243,43 @@ def test_reference_table_accepts_only_its_single_printed_temperature():
 def test_coefficient_bounds_are_not_a_printed_function_grid():
     with pytest.raises(PrintedTemperatureUnavailable):
         lookup_temperature("cp-p041-01", 298.15)
+
+
+# Printed B2131 function grid: reference-state 298.15 K plus the 100 K steps used
+# in the high-temperature tables (300 K through 1800 K). Transition temperatures
+# are extra printed rows, not members of this heading grid.
+PRINTED_TEMPERATURE_GRID = frozenset({298.15} | {float(t) for t in range(300, 1801, 100)})
+
+
+def test_grid_values_are_printed_members_and_reference_state_looks_up_298_15(monkeypatch):
+    records = list(load_records())
+    manifest = load_manifest()
+    monkeypatch.setattr(b2131_loader, "load_manifest", lambda root=COMPILATION_ROOT: manifest)
+    for record in records:
+        for cell in record.get("temperature_grid") or []:
+            raw = cell.get("raw")
+            value = cell.get("value")
+            if value is not None:
+                assert value in PRINTED_TEMPERATURE_GRID, (record["record_id"], cell)
+            try:
+                raw_is_printed = float(raw) in PRINTED_TEMPERATURE_GRID
+            except (TypeError, ValueError):
+                raw_is_printed = False
+            if not raw_is_printed:
+                assert cell["ocr_suspect"], record["record_id"]
+                assert cell.get("printed_token"), record["record_id"]
+                assert float(cell["printed_token"]) in PRINTED_TEMPERATURE_GRID
+                assert value == float(cell["printed_token"])
+                matching = [
+                    item for item in record.get("corrections") or []
+                    if item.get("raw_token") == raw and item.get("printed_token") == cell["printed_token"]
+                ]
+                assert matching, record["record_id"]
+                assert matching[0]["page"] == record["page"]
+                assert matching[0]["record_id"] == record["record_id"]
+                assert matching[0].get("image_quote")
+        if record.get("table_kind") == "reference_state_298K":
+            rows = lookup_temperature(record["record_id"], 298.15)
+            assert rows, record["record_id"]
+    with pytest.raises(PrintedTemperatureUnavailable):
+        lookup_temperature("reference-p039-13", 291.15)

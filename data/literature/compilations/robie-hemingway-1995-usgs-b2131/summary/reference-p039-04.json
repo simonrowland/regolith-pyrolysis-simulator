@@ -4,7 +4,7 @@
   "pdf_page": 45,
   "page": 39,
   "table_number": null,
-  "table_title_raw": "THERMODYNAMIC PROPERTIES OF SHEET STRUCTURE SILICATE MINERALS AT 291.15 K",
+  "table_title_raw": "THERMODYNAMIC PROPERTIES OF SHEET STRUCTURE SILICATE MINERALS AT 298.15 K",
   "name_as_published": "PYROPHYLLITE",
   "formula_as_published": "At 2st 4o10 <0H> 2",
   "phase_as_published": [],
@@ -162,24 +162,24 @@
   "identity_checks": [
     {
       "identity": "delta_f_G + R*T*ln(10)*log_Kf = 0",
-      "residual_kJ_per_mol": -123.6311070152151,
-      "rounding_tolerance_kJ_per_mol": 0.33869980993847737,
-      "disagreement": true
+      "residual_kJ_per_mol": 0.009567039030116575,
+      "rounding_tolerance_kJ_per_mol": 0.3454004751267629,
+      "disagreement": false
     }
   ],
   "ambiguities": [
     "formation_enthalpy: unparsed printed OCR token '·5640.0'",
     "reference_entropy: unparsed printed OCR token '365 258'",
     "Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C",
-    "Formation Gibbs/log Kf identity disagreement: residual -123.6311070152151 kJ/mol; tolerance 0.33869980993847737; detector only, raw unchanged",
     "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair."
   ],
   "temperature_grid": [
     {
       "raw": "291.15",
-      "value": 291.15,
+      "value": 298.15,
       "ocr_suspect": true,
-      "ocr_check": "machine_disagreement"
+      "ocr_check": "machine_disagreement",
+      "printed_token": "298.15"
     }
   ],
   "source_id": "robie-hemingway-1995-usgs-b2131",
@@ -190,5 +190,17 @@
     "battery_refusal": "gibbs_table_not_runtime_observable"
   },
   "source_line_start": 21,
-  "source_line_end": 22
+  "source_line_end": 22,
+  "corrections": [
+    {
+      "record_id": "reference-p039-04",
+      "page": 39,
+      "pdf_page": 45,
+      "field": "temperature_grid[0]",
+      "raw_token": "291.15",
+      "printed_token": "298.15",
+      "image_quote": "THERMODYNAMIC PROPERTIES OF SHEET STRUCTURE SILICATE MINERALS AT 298.15 K",
+      "title_raw": "THERMODYNAMIC PROPERTIES OF SHEET STRUCTURE SILICATE MINERALS AT 291.15 K"
+    }
+  ]
 }

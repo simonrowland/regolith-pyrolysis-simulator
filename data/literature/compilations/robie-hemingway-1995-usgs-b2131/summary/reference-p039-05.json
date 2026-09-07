@@ -4,7 +4,7 @@
   "pdf_page": 45,
   "page": 39,
   "table_number": null,
-  "table_title_raw": "THERMODYNAMIC PROPERTIES OF SHEET STRUCTURE SILICATE MINERALS AT 291.15 K",
+  "table_title_raw": "THERMODYNAMIC PROPERTIES OF SHEET STRUCTURE SILICATE MINERALS AT 298.15 K",
   "name_as_published": "ILLITE",
   "formula_as_published": "K3<Al7Ma><Al 2st 14 >o40 <0H> 8",
   "phase_as_published": [],
@@ -176,9 +176,10 @@
   "temperature_grid": [
     {
       "raw": "291.15",
-      "value": 291.15,
+      "value": 298.15,
       "ocr_suspect": true,
-      "ocr_check": "machine_disagreement"
+      "ocr_check": "machine_disagreement",
+      "printed_token": "298.15"
     }
   ],
   "source_id": "robie-hemingway-1995-usgs-b2131",
@@ -189,5 +190,17 @@
     "battery_refusal": "gibbs_table_not_runtime_observable"
   },
   "source_line_start": 24,
-  "source_line_end": 25
+  "source_line_end": 25,
+  "corrections": [
+    {
+      "record_id": "reference-p039-05",
+      "page": 39,
+      "pdf_page": 45,
+      "field": "temperature_grid[0]",
+      "raw_token": "291.15",
+      "printed_token": "298.15",
+      "image_quote": "THERMODYNAMIC PROPERTIES OF SHEET STRUCTURE SILICATE MINERALS AT 298.15 K",
+      "title_raw": "THERMODYNAMIC PROPERTIES OF SHEET STRUCTURE SILICATE MINERALS AT 291.15 K"
+    }
+  ]
 }
