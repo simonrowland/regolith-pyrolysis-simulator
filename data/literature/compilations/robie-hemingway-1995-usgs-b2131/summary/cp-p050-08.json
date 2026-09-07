@@ -5,115 +5,174 @@
   "page": 50,
   "table_number": null,
   "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR OXIDE AND HYDROXIDE MINERALS",
-  "name_as_published": null,
-  "formula_as_published": null,
+  "name_as_published": "THORIANITE",
+  "formula_as_published": "ThO2",
   "phase_as_published": null,
-  "name_candidate": "THORIANITE",
-  "formula_candidate": "T~",
   "header_and_units_raw": "NAME AND FORMULA           ENTROPY             ~1            A2           A3            A4           AS     T range   Tan     4.H•\n                          J •IIOl-1•1(1                     (T)          u-2,        (T-o.&)       (T2)       K        K     kJ·110r1\n\n\n",
-  "source_text": "THORIANITE                     65.2       7. 138E+01     7.556E-03   -1.053E+06                               298\nT~                              0.2                                                                          1200",
+  "source_text": "THORIANITE  65.2  7.138E+01  7.556E-03  -1.053E+06  298  \nThO2  0.2  1200  ",
   "rows": [
     {
-      "raw": "THORIANITE                     65.2       7. 138E+01     7.556E-03   -1.053E+06                               298",
-      "tokens": [
-        {
-          "raw": "THORIANITE",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 0,
-          "end_offset": 10
-        },
-        {
+      "label_raw": "THORIANITE",
+      "cells": {
+        "entropy": {
           "raw": "65.2",
           "value": 65.2,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 31,
-          "end_offset": 35
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 12,
+          "end_offset": 16
         },
-        {
-          "raw": "7.",
-          "value": 7.0,
+        "A1": {
+          "raw": "7.138E+01",
+          "value": 71.38,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 42,
-          "end_offset": 44
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 18,
+          "end_offset": 27
         },
-        {
-          "raw": "138E+01",
-          "value": 1380.0,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 45,
-          "end_offset": 52
-        },
-        {
+        "A2": {
           "raw": "7.556E-03",
           "value": 0.007556,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 57,
-          "end_offset": 66
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 29,
+          "end_offset": 38
         },
-        {
+        "A3": {
           "raw": "-1.053E+06",
           "value": -1053000.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 69,
-          "end_offset": 79
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 40,
+          "end_offset": 50
         },
-        {
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
           "raw": "298",
           "value": 298.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 110,
-          "end_offset": 113
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 52,
+          "end_offset": 55
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 0
     },
     {
-      "raw": "T~                              0.2                                                                          1200",
-      "tokens": [
-        {
-          "raw": "T~",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 0,
-          "end_offset": 2
-        },
-        {
+      "label_raw": "ThO2",
+      "cells": {
+        "entropy": {
           "raw": "0.2",
           "value": 0.2,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 32,
-          "end_offset": 35
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 6,
+          "end_offset": 9
         },
-        {
+        "A1": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A2": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
           "raw": "1200",
           "value": 1200.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 109,
-          "end_offset": 113
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 11,
+          "end_offset": 15
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 1
     }
   ],
-  "transcription_status": "untranscribed",
+  "transcription_status": "transcribed_ocr_suspect",
   "identity_checks": [],
   "ambiguities": [
-    "A1: unparsed printed OCR token '7. 138E+01'",
-    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A1', '7. 138E+01')]",
-    "Body label or prose enters numeric region: []",
-    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
-    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+    "Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.",
+    "MinerU/image token disagreement (raw kept): A3:-1.053E+06"
   ],
   "temperature_grid": [],
   "source_id": "robie-hemingway-1995-usgs-b2131",

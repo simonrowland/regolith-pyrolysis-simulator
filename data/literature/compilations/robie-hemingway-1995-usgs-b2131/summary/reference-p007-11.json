@@ -5,179 +5,182 @@
   "page": 7,
   "table_number": null,
   "table_title_raw": "THERMODYNAMIC PROPERTIES OF ELEMENTS IN THEIR REFERENCE STATE AT 298.15 K",
-  "name_as_published": null,
-  "formula_as_published": null,
-  "phase_as_published": null,
-  "name_candidate": "IODINE (IDEAL GAS)",
-  "formula_candidate": "lz",
+  "name_as_published": "IODINE (IDEAL GAS)",
+  "formula_as_published": "I2",
+  "phase_as_published": [
+    "(IDEAL GAS)"
+  ],
   "header_and_units_raw": "NAME AND FORMULA                   WEIGHT     ENTROPY        VOLUME      ENTHALPY       FREE      LOG(K)    REFERENCES\n                                                                                       ENERGY\n                                                   s•          yo          A,Ho         A,Go\n                                    I       J•IIOl- 1 •1(1    ctiJ       kJ•110l\" 1   kJ•110l\"1            s    H/G    c\n\n",
-  "source_text": "IODINE (IDEAL GAS)                253.809        260.69 24789.7              62.4         19.3     -3.39   67         67\nlz                                                 0.02     0.2               o. 1         0.1      0.01",
+  "source_text": "IODINE (IDEAL GAS)  253.809  260.69  24789.7  62.4  19.3  -3.39  67  67\nI2  0.02  0.2  0.1  0.1  0.01  ",
   "rows": [
     {
-      "raw": "IODINE (IDEAL GAS)                253.809        260.69 24789.7              62.4         19.3     -3.39   67         67",
-      "tokens": [
-        {
-          "raw": "IODINE",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 0,
-          "end_offset": 6
-        },
-        {
-          "raw": "(IDEAL",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 7,
-          "end_offset": 13
-        },
-        {
-          "raw": "GAS)",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 14,
-          "end_offset": 18
-        },
-        {
+      "label_raw": "IODINE (IDEAL GAS)",
+      "cells": {
+        "weight": {
           "raw": "253.809",
           "value": 253.809,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 34,
-          "end_offset": 41
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 20,
+          "end_offset": 27
         },
-        {
+        "entropy": {
           "raw": "260.69",
           "value": 260.69,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 49,
-          "end_offset": 55
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 29,
+          "end_offset": 35
         },
-        {
+        "volume": {
           "raw": "24789.7",
           "value": 24789.7,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 56,
-          "end_offset": 63
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 37,
+          "end_offset": 44
         },
-        {
+        "formation_enthalpy": {
           "raw": "62.4",
           "value": 62.4,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 77,
-          "end_offset": 81
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 46,
+          "end_offset": 50
         },
-        {
+        "formation_gibbs": {
           "raw": "19.3",
           "value": 19.3,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 90,
-          "end_offset": 94
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 52,
+          "end_offset": 56
         },
-        {
+        "log_kf": {
           "raw": "-3.39",
           "value": -3.39,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 99,
-          "end_offset": 104
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 58,
+          "end_offset": 63
         },
-        {
+        "reference_entropy": {
           "raw": "67",
           "value": 67.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 107,
-          "end_offset": 109
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 65,
+          "end_offset": 67
         },
-        {
+        "reference_enthalpy_gibbs": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "reference_heat_capacity": {
           "raw": "67",
           "value": 67.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 118,
-          "end_offset": 120
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 69,
+          "end_offset": 71
         }
-      ],
+      },
       "source_line_index": 0
     },
     {
-      "raw": "lz                                                 0.02     0.2               o. 1         0.1      0.01",
-      "tokens": [
-        {
-          "raw": "lz",
+      "label_raw": "I2",
+      "cells": {
+        "weight": {
+          "raw": "",
           "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 0,
-          "end_offset": 2
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         },
-        {
+        "entropy": {
           "raw": "0.02",
           "value": 0.02,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 51,
-          "end_offset": 55
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 4,
+          "end_offset": 8
         },
-        {
+        "volume": {
           "raw": "0.2",
           "value": 0.2,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 60,
-          "end_offset": 63
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 10,
+          "end_offset": 13
         },
-        {
-          "raw": "o.",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 78,
-          "end_offset": 80
-        },
-        {
-          "raw": "1",
-          "value": 1.0,
-          "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 81,
-          "end_offset": 82
-        },
-        {
+        "formation_enthalpy": {
           "raw": "0.1",
           "value": 0.1,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 91,
-          "end_offset": 94
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 15,
+          "end_offset": 18
         },
-        {
+        "formation_gibbs": {
+          "raw": "0.1",
+          "value": 0.1,
+          "ocr_suspect": true,
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 20,
+          "end_offset": 23
+        },
+        "log_kf": {
           "raw": "0.01",
           "value": 0.01,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 100,
-          "end_offset": 104
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 25,
+          "end_offset": 29
+        },
+        "reference_entropy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "reference_enthalpy_gibbs": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "reference_heat_capacity": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 1
     }
   ],
-  "transcription_status": "untranscribed",
-  "identity_checks": [],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [
+    {
+      "identity": "delta_f_G + R*T*ln(10)*log_Kf = 0",
+      "residual_kJ_per_mol": -0.05015221359452582,
+      "rounding_tolerance_kJ_per_mol": 0.08854004751267629,
+      "disagreement": false
+    }
+  ],
   "ambiguities": [
-    "formation_enthalpy: unparsed printed OCR token 'o. 1'",
-    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(2, 'formation_enthalpy', 'o. 1')]",
-    "Body label or prose enters numeric region: []",
-    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
-    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+    "Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair."
   ],
   "temperature_grid": [
     {

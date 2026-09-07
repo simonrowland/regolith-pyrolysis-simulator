@@ -5,122 +5,174 @@
   "page": 53,
   "table_number": null,
   "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR HALIDE MINERALS",
-  "name_as_published": null,
-  "formula_as_published": null,
+  "name_as_published": "MOLYSITE",
+  "formula_as_published": "FeCl3",
   "phase_as_published": null,
-  "name_candidate": "MOLYSITE",
-  "formula_candidate": "FeCl 3",
   "header_and_units_raw": "NAME AND FORIIJLA     ENTROPY          A1            A2              A3           A4            A5     T r.,..   T.          a_H•\n                     J·•r' ·K\"'                     (T)            n-2,        (T-o.&)        (T2)       IC      IC      kJ·•r'\n",
-  "source_text": "MOLYSITE                142.3      -2.56E+02    1.1755E+OO       7.89E+06                 -9.738E-04     298\nFeCl 3                    0.4                                                                            577",
+  "source_text": "MOLYSITE  142.3  -2.56E+02  1.1755E+00  7.89E+06  -9.738E-04  298  \nFeCl3  0.4  577  ",
   "rows": [
     {
-      "raw": "MOLYSITE                142.3      -2.56E+02    1.1755E+OO       7.89E+06                 -9.738E-04     298",
-      "tokens": [
-        {
-          "raw": "MOLYSITE",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 0,
-          "end_offset": 8
-        },
-        {
+      "label_raw": "MOLYSITE",
+      "cells": {
+        "entropy": {
           "raw": "142.3",
           "value": 142.3,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 24,
-          "end_offset": 29
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 10,
+          "end_offset": 15
         },
-        {
+        "A1": {
           "raw": "-2.56E+02",
           "value": -256.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 35,
-          "end_offset": 44
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 17,
+          "end_offset": 26
         },
-        {
-          "raw": "1.1755E+OO",
-          "value": null,
+        "A2": {
+          "raw": "1.1755E+00",
+          "value": 1.1755,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 48,
-          "end_offset": 58
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 28,
+          "end_offset": 38
         },
-        {
+        "A3": {
           "raw": "7.89E+06",
           "value": 7890000.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 65,
-          "end_offset": 73
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 40,
+          "end_offset": 48
         },
-        {
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
           "raw": "-9.738E-04",
           "value": -0.0009738,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 90,
-          "end_offset": 100
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 50,
+          "end_offset": 60
         },
-        {
+        "temperature_range": {
           "raw": "298",
           "value": 298.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 105,
-          "end_offset": 108
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 62,
+          "end_offset": 65
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 0
     },
     {
-      "raw": "FeCl 3                    0.4                                                                            577",
-      "tokens": [
-        {
-          "raw": "FeCl",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 0,
-          "end_offset": 4
-        },
-        {
-          "raw": "3",
-          "value": 3.0,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 5,
-          "end_offset": 6
-        },
-        {
+      "label_raw": "FeCl3",
+      "cells": {
+        "entropy": {
           "raw": "0.4",
           "value": 0.4,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 26,
-          "end_offset": 29
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 7,
+          "end_offset": 10
         },
-        {
+        "A1": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A2": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
           "raw": "577",
           "value": 577.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 105,
-          "end_offset": 108
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 12,
+          "end_offset": 15
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 1
     }
   ],
-  "transcription_status": "untranscribed",
+  "transcription_status": "transcribed_ocr_suspect",
   "identity_checks": [],
   "ambiguities": [
-    "A2: unparsed printed OCR token '1.1755E+OO'",
-    "Body label or prose enters numeric region: [('A2', '1.1755E+OO')]",
-    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
-    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+    "Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.",
+    "MinerU/image token disagreement (raw kept): A1:-2.56E+02, A3:7.89E+06, A5:-9.738E-04, temperature_range:577"
   ],
   "temperature_grid": [],
   "source_id": "robie-hemingway-1995-usgs-b2131",

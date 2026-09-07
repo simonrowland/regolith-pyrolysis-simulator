@@ -195,9 +195,28 @@ def test_refuses_every_non_grid_temperature(temperature):
         lookup_temperature("high-temperature-p067", temperature)
 
 
-def test_refuses_missing_ocr_table():
-    with pytest.raises(UntranscribedTableError):
-        lookup_temperature("high-temperature-p176", 298.15)
+def test_transcribed_records_have_rows_and_untranscribed_carry_a_reason():
+    for record in load_records():
+        status = record.get("transcription_status")
+        if status == "untranscribed":
+            reasons = record.get("ambiguities") or []
+            assert reasons, record["record_id"]
+            assert any(
+                (isinstance(item, str) and item.strip())
+                or (isinstance(item, dict) and (item.get("reason") or item.get("kind")))
+                for item in reasons
+            ), record["record_id"]
+        else:
+            assert record.get("rows"), record["record_id"]
+
+
+def test_p176_printed_grid_is_transcribed():
+    rows = lookup_temperature("high-temperature-p176", 298.15)
+    assert len(rows) == 1
+    assert rows[0]["cells"]["cp"]["raw"] == "62.60"
+    assert rows[0]["cells"]["cp"]["value"] == 62.6
+    assert rows[0]["cells"]["enthalpy_function"]["raw"] == "0.00"
+    assert rows[0]["cells"]["enthalpy_function"]["value"] == 0.0
 
 
 def test_unknown_record_has_no_default():

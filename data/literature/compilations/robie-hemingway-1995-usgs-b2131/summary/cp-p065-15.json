@@ -5,154 +5,174 @@
   "page": 65,
   "table_number": null,
   "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR SHEET STRUCTURE SILICATES",
-  "name_as_published": null,
-  "formula_as_published": null,
+  "name_as_published": "TALC",
+  "formula_as_published": "Mg3Si4O10(OH)2",
   "phase_as_published": null,
-  "name_candidate": "TALC",
-  "formula_candidate": "M~Si 4o 10 (0H) 2",
   "header_and_units_raw": "NAME AND FORtiJLA                    ENTROPY\n                                    J·•r' ·K\"'\n                                                       A1           A2\n                                                                  (T)\n                                                                                 A3\n                                                                              (l\"2)\n                                                                                              A4\n                                                                                           n~-•,\n                                                                                                           AS\n                                                                                                         (T2)\n                                                                                                                  T rMQe\n                                                                                                                    IC\n                                                                                                                           Tun\n                                                                                                                            IC\n                                                                                                                                 '-\".\n                                                                                                                                 kJ·•l\"1\n\n",
-  "source_text": "TALC                                   260.8      5.654E+03   -5.212E+OO    4.021E+07   -7.693E+04    2.129E-03      298\nM~Si 4o 10 (0H) 2                        0.6                                                                         800",
+  "source_text": "TALC  260.8  5.654E+03  -5.272E+00  4.021E+07  -7.693E+04  2.729E-03  298  \nMg3Si4O10(OH)2  0.6  800  ",
   "rows": [
     {
-      "raw": "TALC                                   260.8      5.654E+03   -5.212E+OO    4.021E+07   -7.693E+04    2.129E-03      298",
-      "tokens": [
-        {
-          "raw": "TALC",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 0,
-          "end_offset": 4
-        },
-        {
+      "label_raw": "TALC",
+      "cells": {
+        "entropy": {
           "raw": "260.8",
           "value": 260.8,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 39,
-          "end_offset": 44
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 6,
+          "end_offset": 11
         },
-        {
+        "A1": {
           "raw": "5.654E+03",
           "value": 5654.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 50,
-          "end_offset": 59
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 13,
+          "end_offset": 22
         },
-        {
-          "raw": "-5.212E+OO",
-          "value": null,
+        "A2": {
+          "raw": "-5.272E+00",
+          "value": -5.272,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 62,
-          "end_offset": 72
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 24,
+          "end_offset": 34
         },
-        {
+        "A3": {
           "raw": "4.021E+07",
           "value": 40210000.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 76,
-          "end_offset": 85
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 36,
+          "end_offset": 45
         },
-        {
+        "A4": {
           "raw": "-7.693E+04",
           "value": -76930.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 88,
-          "end_offset": 98
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 47,
+          "end_offset": 57
         },
-        {
-          "raw": "2.129E-03",
-          "value": 0.002129,
+        "A5": {
+          "raw": "2.729E-03",
+          "value": 0.002729,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 102,
-          "end_offset": 111
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 59,
+          "end_offset": 68
         },
-        {
+        "temperature_range": {
           "raw": "298",
           "value": 298.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 117,
-          "end_offset": 120
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 70,
+          "end_offset": 73
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 0
     },
     {
-      "raw": "M~Si 4o 10 (0H) 2                        0.6                                                                         800",
-      "tokens": [
-        {
-          "raw": "M~Si",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 0,
-          "end_offset": 4
-        },
-        {
-          "raw": "4o",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 5,
-          "end_offset": 7
-        },
-        {
-          "raw": "10",
-          "value": 10.0,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 8,
-          "end_offset": 10
-        },
-        {
-          "raw": "(0H)",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 11,
-          "end_offset": 15
-        },
-        {
-          "raw": "2",
-          "value": 2.0,
-          "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 16,
-          "end_offset": 17
-        },
-        {
+      "label_raw": "Mg3Si4O10(OH)2",
+      "cells": {
+        "entropy": {
           "raw": "0.6",
           "value": 0.6,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 41,
-          "end_offset": 44
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 16,
+          "end_offset": 19
         },
-        {
+        "A1": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A2": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
           "raw": "800",
           "value": 800.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 117,
-          "end_offset": 120
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 21,
+          "end_offset": 24
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 1
     }
   ],
-  "transcription_status": "untranscribed",
+  "transcription_status": "transcribed_ocr_suspect",
   "identity_checks": [],
   "ambiguities": [
-    "A2: unparsed printed OCR token '-5.212E+OO'",
-    "Body label or prose enters numeric region: [('A2', '-5.212E+OO')]",
-    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
-    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+    "Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.",
+    "MinerU/image token disagreement (raw kept): A5:2.729E-03"
   ],
   "temperature_grid": [],
   "source_id": "robie-hemingway-1995-usgs-b2131",

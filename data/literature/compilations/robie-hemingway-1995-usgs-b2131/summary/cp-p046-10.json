@@ -5,123 +5,174 @@
   "page": 46,
   "table_number": null,
   "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR SULFIDE AND SULFOSALT MINERALS",
-  "name_as_published": null,
-  "formula_as_published": null,
+  "name_as_published": "BERNDTITE",
+  "formula_as_published": "SnS2",
   "phase_as_published": null,
-  "name_candidate": "BERNDTITE",
-  "formula_candidate": "SnS2",
   "header_and_units_raw": "NAME AND FORJIJLA         ENTROPY           A1            A2           A3           A4           A5      Tr.,..\n                                                                                                                  ,_    A....H•\n                         J ·mor' ·lr\n                                    1\n                                                         (T)         (T\"2)       (T-0.&)        (T2)       IC     IC   kJ•110l\"1\n\n\n",
-  "source_text": "BERNDTITE                    87.5       2.004E+01    3.823E-02 · -9.602E+05    8.544E+02                   298\nSnS2                          0.2                                                                         1000",
+  "source_text": "BERNDTITE  87.5  2.004E+01  3.823E-02  -9.602E+05  8.544E+02  298  \nSnS2  0.2  1000  ",
   "rows": [
     {
-      "raw": "BERNDTITE                    87.5       2.004E+01    3.823E-02 · -9.602E+05    8.544E+02                   298",
-      "tokens": [
-        {
-          "raw": "BERNDTITE",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 0,
-          "end_offset": 9
-        },
-        {
+      "label_raw": "BERNDTITE",
+      "cells": {
+        "entropy": {
           "raw": "87.5",
           "value": 87.5,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 29,
-          "end_offset": 33
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 11,
+          "end_offset": 15
         },
-        {
+        "A1": {
           "raw": "2.004E+01",
           "value": 20.04,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 40,
-          "end_offset": 49
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 17,
+          "end_offset": 26
         },
-        {
+        "A2": {
           "raw": "3.823E-02",
           "value": 0.03823,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 53,
-          "end_offset": 62
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 28,
+          "end_offset": 37
         },
-        {
-          "raw": "·",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 63,
-          "end_offset": 64
-        },
-        {
+        "A3": {
           "raw": "-9.602E+05",
           "value": -960200.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 65,
-          "end_offset": 75
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 39,
+          "end_offset": 49
         },
-        {
+        "A4": {
           "raw": "8.544E+02",
           "value": 854.4,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 79,
-          "end_offset": 88
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 51,
+          "end_offset": 60
         },
-        {
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
           "raw": "298",
           "value": 298.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 107,
-          "end_offset": 110
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 62,
+          "end_offset": 65
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 0
     },
     {
-      "raw": "SnS2                          0.2                                                                         1000",
-      "tokens": [
-        {
-          "raw": "SnS2",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 0,
-          "end_offset": 4
-        },
-        {
+      "label_raw": "SnS2",
+      "cells": {
+        "entropy": {
           "raw": "0.2",
           "value": 0.2,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 30,
-          "end_offset": 33
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 6,
+          "end_offset": 9
         },
-        {
+        "A1": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A2": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
           "raw": "1000",
           "value": 1000.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 106,
-          "end_offset": 110
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 11,
+          "end_offset": 15
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 1
     }
   ],
-  "transcription_status": "untranscribed",
+  "transcription_status": "transcribed_ocr_suspect",
   "identity_checks": [],
   "ambiguities": [
-    "A2: unparsed printed OCR token '3.823E-02 ·'",
-    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A2', '3.823E-02 ·')]",
-    "Body label or prose enters numeric region: []",
-    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
-    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+    "Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.",
+    "MinerU/image token disagreement (raw kept): A1:2.004E+01, A4:8.544E+02"
   ],
   "temperature_grid": [],
   "source_id": "robie-hemingway-1995-usgs-b2131",

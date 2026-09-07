@@ -5,124 +5,174 @@
   "page": 50,
   "table_number": null,
   "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR OXIDE AND HYDROXIDE MINERALS",
-  "name_as_published": null,
-  "formula_as_published": null,
+  "name_as_published": "CRISTOBALITE",
+  "formula_as_published": "SiO2",
   "phase_as_published": null,
-  "name_candidate": "CRISTOBALITE",
-  "formula_candidate": "Si~",
   "header_and_units_raw": "NAME AND FORMULA           ENTROPY             ~1            A2           A3            A4           AS     T range   Tan     4.H•\n                          J •IIOl-1•1(1                     (T)          u-2,        (T-o.&)       (T2)       K        K     kJ·110r1\n\n\n",
-  "source_text": "CRISTOBALITE                   43.4       -4. 160E+03    2.548E+OO   -6.286E+07     7.168E+04                 298\nSi~                             0.1                                                                           523",
+  "source_text": "CRISTOBALITE  43.4  -4.160E+03  2.548E+00  -6.286E+07  7.168E+04  298  \nSiO2  0.1  523  ",
   "rows": [
     {
-      "raw": "CRISTOBALITE                   43.4       -4. 160E+03    2.548E+OO   -6.286E+07     7.168E+04                 298",
-      "tokens": [
-        {
-          "raw": "CRISTOBALITE",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 0,
-          "end_offset": 12
-        },
-        {
+      "label_raw": "CRISTOBALITE",
+      "cells": {
+        "entropy": {
           "raw": "43.4",
           "value": 43.4,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 31,
-          "end_offset": 35
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 14,
+          "end_offset": 18
         },
-        {
-          "raw": "-4.",
-          "value": -4.0,
+        "A1": {
+          "raw": "-4.160E+03",
+          "value": -4160.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 42,
-          "end_offset": 45
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 20,
+          "end_offset": 30
         },
-        {
-          "raw": "160E+03",
-          "value": 160000.0,
+        "A2": {
+          "raw": "2.548E+00",
+          "value": 2.548,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 46,
-          "end_offset": 53
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 32,
+          "end_offset": 41
         },
-        {
-          "raw": "2.548E+OO",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 57,
-          "end_offset": 66
-        },
-        {
+        "A3": {
           "raw": "-6.286E+07",
           "value": -62860000.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 69,
-          "end_offset": 79
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 43,
+          "end_offset": 53
         },
-        {
+        "A4": {
           "raw": "7.168E+04",
           "value": 71680.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 84,
-          "end_offset": 93
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 55,
+          "end_offset": 64
         },
-        {
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
           "raw": "298",
           "value": 298.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 110,
-          "end_offset": 113
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 66,
+          "end_offset": 69
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 0
     },
     {
-      "raw": "Si~                             0.1                                                                           523",
-      "tokens": [
-        {
-          "raw": "Si~",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 0,
-          "end_offset": 3
-        },
-        {
+      "label_raw": "SiO2",
+      "cells": {
+        "entropy": {
           "raw": "0.1",
           "value": 0.1,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 32,
-          "end_offset": 35
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 6,
+          "end_offset": 9
         },
-        {
+        "A1": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A2": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
           "raw": "523",
           "value": 523.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 110,
-          "end_offset": 113
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 11,
+          "end_offset": 14
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 1
     }
   ],
-  "transcription_status": "untranscribed",
+  "transcription_status": "transcribed_ocr_suspect",
   "identity_checks": [],
   "ambiguities": [
-    "A1: unparsed printed OCR token '-4. 160E+03'",
-    "A2: unparsed printed OCR token '2.548E+OO'",
-    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(1, 'A1', '-4. 160E+03')]",
-    "Body label or prose enters numeric region: [('A2', '2.548E+OO')]",
-    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
-    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+    "Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.",
+    "MinerU/image token disagreement (raw kept): A4:7.168E+04"
   ],
   "temperature_grid": [],
   "source_id": "robie-hemingway-1995-usgs-b2131",

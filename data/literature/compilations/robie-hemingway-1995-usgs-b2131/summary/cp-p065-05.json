@@ -5,131 +5,174 @@
   "page": 65,
   "table_number": null,
   "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR SHEET STRUCTURE SILICATES",
-  "name_as_published": null,
-  "formula_as_published": null,
+  "name_as_published": "ILLITE",
+  "formula_as_published": "K3(Al7Mg)(Al2Si14)O40(OH)8",
   "phase_as_published": null,
-  "name_candidate": "ILLITE",
-  "formula_candidate": "~e3 <Al7Mg><At 2st 14 >o40 <0H>",
   "header_and_units_raw": "NAME AND FORtiJLA                    ENTROPY\n                                    J·•r' ·K\"'\n                                                       A1           A2\n                                                                  (T)\n                                                                                 A3\n                                                                              (l\"2)\n                                                                                              A4\n                                                                                           n~-•,\n                                                                                                           AS\n                                                                                                         (T2)\n                                                                                                                  T rMQe\n                                                                                                                    IC\n                                                                                                                           Tun\n                                                                                                                            IC\n                                                                                                                                 '-\".\n                                                                                                                                 kJ·•l\"1\n\n",
-  "source_text": "ILLITE                                1104.2      1.291E+03                                                          298\n~e3 <Al7Mg><At 2st 14 >o40 <0H> 8        2.5",
+  "source_text": "ILLITE  1104.2  1.291E+03  298  \nK3(Al7Mg)(Al2Si14)O40(OH)8  2.5  ",
   "rows": [
     {
-      "raw": "ILLITE                                1104.2      1.291E+03                                                          298",
-      "tokens": [
-        {
-          "raw": "ILLITE",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 0,
-          "end_offset": 6
-        },
-        {
+      "label_raw": "ILLITE",
+      "cells": {
+        "entropy": {
           "raw": "1104.2",
           "value": 1104.2,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 38,
-          "end_offset": 44
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 8,
+          "end_offset": 14
         },
-        {
+        "A1": {
           "raw": "1.291E+03",
           "value": 1291.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 50,
-          "end_offset": 59
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 16,
+          "end_offset": 25
         },
-        {
+        "A2": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
           "raw": "298",
           "value": 298.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 117,
-          "end_offset": 120
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 27,
+          "end_offset": 30
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 0
     },
     {
-      "raw": "~e3 <Al7Mg><At 2st 14 >o40 <0H> 8        2.5",
-      "tokens": [
-        {
-          "raw": "~e3",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 0,
-          "end_offset": 3
-        },
-        {
-          "raw": "<Al7Mg><At",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 4,
-          "end_offset": 14
-        },
-        {
-          "raw": "2st",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 15,
-          "end_offset": 18
-        },
-        {
-          "raw": "14",
-          "value": 14.0,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 19,
-          "end_offset": 21
-        },
-        {
-          "raw": ">o40",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 22,
-          "end_offset": 26
-        },
-        {
-          "raw": "<0H>",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 27,
-          "end_offset": 31
-        },
-        {
-          "raw": "8",
-          "value": 8.0,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 32,
-          "end_offset": 33
-        },
-        {
+      "label_raw": "K3(Al7Mg)(Al2Si14)O40(OH)8",
+      "cells": {
+        "entropy": {
           "raw": "2.5",
           "value": 2.5,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 41,
-          "end_offset": 44
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 28,
+          "end_offset": 31
+        },
+        "A1": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A2": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A3": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 1
     }
   ],
-  "transcription_status": "untranscribed",
+  "transcription_status": "transcribed_ocr_suspect",
   "identity_checks": [],
   "ambiguities": [
-    "entropy: unparsed printed OCR token '8        2.5'",
-    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(2, 'entropy', '8        2.5')]",
-    "Body label or prose enters numeric region: []",
-    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
-    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+    "Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.",
+    "MinerU/image token disagreement (raw kept): entropy:1104.2, A1:1.291E+03"
   ],
   "temperature_grid": [],
   "source_id": "robie-hemingway-1995-usgs-b2131",

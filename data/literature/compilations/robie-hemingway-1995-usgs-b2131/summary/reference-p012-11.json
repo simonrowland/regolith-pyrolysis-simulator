@@ -5,219 +5,183 @@
   "page": 12,
   "table_number": null,
   "table_title_raw": "THERMODYNAMIC PROPERTIES OF SULFIDE MINERALS AT 298.15 K",
-  "name_as_published": null,
-  "formula_as_published": null,
-  "phase_as_published": null,
-  "name_candidate": "HYDROGEN SULFIDE (IDEAL GAS)",
-  "formula_candidate": "H2s",
+  "name_as_published": "HYDROGEN SULFIDE (IDEAL GAS)",
+  "formula_as_published": "H2S",
+  "phase_as_published": [
+    "(IDEAL GAS)"
+  ],
   "header_and_units_raw": "     NAME AND FORJIJLA                WEIGHT     ENTROPY      VOLUME   ENTHALPY    FREE      LOG(K)     REFERENCES\n                                                                                  ENERGY\n                                                     s•         v•      ......      A,G•\n                                       I       J·mol\"'·K'\"'    ~       kJ·mol·'   kJ·mol-1             s    H/G    c\n\n",
-  "source_text": "     HYDROGEN SULFIDE (IDEAL GAS)     34.082       205.8 24789.70        -20.6      -33.4     5.86    85    85    85\n     H2s                                             0.2     0.20          0.6        0.6     o. 11   67    67    67",
+  "source_text": "HYDROGEN SULFIDE (IDEAL GAS)  34.082  205.8  24789.70  -20.6  -33.4  5.86  85  85  85\nH2S  0.2  0.20  0.6  0.6  0.11  67  67  67",
   "rows": [
     {
-      "raw": "     HYDROGEN SULFIDE (IDEAL GAS)     34.082       205.8 24789.70        -20.6      -33.4     5.86    85    85    85",
-      "tokens": [
-        {
-          "raw": "HYDROGEN",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 5,
-          "end_offset": 13
-        },
-        {
-          "raw": "SULFIDE",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 14,
-          "end_offset": 21
-        },
-        {
-          "raw": "(IDEAL",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 22,
-          "end_offset": 28
-        },
-        {
-          "raw": "GAS)",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 29,
-          "end_offset": 33
-        },
-        {
+      "label_raw": "HYDROGEN SULFIDE (IDEAL GAS)",
+      "cells": {
+        "weight": {
           "raw": "34.082",
           "value": 34.082,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 38,
-          "end_offset": 44
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 30,
+          "end_offset": 36
         },
-        {
+        "entropy": {
           "raw": "205.8",
           "value": 205.8,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 51,
-          "end_offset": 56
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 38,
+          "end_offset": 43
         },
-        {
+        "volume": {
           "raw": "24789.70",
           "value": 24789.7,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 57,
-          "end_offset": 65
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 45,
+          "end_offset": 53
         },
-        {
+        "formation_enthalpy": {
           "raw": "-20.6",
           "value": -20.6,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 73,
-          "end_offset": 78
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 55,
+          "end_offset": 60
         },
-        {
+        "formation_gibbs": {
           "raw": "-33.4",
           "value": -33.4,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 84,
-          "end_offset": 89
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 62,
+          "end_offset": 67
         },
-        {
+        "log_kf": {
           "raw": "5.86",
           "value": 5.86,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 94,
-          "end_offset": 98
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 69,
+          "end_offset": 73
         },
-        {
+        "reference_entropy": {
           "raw": "85",
           "value": 85.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 102,
-          "end_offset": 104
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 75,
+          "end_offset": 77
         },
-        {
+        "reference_enthalpy_gibbs": {
           "raw": "85",
           "value": 85.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 108,
-          "end_offset": 110
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 79,
+          "end_offset": 81
         },
-        {
+        "reference_heat_capacity": {
           "raw": "85",
           "value": 85.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 114,
-          "end_offset": 116
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 83,
+          "end_offset": 85
         }
-      ],
+      },
       "source_line_index": 0
     },
     {
-      "raw": "     H2s                                             0.2     0.20          0.6        0.6     o. 11   67    67    67",
-      "tokens": [
-        {
-          "raw": "H2s",
+      "label_raw": "H2S",
+      "cells": {
+        "weight": {
+          "raw": "",
           "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 5,
-          "end_offset": 8
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         },
-        {
+        "entropy": {
           "raw": "0.2",
           "value": 0.2,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 53,
-          "end_offset": 56
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 5,
+          "end_offset": 8
         },
-        {
+        "volume": {
           "raw": "0.20",
           "value": 0.2,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 61,
-          "end_offset": 65
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 10,
+          "end_offset": 14
         },
-        {
+        "formation_enthalpy": {
           "raw": "0.6",
           "value": 0.6,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 75,
-          "end_offset": 78
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 16,
+          "end_offset": 19
         },
-        {
+        "formation_gibbs": {
           "raw": "0.6",
           "value": 0.6,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 86,
-          "end_offset": 89
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 21,
+          "end_offset": 24
         },
-        {
-          "raw": "o.",
-          "value": null,
+        "log_kf": {
+          "raw": "0.11",
+          "value": 0.11,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 94,
-          "end_offset": 96
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 26,
+          "end_offset": 30
         },
-        {
-          "raw": "11",
-          "value": 11.0,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 97,
-          "end_offset": 99
-        },
-        {
+        "reference_entropy": {
           "raw": "67",
           "value": 67.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 102,
-          "end_offset": 104
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 32,
+          "end_offset": 34
         },
-        {
+        "reference_enthalpy_gibbs": {
           "raw": "67",
           "value": 67.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 108,
-          "end_offset": 110
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 36,
+          "end_offset": 38
         },
-        {
+        "reference_heat_capacity": {
           "raw": "67",
           "value": 67.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 114,
-          "end_offset": 116
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 40,
+          "end_offset": 42
         }
-      ],
+      },
       "source_line_index": 1
     }
   ],
-  "transcription_status": "untranscribed",
-  "identity_checks": [],
+  "transcription_status": "transcribed_ocr_suspect",
+  "identity_checks": [
+    {
+      "identity": "delta_f_G + R*T*ln(10)*log_Kf = 0",
+      "residual_kJ_per_mol": 0.048935684856616035,
+      "rounding_tolerance_kJ_per_mol": 0.08854004751267629,
+      "disagreement": false
+    }
+  ],
   "ambiguities": [
-    "log_kf: unparsed printed OCR token 'o. 11'",
-    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(2, 'log_kf', 'o. 11')]",
-    "Body label or prose enters numeric region: []",
-    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
-    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+    "Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.",
+    "MinerU/image token disagreement (raw kept): volume:24789.70, formation_gibbs:-33.4"
   ],
   "temperature_grid": [
     {

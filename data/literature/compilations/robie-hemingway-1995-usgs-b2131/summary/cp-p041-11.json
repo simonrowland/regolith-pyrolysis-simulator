@@ -5,139 +5,176 @@
   "page": 41,
   "table_number": null,
   "table_title_raw": "COEFFICIENTS FOR HEAT CAPACITY EQUATIONS FOR SELECTED ELEMENTS",
-  "name_as_published": null,
-  "formula_as_published": null,
-  "phase_as_published": null,
-  "name_candidate": "CALCilM",
-  "formula_candidate": "Ca",
+  "name_as_published": "CALCIUM",
+  "formula_as_published": "Ca",
+  "phase_as_published": [
+    "(α-crystal)"
+  ],
   "header_and_units_raw": "NAME AND FORMULA    ENTROPY            A1             A2           A3            A4             A5      Trange     T..         A..H•\n                   J •110l\",·l(1                     (T)         n-z,          n~-•,           (T2)        IC       IC     kJ•110l\"1\n\n",
-  "source_text": "CALCilM                 42.90 -2.659E+01         5.236E-02    -4.877E+05     7.442E+02    -9.772E-06       298\nCa («·crystal)           o. 10                                                                            716",
+  "source_text": "CALCIUM  42.90  -2.659E+01  5.236E-02  -4.877E+05  7.442E+02  -9.772E-06  298  \nCa (α-crystal)  0.10  716  ",
   "rows": [
     {
-      "raw": "CALCilM                 42.90 -2.659E+01         5.236E-02    -4.877E+05     7.442E+02    -9.772E-06       298",
-      "tokens": [
-        {
-          "raw": "CALCilM",
-          "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 0,
-          "end_offset": 7
-        },
-        {
+      "label_raw": "CALCIUM",
+      "cells": {
+        "entropy": {
           "raw": "42.90",
           "value": 42.9,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 24,
-          "end_offset": 29
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 9,
+          "end_offset": 14
         },
-        {
+        "A1": {
           "raw": "-2.659E+01",
           "value": -26.59,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 30,
-          "end_offset": 40
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 16,
+          "end_offset": 26
         },
-        {
+        "A2": {
           "raw": "5.236E-02",
           "value": 0.05236,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 49,
-          "end_offset": 58
+          "ocr_check": "mineru_image_token_disagreement",
+          "start_offset": 28,
+          "end_offset": 37
         },
-        {
+        "A3": {
           "raw": "-4.877E+05",
           "value": -487700.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 62,
-          "end_offset": 72
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 39,
+          "end_offset": 49
         },
-        {
+        "A4": {
           "raw": "7.442E+02",
           "value": 744.2,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 77,
-          "end_offset": 86
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 51,
+          "end_offset": 60
         },
-        {
+        "A5": {
           "raw": "-9.772E-06",
           "value": -9.772e-06,
           "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 90,
-          "end_offset": 100
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 62,
+          "end_offset": 72
         },
-        {
+        "temperature_range": {
           "raw": "298",
           "value": 298.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 107,
-          "end_offset": 110
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 74,
+          "end_offset": 77
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 0
     },
     {
-      "raw": "Ca («·crystal)           o. 10                                                                            716",
-      "tokens": [
-        {
-          "raw": "Ca",
+      "label_raw": "Ca (α-crystal)",
+      "cells": {
+        "entropy": {
+          "raw": "0.10",
+          "value": 0.1,
+          "ocr_suspect": true,
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 16,
+          "end_offset": 20
+        },
+        "A1": {
+          "raw": "",
           "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 0,
-          "end_offset": 2
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         },
-        {
-          "raw": "(«·crystal)",
+        "A2": {
+          "raw": "",
           "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 3,
-          "end_offset": 14
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         },
-        {
-          "raw": "o.",
+        "A3": {
+          "raw": "",
           "value": null,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 25,
-          "end_offset": 27
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         },
-        {
-          "raw": "10",
-          "value": 10.0,
-          "ocr_suspect": true,
-          "ocr_check": "machine_disagreement",
-          "start_offset": 28,
-          "end_offset": 30
+        "A4": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         },
-        {
+        "A5": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "temperature_range": {
           "raw": "716",
           "value": 716.0,
           "ocr_suspect": true,
-          "ocr_check": "machine_token_agreement_row_unverified",
-          "start_offset": 106,
-          "end_offset": 109
+          "ocr_check": "mineru_image_token_agreement",
+          "start_offset": 22,
+          "end_offset": 25
+        },
+        "transition_temperature": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
+        },
+        "transition_enthalpy": {
+          "raw": "",
+          "value": null,
+          "ocr_suspect": false,
+          "ocr_check": "blank",
+          "start_offset": null,
+          "end_offset": null
         }
-      ],
+      },
       "source_line_index": 1
     }
   ],
-  "transcription_status": "untranscribed",
+  "transcription_status": "transcribed_ocr_suspect",
   "identity_checks": [],
   "ambiguities": [
-    "entropy: unparsed printed OCR token 'o. 10'",
-    "Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established: [(2, 'entropy', 'o. 10')]",
-    "Body label or prose enters numeric region: []",
-    "All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified. No OCR repair.",
-    "Column geometry or metadata collides with numeric fields; semantic assignment withheld."
+    "Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.",
+    "MinerU/image token disagreement (raw kept): A2:5.236E-02"
   ],
   "temperature_grid": [],
   "source_id": "robie-hemingway-1995-usgs-b2131",

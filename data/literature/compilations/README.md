@@ -74,4 +74,4 @@ ions and condensed phases included). See `nasa-glenn/README.md`.
 
 | Compilation | Local status |
 |---|---|
-| [Robie & Hemingway 1995, USGS Bulletin 2131](robie-hemingway-1995-usgs-b2131/) | Whole-bulletin numeric-table census (1,277 records); native OCR records and explicit untranscribed gaps. Public domain; reference input only, never battery-scored. |
+| [Robie & Hemingway 1995, USGS Bulletin 2131](robie-hemingway-1995-usgs-b2131/) | Whole-bulletin numeric-table census (1,277 records); native OCR records. Pass 2 transcribed the 111 pass-1 OCR/layout gaps from MinerU tables plus page images. Public domain; reference input only, never battery-scored. |

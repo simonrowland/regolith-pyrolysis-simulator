@@ -1590,14 +1590,14 @@ census:
     - 461
     reason: Names/formula index; integers are bibliographic page locators
 summary:
-  numeric_cell_count: 57679
-  parsed_value_count: 46357
-  ocr_suspect_count: 20130
-  untranscribed_record_count: 111
-  identity_check_disagreement_count: 86
+  numeric_cell_count: 58171
+  parsed_value_count: 46480
+  ocr_suspect_count: 19699
+  untranscribed_record_count: 0
+  identity_check_disagreement_count: 90
   record_count: 1277
-  transcribed_record_count: 1166
-  record_ambiguity_count: 7290
+  transcribed_record_count: 1277
+  record_ambiguity_count: 6861
 ocr_suspect_examples:
 - record_id: symbols-constants
   tokens:
@@ -1613,10 +1613,10 @@ ocr_suspect_examples:
   - '-2.124E+05'
 - record_id: cp-p041-02
   tokens:
-  - AlliUNlM
   - '28.30'
-  - '4.'
-  - 132E+01
+  - '4.132E+01'
+  - '-1.988E-02'
+  - '-1.265E+05'
 - record_id: cp-p041-03
   tokens:
   - '35.69'
@@ -1625,10 +1625,10 @@ ocr_suspect_examples:
   - '-9.8777E+04'
 - record_id: cp-p041-04
   tokens:
-  - GOLD
   - '47.49'
-  - '4.'
-  - 197E+01
+  - '4.197E+01'
+  - '-1.770E-02'
+  - '-2.161E+02'
 - record_id: cp-p041-05
   tokens:
   - '5.83'
@@ -1643,10 +1643,10 @@ ocr_suspect_examples:
   - ·4.502E+05
 - record_id: cp-p041-07
   tokens:
-  - BISMUTH
   - '56.74'
   - '2.6852E+01'
   - '-1.7289E-02'
+  - '4.1802E-05'
 - record_id: cp-p041-08
   tokens:
   - '249.34'
@@ -1655,1829 +1655,102 @@ ocr_suspect_examples:
   - ·3.021E+04
 - record_id: cp-p041-09
   tokens:
-  - GRAPHITE
   - '5.74'
   - '6.086E+01'
-  - ·1.024E·02
+  - '-1.024E-02'
+  - '7.139E+05'
 - record_id: cp-p041-10
   tokens:
-  - DIAMOND
   - '2.38'
   - '9.845E+01'
-  - ·3.655E·02
+  - '-3.655E-02'
+  - '1.217E+06'
 - record_id: cp-p041-11
   tokens:
-  - CALCilM
   - '42.90'
   - '-2.659E+01'
   - '5.236E-02'
+  - '-4.877E+05'
 ocr_policy:
   primary: pdftotext -layout, separately per PDF page; scratch text outside repository
-  second_reading: Tesseract on rendered printed pages; MinerU absent at start
+  second_reading: Tesseract on rendered printed pages; MinerU tables plus page images for the 111 previously untranscribed
+    records (pass 2)
   numeric_repairs: false
   identity_checks: detectors only; never correct values
-  manual_verification: atomic weights and constants; other records retain automated raster-reading flags
+  manual_verification: atomic weights and constants; pass-2 gap records cross-checked against rendered page images; other
+    records retain automated raster-reading flags
 feedstock_element_coverage:
-  Ag: 17
-  Al: 145
-  As: 11
-  Au: 3
-  B: 13
-  Ba: 13
-  Bi: 6
+  Ag: 20
+  Al: 165
+  As: 13
+  Au: 4
+  B: 16
+  Ba: 14
+  Bi: 8
   Br: 10
-  C: 100
-  Ca: 73
-  Cd: 7
-  Ce: 7
-  Cl: 25
-  Co: 12
-  Cr: 6
-  Cs: 2
-  Cu: 16
+  C: 106
+  Ca: 85
+  Cd: 8
+  Ce: 8
+  Cl: 32
+  Co: 13
+  Cr: 7
+  Cs: 3
+  Cu: 21
   Dy: 1
   Er: 1
   Eu: 1
-  F: 36
-  Fe: 115
+  F: 41
+  Fe: 133
   Ga: 1
   Gd: 1
-  Ge: 2
-  H: 138
+  Ge: 4
+  H: 164
   Hf: 3
   Ho: 1
-  I: 31
+  I: 36
   In: 1
   Ir: 1
-  K: 49
+  K: 59
   La: 1
-  Li: 14
+  Li: 15
   Lu: 1
-  Mg: 79
-  Mn: 34
-  Mo: 11
-  N: 35
-  Na: 81
+  Mg: 87
+  Mn: 39
+  Mo: 12
+  N: 38
+  Na: 89
   Nb: 1
   Nd: 1
-  Ni: 21
-  O: 124
+  Ni: 24
+  O: 185
   Os: 8
-  P: 18
+  P: 19
   Pb: 27
   Pr: 1
-  Pt: 3
-  Rb: 1
-  S: 124
+  Pt: 4
+  Rb: 2
+  S: 137
   Sb: 11
   Sc: 1
   Se: 4
-  Si: 173
+  Si: 203
   Sm: 1
-  Sn: 10
-  Sr: 12
+  Sn: 11
+  Sr: 13
   Tb: 0
-  Te: 7
-  Th: 4
-  Ti: 26
+  Te: 8
+  Th: 5
+  Ti: 27
   Tm: 1
-  U: 10
-  V: 4
+  U: 11
+  V: 5
   W: 11
   Y: 1
   Yb: 1
   Zn: 27
   Zr: 7
-untranscribed:
-- record_id: cp-p041-02
-  page_range:
-  - 41
-  - 41
-  pdf_page_range:
-  - 47
-  - 47
-  reasons: &id002
-  - 'A1: unparsed printed OCR token ''4. 132E+01'''
-  - 'A3: unparsed printed OCR token ''·1.265E+05'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A1'', ''4. 132E+01'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p041-04
-  page_range:
-  - 41
-  - 41
-  pdf_page_range:
-  - 47
-  - 47
-  reasons: &id003
-  - 'A1: unparsed printed OCR token ''4. 197E+01'''
-  - 'A4: unparsed printed OCR token ''·2.161E+02'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A1'', ''4. 197E+01'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p041-07
-  page_range:
-  - 41
-  - 41
-  pdf_page_range:
-  - 47
-  - 47
-  reasons: &id004
-  - 'A5: unparsed printed OCR token ''4. 1802E-05'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A5'', ''4. 1802E-05'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p041-09
-  page_range:
-  - 41
-  - 41
-  pdf_page_range:
-  - 47
-  - 47
-  reasons: &id005
-  - 'A2: unparsed printed OCR token ''·1.024E·02'''
-  - 'A3: unparsed printed OCR token ''7. 139E+05'''
-  - 'A4: unparsed printed OCR token ''·9.922E+02'''
-  - 'A5: unparsed printed OCR token ''1.669£-06'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A3'', ''7. 139E+05'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p041-10
-  page_range:
-  - 41
-  - 41
-  pdf_page_range:
-  - 47
-  - 47
-  reasons: &id006
-  - 'A2: unparsed printed OCR token ''·3.655E·02'''
-  - 'A4: unparsed printed OCR token ''-1 .659E+03'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A4'', ''-1 .659E+03'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p041-11
-  page_range:
-  - 41
-  - 41
-  pdf_page_range:
-  - 47
-  - 47
-  reasons: &id007
-  - 'entropy: unparsed printed OCR token ''o. 10'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 10'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p041-12
-  page_range:
-  - 41
-  - 41
-  pdf_page_range:
-  - 47
-  - 47
-  reasons: &id008
-  - 'A2: unparsed printed OCR token ''·3.8115E·02'''
-  - 'A3: unparsed printed OCR token ''·1.3402E+05'''
-  - 'A4: unparsed printed OCR token ''3.0044E+02 -1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A4'', ''3.0044E+02 -1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p041-14
-  page_range:
-  - 41
-  - 41
-  pdf_page_range:
-  - 47
-  - 47
-  reasons: &id009
-  - 'A3: unparsed printed OCR token ''·4.094E+04'''
-  - 'A4: unparsed printed OCR token ''·1 .811E+02'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A4'', ''·1 .811E+02'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p042-04
-  page_range:
-  - 42
-  - 42
-  pdf_page_range:
-  - 48
-  - 48
-  reasons: &id010
-  - 'A3: unparsed printed OCR token ''-1. 5714E+05'''
-  - 'A4: unparsed printed OCR token ''0.84921E+OO'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A3'', ''-1. 5714E+05'')]'
-  - 'Body label or prose enters numeric region: [(''A4'', ''0.84921E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p042-05
-  page_range:
-  - 42
-  - 42
-  pdf_page_range:
-  - 48
-  - 48
-  reasons: &id011
-  - 'A1: unparsed printed OCR token ''4.783E+OO'''
-  - 'Body label or prose enters numeric region: [(''A1'', ''4.783E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p043-01
-  page_range:
-  - 43
-  - 43
-  pdf_page_range:
-  - 49
-  - 49
-  reasons: &id012
-  - 'A4: unparsed printed OCR token ''-1 .3746E+03'''
-  - 'A5: unparsed printed OCR token ''1.742£-04'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A4'', ''-1 .3746E+03'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p043-10
-  page_range:
-  - 43
-  - 43
-  pdf_page_range:
-  - 49
-  - 49
-  reasons: &id013
-  - 'A1: unparsed printed OCR token ''2. 720E+01'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A1'', ''2. 720E+01'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p043-14
-  page_range:
-  - 43
-  - 43
-  pdf_page_range:
-  - 49
-  - 49
-  reasons: &id014
-  - 'A2: unparsed printed OCR token ''9. 338E -03'''
-  - 'A3: unparsed printed OCR token ''-3. 00023E+03'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A2'', ''9. 338E -03''), (1, ''A3'', ''-3. 00023E+03'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p043-15
-  page_range:
-  - 43
-  - 43
-  pdf_page_range:
-  - 49
-  - 49
-  reasons: &id015
-  - 'A2: unparsed printed OCR token ''-1.4675E-01 1.97328E+06'''
-  - 'entropy: unparsed printed OCR token ''o. 10'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A2'', ''-1.4675E-01 1.97328E+06''), (2, ''entropy'', ''o. 10'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p044-01
-  page_range:
-  - 44
-  - 44
-  pdf_page_range:
-  - 50
-  - 50
-  reasons: &id016
-  - 'A1: unparsed printed OCR token ''3.440E+OO'''
-  - 'Body label or prose enters numeric region: [(''A1'', ''3.440E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p045-08
-  page_range:
-  - 45
-  - 45
-  pdf_page_range:
-  - 51
-  - 51
-  reasons: &id017
-  - 'A2: unparsed printed OCR token ''1.358E+OO'''
-  - 'Body label or prose enters numeric region: [(''A2'', ''1.358E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p046-10
-  page_range:
-  - 46
-  - 46
-  pdf_page_range:
-  - 52
-  - 52
-  reasons: &id018
-  - 'A2: unparsed printed OCR token ''3.823E-02 ·'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A2'', ''3.823E-02 ·'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p047-04
-  page_range:
-  - 47
-  - 47
-  pdf_page_range:
-  - 53
-  - 53
-  reasons: &id019
-  - 'entropy: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p047-05
-  page_range:
-  - 47
-  - 47
-  pdf_page_range:
-  - 53
-  - 53
-  reasons: &id020
-  - 'A2: unparsed printed OCR token ''7. 108E-03'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A2'', ''7. 108E-03'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p048-01
-  page_range:
-  - 48
-  - 48
-  pdf_page_range:
-  - 54
-  - 54
-  reasons: &id021
-  - 'A1: unparsed printed OCR token ''1.190£+02'''
-  - 'A3: unparsed printed OCR token ''-1.442£+06'''
-  - 'A4: unparsed printed OCR token ''•3.405E+OO'''
-  - 'Body label or prose enters numeric region: [(''A4'', ''•3.405E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p048-06
-  page_range:
-  - 48
-  - 48
-  pdf_page_range:
-  - 54
-  - 54
-  reasons: &id022
-  - 'A1: unparsed printed OCR token ''1.50147E+03 -1.2146£+00'''
-  - 'A5: unparsed printed OCR token ''5.690£-04'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A1'', ''1.50147E+03 -1.2146£+00'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p048-08
-  page_range:
-  - 48
-  - 48
-  pdf_page_range:
-  - 54
-  - 54
-  reasons: &id023
-  - 'A1: unparsed printed OCR token ''2.65911E+03 -2.5215E+OO'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A1'', ''2.65911E+03 -2.5215E+OO'')]'
-  - 'Body label or prose enters numeric region: [(''A1'', ''2.65911E+03 -2.5215E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p048-15
-  page_range:
-  - 48
-  - 48
-  pdf_page_range:
-  - 54
-  - 54
-  reasons: &id024
-  - 'entropy: unparsed printed OCR token ''0~ 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''0~ 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p049-02
-  page_range:
-  - 49
-  - 49
-  pdf_page_range:
-  - 55
-  - 55
-  reasons: &id025
-  - 'A1: unparsed printed OCR token ''-7.432E+OO'''
-  - 'Body label or prose enters numeric region: [(''A1'', ''-7.432E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p049-04
-  page_range:
-  - 49
-  - 49
-  pdf_page_range:
-  - 55
-  - 55
-  reasons: &id026
-  - 'A1: unparsed printed OCR token ''6.433E+OO'''
-  - 'Body label or prose enters numeric region: [(''A1'', ''6.433E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p049-05
-  page_range:
-  - 49
-  - 49
-  pdf_page_range:
-  - 55
-  - 55
-  reasons: &id027
-  - 'A2: unparsed printed OCR token ''-1. 121E-02'''
-  - 'entropy: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A2'', ''-1. 121E-02''), (2, ''entropy'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p049-07
-  page_range:
-  - 49
-  - 49
-  pdf_page_range:
-  - 55
-  - 55
-  reasons: &id028
-  - 'A2: unparsed printed OCR token ''-5.3024E+OO'''
-  - 'A3: unparsed printed OCR token ''2.43067E+07 -5.3039E+04'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A3'', ''2.43067E+07 -5.3039E+04'')]'
-  - 'Body label or prose enters numeric region: [(''A2'', ''-5.3024E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p049-08
-  page_range:
-  - 49
-  - 49
-  pdf_page_range:
-  - 55
-  - 55
-  reasons: &id029
-  - 'A1: unparsed printed OCR token ''-8.776E+OO'''
-  - 'Body label or prose enters numeric region: [(''A1'', ''-8.776E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p049-12
-  page_range:
-  - 49
-  - 49
-  pdf_page_range:
-  - 55
-  - 55
-  reasons: &id030
-  - 'entropy: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p049-15
-  page_range:
-  - 49
-  - 49
-  pdf_page_range:
-  - 55
-  - 55
-  reasons: &id031
-  - 'A1: unparsed printed OCR token ''a. 1145E+01'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A1'', ''a. 1145E+01'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p050-01
-  page_range:
-  - 50
-  - 50
-  pdf_page_range:
-  - 56
-  - 56
-  reasons: &id032
-  - 'A1: unparsed printed OCR token ''-4. 160E+03'''
-  - 'A2: unparsed printed OCR token ''2.548E+OO'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A1'', ''-4. 160E+03'')]'
-  - 'Body label or prose enters numeric region: [(''A2'', ''2.548E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p050-08
-  page_range:
-  - 50
-  - 50
-  pdf_page_range:
-  - 56
-  - 56
-  reasons: &id033
-  - 'A1: unparsed printed OCR token ''7. 138E+01'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A1'', ''7. 138E+01'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p050-11
-  page_range:
-  - 50
-  - 50
-  pdf_page_range:
-  - 56
-  - 56
-  reasons: &id034
-  - 'A3: unparsed printed OCR token ''-1 .867E+06'''
-  - 'A4: unparsed printed OCR token ''3.689£+02'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A3'', ''-1 .867E+06'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p053-04
-  page_range:
-  - 53
-  - 53
-  pdf_page_range:
-  - 59
-  - 59
-  reasons: &id035
-  - 'A1: unparsed printed OCR token ''-4.725E+OO'''
-  - 'Body label or prose enters numeric region: [(''A1'', ''-4.725E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p053-07
-  page_range:
-  - 53
-  - 53
-  pdf_page_range:
-  - 59
-  - 59
-  reasons: &id036
-  - 'A2: unparsed printed OCR token ''1.1755E+OO'''
-  - 'Body label or prose enters numeric region: [(''A2'', ''1.1755E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p053-08
-  page_range:
-  - 53
-  - 53
-  pdf_page_range:
-  - 59
-  - 59
-  reasons: &id037
-  - 'A2: unparsed printed OCR token ''1. 165E-02'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A2'', ''1. 165E-02'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p053-11
-  page_range:
-  - 53
-  - 53
-  pdf_page_range:
-  - 59
-  - 59
-  reasons: &id038
-  - 'A2: unparsed printed OCR token ''1. 191E-02'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A2'', ''1. 191E-02'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p054-01
-  page_range:
-  - 54
-  - 54
-  pdf_page_range:
-  - 60
-  - 60
-  reasons: &id039
-  - 'A2: unparsed printed OCR token ''-1.436E+OO'''
-  - 'Body label or prose enters numeric region: [(''A2'', ''-1.436E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p054-02
-  page_range:
-  - 54
-  - 54
-  pdf_page_range:
-  - 60
-  - 60
-  reasons: &id040
-  - 'A1: unparsed printed OCR token ''6.845E+OO'''
-  - 'A3: unparsed printed OCR token ''-4. 108E+05'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A3'', ''-4. 108E+05'')]'
-  - 'Body label or prose enters numeric region: [(''A1'', ''6.845E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p054-04
-  page_range:
-  - 54
-  - 54
-  pdf_page_range:
-  - 60
-  - 60
-  reasons: &id041
-  - 'A1: unparsed printed OCR token ''-2.612E+OO'''
-  - 'entropy: unparsed printed OCR token ''o.,'''
-  - 'Body label or prose enters numeric region: [(''A1'', ''-2.612E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p054-05
-  page_range:
-  - 54
-  - 54
-  pdf_page_range:
-  - 60
-  - 60
-  reasons: &id042
-  - 'entropy: unparsed printed OCR token ''238.5 4'''
-  - 'A2: unparsed printed OCR token ''-3.8582E+OO'''
-  - First-row entropy unresolved
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''entropy'', ''238.5 4'')]'
-  - 'Body label or prose enters numeric region: [(''A2'', ''-3.8582E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p054-09
-  page_range:
-  - 54
-  - 54
-  pdf_page_range:
-  - 60
-  - 60
-  reasons: &id043
-  - 'entropy: unparsed printed OCR token '', .7'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', '', .7'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p054-10
-  page_range:
-  - 54
-  - 54
-  pdf_page_range:
-  - 60
-  - 60
-  reasons: &id044
-  - 'A2: unparsed printed OCR token ''1.0046E+OO'''
-  - 'Body label or prose enters numeric region: [(''A2'', ''1.0046E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p055-10
-  page_range:
-  - 55
-  - 55
-  pdf_page_range:
-  - 61
-  - 61
-  reasons: &id045
-  - 'A2: unparsed printed OCR token ''1.2795E·01'''
-  - 'entropy: unparsed printed OCR token ''1. 7'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''1. 7'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p057-03
-  page_range:
-  - 57
-  - 57
-  pdf_page_range:
-  - 63
-  - 63
-  reasons: &id046
-  - 'A1: unparsed printed OCR token ''1.9833E+03 -1'''
-  - 'A2: unparsed printed OCR token ''.64948E+OO'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A1'', ''1.9833E+03 -1'')]'
-  - 'Body label or prose enters numeric region: [(''A2'', ''.64948E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p058-03
-  page_range:
-  - 58
-  - 58
-  pdf_page_range:
-  - 64
-  - 64
-  reasons: &id047
-  - 'entropy: unparsed printed OCR token ''91.4 2.'''
-  - 'A3: unparsed printed OCR token ''·1.9141E+06'''
-  - First-row entropy unresolved
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''entropy'', ''91.4 2.'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p058-06
-  page_range:
-  - 58
-  - 58
-  pdf_page_range:
-  - 64
-  - 64
-  reasons: &id048
-  - 'entropy: unparsed printed OCR token ''75 5.0'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(3, ''entropy'', ''75 5.0'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p059-02
-  page_range:
-  - 59
-  - 59
-  pdf_page_range:
-  - 65
-  - 65
-  reasons: &id049
-  - 'A2: unparsed printed OCR token ''-5.2407E+OO'''
-  - 'Body label or prose enters numeric region: [(''A2'', ''-5.2407E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p059-08
-  page_range:
-  - 59
-  - 59
-  pdf_page_range:
-  - 65
-  - 65
-  reasons: &id050
-  - 'A3: unparsed printed OCR token ''-9.om+04'''
-  - 'Body label or prose enters numeric region: [(''A3'', ''-9.om+04'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p059-14
-  page_range:
-  - 59
-  - 59
-  pdf_page_range:
-  - 65
-  - 65
-  reasons: &id051
-  - 'A1: unparsed printed OCR token ''6. 141E+02'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A1'', ''6. 141E+02'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p060-04
-  page_range:
-  - 60
-  - 60
-  pdf_page_range:
-  - 66
-  - 66
-  reasons: &id052
-  - 'A2: unparsed printed OCR token ''1.276E+OO'''
-  - First-row entropy unresolved
-  - 'Body label or prose enters numeric region: [(''A2'', ''1.276E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p061-16
-  page_range:
-  - 61
-  - 61
-  pdf_page_range:
-  - 67
-  - 67
-  reasons: &id053
-  - 'A3: unparsed printed OCR token ''1. 193E+06'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A3'', ''1. 193E+06'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p062-06
-  page_range:
-  - 62
-  - 62
-  pdf_page_range:
-  - 68
-  - 68
-  reasons: &id054
-  - 'A2: unparsed printed OCR token ''6. 197E-02'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A2'', ''6. 197E-02'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p062-07
-  page_range:
-  - 62
-  - 62
-  pdf_page_range:
-  - 68
-  - 68
-  reasons: &id055
-  - 'A2: unparsed printed OCR token ''-4. 189E+OO'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A2'', ''-4. 189E+OO'')]'
-  - 'Body label or prose enters numeric region: [(''A2'', ''-4. 189E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p063-07
-  page_range:
-  - 63
-  - 63
-  pdf_page_range:
-  - 69
-  - 69
-  reasons: &id056
-  - 'entropy: unparsed printed OCR token ''4o 12 ·H o 0.4'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(3, ''entropy'', ''4o 12 ·H o 0.4'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p063-08
-  page_range:
-  - 63
-  - 63
-  pdf_page_range:
-  - 69
-  - 69
-  reasons: &id057
-  - 'A2: unparsed printed OCR token ''-2. 171E-01'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A2'', ''-2. 171E-01'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p063-09
-  page_range:
-  - 63
-  - 63
-  pdf_page_range:
-  - 69
-  - 69
-  reasons: &id058
-  - 'A2: unparsed printed OCR token ''-1. 717E-01'''
-  - 'A4: unparsed printed OCR token ''·8.305E+03'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A2'', ''-1. 717E-01'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p064-09
-  page_range:
-  - 64
-  - 64
-  pdf_page_range:
-  - 70
-  - 70
-  reasons: &id059
-  - 'A2: unparsed printed OCR token ''6. 711E-02'''
-  - First-row entropy unresolved
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A2'', ''6. 711E-02'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p065-05
-  page_range:
-  - 65
-  - 65
-  pdf_page_range:
-  - 71
-  - 71
-  reasons: &id060
-  - 'entropy: unparsed printed OCR token ''8        2.5'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''8        2.5'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p065-15
-  page_range:
-  - 65
-  - 65
-  pdf_page_range:
-  - 71
-  - 71
-  reasons: &id061
-  - 'A2: unparsed printed OCR token ''-5.212E+OO'''
-  - 'Body label or prose enters numeric region: [(''A2'', ''-5.212E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p066-01
-  page_range:
-  - 66
-  - 66
-  pdf_page_range:
-  - 72
-  - 72
-  reasons: &id062
-  - 'A2: unparsed printed OCR token ''-7.8834E+OO'''
-  - 'A3: unparsed printed OCR token ''8.31194E+07 -1.3594E+05'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''A3'', ''8.31194E+07 -1.3594E+05'')]'
-  - 'Body label or prose enters numeric region: [(''A2'', ''-7.8834E+OO'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: cp-p066-02
-  page_range:
-  - 66
-  - 66
-  pdf_page_range:
-  - 72
-  - 72
-  reasons: &id063
-  - 'entropy: unparsed printed OCR token ''2        0.9'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''2        0.9'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p005-02
-  page_range:
-  - 5
-  - 5
-  pdf_page_range:
-  - 11
-  - 11
-  reasons: &id064
-  - 'formation_enthalpy: unparsed printed OCR token ''o. 1'''
-  - 'formation_gibbs: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''formation_enthalpy'', ''o. 1''), (2, ''formation_gibbs'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p005-09
-  page_range:
-  - 5
-  - 5
-  pdf_page_range:
-  - 11
-  - 11
-  reasons: &id065
-  - 'formation_gibbs: unparsed printed OCR token ''1.o'''
-  - 'log_kf: unparsed printed OCR token ''o. 18'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''log_kf'', ''o. 18'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p005-15
-  page_range:
-  - 5
-  - 5
-  pdf_page_range:
-  - 11
-  - 11
-  reasons: &id066
-  - 'entropy: unparsed printed OCR token ''o. 10'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 10'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p006-07
-  page_range:
-  - 6
-  - 6
-  pdf_page_range:
-  - 12
-  - 12
-  reasons: &id067
-  - 'formation_gibbs: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''formation_gibbs'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p007-01
-  page_range:
-  - 7
-  - 7
-  pdf_page_range:
-  - 13
-  - 13
-  reasons: &id068
-  - 'formation_enthalpy: unparsed printed OCR token ''o.o'''
-  - 'entropy: unparsed printed OCR token ''o. 13'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 13'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p007-04
-  page_range:
-  - 7
-  - 7
-  pdf_page_range:
-  - 13
-  - 13
-  reasons: &id069
-  - 'entropy: unparsed printed OCR token ''o. 15'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 15'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p007-11
-  page_range:
-  - 7
-  - 7
-  pdf_page_range:
-  - 13
-  - 13
-  reasons: &id070
-  - 'formation_enthalpy: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''formation_enthalpy'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p007-12
-  page_range:
-  - 7
-  - 7
-  pdf_page_range:
-  - 13
-  - 13
-  reasons: &id071
-  - 'formation_enthalpy: unparsed printed OCR token ''o. 1'''
-  - 'formation_gibbs: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''formation_enthalpy'', ''o. 1''), (2, ''formation_gibbs'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p007-14
-  page_range:
-  - 7
-  - 7
-  pdf_page_range:
-  - 13
-  - 13
-  reasons: &id072
-  - 'formation_enthalpy: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''formation_enthalpy'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p007-16
-  page_range:
-  - 7
-  - 7
-  pdf_page_range:
-  - 13
-  - 13
-  reasons: &id073
-  - 'formation_enthalpy: unparsed printed OCR token ''o. 1'''
-  - 'formation_gibbs: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''formation_enthalpy'', ''o. 1''), (2, ''formation_gibbs'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p009-07
-  page_range:
-  - 9
-  - 9
-  pdf_page_range:
-  - 15
-  - 15
-  reasons: &id074
-  - 'formation_enthalpy: unparsed printed OCR token ''1. 7'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''formation_enthalpy'', ''1. 7'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p011-05
-  page_range:
-  - 11
-  - 11
-  pdf_page_range:
-  - 17
-  - 17
-  reasons: &id075
-  - 'log_kf: unparsed printed OCR token ''t3. 71'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''log_kf'', ''t3. 71'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p011-09
-  page_range:
-  - 11
-  - 11
-  pdf_page_range:
-  - 17
-  - 17
-  reasons: &id076
-  - 'formation_enthalpy: unparsed printed OCR token ''·347.5'''
-  - Substance name and formula missing from primary OCR layer at this numeric block
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p011-14
-  page_range:
-  - 11
-  - 11
-  pdf_page_range:
-  - 17
-  - 17
-  reasons: &id077
-  - 'reference_entropy: unparsed printed OCR token ''142 369'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'log_kf: unparsed printed OCR token ''o. 19'''
-  - 'reference_enthalpy_gibbs: unparsed printed OCR token ''48 142'''
-  - Reference columns collapsed by OCR at source line 2; preserve raw span without assigning reference IDs to S/HG/C
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''log_kf'', ''o. 19'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p011-16
-  page_range:
-  - 11
-  - 11
-  pdf_page_range:
-  - 17
-  - 17
-  reasons: &id078
-  - 'formation_gibbs: unparsed printed OCR token ''·394.7'''
-  - 'reference_entropy: unparsed printed OCR token ''369 369'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - Substance name and formula missing from primary OCR layer at this numeric block
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p012-03
-  page_range:
-  - 12
-  - 12
-  pdf_page_range:
-  - 18
-  - 18
-  reasons: &id079
-  - 'formation_enthalpy: unparsed printed OCR token ''-101 .o'''
-  - 'reference_enthalpy_gibbs: unparsed printed OCR token ''3 131'''
-  - Reference columns collapsed by OCR at source line 2; preserve raw span without assigning reference IDs to S/HG/C
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''formation_enthalpy'', ''-101 .o'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p012-05
-  page_range:
-  - 12
-  - 12
-  pdf_page_range:
-  - 18
-  - 18
-  reasons: &id080
-  - 'reference_entropy: unparsed printed OCR token ''135 375'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'entropy: unparsed printed OCR token ''o. 1'''
-  - 'volume: unparsed printed OCR token ''o. 10'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 1''), (2, ''volume'', ''o. 10'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p012-06
-  page_range:
-  - 12
-  - 12
-  pdf_page_range:
-  - 18
-  - 18
-  reasons: &id081
-  - 'reference_entropy: unparsed printed OCR token ''138 409'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'entropy: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p012-07
-  page_range:
-  - 12
-  - 12
-  pdf_page_range:
-  - 18
-  - 18
-  reasons: &id082
-  - 'reference_entropy: unparsed printed OCR token ''139 139'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'entropy: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p012-11
-  page_range:
-  - 12
-  - 12
-  pdf_page_range:
-  - 18
-  - 18
-  reasons: &id083
-  - 'log_kf: unparsed printed OCR token ''o. 11'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''log_kf'', ''o. 11'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p012-14
-  page_range:
-  - 12
-  - 12
-  pdf_page_range:
-  - 18
-  - 18
-  reasons: &id084
-  - 'reference_entropy: unparsed printed OCR token ''217 120'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'log_kf: unparsed printed OCR token ''o. 15'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''log_kf'', ''o. 15'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p013-10
-  page_range:
-  - 13
-  - 13
-  pdf_page_range:
-  - 19
-  - 19
-  reasons: &id085
-  - 'reference_entropy: unparsed printed OCR token ''136 136'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'entropy: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p015-05
-  page_range:
-  - 15
-  - 15
-  pdf_page_range:
-  - 21
-  - 21
-  reasons: &id086
-  - 'formation_gibbs: unparsed printed OCR token ''.. 576.0'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''formation_gibbs'', ''.. 576.0'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p015-06
-  page_range:
-  - 15
-  - 15
-  pdf_page_range:
-  - 21
-  - 21
-  reasons: &id087
-  - 'formation_gibbs: unparsed printed OCR token ''.. 575.6'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''formation_gibbs'', ''.. 575.6'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p016-01
-  page_range:
-  - 16
-  - 16
-  pdf_page_range:
-  - 22
-  - 22
-  reasons: &id088
-  - 'log_kf: unparsed printed OCR token ''157.33 67'''
-  - 'reference_entropy: unparsed printed OCR token ''67 67'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'reference_entropy: unparsed printed OCR token ''158 158 117'''
-  - Reference columns collapsed by OCR at source line 2; preserve raw span without assigning reference IDs to S/HG/C
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''log_kf'', ''157.33 67'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p016-03
-  page_range:
-  - 16
-  - 16
-  pdf_page_range:
-  - 22
-  - 22
-  reasons: &id089
-  - 'reference_enthalpy_gibbs: unparsed printed OCR token ''14 227'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'entropy: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p016-09
-  page_range:
-  - 16
-  - 16
-  pdf_page_range:
-  - 22
-  - 22
-  reasons: &id090
-  - 'reference_entropy: unparsed printed OCR token ''67 190'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'formation_enthalpy: unparsed printed OCR token ''o. 1'''
-  - 'formation_gibbs: unparsed printed OCR token ''o. 1'''
-  - 'reference_entropy: unparsed printed OCR token ''310 272'''
-  - Reference columns collapsed by OCR at source line 2; preserve raw span without assigning reference IDs to S/HG/C
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''formation_enthalpy'', ''o. 1''), (2, ''formation_gibbs'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p016-10
-  page_range:
-  - 16
-  - 16
-  pdf_page_range:
-  - 22
-  - 22
-  reasons: &id091
-  - 'log_kf: unparsed printed OCR token ''42.91 67'''
-  - 'reference_entropy: unparsed printed OCR token ''132 148'''
-  - Reference columns collapsed by OCR at source line 2; preserve raw span without assigning reference IDs to S/HG/C
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''log_kf'', ''42.91 67'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p016-11
-  page_range:
-  - 16
-  - 16
-  pdf_page_range:
-  - 22
-  - 22
-  reasons: &id092
-  - 'weight: unparsed printed OCR token ''. 71 .846'''
-  - 'log_kf: unparsed printed OCR token ''44.05 67'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''weight'', ''. 71 .846''), (1, ''log_kf'', ''44.05 67'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p016-12
-  page_range:
-  - 16
-  - 16
-  pdf_page_range:
-  - 22
-  - 22
-  reasons: &id093
-  - 'reference_entropy: unparsed printed OCR token ''137 161 83'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'log_kf: unparsed printed OCR token ''0.23 67'''
-  - 'reference_entropy: unparsed printed OCR token ''310 130'''
-  - Reference columns collapsed by OCR at source line 2; preserve raw span without assigning reference IDs to S/HG/C
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''log_kf'', ''0.23 67'')]'
-  - Substance name and formula missing from primary OCR layer at this numeric block
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p016-13
-  page_range:
-  - 16
-  - 16
-  pdf_page_range:
-  - 22
-  - 22
-  reasons: &id094
-  - 'reference_entropy: unparsed printed OCR token ''440 161 161'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'log_kf: unparsed printed OCR token ''0.37 22'''
-  - 'reference_entropy: unparsed printed OCR token ''310 134'''
-  - Reference columns collapsed by OCR at source line 2; preserve raw span without assigning reference IDs to S/HG/C
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''log_kf'', ''0.37 22'')]'
-  - Substance name and formula missing from primary OCR layer at this numeric block
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p016-14
-  page_range:
-  - 16
-  - 16
-  pdf_page_range:
-  - 22
-  - 22
-  reasons: &id095
-  - 'log_kf: unparsed printed OCR token ''86. 16'''
-  - 'reference_entropy: unparsed printed OCR token ''235 221'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''log_kf'', ''86. 16'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p016-15
-  page_range:
-  - 16
-  - 16
-  pdf_page_range:
-  - 22
-  - 22
-  reasons: &id096
-  - 'reference_enthalpy_gibbs: unparsed printed OCR token ''85 117'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'entropy: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p017-07
-  page_range:
-  - 17
-  - 17
-  pdf_page_range:
-  - 23
-  - 23
-  reasons: &id097
-  - 'reference_enthalpy_gibbs: unparsed printed OCR token ''85 418'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'volume: unparsed printed OCR token ''o.oo'''
-  - 'reference_enthalpy_gibbs: unparsed printed OCR token ''321 117'''
-  - Reference columns collapsed by OCR at source line 2; preserve raw span without assigning reference IDs to S/HG/C
-  - 'Body label or prose enters numeric region: [(''volume'', ''o.oo'')]'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p017-12
-  page_range:
-  - 17
-  - 17
-  pdf_page_range:
-  - 23
-  - 23
-  reasons: &id098
-  - 'reference_entropy: unparsed printed OCR token ''357 357'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - Substance name and formula missing from primary OCR layer at this numeric block
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p023-13
-  page_range:
-  - 23
-  - 23
-  pdf_page_range:
-  - 29
-  - 29
-  reasons: &id099
-  - 'reference_entropy: unparsed printed OCR token ''419 419'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - Substance name and formula missing from primary OCR layer at this numeric block
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p024-07
-  page_range:
-  - 24
-  - 24
-  pdf_page_range:
-  - 30
-  - 30
-  reasons: &id100
-  - 'reference_entropy: unparsed printed OCR token ''419 419'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'formation_enthalpy: unparsed printed OCR token ''1. 7'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''formation_enthalpy'', ''1. 7'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p026-01
-  page_range:
-  - 26
-  - 26
-  pdf_page_range:
-  - 32
-  - 32
-  reasons: &id101
-  - 'reference_entropy: unparsed printed OCR token ''351 351'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'entropy: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p026-16
-  page_range:
-  - 26
-  - 26
-  pdf_page_range:
-  - 32
-  - 32
-  reasons: &id102
-  - 'reference_entropy: unparsed printed OCR token ''419 419'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'log_kf: unparsed printed OCR token ''o. 15'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''log_kf'', ''o. 15'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p031-10
-  page_range:
-  - 31
-  - 31
-  pdf_page_range:
-  - 37
-  - 37
-  reasons: &id103
-  - 'reference_entropy: unparsed printed OCR token ''164 164'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'volume: unparsed printed OCR token ''o. 1'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''volume'', ''o. 1'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p031-12
-  page_range:
-  - 31
-  - 31
-  pdf_page_range:
-  - 37
-  - 37
-  reasons: &id104
-  - 'reference_enthalpy_gibbs: unparsed printed OCR token ''68 335'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'volume: unparsed printed OCR token ''o. 12'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''volume'', ''o. 12'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p032-08
-  page_range:
-  - 32
-  - 32
-  pdf_page_range:
-  - 38
-  - 38
-  reasons: &id105
-  - 'weight: unparsed printed OCR token ''1n.239'''
-  - 'reference_entropy: unparsed printed OCR token ''225 149'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - Substance name and formula missing from primary OCR layer at this numeric block
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p032-16
-  page_range:
-  - 32
-  - 32
-  pdf_page_range:
-  - 38
-  - 38
-  reasons: &id106
-  - 'reference_entropy: unparsed printed OCR token ''350 350'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - Substance name and formula missing from primary OCR layer at this numeric block
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p036-05
-  page_range:
-  - 36
-  - 36
-  pdf_page_range:
-  - 42
-  - 42
-  reasons: &id107
-  - 'log_kf: unparsed printed OCR token ''1m.s 195'''
-  - 'log_kf: unparsed printed OCR token ''1.2 74'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(1, ''log_kf'', ''1m.s 195''), (2, ''log_kf'', ''1.2 74'')]'
-  - 'Primary numeric weight or coefficient falls inside the page-derived label boundary: ''STILBITE                        714.893'''
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p036-11
-  page_range:
-  - 36
-  - 36
-  pdf_page_range:
-  - 42
-  - 42
-  reasons: &id108
-  - 'volume: unparsed printed OCR token ''o. 10'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''volume'', ''o. 10'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p037-04
-  page_range:
-  - 37
-  - 37
-  pdf_page_range:
-  - 43
-  - 43
-  reasons: &id109
-  - 'reference_entropy: unparsed printed OCR token ''220 188'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'entropy: unparsed printed OCR token ''1. 7'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''entropy'', ''1. 7'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p038-08
-  page_range:
-  - 38
-  - 38
-  pdf_page_range:
-  - 44
-  - 44
-  reasons: &id110
-  - 'entropy: unparsed printed OCR token ''276.6+'''
-  - First-row entropy unresolved
-  - 'Primary numeric weight or coefficient falls inside the page-derived label boundary: ''MERLINOITE                      244.028'''
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: reference-p039-13
-  page_range:
-  - 39
-  - 39
-  pdf_page_range:
-  - 45
-  - 45
-  reasons: &id111
-  - 'formation_gibbs: unparsed printed OCR token ''·6015.7'''
-  - 'reference_entropy: unparsed printed OCR token ''218 171'''
-  - Reference columns collapsed by OCR at source line 1; preserve raw span without assigning reference IDs to S/HG/C
-  - 'volume: unparsed printed OCR token ''o. 10'''
-  - 'Multiple lexical tokens share a semantic field; split-token versus adjacent-column assignment cannot be established:
-    [(2, ''volume'', ''o. 10'')]'
-  - 'Body label or prose enters numeric region: []'
-  - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
-    No OCR repair.
-  - Column geometry or metadata collides with numeric fields; semantic assignment withheld.
-- record_id: high-temperature-p176
-  page_range:
-  - 176
-  - 176
-  pdf_page_range:
-  - 182
-  - 182
-  reasons: &id112
-  - kind: untranscribed
-    reason: temperature table absent from OCR text layer
-  - kind: metadata_ocr_suspect
-    metadata_index: 1
-    tokens:
-    - '2'
-    - o3
+untranscribed: []
 entries:
 - record_id: atomic-weight-001
   formula: Ac
@@ -5142,9 +3415,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p041-02
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Al
+  phase:
+  - (crystal)
+  name_as_published: ALUMINUM
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p041-02.json
@@ -5154,10 +3428,11 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p041-02.json
   row_count: 2
-  ocr_suspect_count: 15
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id002
+  ocr_suspect_count: 11
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: cp-p041-03
   formula: As
   phase: []
@@ -5179,9 +3454,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p041-04
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Au
+  phase:
+  - (crystal)
+  name_as_published: GOLD
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p041-04.json
@@ -5191,10 +3467,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p041-04.json
   row_count: 2
-  ocr_suspect_count: 14
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id003
+  ocr_suspect_count: 10
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:4.197E+01'
 - record_id: cp-p041-05
   formula: B
   phase:
@@ -5240,9 +3518,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p041-07
-  formula: null
+  formula: Bi
   phase: null
-  name_as_published: null
+  name_as_published: BISMUTH
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p041-07.json
@@ -5252,10 +3530,11 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p041-07.json
   row_count: 2
-  ocr_suspect_count: 10
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id004
+  ocr_suspect_count: 7
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: cp-p041-08
   formula: Br2
   phase:
@@ -5279,9 +3558,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p041-09
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: C
+  phase:
+  - (crystal)
+  name_as_published: GRAPHITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p041-09.json
@@ -5291,14 +3571,17 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p041-09.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 8
-  ambiguities: *id005
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A2:-1.024E-02, A3:7.139E+05'
 - record_id: cp-p041-10
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: C
+  phase:
+  - (crystal)
+  name_as_published: DIAMOND
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p041-10.json
@@ -5308,14 +3591,16 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p041-10.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id006
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: cp-p041-11
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Ca
+  phase:
+  - (α-crystal)
+  name_as_published: CALCIUM
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p041-11.json
@@ -5325,14 +3610,17 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p041-11.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id007
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A2:5.236E-02'
 - record_id: cp-p041-12
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Cd
+  phase:
+  - (crystal)
+  name_as_published: CADMIUM
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p041-12.json
@@ -5342,10 +3630,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p041-12.json
   row_count: 2
-  ocr_suspect_count: 12
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id008
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): temperature_range:594.18'
 - record_id: cp-p041-13
   formula: Ce
   phase:
@@ -5369,9 +3659,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p041-14
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Cl2
+  phase:
+  - (ideal gas)
+  name_as_published: CHLORINE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p041-14.json
@@ -5381,10 +3672,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p041-14.json
   row_count: 2
-  ocr_suspect_count: 15
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id009
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A5:1.009E-06'
 - record_id: cp-p041-15
   formula: Co
   phase:
@@ -5489,9 +3782,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p042-04
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Ge
+  phase:
+  - (crystal)
+  name_as_published: GERMANIUM
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p042-04.json
@@ -5501,14 +3795,17 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p042-04.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id010
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A2:3.049E-03'
 - record_id: cp-p042-05
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: H2
+  phase:
+  - (ideal gas)
+  name_as_published: HYDROGEN
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p042-05.json
@@ -5518,10 +3815,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p042-05.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id011
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A4:4.583E+02, A5:-1.825E-06'
 - record_id: cp-p042-06
   formula: Hg
   phase:
@@ -5746,9 +4045,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p043-01
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Ni
+  phase:
+  - (crystal)
+  name_as_published: NICKEL
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p043-01.json
@@ -5758,10 +4058,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p043-01.json
   row_count: 2
-  ocr_suspect_count: 12
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id012
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A4:-1.3746E+03, A5:1.742E-04'
 - record_id: cp-p043-02
   formula: o2
   phase:
@@ -5922,9 +4224,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p043-10
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Si
+  phase:
+  - (liquid)
+  name_as_published: SILICON
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p043-10.json
@@ -5934,10 +4237,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p043-10.json
   row_count: 2
-  ocr_suspect_count: 9
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id013
+  ocr_suspect_count: 5
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:2.720E+01'
 - record_id: cp-p043-11
   formula: Sn
   phase:
@@ -5999,9 +4304,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p043-14
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: TH
+  phase:
+  - (crystal)
+  name_as_published: Thorium
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p043-14.json
@@ -6011,14 +4317,17 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p043-14.json
   row_count: 2
-  ocr_suspect_count: 16
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id014
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A2:9.338E-03'
 - record_id: cp-p043-15
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Ti
+  phase:
+  - (α-crystal)
+  name_as_published: TITANTIUM
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p043-15.json
@@ -6028,10 +4337,11 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p043-15.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id015
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: cp-p043-16
   formula: U
   phase:
@@ -6053,9 +4363,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p044-01
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: V
+  phase:
+  - (crystal)
+  name_as_published: VANADIUM
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p044-01.json
@@ -6065,10 +4376,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p044-01.json
   row_count: 2
-  ocr_suspect_count: 12
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id016
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): entropy:28.94, A4:4.369E+02'
 - record_id: cp-p044-02
   formula: W
   phase:
@@ -6381,9 +4694,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p045-08
-  formula: null
+  formula: CuFeS2
   phase: null
-  name_as_published: null
+  name_as_published: ISS (intermediate ss)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p045-08.json
@@ -6393,10 +4706,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p045-08.json
   row_count: 2
-  ocr_suspect_count: 9
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id017
+  ocr_suspect_count: 5
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:-1.01845E+03'
 - record_id: cp-p045-09
   formula: C"'5Fes4
   phase: []
@@ -6728,9 +5043,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p046-10
-  formula: null
+  formula: SnS2
   phase: null
-  name_as_published: null
+  name_as_published: BERNDTITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p046-10.json
@@ -6740,10 +5055,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p046-10.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id018
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:2.004E+01, A4:8.544E+02'
 - record_id: cp-p046-11
   formula: ws2
   phase: []
@@ -6902,9 +5219,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p047-04
-  formula: null
+  formula: Al(OH)3
   phase: null
-  name_as_published: null
+  name_as_published: GIBBSITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p047-04.json
@@ -6914,14 +5231,16 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p047-04.json
   row_count: 2
-  ocr_suspect_count: 8
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id019
+  ocr_suspect_count: 4
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:9.170E+01'
 - record_id: cp-p047-05
-  formula: null
+  formula: B2O3
   phase: null
-  name_as_published: null
+  name_as_published: DIBORON TRIOXIDE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p047-05.json
@@ -6931,10 +5250,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p047-05.json
   row_count: 2
-  ocr_suspect_count: 12
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id020
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A3:6.441E+05'
 - record_id: cp-p047-06
   formula: B2~
   phase:
@@ -7157,9 +5478,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p048-01
-  formula: null
+  formula: Cr2O3
   phase: null
-  name_as_published: null
+  name_as_published: ESKOLAITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p048-01.json
@@ -7169,10 +5490,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p048-01.json
   row_count: 2
-  ocr_suspect_count: 10
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id021
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:1.190E+02, A3:-1.442E+06, A4:-3.405E+00'
 - record_id: cp-p048-02
   formula: cuo
   phase: []
@@ -7251,9 +5574,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p048-06
-  formula: null
+  formula: Fe2O3
   phase: null
-  name_as_published: null
+  name_as_published: HEMATITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p048-06.json
@@ -7263,10 +5586,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p048-06.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id022
+  ocr_suspect_count: 11
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): transition_enthalpy:1.24'
 - record_id: cp-p048-07
   formula: Fe20:J
   phase: []
@@ -7289,9 +5614,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p048-08
-  formula: null
+  formula: Fe3O4
   phase: null
-  name_as_published: null
+  name_as_published: MAGNETITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p048-08.json
@@ -7301,10 +5626,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p048-08.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id023
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A4:-3.6455E+04'
 - record_id: cp-p048-09
   formula: F~o4
   phase: []
@@ -7424,9 +5751,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p048-15
-  formula: null
+  formula: MnO
   phase: null
-  name_as_published: null
+  name_as_published: MANGANOSITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p048-15.json
@@ -7436,10 +5763,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p048-15.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id024
+  ocr_suspect_count: 7
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A4:-2.975E+02'
 - record_id: cp-p048-16
   formula: '~'
   phase: []
@@ -7479,9 +5808,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p049-02
-  formula: null
+  formula: Mn3O4
   phase: null
-  name_as_published: null
+  name_as_published: HAUSMANNITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p049-02.json
@@ -7491,10 +5820,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p049-02.json
   row_count: 2
-  ocr_suspect_count: 10
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id025
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - 'Pass-2: MinerU merged the two printed lines on this page; tokens taken from the rendered PDF page image. MinerU A-coefficients
+    agreed with the image. No silent repair.'
 - record_id: cp-p049-03
   formula: Mt;Si012
   phase: []
@@ -7515,9 +5846,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p049-04
-  formula: null
+  formula: MoO3
   phase: null
-  name_as_published: null
+  name_as_published: MOLYBDITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p049-04.json
@@ -7527,14 +5858,16 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p049-04.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id026
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - 'Pass-2: MinerU merged the two printed lines on this page; tokens taken from the rendered PDF page image. MinerU A-coefficients
+    agreed with the image. No silent repair.'
 - record_id: cp-p049-05
-  formula: null
+  formula: NO2
   phase: null
-  name_as_published: null
+  name_as_published: NITROGEN DIOXIDE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p049-05.json
@@ -7544,10 +5877,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p049-05.json
   row_count: 2
-  ocr_suspect_count: 14
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id027
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - 'Pass-2: MinerU merged the two printed lines on this page; tokens taken from the rendered PDF page image. MinerU A-coefficients
+    agreed with the image. No silent repair.'
 - record_id: cp-p049-06
   formula: Na~
   phase: []
@@ -7568,9 +5903,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p049-07
-  formula: null
+  formula: NiO
   phase: null
-  name_as_published: null
+  name_as_published: BUNSENITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p049-07.json
@@ -7580,14 +5915,16 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p049-07.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id028
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - 'Pass-2: MinerU merged the two printed lines on this page; tokens taken from the rendered PDF page image. MinerU A-coefficients
+    agreed with the image. No silent repair.'
 - record_id: cp-p049-08
-  formula: null
+  formula: NiO
   phase: null
-  name_as_published: null
+  name_as_published: BUNSENITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p049-08.json
@@ -7597,10 +5934,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p049-08.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id029
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - 'Pass-2: MinerU merged the two printed lines on this page; tokens taken from the rendered PDF page image. MinerU A-coefficients
+    agreed with the image. No silent repair.'
 - record_id: cp-p049-09
   formula: PbO
   phase: []
@@ -7659,9 +5998,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p049-12
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: SO2
+  phase:
+  - (IDEAL GAS)
+  name_as_published: SULFUR DIOXIDE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p049-12.json
@@ -7671,10 +6011,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p049-12.json
   row_count: 2
-  ocr_suspect_count: 15
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id030
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - 'Pass-2: MinerU merged the two printed lines on this page; tokens taken from the rendered PDF page image. MinerU A-coefficients
+    agreed with the image. No silent repair.'
 - record_id: cp-p049-13
   formula: S0;s
   phase:
@@ -7716,9 +6058,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p049-15
-  formula: null
+  formula: SiO2
   phase: null
-  name_as_published: null
+  name_as_published: QUARTZ
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p049-15.json
@@ -7728,10 +6070,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p049-15.json
   row_count: 2
-  ocr_suspect_count: 12
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id031
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - 'Pass-2: MinerU merged the two printed lines on this page; tokens taken from the rendered PDF page image. MinerU A-coefficients
+    agreed with the image. No silent repair.'
 - record_id: cp-p049-16
   formula: Si~
   phase: []
@@ -7753,9 +6097,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p050-01
-  formula: null
+  formula: SiO2
   phase: null
-  name_as_published: null
+  name_as_published: CRISTOBALITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p050-01.json
@@ -7765,10 +6109,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p050-01.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id032
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A4:7.168E+04'
 - record_id: cp-p050-02
   formula: Si~
   phase: []
@@ -7888,9 +6234,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p050-08
-  formula: null
+  formula: ThO2
   phase: null
-  name_as_published: null
+  name_as_published: THORIANITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p050-08.json
@@ -7900,10 +6246,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p050-08.json
   row_count: 2
-  ocr_suspect_count: 10
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id033
+  ocr_suspect_count: 7
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A3:-1.053E+06'
 - record_id: cp-p050-09
   formula: Ti~
   phase: []
@@ -7944,9 +6292,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p050-11
-  formula: null
+  formula: UO2
   phase: null
-  name_as_published: null
+  name_as_published: URANINITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p050-11.json
@@ -7956,10 +6304,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p050-11.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id034
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A2:1.606E-02, A4:3.689E+02'
 - record_id: cp-p050-12
   formula: v2~
   phase: []
@@ -8502,9 +6852,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p053-04
-  formula: null
+  formula: CaCl2
   phase: null
-  name_as_published: null
+  name_as_published: HYDROPHILITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p053-04.json
@@ -8514,10 +6864,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p053-04.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id035
+  ocr_suspect_count: 10
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A4:1.503E+03'
 - record_id: cp-p053-05
   formula: cacl 2
   phase:
@@ -8559,9 +6911,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p053-07
-  formula: null
+  formula: FeCl3
   phase: null
-  name_as_published: null
+  name_as_published: MOLYSITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p053-07.json
@@ -8571,14 +6923,17 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p053-07.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id036
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:-2.56E+02, A3:7.89E+06, A5:-9.738E-04, temperature_range:577'
 - record_id: cp-p053-08
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: HCl
+  phase:
+  - (ideal gas)
+  name_as_published: HYDROGEN CHLORIDE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p053-08.json
@@ -8588,10 +6943,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p053-08.json
   row_count: 2
-  ocr_suspect_count: 15
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id037
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A2:1.165E-02'
 - record_id: cp-p053-09
   formula: KCl
   phase: []
@@ -8631,9 +6988,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p053-11
-  formula: null
+  formula: MnCl2
   phase: null
-  name_as_published: null
+  name_as_published: SCACCHITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p053-11.json
@@ -8643,10 +7000,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p053-11.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id038
+  ocr_suspect_count: 7
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A2:1.191E-02'
 - record_id: cp-p053-12
   formula: NH4Cl
   phase: []
@@ -8744,9 +7103,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p054-01
-  formula: null
+  formula: CaF2
   phase: null
-  name_as_published: null
+  name_as_published: FLUORITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p054-01.json
@@ -8756,14 +7115,17 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p054-01.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id039
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A3:2.988E+07, A5:5.040E-04'
 - record_id: cp-p054-02
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: HF
+  phase:
+  - (ideal gas)
+  name_as_published: HYDROGEN FLUORIDE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p054-02.json
@@ -8773,10 +7135,11 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p054-02.json
   row_count: 2
-  ocr_suspect_count: 15
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id040
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: cp-p054-03
   formula: MgF 2
   phase: []
@@ -8797,9 +7160,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p054-04
-  formula: null
+  formula: NaF
   phase: null
-  name_as_published: null
+  name_as_published: VILLIAUMITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p054-04.json
@@ -8809,14 +7172,16 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p054-04.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id041
+  ocr_suspect_count: 10
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:-2.612E+00, A4:9.542E+02, transition_enthalpy:33.14'
 - record_id: cp-p054-05
-  formula: null
+  formula: Na3AlF6
   phase: null
-  name_as_published: null
+  name_as_published: CRYOLITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p054-05.json
@@ -8826,10 +7191,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p054-05.json
   row_count: 2
-  ocr_suspect_count: 15
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id042
+  ocr_suspect_count: 11
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:4.04227E+03, A4:-5.5876E+04, A5:2.004E-03'
 - record_id: cp-p054-06
   formula: N~AlF6
   phase: []
@@ -8888,9 +7255,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p054-09
-  formula: null
+  formula: AgI
   phase: null
-  name_as_published: null
+  name_as_published: IODARGYRITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p054-09.json
@@ -8900,14 +7267,15 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p054-09.json
   row_count: 2
-  ocr_suspect_count: 9
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id043
+  ocr_suspect_count: 6
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: cp-p054-10
-  formula: null
+  formula: CuI
   phase: null
-  name_as_published: null
+  name_as_published: MARSHITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p054-10.json
@@ -8917,10 +7285,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p054-10.json
   row_count: 2
-  ocr_suspect_count: 10
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id044
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:-1.6941E+03'
 - record_id: cp-p055-01
   formula: Ba~
   phase: []
@@ -9095,9 +7465,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p055-10
-  formula: null
+  formula: SrCO3
   phase: null
-  name_as_published: null
+  name_as_published: STRONTIANITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p055-10.json
@@ -9107,10 +7477,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p055-10.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id045
+  ocr_suspect_count: 10
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A4:5.294E+03'
 - record_id: cp-p055-11
   formula: z~
   phase: []
@@ -9576,9 +7948,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p057-03
-  formula: null
+  formula: AlPO4
   phase: null
-  name_as_published: null
+  name_as_published: BERLINITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p057-03.json
@@ -9588,10 +7960,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p057-03.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id046
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:1.9833E+03, A5:7.72E-04'
 - record_id: cp-p057-04
   formula: C~(P04)2
   phase: []
@@ -9694,9 +8068,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p058-03
-  formula: null
+  formula: Al2SiO5
   phase: null
-  name_as_published: null
+  name_as_published: ANDALUSITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p058-03.json
@@ -9706,10 +8080,11 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p058-03.json
   row_count: 2
-  ocr_suspect_count: 12
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id047
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: cp-p058-04
   formula: Al 2Si«Js
   phase: []
@@ -9751,9 +8126,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p058-06
-  formula: null
+  formula: Al6.75□ .25Si3BO17.25(OH).75
   phase: null
-  name_as_published: null
+  name_as_published: DUMORTIERITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p058-06.json
@@ -9762,11 +8137,13 @@ entries:
     printed_page: 58
     table_number: null
   original_record_text_location: summary/cp-p058-06.json
-  row_count: 3
-  ocr_suspect_count: 18
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id048
+  row_count: 2
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A5:4.884E-05'
 - record_id: cp-p058-07
   formula: ae2sto4
   phase: []
@@ -9992,9 +8369,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p059-02
-  formula: null
+  formula: CaFe3(Si2O7)O(OH)
   phase: null
-  name_as_published: null
+  name_as_published: ILVAITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p059-02.json
@@ -10004,10 +8381,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p059-02.json
   row_count: 2
-  ocr_suspect_count: 10
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id049
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:8.569E+03'
 - record_id: cp-p059-03
   formula: C~Fe2si 3o 12
   phase: []
@@ -10105,9 +8484,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p059-08
-  formula: null
+  formula: alpha -Ca2SiO4
   phase: null
-  name_as_published: null
+  name_as_published: LARNITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p059-08.json
@@ -10117,10 +8496,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p059-08.json
   row_count: 2
-  ocr_suspect_count: 10
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id050
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:2.487E+02'
 - record_id: cp-p059-09
   formula: ca•-ca2sto4
   phase: []
@@ -10217,9 +8598,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p059-14
-  formula: null
+  formula: Ca5(SiO4)2CO3
   phase: null
-  name_as_published: null
+  name_as_published: SPURRITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p059-14.json
@@ -10229,10 +8610,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p059-14.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id051
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:6.141E+02, A4:-4.168E+03'
 - record_id: cp-p059-15
   formula: ca5 SizG7<~> 2
   phase: []
@@ -10331,9 +8714,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p060-04
-  formula: null
+  formula: KMg2Al3[Si10Al2O30]·H2O
   phase: null
-  name_as_published: null
+  name_as_published: OSUMILITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p060-04.json
@@ -10343,10 +8726,11 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p060-04.json
   row_count: 2
-  ocr_suspect_count: 15
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id052
+  ocr_suspect_count: 7
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: cp-p060-05
   formula: Mg~L (AlSi o
   phase: []
@@ -10874,9 +9258,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p061-16
-  formula: null
+  formula: MgSiO3
   phase: null
-  name_as_published: null
+  name_as_published: CLINOENSTATITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p061-16.json
@@ -10886,10 +9270,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p061-16.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id053
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A3:1.193E+06'
 - record_id: cp-p062-01
   formula: MgSi~
   phase: []
@@ -10992,9 +9378,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p062-06
-  formula: null
+  formula: NaFeSi2O6
   phase: null
-  name_as_published: null
+  name_as_published: ACMITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p062-06.json
@@ -11004,14 +9390,16 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p062-06.json
   row_count: 2
-  ocr_suspect_count: 10
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id054
+  ocr_suspect_count: 7
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:1.994E+02, A2:6.197E-02'
 - record_id: cp-p062-07
-  formula: null
+  formula: Ca2Mg5Si8O22(OH)2
   phase: null
-  name_as_published: null
+  name_as_published: TREMOLITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p062-07.json
@@ -11021,10 +9409,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p062-07.json
   row_count: 2
-  ocr_suspect_count: 14
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id055
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:6.131E+03, A5:1.757E-03'
 - record_id: cp-p062-08
   formula: F.,Sis'>22(0H)2
   phase: []
@@ -11220,9 +9610,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p063-07
-  formula: null
+  formula: (Cs.65Na.19Rb.03)Al2Si4O12·H2O
   phase: null
-  name_as_published: null
+  name_as_published: POLLUCITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p063-07.json
@@ -11231,15 +9621,17 @@ entries:
     printed_page: 63
     table_number: null
   original_record_text_location: summary/cp-p063-07.json
-  row_count: 3
-  ocr_suspect_count: 22
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id056
+  row_count: 2
+  ocr_suspect_count: 7
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): temperature_range:700'
 - record_id: cp-p063-08
-  formula: null
+  formula: KAlSi3O8
   phase: null
-  name_as_published: null
+  name_as_published: MICROCLINE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p063-08.json
@@ -11249,14 +9641,16 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p063-08.json
   row_count: 2
-  ocr_suspect_count: 13
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id057
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:7.595E+02, A3:4.746E+06, A4:-9.527E+03, A5:6.433E-05'
 - record_id: cp-p063-09
-  formula: null
+  formula: KAlSi3O8
   phase: null
-  name_as_published: null
+  name_as_published: SANIDINE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p063-09.json
@@ -11266,10 +9660,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p063-09.json
   row_count: 2
-  ocr_suspect_count: 15
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id058
+  ocr_suspect_count: 11
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:6.934E+02, A4:-8.305E+03, A5:4.919E-05'
 - record_id: cp-p063-10
   formula: KAlSf 3o8
   phase: []
@@ -11567,9 +9963,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p064-09
-  formula: null
+  formula: (Na.78K.22)AlSiO4
   phase: null
-  name_as_published: null
+  name_as_published: NEPHELINE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p064-09.json
@@ -11579,10 +9975,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p064-09.json
   row_count: 2
-  ocr_suspect_count: 9
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id059
+  ocr_suspect_count: 4
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A1:1.121E+02'
 - record_id: cp-p064-10
   formula: NaAlSi 2o6 ·HzO
   phase: []
@@ -11700,9 +10098,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p065-05
-  formula: null
+  formula: K3(Al7Mg)(Al2Si14)O40(OH)8
   phase: null
-  name_as_published: null
+  name_as_published: ILLITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p065-05.json
@@ -11712,10 +10110,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p065-05.json
   row_count: 2
-  ocr_suspect_count: 12
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id060
+  ocr_suspect_count: 4
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): entropy:1104.2, A1:1.291E+03'
 - record_id: cp-p065-06
   formula: CaAl 2 [Al 2St201oJ (OH) 2
   phase: []
@@ -11898,9 +10298,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p065-15
-  formula: null
+  formula: Mg3Si4O10(OH)2
   phase: null
-  name_as_published: null
+  name_as_published: TALC
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p065-15.json
@@ -11910,10 +10310,12 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p065-15.json
   row_count: 2
-  ocr_suspect_count: 15
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id061
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): A5:2.729E-03'
 - record_id: cp-p065-16
   formula: M~Si 20s(OH) 4
   phase: []
@@ -11934,9 +10336,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: cp-p066-01
-  formula: null
+  formula: Mg5Al(AlSi3O10)(OH)8
   phase: null
-  name_as_published: null
+  name_as_published: CLINOCHLORE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p066-01.json
@@ -11946,14 +10348,16 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p066-01.json
   row_count: 2
-  ocr_suspect_count: 11
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id062
+  ocr_suspect_count: 9
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: cp-p066-02
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: NaAl2[AlSi3O10](OH)2
+  phase:
+  - (disordered)
+  name_as_published: PARAGONITE (disordered)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/cp-p066-02.json
@@ -11963,10 +10367,11 @@ entries:
     table_number: null
   original_record_text_location: summary/cp-p066-02.json
   row_count: 2
-  ocr_suspect_count: 16
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id063
+  ocr_suspect_count: 8
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: cp-p066-03
   formula: NaAl2tAlSi 301oJ (OH) 2
   phase:
@@ -12008,9 +10413,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p005-02
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Ag+
+  phase:
+  - (AQUEOUS ION)
+  name_as_published: Ag+ (AQUEOUS ION)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p005-02.json
@@ -12020,10 +10426,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p005-02.json
   row_count: 2
-  ocr_suspect_count: 22
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id064
+  ocr_suspect_count: 12
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): formation_gibbs:77.1'
 - record_id: reference-p005-03
   formula: Al
   phase:
@@ -12153,9 +10561,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p005-09
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Ba2+
+  phase:
+  - (AQUEOUS ION)
+  name_as_published: Ba2+ (AQUEOUS ION)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p005-09.json
@@ -12165,10 +10574,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p005-09.json
   row_count: 2
-  ocr_suspect_count: 21
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id065
+  ocr_suspect_count: 12
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): formation_enthalpy:-532.5'
 - record_id: reference-p005-10
   formula: Be
   phase:
@@ -12274,9 +10685,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p005-15
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: C
+  phase:
+  - (REFERENCE STATE)
+  name_as_published: GRAPHITE (REFERENCE STATE)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p005-15.json
@@ -12286,10 +10698,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p005-15.json
   row_count: 2
-  ocr_suspect_count: 16
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id066
+  ocr_suspect_count: 11
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): entropy:5.74'
 - record_id: reference-p005-16
   formula: c
   phase: []
@@ -12441,9 +10855,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p006-07
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Cl-
+  phase:
+  - (AQUEOUS ION)
+  name_as_published: Cl- (AQUEOUS ION)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p006-07.json
@@ -12453,10 +10868,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p006-07.json
   row_count: 2
-  ocr_suspect_count: 20
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id067
+  ocr_suspect_count: 11
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): formation_enthalpy:-167.1'
 - record_id: reference-p006-08
   formula: Co
   phase:
@@ -12641,9 +11058,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p007-01
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Fe
+  phase:
+  - (REFERENCE STATE)
+  name_as_published: IRON (REFERENCE STATE)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p007-01.json
@@ -12653,10 +11071,11 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p007-01.json
   row_count: 2
-  ocr_suspect_count: 18
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id068
+  ocr_suspect_count: 13
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: reference-p007-02
   formula: Fe2+
   phase:
@@ -12702,9 +11121,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p007-04
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Ge
+  phase:
+  - (REFERENCE STATE)
+  name_as_published: GERMANIUM (REFERENCE STATE)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p007-04.json
@@ -12714,10 +11134,11 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p007-04.json
   row_count: 2
-  ocr_suspect_count: 16
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id069
+  ocr_suspect_count: 11
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: reference-p007-05
   formula: Hz
   phase:
@@ -12842,9 +11263,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p007-11
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: I2
+  phase:
+  - (IDEAL GAS)
+  name_as_published: IODINE (IDEAL GAS)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p007-11.json
@@ -12854,14 +11276,16 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p007-11.json
   row_count: 2
-  ocr_suspect_count: 19
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id070
+  ocr_suspect_count: 14
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: reference-p007-12
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: I-
+  phase:
+  - (AQUEOUS ION)
+  name_as_published: I- (AQUEOUS ION)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p007-12.json
@@ -12871,10 +11295,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p007-12.json
   row_count: 2
-  ocr_suspect_count: 21
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id071
+  ocr_suspect_count: 12
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:126.904, formation_gibbs:-51.7'
 - record_id: reference-p007-13
   formula: K
   phase:
@@ -12897,9 +11323,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p007-14
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: K+
+  phase:
+  - (AQUEOUS ION)
+  name_as_published: K+ (AQUEOUS ION)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p007-14.json
@@ -12909,10 +11336,11 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p007-14.json
   row_count: 2
-  ocr_suspect_count: 21
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id072
+  ocr_suspect_count: 12
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: reference-p007-15
   formula: Li
   phase:
@@ -12934,9 +11362,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p007-16
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: Li+
+  phase:
+  - (AQUEOUS ION)
+  name_as_published: Li+ (AQUEOUS ION)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p007-16.json
@@ -12946,10 +11375,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p007-16.json
   row_count: 2
-  ocr_suspect_count: 22
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id073
+  ocr_suspect_count: 12
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): entropy:12.24, formation_enthalpy:-278.5'
 - record_id: reference-p008-01
   formula: Mg
   phase:
@@ -13401,9 +11832,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p009-07
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: H4SiO4o
+  phase:
+  - (AQUEOUS ION)
+  name_as_published: H4SiO4o (AQUEOUS ION)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p009-07.json
@@ -13413,10 +11845,14 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p009-07.json
   row_count: 2
-  ocr_suspect_count: 23
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id074
+  ocr_suspect_count: 14
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 3
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): formation_enthalpy:-1460.0, formation_gibbs:2.1, reference_heat_capacity:414'
+  - 'Formation Gibbs/log Kf identity disagreement: residual 0.3191372208784742 kJ/mol; tolerance 0.08854004751267629; detector
+    only, raw unchanged'
 - record_id: reference-p009-08
   formula: Sn   (WHITE, lET.)
   phase:
@@ -13833,9 +12269,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p011-05
-  formula: null
+  formula: Bi2Te3
   phase: null
-  name_as_published: null
+  name_as_published: TELLUROBISMUTHITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p011-05.json
@@ -13845,10 +12281,11 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p011-05.json
   row_count: 2
-  ocr_suspect_count: 18
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id075
+  ocr_suspect_count: 14
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: reference-p011-06
   formula: CaS
   phase: []
@@ -13913,9 +12350,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p011-09
-  formula: null
+  formula: Co3S4
   phase: null
-  name_as_published: null
+  name_as_published: LINNAEITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p011-09.json
@@ -13926,9 +12363,11 @@ entries:
   original_record_text_location: summary/reference-p011-09.json
   row_count: 2
   ocr_suspect_count: 15
-  transcription_status: untranscribed
-  ambiguity_count: 4
-  ambiguities: *id076
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:305.064, formation_enthalpy:-347.5, formation_gibbs:-334.9'
 - record_id: reference-p011-10
   formula: cus
   phase: []
@@ -14015,9 +12454,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p011-14
-  formula: null
+  formula: Cu2S
   phase: null
-  name_as_published: null
+  name_as_published: CHALCOCITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p011-14.json
@@ -14027,10 +12466,11 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p011-14.json
   row_count: 2
-  ocr_suspect_count: 21
-  transcription_status: untranscribed
-  ambiguity_count: 9
-  ambiguities: *id077
+  ocr_suspect_count: 18
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: reference-p011-15
   formula: CuFes2
   phase: []
@@ -14055,9 +12495,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p011-16
-  formula: null
+  formula: Cu5FeS4
   phase: null
-  name_as_published: null
+  name_as_published: BORNITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p011-16.json
@@ -14068,9 +12508,13 @@ entries:
   original_record_text_location: summary/reference-p011-16.json
   row_count: 2
   ocr_suspect_count: 16
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id078
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 3
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:501.841, volume:98.73, formation_enthalpy:-371.6, formation_gibbs:-394.7'
+  - 'Formation Gibbs/log Kf identity disagreement: residual 0.9792187157440821 kJ/mol; tolerance 0.08854004751267629; detector
+    only, raw unchanged'
 - record_id: reference-p012-01
   formula: CuFe2 ~
   phase: []
@@ -14111,9 +12555,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p012-03
-  formula: null
+  formula: FeS
   phase: null
-  name_as_published: null
+  name_as_published: TROILITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p012-03.json
@@ -14123,10 +12567,11 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p012-03.json
   row_count: 2
-  ocr_suspect_count: 21
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id079
+  ocr_suspect_count: 18
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: reference-p012-04
   formula: Fe. 875 s
   phase: []
@@ -14149,9 +12594,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p012-05
-  formula: null
+  formula: Fe.90S
   phase: null
-  name_as_published: null
+  name_as_published: PYRRHOTITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p012-05.json
@@ -14161,14 +12606,18 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p012-05.json
   row_count: 2
-  ocr_suspect_count: 20
-  transcription_status: untranscribed
-  ambiguity_count: 8
-  ambiguities: *id080
+  ocr_suspect_count: 15
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 3
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): log_kf:14.45'
+  - 'Formation Gibbs/log Kf identity disagreement: residual -17.11926268836551 kJ/mol; tolerance 0.08854004751267629; detector
+    only, raw unchanged'
 - record_id: reference-p012-06
-  formula: null
+  formula: FeS2
   phase: null
-  name_as_published: null
+  name_as_published: PYRITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p012-06.json
@@ -14178,14 +12627,16 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p012-06.json
   row_count: 2
-  ocr_suspect_count: 19
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id081
+  ocr_suspect_count: 16
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): volume:23.94'
 - record_id: reference-p012-07
-  formula: null
+  formula: FeS2
   phase: null
-  name_as_published: null
+  name_as_published: MARCASITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p012-07.json
@@ -14195,10 +12646,11 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p012-07.json
   row_count: 2
-  ocr_suspect_count: 18
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id082
+  ocr_suspect_count: 15
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: reference-p012-08
   formula: FeAa2
   phase: []
@@ -14259,9 +12711,10 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p012-11
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: H2S
+  phase:
+  - (IDEAL GAS)
+  name_as_published: HYDROGEN SULFIDE (IDEAL GAS)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p012-11.json
@@ -14271,10 +12724,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p012-11.json
   row_count: 2
-  ocr_suspect_count: 24
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id083
+  ocr_suspect_count: 18
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): volume:24789.70, formation_gibbs:-33.4'
 - record_id: reference-p012-12
   formula: HS-
   phase:
@@ -14317,9 +12772,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p012-14
-  formula: null
+  formula: HgS
   phase: null
-  name_as_published: null
+  name_as_published: METACINNABAR
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p012-14.json
@@ -14329,10 +12784,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p012-14.json
   row_count: 2
-  ocr_suspect_count: 17
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id084
+  ocr_suspect_count: 14
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): entropy:96.2, formation_gibbs:-43.3'
 - record_id: reference-p012-15
   formula: MgS
   phase: []
@@ -14571,9 +13028,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p013-10
-  formula: null
+  formula: PtS
   phase: null
-  name_as_published: null
+  name_as_published: COOPERITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p013-10.json
@@ -14583,10 +13040,11 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p013-10.json
   row_count: 2
-  ocr_suspect_count: 17
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id085
+  ocr_suspect_count: 14
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: reference-p013-11
   formula: ~~
   phase: []
@@ -15086,9 +13544,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p015-05
-  formula: null
+  formula: As2O3
   phase: null
-  name_as_published: null
+  name_as_published: ARSENOLITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p015-05.json
@@ -15098,14 +13556,16 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p015-05.json
   row_count: 2
-  ocr_suspect_count: 17
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id086
+  ocr_suspect_count: 14
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): entropy:107.4, formation_gibbs:-576.0'
 - record_id: reference-p015-06
-  formula: null
+  formula: As2O3
   phase: null
-  name_as_published: null
+  name_as_published: CLAUDETITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p015-06.json
@@ -15115,10 +13575,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p015-06.json
   row_count: 2
-  ocr_suspect_count: 16
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id087
+  ocr_suspect_count: 13
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): formation_gibbs:-575.6'
 - record_id: reference-p015-07
   formula: Bz03
   phase: []
@@ -15342,9 +13804,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p016-01
-  formula: null
+  formula: Ca(OH)2
   phase: null
-  name_as_published: null
+  name_as_published: PORTLANDITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p016-01.json
@@ -15354,10 +13816,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p016-01.json
   row_count: 2
-  ocr_suspect_count: 21
-  transcription_status: untranscribed
-  ambiguity_count: 9
-  ambiguities: *id088
+  ocr_suspect_count: 18
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:74.093, formation_enthalpy:-986.1, formation_gibbs:-898.0'
 - record_id: reference-p016-02
   formula: Cc:k)
   phase: []
@@ -15379,9 +13843,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p016-03
-  formula: null
+  formula: CeO2
   phase: null
-  name_as_published: null
+  name_as_published: CERIANITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p016-03.json
@@ -15391,10 +13855,13 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p016-03.json
   row_count: 2
-  ocr_suspect_count: 18
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id089
+  ocr_suspect_count: 15
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:172.114, formation_enthalpy:-1088.7, formation_gibbs:-1025.4, log_kf:179.64,
+    log_kf:0.34'
 - record_id: reference-p016-04
   formula: coo
   phase: []
@@ -15502,9 +13969,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p016-09
-  formula: null
+  formula: Cu2O
   phase: null
-  name_as_published: null
+  name_as_published: CUPRITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p016-09.json
@@ -15514,14 +13981,16 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p016-09.json
   row_count: 2
-  ocr_suspect_count: 22
-  transcription_status: untranscribed
-  ambiguity_count: 10
-  ambiguities: *id090
+  ocr_suspect_count: 18
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:143.091, volume:23.44, formation_gibbs:-147.8'
 - record_id: reference-p016-10
-  formula: null
+  formula: Fe947O
   phase: null
-  name_as_published: null
+  name_as_published: WUSTITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p016-10.json
@@ -15531,14 +14000,16 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p016-10.json
   row_count: 2
-  ocr_suspect_count: 21
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id091
+  ocr_suspect_count: 18
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): volume:12.04, formation_enthalpy:-266.3, log_kf:0.14'
 - record_id: reference-p016-11
-  formula: null
+  formula: FeO
   phase: null
-  name_as_published: null
+  name_as_published: FERROUS OXIDE (STOICHIOMETRIC)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p016-11.json
@@ -15548,14 +14019,16 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p016-11.json
   row_count: 2
-  ocr_suspect_count: 22
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id092
+  ocr_suspect_count: 16
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): formation_gibbs:-251.4'
 - record_id: reference-p016-12
-  formula: null
+  formula: Fe2O3
   phase: null
-  name_as_published: null
+  name_as_published: HEMATITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p016-12.json
@@ -15566,13 +14039,15 @@ entries:
   original_record_text_location: summary/reference-p016-12.json
   row_count: 2
   ocr_suspect_count: 18
-  transcription_status: untranscribed
-  ambiguity_count: 10
-  ambiguities: *id093
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): formation_enthalpy:-826.2, formation_gibbs:-744.4'
 - record_id: reference-p016-13
-  formula: null
+  formula: Fe3O4
   phase: null
-  name_as_published: null
+  name_as_published: MAGNETITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p016-13.json
@@ -15583,13 +14058,15 @@ entries:
   original_record_text_location: summary/reference-p016-13.json
   row_count: 2
   ocr_suspect_count: 18
-  transcription_status: untranscribed
-  ambiguity_count: 10
-  ambiguities: *id094
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): volume:44.52'
 - record_id: reference-p016-14
-  formula: null
+  formula: FeO(OH)
   phase: null
-  name_as_published: null
+  name_as_published: GOETHITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p016-14.json
@@ -15599,14 +14076,17 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p016-14.json
   row_count: 2
-  ocr_suspect_count: 18
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id095
+  ocr_suspect_count: 15
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): formation_enthalpy:-562.6, formation_gibbs:-491.8'
 - record_id: reference-p016-15
-  formula: null
-  phase: null
-  name_as_published: null
+  formula: H2O
+  phase:
+  - (LIQUID)
+  name_as_published: WATER
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p016-15.json
@@ -15616,10 +14096,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p016-15.json
   row_count: 2
-  ocr_suspect_count: 20
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id096
+  ocr_suspect_count: 16
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): log_kf:41.55'
 - record_id: reference-p016-16
   formula: Olf
   phase:
@@ -15762,9 +14244,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p017-07
-  formula: null
+  formula: MgO
   phase: null
-  name_as_published: null
+  name_as_published: PERICLASE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p017-07.json
@@ -15774,10 +14256,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p017-07.json
   row_count: 2
-  ocr_suspect_count: 20
-  transcription_status: untranscribed
-  ambiguity_count: 8
-  ambiguities: *id097
+  ocr_suspect_count: 18
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:40.304, log_kf:99.74'
 - record_id: reference-p017-08
   formula: Mg(OH) 2
   phase: []
@@ -15863,9 +14347,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p017-12
-  formula: null
+  formula: Mn3O4
   phase: null
-  name_as_published: null
+  name_as_published: HAUSMANNITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p017-12.json
@@ -15876,9 +14360,12 @@ entries:
   original_record_text_location: summary/reference-p017-12.json
   row_count: 2
   ocr_suspect_count: 15
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id098
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 3
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): formation_enthalpy:-1384.5, formation_gibbs:-1282.5'
+  - MinerU name token 'MAUSMANNITE' disagrees with the rendered page image 'HAUSMANNITE'; image token kept.
 - record_id: reference-p017-13
   formula: Mf7Si012
   phase: []
@@ -17380,9 +15867,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p023-13
-  formula: null
+  formula: NH4Cl
   phase: null
-  name_as_published: null
+  name_as_published: SALAMMONIAC
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p023-13.json
@@ -17393,9 +15880,11 @@ entries:
   original_record_text_location: summary/reference-p023-13.json
   row_count: 2
   ocr_suspect_count: 16
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id099
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): entropy:94.6, formation_enthalpy:-314.4'
 - record_id: reference-p023-14
   formula: N8Cl
   phase: []
@@ -17579,9 +16068,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p024-07
-  formula: null
+  formula: AgI
   phase: null
-  name_as_published: null
+  name_as_published: IODARGYRITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p024-07.json
@@ -17591,10 +16080,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p024-07.json
   row_count: 2
-  ocr_suspect_count: 18
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id100
+  ocr_suspect_count: 15
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): formation_enthalpy:-61.8'
 - record_id: reference-p024-08
   formula: CUI
   phase: []
@@ -17972,9 +16463,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p026-01
-  formula: null
+  formula: MnCO3
   phase: null
-  name_as_published: null
+  name_as_published: RHODOCHROSITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p026-01.json
@@ -17984,10 +16475,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p026-01.json
   row_count: 2
-  ocr_suspect_count: 18
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id101
+  ocr_suspect_count: 15
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:114.947, log_kf:143.50, reference_heat_capacity:283'
 - record_id: reference-p026-02
   formula: NaHCO;s
   phase: []
@@ -18271,9 +16764,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p026-16
-  formula: null
+  formula: NH4NO3
   phase: null
-  name_as_published: null
+  name_as_published: AMMONIA-NITER
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p026-16.json
@@ -18283,10 +16776,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p026-16.json
   row_count: 2
-  ocr_suspect_count: 19
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id102
+  ocr_suspect_count: 15
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:80.043, volume:46.49'
 - record_id: reference-p027-01
   formula: NaNO:J
   phase: []
@@ -19368,9 +17863,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p031-10
-  formula: null
+  formula: Be4Si2O7(OH)2
   phase: null
-  name_as_published: null
+  name_as_published: BERTRANDITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p031-10.json
@@ -19380,10 +17875,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p031-10.json
   row_count: 2
-  ocr_suspect_count: 21
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id103
+  ocr_suspect_count: 16
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): formation_gibbs:-4295.1'
 - record_id: reference-p031-11
   formula: Ca~L Fest o
   phase: []
@@ -19404,9 +17901,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p031-12
-  formula: null
+  formula: CaAl2[Si2O7(OH)2]H2O
   phase: null
-  name_as_published: null
+  name_as_published: LAWSONITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p031-12.json
@@ -19416,10 +17913,11 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p031-12.json
   row_count: 2
-  ocr_suspect_count: 20
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id104
+  ocr_suspect_count: 16
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: reference-p031-13
   formula: Ca~L 2 si~
   phase: []
@@ -19655,9 +18153,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p032-08
-  formula: null
+  formula: alpha-Ca2SiO4
   phase: null
-  name_as_published: null
+  name_as_published: LARNITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p032-08.json
@@ -19668,9 +18166,10 @@ entries:
   original_record_text_location: summary/reference-p032-08.json
   row_count: 2
   ocr_suspect_count: 16
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id105
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 1
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
 - record_id: reference-p032-09
   formula: y·Ca2sto4
   phase: []
@@ -19822,9 +18321,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p032-16
-  formula: null
+  formula: Fe2SiO4
   phase: null
-  name_as_published: null
+  name_as_published: FAYALITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p032-16.json
@@ -19835,9 +18334,11 @@ entries:
   original_record_text_location: summary/reference-p032-16.json
   row_count: 2
   ocr_suspect_count: 17
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id106
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): formation_enthalpy:-1478.2'
 - record_id: reference-p033-01
   formula: F~Al 2 st 3o 12
   phase: []
@@ -20917,9 +19418,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p036-05
-  formula: null
+  formula: Ca1.02Na0.14K.01(Al2.18Si6.82O18) · 7.33H2O
   phase: null
-  name_as_published: null
+  name_as_published: STILBITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p036-05.json
@@ -20929,10 +19430,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p036-05.json
   row_count: 2
-  ocr_suspect_count: 17
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id107
+  ocr_suspect_count: 15
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:714.893'
 - record_id: reference-p036-06
   formula: cao.s~ro.1818 o.06N•o.38Ko.13AL2.16sf6.8
   phase: []
@@ -21035,9 +19538,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p036-11
-  formula: null
+  formula: Ca2Al2SiO6(OH)2
   phase: null
-  name_as_published: null
+  name_as_published: BICCHULITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p036-11.json
@@ -21047,10 +19550,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p036-11.json
   row_count: 2
-  ocr_suspect_count: 21
-  transcription_status: untranscribed
-  ambiguity_count: 5
-  ambiguities: *id108
+  ocr_suspect_count: 16
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): reference_enthalpy_gibbs:144'
 - record_id: reference-p036-12
   formula: az
   phase:
@@ -21222,9 +19727,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p037-04
-  formula: null
+  formula: KAlSi2O6
   phase: null
-  name_as_published: null
+  name_as_published: LEUCITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p037-04.json
@@ -21234,10 +19739,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p037-04.json
   row_count: 2
-  ocr_suspect_count: 19
-  transcription_status: untranscribed
-  ambiguity_count: 7
-  ambiguities: *id109
+  ocr_suspect_count: 16
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:218.247, formation_gibbs:-2875.1'
 - record_id: reference-p037-05
   formula: LtAlsto4
   phase: []
@@ -21651,9 +20158,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p038-08
-  formula: null
+  formula: K0.80Na0.20AlSi1.94O5.88 · 1.81H2O
   phase: null
-  name_as_published: null
+  name_as_published: MERLINOITE
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p038-08.json
@@ -21663,10 +20170,12 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p038-08.json
   row_count: 2
-  ocr_suspect_count: 17
-  transcription_status: untranscribed
-  ambiguity_count: 6
-  ambiguities: *id110
+  ocr_suspect_count: 15
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 2
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:244.028, entropy:276.6+, formation_gibbs:-3258.0, entropy:0.4'
 - record_id: reference-p038-09
   formula: KAlSi 1 • 94os. 88 ·1.69H~
   phase: []
@@ -22032,9 +20541,9 @@ entries:
   - All numerical tokens checked against independent raster OCR by exact page occurrence; row alignment remains unverified.
     No OCR repair.
 - record_id: reference-p039-13
-  formula: null
+  formula: KMg3[AlSi3O10]F2
   phase: null
-  name_as_published: null
+  name_as_published: FLUORPHLOGOPITE (Al/Si disorder)
   source: *id001
   sha256: ca89fc07fd110a0441f3bc01d5fe67d749a944da2e7f2537520dbaf367f49dd8
   path: summary/reference-p039-13.json
@@ -22044,10 +20553,14 @@ entries:
     table_number: null
   original_record_text_location: summary/reference-p039-13.json
   row_count: 2
-  ocr_suspect_count: 23
-  transcription_status: untranscribed
-  ambiguity_count: 8
-  ambiguities: *id111
+  ocr_suspect_count: 16
+  transcription_status: transcribed_ocr_suspect
+  ambiguity_count: 3
+  ambiguities:
+  - Pass-2 MinerU table cells cross-checked against the rendered page image / Tesseract. No silent numeric repair.
+  - 'MinerU/image token disagreement (raw kept): weight:421.242, entropy:2.1'
+  - 'Formation Gibbs/log Kf identity disagreement: residual -141.2654061167732 kJ/mol; tolerance 0.33869980993847737; detector
+    only, raw unchanged'
 - record_id: reference-p039-14
   formula: KMI] tAlSi 301oJ F2
   phase:
@@ -35915,7 +34428,7 @@ entries:
     - -,:1'
     - ',..1'
 - record_id: high-temperature-p176
-  formula: s 2 o3
+  formula: B2O3
   phase: Hexagonal crystals 298.15 to melting point 723 K.
   name_as_published: DIBORON TRIOXIDE
   source: *id001
@@ -35926,11 +34439,69 @@ entries:
     printed_page: 176
     table_number: null
   original_record_text_location: records/high-temperature-p176.json
-  row_count: 0
-  ocr_suspect_count: 2
-  transcription_status: untranscribed
-  ambiguity_count: 2
-  ambiguities: *id112
+  row_count: 17
+  ocr_suspect_count: 16
+  transcription_status: transcribed_with_ocr_ambiguities
+  ambiguity_count: 14
+  ambiguities:
+  - kind: ocr_suspect
+    row: 0
+    columns:
+    - formation_gibbs
+  - kind: ocr_suspect
+    row: 6
+    columns:
+    - formation_enthalpy
+  - kind: ocr_suspect
+    row: 9
+    columns:
+    - formation_gibbs
+  - kind: ocr_suspect
+    row: 11
+    columns:
+    - formation_gibbs
+  - kind: ocr_suspect
+    row: 12
+    columns:
+    - formation_gibbs
+  - kind: ocr_suspect
+    row: 13
+    columns:
+    - formation_gibbs
+  - kind: ocr_suspect
+    row: 14
+    columns:
+    - formation_gibbs
+  - kind: ocr_suspect
+    row: 15
+    columns:
+    - formation_enthalpy
+  - kind: ocr_suspect
+    row: 16
+    columns:
+    - formation_gibbs
+  - kind: metadata_ocr_suspect
+    metadata_index: 0
+    tokens:
+    - B2O3
+  - kind: metadata_ocr_suspect
+    metadata_index: 3
+    tokens:
+    - J·bar-1
+  - kind: metadata_ocr_suspect
+    metadata_index: 4
+    tokens:
+    - cm3
+  - kind: metadata_ocr_suspect
+    metadata_index: 5
+    tokens:
+    - H2o298-H0o
+  - kind: metadata_ocr_suspect
+    metadata_index: 6
+    tokens:
+    - A=-1.240E+03
+    - B=2.148E-01
+    - C=-2.28E+06
 - record_id: high-temperature-p177
   formula: BaO
   phase: CUbic crystals 298.15 to 1800 K.
