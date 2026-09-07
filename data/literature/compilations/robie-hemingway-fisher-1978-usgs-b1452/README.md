@@ -11,7 +11,7 @@ The bulletin contents identify numbered Tables 1–2 and the thermodynamic
 sections. The resulting 400-table census comprises Table 1 on printed page 3,
 Table 2 on page 4, the 298.15 K summary on pages 12–29, and one unnumbered
 high-temperature substance table on every printed page 30–426. Printed page
-427 was visually checked and is blank. Phase boundaries produce 574 JSON
+427 was visually checked and is blank. Phase boundaries produce 584 JSON
 records from those 400 tables; explicit `untranscribed` records remain where
 the page image itself is unreadable.
 
@@ -20,20 +20,20 @@ the page image itself is unreadable.
 The PDF was read one page at a time with `pdftotext -layout`; per-page horizontal
 column offsets recover tokens split across layout lines. Pass 2 added MinerU
 `table_body` HTML plus page-image cross-check for the remaining stubs. Of 400
-tables, 299 are transcribed into 5,123 rows and 473 phase-specific records.
-The other 101 tables retain page locators and failure reasons in the `t-852`
+tables, 324 are transcribed into 5,488 rows and 508 phase-specific records.
+The other 76 tables retain page locators and failure reasons in the `t-852`
 MinerU follow-up list in `manifest.yaml`.
 
 Every recoverable numeric cell stores its raw token, exact page-text line/span,
 a parsed float or null, `ocr_suspect`, and retained footnote markers. Numeric
 admission requires the column's printed digit/sign/decimal shape on the raw
-token (bullets, spaces, and letters are never stripped); 8,451 failing tokens
+token (bullets, spaces, and letters are never stripped); 8,760 failing tokens
 remain unchanged, are marked suspect, and have no parsed value. Identity and
 image-OCR checks are detectors: they set `ocr_suspect` and list ambiguities,
 and they never null a numeric-shaped value. A value changes only with a
 `corrections` entry that cites a page-image reading. No units are converted, no
 values are rounded, and no gaps are filled. Printed rules and restarted
-temperature grids split 174 additional phase records, each carrying
+temperature grids split 184 additional phase records, each carrying
 `phase_as_published` from its printed header. Formula, title, state description,
 units, uncertainty line, formula weight, auxiliary property/equation lines, PDF
 page, printed page, and source-text line locators are retained when the text
