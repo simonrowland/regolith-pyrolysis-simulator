@@ -142,6 +142,24 @@ def test_source_grounded_mutation_probe(corpus, layout_pages):
     with pytest.raises(ValueError, match=r"b1259-ht-0001.*12\.010.*PDF page 32.*0\.625"):
         validate_record_source_tokens(swapped, layout_pages[31])
 
+    value_only = copy.deepcopy(silver)
+    row = next(
+        row
+        for row in value_only["rows"]
+        if row.get("kind") == "data" and row["temperature"]["value"] == 400
+    )
+    row["H_minus_H298"]["value"] = 9.625
+    with pytest.raises(ValueError, match=r"b1259-ht-0001.*9\.625.*0\.625"):
+        validate_record_source_tokens(value_only, layout_pages[31])
+    row["H_minus_H298"]["value"] = 0.625
+    row["entropy"]["value"] = 99.01
+    with pytest.raises(ValueError, match=r"b1259-ht-0001.*99\.01"):
+        validate_record_source_tokens(value_only, layout_pages[31])
+    row["entropy"]["value"] = 12.01
+    row["delta_f_G"]["value"] = -88.8
+    with pytest.raises(ValueError, match=r"b1259-ht-0001.*-88\.8"):
+        validate_record_source_tokens(value_only, layout_pages[31])
+
 
 def test_cited_fidelity_repairs(corpus):
     _, records = corpus
@@ -219,6 +237,21 @@ def test_lookup_uses_only_source_proven_temperature_grid(corpus):
     untranscribed = next(record for record in records if record.get("untranscribed"))
     with pytest.raises(TemperatureNotOnPrintedGrid, match="untranscribed"):
         lookup(untranscribed, 298.15)
+    ammonia = next(record for record in records if record["record_id"].startswith("b1259-ht-0054"))
+    assert lookup(ammonia, 298.15)[0]["temperature"]["layout_as_extracted"] == "298. 15"
+    assert lookup(ammonia, 600)[0]["temperature"]["layout_as_extracted"] == "AGO"
+    bromine = next(record for record in records if record["record_id"].startswith("b1259-ht-0009"))
+    assert {row["H_minus_H298"]["as_published"] for row in lookup(bromine, 332.62)} == {".623", "7.687"}
+    assert lookup(bromine, 400)[0]["H_minus_H298"]["as_published"] == "8.273"
+    assert lookup(bromine, 500)[0]["H_minus_H298"]["as_published"] == "9.156"
+    remaining_refusals = [
+        (record["record_id"], record.get("grid_refusals"))
+        for record in records
+        if record.get("table_kind") == "high_temperature"
+        and not record.get("untranscribed")
+        and record.get("grid_refusals")
+    ]
+    assert remaining_refusals == []
 
 
 @pytest.mark.parametrize("token", ["10.2CO", "13^750", "footnote a", "1,234", "7. 78"])

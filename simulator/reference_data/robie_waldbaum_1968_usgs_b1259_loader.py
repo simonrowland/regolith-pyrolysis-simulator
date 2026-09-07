@@ -362,7 +362,7 @@ IMAGE_VERIFIED_GRID_ROWS = {
     154: {
         ' 29fl. 15 0.000                 18.63         18.63        -259.200         -246.569      180.739': ('298.15', '298.15 0.000 18.63 18.63 -259.200 -246.569 180.739'),
         '17CO               28.070       52.16         35.65       -260.120          -189.453        24.356': ('1700', '1700 28.070 52.16 35.65 -260.120 -189.453 24.356'),
-        '1300               30.260       53.41         36.60       -259.734          -185.291        22.497': ('1800', '1800 30.260 53.41 36.60 -259.734 -181.166 20.839'),
+        '1300               30.260       53.41         36.60       -259.734          -185.291        22.497': ('1800', '1800 30.260 53.41 36.60 -259.734 -185.291 22.497'),
     },
     155: {
         '14CO               34.940     70.98         46.02          285.186       207.556     32.401': ('1400', '1400 34.940 70.98 46.02 -285.186 -207.556 32.401'),
@@ -698,13 +698,11 @@ IMAGE_VERIFIED_CELLS_R3 = {
         (1500.0, 1, 'delta_f_H', '-373.707'),
         (1600.0, 1, 'delta_f_G', '-160.772'),
         (1600.0, 1, 'delta_f_H', '-372.183'),
-        (1600.0, 1, 'delta_f_H', '-372.183'),
         (1600.0, 1, 'entropy', '116.74'),
         (1600.0, 1, 'gibbs_function', '75.46'),
         (1600.0, 1, 'log_Kf', '21.960'),
         (1700.0, 1, 'delta_f_H', '-370.668'),
         (1800.0, 1, 'delta_f_G', '-134.519'),
-        (1800.0, 1, 'delta_f_H', '-369.180'),
         (1800.0, 1, 'delta_f_H', '-369.180'),
         (1800.0, 1, 'entropy', '122.29'),
         (1800.0, 1, 'gibbs_function', '80.36'),
@@ -954,6 +952,12 @@ def _image_correction(
 ) -> None:
     correction_id = f"b1259-p{record['pdf_page']}-{field}-{ordinal:02d}"
     raw = cell.get("layout_as_extracted", cell.get("as_published", ""))
+    try:
+        printed_value = float(Decimal(printed))
+    except (InvalidOperation, ValueError):
+        printed_value = None
+    if cell.get("as_published") == printed and cell.get("value") == printed_value:
+        return
     if "correction_id" in cell:
         raise ValueError(
             f"{record.get('record_id')}: cell {field} at row {ordinal} already carries "
