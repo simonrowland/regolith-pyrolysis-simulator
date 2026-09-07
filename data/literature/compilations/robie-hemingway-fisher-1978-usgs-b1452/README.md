@@ -12,22 +12,20 @@ sections. The resulting 400-table census comprises Table 1 on printed page 3,
 Table 2 on page 4, the 298.15 K summary on pages 12–29, and one unnumbered
 high-temperature substance table on every printed page 30–426. Printed page
 427 was visually checked and is blank. Phase boundaries produce 606 JSON
-records from those 400 tables; explicit `untranscribed` records remain where
-the page image itself is unreadable.
+records from those 400 tables. Pass 2 left no untranscribed census tables.
 
 ## Native transcription
 
 The PDF was read one page at a time with `pdftotext -layout`; per-page horizontal
 column offsets recover tokens split across layout lines. Pass 2 added MinerU
 `table_body` HTML plus page-image cross-check for the remaining stubs. Of 400
-tables, 399 are transcribed into 6,447 rows and 605 phase-specific records.
-The other 1 tables retain page locators and failure reasons in the `t-852`
-MinerU follow-up list in `manifest.yaml`.
+tables, 400 are transcribed into 6,453 rows and 606 phase-specific records.
+The `t-852` MinerU follow-up list in `manifest.yaml` is empty.
 
 Every recoverable numeric cell stores its raw token, exact page-text line/span,
 a parsed float or null, `ocr_suspect`, and retained footnote markers. Numeric
 admission requires the column's printed digit/sign/decimal shape on the raw
-token (bullets, spaces, and letters are never stripped); 10,050 failing tokens
+token (bullets, spaces, and letters are never stripped); 10,062 failing tokens
 remain unchanged, are marked suspect, and have no parsed value. Identity and
 image-OCR checks are detectors: they set `ocr_suspect` and list ambiguities,
 and they never null a numeric-shaped value. A value changes only with a
