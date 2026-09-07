@@ -82,15 +82,15 @@
     "TEIIP.        ( H;-u~ 98 )/T      so      -(G;-H~ 98 )/T      CD",
     "                                                                p     ENTHALPY     FREE ENERGY     Log Kf",
     "                                   T",
-    "                  J/aol•K      J/mol• K     J/aol•K        J/aol•K          kJ/aol           kJ/aol",
+    "                  J/aol\u2022K      J/mol\u2022 K     J/aol\u2022K        J/aol\u2022K          kJ/aol           kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/mol• K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/mol\u2022 K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -139,7 +139,7 @@
     "ENTHALPY OF !!ELTING                   8.519 kJ            ENTHALPY OF VAPORIZAT I Oil           464.070 kJ",
     " 0",
     "H298     -   Ho",
-    "              0                        6.364 kJ            IIOLAR VOLUIIE                          1 • ..!497 J/bar",
+    "              0                        6.364 kJ            IIOLAR VOLUIIE                          1 \u2022 ..!497 J/bar",
     "                                                                                                  12.497 c11 3",
     "TRANSITIONS IN REFEBEIICE STATE ELEIIENTS",
     "HEAT CAPACITY EQUATIONS",
@@ -154,5 +154,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=22, enthalpy_function=22, entropy=22, negative_gibbs_function=22, heat_capacity=21, formation_enthalpy=22, formation_gibbs_energy=22, log_kf=22",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Alpha crystals ( orthorhoabic) 298.15 to 941 K.  Beta crystals (tetragonal)\n         941 to 1048 K.   Gaaaa crystals (body-centered cubic) 10411 to melting point\n         1405 K.  Liquid 1405 to 1800 K."
 }

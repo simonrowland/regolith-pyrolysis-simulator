@@ -61,15 +61,15 @@
     "                                                                  POB!lTIOI FlO I THE ILl !BITS",
     "                                                                                 GIBBS",
     "TIIP.      ( H;-a;98 )/T      soT     -(G;-a~ 98 )/T      cop    !ITBlLP!    PB!I !IEBGY     Log If",
-    "  K          Jtaol•K       J/aol•K      Jtaol•K        Jtaol•K         ltJtaol         ltJtaol",
+    "  K          Jtaol\u2022K       J/aol\u2022K      Jtaol\u2022K        Jtaol\u2022K         ltJtaol         ltJtaol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jtaol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "Jtaol•K",
-    "heat_capacity": "Jtaol•K",
+    "enthalpy_function": "Jtaol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "Jtaol\u2022K",
+    "heat_capacity": "Jtaol\u2022K",
     "formation_enthalpy": "ltJtaol",
     "formation_gibbs_energy": "ltJtaol",
     "log_kf": ""
@@ -77,25 +77,25 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "577",
-      "value": null,
+      "value": 577.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -148,7 +148,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -243,7 +243,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -338,7 +338,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -433,7 +433,7 @@
       "cells": {
         "temperature": {
           "as_published": "577",
-          "value": null,
+          "value": 577.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -510,7 +510,7 @@
     },
     {
       "as_published": "0.1120",
-      "value": null,
+      "value": 0.112,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -549,7 +549,7 @@
     "8~ 98 - H~                     19.707 kJ               ftOLlB VOLU!E                        5.7860 J/bar",
     "                                                                                           57.860 cal",
     "TRAISITIONS II REFERENCE STATE ELEftENTS",
-    "      IRON ••••••• CURIE P. 1042 1 lLPHl-Gl!ftl 1184 1 GAftftl-DBLTl 1665 1",
+    "      IRON \u2022\u2022\u2022\u2022\u2022\u2022\u2022 CURIE P. 1042 1 lLPHl-Gl!ftl 1184 1 GAftftl-DBLTl 1665 1",
     "                   ft. P. DELTA 1809 K.",
     "KElT CAPACITY EQUATION",
     " c;       1.2368x10Z -      2.5564x10Z       ,-z",
@@ -573,5 +573,6 @@
     "row_start": 1,
     "row_stop": 4,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to aelting point 577 1."
 }

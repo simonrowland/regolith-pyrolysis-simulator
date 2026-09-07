@@ -17,11 +17,11 @@
   "name_as_published": "THORIUI! ( REFEREIICE STATE)",
   "formula_as_published": "Th",
   "phase_state_as_published": [
-    "Alpha c·rystals (face-centered cubic) 298.15 to 1636 K.                          Beta crystals",
+    "Alpha c\u00b7rystals (face-centered cubic) 298.15 to 1636 K.                          Beta crystals",
     "          (body-centered cubic) 1636 to aelting point 2028 K."
   ],
   "description_lines_as_published": [
-    "Th:       Alpha c·rystals (face-centered cubic) 298.15 to 1636 K.                          Beta crystals",
+    "Th:       Alpha c\u00b7rystals (face-centered cubic) 298.15 to 1636 K.                          Beta crystals",
     "          (body-centered cubic) 1636 to aelting point 2028 K."
   ],
   "formation_basis_header_as_published": "PORIIATION FRO II THE ELEIIE NTS",
@@ -62,7 +62,7 @@
     "log_kf"
   ],
   "column_header_lines_as_published": [
-    "Th:       Alpha c·rystals (face-centered cubic) 298.15 to 1636 K.                          Beta crystals",
+    "Th:       Alpha c\u00b7rystals (face-centered cubic) 298.15 to 1636 K.                          Beta crystals",
     "          (body-centered cubic) 1636 to aelting point 2028 K.",
     "--------------------------------------------------------------------------------",
     "                                                 PORIIATION FRO II THE ELEIIE NTS",
@@ -81,13 +81,13 @@
   "temperature_grid": [
     {
       "as_published": "1636",
-      "value": null,
+      "value": 1636.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1700",
-      "value": null,
+      "value": 1700.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -146,7 +146,7 @@
       "cells": {
         "temperature": {
           "as_published": "1636",
-          "value": null,
+          "value": 1636.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -241,7 +241,7 @@
       "cells": {
         "temperature": {
           "as_published": "1700",
-          "value": null,
+          "value": 1700.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -270,11 +270,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -437,7 +437,7 @@
     }
   ],
   "reference_state_notes_as_published": [
-    "Th:       Alpha c·rystals (face-centered cubic) 298.15 to 1636 K.                          Beta crystals",
+    "Th:       Alpha c\u00b7rystals (face-centered cubic) 298.15 to 1636 K.                          Beta crystals",
     "          (body-centered cubic) 1636 to aelting point 2028 K."
   ],
   "auxiliary_lines_as_published": [
@@ -447,7 +447,7 @@
     "                                                                                                 19.7dll cm 3",
     "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
     "HEAT CAPACITY EQUATION",
-    "           23.317 • 1.2793x1o-z T                   5.i.i662 T-o·s",
+    "           23.317 \u2022 1.2793x1o-z T                   5.i.i662 T-o\u00b7s",
     "              (EQUATION VALID FROII              298- 1636 K)"
   ],
   "footnote_markers": [],
@@ -459,5 +459,6 @@
     "row_start": 16,
     "row_stop": 18,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Beta crystals\n          (body-centered cubic) 1636 to aelting point 2028 K."
 }

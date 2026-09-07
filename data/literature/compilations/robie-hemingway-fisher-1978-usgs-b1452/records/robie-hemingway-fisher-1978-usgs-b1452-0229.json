@@ -66,15 +66,15 @@
     "                                                                                         GIBBS",
     "TEftP.      (a;-a~ 98 )/T      so      -(G;-a~ 98 )/T      cop         ENTHALPY       FREE ENERGY      Log Kf",
     "                                T",
-    "   K         J/•ol•K        J/IIOl•K     J/1101• K      J/1101• K         kJ/ao1         kJ/ao1",
+    "   K         J/\u2022ol\u2022K        J/IIOl\u2022K     J/1101\u2022 K      J/1101\u2022 K         kJ/ao1         kJ/ao1",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/•ol•K",
-    "entropy": "J/IIOl•K",
-    "negative_gibbs_function": "J/1101• K",
-    "heat_capacity": "J/1101• K",
+    "enthalpy_function": "J/\u2022ol\u2022K",
+    "entropy": "J/IIOl\u2022K",
+    "negative_gibbs_function": "J/1101\u2022 K",
+    "heat_capacity": "J/1101\u2022 K",
     "formation_enthalpy": "kJ/ao1",
     "formation_gibbs_energy": "kJ/ao1",
     "log_kf": ""
@@ -118,7 +118,7 @@
     },
     {
       "as_published": "900",
-      "value": null,
+      "value": 900.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -213,13 +213,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-772.553",
-          "value": null,
+          "value": -772.553,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "135.349",
-          "value": null,
+          "value": 135.349,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -308,13 +308,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-731.979",
-          "value": null,
+          "value": -731.979,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "95.587",
-          "value": null,
+          "value": 95.587,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -747,7 +747,7 @@
       "cells": {
         "temperature": {
           "as_published": "900",
-          "value": null,
+          "value": 900.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -941,7 +941,7 @@
     },
     {
       "as_published": "1.489",
-      "value": null,
+      "value": 1.489,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -960,9 +960,9 @@
     "                                          kJ            llOLAR VOLUME                          3.9770 J/bar",
     "                                                                                              39.770 ca 3",
     "TRANSITIONS IN REFEREHCE STATE ELEMENTS",
-    "    COBALT ••••• ALPHA-BETA 700, CURIE P. 1394•                  ft.    P. BETA 1768 K.",
+    "    COBALT \u2022\u2022\u2022\u2022\u2022 ALPHA-BETA 700, CURIE P. 1394\u2022                  ft.    P. BETA 1768 K.",
     "HEAT CAPACITY EQUATION",
-    "           -4.8355x102 +  0.34236 T               1.1845x10• T-o·s",
+    "           -4.8355x102 +  0.34236 T               1.1845x10\u2022 T-o\u00b7s",
     "               (EQUATION VALID FROft           298 - 1000 K)",
     "REFEBE NCE       129           263                                           263                     COftPILED",
     "                                                                                                      8- 4-76"
@@ -1004,5 +1004,6 @@
     "row_start": 1,
     "row_stop": 8,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to 1000 K."
 }

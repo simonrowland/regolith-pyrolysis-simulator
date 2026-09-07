@@ -70,15 +70,15 @@
     "TEilP.    ( H;-u;98 )IT      so",
     "                              T      -(G;-u~ 98 )/T      co",
     "                                                          p      ENTHALPY          FREE EIERGY      Log Kf",
-    "  K         J/llol•K      J/IIOl!K     J/aol•K        J/aol• K         kJ/1101        kJ/1101",
+    "  K         J/llol\u2022K      J/IIOl!K     J/aol\u2022K        J/aol\u2022 K         kJ/1101        kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/llol•K",
+    "enthalpy_function": "J/llol\u2022K",
     "entropy": "J/IIOl!K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol• K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -235,19 +235,19 @@
         },
         "enthalpy_function": {
           "as_published": "18.883",
-          "value": null,
+          "value": 18.883,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "59.70",
-          "value": null,
+          "value": 59.7,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "40.83",
-          "value": null,
+          "value": 40.83,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -739,11 +739,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -830,11 +830,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1117,11 +1117,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1499,11 +1499,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1749,7 +1749,7 @@
     "                                                                                           11.790 ca 3",
     "TRANSITIONS IN REFERENCE STATE ELEIIEITS",
     "HEAT CAPACITY EQUATION",
-    "         31.155-    1.0116x10-~ T    1.2666x10Z T-o·s",
+    "         31.155-    1.0116x10-~ T    1.2666x10Z T-o\u00b7s",
     "            EQUATION VALID FRO! 302.90- 700 K)",
     "REF~BEICE      107           107                                                                  COIIPILED",
     "                                                                                                   4-13-76"
@@ -1774,5 +1774,6 @@
     "row_start": 3,
     "row_stop": 18,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Liquid 302.9 to\n         boiling point 2478 K."
 }

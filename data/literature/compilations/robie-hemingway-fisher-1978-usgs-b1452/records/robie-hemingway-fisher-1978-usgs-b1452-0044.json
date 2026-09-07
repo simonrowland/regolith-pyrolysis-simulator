@@ -67,15 +67,15 @@
     "TEIIP.   ( H;-H~ 98 )/T      So",
     "                              T      -(G;-H~ 98 )/T     CD",
     "                                                          p     ENTHALPY        FREE ENERGY      Log Kf",
-    "            J/mol•K       J/mol•K      J/•ol•K        J/aol•K       kJ/mol         kJ/mol",
+    "            J/mol\u2022K       J/mol\u2022K      J/\u2022ol\u2022K        J/aol\u2022K       kJ/mol         kJ/mol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/mol•K",
-    "entropy": "J/mol•K",
-    "negative_gibbs_function": "J/•ol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/mol\u2022K",
+    "entropy": "J/mol\u2022K",
+    "negative_gibbs_function": "J/\u2022ol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/mol",
     "formation_gibbs_energy": "kJ/mol",
     "log_kf": ""
@@ -149,7 +149,7 @@
     },
     {
       "as_published": "1400",
-      "value": null,
+      "value": 1400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -350,19 +350,19 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -930,11 +930,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -1277,7 +1277,7 @@
       "cells": {
         "temperature": {
           "as_published": "1400",
-          "value": null,
+          "value": 1400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1306,11 +1306,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1403,11 +1403,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1690,11 +1690,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1749,7 +1749,7 @@
     "                                                                                       17.770 ca 3",
     "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
     "HEAT CAPACITY EQUATION",
-    "         17.027 + 7.0407x1U-6 TZ      2.04J8I10Z T-0·5",
+    "         17.027 + 7.0407x1U-6 TZ      2.04J8I10Z T-0\u00b75",
     "            (EQUATION VALID FROII 298- 18(10 K)"
   ],
   "footnote_markers": [],
@@ -1769,5 +1769,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Hexagonal close packed crystals 298.15 to 11eltinq point 1936 K."
 }

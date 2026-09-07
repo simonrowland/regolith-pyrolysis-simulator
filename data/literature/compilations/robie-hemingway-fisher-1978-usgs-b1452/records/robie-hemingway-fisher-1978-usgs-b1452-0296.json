@@ -71,15 +71,15 @@
     "                                                                                         GIBBS",
     "TBIIP.      <a;-a~98 )l'f     so      -(G;-a~98 )/T      cop       BITRll.PI         PllBB BIIBBGY     Log 't",
     "                               T",
-    "  J(            J/ao~•l    J/aO~•I      J/ao~·l       J/aol•l           ltJ/aol         Jt.J;aol",
+    "  J(            J/ao~\u2022l    J/aO~\u2022I      J/ao~\u00b7l       J/aol\u2022l           ltJ/aol         Jt.J;aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "J(",
-    "enthalpy_function": "J/ao~•l",
-    "entropy": "J/aO~•I",
-    "negative_gibbs_function": "J/ao~·l",
-    "heat_capacity": "J/aol•l",
+    "enthalpy_function": "J/ao~\u2022l",
+    "entropy": "J/aO~\u2022I",
+    "negative_gibbs_function": "J/ao~\u00b7l",
+    "heat_capacity": "J/aol\u2022l",
     "formation_enthalpy": "ltJ/aol",
     "formation_gibbs_energy": "Jt.J;aol",
     "log_kf": ""
@@ -88,7 +88,7 @@
   "rows": [],
   "row_count": 0,
   "detected_data_row_count": 22,
-  "uncertainty_line_as_published": "OICBBTllftt                   0.35            o.35                        o. 540           o.s•o          0.095",
+  "uncertainty_line_as_published": "OICBBTllftt                   0.35            o.35                        o. 540           o.s\u2022o          0.095",
   "uncertainty_values": [
     {
       "as_published": "0.35",
@@ -124,10 +124,12 @@
       }
     },
     {
-      "as_published": "o.s•o",
+      "as_published": "o.s\u2022o",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": [],
+      "footnote_markers": [
+        "\u2022"
+      ],
       "source_text_span": {
         "line": 20,
         "start": 91,
@@ -156,13 +158,13 @@
     "a;98 -     B~                            kJ           IIOLlB YOLOII.B                           6.5500 J/ilar",
     "                                                                                               65.500 ca 3",
     "TBliSIUOIS II IBP:UBICI STlTB BLBIIBBTS",
-    "       POTlSSIUII •• I. P. 336.4, B. P. 1030 K.",
-    "       SULPUB ••••• OITBG-11010 368.54,         a. P. 8010 388.36,",
+    "       POTlSSIUII \u2022\u2022 I. P. 336.4, B. P. 1030 K.",
+    "       SULPUB \u2022\u2022\u2022\u2022\u2022 OITBG-11010 368.54,         a. P. 8010 388.36,",
     "                    B. P. 716.9 lt.",
     "HBlT ClPJ.CITI JQUJ.TIOIS",
-    " c; = 120.37 •          9.9519z1o-•     r - 1.7824x1o• ,-.",
+    " c; = 120.37 \u2022          9.9519z1o-\u2022     r - 1.7824x1o\u2022 ,-.",
     "                ( ~Olt'IOI YlLID PBOII        298 -   856 I)",
-    " c; = -8.4452ll10• • 0.68449 T • 3.4994z1o• ,-.",
+    " c; = -8.4452ll10\u2022 \u2022 0.68449 T \u2022 3.4994z1o\u2022 ,-.",
     "                 (BQUITIOI YILID PBOII        856 - 1342 l)",
     "BBPBBBIICB         239        215                                          215                       COIIPILBD",
     "                                                                                                      6-28-76"
@@ -175,5 +177,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=20, enthalpy_function=20, entropy=19, negative_gibbs_function=20, heat_capacity=20, formation_enthalpy=19, formation_gibbs_energy=19, log_kf=20",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "llouic crystals (alpha) 298.15 to 856 1.                  Bezagoaa.~   crystals\n                (beta) 856 to aeltiag poiat 1342 1.              Ligaid 1342 to 1700 1."
 }

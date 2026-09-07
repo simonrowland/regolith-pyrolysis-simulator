@@ -82,13 +82,13 @@
   "temperature_grid": [
     {
       "as_published": "1261",
-      "value": null,
+      "value": 1261.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1300",
-      "value": null,
+      "value": 1300.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -141,7 +141,7 @@
       "cells": {
         "temperature": {
           "as_published": "1261",
-          "value": null,
+          "value": 1261.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -236,7 +236,7 @@
       "cells": {
         "temperature": {
           "as_published": "1300",
-          "value": null,
+          "value": 1300.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -287,13 +287,15 @@
   ],
   "row_count": 2,
   "detected_data_row_count": 16,
-  "uncertainty_line_as_published": "            J/mol•K        J/mol• K      J/mol•K        J/110 1• K       kJ/1101         kJ/11101",
+  "uncertainty_line_as_published": "            J/mol\u2022K        J/mol\u2022 K      J/mol\u2022K        J/110 1\u2022 K       kJ/1101         kJ/11101",
   "uncertainty_values": [
     {
-      "as_published": "J/mol• K",
+      "as_published": "J/mol\u2022 K",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": [],
+      "footnote_markers": [
+        "\u2022"
+      ],
       "source_text_span": {
         "line": 18,
         "start": 27,
@@ -301,10 +303,12 @@
       }
     },
     {
-      "as_published": "J/mol•K",
+      "as_published": "J/mol\u2022K",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": [],
+      "footnote_markers": [
+        "\u2022"
+      ],
       "source_text_span": {
         "line": 18,
         "start": 12,
@@ -312,10 +316,12 @@
       }
     },
     {
-      "as_published": "J/110 1• K",
+      "as_published": "J/110 1\u2022 K",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": [],
+      "footnote_markers": [
+        "\u2022"
+      ],
       "source_text_span": {
         "line": 18,
         "start": 56,
@@ -368,5 +374,6 @@
     "row_start": 14,
     "row_stop": 15,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Ideal diatomic gas 1261 to 1800 K."
 }

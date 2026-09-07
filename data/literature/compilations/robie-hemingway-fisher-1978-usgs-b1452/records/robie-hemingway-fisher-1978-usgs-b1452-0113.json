@@ -71,15 +71,15 @@
     "                                                                                             GIBBS",
     "TEIIP.       ( H;-H~98 )/T         so      -(G~-H~ 98 )/T       cop       EIITHALPY      FBEE EIIEBGY    Log Kf",
     "                                    T",
-    "   K          J;aol•K         J/aol•K        J/IIIOl•K      J/llol• K            kJ/mol         kJ;aol",
+    "   K          J;aol\u2022K         J/aol\u2022K        J/IIIOl\u2022K      J/llol\u2022 K            kJ/mol         kJ;aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J;aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/IIIOl•K",
-    "heat_capacity": "J/llol• K",
+    "enthalpy_function": "J;aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/IIIOl\u2022K",
+    "heat_capacity": "J/llol\u2022 K",
     "formation_enthalpy": "kJ/mol",
     "formation_gibbs_energy": "kJ;aol",
     "log_kf": ""
@@ -87,19 +87,19 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -152,7 +152,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -247,7 +247,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -342,7 +342,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -463,7 +463,7 @@
     "                                        8.828 kJ            !lOLA i   VOLU 1!E                       1.9535 J/bar",
     "                                                                                                    19.535 ca 3",
     "TRANSITIONS Ill iEFERENCE STATE ELEI!EIIITS",
-    "      ALUI!IIIIUII ••• II.   P.   933 K.",
+    "      ALUI!IIIIUII \u2022\u2022\u2022 II.   P.   933 K.",
     "HEAT CAPACITY EQUATION",
     " c~        60.396 +   1.7573x1o-z T",
     "              (EQUATION VALID FBOII                298-   500 K)"
@@ -484,5 +484,6 @@
     "row_start": 1,
     "row_stop": 3,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to 500 K."
 }

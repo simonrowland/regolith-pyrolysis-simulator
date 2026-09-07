@@ -79,15 +79,15 @@
     "                                                                     POBUTION",
     "                                                                                        GIBBS",
     "TEI!P.     (H;-H; 98 )/T      soT      -(G;-H~ 98 )/T      cop     ENTHALPY          FREE ENERGY       Loq 't",
-    "            J/aol•K        J/aol•K       J/aol•K        J/aol•K          kJ/aol         kJ/aol",
+    "            J/aol\u2022K        J/aol\u2022K       J/aol\u2022K        J/aol\u2022K          kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -202,13 +202,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-854.512",
-          "value": null,
+          "value": -854.512,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "149.708",
-          "value": null,
+          "value": 149.708,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -539,7 +539,7 @@
     },
     {
       "as_published": "2.110",
-      "value": null,
+      "value": 2.11,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -550,7 +550,7 @@
     },
     {
       "as_published": "0.313",
-      "value": null,
+      "value": 0.313,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -590,5 +590,6 @@
     "row_start": 1,
     "row_stop": 4,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Alpha cristobalite 298.15 to 523 K."
 }

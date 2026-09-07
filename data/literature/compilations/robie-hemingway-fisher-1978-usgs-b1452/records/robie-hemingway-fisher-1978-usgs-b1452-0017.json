@@ -69,15 +69,15 @@
     "                                                                                        GIBBS",
     "TEIIP.     ( H;-a; 98 )/T      so      -( ~-H~98 )/T       cop      BITHALPY         FREE EIERGY      Log Kt",
     "                                T",
-    "  K          J/aol• K       Jtaol•K      J/aol•K        Jfaol•K          kJ/aol         kJ/aol",
+    "  K          J/aol\u2022 K       Jtaol\u2022K      J/aol\u2022K        Jfaol\u2022K          kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol• K",
-    "entropy": "Jtaol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "Jfaol•K",
+    "enthalpy_function": "J/aol\u2022 K",
+    "entropy": "Jtaol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "Jfaol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -85,25 +85,25 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "594.18",
-      "value": null,
+      "value": 594.18,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -156,7 +156,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -251,7 +251,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -280,11 +280,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -348,7 +348,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -443,7 +443,7 @@
       "cells": {
         "temperature": {
           "as_published": "594.18",
-          "value": null,
+          "value": 594.18,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -574,5 +574,6 @@
     "row_start": 1,
     "row_stop": 4,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Hezagonal close packed crystals 298.15 to aelting point 594.18 K."
 }

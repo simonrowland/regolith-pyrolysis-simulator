@@ -68,15 +68,15 @@
     "                                                                                             GIBBS",
     "TE!P.      ( H~-H~ 98 )/T      so       -(G;-a~ 98 );T       cop     BITHALPY             FREE ENERGY      Log Kf",
     "                                 T",
-    "  K         J;mol•K         J/mol•K       J/aol•K        J/aol•K            lr.J/1101        kJ/1101",
+    "  K         J;mol\u2022K         J/mol\u2022K       J/aol\u2022K        J/aol\u2022K            lr.J/1101        kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J;mol•K",
-    "entropy": "J/mol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J;mol\u2022K",
+    "entropy": "J/mol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "lr.J/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -152,9 +152,9 @@
     "                                           kJ            IIOJ.AB VOI.UftE                          6.2040 Jjbar",
     "                                                                                                  62.040 c11 3",
     "TBAHSITlOHS II REPEBEHCB STATE ELE!ENTS",
-    "      UBAHIU! •••• ALPHA-BETA 941, BETA-GA!ftA 1048, !. P. 1405 K.",
+    "      UBAHIU! \u2022\u2022\u2022\u2022 ALPHA-BETA 941, BETA-GA!ftA 1048, !. P. 1405 K.",
     "HEAT CAPACITY EQDATIOH",
-    "         -1.7529x102 +  0.13399 T                    5.4565x10' T-o·s",
+    "         -1.7529x102 +  0.13399 T                    5.4565x10' T-o\u00b7s",
     "             (EQDATIOH VALID FRO!                 298 - 1000 K)",
     "BEPBREJCE        70              70                                              89                      CO!.PILBD",
     "                                                                                233                       7- 1-76"
@@ -167,5 +167,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=8, enthalpy_function=8, entropy=8, negative_gibbs_function=8, heat_capacity=8, formation_enthalpy=8, formation_gibbs_energy=8, log_kf=7",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Crystals 298.15 to 1000 K."
 }

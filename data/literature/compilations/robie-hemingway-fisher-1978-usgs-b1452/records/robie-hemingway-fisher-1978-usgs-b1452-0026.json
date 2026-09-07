@@ -69,15 +69,15 @@
     "                                                                                              GIBBS",
     "TEIIP.     (H;-H~ 9 8 )/T         so       -(G;-H~ 98 )/T      cop     EIITHALPY          FIIBB BURGI       Loq       If",
     "                                    T",
-    "  K          J/aol•K        J/aol•K          Jjaol•K        Jjaol• K          kJ/aol         kJ/aol",
+    "  K          J/aol\u2022K        J/aol\u2022K          Jjaol\u2022K        Jjaol\u2022 K          kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "Jjaol•K",
-    "heat_capacity": "Jjaol• K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "Jjaol\u2022K",
+    "heat_capacity": "Jjaol\u2022 K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -601,11 +601,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -692,11 +692,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -985,11 +985,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -1039,7 +1039,7 @@
     "                                                                                                 28.970 ca 3",
     "TRAIISITIONS IN REFERENCE STATE BLEIIEIITS",
     "HEAT CAPACITY EQUATIOHS",
-    " c~       3.1897x1o-z       r              3.0408x1oz r-o·s",
+    " c~       3.1897x1o-z       r              3.0408x1oz r-o\u00b7s",
     "             (EQUATION VALID FBOII               298- 503.15 K)",
     "         -1.9919x107 r-z",
     "              EQUATION VALID FROB               503.15- 1090 K)",
@@ -1055,5 +1055,6 @@
     "row_start": 1,
     "row_stop": 9,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Body-centered cubic crystals 298.15 to                     ~~eltillq   point 1090 1."
 }

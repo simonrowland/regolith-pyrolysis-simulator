@@ -61,15 +61,15 @@
     "                                                 FORMAriOll FROM THE ELE.KEHTS",
     "                                                                                         GIBBS",
     "TEKP.      ( H;-H~ 98 )/T      soT    -( G;-H~ 9 a)/T      cop    ENTHALPY            FREE ENERGY     Log Kf",
-    "   K        J;mol•K         J/aol•K     Jjmol•K         Jjaol•K         k.J/1101         kJ/mol",
+    "   K        J;mol\u2022K         J/aol\u2022K     Jjmol\u2022K         Jjaol\u2022K         k.J/1101         kJ/mol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J;mol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "Jjmol•K",
-    "heat_capacity": "Jjaol•K",
+    "enthalpy_function": "J;mol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "Jjmol\u2022K",
+    "heat_capacity": "Jjaol\u2022K",
     "formation_enthalpy": "k.J/1101",
     "formation_gibbs_energy": "kJ/mol",
     "log_kf": ""
@@ -256,13 +256,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-1484.371",
-          "value": null,
+          "value": -1484.371,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "260.057",
-          "value": null,
+          "value": 260.057,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -351,13 +351,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-1454.218",
-          "value": null,
+          "value": -1454.218,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "189.902",
-          "value": null,
+          "value": 189.902,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -636,13 +636,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-1366.876",
-          "value": null,
+          "value": -1366.876,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "101.998",
-          "value": null,
+          "value": 101.998,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1761,11 +1761,11 @@
     "                                13.55& kJ               t!OLAR VOLUME                        3.08&0 J/bar",
     "                                                                                            30.860 cm 3",
     "TRANSITIONS IN REFERENCE STATE ELEMENTS",
-    "    .MAGNESIUM •• K. P. 922, B. P. 1361 K.",
-    "    TITANIUK •••      ALPHA-BETA 1155, K. P. 1943 K.",
+    "    .MAGNESIUM \u2022\u2022 K. P. 922, B. P. 1361 K.",
+    "    TITANIUK \u2022\u2022\u2022      ALPHA-BETA 1155, K. P. 1943 K.",
     "HEAT CAPACITY EQUATION",
-    "          &1.&35 +     3.767lx1u-2 T             3. 5882x 1 o-• T2",
-    "         -4.3444x10• T-2",
+    "          &1.&35 +     3.767lx1u-2 T             3. 5882x 1 o-\u2022 T2",
+    "         -4.3444x10\u2022 T-2",
     "             (EQUATION VALID FROK              298- 1800 K)"
   ],
   "footnote_markers": [],
@@ -1808,5 +1808,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to 1800 K."
 }

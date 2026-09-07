@@ -62,15 +62,15 @@
     "                                                                                       GIBBS",
     "TBI!IP.    (H;-u~ 98 )/T      so     -(G;-u~ 98 )/T       cop    BITHALPY           PBBB EJBBGY     Log Kf",
     "                               T",
-    "   K        J;aol•K        J;aol•K     J/aol•K        Jjaol•K          .kJ/aol        .kJ;aol",
+    "   K        J;aol\u2022K        J;aol\u2022K     J/aol\u2022K        Jjaol\u2022K          .kJ/aol        .kJ;aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J;aol•K",
-    "entropy": "J;aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "Jjaol•K",
+    "enthalpy_function": "J;aol\u2022K",
+    "entropy": "J;aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "Jjaol\u2022K",
     "formation_enthalpy": ".kJ/aol",
     "formation_gibbs_energy": ".kJ;aol",
     "log_kf": ""
@@ -78,31 +78,31 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "600",
-      "value": null,
+      "value": 600.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "700",
-      "value": null,
+      "value": 700.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -114,25 +114,25 @@
     },
     {
       "as_published": "900",
-      "value": null,
+      "value": 900.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1000",
-      "value": null,
+      "value": 1000.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1100",
-      "value": null,
+      "value": 1100.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1200",
-      "value": null,
+      "value": 1200.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -185,7 +185,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -280,7 +280,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -375,7 +375,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -470,7 +470,7 @@
       "cells": {
         "temperature": {
           "as_published": "600",
-          "value": null,
+          "value": 600.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -565,7 +565,7 @@
       "cells": {
         "temperature": {
           "as_published": "700",
-          "value": null,
+          "value": 700.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -755,7 +755,7 @@
       "cells": {
         "temperature": {
           "as_published": "900",
-          "value": null,
+          "value": 900.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -850,7 +850,7 @@
       "cells": {
         "temperature": {
           "as_published": "1000",
-          "value": null,
+          "value": 1000.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -945,7 +945,7 @@
       "cells": {
         "temperature": {
           "as_published": "1100",
-          "value": null,
+          "value": 1100.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1040,7 +1040,7 @@
       "cells": {
         "temperature": {
           "as_published": "1200",
-          "value": null,
+          "value": 1200.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1152,7 +1152,7 @@
   "reference_state_notes_as_published": [],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATION",
-    "          1.1152x102 + 5.3894x1o-z T                  1.6100x103   r-o·s",
+    "          1.1152x102 + 5.3894x1o-z T                  1.6100x103   r-o\u00b7s",
     "             ( EQUlTIOI VALID lRO!I 298 -            1212.70 K)",
     "BBPEBBICE        62          194                                           89                     CO!PILED",
     "                                                                          186                      6- 8-76"
@@ -1173,5 +1173,6 @@
     "row_start": 1,
     "row_stop": 10,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to 1200 K."
 }

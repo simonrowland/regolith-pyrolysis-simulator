@@ -66,15 +66,15 @@
     "                                                                                          GIBBS",
     "TEIIP.     ( H;-a~ 98 )/T      so      -(G;-H~ 98 )/T      cop     EITHALPY           F.BEE EURGY      Log Kf",
     "                                T",
-    "            J;ao1•K         J/II01•K     J/1101• K      J/II01•K         kJ/1101         kJ/1101",
+    "            J;ao1\u2022K         J/II01\u2022K     J/1101\u2022 K      J/II01\u2022K         kJ/1101         kJ/1101",
     "---------------------------------------------------------,----------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J;ao1•K",
-    "entropy": "J/II01•K",
-    "negative_gibbs_function": "J/1101• K",
-    "heat_capacity": "J/II01•K",
+    "enthalpy_function": "J;ao1\u2022K",
+    "entropy": "J/II01\u2022K",
+    "negative_gibbs_function": "J/1101\u2022 K",
+    "heat_capacity": "J/II01\u2022K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -355,11 +355,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -452,11 +452,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -549,11 +549,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -836,11 +836,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -1117,11 +1117,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1381,19 +1381,19 @@
         },
         "enthalpy_function": {
           "as_published": "21.313",
-          "value": null,
+          "value": 21.313,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "87.32",
-          "value": null,
+          "value": 87.32,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "64.01",
-          "value": null,
+          "value": 64.01,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1404,11 +1404,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1772,5 +1772,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Face-centered cubic crystals 298.15 to melting point 2042 K."
 }

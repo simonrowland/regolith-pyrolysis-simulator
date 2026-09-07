@@ -66,17 +66,17 @@
     "                                                                                         GIBBS",
     "TBBP.     (a;-a; 98 )/T         so",
     "                                 T      -( G;-a;98 )/T      cop    EBTHU.PY          !'BEE EIERGI     Log Kf",
-    "  K         J/•ol•K         J/•ol•K       J/•ol•l        J/•ol•K         kJ/aol         kJ/•ol",
+    "  K         J/\u2022ol\u2022K         J/\u2022ol\u2022K       J/\u2022ol\u2022l        J/\u2022ol\u2022K         kJ/aol         kJ/\u2022ol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/•ol•K",
-    "entropy": "J/•ol•K",
-    "negative_gibbs_function": "J/•ol•l",
-    "heat_capacity": "J/•ol•K",
+    "enthalpy_function": "J/\u2022ol\u2022K",
+    "entropy": "J/\u2022ol\u2022K",
+    "negative_gibbs_function": "J/\u2022ol\u2022l",
+    "heat_capacity": "J/\u2022ol\u2022K",
     "formation_enthalpy": "kJ/aol",
-    "formation_gibbs_energy": "kJ/•ol",
+    "formation_gibbs_energy": "kJ/\u2022ol",
     "log_kf": ""
   },
   "temperature_grid": [
@@ -356,13 +356,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-136.410",
-          "value": null,
+          "value": -136.41,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "11.813",
-          "value": null,
+          "value": 11.813,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -736,13 +736,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-110.813",
-          "value": null,
+          "value": -110.813,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "11.153",
-          "value": null,
+          "value": 11.153,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1749,7 +1749,7 @@
     },
     {
       "as_published": "1.489",
-      "value": null,
+      "value": 1.489,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -1768,9 +1768,9 @@
     "                                     8.711 kJ            !lOLli VOLUBE                    2478.9200 J/bar",
     "                                                                                         24789.200 cal",
     "TRANSITIOBS IN REFERENCE STATE ELEIIENTS",
-    "   SILICON ••••       ft.   P. 1&85 K.",
+    "   SILICON \u2022\u2022\u2022\u2022       ft.   P. 1&85 K.",
     "HEAT CAPACITY EQUATION",
-    "          50.373 -  2.0840x10-~ T                  4.0900x102 T-o·s",
+    "          50.373 -  2.0840x10-~ T                  4.0900x102 T-o\u00b7s",
     "             (EQUATION VALID FROB               298 - 1800 K)",
     "REFEREICE       247             247                                         247                     CO!!PILED",
     "                                                                                                     5-24-76"
@@ -1805,5 +1805,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Ideal gas 298.15 to 1800 K."
 }

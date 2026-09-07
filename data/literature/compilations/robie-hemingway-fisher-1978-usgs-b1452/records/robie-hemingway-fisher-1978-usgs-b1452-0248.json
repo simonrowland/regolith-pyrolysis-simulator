@@ -62,15 +62,15 @@
     "                                                                                    GIBBS",
     "TEMP.    ( u;-u; 98 )/T      so      -(G;-u; 98 )/T      cop     EHTHlLPY        FREE BURGY       Log Kf",
     "                              T",
-    "  K         J/aol•K       J/IIOl•K     J/aol•K        J/aol•K        kJ/1101        kJ/aol",
+    "  K         J/aol\u2022K       J/IIOl\u2022K     J/aol\u2022K        J/aol\u2022K        kJ/1101        kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/IIOl•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/IIOl\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -304,13 +304,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-731.971",
-          "value": null,
+          "value": -731.971,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "95.586",
-          "value": null,
+          "value": 95.586,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -654,19 +654,19 @@
         },
         "enthalpy_function": {
           "as_published": "48.714",
-          "value": null,
+          "value": 48.714,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "180.75",
-          "value": null,
+          "value": 180.75,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "131.98",
-          "value": null,
+          "value": 131.98,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -954,9 +954,9 @@
     "                                        k.J          MOLAR VOLUME                        5.0750 J/bar",
     "                                                                                        50. 750 Cll3",
     "TRANSITIONS IN REFERENCE STATE ELEMENTS",
-    "   CALCIUM •••• ALPHA-BETA 720, M. P\" BETA 1112, B. P. 1755 K.",
+    "   CALCIUM \u2022\u2022\u2022\u2022 ALPHA-BETA 720, M. P\" BETA 1112, B. P. 1755 K.",
     "HEAT CAPACITY    E~UATION",
-    "        76.846 +   6.6490x10-• TZ     1.2847x1o• T-3",
+    "        76.846 +   6.6490x10-\u2022 TZ     1.2847x1o\u2022 T-3",
     "            (EQUATION VALID FROM 298 - 1055 K)"
   ],
   "footnote_markers": [],
@@ -989,5 +989,6 @@
     "row_start": 1,
     "row_stop": 8,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "crystals 298.15 to aelting point 1055 K."
 }

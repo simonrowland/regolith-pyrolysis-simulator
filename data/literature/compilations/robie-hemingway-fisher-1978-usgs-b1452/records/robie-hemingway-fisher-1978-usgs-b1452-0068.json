@@ -68,15 +68,15 @@
     "                                                                                           GIBBS",
     "TEIIP.      ( H;-H~ 98 )/T      so      -(~-H~ 98 )/T         cop     EIITHALPY         FREE EIIEBGY        Log Kf",
     "                                 T",
-    "   K         J/aol•K         J/llol•K     J/aol•K          J;aol•K          kJ/aol          kJ/aol",
+    "   K         J/aol\u2022K         J/llol\u2022K     J/aol\u2022K          J;aol\u2022K          kJ/aol          kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/llol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J;aol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/llol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J;aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -152,7 +152,7 @@
     "                                     9. 131 kJ             IIOLAB VOLUIIE                     2478.9200 J/bar",
     "                                                                                             24789.200 c11 3",
     "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
-    "       SULFUR ••••• ORTHO-IIONO 368.54,            II.   P. IIONO 388.36 1",
+    "       SULFUR \u2022\u2022\u2022\u2022\u2022 ORTHO-IIONO 368.54,            II.   P. IIONO 388.36 1",
     "                    B. P. 7 16. 9 K.",
     "HEAT CAPACITY EQUATION",
     "           47.069 -    3.4459x10-3 T",
@@ -167,5 +167,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=16, entropy=16, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=15, formation_gibbs_energy=15, log_kf=14",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Ideal diatoaic gas 298.15 to 1800 K."
 }

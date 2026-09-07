@@ -69,15 +69,15 @@
     "                                                                                            GIBBS",
     "TEIIP.         ( H;-H;98 )/T     so      -(G;-H~ 98 }/T        cop    ERTHlLPY           FREE ENERGY     Log Kf",
     "                                   T",
-    "                Jjaol•K        J/aol•K      Jjaol•K         Jjaol•K          kJ/aol         ltJ/aol",
+    "                Jjaol\u2022K        J/aol\u2022K      Jjaol\u2022K         Jjaol\u2022K          kJ/aol         ltJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "Jjaol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "Jjaol•K",
-    "heat_capacity": "Jjaol•K",
+    "enthalpy_function": "Jjaol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "Jjaol\u2022K",
+    "heat_capacity": "Jjaol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "ltJ/aol",
     "log_kf": ""
@@ -85,7 +85,7 @@
   "temperature_grid": [
     {
       "as_published": "1110",
-      "value": null,
+      "value": 1110.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -144,7 +144,7 @@
       "cells": {
         "temperature": {
           "as_published": "1110",
-          "value": null,
+          "value": 1110.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -358,12 +358,12 @@
     "                                             kJ             IIOLAB VOLUIIE                       5. 1600 J/bar",
     "                                                                                                51.600 ca 3",
     "TRAtiSITIOIIS Ill REFERENCE STATE ELEI!EIITS",
-    "      ClLCIUI! •••• ALPHA-BETA 720, ft.              P. BETA 1112, B. P.        1755 K.",
-    "      SILICON •••• II. P. 1685 K.",
+    "      ClLCIUI! \u2022\u2022\u2022\u2022 ALPHA-BETA 720, ft.              P. BETA 1112, B. P.        1755 K.",
+    "      SILICON \u2022\u2022\u2022\u2022 II. P. 1685 K.",
     "BEAT CAPACITY EQUATION",
-    "           2.4871z102- 8.3145z10-• T       2.0521z1oa T-a·s",
+    "           2.4871z102- 8.3145z10-\u2022 T       2.0521z1oa T-a\u00b7s",
     "              (EQUATION VALID FROft 298 - 970 I)",
-    " c;       134.557 •   0.046108 T",
+    " c;       134.557 \u2022   0.046108 T",
     "              (EQUATION VALID FBOII 970 -                 1710 I)"
   ],
   "footnote_markers": [],
@@ -383,5 +383,6 @@
     "row_start": 19,
     "row_stop": 20,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "m crystals 1710 to 1800 K."
 }

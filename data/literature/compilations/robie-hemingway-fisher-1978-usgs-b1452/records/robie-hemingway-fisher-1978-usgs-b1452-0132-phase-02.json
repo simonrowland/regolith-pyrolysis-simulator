@@ -66,15 +66,15 @@
     "                                                                                             GIBBS",
     "TEftP.        ( H~-H~ 98 )/T      so      -(G;-H~ 98 )/T      cop      ENTHALPY           FREE EIIEBGY     Log Kf",
     "                                   T",
-    "               Jtmol•K         J/aol•K      Jtaol•K        J/mol•K           kJ/1101         kJ/1101",
+    "               Jtmol\u2022K         J/aol\u2022K      Jtaol\u2022K        J/mol\u2022K           kJ/1101         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "Jtmol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "Jtaol•K",
-    "heat_capacity": "J/mol•K",
+    "enthalpy_function": "Jtmol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "Jtaol\u2022K",
+    "heat_capacity": "J/mol\u2022K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -82,7 +82,7 @@
   "temperature_grid": [
     {
       "as_published": "1590",
-      "value": null,
+      "value": 1590.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -94,13 +94,13 @@
     },
     {
       "as_published": "1700",
-      "value": null,
+      "value": 1700.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1800",
-      "value": null,
+      "value": 1800.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -153,7 +153,7 @@
       "cells": {
         "temperature": {
           "as_published": "1590",
-          "value": null,
+          "value": 1590.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -343,7 +343,7 @@
       "cells": {
         "temperature": {
           "as_published": "1700",
-          "value": null,
+          "value": 1700.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -438,7 +438,7 @@
       "cells": {
         "temperature": {
           "as_published": "1800",
-          "value": null,
+          "value": 1800.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -558,7 +558,7 @@
     "TRANSITIONS Ill DEFERENCE STATE ELEftENTS",
     "      DYSP&OSIUft. ALPHA-BETA 1657, M. P. 1682 K.",
     "HEAT CAPACITY EQUATION",
-    "             38.243 + 3.7210x1o-z T                 2.u124x1uJI      r-o·s",
+    "             38.243 + 3.7210x1o-z T                 2.u124x1uJI      r-o\u00b7s",
     "                (EQUATION VALID FROI!             298- 1590 K)",
     "BEFEI!EIICE        202            235                                           235                      COMPILED",
     "                                                                                103                       5-18-76"
@@ -572,5 +572,6 @@
     "row_start": 15,
     "row_stop": 18,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Beta crystals        15~0    to 1800 K."
 }

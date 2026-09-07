@@ -70,15 +70,15 @@
     "TEIIP.    (a;-a~ 98    )/T     so",
     "                                T      -(co;-a~ 98 )/T      co",
     "                                                             p     EITHALPY           FREE EIEBGY      .Loq Kf",
-    "  K         J/mol• K         J/aol•K     J;aol•K         Jjaol•K          kJ/aol         kJjaol",
+    "  K         J/mol\u2022 K         J/aol\u2022K     J;aol\u2022K         Jjaol\u2022K          kJ/aol         kJjaol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/mol• K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J;aol•K",
-    "heat_capacity": "Jjaol•K",
+    "enthalpy_function": "J/mol\u2022 K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J;aol\u2022K",
+    "heat_capacity": "Jjaol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJjaol",
     "log_kf": ""
@@ -294,19 +294,19 @@
         },
         "enthalpy_function": {
           "as_published": "7.900",
-          "value": null,
+          "value": 7.9,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "78.59",
-          "value": null,
+          "value": 78.59,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "10.69",
-          "value": null,
+          "value": 10.69,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -389,19 +389,19 @@
         },
         "enthalpy_function": {
           "as_published": "13.426",
-          "value": null,
+          "value": 13.426,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "86.50",
-          "value": null,
+          "value": 86.5,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "13.01",
-          "value": null,
+          "value": 13.01,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -412,11 +412,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -604,11 +604,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -796,11 +796,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1142,7 +1142,7 @@
     "TRANSITIONS IN REFERENCE STATE ELEI'IENTS",
     "HEAT CAPACITY     EQUATIONS.",
     "         4.0750x102 -         0.23954 T",
-    "         5.9178x10• T-z",
+    "         5.9178x10\u2022 T-z",
     "            (EQUATION VALID FBOI'I             298 -   1190 K)"
   ],
   "footnote_markers": [],
@@ -1175,5 +1175,6 @@
     "row_start": 1,
     "row_stop": 10,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Alpha crystals (rhombohedral) 298.15 to 1190 K."
 }

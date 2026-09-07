@@ -69,15 +69,15 @@
     "                                                                                       GIBBS",
     "TEMP.      {H;-H~ 98 )/T      so      -(G;-H~g 8 }/T      cop      ENTHALPY         FREE ENERGY      Log Kf",
     "                               T",
-    "  K         J;aol•K        J/11ol•K     J/11ol•K       J/llol• K       kJ/1101         kJ/1101",
+    "  K         J;aol\u2022K        J/11ol\u2022K     J/11ol\u2022K       J/llol\u2022 K       kJ/1101         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J;aol•K",
-    "entropy": "J/11ol•K",
-    "negative_gibbs_function": "J/11ol•K",
-    "heat_capacity": "J/llol• K",
+    "enthalpy_function": "J;aol\u2022K",
+    "entropy": "J/11ol\u2022K",
+    "negative_gibbs_function": "J/11ol\u2022K",
+    "heat_capacity": "J/llol\u2022 K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -85,55 +85,55 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "600",
-      "value": null,
+      "value": 600.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "700",
-      "value": null,
+      "value": 700.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "800",
-      "value": null,
+      "value": 800.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "900",
-      "value": null,
+      "value": 900.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1000",
-      "value": null,
+      "value": 1000.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1073.80",
-      "value": null,
+      "value": 1073.8,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -186,7 +186,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -281,7 +281,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -376,7 +376,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -471,7 +471,7 @@
       "cells": {
         "temperature": {
           "as_published": "600",
-          "value": null,
+          "value": 600.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -566,7 +566,7 @@
       "cells": {
         "temperature": {
           "as_published": "700",
-          "value": null,
+          "value": 700.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -661,7 +661,7 @@
       "cells": {
         "temperature": {
           "as_published": "800",
-          "value": null,
+          "value": 800.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -756,7 +756,7 @@
       "cells": {
         "temperature": {
           "as_published": "900",
-          "value": null,
+          "value": 900.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -851,7 +851,7 @@
       "cells": {
         "temperature": {
           "as_published": "1000",
-          "value": null,
+          "value": 1000.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -946,7 +946,7 @@
       "cells": {
         "temperature": {
           "as_published": "1073.80",
-          "value": null,
+          "value": 1073.8,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1065,7 +1065,7 @@
     "                               10.611 kJ               IIOLAR VOLU8E                        2.7015 Jjbar",
     "                                                                                           27.015 c11 3",
     "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
-    "     SODIUII ••••• II. P.    370.98, B. P.      1175 K.",
+    "     SODIUII \u2022\u2022\u2022\u2022\u2022 II. P.    370.98, B. P.      1175 K.",
     "HEAT CAPACITY EQUATIONS",
     "c~        45.151+ 1.7974x1o-zT",
     "             (EQUATION VALID FROft           298- 1073.8 K)",
@@ -1088,5 +1088,6 @@
     "row_start": 1,
     "row_stop": 9,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to melting point 1073.8 K."
 }

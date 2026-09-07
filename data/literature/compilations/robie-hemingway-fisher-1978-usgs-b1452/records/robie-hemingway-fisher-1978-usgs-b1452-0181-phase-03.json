@@ -70,15 +70,15 @@
     "TEIIP.     (H;-H~ 98 )/T      so",
     "                               T     -( G;-H~ 98 )/T      co",
     "                                                           p        ENTHALPY           FREE ENERGY      Log Kf",
-    "  K         Jjmol•K        J/mol•K     J/mol• K        J/mol• K            kJ/1101        kJ/1101",
+    "  K         Jjmol\u2022K        J/mol\u2022K     J/mol\u2022 K        J/mol\u2022 K            kJ/1101        kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jjmol•K",
-    "entropy": "J/mol•K",
-    "negative_gibbs_function": "J/mol• K",
-    "heat_capacity": "J/mol• K",
+    "enthalpy_function": "Jjmol\u2022K",
+    "entropy": "J/mol\u2022K",
+    "negative_gibbs_function": "J/mol\u2022 K",
+    "heat_capacity": "J/mol\u2022 K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -572,11 +572,11 @@
           "footnote_markers": []
         },
         "negative_gibbs_function": {
-          "as_published": "114 • .26",
+          "as_published": "114 \u2022 .26",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "heat_capacity": {
@@ -866,7 +866,7 @@
     "                                        kJ             ~OLAR     VOLU!IE                        .2.3910 Jjbar",
     "                                                                                               23.910 cm 3",
     "TRANSITIONS IN REFERENCE STATE              ELE~ENTS",
-    "     LEAD •••••••    ~.   P. 600.6, B. P. 2021 K.",
+    "     LEAD \u2022\u2022\u2022\u2022\u2022\u2022\u2022    ~.   P. 600.6, B. P. 2021 K.",
     "HEAT CAPACITY EQUATIONS",
     "c~        51.017 + 1.0272x1o-z T               7.3872x1os T-z",
     "             (EQUATION VALID PBO~            298- 762 K)"
@@ -880,5 +880,6 @@
     "row_start": 13,
     "row_stop": 19,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Liguid 1170 to 1789 K."
 }

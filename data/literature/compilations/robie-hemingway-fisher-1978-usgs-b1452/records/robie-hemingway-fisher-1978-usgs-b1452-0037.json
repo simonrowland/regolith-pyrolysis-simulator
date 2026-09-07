@@ -82,7 +82,7 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -141,7 +141,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -271,11 +271,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 0(10",
+          "as_published": "\u2022 0(10",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -289,13 +289,15 @@
   ],
   "row_count": 2,
   "detected_data_row_count": 20,
-  "uncertainty_line_as_published": "             J/mol•K        J/aol•K       J/aol•K        J/IIOl•K         lr.J/1101          kJ/1101",
+  "uncertainty_line_as_published": "             J/mol\u2022K        J/aol\u2022K       J/aol\u2022K        J/IIOl\u2022K         lr.J/1101          kJ/1101",
   "uncertainty_values": [
     {
-      "as_published": "J/aol•K",
+      "as_published": "J/aol\u2022K",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": [],
+      "footnote_markers": [
+        "\u2022"
+      ],
       "source_text_span": {
         "line": 18,
         "start": 28,
@@ -303,10 +305,12 @@
       }
     },
     {
-      "as_published": "J/aol•K",
+      "as_published": "J/aol\u2022K",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": [],
+      "footnote_markers": [
+        "\u2022"
+      ],
       "source_text_span": {
         "line": 18,
         "start": 28,
@@ -314,10 +318,12 @@
       }
     },
     {
-      "as_published": "J/IIOl•K",
+      "as_published": "J/IIOl\u2022K",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": [],
+      "footnote_markers": [
+        "\u2022"
+      ],
       "source_text_span": {
         "line": 18,
         "start": 57,
@@ -358,7 +364,7 @@
     "                                                                                                  51.290 cm 3",
     "TRANSITIONS IN REFERENCE STATE ELEMENTS",
     "HEAT CAPACITY       EQUATION",
-    "           37.872 +      3.4318x1o-· T",
+    "           37.872 +      3.4318x1o-\u00b7 T",
     "         -4.8784x104 T-Z",
     "              EQUATION      VALID FROII     45t! -    1800 K)"
   ],
@@ -378,5 +384,6 @@
     "row_start": 1,
     "row_stop": 2,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to melting point 386.75 K."
 }

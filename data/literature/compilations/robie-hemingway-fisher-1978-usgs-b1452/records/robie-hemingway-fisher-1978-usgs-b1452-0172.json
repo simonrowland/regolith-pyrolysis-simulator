@@ -68,15 +68,15 @@
     "                                                                                        GIBBS",
     "TEftP.     ca;-a; 98 )/T      so",
     "                               T     -( G;-H; 98 )/T      cop     ENTHALPY           FREE ENERGY      Log Kf",
-    "  K         J;mol•K        J/mol•K     J/aol• K        J/aol• K         ltJ/mol         ltJ/aol",
+    "  K         J;mol\u2022K        J/mol\u2022K     J/aol\u2022 K        J/aol\u2022 K         ltJ/mol         ltJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J;mol•K",
-    "entropy": "J/mol•K",
-    "negative_gibbs_function": "J/aol• K",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "J;mol\u2022K",
+    "entropy": "J/mol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022 K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "ltJ/mol",
     "formation_gibbs_energy": "ltJ/aol",
     "log_kf": ""
@@ -122,7 +122,7 @@
     },
     {
       "as_published": "1.020",
-      "value": null,
+      "value": 1.02,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -152,9 +152,9 @@
     "                               21.004 ltJ              liOLAB VOLU!!E                        4.5920 J/bar",
     "                                                                                            45.920 cm3",
     "TRANSITIONS IN REFERENCE STATE ELEftENTS",
-    "      NEODYMIUM •• ALPHA-BETA 1128, M. P. 1289 K.",
+    "      NEODYMIUM \u2022\u2022 ALPHA-BETA 1128, M. P. 1289 K.",
     "HEAT CAPACITY EQUATION",
-    " c~        1.1574xtoz + 2.9779x1o-z T     1.188Jx10• T-z",
+    " c~        1.1574xtoz + 2.9779x1o-z T     1.188Jx10\u2022 T-z",
     "              (EQUATIOH VALID FBOft 298- 1395 K)"
   ],
   "footnote_markers": [],
@@ -165,5 +165,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=18, enthalpy_function=18, entropy=18, negative_gibbs_function=18, heat_capacity=18, formation_enthalpy=18, formation_gibbs_energy=18, log_kf=17",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Alpha crystals 298.15 to 1395 K.              Beta crystals 1395 to 1800 K."
 }

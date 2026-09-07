@@ -64,21 +64,21 @@
   "column_header_lines_as_published": [
     "Au:       Face-centered cubic crystals 298.15 to melting point 1336.15 K.                             LiquJ.d",
     "          1336.15 to 1800 K.",
-    "------·--------------------~----------------------------------------------------",
+    "------\u00b7--------------------~----------------------------------------------------",
     "                                                                     PORIIATlOll FRO II THE ELEIIENTS",
     "                                                                                       GIBBS",
     "TEI!P.     (H;-H~ 98 )/T",
     "                               0",
     "                              sr       -ca;-H~ 98 )/T       cop     ENTHALPY      FiEE ENERGY      Log Kf",
-    "  K         Jjaol•K        Jjmol•K       J/IIOl•K       J/mol• K          kJ/liOl         kJ/1101",
+    "  K         Jjaol\u2022K        Jjmol\u2022K       J/IIOl\u2022K       J/mol\u2022 K          kJ/liOl         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jjaol•K",
-    "entropy": "Jjmol•K",
-    "negative_gibbs_function": "J/IIOl•K",
-    "heat_capacity": "J/mol• K",
+    "enthalpy_function": "Jjaol\u2022K",
+    "entropy": "Jjmol\u2022K",
+    "negative_gibbs_function": "J/IIOl\u2022K",
+    "heat_capacity": "J/mol\u2022 K",
     "formation_enthalpy": "kJ/liOl",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -198,19 +198,19 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -274,19 +274,19 @@
         },
         "enthalpy_function": {
           "as_published": "31.231",
-          "value": null,
+          "value": 31.231,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "99.34",
-          "value": null,
+          "value": 99.34,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "66.11",
-          "value": null,
+          "value": 66.11,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -297,11 +297,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -489,11 +489,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -687,11 +687,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -743,7 +743,7 @@
     "HEAT CAPACITY EQUATIONS",
     "          41.968-    1.7b96x10-2 T                 1.1232x1o-s T2",
     "             (EQUATION VALID FROII              298- 1336.15 K)",
-    "         -1.3492x10• +       3.7585 T              5. 22491l 1 o-· T2",
+    "         -1.3492x10\u2022 +       3.7585 T              5. 22491l 1 o-\u00b7 T2",
     "         -1.8431x10'~T-2",
     "             EQUATION VALID FROII 1336. 15 -             1800 K)"
   ],
@@ -767,5 +767,6 @@
     "row_start": 13,
     "row_stop": 18,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "LiquJ.d\n          1336.15 to 1800 K."
 }

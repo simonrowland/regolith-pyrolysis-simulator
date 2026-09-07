@@ -65,15 +65,15 @@
     "TEftP.     ( a;-H~   98 )/T     so",
     "                                  T      -(G;-a~ 98 )/T      co",
     "                                                               p     ENTHALPY           FREE ENERGY          Log Kf",
-    "  K         Jjmol•K       J;mol•l          J;mol•K        J;mol• K          kJ/mol          kJ/mol",
+    "  K         Jjmol\u2022K       J;mol\u2022l          J;mol\u2022K        J;mol\u2022 K          kJ/mol          kJ/mol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jjmol•K",
-    "entropy": "J;mol•l",
-    "negative_gibbs_function": "J;mol•K",
-    "heat_capacity": "J;mol• K",
+    "enthalpy_function": "Jjmol\u2022K",
+    "entropy": "J;mol\u2022l",
+    "negative_gibbs_function": "J;mol\u2022K",
+    "heat_capacity": "J;mol\u2022 K",
     "formation_enthalpy": "kJ/mol",
     "formation_gibbs_energy": "kJ/mol",
     "log_kf": ""
@@ -147,7 +147,7 @@
     "                                  18. 112 kJ              !toLl R VOLUIIE                            2. 3 23() J/bar",
     "                                                                                                   .23.230 cm 3",
     "TRANSITIOifS IN REFERENCE STATE ELEIIENTS",
-    "      IRON ••••••• CURIE P. 1042, lLPHA-GAI'IIIA 1184,               GAIIIIA-DELTA 1665,",
+    "      IRON \u2022\u2022\u2022\u2022\u2022\u2022\u2022 CURIE P. 1042, lLPHA-GAI'IIIA 1184,               GAIIIIA-DELTA 1665,",
     "                   1'1. P. DELTA 1809 K.",
     "HEAT CAPACITY EQUATION",
     " c:       1.0730x102 +         1. 2528xlo-z T",
@@ -161,5 +161,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=16, entropy=16, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=16, formation_gibbs_energy=16, log_kf=13",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "crystals 298.15 to 1800 K."
 }

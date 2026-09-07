@@ -66,15 +66,15 @@
     "                                                                                     GIBBS",
     "TEIIP.   ( H;-H~98 )/T      so      -(G;-H~ 98 )/T      cop     EITHALPY          PBBE EIBBGY      Log Kf",
     "                             T",
-    "            J/aol•K      Jjaol•K      Jjaol•K        J/aol• K         kJ/aol         kJ/aol",
+    "            J/aol\u2022K      Jjaol\u2022K      Jjaol\u2022K        J/aol\u2022 K         kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "Jjaol•K",
-    "negative_gibbs_function": "Jjaol•K",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "Jjaol\u2022K",
+    "negative_gibbs_function": "Jjaol\u2022K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -166,7 +166,7 @@
     },
     {
       "as_published": "1100",
-      "value": null,
+      "value": 1100.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -421,19 +421,19 @@
         },
         "enthalpy_function": {
           "as_published": "8.394",
-          "value": null,
+          "value": 8.394,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "151.06",
-          "value": null,
+          "value": 151.06,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "148.61",
-          "value": null,
+          "value": 148.61,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -450,11 +450,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -547,11 +547,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -900,19 +900,19 @@
         },
         "enthalpy_function": {
           "as_published": "14.590",
-          "value": null,
+          "value": 14.59,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "111.47",
-          "value": null,
+          "value": 111.47,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "156.88",
-          "value": null,
+          "value": 156.88,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -995,19 +995,19 @@
         },
         "enthalpy_function": {
           "as_published": "15.154",
-          "value": null,
+          "value": 15.154,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "113.36",
-          "value": null,
+          "value": 113.36,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "158.21",
-          "value": null,
+          "value": 158.21,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1185,19 +1185,19 @@
         },
         "enthalpy_function": {
           "as_published": "16.018",
-          "value": null,
+          "value": 16.018,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "116.86",
-          "value": null,
+          "value": 116.86,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "160.84",
-          "value": null,
+          "value": 160.84,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1208,11 +1208,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1400,11 +1400,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1563,7 +1563,7 @@
       "cells": {
         "temperature": {
           "as_published": "1100",
-          "value": null,
+          "value": 1100.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1801,5 +1801,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Ideal gas 298.15 to 1800 K."
 }

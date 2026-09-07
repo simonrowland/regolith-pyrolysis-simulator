@@ -72,15 +72,15 @@
     "                                                                                              GIBBS",
     "                                 so                              cop",
     "TEIIP.    ( H~-H~    98 )/T        T      -(G;-H~ 98 )/T                  EIITHALPY       PBEE ENERGY        Log Kf",
-    "  K           Jjaol•K         J/11ol• K     J;aol• K         J/aol• K         kJ/aol          kJ/1101",
+    "  K           Jjaol\u2022K         J/11ol\u2022 K     J;aol\u2022 K         J/aol\u2022 K         kJ/aol          kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jjaol•K",
-    "entropy": "J/11ol• K",
-    "negative_gibbs_function": "J;aol• K",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "Jjaol\u2022K",
+    "entropy": "J/11ol\u2022 K",
+    "negative_gibbs_function": "J;aol\u2022 K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -88,19 +88,19 @@
   "temperature_grid": [
     {
       "as_published": "1682",
-      "value": null,
+      "value": 1682.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1700",
-      "value": null,
+      "value": 1700.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1800",
-      "value": null,
+      "value": 1800.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -153,25 +153,25 @@
       "cells": {
         "temperature": {
           "as_published": "1682",
-          "value": null,
+          "value": 1682.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "enthalpy_function": {
           "as_published": "37.124",
-          "value": null,
+          "value": 37.124,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "138.91",
-          "value": null,
+          "value": 138.91,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "101.76",
-          "value": null,
+          "value": 101.76,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -182,11 +182,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• OOu",
+          "as_published": "\u2022 OOu",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -250,7 +250,7 @@
       "cells": {
         "temperature": {
           "as_published": "1700",
-          "value": null,
+          "value": 1700.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -345,7 +345,7 @@
       "cells": {
         "temperature": {
           "as_published": "1800",
-          "value": null,
+          "value": 1800.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -374,11 +374,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -460,5 +460,6 @@
     "row_start": 18,
     "row_stop": 20,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Liquid 1682 to\n         1800 K."
 }

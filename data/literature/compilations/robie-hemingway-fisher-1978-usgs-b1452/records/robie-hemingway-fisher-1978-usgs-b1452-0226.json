@@ -68,15 +68,15 @@
     "                                                                                           GIBBS",
     "TEI!IP.     ( H;-a; 98 )/T      so      -(G;-H~ 98 )/T      cop      BBTHALPY           FREE ENERGY      Log 't",
     "                                 T",
-    "   K            Jfaol•K      J/aol•K      J/aol•l        Jfaol•l            kJ/aol         kJ/aol",
+    "   K            Jfaol\u2022K      J/aol\u2022K      J/aol\u2022l        Jfaol\u2022l            kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jfaol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•l",
-    "heat_capacity": "Jfaol•l",
+    "enthalpy_function": "Jfaol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022l",
+    "heat_capacity": "Jfaol\u2022l",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -133,7 +133,7 @@
     },
     {
       "as_published": "0.1119",
-      "value": null,
+      "value": 0.1119,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -152,11 +152,11 @@
     "                                 31.648 kJ               I!IOLlR VOLOI!IE                       6.7180 J/bar",
     "                                                                                               67.180 ca 3",
     "TRANSITIONS IN REFERENCE STATE ELEBENTS",
-    "      CALCIUI!I •••• ALPHA-BETA 720, ft. P. BETA 1112, B. P. 1755 I.",
-    "      IRON ••••••• CURIE P. 1042, ALPBA-GAI!Iftl 1184, GAI!IBA-DELTA 1665 9",
+    "      CALCIUI!I \u2022\u2022\u2022\u2022 ALPHA-BETA 720, ft. P. BETA 1112, B. P. 1755 I.",
+    "      IRON \u2022\u2022\u2022\u2022\u2022\u2022\u2022 CURIE P. 1042, ALPBA-GAI!Iftl 1184, GAI!IBA-DELTA 1665 9",
     "                   1!1. P. DELTA 1809 I.",
     "HEAT CAPACITY EQUATIOI",
-    "          2.2228x10Z +         9.7281x10-3 T + 5.419Sx10Z T-o·s",
+    "          2.2228x10Z +         9.7281x10-3 T + 5.419Sx10Z T-o\u00b7s",
     "                 (EQUATIOI VALID FRO!I    298- 1750 K)",
     "REFEREICE          183          214                                            214                     COIIPILID",
     "                                                                                                        8- 2-76"
@@ -169,5 +169,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=15, enthalpy_function=15, entropy=15, negative_gibbs_function=15, heat_capacity=15, formation_enthalpy=15, formation_gibbs_energy=15, log_kf=14",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Crystals 298.15 to aelting point 1750 1."
 }

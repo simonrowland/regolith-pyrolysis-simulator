@@ -80,15 +80,15 @@
     "TEIIP.     ( H;-H~ 98 )/T      so",
     "                                T      -(G;-H~ 98 )/T      co",
     "                                                            p     ENTHALPY      FREE ENERGY     Log Kf",
-    "             J/aol• K       J/aol• K     J/aol•K        J;aol•K          kJ/aol         kJ/aol",
+    "             J/aol\u2022 K       J/aol\u2022 K     J/aol\u2022K        J;aol\u2022K          kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/aol• K",
-    "entropy": "J/aol• K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J;aol•K",
+    "enthalpy_function": "J/aol\u2022 K",
+    "entropy": "J/aol\u2022 K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J;aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -96,25 +96,25 @@
   "temperature_grid": [
     {
       "as_published": "828",
-      "value": null,
+      "value": 828.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "900",
-      "value": null,
+      "value": 900.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1000",
-      "value": null,
+      "value": 1000.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1041",
-      "value": null,
+      "value": 1041.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -167,7 +167,7 @@
       "cells": {
         "temperature": {
           "as_published": "828",
-          "value": null,
+          "value": 828.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -262,7 +262,7 @@
       "cells": {
         "temperature": {
           "as_published": "900",
-          "value": null,
+          "value": 900.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -297,11 +297,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -359,7 +359,7 @@
       "cells": {
         "temperature": {
           "as_published": "1000",
-          "value": null,
+          "value": 1000.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -454,7 +454,7 @@
       "cells": {
         "temperature": {
           "as_published": "1041",
-          "value": null,
+          "value": 1041.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -483,19 +483,19 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -563,5 +563,6 @@
     "row_start": 8,
     "row_stop": 11,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Gamaa crystals\n          (body-centered cubic) 828 to melting point 1041 K."
 }

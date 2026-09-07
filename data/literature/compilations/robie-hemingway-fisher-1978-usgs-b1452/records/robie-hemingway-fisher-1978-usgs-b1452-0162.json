@@ -62,16 +62,16 @@
     "                                                                                        GIBBS",
     "TEMP.      ( H;-a~ 98 )/T      so      -(G;-a~ 98 )/T      CDp    ENTHALPY           FBEE EHERGY       Loq Kf",
     "                                T",
-    "  K         Jjaol•K         Jjaol• K     Jjaol•K        Jjaol•K          kJ/•ol         kJjaol",
+    "  K         Jjaol\u2022K         Jjaol\u2022 K     Jjaol\u2022K        Jjaol\u2022K          kJ/\u2022ol         kJjaol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jjaol•K",
-    "entropy": "Jjaol• K",
-    "negative_gibbs_function": "Jjaol•K",
-    "heat_capacity": "Jjaol•K",
-    "formation_enthalpy": "kJ/•ol",
+    "enthalpy_function": "Jjaol\u2022K",
+    "entropy": "Jjaol\u2022 K",
+    "negative_gibbs_function": "Jjaol\u2022K",
+    "heat_capacity": "Jjaol\u2022K",
+    "formation_enthalpy": "kJ/\u2022ol",
     "formation_gibbs_energy": "kJjaol",
     "log_kf": ""
   },
@@ -227,13 +227,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-881.068",
-          "value": null,
+          "value": -881.068,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "154.360",
-          "value": null,
+          "value": 154.36,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -310,7 +310,7 @@
         },
         "heat_capacity": {
           "as_published": "109e02",
-          "value": null,
+          "value": 10900.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -322,13 +322,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-854.602",
-          "value": null,
+          "value": -854.602,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "111.600",
-          "value": null,
+          "value": 111.6,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -417,13 +417,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-828.814",
-          "value": null,
+          "value": -828.814,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "86.586",
-          "value": null,
+          "value": 86.586,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -512,13 +512,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-803.159",
-          "value": null,
+          "value": -803.159,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "69.922",
-          "value": null,
+          "value": 69.922,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -607,13 +607,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-717.625",
-          "value": null,
+          "value": -717.625,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "58.027",
-          "value": null,
+          "value": 58.027,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1240,7 +1240,7 @@
     },
     {
       "as_published": "0.389",
-      "value": null,
+      "value": 0.389,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -1257,10 +1257,10 @@
     "                                          kJ            IIOLAR VOLOI!E                         J. 1370 Jjbar",
     "                                                                                              31.370 cal",
     "TRAISITIONS II REFEBENCE STATE ELEIIEITS",
-    "      MANGANESE •• ALPHA-BETA 980 9 BETA-GAIIBA 1360 9 GAIIBl-DELTA 1410,",
+    "      MANGANESE \u2022\u2022 ALPHA-BETA 980 9 BETA-GAIIBA 1360 9 GAIIBl-DELTA 1410,",
     "                   ft. P. DELTA 1517 K.",
     "HEAT CAPACITY EQUATIOI",
-    "          61.943 +  0.10847 T -   J.l189z1o-• rz                         1. 4552x10• T- 2",
+    "          61.943 +  0.10847 T -   J.l189z1o-\u2022 rz                         1. 4552x10\u2022 T- 2",
     "             (EQUATIOI VALID FROB 298 - 1300 K)",
     "REFEBEHCE       115            120                                          263                      COBPILED",
     "                191                                                         197                       6-14-76"
@@ -1325,5 +1325,6 @@
     "row_start": 1,
     "row_stop": 11,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to 1300 K."
 }

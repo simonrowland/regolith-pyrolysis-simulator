@@ -68,15 +68,15 @@
     "                                                                                           GIBBS",
     "TEIIP.       ( u;-H~ 98 )/T      so      -(G;-H~ 98 )/T      cop        ENTHALPY        FREE ENERGY      Log Kf",
     "                                  T",
-    "  K           J/IIOl•K        J/IIOl•K     J/mol•K        J/mol• K         kJ/1101         kJ/1101",
+    "  K           J/IIOl\u2022K        J/IIOl\u2022K     J/mol\u2022K        J/mol\u2022 K         kJ/1101         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/IIOl•K",
-    "entropy": "J/IIOl•K",
-    "negative_gibbs_function": "J/mol•K",
-    "heat_capacity": "J/mol• K",
+    "enthalpy_function": "J/IIOl\u2022K",
+    "entropy": "J/IIOl\u2022K",
+    "negative_gibbs_function": "J/mol\u2022K",
+    "heat_capacity": "J/mol\u2022 K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -152,10 +152,10 @@
     "                                            kJ            IIOLAB VOLUIIE                           4.6950 J/bar",
     "                                                                                                  46.950 c11 3",
     "TIANSITIONS IN REFERENCE STATE ELEKEHTS",
-    "   !ANGANESE •• ALPHA-BETA 980, BETA-GlftiiA 1360, GAftiiA-D&LTA 1q1o,",
+    "   !ANGANESE \u2022\u2022 ALPHA-BETA 980, BETA-GlftiiA 1360, GAftiiA-D&LTA 1q1o,",
     "                ft. P. DELTA 1517 K.",
     "HEAT CAPACITY EQUATION",
-    "           -2.4065z10Z +        0.17137 T          8.5280x10ll T-O·S",
+    "           -2.4065z10Z +        0.17137 T          8.5280x10ll T-O\u00b7S",
     "               (EQUATION VALID FROII             298- 1445 K)",
     "BEFEBEIICE       241             197                                          263                     COIIPILED",
     "                                                                              197                      6- 8-76"
@@ -168,5 +168,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=18, enthalpy_function=18, entropy=18, negative_gibbs_function=18, heat_capacity=17, formation_enthalpy=18, formation_gibbs_energy=18, log_kf=18",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "~O,.:      Tetragonal crystals 298.15 to               1~~5     K.   Cubic crystals     1~~5    to 1800 K."
 }

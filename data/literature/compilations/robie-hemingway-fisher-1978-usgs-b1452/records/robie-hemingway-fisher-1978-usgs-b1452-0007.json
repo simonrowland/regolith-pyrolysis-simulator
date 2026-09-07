@@ -27,7 +27,7 @@
   "formation_basis_header_as_published": "",
   "formula_weight": {
     "as_published": "711.922",
-    "value": null,
+    "value": 711.922,
     "ocr_suspect": true,
     "footnote_markers": [],
     "source_text_span": {
@@ -69,15 +69,15 @@
     "                                                                                       GIBBS",
     "TBIIP.    (H;-8~98 )IT      so       -(G;-a~ 98 )/T        cop      BITHlLPY        PilE UBIGY       Log Kt",
     "                              T",
-    "  K         J/aol• K     J/aol•K       Jtaol•K          J/aol•K         kJ/aol         kJ/aol",
+    "  K         J/aol\u2022 K     J/aol\u2022K       Jtaol\u2022K          J/aol\u2022K         kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol• K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "Jtaol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022 K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "Jtaol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -275,7 +275,7 @@
         },
         "enthalpy_function": {
           "as_published": "6.375",
-          "value": null,
+          "value": 6.375,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -287,7 +287,7 @@
         },
         "negative_gibbs_function": {
           "as_published": "36.66",
-          "value": null,
+          "value": 36.66,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -376,7 +376,7 @@
         },
         "entropy": {
           "as_published": "48.77",
-          "value": null,
+          "value": 48.77,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -465,13 +465,13 @@
         },
         "enthalpy_function": {
           "as_published": "12.902",
-          "value": null,
+          "value": 12.902,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "53.55",
-          "value": null,
+          "value": 53.55,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -661,7 +661,7 @@
         },
         "entropy": {
           "as_published": "61.33",
-          "value": null,
+          "value": 61.33,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -678,11 +678,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -758,7 +758,7 @@
         },
         "entropy": {
           "as_published": "63.82",
-          "value": null,
+          "value": 63.82,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -801,7 +801,7 @@
   "uncertainty_values": [
     {
       "as_published": "0.811",
-      "value": null,
+      "value": 0.811,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -812,7 +812,7 @@
     },
     {
       "as_published": "0.811",
-      "value": null,
+      "value": 0.811,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -829,76 +829,26 @@
   "auxiliary_lines_as_published": [
     "IIBJ.TING POINT                           K             BOI LI BG POINT                      875      It",
     "ENTHALPY OF IIELT ING                     kJ            ENTHALPY OF YlPOIIZlTION             ]4.828 JtJ",
-    "                                  5.130 kJ              !lOLli YOLUBE                       1.2963 J/t»ar",
+    "                                  5.130 kJ              !lOLli YOLUBE                       1.2963 J/t\u00bbar",
     "                                                                                           12.963 ca 3",
     "TRANSITIONS IN RBFEBENCE STATE BLEIIEBTS",
     "BElT CAPACITY EQUlTIOIIS",
-    "         20.845 +      6.326Sz10-3 T               52.398   ,-o·s",
+    "         20.845 +      6.326Sz10-3 T               52.398   ,-o\u00b7s",
     "            ( EQU AT IOII YlL ID FRO II        298 - 875 K)",
-    "         4!1.139 -     9.1839z1o-s T               9.1807   ,-o·s",
+    "         4!1.139 -     9.1839z1o-s T               9.1807   ,-o\u00b7s",
     "            (!QUlTIOII VALID FROB              875 - 1200 K)",
     "RBFBBBBCB      107          107                                                                    CO!PILED",
     "                                                                                                    5-15-76"
   ],
   "footnote_markers": [],
   "ocr_suspect": true,
-  "ambiguities": [
-    {
-      "kind": "thermodynamic_identity_disagreement",
-      "detector_only": true,
-      "row": 2,
-      "temperature_as_published": "400",
-      "check": "negative_gibbs_function = entropy - enthalpy_function",
-      "observed": 36.66,
-      "calculated": 106.636,
-      "residual": -69.976
-    },
-    {
-      "kind": "thermodynamic_identity_disagreement",
-      "detector_only": true,
-      "row": 3,
-      "temperature_as_published": "500",
-      "check": "negative_gibbs_function = entropy - enthalpy_function",
-      "observed": 38.511,
-      "calculated": 38.538900000000005,
-      "residual": -0.02790000000000248
-    },
-    {
-      "kind": "thermodynamic_identity_disagreement",
-      "detector_only": true,
-      "row": 4,
-      "temperature_as_published": "600",
-      "check": "negative_gibbs_function = entropy - enthalpy_function",
-      "observed": 110.65,
-      "calculated": 40.647999999999996,
-      "residual": 70.00200000000001
-    },
-    {
-      "kind": "thermodynamic_identity_disagreement",
-      "detector_only": true,
-      "row": 6,
-      "temperature_as_published": "80(1",
-      "check": "negative_gibbs_function = entropy - enthalpy_function",
-      "observed": 1111.89,
-      "calculated": 45.2161,
-      "residual": 1066.6739
-    },
-    {
-      "kind": "thermodynamic_identity_disagreement",
-      "detector_only": true,
-      "row": 7,
-      "temperature_as_published": "875",
-      "check": "negative_gibbs_function = entropy - enthalpy_function",
-      "observed": 116.51,
-      "calculated": 46.709,
-      "residual": 69.801
-    }
-  ],
+  "ambiguities": [],
   "phase_segment": {
     "ordinal": 1,
     "count_on_printed_page": 2,
     "row_start": 1,
     "row_stop": 7,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Rhoabohedral crystals 298.15 to subliaatioa point 875 K."
 }

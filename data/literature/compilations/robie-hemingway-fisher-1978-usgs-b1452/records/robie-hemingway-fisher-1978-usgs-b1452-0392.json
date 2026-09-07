@@ -62,17 +62,17 @@
     "                                                                                         GIBBS",
     "TEI'IP.    (a;-a; 98   )/'f      so",
     "                                  T      -(G;-H; 98 )/T      cop    BITR.lLPI         PIEB BIBBGI      Log 't",
-    "   I{       J/aol•l           J/aol•lt     J/aol•K        J/•ol•K       kJ/aol           kJ/•ol",
+    "   I{       J/aol\u2022l           J/aol\u2022lt     J/aol\u2022K        J/\u2022ol\u2022K       kJ/aol           kJ/\u2022ol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "I{",
-    "enthalpy_function": "J/aol•l",
-    "entropy": "J/aol•lt",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/•ol•K",
+    "enthalpy_function": "J/aol\u2022l",
+    "entropy": "J/aol\u2022lt",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/\u2022ol\u2022K",
     "formation_enthalpy": "kJ/aol",
-    "formation_gibbs_energy": "kJ/•ol",
+    "formation_gibbs_energy": "kJ/\u2022ol",
     "log_kf": ""
   },
   "temperature_grid": [
@@ -209,13 +209,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-5600.671",
-          "value": null,
+          "value": -5600.671,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "981.219",
-          "value": null,
+          "value": 981.219,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -304,13 +304,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-5471.333",
-          "value": null,
+          "value": -5471.333,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "714.486",
-          "value": null,
+          "value": 714.486,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -399,13 +399,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-5344.043",
-          "value": null,
+          "value": -5344.043,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "558.291",
-          "value": null,
+          "value": 558.291,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -494,13 +494,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-5217.261",
-          "value": null,
+          "value": -5217.261,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "454.205",
-          "value": null,
+          "value": 454.205,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -589,13 +589,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-5091.248",
-          "value": null,
+          "value": -5091.248,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "379.915",
-          "value": null,
+          "value": 379.915,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -684,13 +684,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-4965.994",
-          "value": null,
+          "value": -4965.994,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "324.248",
-          "value": null,
+          "value": 324.248,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -779,13 +779,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-4841.485",
-          "value": null,
+          "value": -4841.485,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "280.994",
-          "value": null,
+          "value": 280.994,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -874,13 +874,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-4715.393",
-          "value": null,
+          "value": -4715.393,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "246.308",
-          "value": null,
+          "value": 246.308,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -950,7 +950,7 @@
   "reference_state_notes_as_published": [],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATION",
-    "c;        9.1767x102-          8.1110x1o-z T     1.0348xlO•          r-o·s        +   2.8J41x10• r-z",
+    "c;        9.1767x102-          8.1110x1o-z T     1.0348xlO\u2022          r-o\u00b7s        +   2.8J41x10\u2022 r-z",
     "            ( EQUAT 10111 VALID PBOII     298 - 1000 K)"
   ],
   "footnote_markers": [],
@@ -1043,5 +1043,6 @@
     "row_start": 1,
     "row_stop": 8,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to 1500 K."
 }

@@ -66,15 +66,15 @@
     "                                                                                              GIBBS",
     "TE!IP.     (H;-H; 98 )/T         so       -(G~-H~ 98 )/T      cop     EIITHALPY            FREE ENERGY     Log Kf",
     "                                  T",
-    "  K         J/aOl•K           J/mol•K       J/aol• K       J/aol• K         k.J/11101         kJ/aol",
+    "  K         J/aOl\u2022K           J/mol\u2022K       J/aol\u2022 K       J/aol\u2022 K         k.J/11101         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aOl•K",
-    "entropy": "J/mol•K",
-    "negative_gibbs_function": "J/aol• K",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "J/aOl\u2022K",
+    "entropy": "J/mol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022 K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "k.J/11101",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -82,37 +82,37 @@
   "temperature_grid": [
     {
       "as_published": "1074",
-      "value": null,
+      "value": 1074.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1100",
-      "value": null,
+      "value": 1100.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1200",
-      "value": null,
+      "value": 1200.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1300",
-      "value": null,
+      "value": 1300.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1400",
-      "value": null,
+      "value": 1400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1500",
-      "value": null,
+      "value": 1500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -165,7 +165,7 @@
       "cells": {
         "temperature": {
           "as_published": "1074",
-          "value": null,
+          "value": 1074.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -260,7 +260,7 @@
       "cells": {
         "temperature": {
           "as_published": "1100",
-          "value": null,
+          "value": 1100.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -355,7 +355,7 @@
       "cells": {
         "temperature": {
           "as_published": "1200",
-          "value": null,
+          "value": 1200.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -450,7 +450,7 @@
       "cells": {
         "temperature": {
           "as_published": "1300",
-          "value": null,
+          "value": 1300.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -545,25 +545,25 @@
       "cells": {
         "temperature": {
           "as_published": "1400",
-          "value": null,
+          "value": 1400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "enthalpy_function": {
           "as_published": "80.850",
-          "value": null,
+          "value": 80.85,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "227.02",
-          "value": null,
+          "value": 227.02,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "146.11",
-          "value": null,
+          "value": 146.11,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -640,7 +640,7 @@
       "cells": {
         "temperature": {
           "as_published": "1500",
-          "value": null,
+          "value": 1500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -760,7 +760,7 @@
     "TRANSITIONS IN BEFEREHCE STATE ELE!IENTS",
     "      !IOLYBOENU!I.    !1.   P. 2890 K.",
     "HEAT CAPACITY EQUATION",
-    "          5.33u2 +           6.3165x1o-z T          1.3599x10:t T-o·s",
+    "          5.33u2 +           6.3165x1o-z T          1.3599x10:t T-o\u00b7s",
     "              (EQUATION VALID FRO!!               298- 1074 K)"
   ],
   "footnote_markers": [],
@@ -783,5 +783,6 @@
     "row_start": 8,
     "row_stop": 13,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Liquid 1074 to 1500 K."
 }

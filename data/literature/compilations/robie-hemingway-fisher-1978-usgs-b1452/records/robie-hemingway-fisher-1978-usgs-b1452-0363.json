@@ -69,15 +69,15 @@
     "TEI!P.     ( H;-u;98 )/T      so",
     "                               T      -(G;-H~ 98 )/T      co",
     "                                                              p   EITBlLP!           FlEE ENERGY     Log ltf",
-    "  K          Jjaol•K       Jjaol•lt     Jjaol•lt       Jjaol•K           kJ/aol         .kJ/aol",
+    "  K          Jjaol\u2022K       Jjaol\u2022lt     Jjaol\u2022lt       Jjaol\u2022K           kJ/aol         .kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jjaol•K",
-    "entropy": "Jjaol•lt",
-    "negative_gibbs_function": "Jjaol•lt",
-    "heat_capacity": "Jjaol•K",
+    "enthalpy_function": "Jjaol\u2022K",
+    "entropy": "Jjaol\u2022lt",
+    "negative_gibbs_function": "Jjaol\u2022lt",
+    "heat_capacity": "Jjaol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": ".kJ/aol",
     "log_kf": ""
@@ -123,7 +123,7 @@
     },
     {
       "as_published": "1.440",
-      "value": null,
+      "value": 1.44,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -134,7 +134,7 @@
     },
     {
       "as_published": "0.252",
-      "value": null,
+      "value": 0.252,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -155,9 +155,9 @@
     "TRAISITIOIS IN BEPEBENCE STATE ELEI!BJTS",
     "   BliGlNESEoo lLPHl-BETl 980, BETl-Gll!l!l 1360, Gllll!l-DELTl 1410,",
     "                1!. Po DELTA 1517 Ito",
-    "   SILICOio o•• 1!. P. 1685 K.",
+    "   SILICOio o\u2022\u2022 1!. P. 1685 K.",
     "HilT CAPACITY EQUATION",
-    "           99.043 + 1.9145z1o-z T             + 2. 7447.:.:1 oz T-o·s         3o 0407z 1 o• T- z",
+    "           99.043 + 1.9145z1o-z T             + 2. 7447.:.:1 oz T-o\u00b7s         3o 0407z 1 o\u2022 T- z",
     "              (BQUATIOI VALID PBOII           298 - 1500 It)",
     "BEPBBBICE       115           285                                            93                    COil PILED",
     "                241                                                         127                     7-13-76"
@@ -170,5 +170,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=13, enthalpy_function=13, entropy=13, negative_gibbs_function=13, heat_capacity=14, formation_enthalpy=13, formation_gibbs_energy=13, log_kf=13",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "s:      crystals 298.15 to aelting point 1564 K."
 }

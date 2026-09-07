@@ -1,0 +1,349 @@
+{
+  "schema_version": "literature_compilation.v1",
+  "source_id": "robie-hemingway-fisher-1978-usgs-b1452",
+  "compilation_role": {
+    "kind": "assessed_thermodynamic_functions",
+    "engine_reference_input": true,
+    "validation_measurement": false,
+    "scoring_eligible": false,
+    "battery_refusal": "gibbs_table_not_runtime_observable",
+    "circularity_warning": "Do not validate an engine against a compilation it consumes."
+  },
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0067-phase-02",
+  "census_id": "high-temperature-printed-page-093",
+  "record_kind": "substance_temperature_table",
+  "section_as_published": "Thermodynamic properties at high temperatures",
+  "table_number_as_published": null,
+  "name_as_published": "SULFUR (REFERENCE STATE)",
+  "formula_as_published": "S",
+  "phase_state_as_published": [
+    "Orthorho8bic crystals 298.15 to 3&8.54 K. llonoclinic crystals 368.54 to",
+    "         aelting point 388.36 K. Liquid 388.36 to boiling point 716.9 K. Ideal",
+    "         diatomic gas 716.9 to 1800 K."
+  ],
+  "description_lines_as_published": [
+    "S:       Orthorho8bic crystals 298.15 to 3&8.54 K. llonoclinic crystals 368.54 to",
+    "         aelting point 388.36 K. Liquid 388.36 to boiling point 716.9 K. Ideal",
+    "         diatomic gas 716.9 to 1800 K."
+  ],
+  "formation_basis_header_as_published": "FORIIATIOIII FROll THE ELEI!ENTS",
+  "formula_weight": {
+    "as_published": "32.0&0",
+    "value": null,
+    "ocr_suspect": true,
+    "footnote_markers": [],
+    "source_text_span": {
+      "line": 4,
+      "start": 105,
+      "end": 111
+    }
+  },
+  "source_locator": {
+    "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
+    "pdf_pages": [
+      99
+    ],
+    "printed_pages": [
+      93
+    ],
+    "pdftotext_layout_page_file": "page-099.txt",
+    "extraction": "pdftotext -layout, one PDF page at a time"
+  },
+  "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
+  "transcription_status": "transcribed",
+  "untranscribed_reasons": [],
+  "title_line_as_published": "SULFUR (REFERENCE STATE)                                                             FORIIULA WEIGHT     32.0&0",
+  "column_ids": [
+    "temperature",
+    "enthalpy_function",
+    "entropy",
+    "negative_gibbs_function",
+    "heat_capacity",
+    "formation_enthalpy",
+    "formation_gibbs_energy",
+    "log_kf"
+  ],
+  "column_header_lines_as_published": [
+    "S:       Orthorho8bic crystals 298.15 to 3&8.54 K. llonoclinic crystals 368.54 to",
+    "         aelting point 388.36 K. Liquid 388.36 to boiling point 716.9 K. Ideal",
+    "         diatomic gas 716.9 to 1800 K.",
+    "--------------------------------------------------------------------------------",
+    "                                                 FORIIATIOIII FROll THE ELEI!ENTS",
+    "                                                                                           GIBBS",
+    "TEftP.      ( H;-u; 98 )/T      so      -(~-H~ 98 )/T          cop      ENTHALPY        FREE EIIERGY      Log Kt",
+    "                                 T",
+    "     K       J/aol\u2022K         Jj8ol\u2022 K     J/\u2022ol\u2022K          J/\u2022ol\u2022K          kJ/aol         k.J/801",
+    "--------------------------------------------------------------------------------"
+  ],
+  "units_as_published": {
+    "temperature": "K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "Jj8ol\u2022 K",
+    "negative_gibbs_function": "J/\u2022ol\u2022K",
+    "heat_capacity": "J/\u2022ol\u2022K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "k.J/801",
+    "log_kf": ""
+  },
+  "temperature_grid": [
+    {
+      "as_published": "368.54",
+      "value": 368.54,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "388.36",
+      "value": 388.36,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    }
+  ],
+  "rows": [
+    {
+      "source_text_line": 22,
+      "source_text_spans": {
+        "temperature": {
+          "line": 22,
+          "start": 1,
+          "end": 7
+        },
+        "enthalpy_function": {
+          "line": 22,
+          "start": 11,
+          "end": 16
+        },
+        "entropy": {
+          "line": 22,
+          "start": 21,
+          "end": 26
+        },
+        "negative_gibbs_function": {
+          "line": 22,
+          "start": 31,
+          "end": 36
+        },
+        "heat_capacity": {
+          "line": 22,
+          "start": 40,
+          "end": 45
+        },
+        "formation_enthalpy": {
+          "line": 22,
+          "start": 54,
+          "end": 59
+        },
+        "formation_gibbs_energy": {
+          "line": 22,
+          "start": 66,
+          "end": 70
+        },
+        "log_kf": {
+          "line": 22,
+          "start": 76,
+          "end": 80
+        }
+      },
+      "cells": {
+        "temperature": {
+          "as_published": "368.54",
+          "value": 368.54,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "5.574",
+          "value": 5.574,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "37.85",
+          "value": 37.85,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "32.28",
+          "value": 32.28,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "24.74",
+          "value": 24.74,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "\u2022"
+          ]
+        },
+        "formation_gibbs_energy": {
+          "as_published": "Mooo",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "log_kf": {
+          "as_published": ".000",
+          "value": 0.0,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 23,
+      "source_text_spans": {
+        "temperature": {
+          "line": 23,
+          "start": 1,
+          "end": 7
+        },
+        "enthalpy_function": {
+          "line": 23,
+          "start": 17,
+          "end": 22
+        },
+        "entropy": {
+          "line": 23,
+          "start": 31,
+          "end": 36
+        },
+        "negative_gibbs_function": {
+          "line": 23,
+          "start": 45,
+          "end": 50
+        },
+        "heat_capacity": {
+          "line": 23,
+          "start": 60,
+          "end": 65
+        },
+        "formation_enthalpy": {
+          "line": 23,
+          "start": 79,
+          "end": 83
+        },
+        "formation_gibbs_energy": {
+          "line": 23,
+          "start": 94,
+          "end": 99
+        },
+        "log_kf": {
+          "line": 23,
+          "start": 108,
+          "end": 112
+        }
+      },
+      "cells": {
+        "temperature": {
+          "as_published": "388.36",
+          "value": 388.36,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "6.561",
+          "value": 6.561,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "39.75",
+          "value": 39.75,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "33.19",
+          "value": 33.19,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "25.33",
+          "value": 25.33,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": ".000",
+          "value": 0.0,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_gibbs_energy": {
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "\u2022"
+          ]
+        },
+        "log_kf": {
+          "as_published": ".000",
+          "value": 0.0,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    }
+  ],
+  "row_count": 2,
+  "detected_data_row_count": 22,
+  "uncertainty_line_as_published": "UtiCERT AIIJTY                  0.21            o. 21",
+  "uncertainty_values": [
+    {
+      "as_published": "0.21",
+      "value": 0.21,
+      "ocr_suspect": false,
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 32,
+        "end": 36
+      }
+    },
+    {
+      "as_published": "o. 21",
+      "value": null,
+      "ocr_suspect": true,
+      "footnote_markers": [],
+      "source_text_span": {
+        "line": 19,
+        "start": 48,
+        "end": 53
+      }
+    }
+  ],
+  "reference_state_notes_as_published": [
+    "S:       Orthorho8bic crystals 298.15 to 3&8.54 K. llonoclinic crystals 368.54 to",
+    "         aelting point 388.36 K. Liquid 388.36 to boiling point 716.9 K. Ideal",
+    "         diatomic gas 716.9 to 1800 K."
+  ],
+  "auxiliary_lines_as_published": [
+    "HEAT CAPACITY EQOATIOR",
+    "           23.535 -       1. 7230x10-ll T               3.4702x10-7 TZ",
+    "          -1.1320x10\u2022 T-z",
+    "              (EQUATION VALID FRO!              716.9 - 1800 K)",
+    "REFBBEICE         247           247                                                                    COIIPILED",
+    "                                                                                                         5-24-76"
+  ],
+  "footnote_markers": [],
+  "ocr_suspect": true,
+  "ambiguities": [],
+  "phase_segment": {
+    "ordinal": 2,
+    "count_on_printed_page": 4,
+    "row_start": 3,
+    "row_stop": 4,
+    "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
+  },
+  "phase_as_published": "llonoclinic crystals 368.54 to\n         aelting point 388.36 K."
+}

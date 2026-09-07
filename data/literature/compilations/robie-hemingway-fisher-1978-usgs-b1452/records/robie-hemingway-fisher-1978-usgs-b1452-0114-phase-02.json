@@ -71,15 +71,15 @@
     "                                                                                           GIBBS",
     "TEIIP.      ( u;-H~     98 )/T      so      -(G;-H~ 98 )/T      cop      ENTHALPY     PBEE ENERGY      Log           Kf",
     "                                     T",
-    "              J/IIOl•K           J/IIOl•K     J/1101• K      J/aol• K         kJ/1101           kJ/1101",
+    "              J/IIOl\u2022K           J/IIOl\u2022K     J/1101\u2022 K      J/aol\u2022 K         kJ/1101           kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/IIOl•K",
-    "entropy": "J/IIOl•K",
-    "negative_gibbs_function": "J/1101• K",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "J/IIOl\u2022K",
+    "entropy": "J/IIOl\u2022K",
+    "negative_gibbs_function": "J/1101\u2022 K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -176,13 +176,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-1106.856",
-          "value": null,
+          "value": -1106.856,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "144.543",
-          "value": null,
+          "value": 144.543,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -259,9 +259,9 @@
     "IIELTING POINT                                 K             BOI LI VG PO Ill T                                 K",
     "ENTHALPY OF MELTING                            kJ            ENTHALPY OF VAPORIZ&TIO'll                         kJ",
     "                                      12.719 kJ              ISOLA R VOLUME                           3.1956 J/bar",
-    "                                                                                                     31 •.956 CIIJ",
+    "                                                                                                     31 \u2022.956 CIIJ",
     "TRANSITIOIIS IN REFERENCE STATE ELEIIEIITS",
-    "      ALUIII NUll •••    II.   P. 933 K."
+    "      ALUIII NUll \u2022\u2022\u2022    II.   P. 933 K."
   ],
   "footnote_markers": [],
   "ocr_suspect": true,
@@ -283,5 +283,6 @@
     "row_start": 2,
     "row_stop": 2,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Gibbsite deco11poses above 480 K."
 }

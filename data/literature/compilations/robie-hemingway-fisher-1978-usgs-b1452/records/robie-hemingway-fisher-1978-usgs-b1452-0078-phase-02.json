@@ -72,29 +72,29 @@
     "                                                                                      GIBBS",
     "TEIIP.   ( H;-a~ 98 )/T      so      -(G;-a~ 98 )/T      cop     EIIITHALPY        FREE ENERGY     Log Kf",
     "                              T",
-    "  K        Jtmol•K        J/•ol•K      J/•ol•K        Jt•ol• K         kJtaol        kJ/•ol",
+    "  K        Jtmol\u2022K        J/\u2022ol\u2022K      J/\u2022ol\u2022K        Jt\u2022ol\u2022 K         kJtaol        kJ/\u2022ol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jtmol•K",
-    "entropy": "J/•ol•K",
-    "negative_gibbs_function": "J/•ol•K",
-    "heat_capacity": "Jt•ol• K",
+    "enthalpy_function": "Jtmol\u2022K",
+    "entropy": "J/\u2022ol\u2022K",
+    "negative_gibbs_function": "J/\u2022ol\u2022K",
+    "heat_capacity": "Jt\u2022ol\u2022 K",
     "formation_enthalpy": "kJtaol",
-    "formation_gibbs_energy": "kJ/•ol",
+    "formation_gibbs_energy": "kJ/\u2022ol",
     "log_kf": ""
   },
   "temperature_grid": [
     {
       "as_published": "1560",
-      "value": null,
+      "value": 1560.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1600",
-      "value": null,
+      "value": 1600.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -153,7 +153,7 @@
       "cells": {
         "temperature": {
           "as_published": "1560",
-          "value": null,
+          "value": 1560.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -248,7 +248,7 @@
       "cells": {
         "temperature": {
           "as_published": "1600",
-          "value": null,
+          "value": 1600.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -283,11 +283,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -447,5 +447,6 @@
     "row_start": 15,
     "row_stop": 17,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Beta crystals\n         (body-centered cubic) 1560 to melting poiat 1630 K."
 }

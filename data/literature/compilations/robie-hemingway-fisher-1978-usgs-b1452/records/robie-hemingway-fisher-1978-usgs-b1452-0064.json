@@ -66,15 +66,15 @@
     "                                                                                           GIBBS",
     "TEftP.     ( H;-H;98 )/T       so       -(G;-u~ 98 )/T        cop      EJTHALPY         FREE EMERGY      Log Kt",
     "                                T",
-    "  K          J/aol•K        J/aol•K       J/aol•K          J/aol•K         kJ/aol         ltJ;aol",
+    "  K          J/aol\u2022K        J/aol\u2022K       J/aol\u2022K          J/aol\u2022K         kJ/aol         ltJ;aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "ltJ;aol",
     "log_kf": ""
@@ -545,11 +545,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -826,19 +826,19 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -1121,11 +1121,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• uuo",
+          "as_published": "\u2022 uuo",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -1402,11 +1402,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1499,11 +1499,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 0(10",
+          "as_published": "\u2022 0(10",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1743,7 +1743,7 @@
   ],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATION",
-    "          8.9772 +        1.9571J:lo-z T                3.6535x10-• TZ",
+    "          8.9772 +        1.9571J:lo-z T                3.6535x10-\u2022 TZ",
     "         -2. 5759x 105 T-z",
     "             (EQUATION VALID FROM               298 - 180(1 K)",
     "REFBREIICE       107           107                                                                    COMPILED",
@@ -1758,5 +1758,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Face-centered cubic crystals 298.15 to aelting point 2233 K."
 }

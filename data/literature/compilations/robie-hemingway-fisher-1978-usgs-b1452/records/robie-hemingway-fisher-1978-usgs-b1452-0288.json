@@ -21,7 +21,7 @@
   "formation_basis_header_as_published": "",
   "formula_weight": {
     "as_published": "148.315",
-    "value": null,
+    "value": 148.315,
     "ocr_suspect": true,
     "footnote_markers": [],
     "source_text_span": {
@@ -61,15 +61,15 @@
     "                                                                                     GitiBS",
     "TEllP.     (H;-u~ 98 )/T      so      -(G;-a~ 98 );T        cop    ENTHALPY       FREE ENERGY   Log Kf",
     "                               T",
-    "            J;aol•K        Jjaol• K     Jjaol•K          J/aol•K          k.Jjaol         k.J/aol",
+    "            J;aol\u2022K        Jjaol\u2022 K     Jjaol\u2022K          J/aol\u2022K          k.Jjaol         k.J/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J;aol•K",
-    "entropy": "Jjaol• K",
-    "negative_gibbs_function": "Jjaol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J;aol\u2022K",
+    "entropy": "Jjaol\u2022 K",
+    "negative_gibbs_function": "Jjaol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "k.Jjaol",
     "formation_gibbs_energy": "k.J/aol",
     "log_kf": ""
@@ -77,25 +77,25 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "600",
-      "value": null,
+      "value": 600.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -148,7 +148,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -243,7 +243,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -338,7 +338,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -433,7 +433,7 @@
       "cells": {
         "temperature": {
           "as_published": "600",
-          "value": null,
+          "value": 600.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -484,7 +484,7 @@
   ],
   "row_count": 4,
   "detected_data_row_count": 4,
-  "uncertainty_line_as_published": "UIICERTAI NTY                 1.60             1.60                         1.300           1.420        0 • .<!49",
+  "uncertainty_line_as_published": "UIICERTAI NTY                 1.60             1.60                         1.300           1.420        0 \u2022 .<!49",
   "uncertainty_values": [
     {
       "as_published": "1.60",
@@ -510,7 +510,7 @@
     },
     {
       "as_published": "1.300",
-      "value": null,
+      "value": 1.3,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -531,10 +531,12 @@
       }
     },
     {
-      "as_published": "0 • .<!49",
+      "as_published": "0 \u2022 .<!49",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": [],
+      "footnote_markers": [
+        "\u2022"
+      ],
       "source_text_span": {
         "line": 20,
         "start": 105,
@@ -570,5 +572,6 @@
     "row_start": 1,
     "row_stop": 4,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to             600 K.\n                                                                    FOR !tAT ION FROM THE ELEMENTS\n                                                                                     GitiBS\nTEllP.     (H;-u~ 98 )/T      so      -(G;-a~ 98 );T        cop    ENTHALPY       FREE ENERGY   Log Kf\n                               T\n            J;aol\u2022K        Jjaol\u2022 K     Jjaol\u2022K          J/aol\u2022K          k.Jjaol         k.J/aol"
 }

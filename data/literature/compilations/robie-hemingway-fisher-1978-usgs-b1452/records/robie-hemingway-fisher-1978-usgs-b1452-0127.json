@@ -25,7 +25,7 @@
   "formation_basis_header_as_published": "FORIIATIOII FRO!! THE ELE!IEIIITS",
   "formula_weight": {
     "as_published": "74.933",
-    "value": null,
+    "value": 74.933,
     "ocr_suspect": true,
     "footnote_markers": [],
     "source_text_span": {
@@ -66,15 +66,15 @@
     "                                                                                             GIBBS",
     "TEftP.     (a;- H~ 98 )/T      so      -(G~-H~ 98 )/T       cop          EIITHALPY        FREE EIIERGY     Log Kf",
     "                                T",
-    "             J/aol•K        J/aol•K      J/aol•K        J/aol•K             kJ/aol           kJ/aol",
+    "             J/aol\u2022K        J/aol\u2022K      J/aol\u2022K        J/aol\u2022K             kJ/aol           kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -1701,11 +1701,11 @@
   ],
   "row_count": 16,
   "detected_data_row_count": 11,
-  "uncertainty_line_as_published": "UIICERTUIITY                   0.34            u.34                              1.255         1.297        O• .l27",
+  "uncertainty_line_as_published": "UIICERTUIITY                   0.34            u.34                              1.255         1.297        O\u2022 .l27",
   "uncertainty_values": [
     {
       "as_published": "0.34",
-      "value": null,
+      "value": 0.34,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -1748,10 +1748,12 @@
       }
     },
     {
-      "as_published": "O• .l27",
+      "as_published": "O\u2022 .l27",
       "value": null,
       "ocr_suspect": true,
-      "footnote_markers": [],
+      "footnote_markers": [
+        "\u2022"
+      ],
       "source_text_span": {
         "line": 19,
         "start": 108,
@@ -1764,7 +1766,7 @@
   ],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATIOII",
-    "             30.468 +       2.9459x1o-z T              1.9317x103        r-o·s",
+    "             30.468 +       2.9459x1o-z T              1.9317x103        r-o\u00b7s",
     "              (EQUATIOII VALID FROB            298 -    1800 K)",
     "BEPERBIICE        129          120                                               263                     COBPILED",
     "                                                                                                          &- 8-76"
@@ -1778,5 +1780,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to aelting point 2078 K."
 }

@@ -68,15 +68,15 @@
     "           ( H;-H~   98 )/T",
     "                                   0",
     "TEBP.                            ST                                   ENTHALPY          PBBB BNEBGI      Log Kf",
-    "  K         J/IIOl•K          J/llol• K     J/IIOl•K       J/IIOl•K        kJ/1101         kJ/aol",
+    "  K         J/IIOl\u2022K          J/llol\u2022 K     J/IIOl\u2022K       J/IIOl\u2022K        kJ/1101         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/IIOl•K",
-    "entropy": "J/llol• K",
-    "negative_gibbs_function": "J/IIOl•K",
-    "heat_capacity": "J/IIOl•K",
+    "enthalpy_function": "J/IIOl\u2022K",
+    "entropy": "J/llol\u2022 K",
+    "negative_gibbs_function": "J/IIOl\u2022K",
+    "heat_capacity": "J/IIOl\u2022K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -898,19 +898,19 @@
         },
         "enthalpy_function": {
           "as_published": "14.589",
-          "value": null,
+          "value": 14.589,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "194.83",
-          "value": null,
+          "value": 194.83,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "180.211",
-          "value": null,
+          "value": 180.211,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1681,11 +1681,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1754,5 +1754,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Ideal gas 298.15 to              1800 K."
 }

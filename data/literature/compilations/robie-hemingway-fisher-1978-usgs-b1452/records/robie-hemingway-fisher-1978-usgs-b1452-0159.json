@@ -69,15 +69,15 @@
     "                                                                                           GIBBS",
     "TEftP.        ca;-a~ 98 )/T      so",
     "                                  T      -( G;-H; 98 );T      cop    EIITHlLPY          FREE EHEBGY       Log Kf",
-    "  K            J;aol•K        J;aol•lt     J/aol•K         J/aol•K          kJ;aol         kJ/aol",
+    "  K            J;aol\u2022K        J;aol\u2022lt     J/aol\u2022K         J/aol\u2022K          kJ;aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J;aol•K",
-    "entropy": "J;aol•lt",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J;aol\u2022K",
+    "entropy": "J;aol\u2022lt",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ;aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -85,43 +85,43 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "600",
-      "value": null,
+      "value": 600.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "700",
-      "value": null,
+      "value": 700.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "800",
-      "value": null,
+      "value": 800.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "900",
-      "value": null,
+      "value": 900.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -174,7 +174,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -269,7 +269,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -364,7 +364,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -459,7 +459,7 @@
       "cells": {
         "temperature": {
           "as_published": "600",
-          "value": null,
+          "value": 600.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -554,7 +554,7 @@
       "cells": {
         "temperature": {
           "as_published": "700",
-          "value": null,
+          "value": 700.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -649,7 +649,7 @@
       "cells": {
         "temperature": {
           "as_published": "800",
-          "value": null,
+          "value": 800.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -744,7 +744,7 @@
       "cells": {
         "temperature": {
           "as_published": "900",
-          "value": null,
+          "value": 900.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -859,7 +859,7 @@
   ],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQDATIOJ",
-    "          1.0222x1oz + 1.5107x1o-z T                       2.6172x1o• T-z",
+    "          1.0222x1oz + 1.5107x1o-z T                       2.6172x1o\u2022 T-z",
     "             (EQDlTIOI VALID PBO!I 298 -                   900 K)",
     "BBFEBEBCE          131           214                                           214                      CO!IPILED",
     "                                                                               102                       5-26-76"
@@ -880,5 +880,6 @@
     "row_start": 1,
     "row_stop": 7,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "crystals 298.15 to 900 K.              At approxiaately 540 K the partial\n                 pressure of steaa in equilibriua vith brucite reaches one ataosphere."
 }

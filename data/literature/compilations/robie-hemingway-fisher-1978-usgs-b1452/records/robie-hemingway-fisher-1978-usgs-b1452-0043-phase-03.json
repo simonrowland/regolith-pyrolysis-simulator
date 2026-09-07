@@ -248,19 +248,19 @@
         },
         "enthalpy_function": {
           "as_published": "110.757",
-          "value": null,
+          "value": 110.757,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "114.96",
-          "value": null,
+          "value": 114.96,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "64.20",
-          "value": null,
+          "value": 64.2,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -283,11 +283,11 @@
           "footnote_markers": []
         },
         "log_kf": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         }
       }
@@ -470,7 +470,7 @@
     "                                                                                            13.017 ca 3",
     "TRANSITIONS IN REFERENCE STATE ELEMENTS",
     "HEAT CAPACITY EQUATIONS",
-    "         -38.655 + 6.7350x1o-z T                  B.5537x10Z T-o·s               5. 5142x105 T-Z",
+    "         -38.655 + 6.7350x1o-z T                  B.5537x10Z T-o\u00b7s               5. 5142x105 T-Z",
     "             (EQUATION VALID FROII             298- 453.70 K)",
     "          11.835 + 9.1183x10-3 T      2.2265l[10-6 TZ",
     "             EQUATION VALID FBOft 453.70- 1618 K)"
@@ -495,5 +495,6 @@
     "row_start": 18,
     "row_stop": 20,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Ideal aonatoaic gas 1618 to 1800 K."
 }

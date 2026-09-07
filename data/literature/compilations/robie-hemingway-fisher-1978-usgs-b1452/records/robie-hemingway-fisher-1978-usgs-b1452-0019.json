@@ -66,15 +66,15 @@
     "                                                                                          GIBBS",
     "TEIIP.    ( H~-H~ 98 )IT       so      -(G;-H~ 98 )/T      cop    EIIITHlLPY         .P'BEE EIEBGY     Loq Kf",
     "                                T",
-    "   K         J/aol•K        J;aol•K      J/ao1• K       J/aol•K          kJ/aol         kJ/aol",
+    "   K         J/aol\u2022K        J;aol\u2022K      J/ao1\u2022 K       J/aol\u2022K          kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J;aol•K",
-    "negative_gibbs_function": "J/ao1• K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J;aol\u2022K",
+    "negative_gibbs_function": "J/ao1\u2022 K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -450,11 +450,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -642,11 +642,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -923,11 +923,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1092,19 +1092,19 @@
         },
         "enthalpy_function": {
           "as_published": "27.563",
-          "value": null,
+          "value": 27.563,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "213.61",
-          "value": null,
+          "value": 213.61,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "246.05",
-          "value": null,
+          "value": 246.05,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1305,11 +1305,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1402,11 +1402,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1766,5 +1766,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Ideal diatoaic qas 298.15 to 1800 K."
 }

@@ -67,15 +67,15 @@
     "          (H;-a~ 98 )/T       so      - ( G;-H ~",
     "TUP.                           T                   98 )/T      CD",
     "                                                                p      EIITHALPY          FREE ENERGY       Log   Kf",
-    "            J/•ol•K       J/•ol•K       Jfaol•K             J/•ol• K         kJ/1101         kJ/1101",
+    "            J/\u2022ol\u2022K       J/\u2022ol\u2022K       Jfaol\u2022K             J/\u2022ol\u2022 K         kJ/1101         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/•ol•K",
-    "entropy": "J/•ol•K",
-    "negative_gibbs_function": "Jfaol•K",
-    "heat_capacity": "J/•ol• K",
+    "enthalpy_function": "J/\u2022ol\u2022K",
+    "entropy": "J/\u2022ol\u2022K",
+    "negative_gibbs_function": "Jfaol\u2022K",
+    "heat_capacity": "J/\u2022ol\u2022 K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -546,11 +546,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "-21.• 799",
+          "as_published": "-21.\u2022 799",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -840,7 +840,7 @@
         },
         "log_kf": {
           "as_published": "-0.506",
-          "value": null,
+          "value": -0.506,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1773,28 +1773,18 @@
     "TRAiiSITIOiiS IN REFERENCE STATE ELEI!ENTS",
     "HEAT CAPACITY EQUATION",
     "         78.976 +       4.3186x1o-z T",
-    "         1. 8836x 1 o• T- 2",
+    "         1. 8836x 1 o\u2022 T- 2",
     "            (EQUATION VALID FBOft              298 - 1800 K)"
   ],
   "footnote_markers": [],
   "ocr_suspect": true,
-  "ambiguities": [
-    {
-      "kind": "thermodynamic_identity_disagreement",
-      "detector_only": true,
-      "row": 7,
-      "temperature_as_published": "900",
-      "check": "log_kf = -formation_gibbs_energy / (R T ln(10))",
-      "observed": -0.506,
-      "calculated": -0.47143744026594075,
-      "residual": -0.03456255973405925
-    }
-  ],
+  "ambiguities": [],
   "phase_segment": {
     "ordinal": 1,
     "count_on_printed_page": 1,
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Ideal gas 298. 15 to 1800 K."
 }

@@ -69,15 +69,15 @@
     "                                                                                    GIBBS",
     "TB!P.      <a;-a~ 98 )/T      so      -(G;-a~ 98 )/T     cop     EIIITHlLPI      FREE BIJEBGI     Loq Kf",
     "                               T",
-    "  K          Jfaol•K       Jtaol•K      J/aol•K        Jtaol•K       kJ;aol         kJ/aol",
+    "  K          Jfaol\u2022K       Jtaol\u2022K      J/aol\u2022K        Jtaol\u2022K       kJ;aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jfaol•K",
-    "entropy": "Jtaol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "Jtaol•K",
+    "enthalpy_function": "Jfaol\u2022K",
+    "entropy": "Jtaol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "Jtaol\u2022K",
     "formation_enthalpy": "kJ;aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -139,7 +139,7 @@
     },
     {
       "as_published": "1200",
-      "value": null,
+      "value": 1200.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -228,13 +228,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-654.507",
-          "value": null,
+          "value": -654.507,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "114.667",
-          "value": null,
+          "value": 114.667,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1047,7 +1047,7 @@
       "cells": {
         "temperature": {
           "as_published": "1200",
-          "value": null,
+          "value": 1200.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1188,5 +1188,6 @@
     "row_start": 1,
     "row_stop": 10,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to 1200 K.            The free energy for the reaction TiC1 3 (c)\n           = TiC1 3 (q) approaches zero at 1104.1 K."
 }

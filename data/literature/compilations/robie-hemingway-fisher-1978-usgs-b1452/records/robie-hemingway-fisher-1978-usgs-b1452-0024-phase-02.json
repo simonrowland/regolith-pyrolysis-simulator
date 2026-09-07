@@ -72,15 +72,15 @@
     "                                                                                              GIBBS",
     "                                 so                              cop",
     "TEIIP.    ( H~-H~    98 )/T        T      -(G;-H~ 98 )/T                  EIITHALPY       PBEE ENERGY        Log Kf",
-    "  K           Jjaol•K         J/11ol• K     J;aol• K         J/aol• K         kJ/aol          kJ/1101",
+    "  K           Jjaol\u2022K         J/11ol\u2022 K     J;aol\u2022 K         J/aol\u2022 K         kJ/aol          kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jjaol•K",
-    "entropy": "J/11ol• K",
-    "negative_gibbs_function": "J;aol• K",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "Jjaol\u2022K",
+    "entropy": "J/11ol\u2022 K",
+    "negative_gibbs_function": "J;aol\u2022 K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -88,13 +88,13 @@
   "temperature_grid": [
     {
       "as_published": "1657",
-      "value": null,
+      "value": 1657.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1682",
-      "value": null,
+      "value": 1682.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -147,7 +147,7 @@
       "cells": {
         "temperature": {
           "as_published": "1657",
-          "value": null,
+          "value": 1657.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -242,25 +242,25 @@
       "cells": {
         "temperature": {
           "as_published": "1682",
-          "value": null,
+          "value": 1682.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "enthalpy_function": {
           "as_published": "30.549",
-          "value": null,
+          "value": 30.549,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "132.34",
-          "value": null,
+          "value": 132.34,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "101.76",
-          "value": null,
+          "value": 101.76,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -355,5 +355,6 @@
     "row_start": 16,
     "row_stop": 17,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Beta crystals\n         (body-centered cubic) 1657 to aelting point 1682 K."
 }

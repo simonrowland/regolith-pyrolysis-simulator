@@ -66,15 +66,15 @@
     "                                                                                     GIBBS",
     "TBIIP.       (B;-H~g 8 )~       so",
     "                                 T      -( G;-a~ 98 )/T     cop     EITBALPI     Pa B.l BR:BBGI    Log Kf",
-    "  I[           Jjao1•K      J/aol•K       Jjaol•K         Jjaol•K       kJ/aol           lt.Jjaol",
+    "  I[           Jjao1\u2022K      J/aol\u2022K       Jjaol\u2022K         Jjaol\u2022K       kJ/aol           lt.Jjaol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "I[",
-    "enthalpy_function": "Jjao1•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "Jjaol•K",
-    "heat_capacity": "Jjaol•K",
+    "enthalpy_function": "Jjao1\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "Jjaol\u2022K",
+    "heat_capacity": "Jjaol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "lt.Jjaol",
     "log_kf": ""
@@ -296,13 +296,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-5137.750",
-          "value": null,
+          "value": -5137.75,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "670.924",
-          "value": null,
+          "value": 670.924,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -367,13 +367,13 @@
         },
         "entropy": {
           "as_published": "416.33",
-          "value": null,
+          "value": 416.33,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "276.58",
-          "value": null,
+          "value": 276.58,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -391,13 +391,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-5011.889",
-          "value": null,
+          "value": -5011.889,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "523.590",
-          "value": null,
+          "value": 523.59,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -486,13 +486,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-4886.421",
-          "value": null,
+          "value": -4886.421,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "425.402",
-          "value": null,
+          "value": 425.402,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -676,13 +676,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-4637.392",
-          "value": null,
+          "value": -4637.392,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "302.791",
-          "value": null,
+          "value": 302.791,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -758,8 +758,8 @@
     "                                 42.695 kJ             !lOLAR VOLU!lE                         12.7820 Jjbar",
     "                                                                                             127.820 ca 3",
     "TRAISIT~ONS       II BEFBBEICE STATE ELEMEBTS",
-    "       &LOlli HUM •••   II. P. 933 K.",
-    "   SILICOI •••• !1. P.        1685 I.",
+    "       &LOlli HUM \u2022\u2022\u2022   II. P. 933 K.",
+    "   SILICOI \u2022\u2022\u2022\u2022 !1. P.        1685 I.",
     "HEAT CAPACITY EQUA'UOI",
     "            7.4675x1oz- 5.3543x1o-z T +                1.9855x1o-s      rz",
     "               ( EQUATIOI VALID FRO! 298 -             800 K)",
@@ -774,50 +774,40 @@
       "detector_only": true,
       "row": 2,
       "temperature_as_published": "400",
-      "check": "log_kf = -formation_gibbs_energy / (R T ln(10))",
+      "check": "log_kf = -formation_gibbs_energy/(R*T*ln(10))",
       "observed": 670.924,
-      "calculated": 670.9082044360777,
-      "residual": 0.015795563922324618
+      "calculated": 670.9455359629636,
+      "residual": -0.021535962963639577
     },
     {
       "kind": "thermodynamic_identity_disagreement",
       "detector_only": true,
       "row": 3,
       "temperature_as_published": "500",
-      "check": "negative_gibbs_function = entropy - enthalpy_function",
-      "observed": 276.58,
-      "calculated": 277.182,
-      "residual": -0.6020000000000323
-    },
-    {
-      "kind": "thermodynamic_identity_disagreement",
-      "detector_only": true,
-      "row": 3,
-      "temperature_as_published": "500",
-      "check": "log_kf = -formation_gibbs_energy / (R T ln(10))",
+      "check": "log_kf = -formation_gibbs_energy/(R*T*ln(10))",
       "observed": 523.59,
-      "calculated": 523.5782122248734,
-      "residual": 0.011787775126663291
+      "calculated": 523.6073458291091,
+      "residual": -0.01734582910910376
     },
     {
       "kind": "thermodynamic_identity_disagreement",
       "detector_only": true,
       "row": 4,
       "temperature_as_published": "600",
-      "check": "log_kf = -formation_gibbs_energy / (R T ln(10))",
+      "check": "log_kf = -formation_gibbs_energy/(R*T*ln(10))",
       "observed": 425.402,
-      "calculated": 425.3924304385828,
-      "residual": 0.00956956141720866
+      "calculated": 425.41610066477625,
+      "residual": -0.014100664776265148
     },
     {
       "kind": "thermodynamic_identity_disagreement",
       "detector_only": true,
       "row": 6,
       "temperature_as_published": "800",
-      "check": "log_kf = -formation_gibbs_energy / (R T ln(10))",
+      "check": "log_kf = -formation_gibbs_energy/(R*T*ln(10))",
       "observed": 302.791,
-      "calculated": 302.78471509768195,
-      "residual": 0.0062849023180433505
+      "calculated": 302.8015630295713,
+      "residual": -0.010563029571301286
     }
   ],
   "phase_segment": {
@@ -826,5 +816,6 @@
     "row_start": 1,
     "row_stop": 6,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298. 15 to 800 1."
 }

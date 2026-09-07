@@ -68,17 +68,17 @@
     "                                                                                          GIBBS",
     "TEI'IP.    (a;-a; 98 )/T           so",
     "                                    T      -(G;-u~ 98 )/T      cop    EITHALPY         FBBE EIIIBIIGY     Log Kf",
-    "  K           J/•ol•K           J/•ol•K      J/•ol•K        J/•ol•K        kJ/•ol         kJ/•ol",
+    "  K           J/\u2022ol\u2022K           J/\u2022ol\u2022K      J/\u2022ol\u2022K        J/\u2022ol\u2022K        kJ/\u2022ol         kJ/\u2022ol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/•ol•K",
-    "entropy": "J/•ol•K",
-    "negative_gibbs_function": "J/•ol•K",
-    "heat_capacity": "J/•ol•K",
-    "formation_enthalpy": "kJ/•ol",
-    "formation_gibbs_energy": "kJ/•ol",
+    "enthalpy_function": "J/\u2022ol\u2022K",
+    "entropy": "J/\u2022ol\u2022K",
+    "negative_gibbs_function": "J/\u2022ol\u2022K",
+    "heat_capacity": "J/\u2022ol\u2022K",
+    "formation_enthalpy": "kJ/\u2022ol",
+    "formation_gibbs_energy": "kJ/\u2022ol",
     "log_kf": ""
   },
   "temperature_grid": [],
@@ -138,12 +138,12 @@
   "auxiliary_lines_as_published": [
     "I!E LTI NG POI NT                             K             BOILIIIG POINT                                 K",
     "ENTHALPY OF ftELTIIIG                         kJ          ENTHALPY OF VAPORIZATION                         kJ",
-    "      •",
+    "      \u2022",
     "H~ 98 - Hg                          97.646 kJ             IIOLAR 'IOLUBE                       27.2920 J/bar",
-    "                                                                                              272.920 c•3",
+    "                                                                                              272.920 c\u20223",
     "TRANSITIONS IH REFERENCE STATE OXIDES",
-    "  Si0 2 • • • • • • • ALPHA - BETA TRANSITIOII 844 K.",
-    "  H 2 0 •• ••• •••    B.   P.   373. 15 K.",
+    "  Si0 2 \u2022 \u2022 \u2022 \u2022 \u2022 \u2022 \u2022 ALPHA - BETA TRANSITIOII 844 K.",
+    "  H 2 0 \u2022\u2022 \u2022\u2022\u2022 \u2022\u2022\u2022    B.   P.   373. 15 K.",
     "HEAT CAPACITY EQUATION",
     "          6. 1310x 10:1            4.1890 T",
     "                     5. 1385x 107 T- z",
@@ -157,5 +157,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=9, enthalpy_function=10, entropy=10, negative_gibbs_function=10, heat_capacity=10, formation_enthalpy=1, formation_gibbs_energy=10, log_kf=1",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Crystals 298.15 to 1100 K."
 }

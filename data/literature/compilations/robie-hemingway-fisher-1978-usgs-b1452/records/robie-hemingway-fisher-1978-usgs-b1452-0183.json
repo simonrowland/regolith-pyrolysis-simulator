@@ -62,15 +62,15 @@
     "                                                                                     GIBBS",
     "TEBP.      cu;-u; 98 )/T      so     -(G;-H; 98 )/T      cop    EIITHALPY         FREE ENERGY     Log Kt",
     "                               T",
-    "  K          J/aol•K       J/aol•K     J/aol•lt       J/aol·~         kJ/aol         kJ/aol",
+    "  K          J/aol\u2022K       J/aol\u2022K     J/aol\u2022lt       J/aol\u00b7~         kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•lt",
-    "heat_capacity": "J/aol·~",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022lt",
+    "heat_capacity": "J/aol\u00b7~",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -138,7 +138,7 @@
     },
     {
       "as_published": "1100",
-      "value": null,
+      "value": 1100.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -257,13 +257,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-601.358",
-          "value": null,
+          "value": -601.358,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "105.356",
-          "value": null,
+          "value": 105.356,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -352,13 +352,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-561.615",
-          "value": null,
+          "value": -561.615,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "73.340",
-          "value": null,
+          "value": 73.34,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -637,13 +637,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-11116.483",
-          "value": null,
+          "value": -11116.483,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "33.317",
-          "value": null,
+          "value": 33.317,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1171,7 +1171,7 @@
       "cells": {
         "temperature": {
           "as_published": "1100",
-          "value": null,
+          "value": 1100.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1682,13 +1682,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-116.924",
-          "value": null,
+          "value": -116.924,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "1.362",
-          "value": null,
+          "value": 1.362,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1734,7 +1734,7 @@
     },
     {
       "as_published": "6.3110",
-      "value": null,
+      "value": 6.311,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -1758,7 +1758,7 @@
   "reference_state_notes_as_published": [],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATIOII",
-    " c;       1.7793x10Z +      3.3260x1o-z T -  2.9259x10•           r-z",
+    " c;       1.7793x10Z +      3.3260x1o-z T -  2.9259x10\u2022           r-z",
     "             (EQUATION VALID FROB      298- 1800 K)",
     "REFEBEIICE         32          32                                        32                     COBPILED",
     "                                                                                                6- 7-76"
@@ -1820,5 +1820,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "crystals 298.15 to 1800 ~."
 }

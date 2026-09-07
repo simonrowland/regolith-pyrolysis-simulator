@@ -18,18 +18,18 @@
   "formula_as_published": "Co",
   "phase_state_as_published": [
     "Alpha crystals (hexagonal close packed) 298.15 to 700 K. Beta crystals",
-    "        (face-centered cubic) 700 to •elting point 1768 K.  Liquid 1768 to 1800 K.",
+    "        (face-centered cubic) 700 to \u2022elting point 1768 K.  Liquid 1768 to 1800 K.",
     "        curie point at 1394 K."
   ],
   "description_lines_as_published": [
     "Co:     Alpha crystals (hexagonal close packed) 298.15 to 700 K. Beta crystals",
-    "        (face-centered cubic) 700 to •elting point 1768 K.  Liquid 1768 to 1800 K.",
+    "        (face-centered cubic) 700 to \u2022elting point 1768 K.  Liquid 1768 to 1800 K.",
     "        curie point at 1394 K."
   ],
   "formation_basis_header_as_published": "",
   "formula_weight": {
     "as_published": "58.933",
-    "value": null,
+    "value": 58.933,
     "ocr_suspect": true,
     "footnote_markers": [],
     "source_text_span": {
@@ -65,7 +65,7 @@
   ],
   "column_header_lines_as_published": [
     "Co:     Alpha crystals (hexagonal close packed) 298.15 to 700 K. Beta crystals",
-    "        (face-centered cubic) 700 to •elting point 1768 K.  Liquid 1768 to 1800 K.",
+    "        (face-centered cubic) 700 to \u2022elting point 1768 K.  Liquid 1768 to 1800 K.",
     "        curie point at 1394 K.",
     "--------------------------------------------------------------------------------",
     "                                                 FORKATION FBOK THE ELEKENTS",
@@ -73,15 +73,15 @@
     "TEKP.     (H;-H~ 98 )/T      so",
     "                              T      -(G;-H~ 98 )/T      co",
     "                                                           p      ENTHALPY        FREE EHEBGY         Log Kt",
-    "            J/•ol•K       J/IIOl•K     J;aol• K       J/llol• K       kJ/aol          kJ/aol",
+    "            J/\u2022ol\u2022K       J/IIOl\u2022K     J;aol\u2022 K       J/llol\u2022 K       kJ/aol          kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/•ol•K",
-    "entropy": "J/IIOl•K",
-    "negative_gibbs_function": "J;aol• K",
-    "heat_capacity": "J/llol• K",
+    "enthalpy_function": "J/\u2022ol\u2022K",
+    "entropy": "J/IIOl\u2022K",
+    "negative_gibbs_function": "J;aol\u2022 K",
+    "heat_capacity": "J/llol\u2022 K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -296,11 +296,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -393,11 +393,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -628,17 +628,17 @@
   ],
   "reference_state_notes_as_published": [
     "Co:     Alpha crystals (hexagonal close packed) 298.15 to 700 K. Beta crystals",
-    "        (face-centered cubic) 700 to •elting point 1768 K.  Liquid 1768 to 1800 K.",
+    "        (face-centered cubic) 700 to \u2022elting point 1768 K.  Liquid 1768 to 1800 K.",
     "        curie point at 1394 K."
   ],
   "auxiliary_lines_as_published": [
     "KELTING POINT                1768                     i!OILING PO.IBT                      3201        K",
     "EBTHALPY OF llELTIBG          1&.192 kJ               ENTHALPY OF VAPORIZATION             37&. 551 kJ",
     "                               4.766 kJ               IIOLlB VOLUKE                         11.&670 J/bar",
-    "                                                                                            6.670 c• 3",
+    "                                                                                            6.670 c\u2022 3",
     "TBUSITIOIIS IN BEFERE!ICE STATE ELEliEIITS",
     "HEAT CAPACITY EQUATIONS",
-    "                                                                2.6875x1oz T-o·5",
+    "                                                                2.6875x1oz T-o\u00b75",
     "            1. 5b46x 105 T- z",
     "            (EQUATION VALID FBOil         l98 -   70u K)",
     "        2.8332x10Z -  0.19791 T               7.9727x10-5 TZ",
@@ -655,5 +655,6 @@
     "row_start": 1,
     "row_stop": 5,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Alpha crystals (hexagonal close packed) 298.15 to 700 K."
 }

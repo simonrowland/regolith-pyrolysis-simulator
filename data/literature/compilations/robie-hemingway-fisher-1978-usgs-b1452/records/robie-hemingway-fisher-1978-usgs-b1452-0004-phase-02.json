@@ -68,16 +68,16 @@
     "                                                 FORMATION FRO II THE ELEI!ENTS",
     "                                                                                          GIBBS",
     "          ( H;-H~               so",
-    "TEI!P.              98 )/T       T      -(G;-H~ 98 )/T      c•p     ENTHALPY           FREE EIIEBGY      Log Kf",
-    "             J/llol•K        J/11ol•K     J/mol• K       J/mol•K           kJ/1101        kJ/1101",
+    "TEI!P.              98 )/T       T      -(G;-H~ 98 )/T      c\u2022p     ENTHALPY           FREE EIIEBGY      Log Kf",
+    "             J/llol\u2022K        J/11ol\u2022K     J/mol\u2022 K       J/mol\u2022K           kJ/1101        kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/llol•K",
-    "entropy": "J/11ol•K",
-    "negative_gibbs_function": "J/mol• K",
-    "heat_capacity": "J/mol•K",
+    "enthalpy_function": "J/llol\u2022K",
+    "entropy": "J/11ol\u2022K",
+    "negative_gibbs_function": "J/mol\u2022 K",
+    "heat_capacity": "J/mol\u2022K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -399,11 +399,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -490,11 +490,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• ouo",
+          "as_published": "\u2022 ouo",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -835,7 +835,7 @@
     "                                                                                               10.272 cm 3",
     "TRANSITIONS Il!l REFERENCE STATE ELEIIENTS",
     "HEAT CAPACITY EQUATION",
-    "         11.255 +       1.1692x1u-z T                2. 2534:1102 T-o· s",
+    "         11.255 +       1.1692x1u-z T                2. 2534:1102 T-o\u00b7 s",
     "             (EQUATION VALID FBOII               298 - 1234 K)",
     "REFEBE NCE      107              35                                                                    COI!PILED",
     "                                                                                                        4-10-7b"
@@ -849,5 +849,6 @@
     "row_start": 12,
     "row_stop": 18,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "LiqYid 1234\n         to 1800 K."
 }

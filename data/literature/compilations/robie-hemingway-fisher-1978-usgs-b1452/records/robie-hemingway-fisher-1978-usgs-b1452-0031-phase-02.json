@@ -27,7 +27,7 @@
   "formation_basis_header_as_published": "FORIIATION .FROII THE ELEIIENTS",
   "formula_weight": {
     "as_published": "12.590",
-    "value": null,
+    "value": 12.59,
     "ocr_suspect": true,
     "footnote_markers": [],
     "source_text_span": {
@@ -69,17 +69,17 @@
     "                                                                                       GIBBS",
     "TEIIP.    (H;-H~98 )/T      so      -{G;-H~ 98 )/T       cop     ENTHALPY           FREE EHERGY         Loq Kf",
     "                             T",
-    "            Jjaol•K      Jtaol• K     Jf•ol•K         Jjaol• K         ltJ/•ol          ltJt•ol",
+    "            Jjaol\u2022K      Jtaol\u2022 K     Jf\u2022ol\u2022K         Jjaol\u2022 K         ltJ/\u2022ol          ltJt\u2022ol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "Jjaol•K",
-    "entropy": "Jtaol• K",
-    "negative_gibbs_function": "Jf•ol•K",
-    "heat_capacity": "Jjaol• K",
-    "formation_enthalpy": "ltJ/•ol",
-    "formation_gibbs_energy": "ltJt•ol",
+    "enthalpy_function": "Jjaol\u2022K",
+    "entropy": "Jtaol\u2022 K",
+    "negative_gibbs_function": "Jf\u2022ol\u2022K",
+    "heat_capacity": "Jjaol\u2022 K",
+    "formation_enthalpy": "ltJ/\u2022ol",
+    "formation_gibbs_energy": "ltJt\u2022ol",
     "log_kf": ""
   },
   "temperature_grid": [
@@ -488,11 +488,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -830,7 +830,7 @@
     "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
     "HEAT CAPACITY EQUATION",
     "          37.798 -    1.3888x1o-z T                8. 8359x 10-. TZ",
-    "         -7.6972x10• T-Z",
+    "         -7.6972x10\u2022 T-Z",
     "             (EQUATION VALID PRO!!          298- 1210.4 K)",
     "REPEREHCE      107          107                                                                       COIIPILED",
     "                                                                                                       4-12-76"
@@ -844,5 +844,6 @@
     "row_start": 12,
     "row_stop": 18,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Liquid 1210.4 to boilinq point 3107 K."
 }

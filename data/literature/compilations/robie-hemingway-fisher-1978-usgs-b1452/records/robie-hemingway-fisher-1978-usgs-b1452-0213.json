@@ -63,15 +63,15 @@
     "TEftP.   ( a;-H~ 98 );T",
     "                              0",
     "                             ST      -< G;-H~ 98 };r      cop    EJTHALPY          FREE EJERGY      Log Kf",
-    "  K         J/aol•K       J/aol•K      Jjaol•K         Jjaol•K         kJ/aol         kJ/aol",
-    "---------------------------------------·-----------------------------------------"
+    "  K         J/aol\u2022K       J/aol\u2022K      Jjaol\u2022K         Jjaol\u2022K         kJ/aol         kJ/aol",
+    "---------------------------------------\u00b7-----------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "Jjaol•K",
-    "heat_capacity": "Jjaol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "Jjaol\u2022K",
+    "heat_capacity": "Jjaol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -79,43 +79,43 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "600",
-      "value": null,
+      "value": 600.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "700",
-      "value": null,
+      "value": 700.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "800",
-      "value": null,
+      "value": 800.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "900",
-      "value": null,
+      "value": 900.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -168,7 +168,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -263,7 +263,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -358,7 +358,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -453,7 +453,7 @@
       "cells": {
         "temperature": {
           "as_published": "600",
-          "value": null,
+          "value": 600.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -548,7 +548,7 @@
       "cells": {
         "temperature": {
           "as_published": "700",
-          "value": null,
+          "value": 700.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -643,7 +643,7 @@
       "cells": {
         "temperature": {
           "as_published": "800",
-          "value": null,
+          "value": 800.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -738,7 +738,7 @@
       "cells": {
         "temperature": {
           "as_published": "900",
-          "value": null,
+          "value": 900.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -854,9 +854,9 @@
     "                                        kJ             KOLAR VOLUftE                        3.5560 Jjbar",
     "                                                                                           35.560 ca 3",
     "TRANSITIONS IN REFERENCE STATE ELEKENTS",
-    "    URANIUK •••• ALPHA-BETA 941, BETA-GAKKA 1048, ft. P. 1405 K.",
+    "    URANIUK \u2022\u2022\u2022\u2022 ALPHA-BETA 941, BETA-GAKKA 1048, ft. P. 1405 K.",
     "HEAT CAPACITY EQUATIOH",
-    "         2.1500x1oz-        J.8496x1o-z T              2.5272x1(J:J T-o·s",
+    "         2.1500x1oz-        J.8496x1o-z T              2.5272x1(J:J T-o\u00b7s",
     "             (EQUATION VALID FROM      298-            90(1 K)"
   ],
   "footnote_markers": [],
@@ -875,5 +875,6 @@
     "row_start": 1,
     "row_stop": 7,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to         900 K."
 }

@@ -64,15 +64,15 @@
     "                                                                                        GIBBS",
     "TEMP.    ( H;-H~ 98 )/T      so          -cG;-H~ 98 )/T        cop   ENTHALPY        FREE ENERGY      Loy Kf",
     "                               T",
-    "  K         J/IIOl•K      J/aol•K          J/IIIOl•K      J/aol•K         kJ/aol         kJ/1101",
+    "  K         J/IIOl\u2022K      J/aol\u2022K          J/IIIOl\u2022K      J/aol\u2022K         kJ/aol         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/IIOl•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/IIIOl•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/IIOl\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/IIIOl\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -118,7 +118,7 @@
     },
     {
       "as_published": "179.643",
-      "value": null,
+      "value": 179.643,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -135,9 +135,9 @@
     "                               10.368 kJ                  IIOLAB VOLUME                       ..1.3853 J/bar",
     "                                                                                             23.853 CIIJ",
     "TRANSITIONS Ill REFERENCE STATE ELEKENTS",
-    "   CERIUM ••••• BETA-GA!!A               999, !. P.     1~71    K.",
+    "   CERIUM \u2022\u2022\u2022\u2022\u2022 BETA-GA!!A               999, !. P.     1~71    K.",
     "HEAT CAPACITY E~UATIOII",
-    "        80.292 +       5.6994x10-3 T                2.0990x10Z T-o·s",
+    "        80.292 +       5.6994x10-3 T                2.0990x10Z T-o\u00b7s",
     "             (EQUATION VALID FBO!                298 - 1800 K)"
   ],
   "footnote_markers": [],
@@ -148,5 +148,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=16, entropy=16, negative_gibbs_function=17, heat_capacity=16, formation_enthalpy=16, formation_gibbs_energy=16, log_kf=15",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Crystals 298.15 to              18~~    K."
 }

@@ -66,15 +66,15 @@
     "                                                                                        GIBBS",
     "TEKP.    <u;-u~98 )IT      so      -( G;-H~ 98 )/T      cop      EHTHlLPY            FREE EHI!BGY      Log Kf",
     "                            T",
-    "  K         Jf•ol•K    Jf•ol•K       Jjaol•K         J/aol• K           kJjmol          kJ/1101",
+    "  K         Jf\u2022ol\u2022K    Jf\u2022ol\u2022K       Jjaol\u2022K         J/aol\u2022 K           kJjmol          kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jf•ol•K",
-    "entropy": "Jf•ol•K",
-    "negative_gibbs_function": "Jjaol•K",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "Jf\u2022ol\u2022K",
+    "entropy": "Jf\u2022ol\u2022K",
+    "negative_gibbs_function": "Jjaol\u2022K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "kJjmol",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -271,11 +271,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -425,7 +425,7 @@
     "                                                                                             12.056 cm 3",
     "TRANSITIONS IN REFERENCE STATE ELEKENTS",
     "HEAT CAPACITY EQUATION",
-    "        31.778 +      5.3B78x10-• T             1.7B64x102 T-o·5",
+    "        31.778 +      5.3B78x10-\u2022 T             1.7B64x102 T-o\u00b75",
     "             (EQUATION VALID FROK           298 - 1685 K)"
   ],
   "footnote_markers": [],
@@ -437,5 +437,6 @@
     "row_start": 16,
     "row_stop": 18,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Liquid 1685 to 1800 K."
 }

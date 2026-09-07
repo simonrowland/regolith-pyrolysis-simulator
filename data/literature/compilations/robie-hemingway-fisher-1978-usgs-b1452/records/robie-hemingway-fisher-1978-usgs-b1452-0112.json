@@ -67,17 +67,17 @@
     "TEIIP.       (H~-H~ 98 )/T",
     "                                  0",
     "                                 sr      -(G;-H~ 98 )/T      cop      ENTHALPY         FREE ENERGY       Log Kf",
-    "               J/IIIOl•K     J/lllol•K     J/mol• K       J/mol•K        kJ/11101         itJ/11101",
+    "               J/IIIOl\u2022K     J/lllol\u2022K     J/mol\u2022 K       J/mol\u2022K        kJ/11101         itJ/11101",
     "--------------------------------------------------------------------------------",
     " :.!98.15  0.000     59.83     59.83    79.02    -1653.517   -15&2. 702  273.780",
     "UNCERTAINTY                     b. 28            &.28                        1.2&0            1. 300      0.228"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/IIIOl•K",
-    "entropy": "J/lllol•K",
-    "negative_gibbs_function": "J/mol• K",
-    "heat_capacity": "J/mol•K",
+    "enthalpy_function": "J/IIIOl\u2022K",
+    "entropy": "J/lllol\u2022K",
+    "negative_gibbs_function": "J/mol\u2022 K",
+    "heat_capacity": "J/mol\u2022K",
     "formation_enthalpy": "kJ/11101",
     "formation_gibbs_energy": "itJ/11101",
     "log_kf": ""
@@ -739,13 +739,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-1409.801",
-          "value": null,
+          "value": -1409.801,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "92.051",
-          "value": null,
+          "value": 92.051,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1792,9 +1792,9 @@
     "ENTHALPY OP !!ELTING              94. 140 kJ              ENTHALPY OF VAPORIZATION                        kJ",
     "                                            kJ          IIOLAR VOLUME                                     J/bar",
     "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
-    "      ALUIIINUM ••• K. P.      933 K.",
+    "      ALUIIINUM \u2022\u2022\u2022 K. P.      933 K.",
     "HEAT CAPACITY        EQUATION",
-    "             1.5343x10Z +      1.9681x10-:J T             9.u063x10Z T-0·5",
+    "             1.5343x10Z +      1.9681x10-:J T             9.u063x10Z T-0\u00b75",
     "                (EQUATION VALID FROM       298 -        1800 K)"
   ],
   "footnote_markers": [],
@@ -1817,5 +1817,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to 1800 K."
 }

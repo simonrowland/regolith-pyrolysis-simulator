@@ -66,15 +66,15 @@
     "                                                                                        GIBBS",
     "TEIIP.    ( a;-H~ 98 )/T      so      -(G;-H~ 98 )/T      cop     EHTHALPY          PIIEE EIEBGI     Log Kf",
     "                               T",
-    "  K          J/aol•K       J/aol•K      J/aol•l        J/aol• K         kJ/aol         kJ/aol",
+    "  K          J/aol\u2022K       J/aol\u2022K      J/aol\u2022l        J/aol\u2022 K         kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•l",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022l",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -1276,19 +1276,19 @@
         },
         "enthalpy_function": {
           "as_published": "42.279",
-          "value": null,
+          "value": 42.279,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "160.09",
-          "value": null,
+          "value": 160.09,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "111.81",
-          "value": null,
+          "value": 111.81,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1765,7 +1765,7 @@
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATION",
     "         1.3529z10Z-         5.7749zto-z       T       2.0865z1o-s TZ",
-    "         1.1688110• T-Z",
+    "         1.1688110\u2022 T-Z",
     "            (.BQUlTIOII VALID FBOII           298 - 1800 K)",
     "R!l!REIIC!      39            120                                            2                     COSPI.LID",
     "                                                                            49                      7-26-76"
@@ -1790,5 +1790,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to aelting point 1803 K."
 }

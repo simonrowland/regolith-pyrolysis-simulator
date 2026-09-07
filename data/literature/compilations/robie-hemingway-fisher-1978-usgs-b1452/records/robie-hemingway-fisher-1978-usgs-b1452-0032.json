@@ -68,15 +68,15 @@
     "                                                                                           GIBBS",
     "TEll Po     ( H~-H~ 98 )/T      so      -(~-H~ 98 )/T        cop      ENTHALPY          FREE EIIE&GY     Log Kf",
     "                                 T",
-    "   K         J/aol•K         J/aol• K      J/aol•K        Jtao l•K         kJ;aol          kJ/aol",
+    "   K         J/aol\u2022K         J/aol\u2022 K      J/aol\u2022K        Jtao l\u2022K         kJ;aol          kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol• K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "Jtao l•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022 K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "Jtao l\u2022K",
     "formation_enthalpy": "kJ;aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -115,7 +115,7 @@
   ],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATION",
-    "           7o4424 +     1o1707x1o-z T                1o3899x1o-• TZ",
+    "           7o4424 +     1o1707x1o-z T                1o3899x1o-\u2022 TZ",
     "          -So1041x105 T-z",
     "              (EQUATION VALID FROII              298 -   1800 K)",
     "REFEREIICE      107              35                                                                    COI!PILKD",
@@ -129,5 +129,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=16, entropy=16, negative_gibbs_function=15, heat_capacity=15, formation_enthalpy=15, formation_gibbs_energy=15, log_kf=15",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Ideal diatoaic gas 298o15 to 1800 Ko"
 }

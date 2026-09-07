@@ -22,7 +22,7 @@
     "                                                                         FO.IUIATIOH FROB THE ELEIIEHTS",
     "                                                                                         GIBBS",
     "                                   T",
-    "  K          J/llol•K         J/IIOl•K       J/llol•K        J/llol•K         kJ/1101         kJ/1101"
+    "  K          J/llol\u2022K         J/IIOl\u2022K       J/llol\u2022K        J/llol\u2022K         kJ/1101         kJ/1101"
   ],
   "description_lines_as_published": [
     "HaOH:    Crystals 298.15 to aeltinq point 596 K.                          Liquid 596 to 1800 K.",
@@ -30,7 +30,7 @@
     "                                                                         FO.IUIATIOH FROB THE ELEIIEHTS",
     "                                                                                         GIBBS",
     "                                   T",
-    "  K          J/llol•K         J/IIOl•K       J/llol•K        J/llol•K         kJ/1101         kJ/1101"
+    "  K          J/llol\u2022K         J/IIOl\u2022K       J/llol\u2022K        J/llol\u2022K         kJ/1101         kJ/1101"
   ],
   "formation_basis_header_as_published": "FO.IUIATIOH FROB THE ELEIIEHTS",
   "formula_weight": {
@@ -76,15 +76,15 @@
     "                                                                                         GIBBS",
     "TEIIP.    (H;-H; 98 )/T           so       -( G;-a~ 98 )/T      cop     EJTHlLPY      FREE EIIERGY   Loq Kf",
     "                                   T",
-    "  K          J/llol•K         J/IIOl•K       J/llol•K        J/llol•K         kJ/1101         kJ/1101",
+    "  K          J/llol\u2022K         J/IIOl\u2022K       J/llol\u2022K        J/llol\u2022K         kJ/1101         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/llol•K",
-    "entropy": "J/IIOl•K",
-    "negative_gibbs_function": "J/llol•K",
-    "heat_capacity": "J/llol•K",
+    "enthalpy_function": "J/llol\u2022K",
+    "entropy": "J/IIOl\u2022K",
+    "negative_gibbs_function": "J/llol\u2022K",
+    "heat_capacity": "J/llol\u2022K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -92,25 +92,25 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "596",
-      "value": null,
+      "value": 596.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -163,7 +163,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -258,7 +258,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -353,7 +353,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -448,7 +448,7 @@
       "cells": {
         "temperature": {
           "as_published": "596",
-          "value": null,
+          "value": 596.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -563,7 +563,7 @@
     "                                                                         FO.IUIATIOH FROB THE ELEIIEHTS",
     "                                                                                         GIBBS",
     "                                   T",
-    "  K          J/llol•K         J/IIOl•K       J/llol•K        J/llol•K         kJ/1101         kJ/1101"
+    "  K          J/llol\u2022K         J/IIOl\u2022K       J/llol\u2022K        J/llol\u2022K         kJ/1101         kJ/1101"
   ],
   "auxiliary_lines_as_published": [
     "BELTING POINT                      596        K              BOILING POI NT                                  K",
@@ -571,9 +571,9 @@
     "                                   10.489 kJ                 llOLAR VOLUIIE                        1.8780 Jjbar",
     "                                                                                                  18.780 CIIJ",
     "TRANSITIOMS IB REFERENCE STATE ELE!EHTS",
-    "   SODIUI! •••••      1!.    P. 370.98, B. P. 1175 K.",
+    "   SODIUI! \u2022\u2022\u2022\u2022\u2022      1!.    P. 370.98, B. P. 1175 K.",
     "HEAT CAPACITY EQUATION",
-    "         88.445-            5.5178x10-3 T              25.993 T-o·s",
+    "         88.445-            5.5178x10-3 T              25.993 T-o\u00b7s",
     "             (EQUATION VALID FROI!                 5 96 - 1800 K)",
     "REFER !ICE       32                32                                            215                      CO !PILED",
     "                                                                                  32                       5-24-76"
@@ -594,5 +594,6 @@
     "row_start": 1,
     "row_stop": 4,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to aeltinq point 596 K."
 }

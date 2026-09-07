@@ -68,15 +68,15 @@
     "                       98 )/T",
     "                                   0",
     "TEftP.                            ST                                   EITHALPY          FREE EIERGY         Log Kf",
-    "  K            J/•ol•K      Jf•ol•K         J/8ol•K         J/aol•K        ltJjaol           kJjaol",
+    "  K            J/\u2022ol\u2022K      Jf\u2022ol\u2022K         J/8ol\u2022K         J/aol\u2022K        ltJjaol           kJjaol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/•ol•K",
-    "entropy": "Jf•ol•K",
-    "negative_gibbs_function": "J/8ol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/\u2022ol\u2022K",
+    "entropy": "Jf\u2022ol\u2022K",
+    "negative_gibbs_function": "J/8ol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "ltJjaol",
     "formation_gibbs_energy": "kJjaol",
     "log_kf": ""
@@ -150,7 +150,7 @@
     },
     {
       "as_published": "1400",
-      "value": null,
+      "value": 1400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -452,11 +452,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -1113,11 +1113,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1276,7 +1276,7 @@
       "cells": {
         "temperature": {
           "as_published": "1400",
-          "value": null,
+          "value": 1400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1311,11 +1311,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -1402,11 +1402,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1499,19 +1499,19 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 0(10",
+          "as_published": "\u2022 0(10",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -1761,5 +1761,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Ideal gas 298.15 to             1800 K."
 }

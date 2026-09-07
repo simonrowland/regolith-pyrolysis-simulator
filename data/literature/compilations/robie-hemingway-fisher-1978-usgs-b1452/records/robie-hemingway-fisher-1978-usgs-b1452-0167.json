@@ -62,15 +62,15 @@
     "                                                                                      GIBBS",
     "TEftP.    ( H;-H; 98 )/T      so     -(G;-H~ 98 )/T      cop      ENTHALPY         FREE EMEBGY      Loq Kf",
     "                               T",
-    "  K         Jjaol•K        J/aol•K     J;aol•K        J/aol•JI:        kJ/aol         kJ/1101",
+    "  K         Jjaol\u2022K        J/aol\u2022K     J;aol\u2022K        J/aol\u2022JI:        kJ/aol         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jjaol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J;aol•K",
-    "heat_capacity": "J/aol•JI:",
+    "enthalpy_function": "Jjaol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J;aol\u2022K",
+    "heat_capacity": "J/aol\u2022JI:",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -78,49 +78,49 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "600",
-      "value": null,
+      "value": 600.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "700",
-      "value": null,
+      "value": 700.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "800",
-      "value": null,
+      "value": 800.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "900",
-      "value": null,
+      "value": 900.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1000",
-      "value": null,
+      "value": 1000.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -173,7 +173,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -268,7 +268,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -363,7 +363,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -458,7 +458,7 @@
       "cells": {
         "temperature": {
           "as_published": "600",
-          "value": null,
+          "value": 600.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -553,7 +553,7 @@
       "cells": {
         "temperature": {
           "as_published": "700",
-          "value": null,
+          "value": 700.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -648,7 +648,7 @@
       "cells": {
         "temperature": {
           "as_published": "800",
-          "value": null,
+          "value": 800.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -743,7 +743,7 @@
       "cells": {
         "temperature": {
           "as_published": "900",
-          "value": null,
+          "value": 900.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -838,25 +838,25 @@
       "cells": {
         "temperature": {
           "as_published": "1000",
-          "value": null,
+          "value": 1000.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "enthalpy_function": {
           "as_published": "60.0119",
-          "value": null,
+          "value": 60.0119,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "175.68",
-          "value": null,
+          "value": 175.68,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "115.63",
-          "value": null,
+          "value": 115.63,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -950,7 +950,7 @@
   "reference_state_notes_as_published": [],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQDATIOW",
-    "c;       1.1397x1oz +  7.11857x1o-~ T - 8.1335x10Z T-o·s",
+    "c;       1.1397x1oz +  7.11857x1o-~ T - 8.1335x10Z T-o\u00b7s",
     "            (EQUATIOH VALID FBOS 298- 1000 K)",
     "RBlBBENCE      247           247                                         183                      COIIPILBD",
     "                63                                                       265                       6- 9-76"
@@ -981,5 +981,6 @@
     "row_start": 1,
     "row_stop": 8,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to aelting point 1193 K."
 }

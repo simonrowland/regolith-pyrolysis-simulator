@@ -63,15 +63,15 @@
     "                                                                                    GIBBS",
     "TEMP.    ca;- a~ 98 )/T      so",
     "                              r     -(G;-a~ 98 )/T      cop    ENTHALPY          FREE EIEBGI     Log Kf",
-    "  K       J;aol•K         J/aol•K     J/aol•K        J/aol•K         kJ/aol         kJ/aol",
+    "  K       J;aol\u2022K         J/aol\u2022K     J/aol\u2022K        J/aol\u2022K         kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J;aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J;aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -79,31 +79,31 @@
   "temperature_grid": [
     {
       "as_published": "950",
-      "value": null,
+      "value": 950.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1000",
-      "value": null,
+      "value": 1000.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1100",
-      "value": null,
+      "value": 1100.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1200",
-      "value": null,
+      "value": 1200.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1300",
-      "value": null,
+      "value": 1300.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -156,7 +156,7 @@
       "cells": {
         "temperature": {
           "as_published": "950",
-          "value": null,
+          "value": 950.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -251,7 +251,7 @@
       "cells": {
         "temperature": {
           "as_published": "1000",
-          "value": null,
+          "value": 1000.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -346,7 +346,7 @@
       "cells": {
         "temperature": {
           "as_published": "1100",
-          "value": null,
+          "value": 1100.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -441,7 +441,7 @@
       "cells": {
         "temperature": {
           "as_published": "1200",
-          "value": null,
+          "value": 1200.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -536,7 +536,7 @@
       "cells": {
         "temperature": {
           "as_published": "1300",
-          "value": null,
+          "value": 1300.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -652,10 +652,10 @@
     "                              16.272 ltJ             IIOLAR VOLUME                        3.9460 J/bar",
     "                                                                                         39.460 ca 3",
     "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
-    "   liON ••••••• CUBIE P. 1042, ALPHA-GA!IIA 1184, GA!IIA-DELTA 1665,",
+    "   liON \u2022\u2022\u2022\u2022\u2022\u2022\u2022 CUBIE P. 1042, ALPHA-GA!IIA 1184, GA!IIA-DELTA 1665,",
     "                ft. P. DELTA 1809 K.",
     "HEAT CAPACITY EQUATION",
-    "        -1.1231x1oz +       8.9510x1o-z T            3.7897x103 T-o·s",
+    "        -1.1231x1oz +       8.9510x1o-z T            3.7897x103 T-o\u00b7s",
     "               (EQUATION VALID FBO!    298 -         950 K)"
   ],
   "footnote_markers": [],
@@ -667,5 +667,6 @@
     "row_start": 9,
     "row_stop": 13,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Liquid 950 to boiling point\n            1347 K."
 }

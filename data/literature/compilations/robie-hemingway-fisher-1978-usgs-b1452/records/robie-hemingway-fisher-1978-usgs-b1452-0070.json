@@ -69,17 +69,17 @@
     "                                                                                         GIBBS",
     "TEIIP.     ( a;-H~ 98 )/T     so       -(G;-a~ 98 )/T       cop      ENTHALPY         FREE EIIERGY      Log Kf",
     "                                T",
-    "  K         J/•ol•K         J/aol•K      J/•ol•K         J/•ol•K          kJ/•ol         kJ/•ol",
+    "  K         J/\u2022ol\u2022K         J/aol\u2022K      J/\u2022ol\u2022K         J/\u2022ol\u2022K          kJ/\u2022ol         kJ/\u2022ol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/•ol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/•ol•K",
-    "heat_capacity": "J/•ol•K",
-    "formation_enthalpy": "kJ/•ol",
-    "formation_gibbs_energy": "kJ/•ol",
+    "enthalpy_function": "J/\u2022ol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/\u2022ol\u2022K",
+    "heat_capacity": "J/\u2022ol\u2022K",
+    "formation_enthalpy": "kJ/\u2022ol",
+    "formation_gibbs_energy": "kJ/\u2022ol",
     "log_kf": ""
   },
   "temperature_grid": [
@@ -281,19 +281,19 @@
         },
         "enthalpy_function": {
           "as_published": "6.517",
-          "value": null,
+          "value": 6.517,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "51.04",
-          "value": null,
+          "value": 51.04,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "46.52",
-          "value": null,
+          "value": 46.52,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -399,11 +399,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -496,11 +496,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -593,11 +593,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -690,11 +690,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -937,10 +937,10 @@
     "!!ELTING POINT                 904                       BOILING POINT                        1860",
     "ENTHALPY OF IIELTIIIG           19.874 kJ                EIITHALPY OF VlPORIZ.ATIOII           86.525 kJ",
     "                                    5.870 kJ             IIOLAR VOLUIIE                        1. 8178 J/bar",
-    "                                                                                              18.178 c• 3",
+    "                                                                                              18.178 c\u2022 3",
     "TRAIISITIOIIS IN REFEREIICE STATE ELEIIBIITS",
     "HEAT CAPACITY EQUATIOII",
-    "         52.624-      3.2992x1o-z T                   2. 4691x 10-5 TZ          l. 6512x10Z T- o•s",
+    "         52.624-      3.2992x1o-z T                   2. 4691x 10-5 TZ          l. 6512x10Z T- o\u2022s",
     "         1.2617x1os r-z",
     "            (EQUATION VALID FROII              298-      904 K)"
   ],
@@ -964,5 +964,6 @@
     "row_start": 1,
     "row_stop": 8,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Rhoabohedral crystals 298. 15 to               ~~elting    point 904 K."
 }

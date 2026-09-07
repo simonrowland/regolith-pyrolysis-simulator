@@ -65,16 +65,16 @@
     "                                                                                           GIBBS",
     "TEIP.    ( u;- H~ 98 )/T      so     -(G;-H~ 98 )/T      cop    EIITBALPI               FREE EIIIBBGY        Log Kf",
     "                               T",
-    "  K         J;aol•K        J/aol•K     J/aol•K        J;aol•K         kJ;aol               kJ/aol",
+    "  K         J;aol\u2022K        J/aol\u2022K     J/aol\u2022K        J;aol\u2022K         kJ;aol               kJ/aol",
     "--------------------------------------------------------------------------------",
     "           o.ooo"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J;aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J;aol•K",
+    "enthalpy_function": "J;aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J;aol\u2022K",
     "formation_enthalpy": "kJ;aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -120,7 +120,7 @@
     },
     {
       "as_published": "1.120",
-      "value": null,
+      "value": 1.12,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -138,7 +138,7 @@
     "                                                                                                39.010 Cll3",
     "TRANSITIONS IN REFERENCE STATE OXIDES",
     "HEAT CAPACITY EQUATION",
-    "            81.59& + O. 10754 T               J.1677x103 T-o·s",
+    "            81.59& + O. 10754 T               J.1677x103 T-o\u00b7s",
     "             (EQUATIOH VALID PROS            298 - 1197 K)"
   ],
   "footnote_markers": [],
@@ -149,5 +149,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=15, enthalpy_function=15, entropy=15, negative_gibbs_function=15, heat_capacity=15, formation_enthalpy=16, formation_gibbs_energy=16, log_kf=15",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "orthorhoabic crystals 298.15 to 1197 K.               Hexaqonal crystals 1197 to\n            1500 K."
 }

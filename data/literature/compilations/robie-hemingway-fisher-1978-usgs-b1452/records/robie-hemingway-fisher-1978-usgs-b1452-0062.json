@@ -69,15 +69,15 @@
     "                                                                                           GIBBS",
     "TEIIP.     ( H;-H~   98 )/T      so",
     "                                  T      -( G;-H~ 98 )/T      cop      EIITHALPY        PBBB EIIEBGY       Log Kf",
-    "  K         J/aol•K           J/IIOl•K     J/1101• K       J/1101• K        kJ/aol         kJ/1101",
+    "  K         J/aol\u2022K           J/IIOl\u2022K     J/1101\u2022 K       J/1101\u2022 K        kJ/aol         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/IIOl•K",
-    "negative_gibbs_function": "J/1101• K",
-    "heat_capacity": "J/1101• K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/IIOl\u2022K",
+    "negative_gibbs_function": "J/1101\u2022 K",
+    "heat_capacity": "J/1101\u2022 K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -268,11 +268,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -342,5 +342,6 @@
     "row_start": 1,
     "row_stop": 2,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Body-centered cubic 298.15 to aeltiag point 312.64 K."
 }

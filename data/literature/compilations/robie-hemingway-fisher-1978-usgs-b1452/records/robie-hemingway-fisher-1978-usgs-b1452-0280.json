@@ -68,15 +68,15 @@
     "                                                                                             GIBBS",
     "TE.IIP.    ( H~-H; 98 )/T      so      -( G~-u; 98 )/T       cop      ENTHALPY            fREE EH.EBGY      Log Kf",
     "                                T",
-    "   K         J/IIOl•K       J/IIOl•K     J/IIOl•K        J/IIOl•K            kJ/1101         kJ/1101",
+    "   K         J/IIOl\u2022K       J/IIOl\u2022K     J/IIOl\u2022K        J/IIOl\u2022K            kJ/1101         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/IIOl•K",
-    "entropy": "J/IIOl•K",
-    "negative_gibbs_function": "J/IIOl•K",
-    "heat_capacity": "J/IIOl•K",
+    "enthalpy_function": "J/IIOl\u2022K",
+    "entropy": "J/IIOl\u2022K",
+    "negative_gibbs_function": "J/IIOl\u2022K",
+    "heat_capacity": "J/IIOl\u2022K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -89,7 +89,7 @@
   "uncertainty_values": [
     {
       "as_published": "0.14",
-      "value": null,
+      "value": 0.14,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -100,7 +100,7 @@
     },
     {
       "as_published": "0.14",
-      "value": null,
+      "value": 0.14,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -152,7 +152,7 @@
     "                                11.b31 kJ                I!OLA B VOL Ull E                         2.8018 J/bar",
     "                                                                                                  28.018 cm 3",
     "TRANSITIONS IN REFERENCE STATE ELEBENTS",
-    "     I!AGNESIUII •• II. P. 922 1 B. P.         1361 K.",
+    "     I!AGNESIUII \u2022\u2022 II. P. 922 1 B. P.         1361 K.",
     "HEAT CAPACITY EQUATION",
     "c~        81.119 + 5.2254x1o-z T              - 1.8320x106 T-z",
     "             (EQUATION VALID FBO.II           298- 1000 K)"
@@ -165,5 +165,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=8, enthalpy_function=8, entropy=8, negative_gibbs_function=8, heat_capacity=8, formation_enthalpy=8, formation_gibbs_energy=8, log_kf=7",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Crystals 298.15 to 1000 K."
 }

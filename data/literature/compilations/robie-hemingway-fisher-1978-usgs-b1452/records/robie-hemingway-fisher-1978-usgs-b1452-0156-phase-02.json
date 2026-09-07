@@ -67,15 +67,15 @@
     "TE.IIP.      ( u;-u~ 98 )/T      so      -(G;-u~ 98 )/T      co",
     "                                                              p     EITHALPY           FREE EIIEBGY      Log Kf",
     "                                  T",
-    "   K          J/aol•K         J/aol•K      J/aol•K        Jjaol•K          kJjaol         kJ/aol",
+    "   K          J/aol\u2022K         J/aol\u2022K      J/aol\u2022K        Jjaol\u2022K          kJjaol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "Jjaol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "Jjaol\u2022K",
     "formation_enthalpy": "kJjaol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -83,7 +83,7 @@
   "temperature_grid": [
     {
       "as_published": "744.30",
-      "value": null,
+      "value": 744.3,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -95,13 +95,13 @@
     },
     {
       "as_published": "900",
-      "value": null,
+      "value": 900.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1000",
-      "value": null,
+      "value": 1000.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -154,7 +154,7 @@
       "cells": {
         "temperature": {
           "as_published": "744.30",
-          "value": null,
+          "value": 744.3,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -344,7 +344,7 @@
       "cells": {
         "temperature": {
           "as_published": "900",
-          "value": null,
+          "value": 900.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -439,7 +439,7 @@
       "cells": {
         "temperature": {
           "as_published": "1000",
-          "value": null,
+          "value": 1000.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -557,7 +557,7 @@
     "                                      7.414 kJ            ftOLAB VOLUIIE                        1.6440 Jjbar",
     "                                                                                               16.440 Cllj",
     "TRANSITIONS IN REFERENCE STATE ELEftENTS",
-    "    LITHIUII •••• .II. P. 453.69, B. P. 1618 K.",
+    "    LITHIUII \u2022\u2022\u2022\u2022 .II. P. 453.69, B. P. 1618 K.",
     "HEAT CAPACITY EQUATION",
     "            51.051 +    3.3271x1o-z T              1.0116x106 T-Z",
     "               (EQUATIOH VALID FROft             298- 744.30K)",
@@ -573,5 +573,6 @@
     "row_start": 7,
     "row_stop": 10,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "crystals 298.15 to melting point 744.3 K.                  Liquid 744.3 to 1000 K."
 }

@@ -65,16 +65,16 @@
     "TEI'IP.    ( H;-a~98 )/T      so",
     "                               T     -(G;-u~ 98 )/T       co",
     "                                                           p      EIITHALPY              FREE ENERGY            Log Kf",
-    "  K         J/IIOl•K       J;aol•K     J;aol• K       J/1101• K       kJ/1101              kJ/aol",
+    "  K         J/IIOl\u2022K       J;aol\u2022K     J;aol\u2022 K       J/1101\u2022 K       kJ/1101              kJ/aol",
     "--------------------------------------------------------------------------------",
     "           o.ooo"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/IIOl•K",
-    "entropy": "J;aol•K",
-    "negative_gibbs_function": "J;aol• K",
-    "heat_capacity": "J/1101• K",
+    "enthalpy_function": "J/IIOl\u2022K",
+    "entropy": "J;aol\u2022K",
+    "negative_gibbs_function": "J;aol\u2022 K",
+    "heat_capacity": "J/1101\u2022 K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -120,7 +120,7 @@
     },
     {
       "as_published": "0.660",
-      "value": null,
+      "value": 0.66,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -134,12 +134,12 @@
   "auxiliary_lines_as_published": [
     "II! LTI NG POI liT            2163      K             BOIL I BG POINT                                            K",
     "ENTHALPY OF !!ELTING                    kJ            ENTHALPY OF YAPOBIZATIOB                                   kJ",
-    "                               17.276 kJ              IIOL lR VOL 011 E                          4.3790 Jt1»ar",
+    "                               17.276 kJ              IIOL lR VOL 011 E                          4.3790 Jt1\u00bbar",
     "                                                                                                43.790 ca 3",
     "TRAHSITIOBS IN REFERENCE STATE OIIDES",
-    "  Si0 2 • • • • • • • ALPHA- BETA TBAHSITION 844 K.",
+    "  Si0 2 \u2022 \u2022 \u2022 \u2022 \u2022 \u2022 \u2022 ALPHA- BETA TBAHSITION 844 K.",
     "HEAT CAPACITY EQUATION",
-    "          2.2798x10Z + 3.4139x10-3 T     1.7446x103 T-o·s",
+    "          2.2798x10Z + 3.4139x10-3 T     1.7446x103 T-o\u00b7s",
     "             (EQUATION VALID FROII 298- 1800 K)"
   ],
   "footnote_markers": [],
@@ -150,5 +150,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=15, entropy=16, negative_gibbs_function=14, heat_capacity=18, formation_enthalpy=16, formation_gibbs_energy=16, log_kf=16",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "crystals 298. 15 to .elting point 2163 K."
 }

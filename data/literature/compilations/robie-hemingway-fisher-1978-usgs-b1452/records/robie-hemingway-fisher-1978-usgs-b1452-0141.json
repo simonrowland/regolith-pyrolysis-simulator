@@ -66,15 +66,15 @@
     "                                                                                             GIBBS",
     "TE!IP.       (a;- s~ 98 )/T        so",
     "                                    T      -(G;-s~ 98 )/T      cop     BIIITHALPY         FREE EIIERGY     Log Kf",
-    "   K          J/aol•K          J/aol•K       J/aol•K        J/aol•K         kJ/aol           kJ/aol",
+    "   K          J/aol\u2022K          J/aol\u2022K       J/aol\u2022K        J/aol\u2022K         kJ/aol           kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -706,19 +706,19 @@
         },
         "enthalpy_function": {
           "as_published": "69.872",
-          "value": null,
+          "value": 69.872,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "192.59",
-          "value": null,
+          "value": 192.59,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "122.12",
-          "value": null,
+          "value": 122.12,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1764,9 +1764,9 @@
   ],
   "auxiliary_lines_as_published": [
     "TRANSITIONS IN REFERENCE STATE ELE!IEHTS",
-    "     GALLIUII ••••       !1.   P. 302.9 K.",
+    "     GALLIUII \u2022\u2022\u2022\u2022       !1.   P. 302.9 K.",
     "HEAT CAPACITY EQUATION",
-    "             1.&578x10Z -         2.4571x10-3 T     1.1589x10~ T-o·s",
+    "             1.&578x10Z -         2.4571x10-3 T     1.1589x10~ T-o\u00b7s",
     "               (EQUATION VALID FRO II        298 - 1800 K)"
   ],
   "footnote_markers": [],
@@ -1789,5 +1789,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals L98.15 to 1800 K."
 }

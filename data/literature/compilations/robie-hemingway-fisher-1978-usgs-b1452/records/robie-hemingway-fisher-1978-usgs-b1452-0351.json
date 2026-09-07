@@ -62,17 +62,17 @@
     "                                                                                          GIBBS",
     "TEIIP.      < a;-a~ 98 )/T      so      -<s;-a; 98 )/T      cop     ENTHALPY          l\"REI BIIBRGY     Log Kf",
     "                                 T",
-    "  K           J/aol•K        J/aol•K      J/mol•K        Jtaol•K           kJ/•ol         kJ/•ol",
+    "  K           J/aol\u2022K        J/aol\u2022K      J/mol\u2022K        Jtaol\u2022K           kJ/\u2022ol         kJ/\u2022ol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/mol•K",
-    "heat_capacity": "Jtaol•K",
-    "formation_enthalpy": "kJ/•ol",
-    "formation_gibbs_energy": "kJ/•ol",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/mol\u2022K",
+    "heat_capacity": "Jtaol\u2022K",
+    "formation_enthalpy": "kJ/\u2022ol",
+    "formation_gibbs_energy": "kJ/\u2022ol",
     "log_kf": ""
   },
   "temperature_grid": [
@@ -340,13 +340,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-3044.840",
-          "value": null,
+          "value": -3044.84,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "397.617",
-          "value": null,
+          "value": 397.617,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -530,13 +530,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-2929.602",
-          "value": null,
+          "value": -2929.602,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "255.045",
-          "value": null,
+          "value": 255.045,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -975,19 +975,19 @@
         },
         "enthalpy_function": {
           "as_published": "1611.360",
-          "value": null,
+          "value": 1611.36,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "438.97",
-          "value": null,
+          "value": 438.97,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "274.61",
-          "value": null,
+          "value": 274.61,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1005,13 +1005,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-2641.670",
-          "value": null,
+          "value": -2641.67,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "125.443",
-          "value": null,
+          "value": 125.443,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1100,13 +1100,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-2582.280",
-          "value": null,
+          "value": -2582.28,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "112.404",
-          "value": null,
+          "value": 112.404,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1195,13 +1195,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-2523.035",
-          "value": null,
+          "value": -2523.035,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "101.377",
-          "value": null,
+          "value": 101.377,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1510,7 +1510,7 @@
     },
     {
       "as_published": "11.00",
-      "value": null,
+      "value": 11.0,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -1556,7 +1556,7 @@
   "reference_state_notes_as_published": [],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY BQOATIOI",
-    " c;        2.3240x102 + 2.18qSz1o-z T -    7.2788z10• ,-z",
+    " c;        2.3240x102 + 2.18qSz1o-z T -    7.2788z10\u2022 ,-z",
     "              (IQUlTIOJ YALID l\"BOB 298 - 1600 K)",
     "REPEREICE        285            88                                            286                     COBPILID",
     "                                                                               88                      03-15-79"
@@ -1631,5 +1631,6 @@
     "row_start": 1,
     "row_stop": 14,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "crystals 298.15 to 1700 1."
 }

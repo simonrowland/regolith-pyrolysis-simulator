@@ -66,15 +66,15 @@
     "                                                                                      GIBBS",
     "TEilP.    (H~-H; 98 )/T      so       -(G;-a~ 98 )/T      cop    ENTHALPY          FREE EIIERGY     Log Kf",
     "                               T",
-    "   K        J/ao1•K       J/II01•K      J/1101• K      Jjaol•K        kJ/1101         kJ/1101",
+    "   K        J/ao1\u2022K       J/II01\u2022K      J/1101\u2022 K      Jjaol\u2022K        kJ/1101         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/ao1•K",
-    "entropy": "J/II01•K",
-    "negative_gibbs_function": "J/1101• K",
-    "heat_capacity": "Jjaol•K",
+    "enthalpy_function": "J/ao1\u2022K",
+    "entropy": "J/II01\u2022K",
+    "negative_gibbs_function": "J/1101\u2022 K",
+    "heat_capacity": "Jjaol\u2022K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -1086,19 +1086,19 @@
         },
         "enthalpy_function": {
           "as_published": "31.072",
-          "value": null,
+          "value": 31.072,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "279.39",
-          "value": null,
+          "value": 279.39,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "242.32",
-          "value": null,
+          "value": 242.32,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1769,7 +1769,7 @@
     "                                                                                       24789.200 ca 3",
     "TRANSITIONS IN REFERENCE STATE ELEilENTS",
     "HEAT CAPACITY EQUATION",
-    "         87.820 -      2.6~42x10-3      T       9.9886x10Z T-o·s",
+    "         87.820 -      2.6~42x10-3      T       9.9886x10Z T-o\u00b7s",
     "            (EQUATION VALID FRO!              298- 1800 K)"
   ],
   "footnote_markers": [],
@@ -1792,5 +1792,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Ideal gas 298.15 to 1800 K."
 }

@@ -27,7 +27,7 @@
   "formation_basis_header_as_published": "",
   "formula_weight": {
     "as_published": "711.922",
-    "value": null,
+    "value": 711.922,
     "ocr_suspect": true,
     "footnote_markers": [],
     "source_text_span": {
@@ -69,15 +69,15 @@
     "                                                                                       GIBBS",
     "TBIIP.    (H;-8~98 )IT      so       -(G;-a~ 98 )/T        cop      BITHlLPY        PilE UBIGY       Log Kt",
     "                              T",
-    "  K         J/aol• K     J/aol•K       Jtaol•K          J/aol•K         kJ/aol         kJ/aol",
+    "  K         J/aol\u2022 K     J/aol\u2022K       Jtaol\u2022K          J/aol\u2022K         kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol• K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "Jtaol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022 K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "Jtaol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -168,8 +168,8 @@
         },
         "enthalpy_function": {
           "as_published": "57.1111",
-          "value": 57.1111,
-          "ocr_suspect": false,
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
@@ -286,11 +286,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -599,7 +599,7 @@
   "uncertainty_values": [
     {
       "as_published": "0.811",
-      "value": null,
+      "value": 0.811,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -610,7 +610,7 @@
     },
     {
       "as_published": "0.811",
-      "value": null,
+      "value": 0.811,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -627,13 +627,13 @@
   "auxiliary_lines_as_published": [
     "IIBJ.TING POINT                           K             BOI LI BG POINT                      875      It",
     "ENTHALPY OF IIELT ING                     kJ            ENTHALPY OF YlPOIIZlTION             ]4.828 JtJ",
-    "                                  5.130 kJ              !lOLli YOLUBE                       1.2963 J/t»ar",
+    "                                  5.130 kJ              !lOLli YOLUBE                       1.2963 J/t\u00bbar",
     "                                                                                           12.963 ca 3",
     "TRANSITIONS IN RBFEBENCE STATE BLEIIEBTS",
     "BElT CAPACITY EQUlTIOIIS",
-    "         20.845 +      6.326Sz10-3 T               52.398   ,-o·s",
+    "         20.845 +      6.326Sz10-3 T               52.398   ,-o\u00b7s",
     "            ( EQU AT IOII YlL ID FRO II        298 - 875 K)",
-    "         4!1.139 -     9.1839z1o-s T               9.1807   ,-o·s",
+    "         4!1.139 -     9.1839z1o-s T               9.1807   ,-o\u00b7s",
     "            (!QUlTIOII VALID FROB              875 - 1200 K)",
     "RBFBBBBCB      107          107                                                                    CO!PILED",
     "                                                                                                    5-15-76"
@@ -647,5 +647,6 @@
     "row_start": 8,
     "row_stop": 12,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Ideal\n         tetratoaic gas 875 to 1800 K."
 }

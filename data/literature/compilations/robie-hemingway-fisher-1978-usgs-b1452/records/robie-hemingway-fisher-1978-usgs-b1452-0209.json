@@ -66,15 +66,15 @@
     "                                                                                        GIBBS",
     "TEBP.      (H;-a; 98 )/T      so      -( G;-8; 98 )/T      CDp    IIITBALPY          FREI BURGY      Log 't",
     "                               T",
-    "   K        Jjaol•K        J/aol•K      J/aol•K         J/aol•K          kJjaol        ltJ/aol",
+    "   K        Jjaol\u2022K        J/aol\u2022K      J/aol\u2022K         J/aol\u2022K          kJjaol        ltJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jjaol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "Jjaol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJjaol",
     "formation_gibbs_energy": "ltJ/aol",
     "log_kf": ""
@@ -183,13 +183,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-2317.411",
-          "value": null,
+          "value": -2317.411,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "406.003",
-          "value": null,
+          "value": 406.003,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -278,13 +278,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-2269.219",
-          "value": null,
+          "value": -2269.219,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "296.331",
-          "value": null,
+          "value": 296.331,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -486,5 +486,6 @@
     "row_start": 1,
     "row_stop": 3,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Alpha crystals 298.15 to 450 K."
 }

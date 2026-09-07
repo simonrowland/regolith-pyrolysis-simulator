@@ -65,15 +65,15 @@
     "TE!!P.    ( H;-a; 98 )/T      s,",
     "                               0",
     "                                      -( G;-H~ 98 )/T        cop      ENTHALPY          PBEE EIIIERGY     Log Kf",
-    "  K          J/IIOl•K      J/aol•K       J/aol•K         J/aol• K          ltJ/aol         ltJ/aol",
+    "  K          J/IIOl\u2022K      J/aol\u2022K       J/aol\u2022K         J/aol\u2022 K          ltJ/aol         ltJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/IIOl•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "J/IIOl\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "ltJ/aol",
     "formation_gibbs_energy": "ltJ/aol",
     "log_kf": ""
@@ -81,13 +81,13 @@
   "temperature_grid": [
     {
       "as_published": "1726",
-      "value": null,
+      "value": 1726.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1800",
-      "value": null,
+      "value": 1800.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -140,7 +140,7 @@
       "cells": {
         "temperature": {
           "as_published": "1726",
-          "value": null,
+          "value": 1726.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -235,7 +235,7 @@
       "cells": {
         "temperature": {
           "as_published": "1800",
-          "value": null,
+          "value": 1800.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -270,11 +270,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -321,7 +321,7 @@
     "                                                                                                 6.588 ca 3",
     "TRAIISITIONS Ill REFERENCE STATE ELEI!ENTS",
     "HEAT CAPACITY EQUATIONS",
-    "         1.5135x102 -   0.20499 T                   1. 7 4111t 1 0- • T2",
+    "         1.5135x102 -   0.20499 T                   1. 7 4111t 1 0- \u2022 T2",
     "            ( EQUATION VALID FRO!!             298 -     631 K)",
     "         3.0548x102 -       7.0339x1o-z T",
     "         2. 5697x107 T-z",
@@ -338,5 +338,6 @@
     "row_start": 18,
     "row_stop": 19,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Liquid 1726 to 1800 K."
 }

@@ -63,15 +63,15 @@
     "                                                                                   GIBBS",
     "TE!P.     <a;-a~ 98 )/T      so",
     "                              T     -( G;-8~98 )/T      cop    EITBll.PI        FREE EIERGY      Log Kf",
-    "   K        J/aol•K       J/aol•K     J/8ol•K        J/aol•K        kJ/aol         kJ/801",
+    "   K        J/aol\u2022K       J/aol\u2022K     J/8ol\u2022K        J/aol\u2022K        kJ/aol         kJ/801",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/8ol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/8ol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/801",
     "log_kf": ""
@@ -163,7 +163,7 @@
     },
     {
       "as_published": "1100",
-      "value": null,
+      "value": 1100.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -448,13 +448,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-352.431",
-          "value": null,
+          "value": -352.431,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "16.818",
-          "value": null,
+          "value": 16.818,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1552,25 +1552,25 @@
       "cells": {
         "temperature": {
           "as_published": "1100",
-          "value": null,
+          "value": 1100.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "enthalpy_function": {
           "as_published": "60.106",
-          "value": null,
+          "value": 60.106,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "376.51",
-          "value": null,
+          "value": 376.51,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "316.42",
-          "value": null,
+          "value": 316.42,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1763,7 +1763,7 @@
     "                                       kJ            !OLlR YOLU!E                    2478.9200 J/bar",
     "                                                                                    24789.2(10 cal",
     "TRliSITIOIS II REPEREICE STlTE ELE!EITS",
-    "     SULFUR ••••• ORTHQ-!010 368.$4, ll. P. !1010 388.36 9",
+    "     SULFUR \u2022\u2022\u2022\u2022\u2022 ORTHQ-!010 368.$4, ll. P. !1010 388.36 9",
     "                  B. P. 716.9 K.",
     "BElT ClPlCITY EQOlTIOR",
     "         1.2760x10Z- 7.8140x10-3 T + 6.1238x105 TZ",
@@ -1808,5 +1808,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Ideal gas 298.15 to 1800 K."
 }

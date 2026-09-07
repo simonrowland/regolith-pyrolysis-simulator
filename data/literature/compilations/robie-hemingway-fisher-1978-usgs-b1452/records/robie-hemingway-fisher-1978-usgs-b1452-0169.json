@@ -68,15 +68,15 @@
     "                                                                                        GIBBS",
     "TE!P.    ( a;-H; 98 )/T      so      -(G;-H~ 98 )/T         cop     EIITHALPY        FREE EIIEIGY      Log Kf",
     "                              T",
-    "  K         J/aol•K       J/aol•K      J/aol•K         J/aol• K        lr.J/aol         kJ/aol",
+    "  K         J/aol\u2022K       J/aol\u2022K      J/aol\u2022K         J/aol\u2022 K        lr.J/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "lr.J/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -148,7 +148,7 @@
   ],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATIOI",
-    " c~ =   43.088     +   S.8405x10-3 T              2. 0913 T-o •5",
+    " c~ =   43.088     +   S.8405x10-3 T              2. 0913 T-o \u20225",
     "             (EQUATION VALID FRO!!             298 -   1800 K)",
     "REUBENCJ!         33          33                                            33                      COIIPILED",
     "                                                                                                      5-19-76"
@@ -161,5 +161,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=17, enthalpy_function=17, entropy=17, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=17, formation_gibbs_energy=17, log_kf=17",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Crystals 298.15 to 1800 K."
 }

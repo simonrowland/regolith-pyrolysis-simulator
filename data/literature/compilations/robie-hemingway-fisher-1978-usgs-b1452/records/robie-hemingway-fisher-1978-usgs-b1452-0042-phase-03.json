@@ -80,15 +80,15 @@
     "TEI'IP.   ( H~-H~ 98 )/T",
     "                              0",
     "                             ST       -( G;-H~ 98 )/T      cop      ENTHALPY       FREE ENERGY          Log Kf",
-    "            J/mol•K     J;mol•K         J;mol•K         J/mol• K          kJ/mol         kJ;mol",
+    "            J/mol\u2022K     J;mol\u2022K         J;mol\u2022K         J/mol\u2022 K          kJ/mol         kJ;mol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/mol•K",
-    "entropy": "J;mol•K",
-    "negative_gibbs_function": "J;mol•K",
-    "heat_capacity": "J/mol• K",
+    "enthalpy_function": "J/mol\u2022K",
+    "entropy": "J;mol\u2022K",
+    "negative_gibbs_function": "J;mol\u2022K",
+    "heat_capacity": "J/mol\u2022 K",
     "formation_enthalpy": "kJ/mol",
     "formation_gibbs_energy": "kJ;mol",
     "log_kf": ""
@@ -342,9 +342,9 @@
     "                                                                                              22.470 cm 3",
     "TRANSITIONS Ill REFERENCE STATE ELEIIENTS",
     "HEAT CAPACITY EQUATIONS",
-    " cop      1.6025x10-2 T      4.8183x1(J2 T- o•s                    4.9617x10S T-2",
+    " cop      1.6025x10-2 T      4.8183x1(J2 T- o\u2022s                    4.9617x10S T-2",
     "             (EQUATION VALID FRO !'I 298 -  550 K)",
-    " co       1. 9885x 10-2 T     4.4020x102 r-o·s                     7. 6150x10S T- 2",
+    " co       1. 9885x 10-2 T     4.4020x102 r-o\u00b7s                     7. 6150x10S T- 2",
     "  p",
     "              (EQUATION VALID FBOII 550 - 11311 K)"
   ],
@@ -357,5 +357,6 @@
     "row_start": 13,
     "row_stop": 14,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Beta crystals\n          (face-centered cubic) 55u to 1134 K."
 }

@@ -69,15 +69,15 @@
     "                                                                                    GIBBS",
     "TEMP.      <H;-H~98 )/T     so      -(~-8; 98 )/T      cop     EHTHALPY          PBEE ERERGY       Log Kf",
     "                              T",
-    "   K           J/aol• K   J/aol•K    J/aol•K        J/aol•K         kJ/ilol         kJ/aol",
+    "   K           J/aol\u2022 K   J/aol\u2022K    J/aol\u2022K        J/aol\u2022K         kJ/ilol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol• K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022 K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/ilol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -169,7 +169,7 @@
     },
     {
       "as_published": "1100",
-      "value": null,
+      "value": 1100.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -732,11 +732,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1560,7 +1560,7 @@
       "cells": {
         "temperature": {
           "as_published": "1100",
-          "value": null,
+          "value": 1100.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1684,11 +1684,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -1739,7 +1739,7 @@
   ],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATIOII",
-    "         22.465 + 7.8597x10-3 T                25.261 T-O·S",
+    "         22.465 + 7.8597x10-3 T                25.261 T-O\u00b7S",
     "            ( EQOATIOH VALID FROII         298 - 1800 K)",
     "\"REF.EBEIICE      107       107                                                                  COIIPILBD",
     "                                                                                                  4-11-76"
@@ -1761,5 +1761,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Alpha crystals (kexagonal close packed) 298.15 to 2013 K.                      Beta crystals\n         (body-centered cubic) 2103 to aelting point 2500 K."
 }

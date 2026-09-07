@@ -71,15 +71,15 @@
     "                             ST      -(G;-H~ 98 )/T        Cp",
     "                                                             0",
     "                                                                    ENTHALPY           PREE EIIIEBGY      Log   Kt",
-    "  K         J/aol•K       J/mol•K      J/mol• K         J/aol• K          kJ/1101         kJ/aol",
+    "  K         J/aol\u2022K       J/mol\u2022K      J/mol\u2022 K         J/aol\u2022 K          kJ/1101         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/mol•K",
-    "negative_gibbs_function": "J/mol• K",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/mol\u2022K",
+    "negative_gibbs_function": "J/mol\u2022 K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -579,11 +579,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -628,8 +628,8 @@
   ],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATIOI",
-    "                                                      2.1681x10-• TZ",
-    "         -7.9563x10• r-z",
+    "                                                      2.1681x10-\u2022 TZ",
+    "         -7.9563x10\u2022 r-z",
     "             (BQUATIOI VALID FBOII            298 -     629 K)",
     "BEFEREICE      107           107                                                                       COIIPILED",
     "                                                                                                         4-10-76"
@@ -643,5 +643,6 @@
     "row_start": 1,
     "row_stop": 5,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Liquid 298.15 to boiling point 629.0 K."
 }

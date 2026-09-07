@@ -71,15 +71,15 @@
     "                                                                                             GIBBS",
     "TEIIP.     ( H~-8~   98 )/T      so     -(G;-a~ 98 )/T        cop       UTHALPY           FREE ENERGY           Log Kf",
     "                                  T",
-    "  K         J/aol•K           J/aol•K     J/mol•K         J/aol•K             kJ/aol          kJ/mol",
+    "  K         J/aol\u2022K           J/aol\u2022K     J/mol\u2022K         J/aol\u2022K             kJ/aol          kJ/mol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/mol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/mol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/mol",
     "log_kf": ""
@@ -156,9 +156,9 @@
     "                                           kJ             MOLAR VOLUIIE                            2.6150 Jjbac",
     "                                                                                                  2&.150 CIIJ",
     "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
-    "     ALUIIINUM ••• II. P. 933 K.",
+    "     ALUIIINUM \u2022\u2022\u2022 II. P. 933 K.",
     "HEAT CAPACITY EQUATIONS",
-    "         -1.461Sxtoz +         o.15u39 T            4.153bx10~        T-o·s",
+    "         -1.461Sxtoz +         o.15u39 T            4.153bx10~        T-o\u00b7s",
     "             (EQUATION VALID FROII               298-     728 K)",
     "c~        90.932 +   9.9J37x1o-~ T",
     "             (EQUATION VALID PROII               728 -   1800 K)"
@@ -171,5 +171,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=18, enthalpy_function=18, entropy=18, negative_gibbs_function=18, heat_capacity=18, formation_enthalpy=18, formation_gibbs_energy=18, log_kf=17",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Alpha crystals 298.15 to 728 K.                   Beta crystals 728 to 1800 K.                  The\n          dissociation temperature is 1549 K."
 }

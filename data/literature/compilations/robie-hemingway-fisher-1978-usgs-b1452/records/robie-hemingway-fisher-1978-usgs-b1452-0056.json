@@ -70,15 +70,15 @@
     "TEMP.      c u;-H~ 98 )/T      so",
     "                                T      -(G;-u~ 98 )/T           co",
     "                                                                 p       ENTHALPY          FREE EIIIERGY      Log Kt",
-    "            J/II01•K        J/II01•K      J/II01•K          J/1101• K         kJ/1101         kJ/1101",
+    "            J/II01\u2022K        J/II01\u2022K      J/II01\u2022K          J/1101\u2022 K         kJ/1101         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/II01•K",
-    "entropy": "J/II01•K",
-    "negative_gibbs_function": "J/II01•K",
-    "heat_capacity": "J/1101• K",
+    "enthalpy_function": "J/II01\u2022K",
+    "entropy": "J/II01\u2022K",
+    "negative_gibbs_function": "J/II01\u2022K",
+    "heat_capacity": "J/1101\u2022 K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -495,11 +495,11 @@
           "footnote_markers": []
         },
         "log_kf": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         }
       }
@@ -736,7 +736,7 @@
     "         35.859 -      1.60J1x1o-z T",
     "        -2.0482x105 T-2",
     "            (EQUATION VALID FBOII               298 -      704 K)",
-    "         30.350 -      6.J500x10-3 T                    1. 8664x 1 o-•   rz",
+    "         30.350 -      6.J500x10-3 T                    1. 8664x 1 o-\u2022   rz",
     "         1.1167x105 T-2",
     "            (EQUATION VALID FROII               704 - 1800 K)"
   ],
@@ -749,5 +749,6 @@
     "row_start": 1,
     "row_stop": 6,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals (red tri9linic, v) 298.15 K to subliaation point 704 K."
 }

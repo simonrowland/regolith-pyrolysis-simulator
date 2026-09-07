@@ -68,17 +68,17 @@
     "                                                                                        GIBBS",
     "TEIIP.    cu;-u~ 98 }/T       so       -( G;-u ; 98 )/T      cop     EIIITHALPY      FBEE EHEBGI     Log Kf",
     "                                T",
-    "  K          J/aol•K       J/aol• K      Jjaol•K          J/•ol• K      kJ/•ol         kJ/•ol",
+    "  K          J/aol\u2022K       J/aol\u2022 K      Jjaol\u2022K          J/\u2022ol\u2022 K      kJ/\u2022ol         kJ/\u2022ol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol• K",
-    "negative_gibbs_function": "Jjaol•K",
-    "heat_capacity": "J/•ol• K",
-    "formation_enthalpy": "kJ/•ol",
-    "formation_gibbs_energy": "kJ/•ol",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022 K",
+    "negative_gibbs_function": "Jjaol\u2022K",
+    "heat_capacity": "J/\u2022ol\u2022 K",
+    "formation_enthalpy": "kJ/\u2022ol",
+    "formation_gibbs_energy": "kJ/\u2022ol",
     "log_kf": ""
   },
   "temperature_grid": [],
@@ -133,7 +133,7 @@
     },
     {
       "as_published": "0.117",
-      "value": null,
+      "value": 0.117,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -162,5 +162,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=17, enthalpy_function=16, entropy=16, negative_gibbs_function=17, heat_capacity=17, formation_enthalpy=16, formation_gibbs_energy=18, log_kf=16",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Ideal gas 298.15 to 1800 K."
 }

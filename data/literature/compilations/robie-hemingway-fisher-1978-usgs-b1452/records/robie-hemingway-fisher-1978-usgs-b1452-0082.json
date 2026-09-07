@@ -35,7 +35,7 @@
   "formation_basis_header_as_published": "FORftATIOii FROM THE ELEMENTS",
   "formula_weight": {
     "as_published": "204.370",
-    "value": null,
+    "value": 204.37,
     "ocr_suspect": true,
     "footnote_markers": [],
     "source_text_span": {
@@ -77,15 +77,15 @@
     "                                                                                    GIBBS",
     "TEMP.    ( u;-H~ 98 }/T      so      -(G;-H~ 98 }/T       cop      ENTHALPY      FREE ENERGY   Log Kf",
     "                              T",
-    "            J/mol•K       Jjmol•K      J/mol•K        J/110 l•K       kJ/1101         kJ/aol",
+    "            J/mol\u2022K       Jjmol\u2022K      J/mol\u2022K        J/110 l\u2022K       kJ/1101         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/mol•K",
-    "entropy": "Jjmol•K",
-    "negative_gibbs_function": "J/mol•K",
-    "heat_capacity": "J/110 l•K",
+    "enthalpy_function": "J/mol\u2022K",
+    "entropy": "Jjmol\u2022K",
+    "negative_gibbs_function": "J/mol\u2022K",
+    "heat_capacity": "J/110 l\u2022K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -478,11 +478,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -539,7 +539,7 @@
     "MELTING POINT                 577                     BOILING POINT                       1744      K",
     "ENTHALPY OF KELTING               4. 142 kJ           ENTHALPY OF VAPORIZATION            164.151 kJ",
     "                                  6.828 kJ            KOLAR VOLUitE                        1. 7210 JA!ar",
-    "                                                                                          17.210 c• 3",
+    "                                                                                          17.210 c\u2022 3",
     "TRANSITIONS IN REFERENCE STATE ELEIIEMTS",
     "HEAT CAPACITY     EQUATION",
     "        30.850 -   2.8925x1o-z T                  5.J134x1o-s TZ",
@@ -554,5 +554,6 @@
     "row_start": 1,
     "row_stop": 4,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Alpha crystals (he~agonal close packed} 298.15 to 507 K."
 }

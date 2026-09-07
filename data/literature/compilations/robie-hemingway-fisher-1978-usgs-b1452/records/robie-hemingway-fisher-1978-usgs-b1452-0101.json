@@ -75,15 +75,15 @@
     "                                                                                      GIBBS",
     "TEftP.      <a;-H~98 )/T      so      -(G;-H~ 98 )/T      cop      ENTHALPY       FREE EIIIERGY     Log Kf",
     "                               T",
-    "   K         J/•ol•K       J/•ol•K      J/•ol•K        J/•ol•K            kJ/1101         kJ/aol",
+    "   K         J/\u2022ol\u2022K       J/\u2022ol\u2022K      J/\u2022ol\u2022K        J/\u2022ol\u2022K            kJ/1101         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/•ol•K",
-    "entropy": "J/•ol•K",
-    "negative_gibbs_function": "J/•ol•K",
-    "heat_capacity": "J/•ol•K",
+    "enthalpy_function": "J/\u2022ol\u2022K",
+    "entropy": "J/\u2022ol\u2022K",
+    "negative_gibbs_function": "J/\u2022ol\u2022K",
+    "heat_capacity": "J/\u2022ol\u2022K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -96,7 +96,7 @@
   "uncertainty_values": [
     {
       "as_published": "0.11",
-      "value": null,
+      "value": 0.11,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -161,14 +161,14 @@
     "ftELTING POIIIIT                                        BOILING POINT                                    K",
     "ENTHALPY OF f!ELTIIIG                    kJ             ENTHALPY OF VAPORIZATION",
     "                                         kJ            !lOLl R VOLU liE                         2.4580 Jjbar",
-    "                                                                                               24.580 c• 3",
+    "                                                                                               24.580 c\u2022 3",
     "TRANSITIOIIIS IN REFERENCE STATE ELEliEIIITS",
-    "     IRON •••••••   CURIE P. 1042 1 lLPHA-GAftiU 1184 1 GAlllll-DELTl 1665 1",
+    "     IRON \u2022\u2022\u2022\u2022\u2022\u2022\u2022   CURIE P. 1042 1 lLPHA-GAftiU 1184 1 GAlllll-DELTl 1665 1",
     "                    ft. P. DELTA 1809 K.",
     "       SUL PUR..... OBTH0-110 NO 368. 54 1 II. P. 1101110 388.36,",
     "                    B. P. 716.9 K.",
     "HEAT CAPACITY EQUATIOIII",
-    "          -3.346h102 +       39.069    ro·s           1.1236 T",
+    "          -3.346h102 +       39.069    ro\u00b7s           1.1236 T",
     "           8. 9245x 10 l T-1",
     "               (EQUATION VALID FROII          298 -    700 K)",
     "BEPBREIIICE        81          81                                             81                      COIIPILED",
@@ -182,5 +182,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=5, enthalpy_function=5, entropy=5, negative_gibbs_function=5, heat_capacity=5, formation_enthalpy=5, formation_gibbs_energy=5, log_kf=4",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Crystals 298.15 to 700 K.\n                                                                    FORftlTIOIII FROft THE ELEIIEIIITS\n                                                                                      GIBBS\nTEftP.      <a;-H~98 )/T      so      -(G;-H~ 98 )/T      cop      ENTHALPY       FREE EIIIERGY     Log Kf\n                               T"
 }

@@ -63,15 +63,15 @@
     "                                                                                       GIBBS",
     "TEIIP.      ( H;- H~ 98 )/T      so      -(G;-H~ga )/T        cop   EITHlLPY        FREE EIIEBGY     Log Kf",
     "                                  T",
-    "  K           J/llol•K        J/IIOl•K     Jjaol• K      J/aol• K       kJ/aol         kJ/1101",
+    "  K           J/llol\u2022K        J/IIOl\u2022K     Jjaol\u2022 K      J/aol\u2022 K       kJ/aol         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/llol•K",
-    "entropy": "J/IIOl•K",
-    "negative_gibbs_function": "Jjaol• K",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "J/llol\u2022K",
+    "entropy": "J/IIOl\u2022K",
+    "negative_gibbs_function": "Jjaol\u2022 K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -79,13 +79,13 @@
   "temperature_grid": [
     {
       "as_published": "296.15",
-      "value": null,
+      "value": 296.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -138,7 +138,7 @@
       "cells": {
         "temperature": {
           "as_published": "296.15",
-          "value": null,
+          "value": 296.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -233,7 +233,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -349,9 +349,9 @@
     "                                            kJ           IWLAR VOLU!E                       5.4160 Jjbar",
     "                                                                                           54.160 Cll 3",
     "TBANSITIOIS IN REFEBEIICE STATE ELEIIENTS",
-    "       SODIUI! ••••• 1!. P. 370.98, B. P.           1175 K.",
-    "       ALUIIINUI! ••• II. P. 933 K.",
-    "       SILICON •••• 1!.   P.    1685 K.",
+    "       SODIUI! \u2022\u2022\u2022\u2022\u2022 1!. P. 370.98, B. P.           1175 K.",
+    "       ALUIIINUI! \u2022\u2022\u2022 II. P. 933 K.",
+    "       SILICON \u2022\u2022\u2022\u2022 1!.   P.    1685 K.",
     "HEAT CAPACITY BQUATIOIIS",
     "  0",
     " Cp        27.74        0.2954 T",
@@ -377,5 +377,6 @@
     "row_start": 1,
     "row_stop": 2,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to 1521 K."
 }

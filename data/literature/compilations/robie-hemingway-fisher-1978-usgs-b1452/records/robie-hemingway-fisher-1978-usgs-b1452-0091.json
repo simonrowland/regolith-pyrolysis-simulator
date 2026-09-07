@@ -69,15 +69,15 @@
     "                                                                                         GIBBS",
     "TlftP.    c H;-a~ 98 ).1T      so      -(G;-a~ 98 )/T      cop     EITHALPY           FREE EIEBGY      Log Kf",
     "                                T",
-    "  K         J/•ol•K         J/aol•K      J/aol• K       J/aol•K           kJ/aol         kJ/aol",
+    "  K         J/\u2022ol\u2022K         J/aol\u2022K      J/aol\u2022 K       J/aol\u2022K           kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/•ol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol• K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/\u2022ol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022 K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -293,19 +293,19 @@
         },
         "enthalpy_function": {
           "as_published": "6.1112",
-          "value": null,
+          "value": 6.1112,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "46.76",
-          "value": null,
+          "value": 46.76,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "40.02",
-          "value": null,
+          "value": 40.02,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -322,11 +322,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -419,11 +419,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -801,11 +801,11 @@
           "footnote_markers": []
         },
         "formation_gibbs_energy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "log_kf": {
@@ -892,11 +892,11 @@
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "• 000",
-          "value": 0.0,
-          "ocr_suspect": false,
+          "as_published": "\u2022 000",
+          "value": null,
+          "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "formation_gibbs_energy": {
@@ -966,19 +966,19 @@
         },
         "enthalpy_function": {
           "as_published": "22.003",
-          "value": null,
+          "value": 22.003,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "11.29",
-          "value": null,
+          "value": 11.29,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "55.29",
-          "value": null,
+          "value": 55.29,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1175,5 +1175,6 @@
     "row_start": 1,
     "row_stop": 10,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "HeKagonal close packed crystals 298.15 to 1136 K."
 }

@@ -69,15 +69,15 @@
     "                                                                                        GIBBS",
     "TBIIP.    ( a;-H~ 98 )/T     so",
     "                              T      -(G;-u; 98 );T       cop    BITHlLPI            IBBB BIBIGI        Log 't",
-    "  K         Jjaol•K     J;aol•K         J/aol•Jt       J/aol•K          ltJ/aol          ltJ;aol",
+    "  K         Jjaol\u2022K     J;aol\u2022K         J/aol\u2022Jt       J/aol\u2022K          ltJ/aol          ltJ;aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jjaol•K",
-    "entropy": "J;aol•K",
-    "negative_gibbs_function": "J/aol•Jt",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "Jjaol\u2022K",
+    "entropy": "J;aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022Jt",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "ltJ/aol",
     "formation_gibbs_energy": "ltJ;aol",
     "log_kf": ""
@@ -85,31 +85,31 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "600",
-      "value": null,
+      "value": 600.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "600.6",
-      "value": null,
+      "value": 600.6,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -162,7 +162,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -257,7 +257,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -352,7 +352,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -447,7 +447,7 @@
       "cells": {
         "temperature": {
           "as_published": "600",
-          "value": null,
+          "value": 600.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -542,7 +542,7 @@
       "cells": {
         "temperature": {
           "as_published": "600.6",
-          "value": null,
+          "value": 600.6,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -597,7 +597,7 @@
   "uncertainty_values": [
     {
       "as_published": "0.112",
-      "value": null,
+      "value": 0.112,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -608,7 +608,7 @@
     },
     {
       "as_published": "0.112",
-      "value": null,
+      "value": 0.112,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -639,5 +639,6 @@
     "row_start": 1,
     "row_stop": 5,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "race-ceutered cubic crystals 298.15 to aelting point 600.6 K."
 }

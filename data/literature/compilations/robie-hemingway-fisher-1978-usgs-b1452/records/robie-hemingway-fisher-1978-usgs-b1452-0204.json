@@ -66,17 +66,17 @@
     "                                                                                       GIBBS",
     "TEBP.     <a;-a~98 )IT      so     -< G;-a~ 98 )/T      cop      fiTHALPY           PRE! EBEBGY     Log Kf",
     "                             T",
-    "   K        J/•ol•K      J/•ol•K     J/•ol•K         J/•ol•K           ltJ/•ol         kJ/•ol",
+    "   K        J/\u2022ol\u2022K      J/\u2022ol\u2022K     J/\u2022ol\u2022K         J/\u2022ol\u2022K           ltJ/\u2022ol         kJ/\u2022ol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/•ol•K",
-    "entropy": "J/•ol•K",
-    "negative_gibbs_function": "J/•ol•K",
-    "heat_capacity": "J/•ol•K",
-    "formation_enthalpy": "ltJ/•ol",
-    "formation_gibbs_energy": "kJ/•ol",
+    "enthalpy_function": "J/\u2022ol\u2022K",
+    "entropy": "J/\u2022ol\u2022K",
+    "negative_gibbs_function": "J/\u2022ol\u2022K",
+    "heat_capacity": "J/\u2022ol\u2022K",
+    "formation_enthalpy": "ltJ/\u2022ol",
+    "formation_gibbs_energy": "kJ/\u2022ol",
     "log_kf": ""
   },
   "temperature_grid": [
@@ -225,13 +225,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-1168.175",
-          "value": null,
+          "value": -1168.175,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "204.765",
-          "value": null,
+          "value": 204.765,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -320,13 +320,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-1149.190",
-          "value": null,
+          "value": -1149.19,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "150.069",
-          "value": null,
+          "value": 150.069,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -415,13 +415,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-1130.188",
-          "value": null,
+          "value": -1130.188,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "118.070",
-          "value": null,
+          "value": 118.07,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1158,7 +1158,7 @@
   ],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATIOI",
-    "          71.379 + 7.5563x10-~ T              1.0529x1o•       r-z",
+    "          71.379 + 7.5563x10-~ T              1.0529x1o\u2022       r-z",
     "             (EQDATIOI VALID PROS          298 - 1200 K)",
     "BEPEBEIICE        260       215                                           215                     COIIPILED",
     "                  240                                                                              6-11-76"
@@ -1203,5 +1203,6 @@
     "row_start": 1,
     "row_stop": 10,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to 1200 K."
 }

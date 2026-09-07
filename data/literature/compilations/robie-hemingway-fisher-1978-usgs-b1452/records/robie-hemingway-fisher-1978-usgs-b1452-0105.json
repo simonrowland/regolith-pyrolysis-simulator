@@ -73,15 +73,15 @@
     "                                                                                            GIBBS",
     "TIIIP.     ( H;-8; 98 )/T      so       -(G;-8~ 98 )/T           cop     EIITHlLPY     PBEE EIIIEBGY     Log Kf",
     "                                 T",
-    "  K            J/aol•K      Jtaol• K      Jtaol• K           J/aol• K        kJ/mol           kJ/aol",
+    "  K            J/aol\u2022K      Jtaol\u2022 K      Jtaol\u2022 K           J/aol\u2022 K        kJ/mol           kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "Jtaol• K",
-    "negative_gibbs_function": "Jtaol• K",
-    "heat_capacity": "J/aol• K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "Jtaol\u2022 K",
+    "negative_gibbs_function": "Jtaol\u2022 K",
+    "heat_capacity": "J/aol\u2022 K",
     "formation_enthalpy": "kJ/mol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -116,7 +116,7 @@
     },
     {
       "as_published": "4.184",
-      "value": null,
+      "value": 4.184,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -127,7 +127,7 @@
     },
     {
       "as_published": "4.393",
-      "value": null,
+      "value": 4.393,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -138,7 +138,7 @@
     },
     {
       "as_published": "0.710",
-      "value": null,
+      "value": 0.71,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -169,5 +169,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=5, enthalpy_function=5, entropy=4, negative_gibbs_function=5, heat_capacity=5, formation_enthalpy=4, formation_gibbs_energy=5, log_kf=4",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "crystals 298.15 to 600 K.\n                                                                                            GIBBS\nTIIIP.     ( H;-8; 98 )/T      so       -(G;-8~ 98 )/T           cop     EIITHlLPY     PBEE EIIIEBGY     Log Kf\n                                 T"
 }

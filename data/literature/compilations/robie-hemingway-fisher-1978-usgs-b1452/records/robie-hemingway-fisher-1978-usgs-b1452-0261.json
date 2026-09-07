@@ -68,15 +68,15 @@
     "                                0",
     "TEI!P.     ca;-a; 98 )/T       ST                           co     EIITHALPY        lBEB BURGY      Log Kf",
     "                                                             p",
-    "  K          Jfaol•K       J/IIOl•K       J/aol•K        J/aol•K        kJ/aol         kJ/aol",
+    "  K          Jfaol\u2022K       J/IIOl\u2022K       J/aol\u2022K        J/aol\u2022K        kJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "Jfaol•K",
-    "entropy": "J/IIOl•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "Jfaol\u2022K",
+    "entropy": "J/IIOl\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -84,7 +84,7 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -96,19 +96,19 @@
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "600",
-      "value": null,
+      "value": 600.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "700",
-      "value": null,
+      "value": 700.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -161,7 +161,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -351,7 +351,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -446,7 +446,7 @@
       "cells": {
         "temperature": {
           "as_published": "600",
-          "value": null,
+          "value": 600.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -457,11 +457,11 @@
           "footnote_markers": []
         },
         "entropy": {
-          "as_published": "286 • .21",
+          "as_published": "286 \u2022 .21",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
-            "•"
+            "\u2022"
           ]
         },
         "negative_gibbs_function": {
@@ -543,7 +543,7 @@
       "cells": {
         "temperature": {
           "as_published": "700",
-          "value": null,
+          "value": 700.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -657,7 +657,7 @@
   ],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATIOII",
-    "             80.231 + 0.12983 T                    3.6987x103 T-o·s",
+    "             80.231 + 0.12983 T                    3.6987x103 T-o\u00b7s",
     "              (EQOATIOIIVU.IDFIO!                 298- 700K}",
     "BEPEBBIICE          10          10                                          89                    COMPILED",
     "                                                                           233                     8-17-76"
@@ -678,5 +678,6 @@
     "row_start": 1,
     "row_stop": 5,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to            700 K."
 }

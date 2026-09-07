@@ -65,15 +65,15 @@
     "TB!P.    ( H;-H~ 98 )/T      so",
     "                              T      -(G;-H~ 98 )/T      co",
     "                                                           p     EtiTHlLPY           FBEE EIIERGY       Log Kf",
-    "  K         J/aol•K       J/mol•K      J/mol•K        J/•ol• K          kJ/mol          kJ/aol",
+    "  K         J/aol\u2022K       J/mol\u2022K      J/mol\u2022K        J/\u2022ol\u2022 K          kJ/mol          kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/mol•K",
-    "negative_gibbs_function": "J/mol•K",
-    "heat_capacity": "J/•ol• K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/mol\u2022K",
+    "negative_gibbs_function": "J/mol\u2022K",
+    "heat_capacity": "J/\u2022ol\u2022 K",
     "formation_enthalpy": "kJ/mol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -119,7 +119,7 @@
     },
     {
       "as_published": "1.470",
-      "value": null,
+      "value": 1.47,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -132,7 +132,7 @@
   "reference_state_notes_as_published": [],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUATION",
-    "        8.2134z102 + 4.3339z1o-z T                 S.0003z103 T-o·s",
+    "        8.2134z102 + 4.3339z1o-z T                 S.0003z103 T-o\u00b7s",
     "           ( BQU.l'l'IOI VALID FRO II 298 -       1700 K)",
     "B!l'EBBIICB      206         273                                            31                      CO! PILED",
     "                                                                                                     7-13-76"
@@ -145,5 +145,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=14, entropy=15, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=16, formation_gibbs_energy=16, log_kf=11",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "crystals 298.15 to 1700 K."
 }

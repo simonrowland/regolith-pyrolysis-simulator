@@ -65,15 +65,15 @@
     "                                                 FOBUTIO!f FROM THE ELEI!EIITS",
     "                                                                                       GIBBS",
     "TEMP.       < u;-H~ 98 )/T      soT     -(G;-u~ 98 )/T      cop     ElfTHALPY       FREE ENERGY      Log Kf",
-    "              J;aol•K        J/aol•K      J/aol•K        Jtaol• K       kJ;aol         kJjaol",
+    "              J;aol\u2022K        J/aol\u2022K      J/aol\u2022K        Jtaol\u2022 K       kJ;aol         kJjaol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J;aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "Jtaol• K",
+    "enthalpy_function": "J;aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "Jtaol\u2022 K",
     "formation_enthalpy": "kJ;aol",
     "formation_gibbs_energy": "kJjaol",
     "log_kf": ""
@@ -152,19 +152,19 @@
         },
         "enthalpy_function": {
           "as_published": "0.000",
-          "value": null,
+          "value": 0.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "71.25",
-          "value": null,
+          "value": 71.25,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "77.25",
-          "value": null,
+          "value": 77.25,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -182,13 +182,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-1433.903",
-          "value": null,
+          "value": -1433.903,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "251.215",
-          "value": null,
+          "value": 251.215,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -277,13 +277,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-1404.293",
-          "value": null,
+          "value": -1404.293,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "183.383",
-          "value": null,
+          "value": 183.383,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -342,19 +342,19 @@
         },
         "enthalpy_function": {
           "as_published": "38.797",
-          "value": null,
+          "value": 38.797,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "129.60",
-          "value": null,
+          "value": 129.6,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "87.80",
-          "value": null,
+          "value": 87.8,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -372,13 +372,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-1384.751",
-          "value": null,
+          "value": -1384.751,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "153.899",
-          "value": null,
+          "value": 153.899,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -391,7 +391,7 @@
   "uncertainty_values": [
     {
       "as_published": "0.21",
-      "value": null,
+      "value": 0.21,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -402,7 +402,7 @@
     },
     {
       "as_published": "0.21",
-      "value": null,
+      "value": 0.21,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -454,9 +454,9 @@
     "                                 14.088 kJ               MOLlB VOLUME                        3.1430 J/bar",
     "                                                                                            31.430 ca 3",
     "TRANSITIONS IN B&PEBEHCE STATE ELIM!IfTS",
-    "      TITANIUM ••• ALPHA-BETA 1155, 8. P. 1943 K.",
+    "      TITANIUM \u2022\u2022\u2022 ALPHA-BETA 1155, 8. P. 1943 K.",
     "HEAT CAPACITY EQUATION",
-    "            1.4861x10Z +       J.2861x10-3 T -  .27.026 T-o·s",
+    "            1.4861x10Z +       J.2861x10-3 T -  .27.026 T-o\u00b7s",
     "               (EQUATIOV VALID FROM       470- 1800 K)",
     "REFEREHCE         J3             JJ                                         JJ                     COMPILED",
     "                 176                                                                                8- 2-76"
@@ -521,5 +521,6 @@
     "row_start": 1,
     "row_stop": 3,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "s:    Alpha crystals 298.15 to 470 K."
 }

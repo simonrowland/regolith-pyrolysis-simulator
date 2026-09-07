@@ -71,15 +71,15 @@
     "                                                                                      GIBBS",
     "TEIIP.    (H;-H~g 8 )/T      so      -(G;-a~ 98 )/T      cop    ENTHALPY           FREE EIERGY        Log Kf",
     "                              T",
-    "  K          J;aol•K      J/aol•lt     J/aol•lt       J/aol•K          kJ/aol          kJ/aol",
+    "  K          J;aol\u2022K      J/aol\u2022lt     J/aol\u2022lt       J/aol\u2022K          kJ/aol          kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J;aol•K",
-    "entropy": "J/aol•lt",
-    "negative_gibbs_function": "J/aol•lt",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J;aol\u2022K",
+    "entropy": "J/aol\u2022lt",
+    "negative_gibbs_function": "J/aol\u2022lt",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -125,7 +125,7 @@
     },
     {
       "as_published": "2.845",
-      "value": null,
+      "value": 2.845,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -154,7 +154,7 @@
     "TRANSITIONS IN REFERENCE STATE ELBBEITS",
     "    PO TASSI Oft.. ft. P. 336. 4, B. P. 1030 lt..",
     "HEAT CAPACITY EQUATION",
-    "         49.265 +      11.6059z1o-z T           6. 1447z102 T-o·s",
+    "         49.265 +      11.6059z1o-z T           6. 1447z102 T-o\u00b7s",
     "             (EQUATION VALID FROft           298 - 1800 K)",
     "REFEREIICE      247          2117                                        2117                       COBPILID",
     "                                                                                                     5-24-76"
@@ -167,5 +167,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=16, enthalpy_function=16, entropy=16, negative_gibbs_function=16, heat_capacity=16, formation_enthalpy=16, formation_gibbs_energy=16, log_kf=15",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Crystals 298.15 to 1800 K.             Decoaposes above 1154 K. Tabulated data\n         are a aetastable extrapolation for teaperatures greater than 1154 K."
 }

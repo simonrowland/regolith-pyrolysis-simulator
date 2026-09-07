@@ -71,15 +71,15 @@
     "                                                                                       GIBBS",
     "TEIIP.    ( H;-H~ 98 )/T      so      -(G;-H~ 98 )/T      cop    BHTHALPY           FREE EIERGY        Log Kf",
     "                               T",
-    "             J/aol•K       J/aol•K      J/aol•K        J/aol•K          kJ/aol          kJ/aol",
+    "             J/aol\u2022K       J/aol\u2022K      J/aol\u2022K        J/aol\u2022K          kJ/aol          kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J/aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J/aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "kJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -159,5 +159,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=15, enthalpy_function=15, entropy=15, negative_gibbs_function=15, heat_capacity=15, formation_enthalpy=15, formation_gibbs_energy=15, log_kf=13",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Crystals 298.15 to aelting point 679 K.                 Liquid 679 to boiling point\n         1596 K."
 }

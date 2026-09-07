@@ -24,7 +24,7 @@
   ],
   "formation_basis_header_as_published": "",
   "formula_weight": {
-    "as_published": "\"'· 059",
+    "as_published": "\"'\u00b7 059",
     "value": null,
     "ocr_suspect": true,
     "footnote_markers": [],
@@ -48,7 +48,7 @@
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "transcribed",
   "untranscribed_reasons": [],
-  "title_line_as_published": "SULFUR DIOXIDE                                                                     FOUULA lEIGHT     \"'· 059",
+  "title_line_as_published": "SULFUR DIOXIDE                                                                     FOUULA lEIGHT     \"'\u00b7 059",
   "column_ids": [
     "temperature",
     "enthalpy_function",
@@ -66,15 +66,15 @@
     "                                                                                        GIBBS",
     "TEBP.     (H;-u~ 98 )/T      so       -( G;-u; 98 }/T       cop      EITHlLPY        FREE EIEBGY     Log Kf",
     "                               T",
-    "            Jjaol•K       J/IIOl•K      J/aol•K         Jjaol•l!l:      ltJ/1101        kJ/IIO.l",
+    "            Jjaol\u2022K       J/IIOl\u2022K      J/aol\u2022K         Jjaol\u2022l!l:      ltJ/1101        kJ/IIO.l",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "Jjaol•K",
-    "entropy": "J/IIOl•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "Jjaol•l!l:",
+    "enthalpy_function": "Jjaol\u2022K",
+    "entropy": "J/IIOl\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "Jjaol\u2022l!l:",
     "formation_enthalpy": "ltJ/1101",
     "formation_gibbs_energy": "kJ/IIO.l",
     "log_kf": ""
@@ -261,13 +261,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-300.110",
-          "value": null,
+          "value": -300.11,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "52.589",
-          "value": null,
+          "value": 52.589,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -896,19 +896,19 @@
         },
         "enthalpy_function": {
           "as_published": "34.412",
-          "value": null,
+          "value": 34.412,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "305.78",
-          "value": null,
+          "value": 305.78,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "271.31",
-          "value": null,
+          "value": 271.31,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1086,19 +1086,19 @@
         },
         "enthalpy_function": {
           "as_published": "37.875",
-          "value": null,
+          "value": 37.875,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "315.84",
-          "value": null,
+          "value": 315.84,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "271.96",
-          "value": null,
+          "value": 271.96,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1198,7 +1198,7 @@
           "footnote_markers": []
         },
         "heat_capacity": {
-          "as_published": "5·6.36",
+          "as_published": "5\u00b76.36",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": []
@@ -1561,19 +1561,19 @@
         },
         "enthalpy_function": {
           "as_published": "43.464",
-          "value": null,
+          "value": 43.464,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "entropy": {
           "as_published": "335.63",
-          "value": null,
+          "value": 335.63,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
           "as_published": "292.11",
-          "value": null,
+          "value": 292.11,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -1768,10 +1768,10 @@
     "                               10.548 kJ                BOLAR VOLUIIE                     2478.9200 Jjbar",
     "                                                                                         24789.200 c11 3",
     "TRANSITIONS IN REFERENCE STATE ELEMENTS",
-    "    SULFUR ••••• ORTHO-ftONO 368.54, ft. P. 8010 388.36,",
+    "    SULFUR \u2022\u2022\u2022\u2022\u2022 ORTHO-ftONO 368.54, ft. P. 8010 388.36,",
     "                 B. P. 716.9 K.",
     "HEAT CAPACITY EQUATION",
-    "         86.219 -  4.3073x10-J T                8.8646x102 T-0·5                5.5769x105 T-2",
+    "         86.219 -  4.3073x10-J T                8.8646x102 T-0\u00b75                5.5769x105 T-2",
     "            (EQUATION VALID FROB             298 - 1800 K)"
   ],
   "footnote_markers": [],
@@ -1824,5 +1824,6 @@
     "row_start": 1,
     "row_stop": 16,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Ideal gas 298.15 to 1800 K."
 }

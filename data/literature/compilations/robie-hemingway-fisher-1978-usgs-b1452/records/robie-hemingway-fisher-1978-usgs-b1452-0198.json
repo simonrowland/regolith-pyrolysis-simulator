@@ -56,24 +56,24 @@
     "log_kf"
   ],
   "column_header_lines_as_published": [
-    "           crystals 298.15 to •elting point 1903 K.",
+    "           crystals 298.15 to \u2022elting point 1903 K.",
     "--------------------------------------------------------------------------------",
     "                                                 FOB!ATION FRO! THE ELEI'IENTS",
     "                                                                                        GIBBS",
     "TEMP.      <a;-a~ 98 )/T      so",
     "                               T      -(G;-H~ga)/T          co",
     "                                                             p    ENTHALPY           FREE EBERGY    Log Kf",
-    "  K         J/mol•K        J/•ol•l(    J/mol• K         J/•ol•K          kJ/•ol         kJ/•ol",
+    "  K         J/mol\u2022K        J/\u2022ol\u2022l(    J/mol\u2022 K         J/\u2022ol\u2022K          kJ/\u2022ol         kJ/\u2022ol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/mol•K",
-    "entropy": "J/•ol•l(",
-    "negative_gibbs_function": "J/mol• K",
-    "heat_capacity": "J/•ol•K",
-    "formation_enthalpy": "kJ/•ol",
-    "formation_gibbs_energy": "kJ/•ol",
+    "enthalpy_function": "J/mol\u2022K",
+    "entropy": "J/\u2022ol\u2022l(",
+    "negative_gibbs_function": "J/mol\u2022 K",
+    "heat_capacity": "J/\u2022ol\u2022K",
+    "formation_enthalpy": "kJ/\u2022ol",
+    "formation_gibbs_energy": "kJ/\u2022ol",
     "log_kf": ""
   },
   "temperature_grid": [
@@ -85,13 +85,13 @@
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "600",
-      "value": null,
+      "value": 600.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -234,13 +234,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-519.902",
-          "value": null,
+          "value": -519.902,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "91.085",
-          "value": null,
+          "value": 91.085,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -293,7 +293,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -388,7 +388,7 @@
       "cells": {
         "temperature": {
           "as_published": "600",
-          "value": null,
+          "value": 600.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -519,13 +519,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-436.079",
-          "value": null,
+          "value": -436.079,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "32.5111",
-          "value": null,
+          "value": 32.5111,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -614,13 +614,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-1114.986",
-          "value": null,
+          "value": -1114.986,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "27.096",
-          "value": null,
+          "value": 27.096,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -709,13 +709,13 @@
         },
         "formation_gibbs_energy": {
           "as_published": "-394.088",
-          "value": null,
+          "value": -394.088,
           "ocr_suspect": true,
           "footnote_markers": []
         },
         "log_kf": {
           "as_published": "22.812",
-          "value": null,
+          "value": 22.812,
           "ocr_suspect": true,
           "footnote_markers": []
         }
@@ -1355,7 +1355,7 @@
   "reference_state_notes_as_published": [],
   "auxiliary_lines_as_published": [
     "HEAT CAPACITY EQUlTIOI",
-    "          72.158 + 1.1726x1o- z T                2.0502x10• T-Z",
+    "          72.158 + 1.1726x1o- z T                2.0502x10\u2022 T-Z",
     "             (BQUlTIOI VALID PRO!             298 - 1500 K)",
     "B!l'EB.ENCE     115           120                                           262                    CO!PILBD",
     "                                                                                                    5-24-76"
@@ -1424,5 +1424,6 @@
     "row_start": 1,
     "row_stop": 12,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "crystals 298.15 to \u2022elting point 1903 K."
 }

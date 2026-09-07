@@ -66,15 +66,15 @@
     "                                                 PORKATION PRO! THE ELE!EIITS",
     "                                                                                               GIBBS",
     "TE!SP.           ( H;-H~ 98 )/T      soT     -(G;-H~ 98 )/T      cop    ENTHALPY          .P'BEE EBEBGY     Log Kf",
-    "       K          J;mol•K         Jjaol•K      J/aol•K        J/aol•K        ltJ/ao,l         kJ/aol",
+    "       K          J;mol\u2022K         Jjaol\u2022K      J/aol\u2022K        J/aol\u2022K        ltJ/ao,l         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J;mol•K",
-    "entropy": "Jjaol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "J/aol•K",
+    "enthalpy_function": "J;mol\u2022K",
+    "entropy": "Jjaol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
     "formation_enthalpy": "ltJ/ao,l",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -82,13 +82,13 @@
   "temperature_grid": [
     {
       "as_published": "1785",
-      "value": null,
+      "value": 1785.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1800",
-      "value": null,
+      "value": 1800.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -141,7 +141,7 @@
       "cells": {
         "temperature": {
           "as_published": "1785",
-          "value": null,
+          "value": 1785.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -236,7 +236,7 @@
       "cells": {
         "temperature": {
           "as_published": "1800",
-          "value": null,
+          "value": 1800.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -354,9 +354,9 @@
     "                                      22.288 ltJ              BOLAR VOLO!E                         9.3420 J/bar",
     "                                                                                                  93.420 ca 3",
     "TRANSITIONS IN REFERENCE STATE ELE!ENTS",
-    "         NIOBIUM •••• !. P. 2740 K.",
+    "         NIOBIUM \u2022\u2022\u2022\u2022 !. P. 2740 K.",
     "HEAT CAPACITY EQUATION",
-    "                 1.6605x102 + 1.8368x1o-z T -  2.7253x102 T-o·s",
+    "                 1.6605x102 + 1.8368x1o-z T -  2.7253x102 T-o\u00b7s",
     "                    (EQUATION VALID PRO! 298- 1785 K)",
     "BEFEREHCE             189             JJ                                          J3                      CO!PILBD",
     "                                                                                                           6- 2-76"
@@ -367,8 +367,9 @@
   "phase_segment": {
     "ordinal": 2,
     "count_on_printed_page": 2,
-    "row_start": 10,
-    "row_stop": 11,
+    "row_start": 17,
+    "row_stop": 18,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Liquid 1785 to 1800 K."
 }

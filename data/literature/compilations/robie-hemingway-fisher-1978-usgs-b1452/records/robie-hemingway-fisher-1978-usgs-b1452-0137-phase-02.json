@@ -62,15 +62,15 @@
     "                                                                                         GIBBS",
     "TEIIP.     ( a;-H~ 98 )/T      so      -(G;-H~g 8 )/T       cop     EIIITHALPY        FREE EIIIEBG!       Log Kf",
     "                                T",
-    "   K         J/IIOl•K       J/llol•K      J/IIOl•K       J/IIOl•K         kJ/mol          kJ/1101",
+    "   K         J/IIOl\u2022K       J/llol\u2022K      J/IIOl\u2022K       J/IIOl\u2022K         kJ/mol          kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J/IIOl•K",
-    "entropy": "J/llol•K",
-    "negative_gibbs_function": "J/IIOl•K",
-    "heat_capacity": "J/IIOl•K",
+    "enthalpy_function": "J/IIOl\u2022K",
+    "entropy": "J/llol\u2022K",
+    "negative_gibbs_function": "J/IIOl\u2022K",
+    "heat_capacity": "J/IIOl\u2022K",
     "formation_enthalpy": "kJ/mol",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -78,19 +78,19 @@
   "temperature_grid": [
     {
       "as_published": "1652",
-      "value": null,
+      "value": 1652.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1700",
-      "value": null,
+      "value": 1700.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1800",
-      "value": null,
+      "value": 1800.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -143,7 +143,7 @@
       "cells": {
         "temperature": {
           "as_published": "1652",
-          "value": null,
+          "value": 1652.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -238,7 +238,7 @@
       "cells": {
         "temperature": {
           "as_published": "1700",
-          "value": null,
+          "value": 1700.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -333,7 +333,7 @@
       "cells": {
         "temperature": {
           "as_published": "1800",
-          "value": null,
+          "value": 1800.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -388,7 +388,7 @@
   "uncertainty_values": [
     {
       "as_published": "0.112",
-      "value": null,
+      "value": 0.112,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -399,7 +399,7 @@
     },
     {
       "as_published": "0.112",
-      "value": null,
+      "value": 0.112,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -432,7 +432,7 @@
     },
     {
       "as_published": "0.1511",
-      "value": null,
+      "value": 0.1511,
       "ocr_suspect": true,
       "footnote_markers": [],
       "source_text_span": {
@@ -449,10 +449,10 @@
     "                                    9.11611 kJ           IIOLAB VOLUIIE                          1. 20ij0 J/bar",
     "                                                                                                12.0110 cm 3",
     "TBAIIISITIONS IN REFERENCE STATE ELEIIENTS",
-    "    IROIII ••••••• CURIE P. 1042, ALPHl-GliiiiA 1184, GAIIIIA-DELTA 1665,",
+    "    IROIII \u2022\u2022\u2022\u2022\u2022\u2022\u2022 CURIE P. 1042, ALPHl-GliiiiA 1184, GAIIIIA-DELTA 1665,",
     "                   II. P. DELTA 1809 K.",
     "HEAT CAPACITY EQUATION",
-    "             19.296 + 3.u165x10-2 T      1.50Q9x103 T-o·s                          2.5333x10• T-2",
+    "             19.296 + 3.u165x10-2 T      1.50Q9x103 T-o\u00b7s                          2.5333x10\u2022 T-2",
     "              (EQUATION VALID FBOII 298 - 1652 K)",
     "IIEFERENCE           44        120                                          109                         COIIPILED",
     "                               2ij7                                         2117                         6-11-76"
@@ -466,5 +466,6 @@
     "row_start": 16,
     "row_stop": 18,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Liquid 1652 to 1800 K."
 }

@@ -71,15 +71,15 @@
     "                                                                                       GIBBS",
     "TEilP.     (H;-H~ 98 );T      so     -(G;-a~ 98 )/T      cop    ENTHALPY            FREE ENERGY       Loq    Kf",
     "                               T",
-    "             J;aol•K       J/aol•K      J/aol•K       Jjaol•K          ltJ/aol         kJ/aol",
+    "             J;aol\u2022K       J/aol\u2022K      J/aol\u2022K       Jjaol\u2022K          ltJ/aol         kJ/aol",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "J;aol•K",
-    "entropy": "J/aol•K",
-    "negative_gibbs_function": "J/aol•K",
-    "heat_capacity": "Jjaol•K",
+    "enthalpy_function": "J;aol\u2022K",
+    "entropy": "J/aol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "Jjaol\u2022K",
     "formation_enthalpy": "ltJ/aol",
     "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
@@ -171,5 +171,6 @@
       "reason": "column-position recovery was not lossless: per-column token counts temperature=9, enthalpy_function=8, entropy=8, negative_gibbs_function=9, heat_capacity=9, formation_enthalpy=8, formation_gibbs_energy=8, log_kf=9",
       "detector_only": false
     }
-  ]
+  ],
+  "phase_as_published": "Crystals 298.15 to aeltinq point 315.5 K.                   AboYe 315.5 K the data\n           tabalated are a metastable extrapolation."
 }

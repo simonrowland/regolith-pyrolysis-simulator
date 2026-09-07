@@ -66,15 +66,15 @@
     "                                                                                                GIBBS",
     "TEI!P.       (H;-H~ 98 )/T       so",
     "                                  T      -(G;-H~ 98 )/T          Cop     ENTHALPY            FREE ENERGY     Log Kf",
-    "  K           J;mol•K         J/llol•K     J/mol• K           J/mol• K          kJ/1101         kJ/1101",
+    "  K           J;mol\u2022K         J/llol\u2022K     J/mol\u2022 K           J/mol\u2022 K          kJ/1101         kJ/1101",
     "--------------------------------------------------------------------------------"
   ],
   "units_as_published": {
     "temperature": "K",
-    "enthalpy_function": "J;mol•K",
-    "entropy": "J/llol•K",
-    "negative_gibbs_function": "J/mol• K",
-    "heat_capacity": "J/mol• K",
+    "enthalpy_function": "J;mol\u2022K",
+    "entropy": "J/llol\u2022K",
+    "negative_gibbs_function": "J/mol\u2022 K",
+    "heat_capacity": "J/mol\u2022 K",
     "formation_enthalpy": "kJ/1101",
     "formation_gibbs_energy": "kJ/1101",
     "log_kf": ""
@@ -82,31 +82,31 @@
   "temperature_grid": [
     {
       "as_published": "298.15",
-      "value": null,
+      "value": 298.15,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "400",
-      "value": null,
+      "value": 400.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "500",
-      "value": null,
+      "value": 500.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "600",
-      "value": null,
+      "value": 600.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "700",
-      "value": null,
+      "value": 700.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
@@ -118,13 +118,13 @@
     },
     {
       "as_published": "900",
-      "value": null,
+      "value": 900.0,
       "ocr_suspect": true,
       "footnote_markers": []
     },
     {
       "as_published": "1000",
-      "value": null,
+      "value": 1000.0,
       "ocr_suspect": true,
       "footnote_markers": []
     }
@@ -177,7 +177,7 @@
       "cells": {
         "temperature": {
           "as_published": "298.15",
-          "value": null,
+          "value": 298.15,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -272,7 +272,7 @@
       "cells": {
         "temperature": {
           "as_published": "400",
-          "value": null,
+          "value": 400.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -367,7 +367,7 @@
       "cells": {
         "temperature": {
           "as_published": "500",
-          "value": null,
+          "value": 500.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -462,7 +462,7 @@
       "cells": {
         "temperature": {
           "as_published": "600",
-          "value": null,
+          "value": 600.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -557,7 +557,7 @@
       "cells": {
         "temperature": {
           "as_published": "700",
-          "value": null,
+          "value": 700.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -747,7 +747,7 @@
       "cells": {
         "temperature": {
           "as_published": "900",
-          "value": null,
+          "value": 900.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -842,7 +842,7 @@
       "cells": {
         "temperature": {
           "as_published": "1000",
-          "value": null,
+          "value": 1000.0,
           "ocr_suspect": true,
           "footnote_markers": []
         },
@@ -960,10 +960,10 @@
     "                                               kJ             IIOLAi VOL UI!E                        4.3280 J/bar",
     "                                                                                                    43.280 CIIJ",
     "TRANSITIONS IN REFERENCE STATE ELEIIENTS",
-    "       POTASSIUII •• 11. P. 336.4,        B.    P. 103() K.",
-    "       BROfliNE ••••    B.   P. 332 K.",
+    "       POTASSIUII \u2022\u2022 11. P. 336.4,        B.    P. 103() K.",
+    "       BROfliNE \u2022\u2022\u2022\u2022    B.   P. 332 K.",
     "HEAT CAPACITY EQUATION",
-    "              43.924 +        5.8546x1o-z T                 1.7173x103   r-o·5",
+    "              43.924 +        5.8546x1o-z T                 1.7173x103   r-o\u00b75",
     "               (EQUATION VALID FRO!                 298 -    1000 K)",
     "R.EFKBEMCE       247             215                                               215                     COI!PILED",
     "                  173                                                                                       6-29-76"
@@ -984,5 +984,6 @@
     "row_start": 1,
     "row_stop": 8,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
-  }
+  },
+  "phase_as_published": "Crystals 298.15 to melting point 1007 K."
 }

@@ -71,17 +71,18 @@ class PublishedNumber:
         return number
 
     def validate_round_trip(self, column: str | None = None) -> None:
-        numeric_token = self.as_published.strip().strip("*•†‡").strip()
+        # The shape check runs on the raw printed token; footnote bullets and
+        # other non-numeric glyphs are OCR artefacts that make the token
+        # ocr_suspect -- they are never stripped to admit a different number.
+        numeric_token = self.as_published.strip()
         token_is_numeric = _NUMBER_RE.fullmatch(numeric_token) is not None
         if token_is_numeric and column == "temperature":
             parsed_temperature = Decimal(numeric_token)
             token_is_numeric = Decimal("250") <= parsed_temperature <= Decimal("2500")
         if self.value is None:
-            if token_is_numeric and not self.ocr_suspect:
-                raise ValueError(f"numeric token lost its parsed value: {self.as_published!r}")
+            if not self.ocr_suspect:
+                raise ValueError(f"withheld token lacks the suspect flag: {self.as_published!r}")
             return
-        if self.ocr_suspect:
-            raise ValueError(f"OCR-suspect token was admitted as numeric: {self.as_published!r}")
         if not token_is_numeric:
             raise ValueError(f"parsed value repairs an OCR token: {self.as_published!r}")
         try:
@@ -189,7 +190,7 @@ def lookup_temperature(
         cell = row["cells"]["temperature"]
         if not cell["ocr_suspect"]:
             continue
-        raw = cell["as_published"].strip().strip("*•†‡").strip()
+        raw = cell["as_published"].strip()
         if _NUMBER_RE.fullmatch(raw) and Decimal(raw) == requested:
             raise OcrSuspectGridTokenError(
                 f"{temperature!r} matches OCR-suspect temperature token {raw!r} in {record_id}"
