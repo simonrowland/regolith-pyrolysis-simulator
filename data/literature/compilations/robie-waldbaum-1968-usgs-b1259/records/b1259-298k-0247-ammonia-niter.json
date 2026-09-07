@@ -62,13 +62,13 @@
     "ocr_reasons": []
   },
   "log_Kf": {
-    "as_published": ".    32.232",
-    "value": null,
-    "ocr_suspect": true,
+    "as_published": "32.232",
+    "value": 32.232,
+    "ocr_suspect": false,
     "footnote_markers": [],
-    "ocr_reasons": [
-      "non_clean_numberish"
-    ]
+    "ocr_reasons": [],
+    "layout_as_extracted": ".    32.232",
+    "correction_id": "b1259-p27-log_Kf-298k-cell"
   },
   "references_as_published": [
     "158",
@@ -96,36 +96,36 @@
   "source_column_spans": {
     "entropy": {
       "source_span": [
-        30,
-        44
+        33,
+        38
       ],
       "source_line_index": 0
     },
     "molar_volume": {
       "source_span": [
-        44,
-        59
+        51,
+        56
       ],
       "source_line_index": 0
     },
     "delta_f_H": {
       "source_span": [
-        59,
-        72
+        64,
+        70
       ],
       "source_line_index": 0
     },
     "delta_f_G": {
       "source_span": [
-        72,
+        79,
         85
       ],
       "source_line_index": 0
     },
     "log_Kf": {
       "source_span": [
-        85,
-        102
+        86,
+        97
       ],
       "source_line_index": 0
     },
@@ -141,6 +141,16 @@
   "identity_disagreements": [],
   "ambiguities": [
     "ocr_suspect_token_retained_uncorrected"
+  ],
+  "corrections": [
+    {
+      "correction_id": "b1259-p27-log_Kf-298k-cell",
+      "pdf_page": 27,
+      "field": "log_Kf",
+      "layout_as_extracted": ".    32.232",
+      "printed_token": "32.232",
+      "evidence": "PDF page 27 image visibly prints log_Kf=32.232 in the 'Ammonia- Niter' row: 'Ammonia- Niter        80.043     36.11             46.49        -87373         -43971 .    32.232      158    158        74'"
+    }
   ],
   "record_id": "b1259-298k-0247-ammonia-niter",
   "source": {

@@ -34,13 +34,13 @@
     "log_Kf": "dimensionless"
   },
   "entropy": {
-    "as_published": ". 10.43",
-    "value": null,
-    "ocr_suspect": true,
+    "as_published": "10.43",
+    "value": 10.43,
+    "ocr_suspect": false,
     "footnote_markers": [],
-    "ocr_reasons": [
-      "non_clean_numberish"
-    ]
+    "ocr_reasons": [],
+    "layout_as_extracted": ". 10.43",
+    "correction_id": "b1259-p25-entropy-298k-cell"
   },
   "molar_volume": {
     "as_published": "14.338",
@@ -94,36 +94,36 @@
   "source_column_spans": {
     "entropy": {
       "source_span": [
-        29,
-        42
+        31,
+        38
       ],
       "source_line_index": 0
     },
     "molar_volume": {
       "source_span": [
-        42,
-        58
+        48,
+        54
       ],
       "source_line_index": 0
     },
     "delta_f_H": {
       "source_span": [
-        58,
+        67,
         73
       ],
       "source_line_index": 0
     },
     "delta_f_G": {
       "source_span": [
-        73,
-        84
+        77,
+        83
       ],
       "source_line_index": 0
     },
     "log_Kf": {
       "source_span": [
-        84,
-        102
+        88,
+        94
       ],
       "source_line_index": 0
     },
@@ -139,6 +139,16 @@
   "identity_disagreements": [],
   "ambiguities": [
     "ocr_suspect_token_retained_uncorrected"
+  ],
+  "corrections": [
+    {
+      "correction_id": "b1259-p25-entropy-298k-cell",
+      "pdf_page": 25,
+      "field": "entropy",
+      "layout_as_extracted": ". 10.43",
+      "printed_token": "10.43",
+      "evidence": "PDF page 25 image visibly prints entropy=10.43 in the 'Zincite' row: 'Zincite              81.369    . 10.43          14.338             -83250    -76089     55.775         .78          22     74'"
+    }
   ],
   "record_id": "b1259-298k-0198-zincite",
   "source": {

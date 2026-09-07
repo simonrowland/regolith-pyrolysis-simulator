@@ -42,121 +42,17 @@
   },
   "rows": [
     {
-      "kind": "grid_refusal",
-      "source_layout_line": "1 Cnr",
-      "column_token_count": 1,
-      "temperature": {
-        "as_published": "1",
-        "value": 1.0,
-        "ocr_suspect": false,
-        "footnote_markers": [],
-        "ocr_reasons": []
-      },
-      "source_column_spans": {
-        "temperature": [
-          0,
-          1
-        ],
-        "H_minus_H298": [
-          14,
-          34
-        ],
-        "entropy": [
-          34,
-          45
-        ],
-        "gibbs_function": [
-          45,
-          55
-        ],
-        "delta_f_H": [
-          55,
-          68
-        ],
-        "delta_f_G": [
-          68,
-          82
-        ],
-        "log_Kf": [
-          82,
-          5
-        ]
-      },
-      "H_minus_H298": {
-        "as_published": "",
-        "value": null,
-        "ocr_suspect": true,
-        "footnote_markers": [],
-        "ocr_reasons": [
-          "column_absent_in_ocr"
-        ]
-      },
-      "entropy": {
-        "as_published": "",
-        "value": null,
-        "ocr_suspect": true,
-        "footnote_markers": [],
-        "ocr_reasons": [
-          "column_absent_in_ocr"
-        ]
-      },
-      "gibbs_function": {
-        "as_published": "",
-        "value": null,
-        "ocr_suspect": true,
-        "footnote_markers": [],
-        "ocr_reasons": [
-          "column_absent_in_ocr"
-        ]
-      },
-      "delta_f_H": {
-        "as_published": "",
-        "value": null,
-        "ocr_suspect": true,
-        "footnote_markers": [],
-        "ocr_reasons": [
-          "column_absent_in_ocr"
-        ]
-      },
-      "delta_f_G": {
-        "as_published": "",
-        "value": null,
-        "ocr_suspect": true,
-        "footnote_markers": [],
-        "ocr_reasons": [
-          "column_absent_in_ocr"
-        ]
-      },
-      "log_Kf": {
-        "as_published": "",
-        "value": null,
-        "ocr_suspect": true,
-        "footnote_markers": [],
-        "ocr_reasons": [
-          "column_absent_in_ocr"
-        ]
-      },
-      "ocr_suspect_row": true,
-      "missing_columns": [
-        "H_minus_H298",
-        "entropy",
-        "gibbs_function",
-        "delta_f_H",
-        "delta_f_G",
-        "log_Kf"
-      ],
-      "grid_refusal_reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
-    },
-    {
-      "kind": "grid_refusal",
+      "kind": "data",
       "source_layout_line": " 2981.15 0.000                        12.87     12.87    -303.640       -284.728   208.711",
-      "column_token_count": 6,
+      "column_token_count": 7,
       "temperature": {
-        "as_published": "2981.15",
-        "value": 2981.15,
+        "as_published": "298.15",
+        "value": 298.15,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "2981.15",
+        "correction_id": "b1259-p102-temperature-01"
       },
       "source_column_spans": {
         "temperature": [
@@ -164,38 +60,36 @@
           8
         ],
         "H_minus_H298": [
-          14,
-          34
+          9,
+          14
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          83,
           90
         ]
       },
       "H_minus_H298": {
-        "as_published": "",
-        "value": null,
-        "ocr_suspect": true,
+        "as_published": "0.000",
+        "value": 0.0,
+        "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": [
-          "column_absent_in_ocr"
-        ]
+        "ocr_reasons": []
       },
       "entropy": {
         "as_published": "12.87",
@@ -232,45 +126,30 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "ocr_suspect_row": true,
-      "missing_columns": [
-        "H_minus_H298"
-      ],
-      "grid_refusal_reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup",
-      "identity_disagreements": [
-        "logKf_identity |logK+1000 dG/(RT ln10)|=187.8375 at T=2981.15"
-      ]
+      "ocr_suspect_row": true
     },
     {
       "kind": "uncertainty",
       "source_layout_line": "UNCERTAINTY                            0.10      0.10       0.400          0.410     0.301",
       "source_column_spans": {
-        "temperature": [
-          0,
-          14
-        ],
-        "H_minus_H298": [
-          14,
-          34
-        ],
         "entropy": [
-          34,
-          45
+          39,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          49,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          60,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          75,
+          80
         ],
         "log_Kf": [
-          82,
+          85,
           90
         ]
       },
@@ -327,27 +206,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          25,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          83,
           90
         ]
       },
@@ -411,27 +290,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          25,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          83,
           90
         ]
       },
@@ -495,27 +374,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          25,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -579,27 +458,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          25,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -663,27 +542,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          25,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -747,27 +626,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -831,27 +710,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -915,27 +794,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          54
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -1002,27 +881,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -1086,27 +965,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -1170,27 +1049,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -1254,27 +1133,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -1338,27 +1217,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -1422,27 +1301,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -1506,27 +1385,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -1590,27 +1469,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -1674,27 +1553,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -1758,27 +1637,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -1842,27 +1721,27 @@
           4
         ],
         "H_minus_H298": [
-          14,
-          34
+          24,
+          30
         ],
         "entropy": [
-          34,
-          45
+          38,
+          43
         ],
         "gibbs_function": [
-          45,
-          55
+          48,
+          53
         ],
         "delta_f_H": [
-          55,
-          68
+          57,
+          65
         ],
         "delta_f_G": [
-          68,
-          82
+          72,
+          80
         ],
         "log_Kf": [
-          82,
+          84,
           90
         ]
       },
@@ -1910,26 +1789,23 @@
       }
     }
   ],
-  "row_count": 21,
-  "lookup_grid_count": 19,
-  "grid_refusals": [
-    {
-      "raw_temperature_token": "1",
-      "source_layout_line": "1 Cnr",
-      "reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
-    },
-    {
-      "raw_temperature_token": "2981.15",
-      "source_layout_line": " 2981.15 0.000                        12.87     12.87    -303.640       -284.728   208.711",
-      "reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
-    }
-  ],
-  "ocr_suspect_token_count": 8,
-  "identity_disagreements": [
-    "logKf_identity |logK+1000 dG/(RT ln10)|=187.8375 at T=2981.15"
-  ],
+  "row_count": 20,
+  "lookup_grid_count": 20,
+  "grid_refusals": [],
+  "ocr_suspect_token_count": 1,
+  "identity_disagreements": [],
   "ambiguities": [
     "logKf_identity |logK+1000 dG/(RT ln10)|=187.8375 at T=2981.15"
+  ],
+  "corrections": [
+    {
+      "correction_id": "b1259-p102-temperature-01",
+      "pdf_page": 102,
+      "field": "temperature",
+      "layout_as_extracted": "2981.15",
+      "printed_token": "298.15",
+      "evidence": "PDF page 102 image visibly prints '298.15 0.000 12.87 12.87 -303.640 -284.728 208.711'"
+    }
   ],
   "record_id": "b1259-ht-0071-boric-oxioe",
   "source": {

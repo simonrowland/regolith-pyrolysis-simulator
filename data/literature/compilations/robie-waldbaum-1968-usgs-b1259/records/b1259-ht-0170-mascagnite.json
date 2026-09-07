@@ -60,23 +60,23 @@
           13
         ],
         "entropy": [
-          27,
-          38
+          30,
+          35
         ],
         "gibbs_function": [
-          38,
-          50
+          42,
+          47
         ],
         "delta_f_H": [
-          50,
-          64
+          53,
+          61
         ],
         "delta_f_G": [
-          64,
-          78
+          68,
+          76
         ],
         "log_Kf": [
-          78,
+          81,
           88
         ]
       },
@@ -127,32 +127,24 @@
       "kind": "uncertainty",
       "source_layout_line": "UNCERTAINTY                    0.30        0.30         0.300          0.320       0.235",
       "source_column_spans": {
-        "temperature": [
-          0,
-          13
-        ],
-        "H_minus_H298": [
-          13,
-          27
-        ],
         "entropy": [
-          27,
-          38
+          31,
+          35
         ],
         "gibbs_function": [
-          38,
-          50
+          43,
+          47
         ],
         "delta_f_H": [
-          50,
-          64
+          56,
+          61
         ],
         "delta_f_G": [
-          64,
-          78
+          71,
+          76
         ],
         "log_Kf": [
-          78,
+          83,
           88
         ]
       },
@@ -209,27 +201,27 @@
           7
         ],
         "H_minus_H298": [
-          13,
-          27
+          20,
+          25
         ],
         "entropy": [
-          27,
-          38
+          30,
+          35
         ],
         "gibbs_function": [
-          38,
-          50
+          42,
+          47
         ],
         "delta_f_H": [
-          50,
-          64
+          54,
+          61
         ],
         "delta_f_G": [
-          64,
-          78
+          68,
+          76
         ],
         "log_Kf": [
-          78,
+          81,
           88
         ]
       },
@@ -277,18 +269,17 @@
       }
     },
     {
-      "kind": "grid_refusal",
+      "kind": "data",
       "source_layout_line": "    5CO            10.340     78.88       58.20       283.885       -169.937      74.279",
       "column_token_count": 7,
       "temperature": {
-        "as_published": "5CO",
-        "value": null,
-        "ocr_suspect": true,
+        "as_published": "500",
+        "value": 500.0,
+        "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": [
-          "letter_in_numeric_token",
-          "non_clean_numberish"
-        ]
+        "ocr_reasons": [],
+        "layout_as_extracted": "5CO",
+        "correction_id": "b1259-p201-temperature-04"
       },
       "source_column_spans": {
         "temperature": [
@@ -296,27 +287,27 @@
           7
         ],
         "H_minus_H298": [
-          13,
-          27
+          19,
+          25
         ],
         "entropy": [
-          27,
-          38
+          30,
+          35
         ],
         "gibbs_function": [
-          38,
-          50
+          42,
+          47
         ],
         "delta_f_H": [
-          50,
-          64
+          54,
+          61
         ],
         "delta_f_G": [
-          64,
-          78
+          68,
+          76
         ],
         "log_Kf": [
-          78,
+          82,
           88
         ]
       },
@@ -342,11 +333,13 @@
         "ocr_reasons": []
       },
       "delta_f_H": {
-        "as_published": "283.885",
-        "value": 283.885,
+        "as_published": "-283.885",
+        "value": -283.885,
         "ocr_suspect": false,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [],
+        "layout_as_extracted": "283.885",
+        "correction_id": "b1259-p201-delta_f_H-04"
       },
       "delta_f_G": {
         "as_published": "-169.937",
@@ -362,8 +355,7 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "ocr_suspect_row": true,
-      "grid_refusal_reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
+      "ocr_suspect_row": true
     },
     {
       "kind": "data",
@@ -382,27 +374,27 @@
           7
         ],
         "H_minus_H298": [
-          13,
-          27
+          19,
+          25
         ],
         "entropy": [
-          27,
-          38
+          30,
+          35
         ],
         "gibbs_function": [
-          38,
-          50
+          42,
+          47
         ],
         "delta_f_H": [
-          50,
-          64
+          54,
+          61
         ],
         "delta_f_G": [
-          64,
-          78
+          68,
+          76
         ],
         "log_Kf": [
-          78,
+          82,
           88
         ]
       },
@@ -451,17 +443,29 @@
     }
   ],
   "row_count": 4,
-  "lookup_grid_count": 3,
-  "grid_refusals": [
-    {
-      "raw_temperature_token": "5CO",
-      "source_layout_line": "    5CO            10.340     78.88       58.20       283.885       -169.937      74.279",
-      "reason": "temperature token is absent or ambiguous in the OCR layout; row is retained but not admitted to lookup"
-    }
-  ],
+  "lookup_grid_count": 4,
+  "grid_refusals": [],
   "ocr_suspect_token_count": 1,
   "identity_disagreements": [],
   "ambiguities": [],
+  "corrections": [
+    {
+      "correction_id": "b1259-p201-temperature-04",
+      "pdf_page": 201,
+      "field": "temperature",
+      "layout_as_extracted": "5CO",
+      "printed_token": "500",
+      "evidence": "PDF page 201 image visibly prints '500 10.340 78.88 58.20 -283.885 -169.937 74.279'"
+    },
+    {
+      "correction_id": "b1259-p201-delta_f_H-04",
+      "pdf_page": 201,
+      "field": "delta_f_H",
+      "layout_as_extracted": "283.885",
+      "printed_token": "-283.885",
+      "evidence": "PDF page 201 image visibly prints delta_f_H=-283.885 at T=500.0 K"
+    }
+  ],
   "record_id": "b1259-ht-0170-mascagnite",
   "source": {
     "database": "USGS Bulletin 1259, Robie & Waldbaum 1968",
