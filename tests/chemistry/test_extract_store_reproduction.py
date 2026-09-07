@@ -136,9 +136,9 @@ def test_store_yields_adopted_target_type_observations(
             if obs.source_id.startswith("kems-") and obs.adoption_basis != "superseded"]
     # B1 harvest + class-tagged fence rows expanded the KEMS surface; keep the
     # count live-derived so a silent shrink is RED without hard-coding B1 IDs.
-    # 2026-08-27 harvest + d-006 gate: KEMS observations/sources are the
-    # live studio battery after snapshot regen.
-    assert len(kems) == 450
+    # 2026-09-06 b-481 attributed regen: deepening folds + supersession
+    # (parents excluded) + closed evidence-marker admission.
+    assert len(kems) == 1133
     # b-480: 15 added KEMS sources; coverage includes typed-skipped evidence.
     assert len({obs.source_id for obs in kems}) == 45
     for obs in adopted_observations:
@@ -1630,20 +1630,17 @@ def test_coverage_ledger_is_observation_first_and_exact(
     adopted_observations: list[AdoptedObservation],
 ) -> None:
     coverage = coverage_summary(battery_evaluations)
-    # 2026-08-11 evidence recovery: Gibbs tables are coverage-only typed skips;
-    # qualitative rate bounds add rows without numeric residuals; Sossi Na
-    # analytical ceilings remove four comparable points. Counts are live
+    # 2026-09-06 b-481 attributed regen: deepening folds after ca6b0748 plus
+    # supersession and closed evidence-marker admission. Counts are live
     # battery, not hand-estimated.
-    # 2026-08-27 harvest + d-006 binary-melt gate + DeMaria figure-only
-    # withdrawal. Numbers are the LIVE studio battery after snapshot regen.
     assert coverage["observations"] == sum(
         obs.adoption_basis != "superseded" for obs in adopted_observations
-    ) == 570
-    assert coverage["comparable"] == 67
-    assert coverage["skipped"] == 503
+    ) == 1239
+    assert coverage["comparable"] == 30
+    assert coverage["skipped"] == 1209
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
-    assert coverage["comparable_points"] == 105
-    assert coverage["gap_points"] == 532
+    assert coverage["comparable_points"] == 60
+    assert coverage["gap_points"] == 1235
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")
@@ -1665,29 +1662,29 @@ def test_coverage_ledger_is_observation_first_and_exact(
         )
         for key, row in by_type.items()
     } == {
-        "activity_coefficient": (311, 27, 284, 27),
-        "alpha": (63, 17, 46, 45),
-        "gibbs_table": (33, 0, 33, 0),
-        "psat_series": (23, 1, 22, 2),
-        "rate_series": (75, 7, 68, 16),
-        "transition_point": (74, 15, 59, 15),
+        "activity_coefficient": (285, 1, 284, 1),
+        "alpha": (99, 8, 91, 28),
+        "gibbs_table": (241, 0, 241, 0),
+        "psat_series": (334, 1, 333, 2),
+        "rate_series": (209, 5, 204, 14),
+        "transition_point": (71, 15, 56, 15),
     }
     by_family = {row["comparison_family"]: row for row in coverage["by_family"]}
     assert {
         key: (row["observations"], row["comparable"], row["comparable_points"])
         for key, row in by_family.items()
     } == {
-        "activity_coefficient": (285, 27, 27),
-        "activity_self_agreement": (9, 0, 0),
-        "alpha": (63, 17, 45),
+        "activity_coefficient": (152, 1, 1),
+        "activity_self_agreement": (10, 0, 0),
+        "alpha": (99, 8, 28),
         "alpha_in_legacy_rate_series": (3, 3, 12),
-        "gibbs_table": (33, 0, 0),
-        "ordering_activity": (17, 0, 0),
-        "ordering_bound": (26, 4, 4),
-        "psat_series": (23, 1, 2),
-        "rate_hkl": (45, 0, 0),
+        "gibbs_table": (241, 0, 0),
+        "ordering_activity": (123, 0, 0),
+        "ordering_bound": (98, 2, 2),
+        "psat_series": (334, 1, 2),
+        "rate_hkl": (107, 0, 0),
         "relative_volatility": (1, 0, 0),
-        "transition_point": (74, 15, 15),
+        "transition_point": (71, 15, 15),
     }
     assert {row["species"] for row in coverage["by_species"]} == {
         obs.species_id for obs in adopted_observations

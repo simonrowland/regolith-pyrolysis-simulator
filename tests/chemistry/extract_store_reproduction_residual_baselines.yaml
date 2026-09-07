@@ -31,6 +31,11 @@ points:
 #   admission_status=rejected_no_figure_reading.
 # - Fedkin Mg table3 T=2123 placeholder: live payload is the
 #   transcribed per-T series 1973/2073/2173/2273.
+# 2026-09-06 b-481 pin withdrawals (not residual moves): eight
+# kems-010-richter-2007 keys no longer live. Parents are superseded;
+# Arrhenius replacements are model_output_not_measurement; ordering
+# replacements are qualitative bounds, not numeric comparables.
+
 - key: fedkin_2006_table3_fe_hashimoto_langmuir:T=1973
   case_id: fedkin-grossman-ghiorso-2006::fedkin_2006_table3_fe_hashimoto_langmuir
   source_id: fedkin-grossman-ghiorso-2006
@@ -247,36 +252,6 @@ points:
   temperature_K: 2273.0
   residual: -0.07
   band_residual: 0.02
-- key: richter_2007_mg_cai_langmuir_alpha_arrhenius:T=1873
-  case_id: kems-010-richter-2007::richter_2007_mg_cai_langmuir_alpha_arrhenius
-  source_id: kems-010-richter-2007
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.5202907093862962
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1873.0
-- key: richter_2007_mg_cai_langmuir_alpha_arrhenius:T=2023
-  case_id: kems-010-richter-2007::richter_2007_mg_cai_langmuir_alpha_arrhenius
-  source_id: kems-010-richter-2007
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.27007345151278755
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2023.0
-- key: richter_2007_mg_cai_langmuir_alpha_arrhenius:T=2173
-  case_id: kems-010-richter-2007::richter_2007_mg_cai_langmuir_alpha_arrhenius
-  source_id: kems-010-richter-2007
-  observation_type: alpha
-  species: Mg
-  residual_dex: 0.054400683911738565
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2173.0
 - key: richter_2007_mg_cai_arrhenius_langmuir:T=1873
   case_id: richter-et-al-2007::richter_2007_mg_cai_arrhenius_langmuir
   source_id: richter-et-al-2007
@@ -399,36 +374,6 @@ points:
   residual: -0.10721665192129436
   band_residual: 0.01
   extrapolated: true
-- key: richter_2007_sio_cai_langmuir_alpha_arrhenius:T=1873
-  case_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
-  source_id: kems-010-richter-2007
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.024104330930435496
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 1873.0
-- key: richter_2007_sio_cai_langmuir_alpha_arrhenius:T=2023
-  case_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
-  source_id: kems-010-richter-2007
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.10277813385983575
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2023.0
-- key: richter_2007_sio_cai_langmuir_alpha_arrhenius:T=2173
-  case_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
-  source_id: kems-010-richter-2007
-  observation_type: alpha
-  species: SiO
-  residual_dex: 0.21214346131136663
-  band_dex: 0.01
-  status: match
-  note: Expanded real-harness pin; residual is reported, not tuned.
-  temperature_K: 2173.0
 - key: richter_2007_si_cai_arrhenius_langmuir:T=1873
   case_id: richter-et-al-2007::richter_2007_si_cai_arrhenius_langmuir
   source_id: richter-et-al-2007
@@ -691,30 +636,6 @@ points:
   temperature_K: 3630.956
   residual: -70.806000188918
 # --- std2 fragment ---
-- key: richter_2007_al_non_loss_until_mg_exhausted:ordering
-  case_id: kems-010-richter-2007::richter_2007_al_non_loss_until_mg_exhausted
-  source_id: kems-010-richter-2007
-  observation_type: rate_series
-  species: Al
-  residual_dex: 0.0
-  band_dex: 0.01
-  residual: 0.0
-  band_residual: 0.01
-  status: ordering-pass
-  note: 'Ordering pin: Al not lost until Mg exhausted; 3/3 pairwise rank constraints held over 1873–2173
-    K.'
-- key: richter_2007_ca_non_loss_until_mg_exhausted:ordering
-  case_id: kems-010-richter-2007::richter_2007_ca_non_loss_until_mg_exhausted
-  source_id: kems-010-richter-2007
-  observation_type: rate_series
-  species: Ca
-  residual_dex: 0.0
-  band_dex: 0.01
-  residual: 0.0
-  band_residual: 0.01
-  status: ordering-pass
-  note: 'Ordering pin: Ca not lost until Mg exhausted; 3/3 pairwise rank constraints held over 1873–2173
-    K.'
 - key: hashimoto_1983_cao_al2o3_residue_enrichment:ordering
   case_id: kems-015-hashimoto-1983::hashimoto_1983_cao_al2o3_residue_enrichment
   source_id: kems-015-hashimoto-1983
