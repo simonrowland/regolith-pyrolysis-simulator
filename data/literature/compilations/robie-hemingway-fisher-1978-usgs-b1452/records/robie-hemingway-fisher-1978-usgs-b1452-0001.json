@@ -25,13 +25,14 @@
     "printed_pages": [
       3
     ],
-    "extraction": "pdftotext -layout, one PDF page at a time"
+    "extraction": "mineru table_body + page-image cross-check",
+    "mineru_chunk": "chunk-p001-p090",
+    "mineru_page_idx": 8,
+    "mineru_table_index": 0
   },
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
-  "transcription_status": "untranscribed",
-  "untranscribed_reasons": [
-    "mixed prose and numeric constants have merged symbols, exponents, and unit glyphs in the OCR text layer; not all printed numeric tokens can be mapped losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly"
-  ],
+  "transcription_status": "transcribed",
+  "untranscribed_reasons": [],
   "formula_weight": {
     "as_published": "",
     "value": null,
@@ -39,25 +40,690 @@
     "footnote_markers": [],
     "source_text_span": null
   },
-  "column_ids": [],
+  "column_ids": [
+    "symbol",
+    "definition"
+  ],
   "column_header_lines_as_published": [],
   "units_as_published": {},
   "temperature_grid": [],
-  "rows": [],
-  "row_count": 0,
-  "detected_data_row_count": 0,
+  "rows": [
+    {
+      "source_text_line": 1,
+      "source_text_spans": {
+        "symbol": {
+          "line": 1,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 1,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "T",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Temperature in kelvins.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 2,
+      "source_text_spans": {
+        "symbol": {
+          "line": 2,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 2,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "K",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Kelvin, the unit of temperature. It is the fraction 1/273.16 of the thermodynamic temperature of the triple point of water.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 3,
+      "source_text_spans": {
+        "symbol": {
+          "line": 3,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 3,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "J",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Joule, the unit of energy (or work). One joule = 1/4.1840 thermochemical calories or 10 cm3\u00b7 bar.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 4,
+      "source_text_spans": {
+        "symbol": {
+          "line": 4,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 4,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "mol",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Amount of substance of a system that contains as many elementary entities as there are atoms in 0.012 kilograms of carbon 12. It is identical with the gfw (gram formula weight).",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 5,
+      "source_text_spans": {
+        "symbol": {
+          "line": 5,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 5,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "P",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Pressure in bars. One bar = 105pascals or 0.1 MPa. The standard atmosphere is equal to 101325 pascals. The kilogram\u00b7 cm-2is equal to 98065.5 pascals.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 6,
+      "source_text_spans": {
+        "symbol": {
+          "line": 6,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 6,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "\u00b0",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Superscript indicates that the substance is in its standard state, 1 bar (105pascals) for a condensed phase.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 7,
+      "source_text_spans": {
+        "symbol": {
+          "line": 7,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 7,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "HT- H298",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Enthalpy at temperature T relative to 298.15 K in J\u00b7 mol-1, also called the heat content.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 8,
+      "source_text_spans": {
+        "symbol": {
+          "line": 8,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 8,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "(HT- H298)/T",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Enthalpy function in J\u00b7 mol-1\u00b7 K-1.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 9,
+      "source_text_spans": {
+        "symbol": {
+          "line": 9,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 9,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "ST",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Entropy at temperature T, in J\u00b7 mol-1\u00b7 K-1.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 10,
+      "source_text_spans": {
+        "symbol": {
+          "line": 10,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 10,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "(GT- H298)/T",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Gibbs energy function in J\u00b7 mol-1\u00b7 K-1.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 11,
+      "source_text_spans": {
+        "symbol": {
+          "line": 11,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 11,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "CP",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Heat capacity at constant pressure in J\u00b7 mol-1\u00b7 K-1.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 12,
+      "source_text_spans": {
+        "symbol": {
+          "line": 12,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 12,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "v298",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Volume of 1 mol of a substance at 1 bar pressure and at 298.15 K, in cm3, or J\u00b7 bar-1.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 13,
+      "source_text_spans": {
+        "symbol": {
+          "line": 13,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 13,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "\u0394Hm",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Enthalpy of melting at 1 bar pressure in J\u00b7 mol-1.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 14,
+      "source_text_spans": {
+        "symbol": {
+          "line": 14,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 14,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "\u0394Hb",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Enthalpy of vaporization to the ideal gas at 1 bar pressure at the normal boiling point in J\u00b7 mol-1.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 15,
+      "source_text_spans": {
+        "symbol": {
+          "line": 15,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 15,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "\u0394Hf",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Enthalpy of formation from the elements in their standard reference states in J\u00b7 mol-1.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 16,
+      "source_text_spans": {
+        "symbol": {
+          "line": 16,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 16,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "\u0394Gf",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Gibbs free energy of formation from the elements in their reference states in J\u00b7 mol-1.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 17,
+      "source_text_spans": {
+        "symbol": {
+          "line": 17,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 17,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "Kf",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Equilibrium constant of formation.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 18,
+      "source_text_spans": {
+        "symbol": {
+          "line": 18,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 18,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "R",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Gas constant, 8.3143 \u00b1 0.0008 J\u00b7 K-1\u00b7 mol-1.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 19,
+      "source_text_spans": {
+        "symbol": {
+          "line": 19,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 19,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "F",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Faraday constant, 96,487.0 \u00b1 1.0 J\u00b7 V-1\u00b7 mol-1.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 20,
+      "source_text_spans": {
+        "symbol": {
+          "line": 20,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 20,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "A",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Avogadro's number, (6.022094 \u00b1 0.000008) \u00d7 1023 mol-1.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 21,
+      "source_text_spans": {
+        "symbol": {
+          "line": 21,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 21,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "log",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Common logarithm, base 10.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 22,
+      "source_text_spans": {
+        "symbol": {
+          "line": 22,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 22,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "1n",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Natural logarithm, base e = 2.71828 . . .",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 23,
+      "source_text_spans": {
+        "symbol": {
+          "line": 23,
+          "start": 0,
+          "end": 1
+        },
+        "definition": {
+          "line": 23,
+          "start": 1,
+          "end": 2
+        }
+      },
+      "cells": {
+        "symbol": {
+          "as_published": "V",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "definition": {
+          "as_published": "Volt.",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    }
+  ],
+  "row_count": 23,
+  "detected_data_row_count": 23,
   "uncertainty_line_as_published": "",
   "uncertainty_values": [],
   "reference_state_notes_as_published": [],
   "auxiliary_lines_as_published": [],
   "footnote_markers": [],
   "ocr_suspect": true,
-  "ambiguities": [
-    {
-      "kind": "untranscribed_table",
-      "reason": "mixed prose and numeric constants have merged symbols, exponents, and unit glyphs in the OCR text layer; not all printed numeric tokens can be mapped losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly",
-      "detector_only": false
-    }
-  ],
+  "ambiguities": [],
   "phase_as_published": null
 }

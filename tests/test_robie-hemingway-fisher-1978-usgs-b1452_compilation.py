@@ -2,9 +2,11 @@
 
 import copy
 import hashlib
+import json
 import re
 import shutil
 import subprocess
+from functools import lru_cache
 from pathlib import Path
 
 import pytest
@@ -22,8 +24,22 @@ from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader impo
     load_manifest,
     load_records,
     lookup_temperature,
+    parse_mineru_table_html,
     token_has_printed_shape,
 )
+
+MINERU_ROOT = Path(
+    "/Users/simonrowland/Repos/regolith-corpus/text/"
+    "robie-hemingway-fisher-1978-usgs-b1452/mineru"
+)
+MINERU_CHUNKS = [
+    ("chunk-p001-p090", 1),
+    ("chunk-p091-p180", 91),
+    ("chunk-p181-p270", 181),
+    ("chunk-p271-p360", 271),
+    ("chunk-p361-p450", 361),
+    ("chunk-p451-p464", 451),
+]
 
 
 SOURCE_PDF = Path(
@@ -57,7 +73,102 @@ def source_layout(compilation):
     }
 
 
+def mineru_chunk_for_pdf_page(pdf_page: int) -> tuple[str, int]:
+    for chunk, start in MINERU_CHUNKS:
+        end = start + 89 if chunk != "chunk-p451-p464" else start + 13
+        if start <= pdf_page <= end:
+            return chunk, start
+    raise AssertionError(f"no MinerU chunk for pdf page {pdf_page}")
+
+
+@lru_cache(maxsize=None)
+def load_mineru_content_list(chunk: str) -> list:
+    files = [
+        path
+        for path in (MINERU_ROOT / chunk).glob("*_content_list.json")
+        if "v2" not in path.name
+    ]
+    assert files, chunk
+    return json.loads(files[0].read_text(encoding="utf-8"))
+
+
+def mineru_tables_on_pdf_page(pdf_page: int) -> list[dict]:
+    chunk, start = mineru_chunk_for_pdf_page(pdf_page)
+    page_idx = pdf_page - start
+    return [
+        item
+        for item in load_mineru_content_list(chunk)
+        if item.get("type") == "table" and item.get("page_idx") == page_idx
+    ]
+
+
+def mineru_page_text(pdf_page: int) -> str:
+    chunk, start = mineru_chunk_for_pdf_page(pdf_page)
+    page_idx = pdf_page - start
+    texts = [
+        item.get("text") or ""
+        for item in load_mineru_content_list(chunk)
+        if item.get("page_idx") == page_idx and item.get("type") in {"text", "header"}
+    ]
+    return "\n".join(texts)
+
+
+def mineru_grid_for_record(record) -> list[list[str]]:
+    locator = record["source_locator"]
+    if record["census_id"] == "thermodynamic-properties-at-298-15-k":
+        grid = []
+        for pdf_page in locator["pdf_pages"]:
+            for table in mineru_tables_on_pdf_page(pdf_page):
+                body = table.get("table_body") or ""
+                if not body:
+                    continue
+                parsed = parse_mineru_table_html(body)
+                width = max((len(row) for row in parsed), default=0)
+                if width >= 7:
+                    grid.extend(parsed)
+        return grid
+    tables = mineru_tables_on_pdf_page(locator["pdf_pages"][0])
+    table = tables[locator["mineru_table_index"]]
+    return parse_mineru_table_html(table.get("table_body") or "")
+
+
+def assert_record_matches_mineru(record, layouts):
+    grid = mineru_grid_for_record(record)
+    page_text = "\n".join(mineru_page_text(page) for page in record["source_locator"]["pdf_pages"])
+    page_lines = layouts[record["source_locator"]["pdf_pages"][0]]
+    collapsed_layout = "\n".join(page_lines)
+    for number in [record["formula_weight"], *record["uncertainty_values"]]:
+        token = number["as_published"]
+        if not token:
+            continue
+        in_mineru = token in page_text or any(token in cell for row in grid for cell in row)
+        span = number.get("source_text_span")
+        in_layout = False
+        if span and span.get("line"):
+            source_line = page_lines[span["line"] - 1]
+            in_layout = source_line[span["start"] : span["end"]] == token
+        assert in_mineru or in_layout or token in collapsed_layout, (
+            record["record_id"],
+            token,
+        )
+    if not record["rows"]:
+        return
+    for row in record["rows"]:
+        for column, span in row["source_text_spans"].items():
+            line_cells = grid[span["line"] - 1]
+            raw = line_cells[span["start"]] if span["start"] < len(line_cells) else ""
+            assert row["cells"][column]["as_published"] == raw, (
+                record["record_id"],
+                column,
+                row["cells"][column]["as_published"],
+                raw,
+            )
+
+
 def assert_record_matches_source(record, layouts):
+    if "mineru" in record["source_locator"].get("extraction", ""):
+        assert_record_matches_mineru(record, layouts)
+        return
     for number in [record["formula_weight"], *record["uncertainty_values"]]:
         if number["as_published"]:
             span = number["source_text_span"]
@@ -157,7 +268,13 @@ def test_every_numeric_token_round_trips_to_page_layout(compilation, source_layo
 
 def test_source_round_trip_rejects_consistent_token_value_mutation(compilation, source_layout):
     _, records = compilation
-    record = copy.deepcopy(next(record for record in records if record["rows"]))
+    record = copy.deepcopy(
+        next(
+            item
+            for item in records
+            if item["rows"] and "temperature" in item["column_ids"]
+        )
+    )
     cell = record["rows"][0]["cells"]["temperature"]
     cell["as_published"] = "299.15"
     cell["value"] = 299.15
@@ -196,6 +313,8 @@ def test_shape_failures_are_suspect_and_never_admitted(compilation):
 def test_phase_records_have_strict_safe_grids_and_no_embedded_headers(compilation, source_layout):
     manifest, records = compilation
     for record in records:
+        if "temperature" not in record["column_ids"]:
+            continue
         values = [
             row["cells"]["temperature"]["value"]
             for row in record["rows"]
@@ -204,6 +323,8 @@ def test_phase_records_have_strict_safe_grids_and_no_embedded_headers(compilatio
         ]
         assert all(right > left for left, right in zip(values, values[1:]))
         if not record["rows"]:
+            continue
+        if "mineru" in record["source_locator"].get("extraction", ""):
             continue
         page_lines = source_layout[record["source_locator"]["pdf_pages"][0]]
         first = record["rows"][0]["source_text_line"]
@@ -311,8 +432,21 @@ def test_phase_as_published_represented_per_record(compilation, source_layout):
         if not phase:
             continue
         header = re.split(r"(?<=\.)\s+", phase.strip(), maxsplit=1)[0]
-        page_lines = source_layout[record["source_locator"]["pdf_pages"][0]]
         collapsed_header = re.sub(r"\s+", " ", header)
+        if "mineru" in record["source_locator"].get("extraction", ""):
+            page_lines = source_layout[record["source_locator"]["pdf_pages"][0]]
+            collapsed_page = re.sub(r"\s+", " ", "\n".join(page_lines))
+            mineru_text = re.sub(
+                r"\s+",
+                " ",
+                mineru_page_text(record["source_locator"]["pdf_pages"][0]),
+            )
+            assert collapsed_header in collapsed_page or collapsed_header in mineru_text, (
+                record["record_id"],
+                collapsed_header,
+            )
+            continue
+        page_lines = source_layout[record["source_locator"]["pdf_pages"][0]]
         collapsed_page = re.sub(r"\s+", " ", "\n".join(page_lines))
         assert collapsed_header in collapsed_page, (record["record_id"], collapsed_header)
 
@@ -533,3 +667,39 @@ def test_compilation_is_never_measurement_or_battery_scoring(compilation):
     assert ROLE["battery_refusal"] == "gibbs_table_not_runtime_observable"
     assert all(record["compilation_role"] == ROLE for record in records)
     assert all(list(iter_published_numbers(record)) for record in records)
+
+
+def test_transcribed_tables_have_rows_and_untranscribed_tables_have_reasons(compilation):
+    manifest, records = compilation
+    by_census = {}
+    for record in records:
+        by_census.setdefault(record["census_id"], []).append(record)
+    transcribed = 0
+    untranscribed = 0
+    for group in by_census.values():
+        statuses = {record["transcription_status"] for record in group}
+        if "transcribed" in statuses:
+            transcribed += 1
+            assert all(record["transcription_status"] == "transcribed" for record in group)
+            assert any(record["rows"] for record in group)
+            assert all(record["rows"] for record in group if record["transcription_status"] == "transcribed")
+        else:
+            untranscribed += 1
+            for record in group:
+                assert record["transcription_status"] == "untranscribed"
+                assert record["untranscribed_reasons"]
+                assert not record["rows"]
+                assert any(item["kind"] == "untranscribed_table" for item in record["ambiguities"])
+    assert transcribed == manifest["summary"]["transcribed_table_count"]
+    assert untranscribed == manifest["summary"]["untranscribed_table_count"]
+    assert transcribed + untranscribed == 400
+    assert manifest["summary"] == expected_summary(manifest, records)
+
+
+def test_compilation_yaml_files_parse():
+    import yaml
+
+    for path in COMPILATION_ROOT.rglob("*.yaml"):
+        yaml.safe_load(path.read_text(encoding="utf-8"))
+    access = COMPILATION_ROOT.parents[0] / "access-status.yaml"
+    yaml.safe_load(access.read_text(encoding="utf-8"))

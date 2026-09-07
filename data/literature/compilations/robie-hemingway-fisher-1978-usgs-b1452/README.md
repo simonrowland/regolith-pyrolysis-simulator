@@ -11,30 +11,29 @@ The bulletin contents identify numbered Tables 1–2 and the thermodynamic
 sections. The resulting 400-table census comprises Table 1 on printed page 3,
 Table 2 on page 4, the 298.15 K summary on pages 12–29, and one unnumbered
 high-temperature substance table on every printed page 30–426. Printed page
-427 was visually checked and is blank. Phase boundaries produce 557 JSON
+427 was visually checked and is blank. Phase boundaries produce 568 JSON
 records from those 400 tables; explicit `untranscribed` records remain where
-the OCR text layer is not losslessly recoverable.
+the page image itself is unreadable.
 
 ## Native transcription
 
 The PDF was read one page at a time with `pdftotext -layout`; per-page horizontal
-column offsets recover tokens split across layout lines. Of 400 tables, 249
-high-temperature tables are transcribed into 3,673 rows and 406 phase-specific
-records. The other 151 tables retain page locators and exact per-column failure
-reasons in the `t-852` MinerU follow-up list in `manifest.yaml`. The 298.15 K
-summary and numbered Tables 1–2 remain untranscribed after the same offset and
-page-image reattempt because their symbol/value mappings are not lossless.
+column offsets recover tokens split across layout lines. Pass 2 added MinerU
+`table_body` HTML plus page-image cross-check for the remaining stubs. Of 400
+tables, 274 are transcribed into 4,779 rows and 442 phase-specific records.
+The other 126 tables retain page locators and failure reasons in the `t-852`
+MinerU follow-up list in `manifest.yaml`.
 
 Every recoverable numeric cell stores its raw token, exact page-text line/span,
 a parsed float or null, `ocr_suspect`, and retained footnote markers. Numeric
 admission requires the column's printed digit/sign/decimal shape on the raw
-token (bullets, spaces, and letters are never stripped); 5,123 failing tokens
+token (bullets, spaces, and letters are never stripped); 8,319 failing tokens
 remain unchanged, are marked suspect, and have no parsed value. Identity and
 image-OCR checks are detectors: they set `ocr_suspect` and list ambiguities,
 and they never null a numeric-shaped value. A value changes only with a
 `corrections` entry that cites a page-image reading. No units are converted, no
 values are rounded, and no gaps are filled. Printed rules and restarted
-temperature grids split 157 additional phase records, each carrying
+temperature grids split 168 additional phase records, each carrying
 `phase_as_published` from its printed header. Formula, title, state description,
 units, uncertainty line, formula weight, auxiliary property/equation lines, PDF
 page, printed page, and source-text line locators are retained when the text

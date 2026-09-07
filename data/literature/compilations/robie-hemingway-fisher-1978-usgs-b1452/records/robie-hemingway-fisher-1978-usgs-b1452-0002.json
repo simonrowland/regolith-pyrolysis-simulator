@@ -25,13 +25,14 @@
     "printed_pages": [
       4
     ],
-    "extraction": "pdftotext -layout, one PDF page at a time"
+    "extraction": "mineru table_body + page-image cross-check",
+    "mineru_chunk": "chunk-p001-p090",
+    "mineru_page_idx": 9,
+    "mineru_table_index": 0
   },
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
-  "transcription_status": "untranscribed",
-  "untranscribed_reasons": [
-    "the OCR text layer omits multiple element symbols and contains merged or shifted atomic-weight tokens such as '132,Q054', '83,80', and '131. 30'; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly"
-  ],
+  "transcription_status": "transcribed",
+  "untranscribed_reasons": [],
   "formula_weight": {
     "as_published": "",
     "value": null,
@@ -39,25 +40,3531 @@
     "footnote_markers": [],
     "source_text_span": null
   },
-  "column_ids": [],
+  "column_ids": [
+    "element",
+    "symbol",
+    "atomic_weight",
+    "element_right",
+    "symbol_right",
+    "atomic_weight_right"
+  ],
   "column_header_lines_as_published": [],
   "units_as_published": {},
   "temperature_grid": [],
-  "rows": [],
-  "row_count": 0,
-  "detected_data_row_count": 0,
+  "rows": [
+    {
+      "source_text_line": 2,
+      "source_text_spans": {
+        "element": {
+          "line": 2,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 2,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 2,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 2,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 2,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 2,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Actinium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Ac",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "227.0278",
+          "value": 227.0278,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Sodium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Na",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "22.98977",
+          "value": 22.98977,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 3,
+      "source_text_spans": {
+        "element": {
+          "line": 3,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 3,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 3,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 3,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 3,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 3,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Silver",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Ag",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "107.868",
+          "value": 107.868,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Niobium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Nb",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "92.9064",
+          "value": 92.9064,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 4,
+      "source_text_spans": {
+        "element": {
+          "line": 4,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 4,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 4,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 4,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 4,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 4,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Aluminum",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Al",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "26.98154",
+          "value": 26.98154,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Neodymium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Nd",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "144.24",
+          "value": 144.24,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 5,
+      "source_text_spans": {
+        "element": {
+          "line": 5,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 5,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 5,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 5,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 5,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 5,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Americium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Am",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "(243)",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Neon",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Ne",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "20.179",
+          "value": 20.179,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 6,
+      "source_text_spans": {
+        "element": {
+          "line": 6,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 6,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 6,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 6,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 6,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 6,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Argon",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Ar",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "39.948",
+          "value": 39.948,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Nickel",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Ni",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "58.70",
+          "value": 58.7,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 7,
+      "source_text_spans": {
+        "element": {
+          "line": 7,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 7,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 7,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 7,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 7,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 7,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Arsenic",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "As",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "74.9216",
+          "value": 74.9216,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Neptunium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Np",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "237.0482",
+          "value": 237.0482,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 8,
+      "source_text_spans": {
+        "element": {
+          "line": 8,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 8,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 8,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 8,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 8,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 8,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Astatine",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "At",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "(210)",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Oxygen",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "O",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "15.9994",
+          "value": 15.9994,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 9,
+      "source_text_spans": {
+        "element": {
+          "line": 9,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 9,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 9,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 9,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 9,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 9,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Gold",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Au",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "196.9665",
+          "value": 196.9665,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Osmium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Os",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "190.2",
+          "value": 190.2,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 10,
+      "source_text_spans": {
+        "element": {
+          "line": 10,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 10,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 10,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 10,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 10,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 10,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Boron",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "B",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "10.81",
+          "value": 10.81,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Phosphorus",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "P",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "30.97376",
+          "value": 30.97376,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 11,
+      "source_text_spans": {
+        "element": {
+          "line": 11,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 11,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 11,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 11,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 11,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 11,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Barium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Ba",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "137.33",
+          "value": 137.33,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Protactinium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Pa",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "231.0359",
+          "value": 231.0359,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 12,
+      "source_text_spans": {
+        "element": {
+          "line": 12,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 12,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 12,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 12,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 12,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 12,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Beryllium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Be",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "9.01218",
+          "value": 9.01218,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Lead",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Pb",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "207.2",
+          "value": 207.2,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 13,
+      "source_text_spans": {
+        "element": {
+          "line": 13,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 13,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 13,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 13,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 13,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 13,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Bismuth",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Bi",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "208.9804",
+          "value": 208.9804,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Palladium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Pd",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "106.4",
+          "value": 106.4,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 14,
+      "source_text_spans": {
+        "element": {
+          "line": 14,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 14,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 14,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 14,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 14,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 14,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Bromine",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Br",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "79.904",
+          "value": 79.904,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Polonium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Po",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "(209)",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 15,
+      "source_text_spans": {
+        "element": {
+          "line": 15,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 15,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 15,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 15,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 15,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 15,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Carbon",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "C",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "12.011",
+          "value": 12.011,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Promethium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Pm",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "(145)",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 16,
+      "source_text_spans": {
+        "element": {
+          "line": 16,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 16,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 16,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 16,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 16,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 16,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Calcium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Ca",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "40.08",
+          "value": 40.08,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Praseodymium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Pr",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "140.9077",
+          "value": 140.9077,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 17,
+      "source_text_spans": {
+        "element": {
+          "line": 17,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 17,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 17,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 17,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 17,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 17,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Cadmium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Cd",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "112.41",
+          "value": 112.41,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Platinum",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Pt",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "195.09",
+          "value": 195.09,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 18,
+      "source_text_spans": {
+        "element": {
+          "line": 18,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 18,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 18,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 18,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 18,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 18,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Cerium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Ce",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "140.12",
+          "value": 140.12,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Plutonium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Pu",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "(244)",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 19,
+      "source_text_spans": {
+        "element": {
+          "line": 19,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 19,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 19,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 19,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 19,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 19,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Chlorine",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Cl",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "35.453",
+          "value": 35.453,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Radium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Ra",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "226.0254",
+          "value": 226.0254,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 20,
+      "source_text_spans": {
+        "element": {
+          "line": 20,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 20,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 20,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 20,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 20,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 20,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Cobalt",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Co",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "58.9332",
+          "value": 58.9332,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Rubidium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Rb",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "85.4678",
+          "value": 85.4678,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 21,
+      "source_text_spans": {
+        "element": {
+          "line": 21,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 21,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 21,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 21,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 21,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 21,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Chromium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Cr",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "51.996",
+          "value": 51.996,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Rhenium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Re",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "186.207",
+          "value": 186.207,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 22,
+      "source_text_spans": {
+        "element": {
+          "line": 22,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 22,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 22,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 22,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 22,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 22,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Cesium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Cs",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "132.9054",
+          "value": 132.9054,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Rhodium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Rh",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "102.9055",
+          "value": 102.9055,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 23,
+      "source_text_spans": {
+        "element": {
+          "line": 23,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 23,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 23,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 23,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 23,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 23,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Copper",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Cu",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "63.546",
+          "value": 63.546,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Radon",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Rn",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "(222)",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 24,
+      "source_text_spans": {
+        "element": {
+          "line": 24,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 24,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 24,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 24,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 24,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 24,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Dysprosium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Dy",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "162.50",
+          "value": 162.5,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Ruthenium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Ru",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "101.07",
+          "value": 101.07,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 25,
+      "source_text_spans": {
+        "element": {
+          "line": 25,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 25,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 25,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 25,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 25,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 25,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Erbium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Er",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "167.26",
+          "value": 167.26,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Sulfur",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "S",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "32.06",
+          "value": 32.06,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 26,
+      "source_text_spans": {
+        "element": {
+          "line": 26,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 26,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 26,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 26,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 26,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 26,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Europium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Eu",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "151.96",
+          "value": 151.96,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Antimony",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Sb",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "121.75",
+          "value": 121.75,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 27,
+      "source_text_spans": {
+        "element": {
+          "line": 27,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 27,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 27,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 27,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 27,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 27,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Fluorine",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "F",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "18.9984",
+          "value": 18.9984,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Scandium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Sc",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "44.9559",
+          "value": 44.9559,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 28,
+      "source_text_spans": {
+        "element": {
+          "line": 28,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 28,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 28,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 28,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 28,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 28,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Iron",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Fe",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "55.847",
+          "value": 55.847,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Selenium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Se",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "78.96",
+          "value": 78.96,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 29,
+      "source_text_spans": {
+        "element": {
+          "line": 29,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 29,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 29,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 29,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 29,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 29,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Francium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Fr",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "(223)",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Silicon",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Si",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "28.0855",
+          "value": 28.0855,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 30,
+      "source_text_spans": {
+        "element": {
+          "line": 30,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 30,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 30,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 30,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 30,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 30,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Gallium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Ga",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "69.72",
+          "value": 69.72,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Samarium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Sm",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "150.4",
+          "value": 150.4,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 31,
+      "source_text_spans": {
+        "element": {
+          "line": 31,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 31,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 31,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 31,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 31,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 31,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Gadolinium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Gd",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "157.25",
+          "value": 157.25,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Tin",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Sn",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "118.69",
+          "value": 118.69,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 32,
+      "source_text_spans": {
+        "element": {
+          "line": 32,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 32,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 32,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 32,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 32,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 32,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Germanium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Ge",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "72.59",
+          "value": 72.59,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Strontium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Sr",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "87.62",
+          "value": 87.62,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 33,
+      "source_text_spans": {
+        "element": {
+          "line": 33,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 33,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 33,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 33,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 33,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 33,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Hydrogen",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "H",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "1.0079",
+          "value": 1.0079,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Tantalum",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Ta",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "180.9479",
+          "value": 180.9479,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 34,
+      "source_text_spans": {
+        "element": {
+          "line": 34,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 34,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 34,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 34,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 34,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 34,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Helium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "He",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "4.0026",
+          "value": 4.0026,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Terbium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Tb",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "158.9254",
+          "value": 158.9254,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 35,
+      "source_text_spans": {
+        "element": {
+          "line": 35,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 35,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 35,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 35,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 35,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 35,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Hafnium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Hf",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "178.49",
+          "value": 178.49,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Technetium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Tc",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "(97)",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 36,
+      "source_text_spans": {
+        "element": {
+          "line": 36,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 36,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 36,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 36,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 36,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 36,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Mercury",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Hg",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "200.59",
+          "value": 200.59,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Tellurium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Te",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "127.60",
+          "value": 127.6,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 37,
+      "source_text_spans": {
+        "element": {
+          "line": 37,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 37,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 37,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 37,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 37,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 37,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Holmium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Ho",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "164.9304",
+          "value": 164.9304,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Thorium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Th",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "232.0381",
+          "value": 232.0381,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 38,
+      "source_text_spans": {
+        "element": {
+          "line": 38,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 38,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 38,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 38,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 38,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 38,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Iodine",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "I",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "126.9045",
+          "value": 126.9045,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Titanium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Ti",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "47.90",
+          "value": 47.9,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 39,
+      "source_text_spans": {
+        "element": {
+          "line": 39,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 39,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 39,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 39,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 39,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 39,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Indium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "In",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "114.82",
+          "value": 114.82,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Thallium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Tl",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "204.37",
+          "value": 204.37,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 40,
+      "source_text_spans": {
+        "element": {
+          "line": 40,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 40,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 40,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 40,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 40,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 40,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Iridium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Ir",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "192.22",
+          "value": 192.22,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Thulium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Tm",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "168.9342",
+          "value": 168.9342,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 41,
+      "source_text_spans": {
+        "element": {
+          "line": 41,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 41,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 41,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 41,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 41,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 41,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Potassium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "K",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "39.0983",
+          "value": 39.0983,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Uranium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "U",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "238.029",
+          "value": 238.029,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 42,
+      "source_text_spans": {
+        "element": {
+          "line": 42,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 42,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 42,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 42,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 42,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 42,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Krypton",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Kr",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "83.80",
+          "value": 83.8,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Vanadium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "V",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "50.9414",
+          "value": 50.9414,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 43,
+      "source_text_spans": {
+        "element": {
+          "line": 43,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 43,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 43,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 43,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 43,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 43,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Lanthanum",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "La",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "138.9055",
+          "value": 138.9055,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Tungsten",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "W",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "183.85",
+          "value": 183.85,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 44,
+      "source_text_spans": {
+        "element": {
+          "line": 44,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 44,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 44,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 44,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 44,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 44,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Lithium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Li",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "6.941",
+          "value": 6.941,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Xenon",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Xe",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "131.30",
+          "value": 131.3,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 45,
+      "source_text_spans": {
+        "element": {
+          "line": 45,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 45,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 45,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 45,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 45,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 45,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Lutetium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Lu",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "174.97",
+          "value": 174.97,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Yttrium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Y",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "88.9059",
+          "value": 88.9059,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 46,
+      "source_text_spans": {
+        "element": {
+          "line": 46,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 46,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 46,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 46,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 46,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 46,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Magnesium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Mg",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "24.305",
+          "value": 24.305,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Ytterbium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Yb",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "173.04",
+          "value": 173.04,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 47,
+      "source_text_spans": {
+        "element": {
+          "line": 47,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 47,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 47,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 47,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 47,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 47,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Manganese",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Mn",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "54.9380",
+          "value": 54.938,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Zinc",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Zn",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "65.38",
+          "value": 65.38,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 48,
+      "source_text_spans": {
+        "element": {
+          "line": 48,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 48,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 48,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 48,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 48,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 48,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Molybdenum",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "Mo",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "95.94",
+          "value": 95.94,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "Zirconium",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "Zr",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "91.22",
+          "value": 91.22,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 49,
+      "source_text_spans": {
+        "element": {
+          "line": 49,
+          "start": 0,
+          "end": 1
+        },
+        "symbol": {
+          "line": 49,
+          "start": 1,
+          "end": 2
+        },
+        "atomic_weight": {
+          "line": 49,
+          "start": 2,
+          "end": 3
+        },
+        "element_right": {
+          "line": 49,
+          "start": 3,
+          "end": 4
+        },
+        "symbol_right": {
+          "line": 49,
+          "start": 4,
+          "end": 5
+        },
+        "atomic_weight_right": {
+          "line": 49,
+          "start": 5,
+          "end": 6
+        }
+      },
+      "cells": {
+        "element": {
+          "as_published": "Nitrogen",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol": {
+          "as_published": "N",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight": {
+          "as_published": "14.0067",
+          "value": 14.0067,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "element_right": {
+          "as_published": "",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "symbol_right": {
+          "as_published": "",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "atomic_weight_right": {
+          "as_published": "",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        }
+      }
+    }
+  ],
+  "row_count": 48,
+  "detected_data_row_count": 48,
   "uncertainty_line_as_published": "",
   "uncertainty_values": [],
   "reference_state_notes_as_published": [],
   "auxiliary_lines_as_published": [],
   "footnote_markers": [],
   "ocr_suspect": true,
-  "ambiguities": [
-    {
-      "kind": "untranscribed_table",
-      "reason": "the OCR text layer omits multiple element symbols and contains merged or shifted atomic-weight tokens such as '132,Q054', '83,80', and '131. 30'; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly; round-2 column-position and page-image reattempt still could not map every printed token losslessly",
-      "detector_only": false
-    }
-  ],
+  "ambiguities": [],
   "phase_as_published": null
 }

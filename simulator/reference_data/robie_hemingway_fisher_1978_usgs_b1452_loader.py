@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import html
 import json
 import re
 from collections import Counter
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Iterator, Mapping
 
@@ -145,18 +147,62 @@ def iter_published_numbers(record: Mapping[str, Any]) -> Iterator[PublishedNumbe
             yield PublishedNumber.from_mapping(row["cells"][column], column)
 
 
+class _MinerUTableParser(HTMLParser):
+    """Collect cell text from a MinerU ``table_body`` HTML fragment."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.rows: list[list[str]] = []
+        self._row: list[str] | None = None
+        self._cell: list[str] | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "tr":
+            self._row = []
+        elif tag in ("td", "th"):
+            self._cell = []
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in ("td", "th") and self._row is not None and self._cell is not None:
+            text = html.unescape("".join(self._cell)).replace("\n", "")
+            text = re.sub(r"[ \t]+", " ", text).strip()
+            self._row.append(text)
+            self._cell = None
+        elif tag == "tr" and self._row is not None:
+            if any(cell.strip() for cell in self._row):
+                self.rows.append(self._row)
+            self._row = None
+
+    def handle_data(self, data: str) -> None:
+        if self._cell is not None:
+            self._cell.append(data)
+
+
+def parse_mineru_table_html(table_body: str) -> list[list[str]]:
+    """Return row-major cell strings from a MinerU HTML table, newlines removed."""
+
+    parser = _MinerUTableParser()
+    parser.feed(table_body)
+    parser.close()
+    return parser.rows
+
+
 def validate_record_round_trip(record: Mapping[str, Any]) -> None:
     list(iter_published_numbers(record))
     rows = record["rows"]
     if record["row_count"] != len(rows):
         raise ValueError(f"row count differs in {record['record_id']}")
-    grid = [row["cells"]["temperature"] for row in rows]
-    if record["temperature_grid"] != grid:
-        raise ValueError(f"temperature grid differs from printed rows in {record['record_id']}")
+    column_ids = list(record["column_ids"])
+    if "temperature" in column_ids:
+        grid = [row["cells"]["temperature"] for row in rows]
+        if record["temperature_grid"] != grid:
+            raise ValueError(f"temperature grid differs from printed rows in {record['record_id']}")
+    elif record["temperature_grid"]:
+        raise ValueError(f"non-temperature table has a temperature grid in {record['record_id']}")
     if record["transcription_status"] == "transcribed":
         if not rows:
             raise ValueError(f"transcribed record has no rows: {record['record_id']}")
-        expected = set(record["column_ids"])
+        expected = set(column_ids)
         if any(set(row["cells"]) != expected for row in rows):
             raise ValueError(f"row columns differ in {record['record_id']}")
     elif record["transcription_status"] == "untranscribed":
@@ -177,6 +223,10 @@ def lookup_temperature(
     if record["transcription_status"] != "transcribed":
         reasons = "; ".join(record["untranscribed_reasons"])
         raise UntranscribedTableError(f"{record_id} is untranscribed: {reasons}")
+    if "temperature" not in record["column_ids"]:
+        raise TemperatureNotInPrintedGridError(
+            f"{record_id} has no printed temperature grid; available columns: {tuple(record['column_ids'])}"
+        )
     try:
         requested = Decimal(str(temperature))
     except InvalidOperation as exc:
