@@ -15,13 +15,13 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 125
-- Extracts (`literature_extract.v1`): 122
+- Sources: 126
+- Extracts (`literature_extract.v1`): 123
 - PDFs present in this worktree: 44
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 39
 - PDFs with no extract: 3
-- Extracts with no PDF: 81
-- Alias groups needing owner/controller resolution: 29
+- Extracts with no PDF: 82
+- Alias groups needing owner/controller resolution: 30
 - Extracts with private/non-public row locators: 37
 
 ## Sources
@@ -145,6 +145,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `safarian-engh-2013-si-pure-langmuir` | Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2 | 10.1007/s11661-012-1464-2 | ABSENT, `` | `raw/safarian-engh-2013-si-pure-langmuir/safarian-engh-2013-si-pure-langmuir.pdf` (ABSENT, ); `text/safarian-engh-2013-si-pure-langmuir/` (0 files, ABSENT); `tables/safarian-engh-2013-si-pure-langmuir/` (0 files, ABSENT) | `data/literature/extracts/safarian-engh-2013-si-pure-langmuir.yaml` (1 rows, draft) | `ledger/safarian-engh-2013-si-pure-langmuir.yaml`: extracted (2026-09-06) |
 | `sf04-magma-companion-workbook` | Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature lava vaporization on Io", Icarus 169:216-241; numerical MAGMA grid preserved in the VapoRock Schaefer2004-MAGMA-valid.xlsx companion workbook. | 10.1016/j.icarus.2003.08.023 | ABSENT, `` | `raw/sf04-magma-companion-workbook/sf04-magma-companion-workbook.pdf` (ABSENT, ); `text/sf04-magma-companion-workbook/` (0 files, ABSENT); `tables/sf04-magma-companion-workbook/` (0 files, ABSENT) | `data/literature/extracts/sf04-magma-companion-workbook.yaml` (7 rows, reviewed) | `ledger/sf04-magma-companion-workbook.yaml`: extracted (2026-09-06) |
 | `slag-001-banya-1993` | Ban-Ya, Shiro (1993), "Mathematical Expression of Slag-Metal Reactions in Steelmaking Process by Quadratic Formalism Based on the Regular Solution Model", ISIJ International 33(1), 2–11, DOI 10.2355/isijinternational.33.2 | 10.2355/isijinternational.33.2 | ABSENT, `` | `raw/slag-001-banya-1993/slag-001-banya-1993.pdf` (ABSENT, ); `text/slag-001-banya-1993/` (0 files, ABSENT); `tables/slag-001-banya-1993/` (0 files, ABSENT) | `data/literature/extracts/slag-001-banya-1993.yaml` (48 rows, draft) | `ledger/slag-001-banya-1993.yaml`: extracted (2026-09-07) |
+| `slag-002-banya-hino-nagasaka-1993` | Ban-Ya, S., Hino, M. and Nagasaka, T. (1993), "Estimation of Water Vapor Solubility in Molten Silicates by Quadratic Formalism Based on the Regular Solution Model", ISIJ International 33(1), 12–19, DOI 10.2355/isijinternational.33.12 | 10.2355/isijinternational.33.12 | ABSENT, `` | `raw/slag-002-banya-hino-nagasaka-1993/slag-002-banya-hino-nagasaka-1993.pdf` (ABSENT, ); `text/slag-002-banya-hino-nagasaka-1993/` (0 files, ABSENT); `tables/slag-002-banya-hino-nagasaka-1993/` (0 files, ABSENT) | `data/literature/extracts/slag-002-banya-hino-nagasaka-1993.yaml` (27 rows, draft) | `ledger/slag-002-banya-hino-nagasaka-1993.yaml`: — (—) |
 | `smales-1971-lpsc-12022` | Smales, A. A. et al. (1971), "Elemental composition of lunar surface material (part 2)", Proceedings of the Second Lunar Science Conference 2, 1253–1258. |  | `docs/references/pdfs/99-kems-langmuir/smales-1971-lpsc-12022.pdf`, `7af2b6b0` | `raw/smales-1971-lpsc-12022/smales-1971-lpsc-12022.pdf` (present, 7af2b6b0); `text/smales-1971-lpsc-12022/` (19 files, exists); `tables/smales-1971-lpsc-12022/` (0 files, ABSENT) | `data/literature/extracts/smales-1971-lpsc-12022.yaml` (2 rows, draft, private_path) | `ledger/smales-1971-lpsc-12022.yaml`: decoded (2026-09-06) |
 | `sossi-et-al-2019` | Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021 | 10.1016/j.gca.2019.06.021 | ABSENT, `` | `raw/sossi-et-al-2019/sossi-et-al-2019.pdf` (ABSENT, ); `text/sossi-et-al-2019/` (0 files, ABSENT); `tables/sossi-et-al-2019/` (0 files, ABSENT) | `data/literature/extracts/sossi-et-al-2019.yaml` (1 rows, draft) | `ledger/sossi-et-al-2019.yaml`: extracted (2026-09-06) |
 | `span-wagner-1996-co2-psat` | Span, R. & Wagner, W. (1996), "A New Equation of State for Carbon Dioxide Covering the Fluid Region from the Triple-Point Temperature to 1100 K at Pressures up to 800 MPa", J. Phys. Chem. Ref. Data 25:1509–1596, DOI 10.1063/1.555991 — CO2(s/l/g) saturation from multiparameter EOS (triple point 216.592 K; solid CO2 sublimation from separate ice tables). Primary solid sublimation cross-check: Giauque & Egan (1937) J. Chem. Phys. 5:45–54 (historical calorimetric triple-point / vapor pressure). | 10.1063/1.555991 | ABSENT, `` | `raw/span-wagner-1996-co2-psat/span-wagner-1996-co2-psat.pdf` (ABSENT, ); `text/span-wagner-1996-co2-psat/` (0 files, ABSENT); `tables/span-wagner-1996-co2-psat/` (0 files, ABSENT) | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` (1 rows, draft) | `ledger/span-wagner-1996-co2-psat.yaml`: extracted (2026-09-06) |
@@ -240,6 +241,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `safarian-engh-2013-si-pure-langmuir`
 - `sf04-magma-companion-workbook`
 - `slag-001-banya-1993`
+- `slag-002-banya-hino-nagasaka-1993`
 - `sossi-et-al-2019`
 - `span-wagner-1996-co2-psat`
 - `wetzel-gail-2013-sio-arrhenius`
@@ -359,4 +361,5 @@ The builder does not pick a winner.
 - source_id_alias `safarian-2013`: `kems-009-safarian-2013`, `safarian-engh-2013-si-pure-langmuir` — needs owner/controller resolution
 - source_id_alias `schaefer-2004`: `kems-008-schaefer-fegley-2004`, `sf04-magma-companion-workbook` — needs owner/controller resolution
 - source_id_alias `sesko-2024`: `kems-036-sesko-2024`, `sesko_2024`, `sesko_2024_vapor_phase_pyrolysis` — needs owner/controller resolution
+- source_id_alias `slag-1993`: `slag-001-banya-1993`, `slag-002-banya-hino-nagasaka-1993` — needs owner/controller resolution
 - source_id_alias `sossi-2018`: `kems-041-sossi-fegley-2018`, `kems-045-sossi-2018-pnas-cr` — needs owner/controller resolution
