@@ -12,6 +12,7 @@ from pathlib import Path
 from copy import deepcopy
 import hashlib
 import json
+import os
 
 import pytest
 import yaml
@@ -39,6 +40,10 @@ from tools.harvest_janaf_compilation import parse_table, parse_element_index
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data" / "literature" / "extracts" / "janaf-4th.yaml"
+CORPUS_ROOT = Path(
+    os.environ.get("REGOLITH_CORPUS_ROOT", "/Users/simonrowland/Repos/regolith-corpus")
+)
+JANAF_SOURCE_DIR = CORPUS_ROOT / "raw" / "janaf-nist-txt"
 LIVE_TXT_SAMPLE = (
     "Aluminum, Ion (Al+)\tAl1+(g)\n"
     "T(K)\tCp\tS\t-[G-H(Tr)]/T\tH-H(Tr)\tdelta-f H\tdelta-f G\tlog Kf\n"
@@ -119,13 +124,22 @@ def _assert_source_round_trip(document, source_path):
     assert round_trip_failures(document) == []
 
 
+@pytest.fixture(scope="module")
+def janaf_source_dir() -> Path:
+    if not JANAF_SOURCE_DIR.is_dir():
+        pytest.skip(
+            f"janaf_source_directory_absent: {JANAF_SOURCE_DIR}; "
+            "source fidelity NOT VERIFIED"
+        )
+    return JANAF_SOURCE_DIR
+
+
 @pytest.mark.parametrize("path", list(iter_table_paths()), ids=lambda path: path.stem)
-def test_source_txt_round_trip(path, manifest_entries):
+def test_source_txt_round_trip(path, manifest_entries, janaf_source_dir):
     document = load_table_document(path)
     extraction = document["extraction"]
-    source_path = Path(extraction.get("source_cache_path", "SOURCE_UNAVAILABLE"))
-    if not source_path.is_file():
-        pytest.skip(f"source bytes unavailable: {path.stem}; source fidelity NOT VERIFIED")
+    source_path = janaf_source_dir / f"{path.stem}.txt"
+    assert source_path.is_file(), f"corpus source missing: {source_path}"
     assert hashlib.sha256(source_path.read_bytes()).hexdigest() == extraction["source_sha256"]
     _assert_source_round_trip(document, source_path)
     manifest_entry = manifest_entries[path.stem]
@@ -209,11 +223,10 @@ def test_all_41_molecular_ions_keep_atom_counts(case, manifest_entries):
     assert manifest_entries[table_id]["formula_normalised"] == published[:-1]
 
 
-def test_mutated_real_source_token_fails(tmp_path):
+def test_mutated_real_source_token_fails(tmp_path, janaf_source_dir):
     document = load_table_document(TABLES_DIR / "Al-006.yaml")
-    source_path = Path(document["extraction"]["source_cache_path"])
-    if not source_path.is_file():
-        pytest.skip("Al-006 source unavailable; real source mutation NOT VERIFIED")
+    source_path = janaf_source_dir / "Al-006.txt"
+    assert source_path.is_file(), f"corpus source missing: {source_path}"
     _assert_source_round_trip(document, source_path)
     original = source_path.read_text()
     assert "20.786" in original
