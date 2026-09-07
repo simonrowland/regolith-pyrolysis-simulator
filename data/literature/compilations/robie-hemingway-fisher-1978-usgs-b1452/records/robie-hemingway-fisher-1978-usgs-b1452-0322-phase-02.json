@@ -9,45 +9,51 @@
     "battery_refusal": "gibbs_table_not_runtime_observable",
     "circularity_warning": "Do not validate an engine against a compilation it consumes."
   },
-  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0348",
-  "census_id": "high-temperature-printed-page-374",
+  "record_id": "robie-hemingway-fisher-1978-usgs-b1452-0322-phase-02",
+  "census_id": "high-temperature-printed-page-348",
   "record_kind": "substance_temperature_table",
   "section_as_published": "Thermodynamic properties at high temperatures",
   "table_number_as_published": null,
-  "name_as_published": "lOLLI STOll 'lB",
-  "formula_as_published": null,
-  "phase_state_as_published": [],
-  "description_lines_as_published": [],
+  "name_as_published": "LlRNITE",
+  "formula_as_published": "Ca 2 Si0 4",
+  "phase_state_as_published": [
+    "Crystals 298o15 to 970 Ko               a' crystals (bredigite} 970 to 1710 Ko",
+    "                   \u00ab crystals 1710 to 1800 Ko"
+  ],
+  "description_lines_as_published": [
+    "Ca 2 Si0 4 :     Crystals 298o15 to 970 Ko               a' crystals (bredigite} 970 to 1710 Ko",
+    "                   \u00ab crystals 1710 to 1800 Ko"
+  ],
   "formation_basis_header_as_published": "",
   "formula_weight": {
-    "as_published": "116.164",
-    "value": 116.164,
+    "as_published": "172.244",
+    "value": 172.244,
     "ocr_suspect": false,
     "footnote_markers": [],
     "source_text_span": {
       "line": 1,
-      "start": 31,
-      "end": 38
+      "start": 24,
+      "end": 31
     }
   },
   "source_locator": {
     "source_file": "robie-hemingway-fisher-1978-usgs-b1452.pdf",
     "pdf_pages": [
-      380
+      354
     ],
     "printed_pages": [
-      374
+      348
     ],
-    "pdftotext_layout_page_file": "page-380.txt",
+    "pdftotext_layout_page_file": "page-354.txt",
     "extraction": "mineru table_body + page-image cross-check",
-    "mineru_chunk": "chunk-p361-p450",
-    "mineru_page_idx": 19,
+    "mineru_chunk": "chunk-p271-p360",
+    "mineru_page_idx": 83,
     "mineru_table_index": 0
   },
   "source_sha256": "3e394cccef03515310ead8e3b363f631be3af4d60ceeec8f329ff86c74040622",
   "transcription_status": "transcribed",
   "untranscribed_reasons": [],
-  "title_line_as_published": "lOLLI STOll 'lB                                                                  POl !U L1 IIBIGHT        116. 164",
+  "title_line_as_published": "LlRNITE                                                                              FORIIULA WEIGHT         172o244",
   "column_ids": [
     "temperature",
     "enthalpy_function",
@@ -59,67 +65,32 @@
     "log_kf"
   ],
   "column_header_lines_as_published": [
-    "            crystals 298.15 to 11t00 K.               Pseudowollastonite is the stable phase",
-    "            aboYe 1398 K.",
+    "Ca 2 Si0 4 :     Crystals 298o15 to 970 Ko               a' crystals (bredigite} 970 to 1710 Ko",
+    "                   \u00ab crystals 1710 to 1800 Ko",
     "--------------------------------------------------------------------------------",
-    "                                                  POil!lTIOI PIOII THE OIIDBS",
-    "                                                                                          GIBBS",
-    "TEIIP.    ( a;-H; 98 )/T      so      -(~-a; 98 )/T       cop     EITBALPY             FREE EIBIGY         Loq   It",
-    "  K         J/aol\u2022K",
-    "                               '",
-    "                           J/aol\u2022K      J/aol\u2022K       J/aol\u2022K           kJtaol            kJtaol",
-    "--------------------------------------------------------------------------------"
+    "                                                  FOBIIlTIOil FBOl'l THE OIIDES",
+    "                                                                                             GIBBS",
+    "TEll Po        ca;-a; 98 }/T      so",
+    "                                   T      -(G;-a; 98 }/T      cop    BBTHALPY              FRBB BBEBGY        Log Kf",
+    "                Jjaol\u2022K        Jjaol\u2022K      J/aol\u2022K       J/aol\u2022K           kJ/aol           kJ/aol",
+    "--------------------------------------------------------------------------------",
+    " 298o15",
+    "UNCERTAIBTY"
   ],
   "units_as_published": {
     "temperature": "",
-    "enthalpy_function": "",
-    "entropy": "",
-    "negative_gibbs_function": "",
-    "heat_capacity": "",
-    "formation_enthalpy": "",
-    "formation_gibbs_energy": "",
+    "enthalpy_function": "Jjaol\u2022K",
+    "entropy": "Jjaol\u2022K",
+    "negative_gibbs_function": "J/aol\u2022K",
+    "heat_capacity": "J/aol\u2022K",
+    "formation_enthalpy": "kJ/aol",
+    "formation_gibbs_energy": "kJ/aol",
     "log_kf": ""
   },
   "temperature_grid": [
     {
-      "as_published": "298.15",
-      "value": 298.15,
-      "ocr_suspect": false,
-      "footnote_markers": []
-    },
-    {
-      "as_published": "400",
-      "value": 400.0,
-      "ocr_suspect": true,
-      "footnote_markers": []
-    },
-    {
-      "as_published": "500",
-      "value": 500.0,
-      "ocr_suspect": false,
-      "footnote_markers": []
-    },
-    {
-      "as_published": "600",
-      "value": 600.0,
-      "ocr_suspect": false,
-      "footnote_markers": []
-    },
-    {
-      "as_published": "700",
-      "value": 700.0,
-      "ocr_suspect": false,
-      "footnote_markers": []
-    },
-    {
-      "as_published": "800",
-      "value": 800.0,
-      "ocr_suspect": false,
-      "footnote_markers": []
-    },
-    {
-      "as_published": "900",
-      "value": 900.0,
+      "as_published": "970",
+      "value": 970.0,
       "ocr_suspect": false,
       "footnote_markers": []
     },
@@ -150,704 +121,35 @@
     {
       "as_published": "1400",
       "value": 1400.0,
+      "ocr_suspect": true,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1500",
+      "value": 1500.0,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1600",
+      "value": 1600.0,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1700",
+      "value": 1700.0,
+      "ocr_suspect": false,
+      "footnote_markers": []
+    },
+    {
+      "as_published": "1710",
+      "value": 1710.0,
       "ocr_suspect": false,
       "footnote_markers": []
     }
   ],
   "rows": [
-    {
-      "source_text_line": 5,
-      "source_text_spans": {
-        "temperature": {
-          "line": 5,
-          "start": 0,
-          "end": 1
-        },
-        "enthalpy_function": {
-          "line": 5,
-          "start": 1,
-          "end": 2
-        },
-        "entropy": {
-          "line": 5,
-          "start": 2,
-          "end": 3
-        },
-        "negative_gibbs_function": {
-          "line": 5,
-          "start": 3,
-          "end": 4
-        },
-        "heat_capacity": {
-          "line": 5,
-          "start": 4,
-          "end": 5
-        },
-        "formation_enthalpy": {
-          "line": 5,
-          "start": 5,
-          "end": 6
-        },
-        "formation_gibbs_energy": {
-          "line": 5,
-          "start": 6,
-          "end": 7
-        },
-        "log_kf": {
-          "line": 5,
-          "start": 7,
-          "end": 8
-        }
-      },
-      "cells": {
-        "temperature": {
-          "as_published": "298.15",
-          "value": 298.15,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "enthalpy_function": {
-          "as_published": "0.000",
-          "value": 0.0,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "entropy": {
-          "as_published": "82.01",
-          "value": 82.01,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "negative_gibbs_function": {
-          "as_published": "82.01",
-          "value": 82.01,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "heat_capacity": {
-          "as_published": "85.27",
-          "value": 85.27,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "formation_enthalpy": {
-          "as_published": "-89.431 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "formation_gibbs_energy": {
-          "as_published": "-90.128 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "log_kf": {
-          "as_published": "15.790",
-          "value": 15.79,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        }
-      }
-    },
-    {
-      "source_text_line": 7,
-      "source_text_spans": {
-        "temperature": {
-          "line": 7,
-          "start": 0,
-          "end": 1
-        },
-        "enthalpy_function": {
-          "line": 7,
-          "start": 1,
-          "end": 2
-        },
-        "entropy": {
-          "line": 7,
-          "start": 2,
-          "end": 3
-        },
-        "negative_gibbs_function": {
-          "line": 7,
-          "start": 3,
-          "end": 4
-        },
-        "heat_capacity": {
-          "line": 7,
-          "start": 4,
-          "end": 5
-        },
-        "formation_enthalpy": {
-          "line": 7,
-          "start": 5,
-          "end": 6
-        },
-        "formation_gibbs_energy": {
-          "line": 7,
-          "start": 6,
-          "end": 7
-        },
-        "log_kf": {
-          "line": 7,
-          "start": 7,
-          "end": 8
-        }
-      },
-      "cells": {
-        "temperature": {
-          "as_published": "400",
-          "value": 400.0,
-          "ocr_suspect": true,
-          "footnote_markers": []
-        },
-        "enthalpy_function": {
-          "as_published": "23.900",
-          "value": 23.9,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "entropy": {
-          "as_published": "109.49",
-          "value": 109.49,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "negative_gibbs_function": {
-          "as_published": "85.59",
-          "value": 85.59,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "heat_capacity": {
-          "as_published": "100.48",
-          "value": 100.48,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "formation_enthalpy": {
-          "as_published": "-89.451 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "formation_gibbs_energy": {
-          "as_published": "-90.359 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "log_kf": {
-          "as_published": "11.800",
-          "value": 11.8,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        }
-      }
-    },
-    {
-      "source_text_line": 8,
-      "source_text_spans": {
-        "temperature": {
-          "line": 8,
-          "start": 0,
-          "end": 1
-        },
-        "enthalpy_function": {
-          "line": 8,
-          "start": 1,
-          "end": 2
-        },
-        "entropy": {
-          "line": 8,
-          "start": 2,
-          "end": 3
-        },
-        "negative_gibbs_function": {
-          "line": 8,
-          "start": 3,
-          "end": 4
-        },
-        "heat_capacity": {
-          "line": 8,
-          "start": 4,
-          "end": 5
-        },
-        "formation_enthalpy": {
-          "line": 8,
-          "start": 5,
-          "end": 6
-        },
-        "formation_gibbs_energy": {
-          "line": 8,
-          "start": 6,
-          "end": 7
-        },
-        "log_kf": {
-          "line": 8,
-          "start": 7,
-          "end": 8
-        }
-      },
-      "cells": {
-        "temperature": {
-          "as_published": "500",
-          "value": 500.0,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "enthalpy_function": {
-          "as_published": "40.052",
-          "value": 40.052,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "entropy": {
-          "as_published": "132.81",
-          "value": 132.81,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "negative_gibbs_function": {
-          "as_published": "92.76",
-          "value": 92.76,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "heat_capacity": {
-          "as_published": "108.08",
-          "value": 108.08,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "formation_enthalpy": {
-          "as_published": "-89.435 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "formation_gibbs_energy": {
-          "as_published": "-90.590 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "log_kf": {
-          "as_published": "9.464",
-          "value": 9.464,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        }
-      }
-    },
-    {
-      "source_text_line": 9,
-      "source_text_spans": {
-        "temperature": {
-          "line": 9,
-          "start": 0,
-          "end": 1
-        },
-        "enthalpy_function": {
-          "line": 9,
-          "start": 1,
-          "end": 2
-        },
-        "entropy": {
-          "line": 9,
-          "start": 2,
-          "end": 3
-        },
-        "negative_gibbs_function": {
-          "line": 9,
-          "start": 3,
-          "end": 4
-        },
-        "heat_capacity": {
-          "line": 9,
-          "start": 4,
-          "end": 5
-        },
-        "formation_enthalpy": {
-          "line": 9,
-          "start": 5,
-          "end": 6
-        },
-        "formation_gibbs_energy": {
-          "line": 9,
-          "start": 6,
-          "end": 7
-        },
-        "log_kf": {
-          "line": 9,
-          "start": 7,
-          "end": 8
-        }
-      },
-      "cells": {
-        "temperature": {
-          "as_published": "600",
-          "value": 600.0,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "enthalpy_function": {
-          "as_published": "51.813",
-          "value": 51.813,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "entropy": {
-          "as_published": "152.96",
-          "value": 152.96,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "negative_gibbs_function": {
-          "as_published": "101.15",
-          "value": 101.15,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "heat_capacity": {
-          "as_published": "112.85",
-          "value": 112.85,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "formation_enthalpy": {
-          "as_published": "-89.552 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "formation_gibbs_energy": {
-          "as_published": "-90.806 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "log_kf": {
-          "as_published": "7.905",
-          "value": 7.905,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        }
-      }
-    },
-    {
-      "source_text_line": 10,
-      "source_text_spans": {
-        "temperature": {
-          "line": 10,
-          "start": 0,
-          "end": 1
-        },
-        "enthalpy_function": {
-          "line": 10,
-          "start": 1,
-          "end": 2
-        },
-        "entropy": {
-          "line": 10,
-          "start": 2,
-          "end": 3
-        },
-        "negative_gibbs_function": {
-          "line": 10,
-          "start": 3,
-          "end": 4
-        },
-        "heat_capacity": {
-          "line": 10,
-          "start": 4,
-          "end": 5
-        },
-        "formation_enthalpy": {
-          "line": 10,
-          "start": 5,
-          "end": 6
-        },
-        "formation_gibbs_energy": {
-          "line": 10,
-          "start": 6,
-          "end": 7
-        },
-        "log_kf": {
-          "line": 10,
-          "start": 7,
-          "end": 8
-        }
-      },
-      "cells": {
-        "temperature": {
-          "as_published": "700",
-          "value": 700.0,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "enthalpy_function": {
-          "as_published": "60.789",
-          "value": 60.789,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "entropy": {
-          "as_published": "170.63",
-          "value": 170.63,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "negative_gibbs_function": {
-          "as_published": "109.84",
-          "value": 109.84,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "heat_capacity": {
-          "as_published": "116.28",
-          "value": 116.28,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "formation_enthalpy": {
-          "as_published": "-89.866 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "formation_gibbs_energy": {
-          "as_published": "-91.000 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "log_kf": {
-          "as_published": "6.791",
-          "value": 6.791,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        }
-      }
-    },
-    {
-      "source_text_line": 11,
-      "source_text_spans": {
-        "temperature": {
-          "line": 11,
-          "start": 0,
-          "end": 1
-        },
-        "enthalpy_function": {
-          "line": 11,
-          "start": 1,
-          "end": 2
-        },
-        "entropy": {
-          "line": 11,
-          "start": 2,
-          "end": 3
-        },
-        "negative_gibbs_function": {
-          "line": 11,
-          "start": 3,
-          "end": 4
-        },
-        "heat_capacity": {
-          "line": 11,
-          "start": 4,
-          "end": 5
-        },
-        "formation_enthalpy": {
-          "line": 11,
-          "start": 5,
-          "end": 6
-        },
-        "formation_gibbs_energy": {
-          "line": 11,
-          "start": 6,
-          "end": 7
-        },
-        "log_kf": {
-          "line": 11,
-          "start": 7,
-          "end": 8
-        }
-      },
-      "cells": {
-        "temperature": {
-          "as_published": "800",
-          "value": 800.0,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "enthalpy_function": {
-          "as_published": "67.902",
-          "value": 67.902,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "entropy": {
-          "as_published": "186.34",
-          "value": 186.34,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "negative_gibbs_function": {
-          "as_published": "118.44",
-          "value": 118.44,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "heat_capacity": {
-          "as_published": "119.01",
-          "value": 119.01,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "formation_enthalpy": {
-          "as_published": "-90.406 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "formation_gibbs_energy": {
-          "as_published": "-91.126 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "log_kf": {
-          "as_published": "5.950",
-          "value": 5.95,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        }
-      }
-    },
-    {
-      "source_text_line": 12,
-      "source_text_spans": {
-        "temperature": {
-          "line": 12,
-          "start": 0,
-          "end": 1
-        },
-        "enthalpy_function": {
-          "line": 12,
-          "start": 1,
-          "end": 2
-        },
-        "entropy": {
-          "line": 12,
-          "start": 2,
-          "end": 3
-        },
-        "negative_gibbs_function": {
-          "line": 12,
-          "start": 3,
-          "end": 4
-        },
-        "heat_capacity": {
-          "line": 12,
-          "start": 4,
-          "end": 5
-        },
-        "formation_enthalpy": {
-          "line": 12,
-          "start": 5,
-          "end": 6
-        },
-        "formation_gibbs_energy": {
-          "line": 12,
-          "start": 6,
-          "end": 7
-        },
-        "log_kf": {
-          "line": 12,
-          "start": 7,
-          "end": 8
-        }
-      },
-      "cells": {
-        "temperature": {
-          "as_published": "900",
-          "value": 900.0,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "enthalpy_function": {
-          "as_published": "73.711",
-          "value": 73.711,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "entropy": {
-          "as_published": "200.50",
-          "value": 200.5,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "negative_gibbs_function": {
-          "as_published": "126.79",
-          "value": 126.79,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "heat_capacity": {
-          "as_published": "121.32",
-          "value": 121.32,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        },
-        "formation_enthalpy": {
-          "as_published": "-91.101 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "formation_gibbs_energy": {
-          "as_published": "-91.173 *",
-          "value": null,
-          "ocr_suspect": true,
-          "footnote_markers": [
-            "*"
-          ]
-        },
-        "log_kf": {
-          "as_published": "5.292",
-          "value": 5.292,
-          "ocr_suspect": false,
-          "footnote_markers": []
-        }
-      }
-    },
     {
       "source_text_line": 13,
       "source_text_spans": {
@@ -894,37 +196,37 @@
       },
       "cells": {
         "temperature": {
-          "as_published": "1000",
-          "value": 1000.0,
+          "as_published": "970",
+          "value": 970.0,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "enthalpy_function": {
-          "as_published": "78.578",
-          "value": 78.578,
+          "as_published": "113.040",
+          "value": 113.04,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "entropy": {
-          "as_published": "213.39",
-          "value": 213.39,
+          "as_published": "314.16",
+          "value": 314.16,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
-          "as_published": "134.81",
-          "value": 134.81,
+          "as_published": "201.12",
+          "value": 201.12,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "heat_capacity": {
-          "as_published": "123.38",
-          "value": 123.38,
+          "as_published": "179.28",
+          "value": 179.28,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "-91.055 *",
+          "as_published": "-125.698 *",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
@@ -932,7 +234,7 @@
           ]
         },
         "formation_gibbs_energy": {
-          "as_published": "-91.185 *",
+          "as_published": "-133.903 *",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
@@ -940,8 +242,8 @@
           ]
         },
         "log_kf": {
-          "as_published": "4.763",
-          "value": 4.763,
+          "as_published": "7.211",
+          "value": 7.211,
           "ocr_suspect": false,
           "footnote_markers": []
         }
@@ -993,37 +295,37 @@
       },
       "cells": {
         "temperature": {
-          "as_published": "1100",
-          "value": 1100.0,
+          "as_published": "1000",
+          "value": 1000.0,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "enthalpy_function": {
-          "as_published": "82.738",
-          "value": 82.738,
+          "as_published": "115.048",
+          "value": 115.048,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "entropy": {
-          "as_published": "225.24",
-          "value": 225.24,
+          "as_published": "319.64",
+          "value": 319.64,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
-          "as_published": "142.50",
-          "value": 142.5,
+          "as_published": "204.59",
+          "value": 204.59,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "heat_capacity": {
-          "as_published": "125.28",
-          "value": 125.28,
+          "as_published": "180.66",
+          "value": 180.66,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "-90.969 *",
+          "as_published": "-125.491 *",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
@@ -1031,7 +333,7 @@
           ]
         },
         "formation_gibbs_energy": {
-          "as_published": "-91.201 *",
+          "as_published": "-134.171 *",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
@@ -1039,8 +341,8 @@
           ]
         },
         "log_kf": {
-          "as_published": "4.331",
-          "value": 4.331,
+          "as_published": "7.008",
+          "value": 7.008,
           "ocr_suspect": false,
           "footnote_markers": []
         }
@@ -1092,37 +394,37 @@
       },
       "cells": {
         "temperature": {
-          "as_published": "1200",
-          "value": 1200.0,
+          "as_published": "1100",
+          "value": 1100.0,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "enthalpy_function": {
-          "as_published": "86.358",
-          "value": 86.358,
+          "as_published": "121.354",
+          "value": 121.354,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "entropy": {
-          "as_published": "236.21",
-          "value": 236.21,
+          "as_published": "337.21",
+          "value": 337.21,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
-          "as_published": "149.85",
-          "value": 149.85,
+          "as_published": "215.86",
+          "value": 215.86,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "heat_capacity": {
-          "as_published": "127.06",
-          "value": 127.06,
+          "as_published": "185.28",
+          "value": 185.28,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "-90.855 *",
+          "as_published": "-124.800 *",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
@@ -1130,7 +432,7 @@
           ]
         },
         "formation_gibbs_energy": {
-          "as_published": "-91.215 *",
+          "as_published": "-135.064 *",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
@@ -1138,8 +440,8 @@
           ]
         },
         "log_kf": {
-          "as_published": "3.970",
-          "value": 3.97,
+          "as_published": "6.414",
+          "value": 6.414,
           "ocr_suspect": false,
           "footnote_markers": []
         }
@@ -1191,37 +493,37 @@
       },
       "cells": {
         "temperature": {
-          "as_published": "1300",
-          "value": 1300.0,
+          "as_published": "1200",
+          "value": 1200.0,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "enthalpy_function": {
-          "as_published": "89.555",
-          "value": 89.555,
+          "as_published": "126.837",
+          "value": 126.837,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "entropy": {
-          "as_published": "246.45",
-          "value": 246.45,
+          "as_published": "353.50",
+          "value": 353.5,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
-          "as_published": "156.89",
-          "value": 156.89,
+          "as_published": "226.66",
+          "value": 226.66,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "heat_capacity": {
-          "as_published": "128.76",
-          "value": 128.76,
+          "as_published": "189.89",
+          "value": 189.89,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "-90.719 *",
+          "as_published": "-124.046 *",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
@@ -1229,7 +531,7 @@
           ]
         },
         "formation_gibbs_energy": {
-          "as_published": "-91.252 *",
+          "as_published": "-136.033 *",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
@@ -1237,8 +539,8 @@
           ]
         },
         "log_kf": {
-          "as_published": "3.667",
-          "value": 3.667,
+          "as_published": "5.921",
+          "value": 5.921,
           "ocr_suspect": false,
           "footnote_markers": []
         }
@@ -1290,37 +592,37 @@
       },
       "cells": {
         "temperature": {
-          "as_published": "1400",
-          "value": 1400.0,
+          "as_published": "1300",
+          "value": 1300.0,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "enthalpy_function": {
-          "as_published": "92.414",
-          "value": 92.414,
+          "as_published": "131.663",
+          "value": 131.663,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "entropy": {
-          "as_published": "256.06",
-          "value": 256.06,
+          "as_published": "368.67",
+          "value": 368.67,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "negative_gibbs_function": {
-          "as_published": "163.65",
-          "value": 163.65,
+          "as_published": "237.01",
+          "value": 237.01,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "heat_capacity": {
-          "as_published": "130.41",
-          "value": 130.41,
+          "as_published": "194.50",
+          "value": 194.5,
           "ocr_suspect": false,
           "footnote_markers": []
         },
         "formation_enthalpy": {
-          "as_published": "-90.561 *",
+          "as_published": "-123.254 *",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
@@ -1328,7 +630,7 @@
           ]
         },
         "formation_gibbs_energy": {
-          "as_published": "-91.318 *",
+          "as_published": "-137.059 *",
           "value": null,
           "ocr_suspect": true,
           "footnote_markers": [
@@ -1336,17 +638,512 @@
           ]
         },
         "log_kf": {
-          "as_published": "3.407",
-          "value": 3.407,
+          "as_published": "5.507",
+          "value": 5.507,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 18,
+      "source_text_spans": {
+        "temperature": {
+          "line": 18,
+          "start": 0,
+          "end": 1
+        },
+        "enthalpy_function": {
+          "line": 18,
+          "start": 1,
+          "end": 2
+        },
+        "entropy": {
+          "line": 18,
+          "start": 2,
+          "end": 3
+        },
+        "negative_gibbs_function": {
+          "line": 18,
+          "start": 3,
+          "end": 4
+        },
+        "heat_capacity": {
+          "line": 18,
+          "start": 4,
+          "end": 5
+        },
+        "formation_enthalpy": {
+          "line": 18,
+          "start": 5,
+          "end": 6
+        },
+        "formation_gibbs_energy": {
+          "line": 18,
+          "start": 6,
+          "end": 7
+        },
+        "log_kf": {
+          "line": 18,
+          "start": 7,
+          "end": 8
+        }
+      },
+      "cells": {
+        "temperature": {
+          "as_published": "1400",
+          "value": 1400.0,
+          "ocr_suspect": true,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "135.950",
+          "value": 135.95,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "382.87",
+          "value": 382.87,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "246.92",
+          "value": 246.92,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "199.11",
+          "value": 199.11,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": "-122.442 *",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "*"
+          ]
+        },
+        "formation_gibbs_energy": {
+          "as_published": "-138.165 *",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "*"
+          ]
+        },
+        "log_kf": {
+          "as_published": "5.155",
+          "value": 5.155,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 19,
+      "source_text_spans": {
+        "temperature": {
+          "line": 19,
+          "start": 0,
+          "end": 1
+        },
+        "enthalpy_function": {
+          "line": 19,
+          "start": 1,
+          "end": 2
+        },
+        "entropy": {
+          "line": 19,
+          "start": 2,
+          "end": 3
+        },
+        "negative_gibbs_function": {
+          "line": 19,
+          "start": 3,
+          "end": 4
+        },
+        "heat_capacity": {
+          "line": 19,
+          "start": 4,
+          "end": 5
+        },
+        "formation_enthalpy": {
+          "line": 19,
+          "start": 5,
+          "end": 6
+        },
+        "formation_gibbs_energy": {
+          "line": 19,
+          "start": 6,
+          "end": 7
+        },
+        "log_kf": {
+          "line": 19,
+          "start": 7,
+          "end": 8
+        }
+      },
+      "cells": {
+        "temperature": {
+          "as_published": "1500",
+          "value": 1500.0,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "139.791",
+          "value": 139.791,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "396.23",
+          "value": 396.23,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "256.44",
+          "value": 256.44,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "203.72",
+          "value": 203.72,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": "-121.650 *",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "*"
+          ]
+        },
+        "formation_gibbs_energy": {
+          "as_published": "-139.321 *",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "*"
+          ]
+        },
+        "log_kf": {
+          "as_published": "4.852",
+          "value": 4.852,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 20,
+      "source_text_spans": {
+        "temperature": {
+          "line": 20,
+          "start": 0,
+          "end": 1
+        },
+        "enthalpy_function": {
+          "line": 20,
+          "start": 1,
+          "end": 2
+        },
+        "entropy": {
+          "line": 20,
+          "start": 2,
+          "end": 3
+        },
+        "negative_gibbs_function": {
+          "line": 20,
+          "start": 3,
+          "end": 4
+        },
+        "heat_capacity": {
+          "line": 20,
+          "start": 4,
+          "end": 5
+        },
+        "formation_enthalpy": {
+          "line": 20,
+          "start": 5,
+          "end": 6
+        },
+        "formation_gibbs_energy": {
+          "line": 20,
+          "start": 6,
+          "end": 7
+        },
+        "log_kf": {
+          "line": 20,
+          "start": 7,
+          "end": 8
+        }
+      },
+      "cells": {
+        "temperature": {
+          "as_published": "1600",
+          "value": 1600.0,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "143.257",
+          "value": 143.257,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "408.83",
+          "value": 408.83,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "265.57",
+          "value": 265.57,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "208.33",
+          "value": 208.33,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": "-120.873 *",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "*"
+          ]
+        },
+        "formation_gibbs_energy": {
+          "as_published": "-140.504 *",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "*"
+          ]
+        },
+        "log_kf": {
+          "as_published": "4.587",
+          "value": 4.587,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 21,
+      "source_text_spans": {
+        "temperature": {
+          "line": 21,
+          "start": 0,
+          "end": 1
+        },
+        "enthalpy_function": {
+          "line": 21,
+          "start": 1,
+          "end": 2
+        },
+        "entropy": {
+          "line": 21,
+          "start": 2,
+          "end": 3
+        },
+        "negative_gibbs_function": {
+          "line": 21,
+          "start": 3,
+          "end": 4
+        },
+        "heat_capacity": {
+          "line": 21,
+          "start": 4,
+          "end": 5
+        },
+        "formation_enthalpy": {
+          "line": 21,
+          "start": 5,
+          "end": 6
+        },
+        "formation_gibbs_energy": {
+          "line": 21,
+          "start": 6,
+          "end": 7
+        },
+        "log_kf": {
+          "line": 21,
+          "start": 7,
+          "end": 8
+        }
+      },
+      "cells": {
+        "temperature": {
+          "as_published": "1700",
+          "value": 1700.0,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "146.406",
+          "value": 146.406,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "420.76",
+          "value": 420.76,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "274.35",
+          "value": 274.35,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "212.94",
+          "value": 212.94,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": "-120.133 *",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "*"
+          ]
+        },
+        "formation_gibbs_energy": {
+          "as_published": "-141.774 *",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "*"
+          ]
+        },
+        "log_kf": {
+          "as_published": "4.356",
+          "value": 4.356,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        }
+      }
+    },
+    {
+      "source_text_line": 22,
+      "source_text_spans": {
+        "temperature": {
+          "line": 22,
+          "start": 0,
+          "end": 1
+        },
+        "enthalpy_function": {
+          "line": 22,
+          "start": 1,
+          "end": 2
+        },
+        "entropy": {
+          "line": 22,
+          "start": 2,
+          "end": 3
+        },
+        "negative_gibbs_function": {
+          "line": 22,
+          "start": 3,
+          "end": 4
+        },
+        "heat_capacity": {
+          "line": 22,
+          "start": 4,
+          "end": 5
+        },
+        "formation_enthalpy": {
+          "line": 22,
+          "start": 5,
+          "end": 6
+        },
+        "formation_gibbs_energy": {
+          "line": 22,
+          "start": 6,
+          "end": 7
+        },
+        "log_kf": {
+          "line": 22,
+          "start": 7,
+          "end": 8
+        }
+      },
+      "cells": {
+        "temperature": {
+          "as_published": "1710",
+          "value": 1710.0,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "enthalpy_function": {
+          "as_published": "146.700",
+          "value": 146.7,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "entropy": {
+          "as_published": "421.95",
+          "value": 421.95,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "negative_gibbs_function": {
+          "as_published": "275.25",
+          "value": 275.25,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "heat_capacity": {
+          "as_published": "213.40",
+          "value": 213.4,
+          "ocr_suspect": false,
+          "footnote_markers": []
+        },
+        "formation_enthalpy": {
+          "as_published": "-119.615 *",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "*"
+          ]
+        },
+        "formation_gibbs_energy": {
+          "as_published": "-141.901 *",
+          "value": null,
+          "ocr_suspect": true,
+          "footnote_markers": [
+            "*"
+          ]
+        },
+        "log_kf": {
+          "as_published": "4.335",
+          "value": 4.335,
           "ocr_suspect": false,
           "footnote_markers": []
         }
       }
     }
   ],
-  "row_count": 12,
-  "detected_data_row_count": 12,
-  "uncertainty_line_as_published": "UNCERTAINTY 0.84 0.84 0.540 0.860",
+  "row_count": 10,
+  "detected_data_row_count": 10,
+  "uncertainty_line_as_published": "UNCERTAINTY 0.84 0.84 0.960 0.970",
   "uncertainty_values": [
     {
       "as_published": "0.84",
@@ -1371,8 +1168,8 @@
       }
     },
     {
-      "as_published": "0.540",
-      "value": 0.54,
+      "as_published": "0.960",
+      "value": 0.96,
       "ocr_suspect": false,
       "footnote_markers": [],
       "source_text_span": {
@@ -1382,8 +1179,8 @@
       }
     },
     {
-      "as_published": "0.860",
-      "value": 0.86,
+      "as_published": "0.970",
+      "value": 0.97,
       "ocr_suspect": false,
       "footnote_markers": [],
       "source_text_span": {
@@ -1393,17 +1190,24 @@
       }
     }
   ],
-  "reference_state_notes_as_published": [],
+  "reference_state_notes_as_published": [
+    "Ca 2 Si0 4 :     Crystals 298o15 to 970 Ko               a' crystals (bredigite} 970 to 1710 Ko",
+    "                   \u00ab crystals 1710 to 1800 Ko"
+  ],
   "auxiliary_lines_as_published": [
-    "I!ELTIIfG POINT                                        BOIL I lfG POIIT                                     J(",
-    "ENTHALPY OF IIELTIBG                     ltJ           ENTHALPY OF VlPOBIZATIOif                            kJ",
-    "                                         kJ            I!OLlB VOLUI!B                          3.9930 J/bar",
-    "                                                                                              39.930 ca 3",
-    "TRANSITIONS IB BEP'EBEBCE STATE OXIDES",
-    "  Si0 2 \u2022 \u2022 \u2022 \u2022 \u2022 \u2022 \u2022 ALPHA- BETA TBAISITIOI 844 I.",
-    "HEAT CAPACITY EQUATION",
-    "         1.1125x102 + 1.437Jx1o-z T      16.936 T-o\u00b7s",
-    "            (EQUATIOI VALID FRO!! 298 - 1400 K)"
+    "IIELTIHG POINT                    2403       K             BOILIBG POIIT",
+    "ENTHALPY OF IIELTIBG                         kJ           BBTRALPY OP VlPOBIZATIOB                             kJ",
+    "H;98 -     H~                                kJ           !lOLl B VOLOIIE                          5.1600 JAar",
+    "                                                                                                  51.600 c\u2022 3",
+    "TBlRSITIOBS II BEPEBEIICE STATE OXIDES",
+    "   SiOzo\u2022o o o o o ALPHA - BETA TBABSITIOW 844 K.",
+    "HEAT CAPACITY EQUlTIOB",
+    "           2.4871x10Z - 8.l145x1o-\u2022 T - 2o0521z1o\u2022 T-o\u00b7s",
+    "              (EQUATIOB VALID FBOft 298- 970 K)",
+    " c;        134.557      o.046108 T",
+    "              ( EQUATIOB VALID FBOII              970 - 1710\u00b7 K)",
+    "BEPEIBIICE          45            120                                          126                       COIIPILBD",
+    "                                                                                                             7- 9-76"
   ],
   "footnote_markers": [],
   "ocr_suspect": true,
@@ -1411,17 +1215,17 @@
     {
       "kind": "image_temperature_disagreement",
       "detector_only": true,
-      "row": 2,
-      "layout_token": "400",
-      "image_ocr_token": "800"
+      "row": 6,
+      "layout_token": "1400",
+      "image_ocr_token": "1800"
     }
   ],
-  "phase_as_published": "crystals 298.15 to 11t00 K.               Pseudowollastonite is the stable phase\n            aboYe 1398 K.",
+  "phase_as_published": "Crystals 298o15 to 970 Ko               a' crystals (bredigite} 970 to 1710 Ko                    \u00ab crystals 1710 to 1800 Ko",
   "phase_segment": {
-    "ordinal": 1,
-    "count_on_printed_page": 1,
-    "row_start": 1,
-    "row_stop": 12,
+    "ordinal": 2,
+    "count_on_printed_page": 3,
+    "row_start": 9,
+    "row_stop": 18,
     "boundary_basis": "printed rule, embedded header, or non-increasing temperature grid"
   }
 }
