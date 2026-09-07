@@ -286,6 +286,22 @@ def test_phase_as_published_represented_per_record(compilation, source_layout):
     indium_liquid = by_id[f"{SOURCE_ID}-0038-phase-02"]
     assert "Liquid" not in indium["phase_as_published"]
     assert "Liquid" in indium_liquid["phase_as_published"]
+    iron_alpha_tail = by_id[f"{SOURCE_ID}-0028-phase-02"]
+    assert iron_alpha_tail["phase_as_published"] == (
+        "Alpha crystals (body-centered cubic) 298.15 to 1184 K.   Curie point\n"
+        "         1042 K."
+    )
+    assert "Ga1111a" not in iron_alpha_tail["phase_as_published"]
+    assert "Liquid" not in iron_alpha_tail["phase_as_published"]
+    erbium_liquid = by_id[f"{SOURCE_ID}-0025-phase-02"]
+    assert "Liquid" in erbium_liquid["phase_as_published"]
+    assert "Huagoaal" not in erbium_liquid["phase_as_published"]
+    cobalt_beta = by_id[f"{SOURCE_ID}-0020-phase-02"]
+    cobalt_liquid = by_id[f"{SOURCE_ID}-0020-phase-03"]
+    assert "Beta crystals" in cobalt_beta["phase_as_published"]
+    assert "Liquid" not in cobalt_beta["phase_as_published"]
+    assert "Liquid" in cobalt_liquid["phase_as_published"]
+    assert "Beta crystals" not in cobalt_liquid["phase_as_published"]
     for record in records:
         phase = record.get("phase_as_published")
         if not phase:
@@ -295,6 +311,108 @@ def test_phase_as_published_represented_per_record(compilation, source_layout):
         collapsed_header = re.sub(r"\s+", " ", header)
         collapsed_page = re.sub(r"\s+", " ", "\n".join(page_lines))
         assert collapsed_header in collapsed_page, (record["record_id"], collapsed_header)
+
+
+_PHASE_WORD = (
+    r"(?:"
+    r"Alpha|Alp~a|Alpaa|llpha|Beta|Be~a|"
+    r"Ga{1,4}[mn1l•]*a|Gamaa|Gaaaa|"
+    r"Delta(?:\s+pri[a-z]+)?|Epsilon|"
+    r"Liq[uy]id|Liguid|Liqu[ij1l]\.d|L~quid|LiCJuid|Liqu1\.d|LiquJ\.d|"
+    r"Ideal|Crystals?|crrstals|crys~als|CrJstals?|Crysta[~1]s|"
+    r"Glass|Diamond|Oiaaond|Graphite|"
+    r"Hexagonal|He[zxk&]agonal|Hezagonal|HeKagonal|"
+    r"Body[- ]centered|Face[- ]cente[\[r]ed|Pace[- ]centered|"
+    r"Orthorhombic|Orthorho[a8]bic|orthorhoabic|"
+    r"Monoclinic|llonoclinic|aonoclinic|"
+    r"Rhombohedral|Rho[mn]bohedral|Rhoabohedral|"
+    r"Tetragonal|Tetraqonal|Cubic|"
+    r"Litharge|eassicot|a-eucrrptite|~-eucryptite|"
+    r"High\s+tali|Lov\s+tali|Low\s+tali|"
+    r"m'\s+crystals|m\s+crystals"
+    r")"
+)
+_PHASE_START = re.compile(r"(?ix)(?:^|(?<=\.)(?=\s)|(?<=:))[ \t]*\n?[ \t]*(" + _PHASE_WORD + r")")
+
+
+def _parent_record_id(record_id: str) -> str:
+    return record_id.rsplit("-phase-", 1)[0] if "-phase-" in record_id else record_id
+
+
+def _split_groups(records):
+    groups = {}
+    for record in records:
+        groups.setdefault(_parent_record_id(record["record_id"]), []).append(record)
+    return {
+        parent: members
+        for parent, members in groups.items()
+        if any("-phase-" in record["record_id"] for record in members)
+    }
+
+
+def _phase_clauses(header: str) -> list[str]:
+    if not header:
+        return []
+    starts = [match.start(1) for match in _PHASE_START.finditer(header)]
+    if not starts:
+        return [header] if header.strip() else []
+    clauses = []
+    for index, start in enumerate(starts):
+        end = starts[index + 1] if index + 1 < len(starts) else len(header)
+        while end > start and header[end - 1] in " \t\n":
+            end -= 1
+        if end > start:
+            clauses.append(header[start:end])
+    return clauses
+
+
+def _phase_start_count(text: str | None) -> int:
+    if not text:
+        return 0
+    return sum(1 for _ in _PHASE_START.finditer(text))
+
+
+def test_split_records_phase_clauses_partition_header(compilation):
+    """Each split record holds one phase slice; siblings cover the header once."""
+    _, records = compilation
+    for members in _split_groups(records).values():
+        headers = {record.get("header_as_published") for record in members}
+        assert None not in headers
+        assert len(headers) == 1
+        header = members[0]["header_as_published"]
+        clauses = _phase_clauses(header)
+        unique_clause_sets = {}
+        for record in members:
+            phase = record.get("phase_as_published")
+            assert record["header_as_published"] == header
+            if not phase:
+                continue
+            collapsed_phase = re.sub(r"\s+", " ", phase).strip()
+            collapsed_header = re.sub(r"\s+", " ", header)
+            assert collapsed_phase in collapsed_header, record["record_id"]
+            starts = _phase_start_count(phase)
+            owned = [clause for clause in clauses if clause in phase]
+            if starts > 1:
+                for sibling in members:
+                    if sibling is record:
+                        continue
+                    other = sibling.get("phase_as_published")
+                    if other and _phase_start_count(other) == 1:
+                        assert other not in phase, record["record_id"]
+            else:
+                assert starts <= 1, record["record_id"]
+            for sibling in members:
+                if sibling is record:
+                    continue
+                other = sibling.get("phase_as_published")
+                if other and other != phase:
+                    assert other not in phase, (record["record_id"], sibling["record_id"])
+            unique_clause_sets.setdefault(phase, owned)
+        seen = []
+        for owned in unique_clause_sets.values():
+            for clause in owned:
+                assert clause not in seen, clause
+                seen.append(clause)
 
 
 def test_corrections_ledger_covers_withheld_numeric_values(compilation):
