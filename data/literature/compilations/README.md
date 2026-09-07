@@ -61,7 +61,7 @@ The NIST-JANAF 4th edition compilation now lives here:
 (Thermo-Calc TDB: ELEMENT / FUNCTION / PHASE / PARAMETER G, TC, BM, BMAGN). Licence quote
 and coverage are in `sgte-unary/README.md`. Compilations still produce no scoring rows.
 
-`robie-hemingway-fisher-1978-usgs-b1452/` contains the complete 400-table census of USGS Bulletin 1452: 324 transcribed tables (5,488 rows in 584 phase-specific records) and 76 explicitly untranscribed OCR stubs; it is assessed reference data and never battery-scored.
+`robie-hemingway-fisher-1978-usgs-b1452/` contains the complete 400-table census of USGS Bulletin 1452: 349 transcribed tables (5,776 rows in 596 phase-specific records) and 51 explicitly untranscribed OCR stubs; it is assessed reference data and never battery-scored.
 
 `robie-waldbaum-1968-usgs-b1259/` is a complete ingest of Robie & Waldbaum 1968, USGS Bulletin 1259 (public-domain US government work). One record per 298.15 K substance row and per high-temperature substance table, plus TOC tables 1–3. Compilations still produce no scoring rows.
 
