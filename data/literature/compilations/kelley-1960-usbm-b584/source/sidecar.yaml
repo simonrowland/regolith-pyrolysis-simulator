@@ -1,0 +1,83 @@
+citation: 'Kelley, K. K., Contributions to the Data on Theoretical Metallurgy: XIII. High-Temperature Heat-Content, Heat-Capacity,
+  and Entropy Data for the Elements and Inorganic Compounds, U.S. Bureau of Mines Bulletin 584 (1960)'
+doi: null
+publisher: U.S. Bureau of Mines / GPO
+licence: US government work (USBM Bulletin 584; public domain in the United States)
+access: open
+present: 'yes'
+sha256: 504c6590c2e69af6529f6bf91c3a9e000bc2cb2f31e046fc82676c68b9abd698
+size: 74873267
+retrieved_at: '2026-09-06T22:58:14Z'
+retrieved_url: https://web.archive.org/web/20170816111913id_/https://digital.library.unt.edu/ark:/67531/metadc12739/m2/1/high_res_d/Bulletin0584.pdf
+attempts:
+- at: '2026-09-06T21:54:29Z'
+  url: https://digital.library.unt.edu/ark:/67531/metadc12739/
+  status: 302
+  final: https://digital.library.unt.edu/dam/?next=%2Fark%3A%2F67531%2Fmetadc12739%2F
+  note: UNT Digital Library redirected to DAM Altcha JS challenge (altcha.min.js); stopped, no bypass
+- at: '2026-09-06T22:49:15Z'
+  url: https://archive.org/advancedsearch.php
+  status: 200
+  note: creator:kelley AND (bulletin 584 OR theoretical metallurgy); numFound 0
+- at: '2026-09-06T22:49:21Z'
+  url: https://archive.org/advancedsearch.php
+  status: 200
+  note: title heat-content / USBM Bulletin 584; no matching item (unrelated DTIC hits)
+- at: '2026-09-06T22:49:41Z'
+  url: https://archive.org/advancedsearch.php
+  status: 200
+  note: title:"Bulletin 584" AND (kelley OR mines); numFound 0
+- at: '2026-09-06T22:50:29Z'
+  url: https://archive.org/advancedsearch.php
+  status: 200
+  note: identifier:metadc12739; numFound 0 (UNT not mirrored as an IA item)
+- at: '2026-09-06T22:52:14Z'
+  url: https://www.googleapis.com/books/v1/volumes?q=Kelley+High-temperature+Heat-content+Bulletin+584
+  status: 429
+  note: Google Books API rate-limited; no CAPTCHA solved
+- at: '2026-09-06T22:53:02Z'
+  url: https://openlibrary.org/search.json?title=High-temperature+heat-content&author=Kelley
+  status: 200
+  note: work OL13085261W (1960 Bulletin 584); ebook_access=no_ebook
+- at: '2026-09-06T22:53:24Z'
+  url: https://www.loc.gov/search/?q=kelley+bulletin+584+bureau+mines&fo=json
+  status: 403
+  note: Cloudflare JS challenge (cf-mitigated); stopped
+- at: '2026-09-06T22:55:10Z'
+  url: https://web.archive.org/cdx/search/cdx?url=digital.library.unt.edu/ark:/67531/metadc12739/*
+  status: 200
+  note: CDX found 2017 snapshot of Bulletin0584.pdf (application/pdf)
+- at: '2026-09-06T22:58:14Z'
+  url: https://web.archive.org/web/20170816111913id_/https://digital.library.unt.edu/ark:/67531/metadc12739/m2/1/high_res_d/Bulletin0584.pdf
+  status: 200
+  final: https://web.archive.org/web/20170816111913id_/https://digital.library.unt.edu/ark:/67531/metadc12739/m2/1/high_res_d/Bulletin0584.pdf
+  ctype: application/pdf
+- at: '2026-09-06T22:59:44Z'
+  url: https://pubs.usgs.gov/pubs-services/publication/?q=kelley+bulletin+584
+  status: 200
+  note: USGS Publications Warehouse JSON; recordCount 0
+- at: '2026-09-06T22:59:50Z'
+  url: https://www.osti.gov/api/v1/records?q=kelley%20bulletin%20584
+  status: 200
+  note: OSTI catalogue; no USBM Bulletin 584 record
+- at: '2026-09-06T23:00:19Z'
+  url: https://catalog.hathitrust.org/api/volumes/brief/json/recordnumber:012278663
+  status: 200
+  note: full-view htid uva.x004168623 (v.13 1960) and pst.000003233276 (no.12-13); rights pd
+- at: '2026-09-06T23:01:05Z'
+  url: https://babel.hathitrust.org/cgi/imgsrv/download/pdf?id=uva.x004168623
+  status: 403
+  note: Cloudflare on babel download endpoint; stopped (no babel-viewer automation)
+- at: '2026-09-06T23:00:25Z'
+  url: https://ntrl.ntis.gov/NTRL/
+  status: 200
+  note: NTRL JSF/PrimeFaces app with jsessionid; needs a browser session; stopped
+topic: thermochemistry
+pages: 248
+title_page: Bulletin 584 Bureau of Mines; Contributions to the Data on Theoretical Metallurgy XIII. High-Temperature Heat-Content,
+  Heat-Capacity, and Entropy Data for the Elements and Inorganic Compounds; By K. K. Kelley; GPO Washington 1960
+located_by:
+  worker: thermo-db-vacuum
+  dispatch_id: thermo-db-vacuum
+  note: Official copies located at UNT TRAIL; fetch blocked by Altcha challenge.
+  official_url: https://digital.library.unt.edu/ark:/67531/metadc12739/
