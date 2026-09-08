@@ -1,0 +1,161 @@
+{
+  "schema_version": "pankratz_b677_native_table.v1",
+  "record_id": "table-0004",
+  "ordinal": 4,
+  "formula_as_published": null,
+  "formula_heading_raw": null,
+  "name_as_published": null,
+  "name_heading_raw": null,
+  "phase_as_published": null,
+  "formula_token": {
+    "raw": "",
+    "value": null,
+    "ocr_suspect": false,
+    "ocr_check": "no_shape_confusion_detected"
+  },
+  "page": 26,
+  "pdf_page": 30,
+  "table_number": null,
+  "toc_section": "chapter_1_examples",
+  "table_kind": "thermodynamic_temperature_grid",
+  "transcription_status": "transcribed",
+  "units_statement_as_published": null,
+  "columns": [
+    {
+      "index": 0,
+      "heading_raw": "T, K:",
+      "units_as_published": null
+    },
+    {
+      "index": 1,
+      "heading_raw": "$CO/CO_{2}$ :",
+      "units_as_published": null
+    }
+  ],
+  "header_rows_raw": [
+    [
+      "T, K:",
+      "$CO/CO_{2}$ :"
+    ]
+  ],
+  "source_table_rows_raw": [
+    [
+      "$CO/CO_{2}$ :",
+      "2.878",
+      "2.663",
+      "2.370"
+    ],
+    [
+      "T, K:",
+      "911",
+      "990",
+      "1121"
+    ]
+  ],
+  "source_orientation": "transposed_for_temperature_lookup",
+  "temperature_grid": [
+    {
+      "raw": "911",
+      "value": 911.0,
+      "ocr_suspect": true,
+      "ocr_check": "raster_table_bbox_token_disagreement",
+      "source_row_index": 1,
+      "source_column_index": 1
+    },
+    {
+      "raw": "990",
+      "value": 990.0,
+      "ocr_suspect": false,
+      "ocr_check": "raster_table_bbox_token_agreement",
+      "source_row_index": 1,
+      "source_column_index": 2
+    },
+    {
+      "raw": "1121",
+      "value": 1121.0,
+      "ocr_suspect": false,
+      "ocr_check": "raster_table_bbox_token_agreement",
+      "source_row_index": 1,
+      "source_column_index": 3
+    }
+  ],
+  "rows": [
+    {
+      "source_row_index": 1,
+      "cells": [
+        {
+          "raw": "911",
+          "value": 911.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "source_row_index": 1,
+          "source_column_index": 1
+        },
+        {
+          "raw": "2.878",
+          "value": 2.878,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 0,
+          "source_column_index": 1
+        }
+      ]
+    },
+    {
+      "source_row_index": 2,
+      "cells": [
+        {
+          "raw": "990",
+          "value": 990.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 1,
+          "source_column_index": 2
+        },
+        {
+          "raw": "2.663",
+          "value": 2.663,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 0,
+          "source_column_index": 2
+        }
+      ]
+    },
+    {
+      "source_row_index": 3,
+      "cells": [
+        {
+          "raw": "1121",
+          "value": 1121.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 1,
+          "source_column_index": 3
+        },
+        {
+          "raw": "2.370",
+          "value": 2.37,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 0,
+          "source_column_index": 3
+        }
+      ]
+    }
+  ],
+  "footnote_markers": [],
+  "source_locator": {
+    "file": "source/mineru/pankratz-1984-usbm-b677-p001-p040.md",
+    "table_index": 4,
+    "table_sha256": "7fde96f36064f77cb6c28cef99d048a7b93dc4df074e49dac2a2934cef636aef",
+    "bbox": [
+      347,
+      157,
+      687,
+      220
+    ]
+  },
+  "ambiguities": [],
+  "corrections": []
+}

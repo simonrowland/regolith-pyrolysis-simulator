@@ -1,0 +1,255 @@
+{
+  "schema_version": "pankratz_b677_native_table.v1",
+  "record_id": "table-0003",
+  "ordinal": 3,
+  "formula_as_published": null,
+  "formula_heading_raw": null,
+  "name_as_published": null,
+  "name_heading_raw": null,
+  "phase_as_published": null,
+  "formula_token": {
+    "raw": "",
+    "value": null,
+    "ocr_suspect": false,
+    "ocr_check": "no_shape_confusion_detected"
+  },
+  "page": 22,
+  "pdf_page": 26,
+  "table_number": null,
+  "toc_section": "chapter_1_examples",
+  "table_kind": "thermodynamic_temperature_grid",
+  "transcription_status": "transcribed_with_ocr_ambiguities",
+  "units_statement_as_published": null,
+  "columns": [
+    {
+      "index": 0,
+      "heading_raw": "T, K / CO",
+      "units_as_published": null
+    },
+    {
+      "index": 1,
+      "heading_raw": "$\\Delta Gf^{\\circ}$ / 0.5  $O_2$",
+      "units_as_published": null
+    },
+    {
+      "index": 2,
+      "heading_raw": "$\\Delta G^{\\circ}$ (reaction 65) / $CO_2$",
+      "units_as_published": null
+    },
+    {
+      "index": 3,
+      "heading_raw": "$K_p$",
+      "units_as_published": null
+    },
+    {
+      "index": 4,
+      "heading_raw": "",
+      "units_as_published": null
+    },
+    {
+      "index": 5,
+      "heading_raw": "",
+      "units_as_published": null
+    }
+  ],
+  "header_rows_raw": [
+    [
+      "T, K",
+      "$\\Delta Gf^{\\circ}$",
+      "$\\Delta G^{\\circ}$ (reaction 65)",
+      "$K_p$",
+      "",
+      ""
+    ],
+    [
+      "CO",
+      "0.5  $O_2$",
+      "$CO_2$",
+      "",
+      "",
+      ""
+    ]
+  ],
+  "source_table_rows_raw": [
+    [
+      "T, K",
+      "$\\Delta Gf^{\\circ}$",
+      "$\\Delta G^{\\circ}$ (reaction 65)",
+      "$K_p$"
+    ],
+    [
+      "CO",
+      "0.5  $O_2$",
+      "$CO_2$"
+    ],
+    [
+      "1000",
+      "-47857",
+      "*0.0",
+      "-94619",
+      "-46762",
+      "$1.66x10^{10}$"
+    ],
+    [
+      "2000",
+      "-68343",
+      "0.0",
+      "-94728",
+      "-26385",
+      "764"
+    ]
+  ],
+  "source_orientation": "rows_as_printed",
+  "temperature_grid": [
+    {
+      "raw": "1000",
+      "value": 1000.0,
+      "ocr_suspect": false,
+      "ocr_check": "raster_table_bbox_token_agreement",
+      "source_row_index": 2,
+      "source_column_index": 0
+    },
+    {
+      "raw": "2000",
+      "value": 2000.0,
+      "ocr_suspect": false,
+      "ocr_check": "raster_table_bbox_token_agreement",
+      "source_row_index": 3,
+      "source_column_index": 0
+    }
+  ],
+  "rows": [
+    {
+      "source_row_index": 2,
+      "cells": [
+        {
+          "raw": "1000",
+          "value": 1000.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 2,
+          "source_column_index": 0
+        },
+        {
+          "raw": "-47857",
+          "value": -47857.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 2,
+          "source_column_index": 1
+        },
+        {
+          "raw": "*0.0",
+          "value": null,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "source_row_index": 2,
+          "source_column_index": 2
+        },
+        {
+          "raw": "-94619",
+          "value": -94619.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 2,
+          "source_column_index": 3
+        },
+        {
+          "raw": "-46762",
+          "value": -46762.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 2,
+          "source_column_index": 4
+        },
+        {
+          "raw": "$1.66x10^{10}$",
+          "value": 16600000000.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "numeric_token": "1.66E10",
+          "source_row_index": 2,
+          "source_column_index": 5
+        }
+      ]
+    },
+    {
+      "source_row_index": 3,
+      "cells": [
+        {
+          "raw": "2000",
+          "value": 2000.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 3,
+          "source_column_index": 0
+        },
+        {
+          "raw": "-68343",
+          "value": -68343.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 3,
+          "source_column_index": 1
+        },
+        {
+          "raw": "0.0",
+          "value": 0.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 3,
+          "source_column_index": 2
+        },
+        {
+          "raw": "-94728",
+          "value": -94728.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 3,
+          "source_column_index": 3
+        },
+        {
+          "raw": "-26385",
+          "value": -26385.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 3,
+          "source_column_index": 4
+        },
+        {
+          "raw": "764",
+          "value": 764.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "source_row_index": 3,
+          "source_column_index": 5
+        }
+      ]
+    }
+  ],
+  "footnote_markers": [],
+  "source_locator": {
+    "file": "source/mineru/pankratz-1984-usbm-b677-p001-p040.md",
+    "table_index": 3,
+    "table_sha256": "7f70a59078ec0dc023f90d2c1160ce3fa5b49b754aa4511f99878d33c559786d",
+    "bbox": [
+      147,
+      125,
+      833,
+      236
+    ]
+  },
+  "ambiguities": [
+    {
+      "kind": "column_shape",
+      "reason": "MinerU rows have unequal cell counts; missing cells retained as blank padding",
+      "row_lengths": [
+        4,
+        3,
+        6,
+        6
+      ]
+    }
+  ],
+  "corrections": []
+}
