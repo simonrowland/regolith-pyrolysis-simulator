@@ -231,11 +231,15 @@
         ]
       },
       "H_minus_H298": {
-        "as_published": "070",
-        "value": 70.0,
-        "ocr_suspect": false,
+        "as_published": "1.070",
+        "value": 1.07,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "070",
+        "correction_id": "b1259-p157-H_minus_H298-03"
       },
       "entropy": {
         "as_published": "13.51",
@@ -272,9 +276,6 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "gef_identity |gef-(S-1000H/T)|=172.3200 at T=400.0"
-      ],
       "ocr_suspect_row": true
     },
     {
@@ -319,11 +320,15 @@
         ]
       },
       "H_minus_H298": {
-        "as_published": "190",
-        "value": 190.0,
-        "ocr_suspect": false,
+        "as_published": "2.190",
+        "value": 2.19,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "190",
+        "correction_id": "b1259-p157-H_minus_H298-04"
       },
       "entropy": {
         "as_published": "16.01",
@@ -360,9 +365,6 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "gef_identity |gef-(S-1000H/T)|=375.6200 at T=500.0"
-      ],
       "ocr_suspect_row": true
     },
     {
@@ -407,11 +409,15 @@
         ]
       },
       "H_minus_H298": {
-        "as_published": "350",
-        "value": 350.0,
-        "ocr_suspect": false,
+        "as_published": "3.350",
+        "value": 3.35,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "350",
+        "correction_id": "b1259-p157-H_minus_H298-05"
       },
       "entropy": {
         "as_published": "18.12",
@@ -448,9 +454,6 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "gef_identity |gef-(S-1000H/T)|=577.7533 at T=600.0"
-      ],
       "ocr_suspect_row": true
     },
     {
@@ -495,11 +498,15 @@
         ]
       },
       "H_minus_H298": {
-        "as_published": "530",
-        "value": 530.0,
-        "ocr_suspect": false,
+        "as_published": "4.530",
+        "value": 4.53,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "530",
+        "correction_id": "b1259-p157-H_minus_H298-06"
       },
       "entropy": {
         "as_published": "19.94",
@@ -536,9 +543,6 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "gef_identity |gef-(S-1000H/T)|=750.6729 at T=700.0"
-      ],
       "ocr_suspect_row": true
     },
     {
@@ -583,11 +587,15 @@
         ]
       },
       "H_minus_H298": {
-        "as_published": "740",
-        "value": 740.0,
-        "ocr_suspect": false,
+        "as_published": "5.740",
+        "value": 5.74,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "740",
+        "correction_id": "b1259-p157-H_minus_H298-07"
       },
       "entropy": {
         "as_published": "21.56",
@@ -624,9 +632,6 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "gef_identity |gef-(S-1000H/T)|=917.8200 at T=800.0"
-      ],
       "ocr_suspect_row": true
     },
     {
@@ -1654,11 +1659,6 @@
   "ocr_suspect_token_count": 2,
   "identity_disagreements": [
     "logKf_identity |logK+1000 dG/(RT ln10)|=111.5496 at T=298.15",
-    "gef_identity |gef-(S-1000H/T)|=172.3200 at T=400.0",
-    "gef_identity |gef-(S-1000H/T)|=375.6200 at T=500.0",
-    "gef_identity |gef-(S-1000H/T)|=577.7533 at T=600.0",
-    "gef_identity |gef-(S-1000H/T)|=750.6729 at T=700.0",
-    "gef_identity |gef-(S-1000H/T)|=917.8200 at T=800.0",
     "gef_identity |gef-(S-1000H/T)|=0.6000 at T=2000.0"
   ],
   "ambiguities": [
@@ -1678,6 +1678,61 @@
       "layout_as_extracted": "900,",
       "printed_token": "900",
       "evidence": "PDF page 157 image visibly prints '900 6.970 23.00 15.26 -84.480 -61.462 14.925'"
+    },
+    {
+      "correction_id": "b1259-p157-H_minus_H298-03",
+      "pdf_page": 157,
+      "field": "H_minus_H298",
+      "layout_as_extracted": "070",
+      "printed_token": "1.070",
+      "evidence": "400 | 1.070 | 13.51 | 10.83",
+      "record_id": "b1259-ht-0126-zincite",
+      "ocr_token": "070",
+      "image_quote": "400 | 1.070 | 13.51 | 10.83"
+    },
+    {
+      "correction_id": "b1259-p157-H_minus_H298-04",
+      "pdf_page": 157,
+      "field": "H_minus_H298",
+      "layout_as_extracted": "190",
+      "printed_token": "2.190",
+      "evidence": "500 | 2.190 | 16.01 | 11.63",
+      "record_id": "b1259-ht-0126-zincite",
+      "ocr_token": "190",
+      "image_quote": "500 | 2.190 | 16.01 | 11.63"
+    },
+    {
+      "correction_id": "b1259-p157-H_minus_H298-05",
+      "pdf_page": 157,
+      "field": "H_minus_H298",
+      "layout_as_extracted": "350",
+      "printed_token": "3.350",
+      "evidence": "600 | 3.350 | 18.12 | 12.54",
+      "record_id": "b1259-ht-0126-zincite",
+      "ocr_token": "350",
+      "image_quote": "600 | 3.350 | 18.12 | 12.54"
+    },
+    {
+      "correction_id": "b1259-p157-H_minus_H298-06",
+      "pdf_page": 157,
+      "field": "H_minus_H298",
+      "layout_as_extracted": "530",
+      "printed_token": "4.530",
+      "evidence": "700 | 4.530 | 19.94 | 13.47",
+      "record_id": "b1259-ht-0126-zincite",
+      "ocr_token": "530",
+      "image_quote": "700 | 4.530 | 19.94 | 13.47"
+    },
+    {
+      "correction_id": "b1259-p157-H_minus_H298-07",
+      "pdf_page": 157,
+      "field": "H_minus_H298",
+      "layout_as_extracted": "740",
+      "printed_token": "5.740",
+      "evidence": "800 | 5.740 | 21.56 | 14.38",
+      "record_id": "b1259-ht-0126-zincite",
+      "ocr_token": "740",
+      "image_quote": "800 | 5.740 | 21.56 | 14.38"
     }
   ],
   "record_id": "b1259-ht-0126-zincite",

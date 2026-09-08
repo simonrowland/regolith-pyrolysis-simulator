@@ -678,11 +678,15 @@
         "ocr_reasons": []
       },
       "delta_f_H": {
-        "as_published": "-2957159",
-        "value": -2957159.0,
-        "ocr_suspect": false,
+        "as_published": "-293.159",
+        "value": -293.159,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "-2957159",
+        "correction_id": "b1259-p192-delta_f_H-08"
       },
       "delta_f_G": {
         "as_published": "",
@@ -1387,6 +1391,19 @@
   "ocr_suspect_token_count": 5,
   "identity_disagreements": [],
   "ambiguities": [],
+  "corrections": [
+    {
+      "correction_id": "b1259-p192-delta_f_H-08",
+      "pdf_page": 192,
+      "field": "delta_f_H",
+      "layout_as_extracted": "-2957159",
+      "printed_token": "-293.159",
+      "evidence": "900 | 15.250 | 50.45 | 33.51 | -293.159",
+      "record_id": "b1259-ht-0161-strontianite",
+      "ocr_token": "-2957159",
+      "image_quote": "900 | 15.250 | 50.45 | 33.51 | -293.159"
+    }
+  ],
   "record_id": "b1259-ht-0161-strontianite",
   "source": {
     "database": "USGS Bulletin 1259, Robie & Waldbaum 1968",

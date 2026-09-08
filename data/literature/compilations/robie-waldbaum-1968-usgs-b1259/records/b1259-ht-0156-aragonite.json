@@ -621,11 +621,15 @@
         ]
       },
       "log_Kf": {
-        "as_published": "657690",
-        "value": 657690.0,
-        "ocr_suspect": false,
+        "as_published": "65.690",
+        "value": 65.69,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "657690",
+        "correction_id": "b1259-p187-log_Kf-07"
       }
     },
     {
@@ -824,6 +828,19 @@
     "logKf_identity |logK+1000 dG/(RT ln10)|=182.6039 at T=600.0",
     "logKf_identity |logK+1000 dG/(RT ln10)|=112.7276 at T=900.0",
     "logKf_identity |logK+1000 dG/(RT ln10)|=98.7804 at T=1000.0"
+  ],
+  "corrections": [
+    {
+      "correction_id": "b1259-p187-log_Kf-07",
+      "pdf_page": 187,
+      "field": "log_Kf",
+      "layout_as_extracted": "657690",
+      "printed_token": "65.690",
+      "evidence": "800 | -287.601 | -238.264 | 65.690",
+      "record_id": "b1259-ht-0156-aragonite",
+      "ocr_token": "657690",
+      "image_quote": "800 | -287.601 | -238.264 | 65.690"
+    }
   ],
   "record_id": "b1259-ht-0156-aragonite",
   "source": {

@@ -32,6 +32,19 @@ ROLE = {
     "battery_refusal": "gibbs_table_not_runtime_observable",
     "circularity_warning": "Do not validate an engine against a compilation it consumes.",
 }
+__all__ = (
+    "COMPILATION_ROOT",
+    "EXPECTED_298K_PAGE_COUNTS",
+    "OCRSuspectRow",
+    "PDF_SHA256",
+    "ROLE",
+    "TemperatureNotOnPrintedGrid",
+    "load_manifest",
+    "load_records",
+    "lookup",
+    "numeric_token",
+    "validate_record_source_tokens",
+)
 R_CAL = Decimal("1.98717")
 LN10 = Decimal("2.302585092994046")
 HIGH_T_COLUMNS = (
@@ -106,11 +119,19 @@ IMAGE_VERIFIED_298K_IDENTITIES = {
     'Zn"1"1" aqueous ion': ("Zn++ aqueous ion", "Zn++", 20),
 }
 IMAGE_VERIFIED_CELLS = {
+    47: [(700, 2, "H_minus_H298", "2.808")],
     50: [(1700, 1, "delta_f_H", ".000")],
     70: [(1900, 1, "gibbs_function", "63.04")],
     85: [
         (900, 1, "gibbs_function", "50.09"),
         (1600, 1, "gibbs_function", "55.02"),
+    ],
+    86: [
+        (500, 1, "H_minus_H298", "1.960"),
+        (600, 1, "H_minus_H298", "3.138"),
+        (700, 1, "H_minus_H298", "4.454"),
+        (800, 1, "H_minus_H298", "5.897"),
+        (900, 1, "H_minus_H298", "7.458"),
     ],
     91: [
         (500, 1, "delta_f_H", "-43.056"),
@@ -119,6 +140,12 @@ IMAGE_VERIFIED_CELLS = {
         (900, 1, "delta_f_H", "-71.064"),
         (1000, 1, "delta_f_H", "-71.136"),
     ],
+    93: [
+        (400, 1, "H_minus_H298", "1.220"),
+        (500, 1, "H_minus_H298", "2.440"),
+        (600, 1, "H_minus_H298", "3.690"),
+        (700, 1, "H_minus_H298", "4.970"),
+    ],
     96: [
         (500, 1, "log_Kf", "10.691"),
         (800, 1, "delta_f_H", "-41.603"),
@@ -126,14 +153,27 @@ IMAGE_VERIFIED_CELLS = {
         (800, 1, "log_Kf", "6.375"),
     ],
     107: [(298.15, 1, "gibbs_function", "51.06")],
-    132: [(1500, 1, "gibbs_function", "66.04")],
+    132: [
+        (1200, 1, "entropy", "72.62"),
+        (1500, 1, "gibbs_function", "66.04"),
+    ],
+    139: [(1900, 1, "gibbs_function", "88.86")],
     146: [(1700, 1, "entropy", "36.03")],
+    157: [
+        (400, 1, "H_minus_H298", "1.070"),
+        (500, 1, "H_minus_H298", "2.190"),
+        (600, 1, "H_minus_H298", "3.350"),
+        (700, 1, "H_minus_H298", "4.530"),
+        (800, 1, "H_minus_H298", "5.740"),
+    ],
     165: [(2000, 1, "gibbs_function", "66.06")],
+    167: [(1000, 1, "log_Kf", "66.905")],
     168: [
         (703, 1, "H_minus_H298", "6.330"),
         (703, 1, "log_Kf", "5.792"),
     ],
     180: [
+        (1200, 1, "delta_f_H", "-289.250"),
         (1424, 2, "entropy", "48.05"),
         (1691, 1, "gibbs_function", "34.02"),
     ],
@@ -152,10 +192,39 @@ IMAGE_VERIFIED_CELLS = {
         )
         for field, printed in (("delta_f_H", delta_h), ("delta_f_G", delta_g))
     ],
+    187: [(800, 1, "log_Kf", "65.690")],
+    192: [(900, 1, "delta_f_H", "-293.159")],
+    206: [(800, 1, "log_Kf", "816.026")],
     209: [
         (298.15, 1, "delta_f_H", "-619.390"),
         (298.15, 1, "delta_f_G", "-584.134"),
     ],
+    219: [(1000, 1, "H_minus_H298", "28.310")],
+}
+OCR_SWEEP_IMAGE_QUOTES = {
+    (47, 700, 2, "H_minus_H298"): "700 | 2.808 | 12.970 | 8.963",
+    (86, 500, 1, "H_minus_H298"): "500 | 1.960 | 49.45 | 45.53",
+    (86, 600, 1, "H_minus_H298"): "600 | 3.138 | 51.60 | 46.37",
+    (86, 700, 1, "H_minus_H298"): "700 | 4.454 | 53.62 | 47.26",
+    (86, 800, 1, "H_minus_H298"): "800 | 5.897 | 55.55 | 48.18",
+    (86, 900, 1, "H_minus_H298"): "900 | 7.458 | 57.38 | 49.10",
+    (93, 700, 1, "H_minus_H298"): "700 | 4.970 | 29.18 | 22.08",
+    (93, 600, 1, "H_minus_H298"): "600 | 3.690 | 27.21 | 21.06",
+    (93, 500, 1, "H_minus_H298"): "500 | 2.440 | 24.93 | 20.05",
+    (93, 400, 1, "H_minus_H298"): "400 | 1.220 | 22.21 | 19.16",
+    (132, 1200, 1, "entropy"): "1200 | 10.324 | 72.62 | 64.02",
+    (139, 1900, 1, "gibbs_function"): "1900 | 66.273 | 123.74 | 88.86",
+    (157, 800, 1, "H_minus_H298"): "800 | 5.740 | 21.56 | 14.38",
+    (157, 700, 1, "H_minus_H298"): "700 | 4.530 | 19.94 | 13.47",
+    (157, 600, 1, "H_minus_H298"): "600 | 3.350 | 18.12 | 12.54",
+    (157, 500, 1, "H_minus_H298"): "500 | 2.190 | 16.01 | 11.63",
+    (157, 400, 1, "H_minus_H298"): "400 | 1.070 | 13.51 | 10.83",
+    (167, 1000, 1, "log_Kf"): "1000 | -376.086 | -306.130 | 66.905",
+    (180, 1200, 1, "delta_f_H"): "1200 | 17.850 | 43.10 | 28.22 | -289.250",
+    (187, 800, 1, "log_Kf"): "800 | -287.601 | -238.264 | 65.690",
+    (192, 900, 1, "delta_f_H"): "900 | 15.250 | 50.45 | 33.51 | -293.159",
+    (206, 800, 1, "log_Kf"): "800 | -3272.661 | -2987.065 | 816.026",
+    (219, 1000, 1, "H_minus_H298"): "1000 | 28.310 | 82.78 | 54.47",
 }
 IMAGE_VERIFIED_GRID_ROWS = {
     33: {
@@ -814,6 +883,16 @@ class TemperatureNotOnPrintedGrid(LookupError):
     """Typed refusal: no interpolation, extrapolation, or zero default."""
 
 
+class OCRSuspectRow(LookupError):
+    """Typed refusal for records or grid rows containing unverified OCR cells."""
+
+    def __init__(self, record_id: str, suspect_cells: list[dict]):
+        self.record_id = record_id
+        self.suspect_cells = tuple(suspect_cells)
+        fields = sorted({item["field"] for item in suspect_cells})
+        super().__init__(f"{record_id}: OCR-suspect cells require explicit audit opt-in: {', '.join(fields)}")
+
+
 def numeric_token(token: str) -> Decimal | None:
     """Parse a clean published token. Empty stays empty; never manufacture a value."""
     if token in ("", None):
@@ -948,7 +1027,14 @@ def _identity_notes(row: dict) -> list[str]:
 
 
 def _image_correction(
-    record: dict, cell: dict, field: str, printed: str, quote: str, ordinal: int
+    record: dict,
+    cell: dict,
+    field: str,
+    printed: str,
+    quote: str,
+    ordinal: int,
+    *,
+    retain_ocr_suspect: bool = False,
 ) -> None:
     correction_id = f"b1259-p{record['pdf_page']}-{field}-{ordinal:02d}"
     raw = cell.get("layout_as_extracted", cell.get("as_published", ""))
@@ -968,21 +1054,24 @@ def _image_correction(
             "layout_as_extracted": raw,
             "as_published": printed,
             "value": float(Decimal(printed)),
-            "ocr_suspect": False,
-            "ocr_reasons": [],
+            "ocr_suspect": retain_ocr_suspect,
+            "ocr_reasons": ["image_verified_correction"] if retain_ocr_suspect else [],
             "correction_id": correction_id,
         }
     )
-    record.setdefault("corrections", []).append(
-        {
-            "correction_id": correction_id,
-            "pdf_page": record["pdf_page"],
-            "field": field,
-            "layout_as_extracted": raw,
-            "printed_token": printed,
-            "evidence": quote,
-        }
-    )
+    correction = {
+        "correction_id": correction_id,
+        "pdf_page": record["pdf_page"],
+        "field": field,
+        "layout_as_extracted": raw,
+        "printed_token": printed,
+        "evidence": quote,
+    }
+    if retain_ocr_suspect:
+        correction.update(
+            record_id=record.get("record_id"), ocr_token=raw, image_quote=quote
+        )
+    record.setdefault("corrections", []).append(correction)
 
 
 def _apply_image_verified_corrections(record: dict) -> None:
@@ -1075,13 +1164,18 @@ def _apply_image_verified_corrections(record: dict) -> None:
             *IMAGE_VERIFIED_CELLS_R3.get(pdf_page, []),
         ):
             if temperature == wanted_t and occurrence == wanted_occurrence:
+                sweep_quote = OCR_SWEEP_IMAGE_QUOTES.get(
+                    (pdf_page, wanted_t, wanted_occurrence, field)
+                )
                 _image_correction(
                     record,
                     row[field],
                     field,
                     printed,
-                    f"PDF page {pdf_page} image visibly prints {field}={printed} at T={wanted_t} K",
+                    sweep_quote
+                    or f"PDF page {pdf_page} image visibly prints {field}={printed} at T={wanted_t} K",
                     ordinal,
+                    retain_ocr_suspect=sweep_quote is not None,
                 )
 
     rows = [row for row in record.get("rows") or [] if row.get("kind") in {"data", "grid_refusal"}]
@@ -2045,6 +2139,83 @@ def parse_table2(text: str) -> dict:
                     "ocr_suspect": weight["ocr_suspect"],
                 }
             )
+    corrections = []
+    for row in rows:
+        raw_line = row["line_as_published"]
+        cell = row["weight"]
+        if cell["as_published"] == "9994" and "Gold" in raw_line:
+            row["element_as_published"] = "Oxygen"
+            row["symbol_as_published"] = "O"
+            cell.update(
+                as_published="15.9994",
+                value=15.9994,
+                ocr_suspect=True,
+                ocr_reasons=["image_verified_ocr_fragment"],
+                layout_as_extracted="9994",
+                correction_id="b1259-p10-atomic-oxygen",
+            )
+            row["ocr_suspect"] = True
+            corrections.append(
+                {
+                    "correction_id": "b1259-p10-atomic-oxygen",
+                    "record_id": "b1259-table-02-atomic-weights",
+                    "pdf_page": 10,
+                    "field": "weight",
+                    "layout_as_extracted": "9994",
+                    "ocr_token": "9994",
+                    "printed_token": "15.9994",
+                    "evidence": "PDF page 10 image visibly prints 'Oxygen O 15.9994'",
+                    "image_quote": "Oxygen | O | 15.9994",
+                }
+            )
+        elif cell["as_published"] == "01" and "Beryllium" in raw_line:
+            row["element_as_published"] = "Beryllium"
+            row["symbol_as_published"] = "Be"
+            cell.update(
+                as_published="9.0122",
+                value=9.0122,
+                ocr_suspect=True,
+                ocr_reasons=["image_verified_ocr_fragment"],
+                layout_as_extracted="01",
+                correction_id="b1259-p10-atomic-beryllium",
+            )
+            row["ocr_suspect"] = True
+            corrections.append(
+                {
+                    "correction_id": "b1259-p10-atomic-beryllium",
+                    "record_id": "b1259-table-02-atomic-weights",
+                    "pdf_page": 10,
+                    "field": "weight",
+                    "layout_as_extracted": "01",
+                    "ocr_token": "01",
+                    "printed_token": "9.0122",
+                    "evidence": "PDF page 10 image visibly prints 'Beryllium Be 9.0122'",
+                    "image_quote": "Beryllium | Be | 9.0122",
+                }
+            )
+        elif cell["as_published"] == "99" and "Protactinium" in row["element_as_published"]:
+            cell.update(
+                as_published="",
+                value=None,
+                ocr_suspect=True,
+                ocr_reasons=["image_verified_blank_weight"],
+                layout_as_extracted="99",
+                correction_id="b1259-p10-atomic-protactinium-blank",
+            )
+            row["ocr_suspect"] = True
+            corrections.append(
+                {
+                    "correction_id": "b1259-p10-atomic-protactinium-blank",
+                    "record_id": "b1259-table-02-atomic-weights",
+                    "pdf_page": 10,
+                    "field": "weight",
+                    "layout_as_extracted": "99",
+                    "ocr_token": "99",
+                    "printed_token": "",
+                    "evidence": "PDF page 10 image leaves the Protactinium weight blank",
+                    "image_quote": "Protactinium | Pa | [blank]",
+                }
+            )
     ambiguities = []
     n_sus = sum(1 for r in rows if r.get("ocr_suspect"))
     if n_sus:
@@ -2066,6 +2237,7 @@ def parse_table2(text: str) -> dict:
         "units_as_published": "scale C12 = 12.0000 as printed",
         "identity_disagreements": [],
         "ambiguities": ambiguities,
+        "corrections": corrections,
     }
 
 
@@ -2101,7 +2273,31 @@ def parse_table3(text: str) -> dict:
     }
 
 
-def lookup(record: dict, temperature: float) -> list[dict]:
+def _ocr_suspect_cells(value: object, path: str = "record") -> list[dict]:
+    found = []
+    if isinstance(value, dict):
+        if value.get("ocr_suspect") is True and (
+            "value" in value or "as_published" in value
+        ):
+            found.append(
+                {
+                    "field": path,
+                    "ocr_token": value.get("layout_as_extracted", value.get("as_published")),
+                    "value": value.get("value"),
+                    "correction_id": value.get("correction_id"),
+                }
+            )
+        for key, child in value.items():
+            found.extend(_ocr_suspect_cells(child, f"{path}.{key}"))
+    elif isinstance(value, list):
+        for index, child in enumerate(value):
+            found.extend(_ocr_suspect_cells(child, f"{path}[{index}]"))
+    return found
+
+
+def lookup(
+    record: dict, temperature: float, *, include_ocr_suspect: bool = False
+) -> list[dict]:
     """Return every printed row at this T. Refuse if T is not on the printed grid."""
     if record.get("untranscribed"):
         raise TemperatureNotOnPrintedGrid(
@@ -2139,6 +2335,9 @@ def lookup(record: dict, temperature: float) -> list[dict]:
             f"{record.get('record_id')}: T={temperature} is not a printed grid point "
             "(no interpolation, no extrapolation, no zero default)"
         )
+    suspect_cells = _ocr_suspect_cells(hits, "rows")
+    if suspect_cells and not include_ocr_suspect:
+        raise OCRSuspectRow(record.get("record_id", "unknown-record"), suspect_cells)
     return hits
 
 
@@ -2146,7 +2345,7 @@ def load_manifest(root: Path = COMPILATION_ROOT) -> dict:
     return yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
 
 
-def load_records(root: Path = COMPILATION_ROOT):
+def load_records(root: Path = COMPILATION_ROOT, *, include_ocr_suspect: bool = False):
     manifest = load_manifest(root)
     for entry in manifest["entries"]:
         path = root / entry["path"] if not Path(entry["path"]).is_absolute() else Path(entry["path"])
@@ -2155,6 +2354,9 @@ def load_records(root: Path = COMPILATION_ROOT):
             raise ValueError(f"record_id mismatch: {entry['path']}")
         if record["compilation_role"]["battery_refusal"] != ROLE["battery_refusal"]:
             raise ValueError(f"compilation_role mismatch: {entry['path']}")
+        suspect_cells = _ocr_suspect_cells(record)
+        if suspect_cells and not include_ocr_suspect:
+            raise OCRSuspectRow(record["record_id"], suspect_cells)
         yield record
 
 
@@ -2376,6 +2578,9 @@ def harvest(page_dir: Path | None = None, output: Path = COMPILATION_ROOT) -> di
     corrections_all = []
 
     def add_entry(record: dict, filename: str) -> None:
+        for correction in record.get("corrections") or []:
+            if "ocr_token" in correction:
+                correction["record_id"] = record["record_id"]
         corrections_all.extend(record.get("corrections") or [])
         record["source"] = source
         path = records_dir / filename

@@ -919,11 +919,15 @@
         "ocr_reasons": []
       },
       "entropy": {
-        "as_published": "72162",
-        "value": 72162.0,
-        "ocr_suspect": false,
+        "as_published": "72.62",
+        "value": 72.62,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "72162",
+        "correction_id": "b1259-p132-entropy-11"
       },
       "gibbs_function": {
         "as_published": "64.02",
@@ -953,9 +957,6 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "gef_identity |gef-(S-1000H/T)|=72089.3767 at T=1200.0"
-      ],
       "ocr_suspect_row": true
     },
     {
@@ -1637,13 +1638,22 @@
   "lookup_grid_count": 18,
   "grid_refusals": [],
   "ocr_suspect_token_count": 3,
-  "identity_disagreements": [
-    "gef_identity |gef-(S-1000H/T)|=72089.3767 at T=1200.0"
-  ],
+  "identity_disagreements": [],
   "ambiguities": [
     "gef_identity |gef-(S-1000H/T)|=72089.3767 at T=1200.0"
   ],
   "corrections": [
+    {
+      "correction_id": "b1259-p132-entropy-11",
+      "pdf_page": 132,
+      "field": "entropy",
+      "layout_as_extracted": "72162",
+      "printed_token": "72.62",
+      "evidence": "1200 | 10.324 | 72.62 | 64.02",
+      "record_id": "b1259-ht-0101-nitrogen-dioxide-ideal-gas",
+      "ocr_token": "72162",
+      "image_quote": "1200 | 10.324 | 72.62 | 64.02"
+    },
     {
       "correction_id": "b1259-p132-gibbs_function-14",
       "pdf_page": 132,

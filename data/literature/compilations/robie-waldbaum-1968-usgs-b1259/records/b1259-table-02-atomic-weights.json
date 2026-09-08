@@ -200,16 +200,20 @@
     },
     {
       "line_as_published": "Gold               Au         196.967     Owcrpri          _    0        15 9994",
-      "element_as_published": "Owcrpri _",
-      "symbol_as_published": "",
+      "element_as_published": "Oxygen",
+      "symbol_as_published": "O",
       "weight": {
-        "as_published": "9994",
-        "value": 9994.0,
-        "ocr_suspect": false,
+        "as_published": "15.9994",
+        "value": 15.9994,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_ocr_fragment"
+        ],
+        "layout_as_extracted": "9994",
+        "correction_id": "b1259-p10-atomic-oxygen"
       },
-      "ocr_suspect": false
+      "ocr_suspect": true
     },
     {
       "line_as_published": "Boron              B           10.811     Osmium                Os      1Qft 9",
@@ -265,29 +269,37 @@
     },
     {
       "line_as_published": "Beryllium     __   Be           Q 01 99 Protactinium       _    Pa",
-      "element_as_published": "Beryllium __ Be Q",
-      "symbol_as_published": "Q",
+      "element_as_published": "Beryllium",
+      "symbol_as_published": "Be",
       "weight": {
-        "as_published": "01",
-        "value": 1.0,
-        "ocr_suspect": false,
+        "as_published": "9.0122",
+        "value": 9.0122,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_ocr_fragment"
+        ],
+        "layout_as_extracted": "01",
+        "correction_id": "b1259-p10-atomic-beryllium"
       },
-      "ocr_suspect": false
+      "ocr_suspect": true
     },
     {
       "line_as_published": "Beryllium     __   Be           Q 01 99 Protactinium       _    Pa",
       "element_as_published": "Protactinium _ Pa",
       "symbol_as_published": "Pa",
       "weight": {
-        "as_published": "99",
-        "value": 99.0,
-        "ocr_suspect": false,
+        "as_published": "",
+        "value": null,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_blank_weight"
+        ],
+        "layout_as_extracted": "99",
+        "correction_id": "b1259-p10-atomic-protactinium-blank"
       },
-      "ocr_suspect": false
+      "ocr_suspect": true
     },
     {
       "line_as_published": "Bismuth            Bi         208.980   Lead               _    Pb      207.19",
@@ -1126,7 +1138,42 @@
   "units_as_published": "scale C12 = 12.0000 as printed",
   "identity_disagreements": [],
   "ambiguities": [
-    "9 atomic-weight tokens ocr_suspect; raw tokens retained uncorrected"
+    "12 atomic-weight tokens ocr_suspect; raw tokens retained uncorrected"
+  ],
+  "corrections": [
+    {
+      "correction_id": "b1259-p10-atomic-oxygen",
+      "record_id": "b1259-table-02-atomic-weights",
+      "pdf_page": 10,
+      "field": "weight",
+      "layout_as_extracted": "9994",
+      "ocr_token": "9994",
+      "printed_token": "15.9994",
+      "evidence": "PDF page 10 image visibly prints 'Oxygen O 15.9994'",
+      "image_quote": "Oxygen | O | 15.9994"
+    },
+    {
+      "correction_id": "b1259-p10-atomic-beryllium",
+      "record_id": "b1259-table-02-atomic-weights",
+      "pdf_page": 10,
+      "field": "weight",
+      "layout_as_extracted": "01",
+      "ocr_token": "01",
+      "printed_token": "9.0122",
+      "evidence": "PDF page 10 image visibly prints 'Beryllium Be 9.0122'",
+      "image_quote": "Beryllium | Be | 9.0122"
+    },
+    {
+      "correction_id": "b1259-p10-atomic-protactinium-blank",
+      "record_id": "b1259-table-02-atomic-weights",
+      "pdf_page": 10,
+      "field": "weight",
+      "layout_as_extracted": "99",
+      "ocr_token": "99",
+      "printed_token": "",
+      "evidence": "PDF page 10 image leaves the Protactinium weight blank",
+      "image_quote": "Protactinium | Pa | [blank]"
+    }
   ],
   "record_id": "b1259-table-02-atomic-weights",
   "source": {

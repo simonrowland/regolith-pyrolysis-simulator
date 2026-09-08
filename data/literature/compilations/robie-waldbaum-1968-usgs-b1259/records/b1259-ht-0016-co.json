@@ -536,11 +536,15 @@
         ]
       },
       "H_minus_H298": {
-        "as_published": "2.608",
-        "value": 2.608,
-        "ocr_suspect": false,
+        "as_published": "2.808",
+        "value": 2.808,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "2.608",
+        "correction_id": "b1259-p47-H_minus_H298-07"
       },
       "entropy": {
         "as_published": "12.970",
@@ -577,9 +581,6 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "gef_identity |gef-(S-1000H/T)|=0.2813 at T=700.0"
-      ],
       "ocr_suspect_row": true
     },
     {
@@ -1931,9 +1932,7 @@
   "lookup_grid_count": 22,
   "grid_refusals": [],
   "ocr_suspect_token_count": 1,
-  "identity_disagreements": [
-    "gef_identity |gef-(S-1000H/T)|=0.2813 at T=700.0"
-  ],
+  "identity_disagreements": [],
   "ambiguities": [
     "gef_identity |gef-(S-1000H/T)|=0.2813 at T=700.0",
     "name_header_absent_or_truncated_in_ocr; not inferred from neighbors"
@@ -1946,6 +1945,17 @@
       "layout_as_extracted": "298U5",
       "printed_token": "298.15",
       "evidence": "PDF page 47 image visibly prints '298.15 0.000 7.180 7.180 0.000 0.000 0.000'"
+    },
+    {
+      "correction_id": "b1259-p47-H_minus_H298-07",
+      "pdf_page": 47,
+      "field": "H_minus_H298",
+      "layout_as_extracted": "2.608",
+      "printed_token": "2.808",
+      "evidence": "700 | 2.808 | 12.970 | 8.963",
+      "record_id": "b1259-ht-0016-co",
+      "ocr_token": "2.608",
+      "image_quote": "700 | 2.808 | 12.970 | 8.963"
     }
   ],
   "record_id": "b1259-ht-0016-co",

@@ -1517,11 +1517,15 @@
         "ocr_reasons": []
       },
       "gibbs_function": {
-        "as_published": "68.86",
-        "value": 68.86,
-        "ocr_suspect": false,
+        "as_published": "88.86",
+        "value": 88.86,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "68.86",
+        "correction_id": "b1259-p139-gibbs_function-18"
       },
       "delta_f_H": {
         "as_published": "-168.549",
@@ -1544,9 +1548,6 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "gef_identity |gef-(S-1000H/T)|=19.9995 at T=1900.0"
-      ],
       "ocr_suspect_row": true
     },
     {
@@ -1638,9 +1639,7 @@
   "lookup_grid_count": 18,
   "grid_refusals": [],
   "ocr_suspect_token_count": 5,
-  "identity_disagreements": [
-    "gef_identity |gef-(S-1000H/T)|=19.9995 at T=1900.0"
-  ],
+  "identity_disagreements": [],
   "ambiguities": [
     "gef_identity |gef-(S-1000H/T)|=19.9995 at T=1900.0"
   ],
@@ -1652,6 +1651,17 @@
       "layout_as_extracted": "1ROO",
       "printed_token": "1800",
       "evidence": "PDF page 139 image visibly prints '1800 61.550 121.19 86.99 -169.430 1.077 -0.131'"
+    },
+    {
+      "correction_id": "b1259-p139-gibbs_function-18",
+      "pdf_page": 139,
+      "field": "gibbs_function",
+      "layout_as_extracted": "68.86",
+      "printed_token": "88.86",
+      "evidence": "1900 | 66.273 | 123.74 | 88.86",
+      "record_id": "b1259-ht-0108-minium",
+      "ocr_token": "68.86",
+      "image_quote": "1900 | 66.273 | 123.74 | 88.86"
     }
   ],
   "record_id": "b1259-ht-0108-minium",

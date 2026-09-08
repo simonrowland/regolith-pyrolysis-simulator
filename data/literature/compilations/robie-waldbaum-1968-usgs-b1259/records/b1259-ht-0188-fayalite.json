@@ -735,11 +735,15 @@
         ]
       },
       "H_minus_H298": {
-        "as_published": "23.310",
-        "value": 23.31,
-        "ocr_suspect": false,
+        "as_published": "28.310",
+        "value": 28.31,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "23.310",
+        "correction_id": "b1259-p219-H_minus_H298-09"
       },
       "entropy": {
         "as_published": "82.78",
@@ -776,9 +780,6 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "gef_identity |gef-(S-1000H/T)|=5.0000 at T=1000.0"
-      ],
       "ocr_suspect_row": true
     },
     {
@@ -1824,9 +1825,7 @@
   "lookup_grid_count": 20,
   "grid_refusals": [],
   "ocr_suspect_token_count": 9,
-  "identity_disagreements": [
-    "gef_identity |gef-(S-1000H/T)|=5.0000 at T=1000.0"
-  ],
+  "identity_disagreements": [],
   "ambiguities": [
     "gef_identity |gef-(S-1000H/T)|=5.0000 at T=1000.0"
   ],
@@ -1854,6 +1853,17 @@
       "layout_as_extracted": "14CO",
       "printed_token": "1400",
       "evidence": "PDF page 219 image visibly prints '1400 47.190 98.62 64.91 -350.800 -244.268 38.132'"
+    },
+    {
+      "correction_id": "b1259-p219-H_minus_H298-09",
+      "pdf_page": 219,
+      "field": "H_minus_H298",
+      "layout_as_extracted": "23.310",
+      "printed_token": "28.310",
+      "evidence": "1000 | 28.310 | 82.78 | 54.47",
+      "record_id": "b1259-ht-0188-fayalite",
+      "ocr_token": "23.310",
+      "image_quote": "1000 | 28.310 | 82.78 | 54.47"
     }
   ],
   "record_id": "b1259-ht-0188-fayalite",

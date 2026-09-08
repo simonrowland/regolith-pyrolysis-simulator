@@ -932,11 +932,15 @@
         "ocr_reasons": []
       },
       "delta_f_H": {
-        "as_published": "-2897250",
-        "value": -2897250.0,
-        "ocr_suspect": false,
+        "as_published": "-289.250",
+        "value": -289.25,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "-2897250",
+        "correction_id": "b1259-p180-delta_f_H-11"
       },
       "delta_f_G": {
         "as_published": "-242.T78",
@@ -1994,6 +1998,17 @@
       "layout_as_extracted": "SCO",
       "printed_token": "800",
       "evidence": "PDF page 180 image visibly prints '800 9.280 34.47 22.87 -288.820 -257.642 70.384'"
+    },
+    {
+      "correction_id": "b1259-p180-delta_f_H-11",
+      "pdf_page": 180,
+      "field": "delta_f_H",
+      "layout_as_extracted": "-2897250",
+      "printed_token": "-289.250",
+      "evidence": "1200 | 17.850 | 43.10 | 28.22 | -289.250",
+      "record_id": "b1259-ht-0149-fluorite",
+      "ocr_token": "-2897250",
+      "image_quote": "1200 | 17.850 | 43.10 | 28.22 | -289.250"
     },
     {
       "correction_id": "b1259-p180-entropy-15",

@@ -771,11 +771,15 @@
         ]
       },
       "log_Kf": {
-        "as_published": "557905",
-        "value": 557905.0,
-        "ocr_suspect": false,
+        "as_published": "66.905",
+        "value": 66.905,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "557905",
+        "correction_id": "b1259-p167-log_Kf-09"
       }
     },
     {
@@ -1643,6 +1647,19 @@
   "ocr_suspect_token_count": 7,
   "identity_disagreements": [],
   "ambiguities": [],
+  "corrections": [
+    {
+      "correction_id": "b1259-p167-log_Kf-09",
+      "pdf_page": 167,
+      "field": "log_Kf",
+      "layout_as_extracted": "557905",
+      "printed_token": "66.905",
+      "evidence": "1000 | -376.086 | -306.130 | 66.905",
+      "record_id": "b1259-ht-0136-geikelite",
+      "ocr_token": "557905",
+      "image_quote": "1000 | -376.086 | -306.130 | 66.905"
+    }
+  ],
   "record_id": "b1259-ht-0136-geikelite",
   "source": {
     "database": "USGS Bulletin 1259, Robie & Waldbaum 1968",

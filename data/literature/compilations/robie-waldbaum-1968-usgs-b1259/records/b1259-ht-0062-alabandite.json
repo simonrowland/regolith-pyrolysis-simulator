@@ -231,11 +231,15 @@
         ]
       },
       "H_minus_H298": {
-        "as_published": "220",
-        "value": 220.0,
-        "ocr_suspect": false,
+        "as_published": "1.220",
+        "value": 1.22,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "220",
+        "correction_id": "b1259-p93-H_minus_H298-03"
       },
       "entropy": {
         "as_published": "22.21",
@@ -272,9 +276,6 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "gef_identity |gef-(S-1000H/T)|=546.9500 at T=400.0"
-      ],
       "ocr_suspect_row": true
     },
     {
@@ -319,11 +320,15 @@
         ]
       },
       "H_minus_H298": {
-        "as_published": "440",
-        "value": 440.0,
-        "ocr_suspect": false,
+        "as_published": "2.440",
+        "value": 2.44,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "440",
+        "correction_id": "b1259-p93-H_minus_H298-04"
       },
       "entropy": {
         "as_published": "24.93",
@@ -406,11 +411,15 @@
         ]
       },
       "H_minus_H298": {
-        "as_published": "690",
-        "value": 690.0,
-        "ocr_suspect": false,
+        "as_published": "3.690",
+        "value": 3.69,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "690",
+        "correction_id": "b1259-p93-H_minus_H298-05"
       },
       "entropy": {
         "as_published": "27.21",
@@ -493,11 +502,15 @@
         ]
       },
       "H_minus_H298": {
-        "as_published": "970",
-        "value": 970.0,
-        "ocr_suspect": false,
+        "as_published": "4.970",
+        "value": 4.97,
+        "ocr_suspect": true,
         "footnote_markers": [],
-        "ocr_reasons": []
+        "ocr_reasons": [
+          "image_verified_correction"
+        ],
+        "layout_as_extracted": "970",
+        "correction_id": "b1259-p93-H_minus_H298-06"
       },
       "entropy": {
         "as_published": "29.18",
@@ -534,9 +547,6 @@
         "footnote_markers": [],
         "ocr_reasons": []
       },
-      "identity_disagreements": [
-        "gef_identity |gef-(S-1000H/T)|=1378.6143 at T=700.0"
-      ],
       "ocr_suspect_row": true
     },
     {
@@ -1815,9 +1825,7 @@
   "grid_refusals": [],
   "ocr_suspect_token_count": 6,
   "identity_disagreements": [
-    "logKf_identity |logK+1000 dG/(RT ln10)|=76.4403 at T=298.15",
-    "gef_identity |gef-(S-1000H/T)|=546.9500 at T=400.0",
-    "gef_identity |gef-(S-1000H/T)|=1378.6143 at T=700.0"
+    "logKf_identity |logK+1000 dG/(RT ln10)|=76.4403 at T=298.15"
   ],
   "ambiguities": [
     "logKf_identity |logK+1000 dG/(RT ln10)|=76.4403 at T=298.15",
@@ -1832,6 +1840,50 @@
       "layout_as_extracted": "18CO",
       "printed_token": "1800",
       "evidence": "PDF page 93 image visibly prints '1800 19.970 41.89 30.80 -71.707 -36.936 4.485'"
+    },
+    {
+      "correction_id": "b1259-p93-H_minus_H298-03",
+      "pdf_page": 93,
+      "field": "H_minus_H298",
+      "layout_as_extracted": "220",
+      "printed_token": "1.220",
+      "evidence": "400 | 1.220 | 22.21 | 19.16",
+      "record_id": "b1259-ht-0062-alabandite",
+      "ocr_token": "220",
+      "image_quote": "400 | 1.220 | 22.21 | 19.16"
+    },
+    {
+      "correction_id": "b1259-p93-H_minus_H298-04",
+      "pdf_page": 93,
+      "field": "H_minus_H298",
+      "layout_as_extracted": "440",
+      "printed_token": "2.440",
+      "evidence": "500 | 2.440 | 24.93 | 20.05",
+      "record_id": "b1259-ht-0062-alabandite",
+      "ocr_token": "440",
+      "image_quote": "500 | 2.440 | 24.93 | 20.05"
+    },
+    {
+      "correction_id": "b1259-p93-H_minus_H298-05",
+      "pdf_page": 93,
+      "field": "H_minus_H298",
+      "layout_as_extracted": "690",
+      "printed_token": "3.690",
+      "evidence": "600 | 3.690 | 27.21 | 21.06",
+      "record_id": "b1259-ht-0062-alabandite",
+      "ocr_token": "690",
+      "image_quote": "600 | 3.690 | 27.21 | 21.06"
+    },
+    {
+      "correction_id": "b1259-p93-H_minus_H298-06",
+      "pdf_page": 93,
+      "field": "H_minus_H298",
+      "layout_as_extracted": "970",
+      "printed_token": "4.970",
+      "evidence": "700 | 4.970 | 29.18 | 22.08",
+      "record_id": "b1259-ht-0062-alabandite",
+      "ocr_token": "970",
+      "image_quote": "700 | 4.970 | 29.18 | 22.08"
     }
   ],
   "record_id": "b1259-ht-0062-alabandite",
