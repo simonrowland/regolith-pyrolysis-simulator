@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0040",
   "table_number": 6,
-  "substance_as_published": "$Sb_2O_4(g)$",
-  "formula_as_published": "$Sb_2O_4(g)$",
-  "formula": "$Sb_2O_4(g)$",
-  "name_as_published": "Sb_2O_4(g)",
+  "substance_as_published": "Sb4O6(g)",
+  "formula_as_published": "Sb4O6(g)",
+  "formula": "Sb4O6(g)",
+  "name_as_published": "Sb4O6(g)",
   "phase_as_published": "(g)",
   "state_as_published": "(g)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 102,
   "pdf_page": 106,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 6,
       "raw": [
-        "$Sb_2O_4(g)$",
+        "Sb4O6(g)",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$Sb_2O_4(g)$"
+          "raw": "Sb4O6(g)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -298,7 +300,21 @@
     "sha256": "cd495af2074f113694f3f4cf926ac0c02d4db3616105f24a9591a83685c02fc7"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 106,
+      "page": 102,
+      "source_row_index": 6,
+      "column": "substance",
+      "ocr_token": "$Sb_2O_4(g)$",
+      "printed_token": "Sb4O6(g)",
+      "quote": "Sb₄O₆(g)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0040"
+    }
+  ],
   "heading_context_as_published": "Antimony:",
+  "metadata_ocr_token": "$Sb_2O_4(g)$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

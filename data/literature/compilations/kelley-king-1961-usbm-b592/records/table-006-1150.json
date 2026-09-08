@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-1150",
   "table_number": 6,
-  "substance_as_published": "$Ta_2O_3(c)$",
-  "formula_as_published": "$Ta_2O_3(c)$",
-  "formula": "$Ta_2O_3(c)$",
-  "name_as_published": "Ta_2O_3(c)",
+  "substance_as_published": "Ta2O5(c)",
+  "formula_as_published": "Ta2O5(c)",
+  "formula": "Ta2O5(c)",
+  "name_as_published": "Ta2O5(c)",
   "phase_as_published": "(c)",
   "state_as_published": "(c)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 115,
   "pdf_page": 119,
   "caption_raw": "TABLE 6.—Low temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 48,
       "raw": [
-        "$Ta_2O_3(c)$",
+        "Ta2O5(c)",
         "(.09)",
         "(1.21)",
         "5.29",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$Ta_2O_3(c)$"
+          "raw": "Ta2O5(c)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "(.09)",
@@ -334,7 +336,21 @@
     "sha256": "0c315ca84ef7e4059f40413c3e03fa23d19e9610ce910248769903707c7d7023"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 119,
+      "page": 115,
+      "source_row_index": 48,
+      "column": "substance",
+      "ocr_token": "$Ta_2O_3(c)$",
+      "printed_token": "Ta2O5(c)",
+      "quote": "Ta₂O₅(c)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-1150"
+    }
+  ],
   "heading_context_as_published": "Tantalum:",
+  "metadata_ocr_token": "$Ta_2O_3(c)$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

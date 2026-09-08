@@ -4,12 +4,12 @@
   "substance_as_published": "$\\mathrm{CdSO}_{4}\\cdot8/3\\mathrm{H}_{2}\\mathrm{O}(c)$",
   "formula_as_published": "$\\mathrm{CdSO}_{4}\\cdot8/3\\mathrm{H}_{2}\\mathrm{O}(c)$",
   "formula": "$\\mathrm{CdSO}_{4}\\cdot8/3\\mathrm{H}_{2}\\mathrm{O}(c)$",
-  "name_as_published": "CdSO_48/3H_2O(c)",
+  "name_as_published": "CdSO_4·8/3H_2O(c)",
   "phase_as_published": "(c)",
   "state_as_published": "(c)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 103,
   "pdf_page": 107,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$\\mathrm{CdSO}_{4}\\cdot8/3\\mathrm{H}_{2}\\mathrm{O}(c)$"
+          "raw": "$\\mathrm{CdSO}_{4}\\cdot8/3\\mathrm{H}_{2}\\mathrm{O}(c)$",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "(.23)",
@@ -334,7 +336,21 @@
     "sha256": "dd35b86c09bb097d1ff11ae330c92fbfe03e8dea19906a9be43594576b1cecaa"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 107,
+      "page": 103,
+      "source_row_index": 63,
+      "column": "substance",
+      "ocr_token": "$\\mathrm{CdSO}_{4}\\cdot8/3\\mathrm{H}_{2}\\mathrm{O}(c)$",
+      "printed_token": "$\\mathrm{CdSO}_{4}\\cdot8/3\\mathrm{H}_{2}\\mathrm{O}(c)$",
+      "quote": "CdSO₄·8/3H₂O(c)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0178"
+    }
+  ],
   "heading_context_as_published": "Cadmium:",
+  "metadata_ocr_token": "$\\mathrm{CdSO}_{4}\\cdot8/3\\mathrm{H}_{2}\\mathrm{O}(c)$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

@@ -23,7 +23,9 @@ source_files:
 - path: source/sidecar.yaml
   sha256: 3d7e02a68187991aeabb949140ed6aa1259ec2444a8d85c1695ce51b0073650b
 - path: source/image-verified-fixture.json
-  sha256: 3dc5b47640c76f195d165fba1bd474e870371bd51d9080f36ea2ba3c01641706
+  sha256: 48b0fcf97aefdd83d2481a364588c93aaded8121ef0b882d08f13c6a45e27d9d
+- path: source/formula-audit.jsonl
+  sha256: 48bd17bb27dda6933e52dc297417efff7ba94e891de99e904e9a34e817735c02
 census:
   basis: Bulletin's own TABLES list (PDF page 7) and all 25 physical table blocks
   numbered_table_count: 7
@@ -1561,10 +1563,10 @@ summary:
   temperature_grid_token_count: 9416
   row_numeric_ocr_suspect_count: 4781
   temperature_grid_ocr_suspect_count: 1002
-  metadata_ocr_suspect_count: 1194
-  ocr_suspect_count: 6977
+  metadata_ocr_suspect_count: 1202
+  ocr_suspect_count: 6985
   identity_check_disagreement_count: 8
-  correction_count: 104
+  correction_count: 308
 ocr_policy:
   primary: MinerU table HTML from five page-aligned chunks
   second_reading: Tesseract on every MinerU table crop; exact token sequence agreement required for a clean numeric cell
@@ -1703,6 +1705,16 @@ corrections:
   printed_token: 15.0±1.0
   quote: 'Actinium: / Ac(c) ... 15.0±1.0'
   basis: MinerU table crop inspected at original resolution; value is printed on the Ac(c) row.
+- record_id: table-006-0010
+  kind: image_verified_metadata_token_correction
+  pdf_page: 105
+  page: 101
+  source_row_index: 13
+  column: substance
+  ocr_token: AlF5(c)
+  printed_token: AlF3(c)
+  quote: AlF₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0036
   kind: image_verified_section_continuation_header_reclassification
   pdf_page: 106
@@ -1713,6 +1725,26 @@ corrections:
   printed_token: Antimony—Con.
   quote: Antimony—Con.
   basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0040
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 6
+  column: substance
+  ocr_token: $Sb_2O_4(g)$
+  printed_token: Sb4O6(g)
+  quote: Sb₄O₆(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0044
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 10
+  column: substance
+  ocr_token: $Sb_3S_5(c)$
+  printed_token: Sb2S3(c)
+  quote: Sb₂S₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0049
   kind: image_verified_metadata_token_correction
   pdf_page: 106
@@ -1721,7 +1753,17 @@ corrections:
   column: substance
   ocr_token: $As_1(g)$
   printed_token: $As_4(g)$
-  quote: As4(g) ... 57.2±0.3
+  quote: As₄(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0051
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 19
+  column: substance
+  ocr_token: $AsCl_5(l)$
+  printed_token: AsCl3(l)
+  quote: AsCl₃(l)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0052
   kind: image_verified_metadata_token_correction
@@ -1731,7 +1773,7 @@ corrections:
   column: substance
   ocr_token: $AsF_1(g)$
   printed_token: $AsF_3(g)$
-  quote: AsF3(g) ... 69.08±0.10
+  quote: AsF₃(g)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0053
   kind: image_verified_metadata_token_correction
@@ -1741,7 +1783,87 @@ corrections:
   column: substance
   ocr_token: $AsF_1(l) \dagger$
   printed_token: $AsF_3(l) \dagger$
-  quote: AsF3(l)† ... 43.3±0.1
+  quote: AsF₃(l)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0054
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 22
+  column: substance
+  ocr_token: $AsH_2(g) \dagger^*$
+  printed_token: AsH3(g)†*
+  quote: AsH₃(g)†*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0059
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 27
+  column: substance
+  ocr_token: $As_2O_5(g)$
+  printed_token: As4O6(g)
+  quote: As₄O₆(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0060
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 28
+  column: substance
+  ocr_token: $As_2O_3(c)$
+  printed_token: As2O5(c)
+  quote: As₂O₅(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0062
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 30
+  column: substance
+  ocr_token: $H_3AsO_3(aq)$
+  printed_token: H2AsO2(aq)
+  quote: H₂AsO₂(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0065
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 33
+  column: substance
+  ocr_token: $H_3AsO_4^{*}(aq)$
+  printed_token: H2AsO4-(aq)
+  quote: H₂AsO₄⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0066
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 34
+  column: substance
+  ocr_token: $HAsO_4^{*}-(aq)$
+  printed_token: HAsO4--(aq)
+  quote: HAsO₄⁻⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0067
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 35
+  column: substance
+  ocr_token: $AsO_4^{*}-(aq)$
+  printed_token: AsO4---(aq)
+  quote: AsO₄⁻⁻⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0068
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 37
+  column: substance
+  ocr_token: $At_3(c)$
+  printed_token: At2(c)
+  quote: At₂(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0070
   kind: image_verified_merged_row_split
@@ -1813,6 +1935,26 @@ corrections:
   printed_token: 40.67±0.01
   quote: $Ba(g)$ ... 40.67±0.01
   basis: Original-resolution page image proves two printed substance rows were merged into one MinerU row.
+- record_id: table-006-0074
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 43
+  column: substance
+  ocr_token: $Ba(BrO_3)_2H_2O(c)$
+  printed_token: Ba(BrO3)2·H2O(c)
+  quote: Ba(BrO₃)₂·H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0077
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 46
+  column: substance
+  ocr_token: $BaCl_2-2H_2O(c)$
+  printed_token: BaCl2·2H2O(c)
+  quote: BaCl₂·2H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0089
   kind: image_verified_wrapped_substance_reconstruction
   pdf_page: 106
@@ -1833,6 +1975,26 @@ corrections:
   printed_token: TiO3(c)
   quote: Ba0.543Sr0.457TiO3(c)
   basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0107
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 78
+  column: substance
+  ocr_token: $BiCl_4(c)$
+  printed_token: BiCl3(c)
+  quote: BiCl₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0112
+  kind: image_verified_metadata_token_correction
+  pdf_page: 106
+  page: 102
+  source_row_index: 83
+  column: substance
+  ocr_token: $Bi(g)$
+  printed_token: BiI(g)
+  quote: BiI(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0119
   kind: image_verified_section_continuation_header_reclassification
   pdf_page: 107
@@ -1853,6 +2015,156 @@ corrections:
   printed_token: $\mathrm{B}_{2}\mathrm{H}_{6}(g)\dagger$
   quote: $\mathrm{B}_{2}\mathrm{H}_{6}(g)\dagger$ ... $\mathrm{B}_{2}\mathrm{H}_{6}(g)\dagger$
   basis: Original-resolution page image proves the printed token.
+- record_id: table-006-0131
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 14
+  column: substance
+  ocr_token: $\mathrm{B}_{4}\mathrm{H}_{5}(l)\dagger$
+  printed_token: B5H9(l)†
+  quote: B₅H₉(l)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0132
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 15
+  column: substance
+  ocr_token: $\mathrm{B}_{5}\mathrm{H}_{5}(g)$
+  printed_token: B5H9(g)
+  quote: B₅H₉(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0139
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 22
+  column: substance
+  ocr_token: $\mathrm{B}_{3}\mathrm{N}_{3}\mathrm{H}_{5}(g)$
+  printed_token: B3N3H6(g)
+  quote: B₃N₃H₆(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0140
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 23
+  column: substance
+  ocr_token: $\mathrm{B}_{2}\mathrm{O}_{2}(c)$
+  printed_token: B2O3(c)
+  quote: B₂O₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0141
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 24
+  column: substance
+  ocr_token: $\mathrm{B}_{2}\mathrm{O}_{2}(g)$
+  printed_token: B2O3(g)
+  quote: B₂O₃(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0148
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 32
+  column: substance
+  ocr_token: $\mathrm{Br}^{+}(aq)$
+  printed_token: Br-(aq)
+  quote: Br⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0153
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 37
+  column: substance
+  ocr_token: $\mathrm{BrF}_{3}(g)$
+  printed_token: BrF5(g)
+  quote: BrF₅(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0175
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 60
+  column: substance
+  ocr_token: $\mathrm{CdSO}_{3}(c)$
+  printed_token: CdSiO3(c)
+  quote: CdSiO₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0177
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 62
+  column: substance
+  ocr_token: $\mathrm{CdSO}_{4}\cdot\mathrm{H}_{2}\mathrm{O}(c)$
+  printed_token: $\mathrm{CdSO}_{4}\cdot\mathrm{H}_{2}\mathrm{O}(c)$
+  quote: CdSO₄·H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0178
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 63
+  column: substance
+  ocr_token: $\mathrm{CdSO}_{4}\cdot8/3\mathrm{H}_{2}\mathrm{O}(c)$
+  printed_token: $\mathrm{CdSO}_{4}\cdot8/3\mathrm{H}_{2}\mathrm{O}(c)$
+  quote: CdSO₄·8/3H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0191
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 77
+  column: substance
+  ocr_token: $\mathrm{Ca}_{3}\mathrm{B}_{2}\mathrm{O}_{5}(c)$
+  printed_token: Ca2B2O5(c)
+  quote: Ca₂B₂O₅(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0192
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 78
+  column: substance
+  ocr_token: $\mathrm{Ca}_{3}\mathrm{B}_{2}\mathrm{O}_{5}(c)$
+  printed_token: Ca3B2O6(c)
+  quote: Ca₃B₂O₆(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0193
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 79
+  column: substance
+  ocr_token: $\mathrm{CaBr}_{3}(c)$
+  printed_token: CaBr2(c)
+  quote: CaBr₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0195
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 81
+  column: substance
+  ocr_token: $\mathrm{CaCl}_{3}(c)$
+  printed_token: CaC2(c)
+  quote: CaC₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0196
+  kind: image_verified_metadata_token_correction
+  pdf_page: 107
+  page: 103
+  source_row_index: 82
+  column: substance
+  ocr_token: $\mathrm{CaCl}_{3}$ (calcite)
+  printed_token: CaCO3(calcite)
+  quote: CaCO₃(calcite)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0203
   kind: image_verified_section_continuation_header_reclassification
   pdf_page: 108
@@ -1871,7 +2183,7 @@ corrections:
   column: substance
   ocr_token: Ca2O4·H2O(c)
   printed_token: CaC2O4·H2O(c)
-  quote: CaC2O4·H2O(c)
+  quote: CaC₂O₄·H₂O(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0217
   kind: image_verified_metadata_token_correction
@@ -1881,7 +2193,7 @@ corrections:
   column: substance
   ocr_token: CaP2O7(β)
   printed_token: Ca2P2O7(β)
-  quote: Ca2P2O7(β)
+  quote: Ca₂P₂O₇(β)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0218
   kind: image_verified_metadata_token_correction
@@ -1891,7 +2203,7 @@ corrections:
   column: substance
   ocr_token: CaP2O8(α)
   printed_token: Ca3P2O8(α)
-  quote: Ca3P2O8(α)
+  quote: Ca₃P₂O₈(α)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0219
   kind: image_verified_metadata_token_correction
@@ -1901,7 +2213,7 @@ corrections:
   column: substance
   ocr_token: CaP2O8(β)
   printed_token: Ca3P2O8(β)
-  quote: Ca3P2O8(β)
+  quote: Ca₃P₂O₈(β)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0221
   kind: image_verified_metadata_token_correction
@@ -1911,7 +2223,7 @@ corrections:
   column: substance
   ocr_token: Ca10(PO4)5P2(c)
   printed_token: Ca10(PO4)6F2(c)
-  quote: Ca10(PO4)6F2(c)
+  quote: Ca₁₀(PO₄)₆F₂(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0222
   kind: image_verified_metadata_token_correction
@@ -1921,7 +2233,7 @@ corrections:
   column: substance
   ocr_token: Ca10(PO4)5(OH)2(c)
   printed_token: Ca10(PO4)6(OH)2(c)
-  quote: Ca10(PO4)6(OH)2(c)
+  quote: Ca₁₀(PO₄)₆(OH)₂(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0225
   kind: image_verified_metadata_token_correction
@@ -1931,7 +2243,7 @@ corrections:
   column: substance
   ocr_token: CaSiO4(β)
   printed_token: Ca2SiO4(β)
-  quote: Ca2SiO4(β)
+  quote: Ca₂SiO₄(β)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0226
   kind: image_verified_metadata_token_correction
@@ -1941,7 +2253,7 @@ corrections:
   column: substance
   ocr_token: CaSiO4(γ)
   printed_token: Ca2SiO4(γ)
-  quote: Ca2SiO4(γ)
+  quote: Ca₂SiO₄(γ)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0227
   kind: image_verified_metadata_token_correction
@@ -1951,7 +2263,7 @@ corrections:
   column: substance
   ocr_token: CaSiO5(c)
   printed_token: Ca3SiO5(c)
-  quote: Ca3SiO5(c)
+  quote: Ca₃SiO₅(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0228
   kind: image_verified_metadata_token_correction
@@ -1961,7 +2273,7 @@ corrections:
   column: substance
   ocr_token: CaSiO2(γ)
   printed_token: Ca3Si2O7(c)
-  quote: Ca3Si2O7(c)
+  quote: Ca₃Si₂O₇(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0229
   kind: image_verified_metadata_token_correction
@@ -1971,7 +2283,7 @@ corrections:
   column: substance
   ocr_token: CaSiO4(insol.)
   printed_token: CaSO4(insol.)
-  quote: CaSO4(insol.)
+  quote: CaSO₄(insol.)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0230
   kind: image_verified_metadata_token_correction
@@ -1981,7 +2293,7 @@ corrections:
   column: substance
   ocr_token: CaSiO4(sol.α)
   printed_token: CaSO4(sol.α)
-  quote: CaSO4(sol.α)
+  quote: CaSO₄(sol.α)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0231
   kind: image_verified_metadata_token_correction
@@ -1991,7 +2303,7 @@ corrections:
   column: substance
   ocr_token: CaSiO4(sol.β)
   printed_token: CaSO4(sol.β)
-  quote: CaSO4(sol.β)
+  quote: CaSO₄(sol.β)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0232
   kind: image_verified_metadata_token_correction
@@ -2001,7 +2313,7 @@ corrections:
   column: substance
   ocr_token: CaSiO4/12H2O(α)
   printed_token: CaSO4·1/2H2O(α)
-  quote: CaSO4·1/2H2O(α)
+  quote: CaSO₄·1/2H₂O(α)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0233
   kind: image_verified_metadata_token_correction
@@ -2011,7 +2323,7 @@ corrections:
   column: substance
   ocr_token: CaSiO4/12H2O(β)
   printed_token: CaSO4·1/2H2O(β)
-  quote: CaSO4·1/2H2O(β)
+  quote: CaSO₄·1/2H₂O(β)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0234
   kind: image_verified_metadata_token_correction
@@ -2021,7 +2333,7 @@ corrections:
   column: substance
   ocr_token: CaSiO4·2H2O(selenite)
   printed_token: CaSO4·2H2O(selenite)
-  quote: CaSO4·2H2O(selenite)
+  quote: CaSO₄·2H₂O(selenite)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0236
   kind: image_verified_metadata_token_correction
@@ -2031,7 +2343,7 @@ corrections:
   column: substance
   ocr_token: CaSiO3(c)
   printed_token: CaSO3(c)
-  quote: CaSO3(c)
+  quote: CaSO₃(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0238
   kind: image_verified_metadata_token_correction
@@ -2041,7 +2353,17 @@ corrections:
   column: substance
   ocr_token: CaTiO3(γ)(c)
   printed_token: Ca3Ti2O7(c)
-  quote: Ca3Ti2O7(c)
+  quote: Ca₃Ti₂O₇(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0266
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 66
+  column: substance
+  ocr_token: COBr3(g)
+  printed_token: COBr2(g)
+  quote: COBr₂(g)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0267
   kind: image_verified_token_correction
@@ -2063,6 +2385,86 @@ corrections:
   printed_token: C2N2(g)†
   quote: C2N2(g)† ... C2N2(g)†
   basis: Original-resolution page image proves the printed token.
+- record_id: table-006-0274
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 74
+  column: substance
+  ocr_token: CN(aq)
+  printed_token: CN-(aq)
+  quote: CN⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0275
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 75
+  column: substance
+  ocr_token: ONBr(g)
+  printed_token: CNBr(g)
+  quote: CNBr(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0281
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 81
+  column: substance
+  ocr_token: HCO3(aq)
+  printed_token: HCO3-(aq)
+  quote: HCO₃⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0282
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 82
+  column: substance
+  ocr_token: CO3(aq)
+  printed_token: CO3--(aq)
+  quote: CO₃⁻⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0283
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 83
+  column: substance
+  ocr_token: CNO(aq)
+  printed_token: CNO-(aq)
+  quote: CNO⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0284
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 84
+  column: substance
+  ocr_token: C2O4(aq)
+  printed_token: C2O4--(aq)
+  quote: C₂O₄⁻⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0290
+  kind: image_verified_metadata_token_correction
+  pdf_page: 109
+  page: 105
+  source_row_index: 8
+  column: substance
+  ocr_token: Ce2S(c)
+  printed_token: Ce2S3(c)
+  quote: Ce₂S₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0295
+  kind: image_verified_metadata_token_correction
+  pdf_page: 109
+  page: 105
+  source_row_index: 14
+  column: substance
+  ocr_token: CsAl(SO4)2-12H2O(c)
+  printed_token: CsAl(SO4)2·12H2O(c)
+  quote: CsAl(SO₄)₂·12H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0300
   kind: image_verified_metadata_token_correction
   pdf_page: 109
@@ -2071,7 +2473,97 @@ corrections:
   column: substance
   ocr_token: Cs1(g)
   printed_token: CsI(g)
-  quote: CsI(g) ... 65.5±0.5
+  quote: CsI(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0318
+  kind: image_verified_metadata_token_correction
+  pdf_page: 109
+  page: 105
+  source_row_index: 39
+  column: substance
+  ocr_token: Cr3C3(c)
+  printed_token: Cr7C3(c)
+  quote: Cr₇C₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0319
+  kind: image_verified_metadata_token_correction
+  pdf_page: 109
+  page: 105
+  source_row_index: 40
+  column: substance
+  ocr_token: Cr2C6(c)
+  printed_token: Cr23C6(c)
+  quote: Cr₂₃C₆(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0325
+  kind: image_verified_metadata_token_correction
+  pdf_page: 109
+  page: 105
+  source_row_index: 46
+  column: substance
+  ocr_token: CrO4-(aq)
+  printed_token: CrO4--(aq)
+  quote: CrO₄⁻⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0345
+  kind: image_verified_metadata_token_correction
+  pdf_page: 109
+  page: 105
+  source_row_index: 68
+  column: substance
+  ocr_token: Cu2.7Fe2.2O4(c)
+  printed_token: Cu0.75Fe2.25O4(c)
+  quote: Cu₀.₇₅Fe₂.₂₅O₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0356
+  kind: image_verified_metadata_token_correction
+  pdf_page: 109
+  page: 105
+  source_row_index: 79
+  column: substance
+  ocr_token: CuO-CuSO4(c)
+  printed_token: CuO·CuSO4(c)
+  quote: CuO·CuSO₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0357
+  kind: image_verified_metadata_token_correction
+  pdf_page: 109
+  page: 105
+  source_row_index: 80
+  column: substance
+  ocr_token: CuSO4-H2O(c)
+  printed_token: CuSO4·H2O(c)
+  quote: CuSO₄·H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0358
+  kind: image_verified_metadata_token_correction
+  pdf_page: 109
+  page: 105
+  source_row_index: 81
+  column: substance
+  ocr_token: CuSO4-3H2O(c)
+  printed_token: CuSO4·3H2O(c)
+  quote: CuSO₄·3H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0359
+  kind: image_verified_metadata_token_correction
+  pdf_page: 109
+  page: 105
+  source_row_index: 82
+  column: substance
+  ocr_token: CuSO4-5H2O(c)
+  printed_token: CuSO4·5H2O(c)
+  quote: CuSO₄·5H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0360
+  kind: image_verified_metadata_token_correction
+  pdf_page: 109
+  page: 105
+  source_row_index: 83
+  column: substance
+  ocr_token: CuS(c)
+  printed_token: Cu2S(c)
+  quote: Cu₂S(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0365
   kind: image_verified_metadata_token_correction
@@ -2081,7 +2573,7 @@ corrections:
   column: substance
   ocr_token: Eu2(SO4)·8H2O(c)
   printed_token: Eu2(SO4)3·8H2O(c)
-  quote: Eu2(SO4)3·8H2O(c)
+  quote: Eu₂(SO₄)₃·8H₂O(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0375
   kind: image_verified_metadata_token_correction
@@ -2091,7 +2583,17 @@ corrections:
   column: substance
   ocr_token: Gd2(SO4)·8H2O(c)*
   printed_token: Gd2(SO4)3·8H2O(c)*
-  quote: Gd2(SO4)3·8H2O(c)*
+  quote: Gd₂(SO₄)₃·8H₂O(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0378
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 21
+  column: substance
+  ocr_token: GaBr2(c)
+  printed_token: GaBr3(c)
+  quote: GaBr₃(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0380
   kind: image_verified_metadata_token_correction
@@ -2100,8 +2602,68 @@ corrections:
   source_row_index: 23
   column: substance
   ocr_token: Ga3C1(g)
-  printed_token: Ga3Cl(g)
-  quote: Ga3Cl(g) ... 71.4±1.5
+  printed_token: Ga2C2(g)
+  quote: Ga₂C₂(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0387
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 30
+  column: substance
+  ocr_token: Ga2O2(c)
+  printed_token: Ga2O3(c)
+  quote: Ga₂O₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0391
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 35
+  column: substance
+  ocr_token: GeBr2(g)
+  printed_token: GeBr4(g)
+  quote: GeBr₄(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0393
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 37
+  column: substance
+  ocr_token: GeCl3(g)
+  printed_token: GeCl4(g)
+  quote: GeCl₄(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0395
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 39
+  column: substance
+  ocr_token: GeF3(g)
+  printed_token: GeF4(g)
+  quote: GeF₄(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0414
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 60
+  column: substance
+  ocr_token: HfBr2(g)
+  printed_token: HfBr4(c)
+  quote: HfBr₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0415
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 61
+  column: substance
+  ocr_token: HfC(c)
+  printed_token: HfBr4(g)
+  quote: HfBr₄(g)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0416
   kind: image_verified_merged_row_split
@@ -2110,8 +2672,8 @@ corrections:
   source_row_index: 62
   column: substance
   ocr_token: HfCl3(c)
-  printed_token: HfCl3(c)
-  quote: HfCl3(c)
+  printed_token: HfC(c)
+  quote: HfC(c)
   basis: Original-resolution page image proves two printed substance rows were merged into one MinerU row.
 - record_id: table-006-0416
   kind: image_verified_merged_row_split
@@ -2121,7 +2683,7 @@ corrections:
   column: entropy_other_sources
   ocr_token: null
   printed_token: 10.9±0.3
-  quote: HfCl3(c) ... 10.9±0.3
+  quote: HfC(c) ... 10.9±0.3
   basis: Original-resolution page image proves two printed substance rows were merged into one MinerU row.
 - record_id: table-006-0416
   kind: image_verified_merged_row_split
@@ -2131,7 +2693,7 @@ corrections:
   column: entropy_recommended
   ocr_token: 10.9±0.3
   printed_token: 10.9±0.3
-  quote: HfCl3(c) ... 10.9±0.3
+  quote: HfC(c) ... 10.9±0.3
   basis: Original-resolution page image proves two printed substance rows were merged into one MinerU row.
 - record_id: table-006-0417
   kind: image_verified_merged_row_split
@@ -2233,6 +2795,76 @@ corrections:
   printed_token: 45.6±0.6
   quote: HfCl4(c) ... 45.6±0.6
   basis: Original-resolution page image proves two printed substance rows were merged into one MinerU row.
+- record_id: table-006-0418
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 63
+  column: substance
+  ocr_token: HfCl3(g)
+  printed_token: HfCl4(g)
+  quote: HfCl₄(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0419
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 64
+  column: substance
+  ocr_token: HfF3(c)
+  printed_token: HfF4(c)
+  quote: HfF₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0420
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 65
+  column: substance
+  ocr_token: HfF(g)
+  printed_token: HfF4(g)
+  quote: HfF₄(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0421
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 66
+  column: substance
+  ocr_token: HfI3(c)
+  printed_token: HfI4(c)
+  quote: HfI₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0422
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 67
+  column: substance
+  ocr_token: HfI(g)
+  printed_token: HfI4(g)
+  quote: HfI₄(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0436
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 84
+  column: substance
+  ocr_token: H+(ag)
+  printed_token: H+(aq)
+  quote: H⁺(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0437
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 85
+  column: substance
+  ocr_token: HN4(g)
+  printed_token: HN3(g)
+  quote: HN₃(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0441
   kind: image_verified_section_continuation_header_reclassification
   pdf_page: 111
@@ -2251,7 +2883,117 @@ corrections:
   column: substance
   ocr_token: DCIO(g)
   printed_token: DClO(g)
-  quote: DClO(g) ... 57.9±0.5
+  quote: DClO(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0455
+  kind: image_verified_metadata_token_correction
+  pdf_page: 111
+  page: 107
+  source_row_index: 16
+  column: substance
+  ocr_token: HNOS(g)
+  printed_token: HNCS(g)
+  quote: HNCS(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0459
+  kind: image_verified_metadata_token_correction
+  pdf_page: 111
+  page: 107
+  source_row_index: 20
+  column: substance
+  ocr_token: HF2(aq)
+  printed_token: HF2-(aq)
+  quote: HF₂⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0464
+  kind: image_verified_metadata_token_correction
+  pdf_page: 111
+  page: 107
+  source_row_index: 25
+  column: substance
+  ocr_token: HNO2(g)
+  printed_token: HNO3(g)
+  quote: HNO₃(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0465
+  kind: image_verified_metadata_token_correction
+  pdf_page: 111
+  page: 107
+  source_row_index: 26
+  column: substance
+  ocr_token: DNO2(g)
+  printed_token: DNO3(g)
+  quote: DNO₃(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0472
+  kind: image_verified_metadata_token_correction
+  pdf_page: 111
+  page: 107
+  source_row_index: 33
+  column: substance
+  ocr_token: HN2O2(aq)
+  printed_token: HN2O2-(aq)
+  quote: HN₂O₂⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0477
+  kind: image_verified_metadata_token_correction
+  pdf_page: 111
+  page: 107
+  source_row_index: 38
+  column: substance
+  ocr_token: TaO(g)
+  printed_token: T2O(g)
+  quote: T₂O(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0491
+  kind: image_verified_metadata_token_correction
+  pdf_page: 111
+  page: 107
+  source_row_index: 52
+  column: substance
+  ocr_token: H2PO4(aq)
+  printed_token: H2PO4-(aq)
+  quote: H₂PO₄⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0492
+  kind: image_verified_metadata_token_correction
+  pdf_page: 111
+  page: 107
+  source_row_index: 53
+  column: substance
+  ocr_token: HPO4(aq)
+  printed_token: HPO4--(aq)
+  quote: HPO₄⁻⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0505
+  kind: image_verified_metadata_token_correction
+  pdf_page: 111
+  page: 107
+  source_row_index: 66
+  column: substance
+  ocr_token: HSO3(aq)
+  printed_token: HSO3-(aq)
+  quote: HSO₃⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0506
+  kind: image_verified_metadata_token_correction
+  pdf_page: 111
+  page: 107
+  source_row_index: 67
+  column: substance
+  ocr_token: H2S2O3(aq)
+  printed_token: H2S2O8(aq)
+  quote: H₂S₂O₈(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0529
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 4
+  column: substance
+  ocr_token: $I_3(g)$
+  printed_token: I2(g)
+  quote: I₂(g)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0536
   kind: image_verified_metadata_token_correction
@@ -2261,7 +3003,7 @@ corrections:
   column: substance
   ocr_token: $IF_8(g)$
   printed_token: $IF_5(g)$
-  quote: IF5(g) ... 78.7±1.0
+  quote: IF₅(g)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0541
   kind: image_verified_metadata_token_correction
@@ -2271,7 +3013,57 @@ corrections:
   column: substance
   ocr_token: $IR_6(g)$
   printed_token: $IrF_6(g)$
-  quote: IrF6(g) ... 84.5±3.0
+  quote: IrF₆(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0545
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 22
+  column: substance
+  ocr_token: $Fe^{++}(aq)$
+  printed_token: Fe+++(aq)
+  quote: Fe⁺⁺⁺(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0550
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 27
+  column: substance
+  ocr_token: $Fe_2Br_5(g)$
+  printed_token: Fe2Br6(g)
+  quote: Fe₂Br₆(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0556
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 33
+  column: substance
+  ocr_token: $Fe_2Cl_5(g)$
+  printed_token: Fe2Cl6(g)
+  quote: Fe₂Cl₆(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0557
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 34
+  column: substance
+  ocr_token: $FeCO_2O_4(c)$
+  printed_token: FeCo2O4(c)
+  quote: FeCo₂O₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0560
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 37
+  column: substance
+  ocr_token: $Fe_{12}(c)$
+  printed_token: FeI2(c)
+  quote: FeI₂(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0562
   kind: image_verified_metadata_token_correction
@@ -2280,8 +3072,18 @@ corrections:
   source_row_index: 39
   column: substance
   ocr_token: $Fe_9.94O(c)*$
-  printed_token: Fe.947O(c)*
-  quote: Fe.947O(c)*
+  printed_token: Fe0.947O(c)*
+  quote: Fe₀.₉₄₇O(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0567
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 44
+  column: substance
+  ocr_token: $FeSO_4\cdot7H_2O(c)*$
+  printed_token: FeSO4·7H2O(c)*
+  quote: FeSO₄·7H₂O(c)*
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0569
   kind: image_verified_metadata_token_correction
@@ -2290,8 +3092,108 @@ corrections:
   source_row_index: 46
   column: substance
   ocr_token: $Fe_2.7S(c)*$
-  printed_token: Fe.877S(c)*
-  quote: Fe.877S(c)*
+  printed_token: Fe0.877S(c)*
+  quote: Fe₀.₈₇₇S(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0572
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 49
+  column: substance
+  ocr_token: $Fe_{11}Te(c)*$
+  printed_token: Fe1.11Te(c)*
+  quote: Fe₁.₁₁Te(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0574
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 51
+  column: substance
+  ocr_token: $Fe_3TiO_4(c)*$
+  printed_token: Fe2TiO4(c)*
+  quote: Fe₂TiO₄(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0575
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 52
+  column: substance
+  ocr_token: $Fe_3TiO_4(c)$
+  printed_token: Fe2TiO5(c)
+  quote: Fe₂TiO₅(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0585
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 65
+  column: substance
+  ocr_token: $Pb^{++}(ng)$
+  printed_token: Pb++(aq)
+  quote: Pb⁺⁺(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0588
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 68
+  column: substance
+  ocr_token: $PbCO_2(c)$
+  printed_token: PbCO3(c)
+  quote: PbCO₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0589
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 69
+  column: substance
+  ocr_token: $PbO\cdot PbCO_3(c)$
+  printed_token: PbO·PbCO3(c)
+  quote: PbO·PbCO₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0602
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 82
+  column: substance
+  ocr_token: $PbO_3(c)$
+  printed_token: Pb2O3(c)
+  quote: Pb₂O₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0603
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 83
+  column: substance
+  ocr_token: $PbO_4(c)$
+  printed_token: Pb3O4(c)
+  quote: Pb₃O₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0608
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 88
+  column: substance
+  ocr_token: $PbSiO_4(amorph.)$
+  printed_token: PbSiO3(amorph.)
+  quote: PbSiO₃(amorph.)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0609
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 89
+  column: substance
+  ocr_token: $Pb_3SiO_4(c)$
+  printed_token: Pb2SiO4(c)
+  quote: Pb₂SiO₄(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0610
   kind: image_verified_section_continuation_header_reclassification
@@ -2303,6 +3205,56 @@ corrections:
   printed_token: Lead—Con.
   quote: Lead—Con.
   basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0612
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 4
+  column: substance
+  ocr_token: $PbSO_4-PbO(c)$
+  printed_token: PbSO4·PbO(c)
+  quote: PbSO₄·PbO(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0613
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 5
+  column: substance
+  ocr_token: $PbSO_4-2PbO(c)$
+  printed_token: PbSO4·2PbO(c)
+  quote: PbSO₄·2PbO(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0614
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 6
+  column: substance
+  ocr_token: $PbSO_4-3PbO(c)$
+  printed_token: PbSO4·3PbO(c)
+  quote: PbSO₄·3PbO(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0631
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 24
+  column: substance
+  ocr_token: $LiFeO_3(c)$
+  printed_token: LiFeO2(c)
+  quote: LiFeO₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0638
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 31
+  column: substance
+  ocr_token: $LiOH-H_3O(c)$
+  printed_token: LiOH·H2O(c)
+  quote: LiOH·H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0646
   kind: image_verified_formula_continuation_prefix_reclassification
   pdf_page: 113
@@ -2363,6 +3315,46 @@ corrections:
   printed_token: Li0.05Zn0.90Fe2.05O4(c,quenched)
   quote: Li0.05Zn0.90Fe2.05O4(c,quenched)
   basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0667
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 62
+  column: substance
+  ocr_token: $MgCl_2-H_2O(c)$
+  printed_token: MgCl2·H2O(c)
+  quote: MgCl₂·H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0668
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 63
+  column: substance
+  ocr_token: $MgCl_2-H_2O(c)$
+  printed_token: MgCl2·2H2O(c)
+  quote: MgCl₂·2H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0669
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 64
+  column: substance
+  ocr_token: $MgCl_2-H_2O(c)$
+  printed_token: MgCl2·4H2O(c)
+  quote: MgCl₂·4H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0670
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 65
+  column: substance
+  ocr_token: $MgCl_2-6H_2O(c)*$
+  printed_token: MgCl2·6H2O(c)*
+  quote: MgCl₂·6H₂O(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0678
   kind: image_verified_metadata_token_correction
   pdf_page: 113
@@ -2371,7 +3363,7 @@ corrections:
   column: substance
   ocr_token: $Mg(OH_2(c)$
   printed_token: $Mg(OH)_2(c)$
-  quote: Mg(OH)2(c) ... 15.09±0.05
+  quote: Mg(OH)₂(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0682
   kind: image_verified_formula_continuation_prefix_reclassification
@@ -2393,6 +3385,216 @@ corrections:
   printed_token: Mg3La2(NO3)12·24H2O(c)*
   quote: Mg3La2(NO3)12·24H2O(c)*
   basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0687
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 82
+  column: substance
+  ocr_token: $MgSiO_4(c)$
+  printed_token: Mg2SiO4(c)
+  quote: Mg₂SiO₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0689
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 84
+  column: substance
+  ocr_token: $MgSO_4-H_2O(c)$
+  printed_token: MgSO4·H2O(c)
+  quote: MgSO₄·H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0690
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 85
+  column: substance
+  ocr_token: $MgSO_4-6H_2O(c)$
+  printed_token: MgSO4·6H2O(c)
+  quote: MgSO₄·6H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0703
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 11
+  column: substance
+  ocr_token: MnCl3(c)
+  printed_token: MnCl2(c)
+  quote: MnCl₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0705
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 13
+  column: substance
+  ocr_token: MnF3(c)*
+  printed_token: MnF2(c)*
+  quote: MnF₂(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0708
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 16
+  column: substance
+  ocr_token: MnI3(c)
+  printed_token: MnI2(c)
+  quote: MnI₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0712
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 20
+  column: substance
+  ocr_token: MnO3(c)*
+  printed_token: MnO2(c)*
+  quote: MnO₂(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0713
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 21
+  column: substance
+  ocr_token: Mn3O3(c)*
+  printed_token: Mn2O3(c)*
+  quote: Mn₂O₃(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0722
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 30
+  column: substance
+  ocr_token: MnS2O4·2H2O(c)
+  printed_token: MnS2O6·2H2O(c)
+  quote: MnS₂O₆·2H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0723
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 31
+  column: substance
+  ocr_token: MnS2O3(c)
+  printed_token: MnS2O6(c)
+  quote: MnS₂O₆(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0724
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 32
+  column: substance
+  ocr_token: MnS2O4·6H2O(c)
+  printed_token: MnS2O6·6H2O(c)
+  quote: MnS₂O₆·6H₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0725
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 34
+  column: substance
+  ocr_token: Hg(I)†
+  printed_token: Hg(l)†
+  quote: Hg(l)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0728
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 37
+  column: substance
+  ocr_token: Hg3+(aq)
+  printed_token: Hg2++(aq)
+  quote: Hg₂⁺⁺(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0731
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 40
+  column: substance
+  ocr_token: HgBr3(g)
+  printed_token: HgBr2(g)
+  quote: HgBr₂(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0735
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 44
+  column: substance
+  ocr_token: HgCl3(g)
+  printed_token: HgCl2(g)
+  quote: HgCl₂(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0740
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 49
+  column: substance
+  ocr_token: HgF3(g)
+  printed_token: HgF2(g)
+  quote: HgF₂(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0751
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 60
+  column: substance
+  ocr_token: HgSO4(c)
+  printed_token: Hg2SO4(c)
+  quote: Hg₂SO₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0757
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 67
+  column: substance
+  ocr_token: MoF6(I)
+  printed_token: MoF6(l)
+  quote: MoF₆(l)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0758
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 68
+  column: substance
+  ocr_token: MoO3(c)
+  printed_token: MoO2(c)
+  quote: MoO₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0770
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 83
+  column: substance
+  ocr_token: Ni(CO)4(I)†
+  printed_token: Ni(CO)4(l)†
+  quote: Ni(CO)₄(l)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0772
+  kind: image_verified_metadata_token_correction
+  pdf_page: 114
+  page: 110
+  source_row_index: 85
+  column: substance
+  ocr_token: NiCl3(c)*
+  printed_token: NiCl2(c)*
+  quote: NiCl₂(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0777
   kind: image_verified_metadata_token_correction
   pdf_page: 114
@@ -2401,7 +3603,7 @@ corrections:
   column: substance
   ocr_token: NiTe1(c)
   printed_token: NiTe1.1(c)
-  quote: NiTe1.1(c) ... 20.10±0.08
+  quote: NiTe₁.₁(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0778
   kind: image_verified_section_continuation_header_reclassification
@@ -2413,6 +3615,176 @@ corrections:
   printed_token: Nickel—Con.
   quote: Nickel—Con.
   basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0779
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 3
+  column: substance
+  ocr_token: $NiTe_{1.4}(c)$
+  printed_token: NiTe1.6(c)
+  quote: NiTe₁.₆(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0781
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 5
+  column: substance
+  ocr_token: $Ni_{0.4}Zn_{0.4}Fe_{2}O_{4}(c)$
+  printed_token: Ni0.4Zn0.6Fe2O4(c)
+  quote: Ni₀.₄Zn₀.₆Fe₂O₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0782
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 6
+  column: substance
+  ocr_token: $Ni_{0.4}Zn_{0.7}Fe_{2}O_{4}(c)$
+  printed_token: Ni0.3Zn0.7Fe2O4(c)
+  quote: Ni₀.₃Zn₀.₇Fe₂O₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0783
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 7
+  column: substance
+  ocr_token: $Ni_{0.2}Zn_{0.4}Fe_{2}O_{4}(c)$
+  printed_token: Ni0.2Zn0.8Fe2O4(c)
+  quote: Ni₀.₂Zn₀.₈Fe₂O₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0784
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 8
+  column: substance
+  ocr_token: $Ni_{0.1}Zn_{0.2}Fe_{2}O_{4}(c)$
+  printed_token: Ni0.1Zn0.9Fe2O4(c)
+  quote: Ni₀.₁Zn₀.₉Fe₂O₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0787
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 12
+  column: substance
+  ocr_token: $NbO(c)$
+  printed_token: NbC(c)
+  quote: NbC(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0788
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 13
+  column: substance
+  ocr_token: $NbF_{4}(c)$
+  printed_token: NbF5(c)
+  quote: NbF₅(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0790
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 15
+  column: substance
+  ocr_token: $NbO_{3}(c)$
+  printed_token: NbO2(c)
+  quote: NbO₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0791
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 16
+  column: substance
+  ocr_token: $Nb_{2}O_{4}(c)$
+  printed_token: Nb2O5(c)
+  quote: Nb₂O₅(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0792
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 18
+  column: substance
+  ocr_token: $N_{2}(g) \uparrow$
+  printed_token: N2(g)†
+  quote: N₂(g)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0794
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 20
+  column: substance
+  ocr_token: $NF_{2}(g) \uparrow$
+  printed_token: NF3(g)†
+  quote: NF₃(g)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0797
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 23
+  column: substance
+  ocr_token: $N_{2}O(g) \uparrow$
+  printed_token: N2O(g)†
+  quote: N₂O(g)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0798
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 24
+  column: substance
+  ocr_token: $NO(g) \uparrow$
+  printed_token: NO(g)†
+  quote: NO(g)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0801
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 27
+  column: substance
+  ocr_token: $N_{2}O_{4}(g) \uparrow$
+  printed_token: N2O4(g)†
+  quote: N₂O₄(g)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0804
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 30
+  column: substance
+  ocr_token: $NO_{4}^{-}(aq)$
+  printed_token: NO3-(aq)
+  quote: NO₃⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0806
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 32
+  column: substance
+  ocr_token: $N_{2}O_{2}^{-}(aq)$
+  printed_token: N2O2--(aq)
+  quote: N₂O₂⁻⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0813
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 39
+  column: substance
+  ocr_token: $NH_{3}(g) \uparrow$
+  printed_token: NH3(g)†
+  quote: NH₃(g)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0817
   kind: image_verified_formula_continuation_prefix_reclassification
   pdf_page: 115
@@ -2453,6 +3825,26 @@ corrections:
   printed_token: (NH4)2O·3Al2O3·4SO3·6H2O(c)
   quote: (NH4)2O·3Al2O3·4SO3·6H2O(c)
   basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0821
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 47
+  column: substance
+  ocr_token: $NH_{3}B_{3}H_{7}(c) \uparrow$
+  printed_token: NH3B3H7(c)†
+  quote: NH₃B₃H₇(c)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0826
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 52
+  column: substance
+  ocr_token: $NH_{4}Cl^{*}$
+  printed_token: NH4Cl*
+  quote: NH₄Cl*
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0827
   kind: image_verified_formula_continuation_prefix_reclassification
   pdf_page: 115
@@ -2473,6 +3865,56 @@ corrections:
   printed_token: NH4Cr(SO4)2·12H2O(c)†
   quote: NH4Cr(SO4)2·12H2O(c)†
   basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0833
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 59
+  column: substance
+  ocr_token: $NH_{4}OH(l) \uparrow$
+  printed_token: NH4OH(l)†
+  quote: NH₄OH(l)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0836
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 62
+  column: substance
+  ocr_token: $NH_{4}NO_{4}(c) \uparrow$
+  printed_token: NH4NO3(c)†
+  quote: NH₄NO₃(c)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0837
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 63
+  column: substance
+  ocr_token: $(NH_{4})_{2}O(l) \uparrow$
+  printed_token: (NH4)2O(l)†
+  quote: (NH₄)₂O(l)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0845
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 73
+  column: substance
+  ocr_token: $O_{2}(g) \uparrow$
+  printed_token: O2(g)†
+  quote: O₂(g)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0857
+  kind: image_verified_metadata_token_correction
+  pdf_page: 115
+  page: 111
+  source_row_index: 87
+  column: substance
+  ocr_token: $P(g)$
+  printed_token: P4(g)
+  quote: P₄(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0861
   kind: image_verified_section_continuation_header_reclassification
   pdf_page: 116
@@ -2483,6 +3925,56 @@ corrections:
   printed_token: Phosphorus—Con.
   quote: Phosphorus—Con.
   basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0862
+  kind: image_verified_metadata_token_correction
+  pdf_page: 116
+  page: 112
+  source_row_index: 3
+  column: substance
+  ocr_token: PCl2(g)
+  printed_token: PCl5(g)
+  quote: PCl₅(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0863
+  kind: image_verified_metadata_token_correction
+  pdf_page: 116
+  page: 112
+  source_row_index: 4
+  column: substance
+  ocr_token: PCl3(c)
+  printed_token: PCl5(c)
+  quote: PCl₅(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0872
+  kind: image_verified_metadata_token_correction
+  pdf_page: 116
+  page: 112
+  source_row_index: 13
+  column: substance
+  ocr_token: PO4-(aq)
+  printed_token: PO4---(aq)
+  quote: PO₄⁻⁻⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0889
+  kind: image_verified_metadata_token_correction
+  pdf_page: 116
+  page: 112
+  source_row_index: 32
+  column: substance
+  ocr_token: PuO2+(aq)
+  printed_token: PuO2++(aq)
+  quote: PuO₂⁺⁺(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0899
+  kind: image_verified_metadata_token_correction
+  pdf_page: 116
+  page: 112
+  source_row_index: 44
+  column: substance
+  ocr_token: KAlSi3O5(c)
+  printed_token: KAlSi3O8(c)
+  quote: KAlSi₃O₈(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0901
   kind: image_verified_formula_continuation_prefix_reclassification
   pdf_page: 116
@@ -2563,6 +4055,36 @@ corrections:
   printed_token: K2O·3Al2O3·4SO3·6H2O(c,synthetic)
   quote: K2O·3Al2O3·4SO3·6H2O(c,synthetic)
   basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0918
+  kind: image_verified_metadata_token_correction
+  pdf_page: 116
+  page: 112
+  source_row_index: 63
+  column: substance
+  ocr_token: K2CrO7(c)
+  printed_token: K2Cr2O7(c)
+  quote: K₂Cr₂O₇(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0919
+  kind: image_verified_metadata_token_correction
+  pdf_page: 116
+  page: 112
+  source_row_index: 64
+  column: substance
+  ocr_token: K2Co(CN)6(c)
+  printed_token: K3Co(CN)6(c)
+  quote: K₃Co(CN)₆(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0925
+  kind: image_verified_metadata_token_correction
+  pdf_page: 116
+  page: 112
+  source_row_index: 70
+  column: substance
+  ocr_token: KH2(c)
+  printed_token: KHF2(c)
+  quote: KHF₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0931
   kind: image_verified_formula_continuation_prefix_reclassification
   pdf_page: 116
@@ -2583,6 +4105,116 @@ corrections:
   printed_token: KMg3AlSi3-O10F2(c)
   quote: KMg3AlSi3-O10F2(c)
   basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0936
+  kind: image_verified_metadata_token_correction
+  pdf_page: 116
+  page: 112
+  source_row_index: 81
+  column: substance
+  ocr_token: K2PtCl3(c)
+  printed_token: K2PtCl6(c)
+  quote: K₂PtCl₆(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0949
+  kind: image_verified_metadata_token_correction
+  pdf_page: 117
+  page: 113
+  source_row_index: 13
+  column: substance
+  ocr_token: ReFe(g)
+  printed_token: ReF6(g)
+  quote: ReF₆(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0950
+  kind: image_verified_metadata_token_correction
+  pdf_page: 117
+  page: 113
+  source_row_index: 14
+  column: substance
+  ocr_token: ReO2(c)
+  printed_token: ReO3(c)
+  quote: ReO₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0953
+  kind: image_verified_metadata_token_correction
+  pdf_page: 117
+  page: 113
+  source_row_index: 17
+  column: substance
+  ocr_token: ReO4(aq)
+  printed_token: ReO4-(aq)
+  quote: ReO₄⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0985
+  kind: image_verified_metadata_token_correction
+  pdf_page: 117
+  page: 113
+  source_row_index: 55
+  column: substance
+  ocr_token: Se3(g)
+  printed_token: Se6(g)
+  quote: Se₆(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0986
+  kind: image_verified_metadata_token_correction
+  pdf_page: 117
+  page: 113
+  source_row_index: 56
+  column: substance
+  ocr_token: Se-(aq)
+  printed_token: Se--(aq)
+  quote: Se⁻⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0991
+  kind: image_verified_metadata_token_correction
+  pdf_page: 117
+  page: 113
+  source_row_index: 61
+  column: substance
+  ocr_token: SeO4-(aq)
+  printed_token: SeO4--(aq)
+  quote: SeO₄⁻⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0994
+  kind: image_verified_metadata_token_correction
+  pdf_page: 117
+  page: 113
+  source_row_index: 64
+  column: substance
+  ocr_token: SeO3-(aq)
+  printed_token: SeO3--(aq)
+  quote: SeO₃⁻⁻(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0999
+  kind: image_verified_metadata_token_correction
+  pdf_page: 117
+  page: 113
+  source_row_index: 70
+  column: substance
+  ocr_token: SiBr(g)
+  printed_token: SiBr4(g)
+  quote: SiBr₄(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1001
+  kind: image_verified_metadata_token_correction
+  pdf_page: 117
+  page: 113
+  source_row_index: 72
+  column: substance
+  ocr_token: SiC(her.)
+  printed_token: SiC(hex.)
+  quote: SiC(hex.)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1012
+  kind: image_verified_metadata_token_correction
+  pdf_page: 117
+  page: 113
+  source_row_index: 83
+  column: substance
+  ocr_token: SiI(g)
+  printed_token: SiI4(g)
+  quote: SiI₄(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-1014
   kind: image_verified_metadata_token_correction
   pdf_page: 117
@@ -2591,7 +4223,7 @@ corrections:
   column: substance
   ocr_token: Si1N4(c)
   printed_token: Si3N4(c)
-  quote: Si3N4(c) ... 22.8
+  quote: Si₃N₄(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-1020
   kind: image_verified_section_continuation_header_reclassification
@@ -2603,6 +4235,116 @@ corrections:
   printed_token: Silicon—Con.
   quote: Silicon—Con.
   basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-1030
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 13
+  column: substance
+  ocr_token: AgCO3(c)
+  printed_token: Ag2CO3(c)
+  quote: Ag₂CO₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1034
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 17
+  column: substance
+  ocr_token: AgCrO4(c)
+  printed_token: Ag2CrO4(c)
+  quote: Ag₂CrO₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1039
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 22
+  column: substance
+  ocr_token: Ag2H31O6(c)*
+  printed_token: Ag2H3IO6(c)*
+  quote: Ag₂H₃IO₆(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1045
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 28
+  column: substance
+  ocr_token: AgO(c)*
+  printed_token: Ag2O(c)*
+  quote: Ag₂O(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1047
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 30
+  column: substance
+  ocr_token: Ag2SiO2(c)
+  printed_token: Ag2SiO3(c)
+  quote: Ag₂SiO₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1048
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 31
+  column: substance
+  ocr_token: AgSO4(c)
+  printed_token: Ag2SO4(c)
+  quote: Ag₂SO₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1049
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 32
+  column: substance
+  ocr_token: AgS(α)
+  printed_token: Ag2S(α)
+  quote: Ag₂S(α)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1050
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 33
+  column: substance
+  ocr_token: Ag(NH2)+ (aq)
+  printed_token: Ag(NH3)2+(aq)
+  quote: Ag(NH₃)₂⁺(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1055
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 39
+  column: substance
+  ocr_token: NaAlO3(c)
+  printed_token: NaAlO2(c)
+  quote: NaAlO₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1056
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 40
+  column: substance
+  ocr_token: NaAlF4(c)
+  printed_token: NaAlF6(c)
+  quote: NaAlF₆(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1059
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 43
+  column: substance
+  ocr_token: NaAlSi3O6(c)
+  printed_token: NaAlSi3O8(c)
+  quote: NaAlSi₃O₈(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-1060
   kind: image_verified_formula_continuation_prefix_reclassification
   pdf_page: 118
@@ -2623,6 +4365,86 @@ corrections:
   printed_token: NaAlSi2O6·H2O(c)
   quote: NaAlSi2O6·H2O(c)
   basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-1063
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 47
+  column: substance
+  ocr_token: Na2H4O7(c)
+  printed_token: Na2B4O7(c)
+  quote: Na₂B₄O₇(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1064
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 48
+  column: substance
+  ocr_token: Na2H4O7(g)
+  printed_token: Na2B4O7(gl)
+  quote: Na₂B₄O₇(gl)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1082
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 66
+  column: substance
+  ocr_token: NaNH3(c)
+  printed_token: NaNH2(c)
+  quote: NaNH₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1083
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 67
+  column: substance
+  ocr_token: NaO(c)
+  printed_token: Na2O(c)
+  quote: Na₂O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1085
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 69
+  column: substance
+  ocr_token: Na2O2(c)*
+  printed_token: NaO2(c)*
+  quote: NaO₂(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1089
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 73
+  column: substance
+  ocr_token: NaSiO2(c)
+  printed_token: Na2SiO3(c)
+  quote: Na₂SiO₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1090
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 74
+  column: substance
+  ocr_token: NaSi2O5(c)
+  printed_token: Na2Si2O5(c)
+  quote: Na₂Si₂O₅(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1091
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 75
+  column: substance
+  ocr_token: NaSiO4(c)
+  printed_token: Na4SiO4(c)
+  quote: Na₄SiO₄(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-1094
   kind: image_verified_formula_continuation_prefix_reclassification
   pdf_page: 118
@@ -2643,6 +4465,36 @@ corrections:
   printed_token: Na2SO4·10H2O(c)
   quote: Na2SO4·10H2O(c)
   basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-1098
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 82
+  column: substance
+  ocr_token: Na2TiO5(c)
+  printed_token: Na2Ti2O5(c)
+  quote: Na₂Ti₂O₅(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1099
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 83
+  column: substance
+  ocr_token: Na2TiO7(c)
+  printed_token: Na2Ti3O7(c)
+  quote: Na₂Ti₃O₇(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1102
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 87
+  column: substance
+  ocr_token: Sr++(g)
+  printed_token: Sr++(aq)
+  quote: Sr⁺⁺(aq)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-1106
   kind: image_verified_section_continuation_header_reclassification
   pdf_page: 119
@@ -2653,6 +4505,116 @@ corrections:
   printed_token: Strontium—Con.
   quote: Strontium—Con.
   basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-1107
+  kind: image_verified_metadata_token_correction
+  pdf_page: 119
+  page: 115
+  source_row_index: 3
+  column: substance
+  ocr_token: $SrCl_3(c)$
+  printed_token: SrCl2(c)
+  quote: SrCl₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1109
+  kind: image_verified_metadata_token_correction
+  pdf_page: 119
+  page: 115
+  source_row_index: 5
+  column: substance
+  ocr_token: $SrF_5(c)$
+  printed_token: SrF2(c)
+  quote: SrF₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1128
+  kind: image_verified_metadata_token_correction
+  pdf_page: 119
+  page: 115
+  source_row_index: 25
+  column: substance
+  ocr_token: $SCl_3(g)$
+  printed_token: SCl2(g)
+  quote: SCl₂(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1129
+  kind: image_verified_metadata_token_correction
+  pdf_page: 119
+  page: 115
+  source_row_index: 26
+  column: substance
+  ocr_token: $S_2Cl_3(g)$
+  printed_token: S2Cl2(g)
+  quote: S₂Cl₂(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1132
+  kind: image_verified_metadata_token_correction
+  pdf_page: 119
+  page: 115
+  source_row_index: 29
+  column: substance
+  ocr_token: $SO_3(g)$
+  printed_token: SO2(g)†
+  quote: SO₂(g)†
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1141
+  kind: image_verified_metadata_token_correction
+  pdf_page: 119
+  page: 115
+  source_row_index: 38
+  column: substance
+  ocr_token: $SO_3Cl_3(g)$
+  printed_token: SO2Cl2(g)
+  quote: SO₂Cl₂(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1142
+  kind: image_verified_metadata_token_correction
+  pdf_page: 119
+  page: 115
+  source_row_index: 39
+  column: substance
+  ocr_token: $SO_3Cl_3(l)$
+  printed_token: SO2Cl2(l)
+  quote: SO₂Cl₂(l)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1145
+  kind: image_verified_metadata_token_correction
+  pdf_page: 119
+  page: 115
+  source_row_index: 42
+  column: substance
+  ocr_token: $SOCl_3(g)$
+  printed_token: SOCl2(g)
+  quote: SOCl₂(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1146
+  kind: image_verified_metadata_token_correction
+  pdf_page: 119
+  page: 115
+  source_row_index: 43
+  column: substance
+  ocr_token: $SOF_3(g)$
+  printed_token: SOF2(g)
+  quote: SOF₂(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1150
+  kind: image_verified_metadata_token_correction
+  pdf_page: 119
+  page: 115
+  source_row_index: 48
+  column: substance
+  ocr_token: $Ta_2O_3(c)$
+  printed_token: Ta2O5(c)
+  quote: Ta₂O₅(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1157
+  kind: image_verified_metadata_token_correction
+  pdf_page: 119
+  page: 115
+  source_row_index: 57
+  column: substance
+  ocr_token: $TeO_3(c)$
+  printed_token: TeO2(c)
+  quote: TeO₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-1186
   kind: image_verified_section_continuation_header_reclassification
   pdf_page: 120
@@ -2670,8 +4632,8 @@ corrections:
   source_row_index: 12
   column: substance
   ocr_token: $SnI_1(g)$
-  printed_token: $SnI_2(g)$
-  quote: SnI2(g) ... 52.4±0.2
+  printed_token: SnI4(g)
+  quote: SnI₄(g)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-1209
   kind: image_verified_token_correction
@@ -2683,6 +4645,26 @@ corrections:
   printed_token: '16.92'
   quote: $TiBr_3(c)$ * ... 16.92
   basis: Original-resolution page image proves the printed token.
+- record_id: table-006-1242
+  kind: image_verified_metadata_token_correction
+  pdf_page: 120
+  page: 116
+  source_row_index: 61
+  column: substance
+  ocr_token: $UF_5(c)$
+  printed_token: UF6(c)
+  quote: UF₆(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1244
+  kind: image_verified_metadata_token_correction
+  pdf_page: 120
+  page: 116
+  source_row_index: 63
+  column: substance
+  ocr_token: $UH_3(\beta)$ *
+  printed_token: $UH_3(\beta)$*
+  quote: UH₃(β)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-1248
   kind: image_verified_metadata_token_correction
   pdf_page: 120
@@ -2690,8 +4672,18 @@ corrections:
   source_row_index: 67
   column: substance
   ocr_token: $U_1O_9(c)$
-  printed_token: $U_3O_8(c)$
-  quote: U3O8(c) ... 67.5±0.2
+  printed_token: U4O9(c)
+  quote: U₄O₉(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1250
+  kind: image_verified_metadata_token_correction
+  pdf_page: 120
+  page: 116
+  source_row_index: 69
+  column: substance
+  ocr_token: $UOCl_5(c)$
+  printed_token: UOCl2(c)
+  quote: UOCl₂(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-1253
   kind: image_verified_formula_continuation_prefix_reclassification
@@ -2713,6 +4705,26 @@ corrections:
   printed_token: UO2(NO3)2·6H2O(c)
   quote: UO2(NO3)2·6H2O(c)
   basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-1259
+  kind: image_verified_metadata_token_correction
+  pdf_page: 121
+  page: 117
+  source_row_index: 5
+  column: substance
+  ocr_token: VO(c)
+  printed_token: VC(c)
+  quote: VC(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1261
+  kind: image_verified_metadata_token_correction
+  pdf_page: 121
+  page: 117
+  source_row_index: 7
+  column: substance
+  ocr_token: VCl2(c)*
+  printed_token: VCl3(c)*
+  quote: VCl₃(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-1269
   kind: image_verified_metadata_token_correction
   pdf_page: 121
@@ -2721,7 +4733,37 @@ corrections:
   column: substance
   ocr_token: VOCI3(g)
   printed_token: VOCl3(g)
-  quote: VOCl3(g) ... 82.2±1.0
+  quote: VOCl₃(g)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1284
+  kind: image_verified_metadata_token_correction
+  pdf_page: 121
+  page: 117
+  source_row_index: 34
+  column: substance
+  ocr_token: ZnSb2(c)
+  printed_token: Zn3Sb2(c)
+  quote: Zn₃Sb₂(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1285
+  kind: image_verified_metadata_token_correction
+  pdf_page: 121
+  page: 117
+  source_row_index: 35
+  column: substance
+  ocr_token: ZnSb3(c)
+  printed_token: Zn4Sb3(c)
+  quote: Zn₄Sb₃(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1300
+  kind: image_verified_metadata_token_correction
+  pdf_page: 121
+  page: 117
+  source_row_index: 50
+  column: substance
+  ocr_token: ZnSiO4(c)
+  printed_token: Zn2SiO4(c)
+  quote: Zn₂SiO₄(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 untranscribed: []
 feedstock_element_coverage:
@@ -2729,28 +4771,28 @@ feedstock_element_coverage:
   Al: 56
   As: 26
   Au: 5
-  B: 44
+  B: 46
   Ba: 22
   Bi: 13
-  Br: 94
-  C: 106
+  Br: 95
+  C: 112
   Ca: 59
   Cd: 28
   Ce: 6
-  Cl: 161
-  Co: 9
+  Cl: 157
+  Co: 10
   Cr: 18
   Cs: 15
   Cu: 28
   Dy: 1
   Er: 1
   Eu: 2
-  F: 122
-  Fe: 52
+  F: 124
+  Fe: 51
   Ga: 13
   Gd: 4
   Ge: 19
-  H: 299
+  H: 297
   Hf: 13
   Ho: 1
   I: 85
@@ -2768,18 +4810,18 @@ feedstock_element_coverage:
   Nb: 7
   Nd: 3
   Ni: 20
-  O: 527
+  O: 524
   Os: 5
   P: 47
   Pb: 36
   Pr: 1
   Pt: 6
   Rb: 19
-  S: 165
+  S: 164
   Sb: 20
   Sc: 3
   Se: 27
-  Si: 67
+  Si: 68
   Sm: 3
   Sn: 25
   Sr: 22
@@ -3553,11 +5595,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0010
-  formula: AlF5(c)
-  formula_as_published: AlF5(c)
+  formula: AlF3(c)
+  formula_as_published: AlF3(c)
   phase: (c)
-  name_as_published: AlF5(c)
+  name_as_published: AlF3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: AlF5(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4155,11 +6198,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0040
-  formula: $Sb_2O_4(g)$
-  formula_as_published: $Sb_2O_4(g)$
+  formula: Sb4O6(g)
+  formula_as_published: Sb4O6(g)
   phase: (g)
-  name_as_published: Sb_2O_4(g)
+  name_as_published: Sb4O6(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Sb_2O_4(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4235,11 +6279,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0044
-  formula: $Sb_3S_5(c)$
-  formula_as_published: $Sb_3S_5(c)$
+  formula: Sb2S3(c)
+  formula_as_published: Sb2S3(c)
   phase: (c)
-  name_as_published: Sb_3S_5(c)
+  name_as_published: Sb2S3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Sb_3S_5(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4387,11 +6432,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0051
-  formula: $AsCl_5(l)$
-  formula_as_published: $AsCl_5(l)$
+  formula: AsCl3(l)
+  formula_as_published: AsCl3(l)
   phase: (l)
-  name_as_published: AsCl_5(l)
+  name_as_published: AsCl3(l)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $AsCl_5(l)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4449,11 +6495,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0054
-  formula: AsH_2(g)
-  formula_as_published: AsH_2(g)
+  formula: AsH3(g)
+  formula_as_published: AsH3(g)
   phase: (g)
-  name_as_published: AsH_2(g)
+  name_as_published: AsH3(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $AsH_2(g) \dagger^*$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4571,11 +6618,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0059
-  formula: $As_2O_5(g)$
-  formula_as_published: $As_2O_5(g)$
+  formula: As4O6(g)
+  formula_as_published: As4O6(g)
   phase: (g)
-  name_as_published: As_2O_5(g)
+  name_as_published: As4O6(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $As_2O_5(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4591,11 +6639,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0060
-  formula: $As_2O_3(c)$
-  formula_as_published: $As_2O_3(c)$
+  formula: As2O5(c)
+  formula_as_published: As2O5(c)
   phase: (c)
-  name_as_published: As_2O_3(c)
+  name_as_published: As2O5(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $As_2O_3(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4631,11 +6680,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0062
-  formula: $H_3AsO_3(aq)$
-  formula_as_published: $H_3AsO_3(aq)$
+  formula: H2AsO2(aq)
+  formula_as_published: H2AsO2(aq)
   phase: (aq)
-  name_as_published: H_3AsO_3(aq)
+  name_as_published: H2AsO2(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $H_3AsO_3(aq)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4691,11 +6741,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0065
-  formula: $H_3AsO_4^{*}(aq)$
-  formula_as_published: $H_3AsO_4^{*}(aq)$
+  formula: H2AsO4-(aq)
+  formula_as_published: H2AsO4-(aq)
   phase: (aq)
-  name_as_published: H_3AsO_4^*(aq)
+  name_as_published: H2AsO4-(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $H_3AsO_4^{*}(aq)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4711,11 +6762,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0066
-  formula: $HAsO_4^{*}-(aq)$
-  formula_as_published: $HAsO_4^{*}-(aq)$
+  formula: HAsO4--(aq)
+  formula_as_published: HAsO4--(aq)
   phase: (aq)
-  name_as_published: HAsO_4^*-(aq)
+  name_as_published: HAsO4--(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $HAsO_4^{*}-(aq)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4731,11 +6783,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0067
-  formula: $AsO_4^{*}-(aq)$
-  formula_as_published: $AsO_4^{*}-(aq)$
+  formula: AsO4---(aq)
+  formula_as_published: AsO4---(aq)
   phase: (aq)
-  name_as_published: AsO_4^*-(aq)
+  name_as_published: AsO4---(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $AsO_4^{*}-(aq)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4751,11 +6804,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0068
-  formula: $At_3(c)$
-  formula_as_published: $At_3(c)$
+  formula: At2(c)
+  formula_as_published: At2(c)
   phase: (c)
-  name_as_published: At_3(c)
+  name_as_published: At2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $At_3(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4871,11 +6925,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0074
-  formula: $Ba(BrO_3)_2H_2O(c)$
-  formula_as_published: $Ba(BrO_3)_2H_2O(c)$
+  formula: Ba(BrO3)2·H2O(c)
+  formula_as_published: Ba(BrO3)2·H2O(c)
   phase: (c)
-  name_as_published: Ba(BrO_3)_2H_2O(c)
+  name_as_published: Ba(BrO3)2·H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Ba(BrO_3)_2H_2O(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4931,11 +6986,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0077
-  formula: $BaCl_2-2H_2O(c)$
-  formula_as_published: $BaCl_2-2H_2O(c)$
+  formula: BaCl2·2H2O(c)
+  formula_as_published: BaCl2·2H2O(c)
   phase: (c)
-  name_as_published: BaCl_2-2H_2O(c)
+  name_as_published: BaCl2·2H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $BaCl_2-2H_2O(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -5534,11 +7590,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0107
-  formula: $BiCl_4(c)$
-  formula_as_published: $BiCl_4(c)$
+  formula: BiCl3(c)
+  formula_as_published: BiCl3(c)
   phase: (c)
-  name_as_published: BiCl_4(c)
+  name_as_published: BiCl3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $BiCl_4(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -5634,11 +7691,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0112
-  formula: $Bi(g)$
-  formula_as_published: $Bi(g)$
+  formula: BiI(g)
+  formula_as_published: BiI(g)
   phase: (g)
-  name_as_published: Bi(g)
+  name_as_published: BiI(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Bi(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -6038,11 +8096,12 @@ entries:
     note: Detector only; phase changes and printed values retained unchanged.
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0131
-  formula: \mathrm{B}_{4}\mathrm{H}_{5}(l)
-  formula_as_published: \mathrm{B}_{4}\mathrm{H}_{5}(l)
+  formula: B5H9(l)
+  formula_as_published: B5H9(l)
   phase: (l)
-  name_as_published: B_4H_5(l)
+  name_as_published: B5H9(l)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{B}_{4}\mathrm{H}_{5}(l)\dagger$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -6058,11 +8117,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0132
-  formula: $\mathrm{B}_{5}\mathrm{H}_{5}(g)$
-  formula_as_published: $\mathrm{B}_{5}\mathrm{H}_{5}(g)$
+  formula: B5H9(g)
+  formula_as_published: B5H9(g)
   phase: (g)
-  name_as_published: B_5H_5(g)
+  name_as_published: B5H9(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{B}_{5}\mathrm{H}_{5}(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -6198,11 +8258,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0139
-  formula: $\mathrm{B}_{3}\mathrm{N}_{3}\mathrm{H}_{5}(g)$
-  formula_as_published: $\mathrm{B}_{3}\mathrm{N}_{3}\mathrm{H}_{5}(g)$
+  formula: B3N3H6(g)
+  formula_as_published: B3N3H6(g)
   phase: (g)
-  name_as_published: B_3N_3H_5(g)
+  name_as_published: B3N3H6(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{B}_{3}\mathrm{N}_{3}\mathrm{H}_{5}(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -6218,11 +8279,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0140
-  formula: $\mathrm{B}_{2}\mathrm{O}_{2}(c)$
-  formula_as_published: $\mathrm{B}_{2}\mathrm{O}_{2}(c)$
+  formula: B2O3(c)
+  formula_as_published: B2O3(c)
   phase: (c)
-  name_as_published: B_2O_2(c)
+  name_as_published: B2O3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{B}_{2}\mathrm{O}_{2}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -6238,11 +8300,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0141
-  formula: $\mathrm{B}_{2}\mathrm{O}_{2}(g)$
-  formula_as_published: $\mathrm{B}_{2}\mathrm{O}_{2}(g)$
+  formula: B2O3(g)
+  formula_as_published: B2O3(g)
   phase: (g)
-  name_as_published: B_2O_2(g)
+  name_as_published: B2O3(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{B}_{2}\mathrm{O}_{2}(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -6378,11 +8441,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0148
-  formula: $\mathrm{Br}^{+}(aq)$
-  formula_as_published: $\mathrm{Br}^{+}(aq)$
+  formula: Br-(aq)
+  formula_as_published: Br-(aq)
   phase: (aq)
-  name_as_published: Br^+(aq)
+  name_as_published: Br-(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{Br}^{+}(aq)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -6478,11 +8542,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0153
-  formula: $\mathrm{BrF}_{3}(g)$
-  formula_as_published: $\mathrm{BrF}_{3}(g)$
+  formula: BrF5(g)
+  formula_as_published: BrF5(g)
   phase: (g)
-  name_as_published: BrF_3(g)
+  name_as_published: BrF5(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{BrF}_{3}(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -6918,11 +8983,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0175
-  formula: $\mathrm{CdSO}_{3}(c)$
-  formula_as_published: $\mathrm{CdSO}_{3}(c)$
+  formula: CdSiO3(c)
+  formula_as_published: CdSiO3(c)
   phase: (c)
-  name_as_published: CdSO_3(c)
+  name_as_published: CdSiO3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{CdSO}_{3}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -6961,8 +9027,9 @@ entries:
   formula: $\mathrm{CdSO}_{4}\cdot\mathrm{H}_{2}\mathrm{O}(c)$
   formula_as_published: $\mathrm{CdSO}_{4}\cdot\mathrm{H}_{2}\mathrm{O}(c)$
   phase: (c)
-  name_as_published: CdSO_4_2O(c)
+  name_as_published: CdSO_4·H_2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{CdSO}_{4}\cdot\mathrm{H}_{2}\mathrm{O}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -6981,8 +9048,9 @@ entries:
   formula: $\mathrm{CdSO}_{4}\cdot8/3\mathrm{H}_{2}\mathrm{O}(c)$
   formula_as_published: $\mathrm{CdSO}_{4}\cdot8/3\mathrm{H}_{2}\mathrm{O}(c)$
   phase: (c)
-  name_as_published: CdSO_48/3H_2O(c)
+  name_as_published: CdSO_4·8/3H_2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{CdSO}_{4}\cdot8/3\mathrm{H}_{2}\mathrm{O}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7238,11 +9306,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0191
-  formula: $\mathrm{Ca}_{3}\mathrm{B}_{2}\mathrm{O}_{5}(c)$
-  formula_as_published: $\mathrm{Ca}_{3}\mathrm{B}_{2}\mathrm{O}_{5}(c)$
+  formula: Ca2B2O5(c)
+  formula_as_published: Ca2B2O5(c)
   phase: (c)
-  name_as_published: Ca_3B_2O_5(c)
+  name_as_published: Ca2B2O5(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{Ca}_{3}\mathrm{B}_{2}\mathrm{O}_{5}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7258,11 +9327,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0192
-  formula: $\mathrm{Ca}_{3}\mathrm{B}_{2}\mathrm{O}_{5}(c)$
-  formula_as_published: $\mathrm{Ca}_{3}\mathrm{B}_{2}\mathrm{O}_{5}(c)$
+  formula: Ca3B2O6(c)
+  formula_as_published: Ca3B2O6(c)
   phase: (c)
-  name_as_published: Ca_3B_2O_5(c)
+  name_as_published: Ca3B2O6(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{Ca}_{3}\mathrm{B}_{2}\mathrm{O}_{5}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7278,11 +9348,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0193
-  formula: $\mathrm{CaBr}_{3}(c)$
-  formula_as_published: $\mathrm{CaBr}_{3}(c)$
+  formula: CaBr2(c)
+  formula_as_published: CaBr2(c)
   phase: (c)
-  name_as_published: CaBr_3(c)
+  name_as_published: CaBr2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{CaBr}_{3}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7318,11 +9389,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0195
-  formula: $\mathrm{CaCl}_{3}(c)$
-  formula_as_published: $\mathrm{CaCl}_{3}(c)$
+  formula: CaC2(c)
+  formula_as_published: CaC2(c)
   phase: (c)
-  name_as_published: CaCl_3(c)
+  name_as_published: CaC2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{CaCl}_{3}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7338,11 +9410,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0196
-  formula: \mathrm{CaCl}_{3}$(calcite)
-  formula_as_published: \mathrm{CaCl}_{3}$ (calcite)
+  formula: CaCO3(calcite)
+  formula_as_published: CaCO3(calcite)
   phase: null
-  name_as_published: CaCl_3$ (calcite)
+  name_as_published: CaCO3(calcite)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $\mathrm{CaCl}_{3}$ (calcite)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -8809,11 +10882,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0266
-  formula: COBr3(g)
-  formula_as_published: COBr3(g)
+  formula: COBr2(g)
+  formula_as_published: COBr2(g)
   phase: (g)
-  name_as_published: COBr3(g)
+  name_as_published: COBr2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: COBr3(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -9031,11 +11105,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0274
-  formula: CN(aq)
-  formula_as_published: CN(aq)
+  formula: CN-(aq)
+  formula_as_published: CN-(aq)
   phase: (aq)
-  name_as_published: CN(aq)
-  metadata_ocr_suspect: false
+  name_as_published: CN-(aq)
+  metadata_ocr_suspect: true
+  metadata_ocr_token: CN(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -9046,16 +11121,17 @@ entries:
     table_number: 6
   path: records/table-006-0274.json
   row_count: 1
-  ocr_suspect_count: 3
+  ocr_suspect_count: 4
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0275
-  formula: ONBr(g)
-  formula_as_published: ONBr(g)
+  formula: CNBr(g)
+  formula_as_published: CNBr(g)
   phase: (g)
-  name_as_published: ONBr(g)
+  name_as_published: CNBr(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: ONBr(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -9171,11 +11247,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0281
-  formula: HCO3(aq)
-  formula_as_published: HCO3(aq)
+  formula: HCO3-(aq)
+  formula_as_published: HCO3-(aq)
   phase: (aq)
-  name_as_published: HCO3(aq)
+  name_as_published: HCO3-(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HCO3(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -9191,11 +11268,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0282
-  formula: CO3(aq)
-  formula_as_published: CO3(aq)
+  formula: CO3--(aq)
+  formula_as_published: CO3--(aq)
   phase: (aq)
-  name_as_published: CO3(aq)
+  name_as_published: CO3--(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CO3(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -9211,11 +11289,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0283
-  formula: CNO(aq)
-  formula_as_published: CNO(aq)
+  formula: CNO-(aq)
+  formula_as_published: CNO-(aq)
   phase: (aq)
-  name_as_published: CNO(aq)
+  name_as_published: CNO-(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CNO(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -9231,11 +11310,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0284
-  formula: C2O4(aq)
-  formula_as_published: C2O4(aq)
+  formula: C2O4--(aq)
+  formula_as_published: C2O4--(aq)
   phase: (aq)
-  name_as_published: C2O4(aq)
+  name_as_published: C2O4--(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: C2O4(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -9351,11 +11431,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0290
-  formula: Ce2S(c)
-  formula_as_published: Ce2S(c)
+  formula: Ce2S3(c)
+  formula_as_published: Ce2S3(c)
   phase: (c)
-  name_as_published: Ce2S(c)
+  name_as_published: Ce2S3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Ce2S(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -9451,11 +11532,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0295
-  formula: CsAl(SO4)2-12H2O(c)
-  formula_as_published: CsAl(SO4)2-12H2O(c)
+  formula: CsAl(SO4)2·12H2O(c)
+  formula_as_published: CsAl(SO4)2·12H2O(c)
   phase: (c)
-  name_as_published: CsAl(SO4)2-12H2O(c)
+  name_as_published: CsAl(SO4)2·12H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CsAl(SO4)2-12H2O(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -9934,11 +12016,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0318
-  formula: Cr3C3(c)
-  formula_as_published: Cr3C3(c)
+  formula: Cr7C3(c)
+  formula_as_published: Cr7C3(c)
   phase: (c)
-  name_as_published: Cr3C3(c)
+  name_as_published: Cr7C3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Cr3C3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -9954,11 +12037,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0319
-  formula: Cr2C6(c)
-  formula_as_published: Cr2C6(c)
+  formula: Cr23C6(c)
+  formula_as_published: Cr23C6(c)
   phase: (c)
-  name_as_published: Cr2C6(c)
+  name_as_published: Cr23C6(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Cr2C6(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -10074,11 +12158,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0325
-  formula: CrO4-(aq)
-  formula_as_published: CrO4-(aq)
+  formula: CrO4--(aq)
+  formula_as_published: CrO4--(aq)
   phase: (aq)
-  name_as_published: CrO4-(aq)
+  name_as_published: CrO4--(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CrO4-(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -10474,11 +12559,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0345
-  formula: Cu2.7Fe2.2O4(c)
-  formula_as_published: Cu2.7Fe2.2O4(c)
+  formula: Cu0.75Fe2.25O4(c)
+  formula_as_published: Cu0.75Fe2.25O4(c)
   phase: (c)
-  name_as_published: Cu2.7Fe2.2O4(c)
+  name_as_published: Cu0.75Fe2.25O4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Cu2.7Fe2.2O4(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -10694,11 +12780,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0356
-  formula: CuO-CuSO4(c)
-  formula_as_published: CuO-CuSO4(c)
+  formula: CuO·CuSO4(c)
+  formula_as_published: CuO·CuSO4(c)
   phase: (c)
-  name_as_published: CuO-CuSO4(c)
+  name_as_published: CuO·CuSO4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CuO-CuSO4(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -10714,11 +12801,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0357
-  formula: CuSO4-H2O(c)
-  formula_as_published: CuSO4-H2O(c)
+  formula: CuSO4·H2O(c)
+  formula_as_published: CuSO4·H2O(c)
   phase: (c)
-  name_as_published: CuSO4-H2O(c)
+  name_as_published: CuSO4·H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CuSO4-H2O(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -10734,11 +12822,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0358
-  formula: CuSO4-3H2O(c)
-  formula_as_published: CuSO4-3H2O(c)
+  formula: CuSO4·3H2O(c)
+  formula_as_published: CuSO4·3H2O(c)
   phase: (c)
-  name_as_published: CuSO4-3H2O(c)
+  name_as_published: CuSO4·3H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CuSO4-3H2O(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -10754,11 +12843,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0359
-  formula: CuSO4-5H2O(c)
-  formula_as_published: CuSO4-5H2O(c)
+  formula: CuSO4·5H2O(c)
+  formula_as_published: CuSO4·5H2O(c)
   phase: (c)
-  name_as_published: CuSO4-5H2O(c)
+  name_as_published: CuSO4·5H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CuSO4-5H2O(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -10774,11 +12864,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0360
-  formula: CuS(c)
-  formula_as_published: CuS(c)
+  formula: Cu2S(c)
+  formula_as_published: Cu2S(c)
   phase: (c)
-  name_as_published: CuS(c)
-  metadata_ocr_suspect: false
+  name_as_published: Cu2S(c)
+  metadata_ocr_suspect: true
+  metadata_ocr_token: CuS(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -10789,7 +12880,7 @@ entries:
     table_number: 6
   path: records/table-006-0360.json
   row_count: 1
-  ocr_suspect_count: 5
+  ocr_suspect_count: 6
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -11169,11 +13260,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0378
-  formula: GaBr2(c)
-  formula_as_published: GaBr2(c)
+  formula: GaBr3(c)
+  formula_as_published: GaBr3(c)
   phase: (c)
-  name_as_published: GaBr2(c)
+  name_as_published: GaBr3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: GaBr2(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -11209,10 +13301,10 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0380
-  formula: Ga3Cl(g)
-  formula_as_published: Ga3Cl(g)
+  formula: Ga2C2(g)
+  formula_as_published: Ga2C2(g)
   phase: (g)
-  name_as_published: Ga3Cl(g)
+  name_as_published: Ga2C2(g)
   metadata_ocr_suspect: true
   metadata_ocr_token: Ga3C1(g)
   source: *id001
@@ -11350,11 +13442,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0387
-  formula: Ga2O2(c)
-  formula_as_published: Ga2O2(c)
+  formula: Ga2O3(c)
+  formula_as_published: Ga2O3(c)
   phase: (c)
-  name_as_published: Ga2O2(c)
+  name_as_published: Ga2O3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Ga2O2(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -11430,11 +13523,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0391
-  formula: GeBr2(g)
-  formula_as_published: GeBr2(g)
+  formula: GeBr4(g)
+  formula_as_published: GeBr4(g)
   phase: (g)
-  name_as_published: GeBr2(g)
+  name_as_published: GeBr4(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: GeBr2(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -11470,11 +13564,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0393
-  formula: GeCl3(g)
-  formula_as_published: GeCl3(g)
+  formula: GeCl4(g)
+  formula_as_published: GeCl4(g)
   phase: (g)
-  name_as_published: GeCl3(g)
+  name_as_published: GeCl4(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: GeCl3(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -11510,11 +13605,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0395
-  formula: GeF3(g)
-  formula_as_published: GeF3(g)
+  formula: GeF4(g)
+  formula_as_published: GeF4(g)
   phase: (g)
-  name_as_published: GeF3(g)
+  name_as_published: GeF4(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: GeF3(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -11908,11 +14004,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0414
-  formula: HfBr2(g)
-  formula_as_published: HfBr2(g)
-  phase: (g)
-  name_as_published: HfBr2(g)
+  formula: HfBr4(c)
+  formula_as_published: HfBr4(c)
+  phase: (c)
+  name_as_published: HfBr4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HfBr2(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -11928,11 +14025,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0415
-  formula: HfC(c)
-  formula_as_published: HfC(c)
-  phase: (c)
-  name_as_published: HfC(c)
+  formula: HfBr4(g)
+  formula_as_published: HfBr4(g)
+  phase: (g)
+  name_as_published: HfBr4(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HfC(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -11948,10 +14046,10 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0416
-  formula: HfCl3(c)
-  formula_as_published: HfCl3(c)
+  formula: HfC(c)
+  formula_as_published: HfC(c)
   phase: (c)
-  name_as_published: HfCl3(c)
+  name_as_published: HfC(c)
   metadata_ocr_suspect: true
   source: *id001
   original_record_text_location:
@@ -11988,11 +14086,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0418
-  formula: HfCl3(g)
-  formula_as_published: HfCl3(g)
+  formula: HfCl4(g)
+  formula_as_published: HfCl4(g)
   phase: (g)
-  name_as_published: HfCl3(g)
+  name_as_published: HfCl4(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HfCl3(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -12008,11 +14107,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0419
-  formula: HfF3(c)
-  formula_as_published: HfF3(c)
+  formula: HfF4(c)
+  formula_as_published: HfF4(c)
   phase: (c)
-  name_as_published: HfF3(c)
+  name_as_published: HfF4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HfF3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -12028,11 +14128,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0420
-  formula: HfF(g)
-  formula_as_published: HfF(g)
+  formula: HfF4(g)
+  formula_as_published: HfF4(g)
   phase: (g)
-  name_as_published: HfF(g)
+  name_as_published: HfF4(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HfF(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -12048,11 +14149,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0421
-  formula: HfI3(c)
-  formula_as_published: HfI3(c)
+  formula: HfI4(c)
+  formula_as_published: HfI4(c)
   phase: (c)
-  name_as_published: HfI3(c)
+  name_as_published: HfI4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HfI3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -12068,11 +14170,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0422
-  formula: HfI(g)
-  formula_as_published: HfI(g)
+  formula: HfI4(g)
+  formula_as_published: HfI4(g)
   phase: (g)
-  name_as_published: HfI(g)
+  name_as_published: HfI4(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HfI(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -12359,11 +14462,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0436
-  formula: H+(ag)
-  formula_as_published: H+(ag)
-  phase: null
-  name_as_published: H+(ag)
+  formula: H+(aq)
+  formula_as_published: H+(aq)
+  phase: (aq)
+  name_as_published: H+(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: H+(ag)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -12379,11 +14483,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0437
-  formula: HN4(g)
-  formula_as_published: HN4(g)
+  formula: HN3(g)
+  formula_as_published: HN3(g)
   phase: (g)
-  name_as_published: HN4(g)
+  name_as_published: HN3(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HN4(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -12775,11 +14880,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0455
-  formula: HNOS(g)
-  formula_as_published: HNOS(g)
+  formula: HNCS(g)
+  formula_as_published: HNCS(g)
   phase: (g)
-  name_as_published: HNOS(g)
+  name_as_published: HNCS(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HNOS(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -12866,11 +14972,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0459
-  formula: HF2(aq)
-  formula_as_published: HF2(aq)
+  formula: HF2-(aq)
+  formula_as_published: HF2-(aq)
   phase: (aq)
-  name_as_published: HF2(aq)
+  name_as_published: HF2-(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HF2(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -12988,11 +15095,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0464
-  formula: HNO2(g)
-  formula_as_published: HNO2(g)
+  formula: HNO3(g)
+  formula_as_published: HNO3(g)
   phase: (g)
-  name_as_published: HNO2(g)
+  name_as_published: HNO3(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HNO2(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -13008,11 +15116,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0465
-  formula: DNO2(g)
-  formula_as_published: DNO2(g)
+  formula: DNO3(g)
+  formula_as_published: DNO3(g)
   phase: (g)
-  name_as_published: DNO2(g)
+  name_as_published: DNO3(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: DNO2(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -13159,11 +15268,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0472
-  formula: HN2O2(aq)
-  formula_as_published: HN2O2(aq)
+  formula: HN2O2-(aq)
+  formula_as_published: HN2O2-(aq)
   phase: (aq)
-  name_as_published: HN2O2(aq)
+  name_as_published: HN2O2-(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HN2O2(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -13259,11 +15369,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0477
-  formula: TaO(g)
-  formula_as_published: TaO(g)
+  formula: T2O(g)
+  formula_as_published: T2O(g)
   phase: (g)
-  name_as_published: TaO(g)
+  name_as_published: T2O(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: TaO(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -13539,11 +15650,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0491
-  formula: H2PO4(aq)
-  formula_as_published: H2PO4(aq)
+  formula: H2PO4-(aq)
+  formula_as_published: H2PO4-(aq)
   phase: (aq)
-  name_as_published: H2PO4(aq)
+  name_as_published: H2PO4-(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: H2PO4(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -13559,11 +15671,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0492
-  formula: HPO4(aq)
-  formula_as_published: HPO4(aq)
+  formula: HPO4--(aq)
+  formula_as_published: HPO4--(aq)
   phase: (aq)
-  name_as_published: HPO4(aq)
+  name_as_published: HPO4--(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HPO4(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -13819,11 +15932,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0505
-  formula: HSO3(aq)
-  formula_as_published: HSO3(aq)
+  formula: HSO3-(aq)
+  formula_as_published: HSO3-(aq)
   phase: (aq)
-  name_as_published: HSO3(aq)
+  name_as_published: HSO3-(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HSO3(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -13839,11 +15953,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0506
-  formula: H2S2O3(aq)
-  formula_as_published: H2S2O3(aq)
+  formula: H2S2O8(aq)
+  formula_as_published: H2S2O8(aq)
   phase: (aq)
-  name_as_published: H2S2O3(aq)
+  name_as_published: H2S2O8(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: H2S2O3(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -14310,11 +16425,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0529
-  formula: $I_3(g)$
-  formula_as_published: $I_3(g)$
+  formula: I2(g)
+  formula_as_published: I2(g)
   phase: (g)
-  name_as_published: I_3(g)
+  name_as_published: I2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $I_3(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -14632,11 +16748,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0545
-  formula: $Fe^{++}(aq)$
-  formula_as_published: $Fe^{++}(aq)$
+  formula: Fe+++(aq)
+  formula_as_published: Fe+++(aq)
   phase: (aq)
-  name_as_published: Fe^++(aq)
+  name_as_published: Fe+++(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Fe^{++}(aq)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -14732,11 +16849,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0550
-  formula: $Fe_2Br_5(g)$
-  formula_as_published: $Fe_2Br_5(g)$
+  formula: Fe2Br6(g)
+  formula_as_published: Fe2Br6(g)
   phase: (g)
-  name_as_published: Fe_2Br_5(g)
+  name_as_published: Fe2Br6(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Fe_2Br_5(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -14859,11 +16977,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0556
-  formula: $Fe_2Cl_5(g)$
-  formula_as_published: $Fe_2Cl_5(g)$
+  formula: Fe2Cl6(g)
+  formula_as_published: Fe2Cl6(g)
   phase: (g)
-  name_as_published: Fe_2Cl_5(g)
+  name_as_published: Fe2Cl6(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Fe_2Cl_5(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -14879,11 +16998,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0557
-  formula: $FeCO_2O_4(c)$
-  formula_as_published: $FeCO_2O_4(c)$
+  formula: FeCo2O4(c)
+  formula_as_published: FeCo2O4(c)
   phase: (c)
-  name_as_published: FeCO_2O_4(c)
+  name_as_published: FeCo2O4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $FeCO_2O_4(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -14939,11 +17059,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0560
-  formula: $Fe_{12}(c)$
-  formula_as_published: $Fe_{12}(c)$
+  formula: FeI2(c)
+  formula_as_published: FeI2(c)
   phase: (c)
-  name_as_published: Fe_12(c)
+  name_as_published: FeI2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Fe_{12}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -14979,10 +17100,10 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0562
-  formula: Fe.947O(c)
-  formula_as_published: Fe.947O(c)
+  formula: Fe0.947O(c)
+  formula_as_published: Fe0.947O(c)
   phase: (c)
-  name_as_published: Fe.947O(c)
+  name_as_published: Fe0.947O(c)
   metadata_ocr_suspect: true
   metadata_ocr_token: $Fe_9.94O(c)*$
   source: *id001
@@ -15080,11 +17201,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0567
-  formula: FeSO_4\cdot7H_2O(c)
-  formula_as_published: FeSO_4\cdot7H_2O(c)
+  formula: FeSO4·7H2O(c)
+  formula_as_published: FeSO4·7H2O(c)
   phase: (c)
-  name_as_published: FeSO_47H_2O(c)
+  name_as_published: FeSO4·7H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $FeSO_4\cdot7H_2O(c)*$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15120,10 +17242,10 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0569
-  formula: Fe.877S(c)
-  formula_as_published: Fe.877S(c)
+  formula: Fe0.877S(c)
+  formula_as_published: Fe0.877S(c)
   phase: (c)
-  name_as_published: Fe.877S(c)
+  name_as_published: Fe0.877S(c)
   metadata_ocr_suspect: true
   metadata_ocr_token: $Fe_2.7S(c)*$
   source: *id001
@@ -15181,11 +17303,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0572
-  formula: Fe_{11}Te(c)
-  formula_as_published: Fe_{11}Te(c)
+  formula: Fe1.11Te(c)
+  formula_as_published: Fe1.11Te(c)
   phase: (c)
-  name_as_published: Fe_11Te(c)
+  name_as_published: Fe1.11Te(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Fe_{11}Te(c)*$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15221,11 +17344,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0574
-  formula: Fe_3TiO_4(c)
-  formula_as_published: Fe_3TiO_4(c)
+  formula: Fe2TiO4(c)
+  formula_as_published: Fe2TiO4(c)
   phase: (c)
-  name_as_published: Fe_3TiO_4(c)
+  name_as_published: Fe2TiO4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Fe_3TiO_4(c)*$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15241,11 +17365,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0575
-  formula: $Fe_3TiO_4(c)$
-  formula_as_published: $Fe_3TiO_4(c)$
+  formula: Fe2TiO5(c)
+  formula_as_published: Fe2TiO5(c)
   phase: (c)
-  name_as_published: Fe_3TiO_4(c)
+  name_as_published: Fe2TiO5(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Fe_3TiO_4(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15452,11 +17577,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0585
-  formula: $Pb^{++}(ng)$
-  formula_as_published: $Pb^{++}(ng)$
-  phase: null
-  name_as_published: Pb^++(ng)
+  formula: Pb++(aq)
+  formula_as_published: Pb++(aq)
+  phase: (aq)
+  name_as_published: Pb++(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Pb^{++}(ng)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15512,11 +17638,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0588
-  formula: $PbCO_2(c)$
-  formula_as_published: $PbCO_2(c)$
+  formula: PbCO3(c)
+  formula_as_published: PbCO3(c)
   phase: (c)
-  name_as_published: PbCO_2(c)
+  name_as_published: PbCO3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $PbCO_2(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15532,11 +17659,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0589
-  formula: $PbO\cdotPbCO_3(c)$
-  formula_as_published: $PbO\cdot PbCO_3(c)$
+  formula: PbO·PbCO3(c)
+  formula_as_published: PbO·PbCO3(c)
   phase: (c)
-  name_as_published: PbO PbCO_3(c)
+  name_as_published: PbO·PbCO3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $PbO\cdot PbCO_3(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15792,11 +17920,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0602
-  formula: $PbO_3(c)$
-  formula_as_published: $PbO_3(c)$
+  formula: Pb2O3(c)
+  formula_as_published: Pb2O3(c)
   phase: (c)
-  name_as_published: PbO_3(c)
+  name_as_published: Pb2O3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $PbO_3(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15812,11 +17941,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0603
-  formula: $PbO_4(c)$
-  formula_as_published: $PbO_4(c)$
+  formula: Pb3O4(c)
+  formula_as_published: Pb3O4(c)
   phase: (c)
-  name_as_published: PbO_4(c)
+  name_as_published: Pb3O4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $PbO_4(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15912,11 +18042,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0608
-  formula: $PbSiO_4(amorph.)$
-  formula_as_published: $PbSiO_4(amorph.)$
+  formula: PbSiO3(amorph.)
+  formula_as_published: PbSiO3(amorph.)
   phase: null
-  name_as_published: PbSiO_4(amorph.)
+  name_as_published: PbSiO3(amorph.)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $PbSiO_4(amorph.)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15932,11 +18063,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0609
-  formula: $Pb_3SiO_4(c)$
-  formula_as_published: $Pb_3SiO_4(c)$
+  formula: Pb2SiO4(c)
+  formula_as_published: Pb2SiO4(c)
   phase: (c)
-  name_as_published: Pb_3SiO_4(c)
+  name_as_published: Pb2SiO4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Pb_3SiO_4(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15994,11 +18126,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0612
-  formula: $PbSO_4-PbO(c)$
-  formula_as_published: $PbSO_4-PbO(c)$
+  formula: PbSO4·PbO(c)
+  formula_as_published: PbSO4·PbO(c)
   phase: (c)
-  name_as_published: PbSO_4-PbO(c)
+  name_as_published: PbSO4·PbO(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $PbSO_4-PbO(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16014,11 +18147,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0613
-  formula: $PbSO_4-2PbO(c)$
-  formula_as_published: $PbSO_4-2PbO(c)$
+  formula: PbSO4·2PbO(c)
+  formula_as_published: PbSO4·2PbO(c)
   phase: (c)
-  name_as_published: PbSO_4-2PbO(c)
+  name_as_published: PbSO4·2PbO(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $PbSO_4-2PbO(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16034,11 +18168,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0614
-  formula: $PbSO_4-3PbO(c)$
-  formula_as_published: $PbSO_4-3PbO(c)$
+  formula: PbSO4·3PbO(c)
+  formula_as_published: PbSO4·3PbO(c)
   phase: (c)
-  name_as_published: PbSO_4-3PbO(c)
+  name_as_published: PbSO4·3PbO(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $PbSO_4-3PbO(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16374,11 +18509,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0631
-  formula: $LiFeO_3(c)$
-  formula_as_published: $LiFeO_3(c)$
+  formula: LiFeO2(c)
+  formula_as_published: LiFeO2(c)
   phase: (c)
-  name_as_published: LiFeO_3(c)
+  name_as_published: LiFeO2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $LiFeO_3(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16514,11 +18650,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0638
-  formula: $LiOH-H_3O(c)$
-  formula_as_published: $LiOH-H_3O(c)$
+  formula: LiOH·H2O(c)
+  formula_as_published: LiOH·H2O(c)
   phase: (c)
-  name_as_published: LiOH-H_3O(c)
+  name_as_published: LiOH·H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $LiOH-H_3O(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -17115,11 +19252,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0667
-  formula: $MgCl_2-H_2O(c)$
-  formula_as_published: $MgCl_2-H_2O(c)$
+  formula: MgCl2·H2O(c)
+  formula_as_published: MgCl2·H2O(c)
   phase: (c)
-  name_as_published: MgCl_2-H_2O(c)
+  name_as_published: MgCl2·H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $MgCl_2-H_2O(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -17135,11 +19273,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0668
-  formula: $MgCl_2-H_2O(c)$
-  formula_as_published: $MgCl_2-H_2O(c)$
+  formula: MgCl2·2H2O(c)
+  formula_as_published: MgCl2·2H2O(c)
   phase: (c)
-  name_as_published: MgCl_2-H_2O(c)
+  name_as_published: MgCl2·2H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $MgCl_2-H_2O(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -17155,11 +19294,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0669
-  formula: $MgCl_2-H_2O(c)$
-  formula_as_published: $MgCl_2-H_2O(c)$
+  formula: MgCl2·4H2O(c)
+  formula_as_published: MgCl2·4H2O(c)
   phase: (c)
-  name_as_published: MgCl_2-H_2O(c)
+  name_as_published: MgCl2·4H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $MgCl_2-H_2O(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -17175,11 +19315,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0670
-  formula: MgCl_2-6H_2O(c)
-  formula_as_published: MgCl_2-6H_2O(c)
+  formula: MgCl2·6H2O(c)
+  formula_as_published: MgCl2·6H2O(c)
   phase: (c)
-  name_as_published: MgCl_2-6H_2O(c)
+  name_as_published: MgCl2·6H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $MgCl_2-6H_2O(c)*$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -17519,11 +19660,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0687
-  formula: $MgSiO_4(c)$
-  formula_as_published: $MgSiO_4(c)$
+  formula: Mg2SiO4(c)
+  formula_as_published: Mg2SiO4(c)
   phase: (c)
-  name_as_published: MgSiO_4(c)
+  name_as_published: Mg2SiO4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $MgSiO_4(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -17559,11 +19701,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0689
-  formula: $MgSO_4-H_2O(c)$
-  formula_as_published: $MgSO_4-H_2O(c)$
+  formula: MgSO4·H2O(c)
+  formula_as_published: MgSO4·H2O(c)
   phase: (c)
-  name_as_published: MgSO_4-H_2O(c)
+  name_as_published: MgSO4·H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $MgSO_4-H_2O(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -17579,11 +19722,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0690
-  formula: $MgSO_4-6H_2O(c)$
-  formula_as_published: $MgSO_4-6H_2O(c)$
+  formula: MgSO4·6H2O(c)
+  formula_as_published: MgSO4·6H2O(c)
   phase: (c)
-  name_as_published: MgSO_4-6H_2O(c)
+  name_as_published: MgSO4·6H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $MgSO_4-6H_2O(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -17839,11 +19983,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0703
-  formula: MnCl3(c)
-  formula_as_published: MnCl3(c)
+  formula: MnCl2(c)
+  formula_as_published: MnCl2(c)
   phase: (c)
-  name_as_published: MnCl3(c)
+  name_as_published: MnCl2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: MnCl3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -17879,11 +20024,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0705
-  formula: MnF3(c)
-  formula_as_published: MnF3(c)
+  formula: MnF2(c)
+  formula_as_published: MnF2(c)
   phase: (c)
-  name_as_published: MnF3(c)
+  name_as_published: MnF2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: MnF3(c)*
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -17939,11 +20085,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0708
-  formula: MnI3(c)
-  formula_as_published: MnI3(c)
+  formula: MnI2(c)
+  formula_as_published: MnI2(c)
   phase: (c)
-  name_as_published: MnI3(c)
+  name_as_published: MnI2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: MnI3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18019,11 +20166,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0712
-  formula: MnO3(c)
-  formula_as_published: MnO3(c)
+  formula: MnO2(c)
+  formula_as_published: MnO2(c)
   phase: (c)
-  name_as_published: MnO3(c)
+  name_as_published: MnO2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: MnO3(c)*
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18039,11 +20187,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0713
-  formula: Mn3O3(c)
-  formula_as_published: Mn3O3(c)
+  formula: Mn2O3(c)
+  formula_as_published: Mn2O3(c)
   phase: (c)
-  name_as_published: Mn3O3(c)
+  name_as_published: Mn2O3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Mn3O3(c)*
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18241,11 +20390,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0722
-  formula: MnS2O4·2H2O(c)
-  formula_as_published: MnS2O4·2H2O(c)
+  formula: MnS2O6·2H2O(c)
+  formula_as_published: MnS2O6·2H2O(c)
   phase: (c)
-  name_as_published: MnS2O4·2H2O(c)
+  name_as_published: MnS2O6·2H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: MnS2O4·2H2O(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18261,11 +20411,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0723
-  formula: MnS2O3(c)
-  formula_as_published: MnS2O3(c)
+  formula: MnS2O6(c)
+  formula_as_published: MnS2O6(c)
   phase: (c)
-  name_as_published: MnS2O3(c)
+  name_as_published: MnS2O6(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: MnS2O3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18281,11 +20432,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0724
-  formula: MnS2O4·6H2O(c)
-  formula_as_published: MnS2O4·6H2O(c)
+  formula: MnS2O6·6H2O(c)
+  formula_as_published: MnS2O6·6H2O(c)
   phase: (c)
-  name_as_published: MnS2O4·6H2O(c)
+  name_as_published: MnS2O6·6H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: MnS2O4·6H2O(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18301,11 +20453,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0725
-  formula: Hg(I)
-  formula_as_published: Hg(I)
-  phase: null
-  name_as_published: Hg(I)
-  metadata_ocr_suspect: false
+  formula: Hg(l)
+  formula_as_published: Hg(l)
+  phase: (l)
+  name_as_published: Hg(l)
+  metadata_ocr_suspect: true
+  metadata_ocr_token: Hg(I)†
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18316,7 +20469,7 @@ entries:
     table_number: 6
   path: records/table-006-0725.json
   row_count: 1
-  ocr_suspect_count: 2
+  ocr_suspect_count: 3
   ambiguity_count: 1
   ambiguities:
   - kind: recommended_entropy_not_equal_to_printed_source_column
@@ -18368,11 +20521,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0728
-  formula: Hg3+(aq)
-  formula_as_published: Hg3+(aq)
+  formula: Hg2++(aq)
+  formula_as_published: Hg2++(aq)
   phase: (aq)
-  name_as_published: Hg3+(aq)
+  name_as_published: Hg2++(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Hg3+(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18428,11 +20582,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0731
-  formula: HgBr3(g)
-  formula_as_published: HgBr3(g)
+  formula: HgBr2(g)
+  formula_as_published: HgBr2(g)
   phase: (g)
-  name_as_published: HgBr3(g)
+  name_as_published: HgBr2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HgBr3(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18508,11 +20663,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0735
-  formula: HgCl3(g)
-  formula_as_published: HgCl3(g)
+  formula: HgCl2(g)
+  formula_as_published: HgCl2(g)
   phase: (g)
-  name_as_published: HgCl3(g)
+  name_as_published: HgCl2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HgCl3(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18608,11 +20764,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0740
-  formula: HgF3(g)
-  formula_as_published: HgF3(g)
+  formula: HgF2(g)
+  formula_as_published: HgF2(g)
   phase: (g)
-  name_as_published: HgF3(g)
+  name_as_published: HgF2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HgF3(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18828,11 +20985,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0751
-  formula: HgSO4(c)
-  formula_as_published: HgSO4(c)
+  formula: Hg2SO4(c)
+  formula_as_published: Hg2SO4(c)
   phase: (c)
-  name_as_published: HgSO4(c)
+  name_as_published: Hg2SO4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: HgSO4(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18948,11 +21106,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0757
-  formula: MoF6(I)
-  formula_as_published: MoF6(I)
-  phase: null
-  name_as_published: MoF6(I)
+  formula: MoF6(l)
+  formula_as_published: MoF6(l)
+  phase: (l)
+  name_as_published: MoF6(l)
   metadata_ocr_suspect: true
+  metadata_ocr_token: MoF6(I)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18968,11 +21127,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0758
-  formula: MoO3(c)
-  formula_as_published: MoO3(c)
+  formula: MoO2(c)
+  formula_as_published: MoO2(c)
   phase: (c)
-  name_as_published: MoO3(c)
+  name_as_published: MoO2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: MoO3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19208,11 +21368,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0770
-  formula: Ni(CO)4(I)
-  formula_as_published: Ni(CO)4(I)
-  phase: null
-  name_as_published: Ni(CO)4(I)
+  formula: Ni(CO)4(l)
+  formula_as_published: Ni(CO)4(l)
+  phase: (l)
+  name_as_published: Ni(CO)4(l)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Ni(CO)4(I)†
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19248,11 +21409,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0772
-  formula: NiCl3(c)
-  formula_as_published: NiCl3(c)
+  formula: NiCl2(c)
+  formula_as_published: NiCl2(c)
   phase: (c)
-  name_as_published: NiCl3(c)
+  name_as_published: NiCl2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: NiCl3(c)*
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19391,11 +21553,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0779
-  formula: $NiTe_{1.4}(c)$
-  formula_as_published: $NiTe_{1.4}(c)$
+  formula: NiTe1.6(c)
+  formula_as_published: NiTe1.6(c)
   phase: (c)
-  name_as_published: NiTe_1.4(c)
+  name_as_published: NiTe1.6(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $NiTe_{1.4}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19431,11 +21594,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0781
-  formula: $Ni_{0.4}Zn_{0.4}Fe_{2}O_{4}(c)$
-  formula_as_published: $Ni_{0.4}Zn_{0.4}Fe_{2}O_{4}(c)$
+  formula: Ni0.4Zn0.6Fe2O4(c)
+  formula_as_published: Ni0.4Zn0.6Fe2O4(c)
   phase: (c)
-  name_as_published: Ni_0.4Zn_0.4Fe_2O_4(c)
+  name_as_published: Ni0.4Zn0.6Fe2O4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Ni_{0.4}Zn_{0.4}Fe_{2}O_{4}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19451,11 +21615,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0782
-  formula: $Ni_{0.4}Zn_{0.7}Fe_{2}O_{4}(c)$
-  formula_as_published: $Ni_{0.4}Zn_{0.7}Fe_{2}O_{4}(c)$
+  formula: Ni0.3Zn0.7Fe2O4(c)
+  formula_as_published: Ni0.3Zn0.7Fe2O4(c)
   phase: (c)
-  name_as_published: Ni_0.4Zn_0.7Fe_2O_4(c)
+  name_as_published: Ni0.3Zn0.7Fe2O4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Ni_{0.4}Zn_{0.7}Fe_{2}O_{4}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19471,11 +21636,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0783
-  formula: $Ni_{0.2}Zn_{0.4}Fe_{2}O_{4}(c)$
-  formula_as_published: $Ni_{0.2}Zn_{0.4}Fe_{2}O_{4}(c)$
+  formula: Ni0.2Zn0.8Fe2O4(c)
+  formula_as_published: Ni0.2Zn0.8Fe2O4(c)
   phase: (c)
-  name_as_published: Ni_0.2Zn_0.4Fe_2O_4(c)
+  name_as_published: Ni0.2Zn0.8Fe2O4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Ni_{0.2}Zn_{0.4}Fe_{2}O_{4}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19491,11 +21657,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0784
-  formula: $Ni_{0.1}Zn_{0.2}Fe_{2}O_{4}(c)$
-  formula_as_published: $Ni_{0.1}Zn_{0.2}Fe_{2}O_{4}(c)$
+  formula: Ni0.1Zn0.9Fe2O4(c)
+  formula_as_published: Ni0.1Zn0.9Fe2O4(c)
   phase: (c)
-  name_as_published: Ni_0.1Zn_0.2Fe_2O_4(c)
+  name_as_published: Ni0.1Zn0.9Fe2O4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Ni_{0.1}Zn_{0.2}Fe_{2}O_{4}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19551,11 +21718,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0787
-  formula: $NbO(c)$
-  formula_as_published: $NbO(c)$
+  formula: NbC(c)
+  formula_as_published: NbC(c)
   phase: (c)
-  name_as_published: NbO(c)
+  name_as_published: NbC(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $NbO(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19571,11 +21739,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0788
-  formula: $NbF_{4}(c)$
-  formula_as_published: $NbF_{4}(c)$
+  formula: NbF5(c)
+  formula_as_published: NbF5(c)
   phase: (c)
-  name_as_published: NbF_4(c)
+  name_as_published: NbF5(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $NbF_{4}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19611,11 +21780,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0790
-  formula: $NbO_{3}(c)$
-  formula_as_published: $NbO_{3}(c)$
+  formula: NbO2(c)
+  formula_as_published: NbO2(c)
   phase: (c)
-  name_as_published: NbO_3(c)
+  name_as_published: NbO2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $NbO_{3}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19631,11 +21801,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0791
-  formula: $Nb_{2}O_{4}(c)$
-  formula_as_published: $Nb_{2}O_{4}(c)$
+  formula: Nb2O5(c)
+  formula_as_published: Nb2O5(c)
   phase: (c)
-  name_as_published: Nb_2O_4(c)
+  name_as_published: Nb2O5(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Nb_{2}O_{4}(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19651,11 +21822,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0792
-  formula: $N_{2}(g)\uparrow$
-  formula_as_published: $N_{2}(g) \uparrow$
+  formula: N2(g)
+  formula_as_published: N2(g)
   phase: (g)
-  name_as_published: N_2(g)
+  name_as_published: N2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $N_{2}(g) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19702,11 +21874,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0794
-  formula: $NF_{2}(g)\uparrow$
-  formula_as_published: $NF_{2}(g) \uparrow$
+  formula: NF3(g)
+  formula_as_published: NF3(g)
   phase: (g)
-  name_as_published: NF_2(g)
+  name_as_published: NF3(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $NF_{2}(g) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19773,11 +21946,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0797
-  formula: $N_{2}O(g)\uparrow$
-  formula_as_published: $N_{2}O(g) \uparrow$
+  formula: N2O(g)
+  formula_as_published: N2O(g)
   phase: (g)
-  name_as_published: N_2O(g)
+  name_as_published: N2O(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $N_{2}O(g) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19804,11 +21978,12 @@ entries:
     note: Detector only; phase changes and printed values retained unchanged.
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0798
-  formula: $NO(g)\uparrow$
-  formula_as_published: $NO(g) \uparrow$
+  formula: NO(g)
+  formula_as_published: NO(g)
   phase: (g)
   name_as_published: NO(g)
-  metadata_ocr_suspect: false
+  metadata_ocr_suspect: true
+  metadata_ocr_token: $NO(g) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19819,7 +21994,7 @@ entries:
     table_number: 6
   path: records/table-006-0798.json
   row_count: 1
-  ocr_suspect_count: 4
+  ocr_suspect_count: 5
   ambiguity_count: 3
   ambiguities:
   - kind: within_record_cp_monotonicity_reversal
@@ -19897,11 +22072,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0801
-  formula: $N_{2}O_{4}(g)\uparrow$
-  formula_as_published: $N_{2}O_{4}(g) \uparrow$
+  formula: N2O4(g)
+  formula_as_published: N2O4(g)
   phase: (g)
-  name_as_published: N_2O_4(g)
+  name_as_published: N2O4(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $N_{2}O_{4}(g) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19968,11 +22144,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0804
-  formula: $NO_{4}^{-}(aq)$
-  formula_as_published: $NO_{4}^{-}(aq)$
+  formula: NO3-(aq)
+  formula_as_published: NO3-(aq)
   phase: (aq)
-  name_as_published: NO_4^-(aq)
+  name_as_published: NO3-(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $NO_{4}^{-}(aq)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -20008,11 +22185,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0806
-  formula: $N_{2}O_{2}^{-}(aq)$
-  formula_as_published: $N_{2}O_{2}^{-}(aq)$
+  formula: N2O2--(aq)
+  formula_as_published: N2O2--(aq)
   phase: (aq)
-  name_as_published: N_2O_2^-(aq)
+  name_as_published: N2O2--(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $N_{2}O_{2}^{-}(aq)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -20148,11 +22326,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0813
-  formula: $NH_{3}(g)\uparrow$
-  formula_as_published: $NH_{3}(g) \uparrow$
+  formula: NH3(g)
+  formula_as_published: NH3(g)
   phase: (g)
-  name_as_published: NH_3(g)
+  name_as_published: NH3(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $NH_{3}(g) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -20325,11 +22504,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0821
-  formula: $NH_{3}B_{3}H_{7}(c)\uparrow$
-  formula_as_published: $NH_{3}B_{3}H_{7}(c) \uparrow$
+  formula: NH3B3H7(c)
+  formula_as_published: NH3B3H7(c)
   phase: (c)
-  name_as_published: NH_3B_3H_7(c)
+  name_as_published: NH3B3H7(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $NH_{3}B_{3}H_{7}(c) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -20425,11 +22605,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0826
-  formula: $NH_{4}Cl^{*}$
-  formula_as_published: $NH_{4}Cl^{*}$
+  formula: NH4Cl
+  formula_as_published: NH4Cl
   phase: null
-  name_as_published: NH_4Cl^*
+  name_as_published: NH4Cl
   metadata_ocr_suspect: true
+  metadata_ocr_token: $NH_{4}Cl^{*}$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -20579,11 +22760,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0833
-  formula: $NH_{4}OH(l)\uparrow$
-  formula_as_published: $NH_{4}OH(l) \uparrow$
+  formula: NH4OH(l)
+  formula_as_published: NH4OH(l)
   phase: (l)
-  name_as_published: NH_4OH(l)
+  name_as_published: NH4OH(l)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $NH_{4}OH(l) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -20639,11 +22821,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0836
-  formula: $NH_{4}NO_{4}(c)\uparrow$
-  formula_as_published: $NH_{4}NO_{4}(c) \uparrow$
+  formula: NH4NO3(c)
+  formula_as_published: NH4NO3(c)
   phase: (c)
-  name_as_published: NH_4NO_4(c)
+  name_as_published: NH4NO3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $NH_{4}NO_{4}(c) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -20659,11 +22842,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0837
-  formula: $(NH_{4})_{2}O(l)\uparrow$
-  formula_as_published: $(NH_{4})_{2}O(l) \uparrow$
+  formula: (NH4)2O(l)
+  formula_as_published: (NH4)2O(l)
   phase: (l)
-  name_as_published: (NH_4)_2O(l)
+  name_as_published: (NH4)2O(l)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $(NH_{4})_{2}O(l) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -20819,11 +23003,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0845
-  formula: $O_{2}(g)\uparrow$
-  formula_as_published: $O_{2}(g) \uparrow$
+  formula: O2(g)
+  formula_as_published: O2(g)
   phase: (g)
-  name_as_published: O_2(g)
+  name_as_published: O2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $O_{2}(g) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21070,11 +23255,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0857
-  formula: $P(g)$
-  formula_as_published: $P(g)$
+  formula: P4(g)
+  formula_as_published: P4(g)
   phase: (g)
-  name_as_published: P(g)
+  name_as_published: P4(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $P(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21172,11 +23358,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0862
-  formula: PCl2(g)
-  formula_as_published: PCl2(g)
+  formula: PCl5(g)
+  formula_as_published: PCl5(g)
   phase: (g)
-  name_as_published: PCl2(g)
+  name_as_published: PCl5(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: PCl2(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21192,11 +23379,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0863
-  formula: PCl3(c)
-  formula_as_published: PCl3(c)
+  formula: PCl5(c)
+  formula_as_published: PCl5(c)
   phase: (c)
-  name_as_published: PCl3(c)
+  name_as_published: PCl5(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: PCl3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21390,11 +23578,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0872
-  formula: PO4-(aq)
-  formula_as_published: PO4-(aq)
+  formula: PO4---(aq)
+  formula_as_published: PO4---(aq)
   phase: (aq)
-  name_as_published: PO4-(aq)
+  name_as_published: PO4---(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: PO4-(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21730,11 +23919,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0889
-  formula: PuO2+(aq)
-  formula_as_published: PuO2+(aq)
+  formula: PuO2++(aq)
+  formula_as_published: PuO2++(aq)
   phase: (aq)
-  name_as_published: PuO2+(aq)
+  name_as_published: PuO2++(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: PuO2+(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21930,11 +24120,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0899
-  formula: KAlSi3O5(c)
-  formula_as_published: KAlSi3O5(c)
+  formula: KAlSi3O8(c)
+  formula_as_published: KAlSi3O8(c)
   phase: (c)
-  name_as_published: KAlSi3O5(c)
+  name_as_published: KAlSi3O8(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: KAlSi3O5(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -22322,11 +24513,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0918
-  formula: K2CrO7(c)
-  formula_as_published: K2CrO7(c)
+  formula: K2Cr2O7(c)
+  formula_as_published: K2Cr2O7(c)
   phase: (c)
-  name_as_published: K2CrO7(c)
+  name_as_published: K2Cr2O7(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: K2CrO7(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -22342,11 +24534,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0919
-  formula: K2Co(CN)6(c)
-  formula_as_published: K2Co(CN)6(c)
+  formula: K3Co(CN)6(c)
+  formula_as_published: K3Co(CN)6(c)
   phase: (c)
-  name_as_published: K2Co(CN)6(c)
+  name_as_published: K3Co(CN)6(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: K2Co(CN)6(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -22462,11 +24655,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0925
-  formula: KH2(c)
-  formula_as_published: KH2(c)
+  formula: KHF2(c)
+  formula_as_published: KHF2(c)
   phase: (c)
-  name_as_published: KH2(c)
+  name_as_published: KHF2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: KH2(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -22685,11 +24879,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0936
-  formula: K2PtCl3(c)
-  formula_as_published: K2PtCl3(c)
+  formula: K2PtCl6(c)
+  formula_as_published: K2PtCl6(c)
   phase: (c)
-  name_as_published: K2PtCl3(c)
+  name_as_published: K2PtCl6(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: K2PtCl3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -22945,11 +25140,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0949
-  formula: ReFe(g)
-  formula_as_published: ReFe(g)
+  formula: ReF6(g)
+  formula_as_published: ReF6(g)
   phase: (g)
-  name_as_published: ReFe(g)
+  name_as_published: ReF6(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: ReFe(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -22965,11 +25161,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0950
-  formula: ReO2(c)
-  formula_as_published: ReO2(c)
+  formula: ReO3(c)
+  formula_as_published: ReO3(c)
   phase: (c)
-  name_as_published: ReO2(c)
+  name_as_published: ReO3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: ReO2(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -23025,11 +25222,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0953
-  formula: ReO4(aq)
-  formula_as_published: ReO4(aq)
+  formula: ReO4-(aq)
+  formula_as_published: ReO4-(aq)
   phase: (aq)
-  name_as_published: ReO4(aq)
+  name_as_published: ReO4-(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: ReO4(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -23665,11 +25863,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0985
-  formula: Se3(g)
-  formula_as_published: Se3(g)
+  formula: Se6(g)
+  formula_as_published: Se6(g)
   phase: (g)
-  name_as_published: Se3(g)
+  name_as_published: Se6(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Se3(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -23685,11 +25884,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0986
-  formula: Se-(aq)
-  formula_as_published: Se-(aq)
+  formula: Se--(aq)
+  formula_as_published: Se--(aq)
   phase: (aq)
-  name_as_published: Se-(aq)
-  metadata_ocr_suspect: false
+  name_as_published: Se--(aq)
+  metadata_ocr_suspect: true
+  metadata_ocr_token: Se-(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -23700,7 +25900,7 @@ entries:
     table_number: 6
   path: records/table-006-0986.json
   row_count: 1
-  ocr_suspect_count: 1
+  ocr_suspect_count: 2
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -23785,11 +25985,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0991
-  formula: SeO4-(aq)
-  formula_as_published: SeO4-(aq)
+  formula: SeO4--(aq)
+  formula_as_published: SeO4--(aq)
   phase: (aq)
-  name_as_published: SeO4-(aq)
+  name_as_published: SeO4--(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: SeO4-(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -23845,11 +26046,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0994
-  formula: SeO3-(aq)
-  formula_as_published: SeO3-(aq)
+  formula: SeO3--(aq)
+  formula_as_published: SeO3--(aq)
   phase: (aq)
-  name_as_published: SeO3-(aq)
+  name_as_published: SeO3--(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: SeO3-(aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -23945,11 +26147,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0999
-  formula: SiBr(g)
-  formula_as_published: SiBr(g)
+  formula: SiBr4(g)
+  formula_as_published: SiBr4(g)
   phase: (g)
-  name_as_published: SiBr(g)
+  name_as_published: SiBr4(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: SiBr(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -23985,11 +26188,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1001
-  formula: SiC(her.)
-  formula_as_published: SiC(her.)
+  formula: SiC(hex.)
+  formula_as_published: SiC(hex.)
   phase: null
-  name_as_published: SiC(her.)
-  metadata_ocr_suspect: false
+  name_as_published: SiC(hex.)
+  metadata_ocr_suspect: true
+  metadata_ocr_token: SiC(her.)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -24000,7 +26204,7 @@ entries:
     table_number: 6
   path: records/table-006-1001.json
   row_count: 1
-  ocr_suspect_count: 4
+  ocr_suspect_count: 5
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -24216,11 +26420,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1012
-  formula: SiI(g)
-  formula_as_published: SiI(g)
+  formula: SiI4(g)
+  formula_as_published: SiI4(g)
   phase: (g)
-  name_as_published: SiI(g)
+  name_as_published: SiI4(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: SiI(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -24579,11 +26784,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1030
-  formula: AgCO3(c)
-  formula_as_published: AgCO3(c)
+  formula: Ag2CO3(c)
+  formula_as_published: Ag2CO3(c)
   phase: (c)
-  name_as_published: AgCO3(c)
+  name_as_published: Ag2CO3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: AgCO3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -24659,11 +26865,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1034
-  formula: AgCrO4(c)
-  formula_as_published: AgCrO4(c)
+  formula: Ag2CrO4(c)
+  formula_as_published: Ag2CrO4(c)
   phase: (c)
-  name_as_published: AgCrO4(c)
+  name_as_published: Ag2CrO4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: AgCrO4(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -24759,11 +26966,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1039
-  formula: Ag2H31O6(c)
-  formula_as_published: Ag2H31O6(c)
+  formula: Ag2H3IO6(c)
+  formula_as_published: Ag2H3IO6(c)
   phase: (c)
-  name_as_published: Ag2H31O6(c)
+  name_as_published: Ag2H3IO6(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Ag2H31O6(c)*
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -24879,11 +27087,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1045
-  formula: AgO(c)
-  formula_as_published: AgO(c)
+  formula: Ag2O(c)
+  formula_as_published: Ag2O(c)
   phase: (c)
-  name_as_published: AgO(c)
+  name_as_published: Ag2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: AgO(c)*
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -24919,11 +27128,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1047
-  formula: Ag2SiO2(c)
-  formula_as_published: Ag2SiO2(c)
+  formula: Ag2SiO3(c)
+  formula_as_published: Ag2SiO3(c)
   phase: (c)
-  name_as_published: Ag2SiO2(c)
+  name_as_published: Ag2SiO3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Ag2SiO2(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -24939,11 +27149,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1048
-  formula: AgSO4(c)
-  formula_as_published: AgSO4(c)
+  formula: Ag2SO4(c)
+  formula_as_published: Ag2SO4(c)
   phase: (c)
-  name_as_published: AgSO4(c)
+  name_as_published: Ag2SO4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: AgSO4(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -24959,11 +27170,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1049
-  formula: AgS(α)
-  formula_as_published: AgS(α)
+  formula: Ag2S(α)
+  formula_as_published: Ag2S(α)
   phase: null
-  name_as_published: AgS(α)
+  name_as_published: Ag2S(α)
   metadata_ocr_suspect: true
+  metadata_ocr_token: AgS(α)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -24979,11 +27191,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1050
-  formula: Ag(NH2)+(aq)
-  formula_as_published: Ag(NH2)+ (aq)
+  formula: Ag(NH3)2+(aq)
+  formula_as_published: Ag(NH3)2+(aq)
   phase: (aq)
-  name_as_published: Ag(NH2)+ (aq)
+  name_as_published: Ag(NH3)2+(aq)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Ag(NH2)+ (aq)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25079,11 +27292,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1055
-  formula: NaAlO3(c)
-  formula_as_published: NaAlO3(c)
+  formula: NaAlO2(c)
+  formula_as_published: NaAlO2(c)
   phase: (c)
-  name_as_published: NaAlO3(c)
+  name_as_published: NaAlO2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: NaAlO3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25099,11 +27313,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1056
-  formula: NaAlF4(c)
-  formula_as_published: NaAlF4(c)
+  formula: NaAlF6(c)
+  formula_as_published: NaAlF6(c)
   phase: (c)
-  name_as_published: NaAlF4(c)
+  name_as_published: NaAlF6(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: NaAlF4(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25159,11 +27374,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1059
-  formula: NaAlSi3O6(c)
-  formula_as_published: NaAlSi3O6(c)
+  formula: NaAlSi3O8(c)
+  formula_as_published: NaAlSi3O8(c)
   phase: (c)
-  name_as_published: NaAlSi3O6(c)
+  name_as_published: NaAlSi3O8(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: NaAlSi3O6(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25242,11 +27458,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1063
-  formula: Na2H4O7(c)
-  formula_as_published: Na2H4O7(c)
+  formula: Na2B4O7(c)
+  formula_as_published: Na2B4O7(c)
   phase: (c)
-  name_as_published: Na2H4O7(c)
+  name_as_published: Na2B4O7(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Na2H4O7(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25262,11 +27479,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1064
-  formula: Na2H4O7(g)
-  formula_as_published: Na2H4O7(g)
-  phase: (g)
-  name_as_published: Na2H4O7(g)
+  formula: Na2B4O7(gl)
+  formula_as_published: Na2B4O7(gl)
+  phase: (gl)
+  name_as_published: Na2B4O7(gl)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Na2H4O7(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25622,11 +27840,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1082
-  formula: NaNH3(c)
-  formula_as_published: NaNH3(c)
+  formula: NaNH2(c)
+  formula_as_published: NaNH2(c)
   phase: (c)
-  name_as_published: NaNH3(c)
+  name_as_published: NaNH2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: NaNH3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25642,11 +27861,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1083
-  formula: NaO(c)
-  formula_as_published: NaO(c)
+  formula: Na2O(c)
+  formula_as_published: Na2O(c)
   phase: (c)
-  name_as_published: NaO(c)
+  name_as_published: Na2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: NaO(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25682,11 +27902,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1085
-  formula: Na2O2(c)
-  formula_as_published: Na2O2(c)
+  formula: NaO2(c)
+  formula_as_published: NaO2(c)
   phase: (c)
-  name_as_published: Na2O2(c)
+  name_as_published: NaO2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Na2O2(c)*
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25773,11 +27994,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1089
-  formula: NaSiO2(c)
-  formula_as_published: NaSiO2(c)
+  formula: Na2SiO3(c)
+  formula_as_published: Na2SiO3(c)
   phase: (c)
-  name_as_published: NaSiO2(c)
+  name_as_published: Na2SiO3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: NaSiO2(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25793,11 +28015,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1090
-  formula: NaSi2O5(c)
-  formula_as_published: NaSi2O5(c)
+  formula: Na2Si2O5(c)
+  formula_as_published: Na2Si2O5(c)
   phase: (c)
-  name_as_published: NaSi2O5(c)
+  name_as_published: Na2Si2O5(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: NaSi2O5(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25813,11 +28036,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1091
-  formula: NaSiO4(c)
-  formula_as_published: NaSiO4(c)
+  formula: Na4SiO4(c)
+  formula_as_published: Na4SiO4(c)
   phase: (c)
-  name_as_published: NaSiO4(c)
+  name_as_published: Na4SiO4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: NaSiO4(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25956,11 +28180,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1098
-  formula: Na2TiO5(c)
-  formula_as_published: Na2TiO5(c)
+  formula: Na2Ti2O5(c)
+  formula_as_published: Na2Ti2O5(c)
   phase: (c)
-  name_as_published: Na2TiO5(c)
+  name_as_published: Na2Ti2O5(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Na2TiO5(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25976,11 +28201,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1099
-  formula: Na2TiO7(c)
-  formula_as_published: Na2TiO7(c)
+  formula: Na2Ti3O7(c)
+  formula_as_published: Na2Ti3O7(c)
   phase: (c)
-  name_as_published: Na2TiO7(c)
+  name_as_published: Na2Ti3O7(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Na2TiO7(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -26036,11 +28262,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1102
-  formula: Sr++(g)
-  formula_as_published: Sr++(g)
-  phase: (g)
-  name_as_published: Sr++(g)
-  metadata_ocr_suspect: false
+  formula: Sr++(aq)
+  formula_as_published: Sr++(aq)
+  phase: (aq)
+  name_as_published: Sr++(aq)
+  metadata_ocr_suspect: true
+  metadata_ocr_token: Sr++(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -26051,7 +28278,7 @@ entries:
     table_number: 6
   path: records/table-006-1102.json
   row_count: 1
-  ocr_suspect_count: 3
+  ocr_suspect_count: 4
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -26138,11 +28365,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1107
-  formula: $SrCl_3(c)$
-  formula_as_published: $SrCl_3(c)$
+  formula: SrCl2(c)
+  formula_as_published: SrCl2(c)
   phase: (c)
-  name_as_published: SrCl_3(c)
+  name_as_published: SrCl2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $SrCl_3(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -26178,11 +28406,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1109
-  formula: $SrF_5(c)$
-  formula_as_published: $SrF_5(c)$
+  formula: SrF2(c)
+  formula_as_published: SrF2(c)
   phase: (c)
-  name_as_published: SrF_5(c)
+  name_as_published: SrF2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $SrF_5(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -26572,11 +28801,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1128
-  formula: $SCl_3(g)$
-  formula_as_published: $SCl_3(g)$
+  formula: SCl2(g)
+  formula_as_published: SCl2(g)
   phase: (g)
-  name_as_published: SCl_3(g)
+  name_as_published: SCl2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $SCl_3(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -26592,11 +28822,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1129
-  formula: $S_2Cl_3(g)$
-  formula_as_published: $S_2Cl_3(g)$
+  formula: S2Cl2(g)
+  formula_as_published: S2Cl2(g)
   phase: (g)
-  name_as_published: S_2Cl_3(g)
+  name_as_published: S2Cl2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $S_2Cl_3(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -26663,11 +28894,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1132
-  formula: $SO_3(g)$
-  formula_as_published: $SO_3(g)$
+  formula: SO2(g)
+  formula_as_published: SO2(g)
   phase: (g)
-  name_as_published: SO_3(g)
+  name_as_published: SO2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $SO_3(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -26854,11 +29086,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1141
-  formula: $SO_3Cl_3(g)$
-  formula_as_published: $SO_3Cl_3(g)$
+  formula: SO2Cl2(g)
+  formula_as_published: SO2Cl2(g)
   phase: (g)
-  name_as_published: SO_3Cl_3(g)
+  name_as_published: SO2Cl2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $SO_3Cl_3(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -26874,11 +29107,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1142
-  formula: $SO_3Cl_3(l)$
-  formula_as_published: $SO_3Cl_3(l)$
+  formula: SO2Cl2(l)
+  formula_as_published: SO2Cl2(l)
   phase: (l)
-  name_as_published: SO_3Cl_3(l)
+  name_as_published: SO2Cl2(l)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $SO_3Cl_3(l)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -26934,11 +29168,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1145
-  formula: $SOCl_3(g)$
-  formula_as_published: $SOCl_3(g)$
+  formula: SOCl2(g)
+  formula_as_published: SOCl2(g)
   phase: (g)
-  name_as_published: SOCl_3(g)
+  name_as_published: SOCl2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $SOCl_3(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -26954,11 +29189,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1146
-  formula: $SOF_3(g)$
-  formula_as_published: $SOF_3(g)$
+  formula: SOF2(g)
+  formula_as_published: SOF2(g)
   phase: (g)
-  name_as_published: SOF_3(g)
+  name_as_published: SOF2(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $SOF_3(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -27034,11 +29270,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1150
-  formula: $Ta_2O_3(c)$
-  formula_as_published: $Ta_2O_3(c)$
+  formula: Ta2O5(c)
+  formula_as_published: Ta2O5(c)
   phase: (c)
-  name_as_published: Ta_2O_3(c)
+  name_as_published: Ta2O5(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Ta_2O_3(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -27174,11 +29411,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1157
-  formula: $TeO_3(c)$
-  formula_as_published: $TeO_3(c)$
+  formula: TeO2(c)
+  formula_as_published: TeO2(c)
   phase: (c)
-  name_as_published: TeO_3(c)
+  name_as_published: TeO2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $TeO_3(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -27967,10 +30205,10 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1196
-  formula: $SnI_2(g)$
-  formula_as_published: $SnI_2(g)$
+  formula: SnI4(g)
+  formula_as_published: SnI4(g)
   phase: (g)
-  name_as_published: SnI_2(g)
+  name_as_published: SnI4(g)
   metadata_ocr_suspect: true
   metadata_ocr_token: $SnI_1(g)$
   source: *id001
@@ -28899,11 +31137,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1242
-  formula: $UF_5(c)$
-  formula_as_published: $UF_5(c)$
+  formula: UF6(c)
+  formula_as_published: UF6(c)
   phase: (c)
-  name_as_published: UF_5(c)
+  name_as_published: UF6(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $UF_5(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -28942,8 +31181,9 @@ entries:
   formula: $UH_3(\beta)$
   formula_as_published: $UH_3(\beta)$
   phase: null
-  name_as_published: UH_3()
+  name_as_published: UH_3(β)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $UH_3(\beta)$ *
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -29030,10 +31270,10 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1248
-  formula: $U_3O_8(c)$
-  formula_as_published: $U_3O_8(c)$
+  formula: U4O9(c)
+  formula_as_published: U4O9(c)
   phase: (c)
-  name_as_published: U_3O_8(c)
+  name_as_published: U4O9(c)
   metadata_ocr_suspect: true
   metadata_ocr_token: $U_1O_9(c)$
   source: *id001
@@ -29071,11 +31311,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1250
-  formula: $UOCl_5(c)$
-  formula_as_published: $UOCl_5(c)$
+  formula: UOCl2(c)
+  formula_as_published: UOCl2(c)
   phase: (c)
-  name_as_published: UOCl_5(c)
+  name_as_published: UOCl2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $UOCl_5(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -29254,11 +31495,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1259
-  formula: VO(c)
-  formula_as_published: VO(c)
+  formula: VC(c)
+  formula_as_published: VC(c)
   phase: (c)
-  name_as_published: VO(c)
-  metadata_ocr_suspect: false
+  name_as_published: VC(c)
+  metadata_ocr_suspect: true
+  metadata_ocr_token: VO(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -29269,7 +31511,7 @@ entries:
     table_number: 6
   path: records/table-006-1259.json
   row_count: 1
-  ocr_suspect_count: 6
+  ocr_suspect_count: 7
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -29294,11 +31536,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1261
-  formula: VCl2(c)
-  formula_as_published: VCl2(c)
+  formula: VCl3(c)
+  formula_as_published: VCl3(c)
   phase: (c)
-  name_as_published: VCl2(c)
+  name_as_published: VCl3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: VCl2(c)*
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -29766,11 +32009,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1284
-  formula: ZnSb2(c)
-  formula_as_published: ZnSb2(c)
+  formula: Zn3Sb2(c)
+  formula_as_published: Zn3Sb2(c)
   phase: (c)
-  name_as_published: ZnSb2(c)
+  name_as_published: Zn3Sb2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: ZnSb2(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -29786,11 +32030,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1285
-  formula: ZnSb3(c)
-  formula_as_published: ZnSb3(c)
+  formula: Zn4Sb3(c)
+  formula_as_published: Zn4Sb3(c)
   phase: (c)
-  name_as_published: ZnSb3(c)
+  name_as_published: Zn4Sb3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: ZnSb3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -30086,11 +32331,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1300
-  formula: ZnSiO4(c)
-  formula_as_published: ZnSiO4(c)
+  formula: Zn2SiO4(c)
+  formula_as_published: Zn2SiO4(c)
   phase: (c)
-  name_as_published: ZnSiO4(c)
+  name_as_published: Zn2SiO4(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: ZnSiO4(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl

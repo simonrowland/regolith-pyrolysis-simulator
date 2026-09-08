@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0529",
   "table_number": 6,
-  "substance_as_published": "$I_3(g)$",
-  "formula_as_published": "$I_3(g)$",
-  "formula": "$I_3(g)$",
-  "name_as_published": "I_3(g)",
+  "substance_as_published": "I2(g)",
+  "formula_as_published": "I2(g)",
+  "formula": "I2(g)",
+  "name_as_published": "I2(g)",
   "phase_as_published": "(g)",
   "state_as_published": "(g)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 108,
   "pdf_page": 112,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 4,
       "raw": [
-        "$I_3(g)$",
+        "I2(g)",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$I_3(g)$"
+          "raw": "I2(g)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -310,7 +312,21 @@
     "sha256": "65ad2da120a4239903f903e0c9f4dd8946505132dec748da00ae472782bd3cb1"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 112,
+      "page": 108,
+      "source_row_index": 4,
+      "column": "substance",
+      "ocr_token": "$I_3(g)$",
+      "printed_token": "I2(g)",
+      "quote": "I₂(g)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0529"
+    }
+  ],
   "heading_context_as_published": "Indium:",
+  "metadata_ocr_token": "$I_3(g)$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

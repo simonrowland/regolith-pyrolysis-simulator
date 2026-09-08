@@ -30,6 +30,8 @@ _CL_AS_I_CONFUSABLE = re.compile(r"CI(?=\d|[A-Z(])")
 _IODINE_FLUORIDE = re.compile(r"(?<![A-Za-z])IF(\d+)")
 _DIGIT_CONFUSABLE = re.compile(r"(?<![\d./])1(?=[A-Za-z,(]|$)")
 _IMAGE_VERIFIED_DIGIT_EXCEPTION = "HNO2(equ1,g)"
+# These integer runs are image-proven corruption, not forbidden stoichiometries.
+_IMAGE_VERIFIED_MULTIDIGIT_ERRORS = frozenset({"Fe12(c)", "Ag2H31O6(c)", "Fe11Te(c)"})
 
 
 class PrintedTemperatureUnavailable(LookupError):
@@ -147,6 +149,8 @@ def _formula_token_issues(token: str) -> tuple[str, ...]:
         issues.append("uppercase I in a Cl-shaped formula position")
     if _DIGIT_CONFUSABLE.search(plain) and plain != _IMAGE_VERIFIED_DIGIT_EXCEPTION:
         issues.append("digit in an element-symbol or subscript position")
+    if plain in _IMAGE_VERIFIED_MULTIDIGIT_ERRORS:
+        issues.append("image-proven corruption inside a multi-digit subscript")
     iodine_fluoride = _IODINE_FLUORIDE.search(plain)
     if iodine_fluoride and int(iodine_fluoride.group(1)) not in {3, 5, 7}:
         issues.append("invalid iodine-fluoride stoichiometry")
@@ -268,6 +272,8 @@ def load_records(
         record = json.loads((root / entry["path"]).read_text(encoding="utf-8"))
         if record["record_id"] != entry["record_id"]:
             raise ValueError(f"record identity differs from manifest: {entry['path']}")
+        if record.get("record_kind", "substance") in _STRUCTURAL_RECORD_KINDS and not include_structural:
+            continue
         record["contains_ocr_suspect_cells"] = bool(_suspect_cells(record, record))
         if record["contains_ocr_suspect_cells"] and not include_ocr_suspect:
             _raise_for_ocr_suspect(record, record)
@@ -306,6 +312,8 @@ def lookup_temperature(
     if entry.get("record_kind", "substance") in _STRUCTURAL_RECORD_KINDS:
         raise KeyError(f"{record_id} is a structural source record, not a substance")
     record = json.loads((root / entry["path"]).read_text(encoding="utf-8"))
+    if record.get("record_kind", "substance") in _STRUCTURAL_RECORD_KINDS:
+        raise KeyError(f"{record_id} is a structural source record, not a substance")
     grid_cell = next(
         (cell for cell in record["temperature_grid"] if cell.get("value") == temperature),
         None,

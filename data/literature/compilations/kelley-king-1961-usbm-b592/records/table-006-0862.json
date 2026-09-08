@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0862",
   "table_number": 6,
-  "substance_as_published": "PCl2(g)",
-  "formula_as_published": "PCl2(g)",
-  "formula": "PCl2(g)",
-  "name_as_published": "PCl2(g)",
+  "substance_as_published": "PCl5(g)",
+  "formula_as_published": "PCl5(g)",
+  "formula": "PCl5(g)",
+  "name_as_published": "PCl5(g)",
   "phase_as_published": "(g)",
   "state_as_published": "(g)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 112,
   "pdf_page": 116,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 3,
       "raw": [
-        "PCl2(g)",
+        "PCl5(g)",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "PCl2(g)"
+          "raw": "PCl5(g)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -310,7 +312,21 @@
     "sha256": "c8d85b1f018767232cdfeb75f8215c27a3a20ff39c79f5fb1f3f2d91c0c6edca"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 116,
+      "page": 112,
+      "source_row_index": 3,
+      "column": "substance",
+      "ocr_token": "PCl2(g)",
+      "printed_token": "PCl5(g)",
+      "quote": "PCl₅(g)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0862"
+    }
+  ],
   "heading_context_as_published": "Phosphorus:",
+  "metadata_ocr_token": "PCl2(g)",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

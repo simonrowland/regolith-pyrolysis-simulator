@@ -197,11 +197,46 @@ def test_actinium_image_proven_row_alignment_correction_is_explicit():
         assert correction["printed_token"] == correction["ocr_token"] == "15.0±1.0"
         assert correction["quote"]
         assert record["rows"][0]["cells"][correction["column"]]["ocr_suspect"]
-    assert load_manifest(include_ocr_suspect=True)["summary"]["correction_count"] == 104
+    assert load_manifest(include_ocr_suspect=True)["summary"]["correction_count"] == 308
 
 
-def test_formula_integrity_census_is_fully_image_corrected():
+def _assert_repaired_identities(records):
+    audit = {
+        item["record_id"]: item
+        for item in map(json.loads, (COMPILATION_ROOT / "source/formula-audit.jsonl").read_text().splitlines())
+    }
+    for record in records:
+        expected = audit[record["record_id"]]
+        if expected["verified"]:
+            for field in ("formula", "formula_as_published", "name_as_published"):
+                assert record[field] == expected["expected_fields"][field], (record["record_id"], field)
+
+
+def test_per_record_image_audit_has_explicit_complete_coverage():
+    audit = list(map(json.loads, (COMPILATION_ROOT / "source/formula-audit.jsonl").read_text().splitlines()))
     records = _records()
+    manifest = load_manifest(include_ocr_suspect=True)
+    assert [item["record_id"] for item in audit] == [record["record_id"] for record in records]
+    assert len(audit) == 1418
+    assert sum(item["verified"] for item in audit) == 1408
+    for item, record, entry in zip(audit, records, manifest["entries"]):
+        assert isinstance(item["verified"], bool)
+        assert item["page"] == record["page"]
+        assert item["pdf_page"] == record["pdf_page"]
+        assert item["record_kind"] == record.get("record_kind", "substance")
+        if item["verified"]:
+            assert item["status"] in {"matched", "corrected"}
+            assert item["printed_quote"]
+            for field, expected in item["expected_fields"].items():
+                assert record[field] == entry[field] == expected, (record["record_id"], field)
+        else:
+            assert item["status"] == "unverified"
+            assert item["expected_fields"] is None
+
+
+def test_formula_integrity_census_and_recorded_repairs():
+    records = _records()
+    _assert_repaired_identities(records)
     corrections = [
         correction
         for record in records
@@ -214,7 +249,7 @@ def test_formula_integrity_census_is_fully_image_corrected():
         for field, token, reason in b592_loader._formula_integrity_issues(record)
     ]
     assert issues == []
-    assert len(corrections) == 36
+    assert len(corrections) == 240
     assert all(
         correction["record_id"]
         and correction["page"]
@@ -223,7 +258,7 @@ def test_formula_integrity_census_is_fully_image_corrected():
         and correction["quote"]
         for correction in corrections
     )
-    assert {correction["record_id"] for correction in corrections} == {
+    assert {correction["record_id"] for correction in corrections} >= {
         "table-006-0049",
         "table-006-0052",
         "table-006-0053",
@@ -270,6 +305,9 @@ def test_formula_integrity_census_is_fully_image_corrected():
         ("Cs1(g)", "digit in an element-symbol or subscript position"),
         ("NiTe1(c)", "digit in an element-symbol or subscript position"),
         ("Si1N4(c)", "digit in an element-symbol or subscript position"),
+        ("Fe12(c)", "image-proven corruption inside a multi-digit subscript"),
+        ("Ag2H31O6(c)", "image-proven corruption inside a multi-digit subscript"),
+        ("Fe11Te(c)", "image-proven corruption inside a multi-digit subscript"),
         ("$IF_8(g)$", "invalid iodine-fluoride stoichiometry"),
         ("$IR_6(g)$", "unknown chemical element token(s): R"),
         ("$Mg(OH_2(c)$", "unbalanced chemical-formula delimiters"),
@@ -316,13 +354,13 @@ def test_image_proven_merged_rows_are_split_without_cross_substance_values():
     assert ba_c["rows"][0]["cells"]["entropy_other_sources"]["raw"] == "16.0±0.5"
     assert ba_g["rows"][0]["cells"]["cp_298_15_k"]["raw"] == "4.97"
     assert ba_g["rows"][0]["cells"]["entropy_recommended"]["raw"] == "40.67±0.01"
-    hfcl3, hfcl4 = by_id["table-006-0416"], by_id["table-006-0417"]
-    assert (hfcl3["substance_as_published"], hfcl4["substance_as_published"]) == ("HfCl3(c)", "HfCl4(c)")
-    assert hfcl3["rows"][0]["cells"]["cp_10_k"]["raw"] == ""
-    assert hfcl3["rows"][0]["cells"]["entropy_other_sources"]["raw"] == "10.9±0.3"
+    hfc, hfcl4 = by_id["table-006-0416"], by_id["table-006-0417"]
+    assert (hfc["substance_as_published"], hfcl4["substance_as_published"]) == ("HfC(c)", "HfCl4(c)")
+    assert hfc["rows"][0]["cells"]["cp_10_k"]["raw"] == ""
+    assert hfc["rows"][0]["cells"]["entropy_other_sources"]["raw"] == "10.9±0.3"
     assert hfcl4["rows"][0]["cells"]["cp_10_k"]["raw"] == "(1.18)"
     assert hfcl4["rows"][0]["cells"]["entropy_recommended"]["raw"] == "45.6±0.6"
-    assert all(item["kind"] == "image_verified_merged_row_split" for record in (ba_c, ba_g, hfcl3, hfcl4) for item in record["corrections"])
+    assert all(item["kind"] == "image_verified_merged_row_split" for record in (ba_c, ba_g, hfc, hfcl4) for item in record["corrections"])
 
 
 def test_source_row_boundary_census_accounts_for_image_proven_splits():
@@ -459,6 +497,77 @@ def test_structural_records_require_source_audit_opt_in_and_cannot_be_looked_up(
     assert all(record.get("record_kind", "substance") == "substance" for record in substances)
     with pytest.raises(KeyError, match="structural source record"):
         lookup_temperature("table-006-0036", 298.15, include_ocr_suspect=True)
+
+
+@pytest.mark.parametrize("include_ocr_suspect", [False, True])
+def test_loaded_structural_kind_excludes_stale_manifest_entry(tmp_path, include_ocr_suspect):
+    manifest = load_manifest(include_ocr_suspect=True)
+    entry = next(item for item in manifest["entries"] if item["record_id"] == "table-006-0036")
+    entry.pop("record_kind")
+    entry["metadata_ocr_suspect"] = False
+    record = json.loads((COMPILATION_ROOT / entry["path"]).read_text())
+    path = tmp_path / entry["path"]
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps(record))
+    (tmp_path / "manifest.yaml").write_text(yaml.safe_dump({"entries": [entry]}))
+    assert list(load_records(tmp_path, include_ocr_suspect=include_ocr_suspect)) == []
+    with pytest.raises(KeyError, match="structural source record"):
+        lookup_temperature(entry["record_id"], 298.15, tmp_path, include_ocr_suspect=include_ocr_suspect)
+    assert list(load_records(tmp_path, include_ocr_suspect=True, include_structural=True))[0]["record_kind"] == "section_continuation_header"
+
+
+@pytest.mark.parametrize("token", [
+    "C12H22O11(c)", "Ca10(PO4)6F2(c)", "Al2(SO4)3·18H2O(c)",
+    "Fe1.11Te(c)", "FeI2(c)", "Ag2H3IO6(c)", "HNO2(equ1,g)",
+])
+def test_legitimate_multidigit_subscripts_remain_accepted(token):
+    assert b592_loader._formula_token_issues(token) == ()
+
+
+@pytest.mark.parametrize("token", ["Fe12(c)", "Ag2H31O6(c)", "Fe11Te(c)"])
+@pytest.mark.parametrize("change_manifest", [False, True])
+def test_multidigit_corruption_refuses_public_loaders(tmp_path, token, change_manifest):
+    record = json.loads((COMPILATION_ROOT / "records/table-006-0300.json").read_text())
+    entry = copy.deepcopy(next(item for item in load_manifest(include_ocr_suspect=True)["entries"] if item["record_id"] == record["record_id"]))
+    entry["metadata_ocr_suspect"] = record["metadata_ocr_suspect"] = False
+    entry["ocr_suspect_count"] = 0
+    for cell in _numeric_cells(record):
+        cell["ocr_suspect"] = False
+    for target in ([record, entry] if change_manifest else [record]):
+        for field in ("formula", "formula_as_published", "name_as_published"):
+            target[field] = token
+    path = tmp_path / entry["path"]
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps(record))
+    (tmp_path / "manifest.yaml").write_text(yaml.safe_dump({"entries": [entry]}))
+    if change_manifest:
+        with pytest.raises(OCRSuspectRow):
+            load_manifest(tmp_path)
+    else:
+        load_manifest(tmp_path)
+    with pytest.raises(OCRSuspectRow):
+        list(load_records(tmp_path))
+    assert list(load_records(tmp_path, include_ocr_suspect=True))[0]["contains_ocr_suspect_cells"]
+
+
+@pytest.mark.parametrize("record_id,corrupt", [
+    ("table-006-0447", "DCIO(g)"),
+    ("table-006-0217", "CaP2O7(β)"),
+    ("table-006-0232", "CaSO4/12H2O(α)"),
+    ("table-006-0562", "Fe9.94O(c)"),
+    ("table-006-0932", "O10F2(c)"),
+    ("table-006-0668", "MgCl2·H2O(c)"),
+    ("table-006-0545", "Fe++(aq)"),
+    ("table-006-0177", "CdSO_4_2O(c)"),
+    ("table-006-1244", "UH3()"),
+    ("table-006-0725", "Hg(I)"),
+])
+@pytest.mark.parametrize("field", ["formula", "formula_as_published", "name_as_published"])
+def test_each_repair_class_rejects_an_identity_revert(record_id, corrupt, field):
+    record = json.loads((COMPILATION_ROOT / "records" / f"{record_id}.json").read_text())
+    record[field] = corrupt
+    with pytest.raises(AssertionError):
+        _assert_repaired_identities([record])
 
 
 @pytest.mark.parametrize("temperature", [0, 9.99, 10.01, 298.14, 298.16, 300, float("nan"), float("inf")])

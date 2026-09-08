@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0985",
   "table_number": 6,
-  "substance_as_published": "Se3(g)",
-  "formula_as_published": "Se3(g)",
-  "formula": "Se3(g)",
-  "name_as_published": "Se3(g)",
+  "substance_as_published": "Se6(g)",
+  "formula_as_published": "Se6(g)",
+  "formula": "Se6(g)",
+  "name_as_published": "Se6(g)",
   "phase_as_published": "(g)",
   "state_as_published": "(g)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 113,
   "pdf_page": 117,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 55,
       "raw": [
-        "Se3(g)",
+        "Se6(g)",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "Se3(g)"
+          "raw": "Se6(g)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -306,7 +308,21 @@
     "sha256": "261eb8f19267aded7cfe77496e71ad642f5d48bfa48e9106a19bbbd0416f722c"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 117,
+      "page": 113,
+      "source_row_index": 55,
+      "column": "substance",
+      "ocr_token": "Se3(g)",
+      "printed_token": "Se6(g)",
+      "quote": "Se₆(g)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0985"
+    }
+  ],
   "heading_context_as_published": "Selenium:",
+  "metadata_ocr_token": "Se3(g)",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

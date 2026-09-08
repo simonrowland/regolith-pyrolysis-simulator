@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0837",
   "table_number": 6,
-  "substance_as_published": "$(NH_{4})_{2}O(l) \\uparrow$",
-  "formula_as_published": "$(NH_{4})_{2}O(l) \\uparrow$",
-  "formula": "$(NH_{4})_{2}O(l)\\uparrow$",
-  "name_as_published": "(NH_4)_2O(l)",
+  "substance_as_published": "(NH4)2O(l)†",
+  "formula_as_published": "(NH4)2O(l)",
+  "formula": "(NH4)2O(l)",
+  "name_as_published": "(NH4)2O(l)",
   "phase_as_published": "(l)",
   "state_as_published": "(l)",
-  "footnote_markers": "",
+  "footnote_markers": "†",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 111,
   "pdf_page": 115,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 63,
       "raw": [
-        "$(NH_{4})_{2}O(l) \\uparrow$",
+        "(NH4)2O(l)†",
         "(.32)",
         "3.34",
         "12.03",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$(NH_{4})_{2}O(l) \\uparrow$"
+          "raw": "(NH4)2O(l)†",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "(.32)",
@@ -334,7 +336,21 @@
     "sha256": "173ead55ff5bc4a48da889358ba7937e495f02a7357500882347fe687eb332c7"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 115,
+      "page": 111,
+      "source_row_index": 63,
+      "column": "substance",
+      "ocr_token": "$(NH_{4})_{2}O(l) \\uparrow$",
+      "printed_token": "(NH4)2O(l)†",
+      "quote": "(NH₄)₂O(l)†",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0837"
+    }
+  ],
   "heading_context_as_published": "Nitrogen:",
+  "metadata_ocr_token": "$(NH_{4})_{2}O(l) \\uparrow$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

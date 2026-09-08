@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0788",
   "table_number": 6,
-  "substance_as_published": "$NbF_{4}(c)$",
-  "formula_as_published": "$NbF_{4}(c)$",
-  "formula": "$NbF_{4}(c)$",
-  "name_as_published": "NbF_4(c)",
+  "substance_as_published": "NbF5(c)",
+  "formula_as_published": "NbF5(c)",
+  "formula": "NbF5(c)",
+  "name_as_published": "NbF5(c)",
   "phase_as_published": "(c)",
   "state_as_published": "(c)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 111,
   "pdf_page": 115,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 13,
       "raw": [
-        "$NbF_{4}(c)$",
+        "NbF5(c)",
         "",
         "",
         "7.82",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$NbF_{4}(c)$"
+          "raw": "NbF5(c)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -326,7 +328,21 @@
     "sha256": "173ead55ff5bc4a48da889358ba7937e495f02a7357500882347fe687eb332c7"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 115,
+      "page": 111,
+      "source_row_index": 13,
+      "column": "substance",
+      "ocr_token": "$NbF_{4}(c)$",
+      "printed_token": "NbF5(c)",
+      "quote": "NbF₅(c)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0788"
+    }
+  ],
   "heading_context_as_published": "Niobium:",
+  "metadata_ocr_token": "$NbF_{4}(c)$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

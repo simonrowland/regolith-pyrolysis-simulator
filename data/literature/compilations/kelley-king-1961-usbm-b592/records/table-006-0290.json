@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0290",
   "table_number": 6,
-  "substance_as_published": "Ce2S(c)",
-  "formula_as_published": "Ce2S(c)",
-  "formula": "Ce2S(c)",
-  "name_as_published": "Ce2S(c)",
+  "substance_as_published": "Ce2S3(c)",
+  "formula_as_published": "Ce2S3(c)",
+  "formula": "Ce2S3(c)",
+  "name_as_published": "Ce2S3(c)",
   "phase_as_published": "(c)",
   "state_as_published": "(c)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 105,
   "pdf_page": 109,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 8,
       "raw": [
-        "Ce2S(c)",
+        "Ce2S3(c)",
         "(.42)",
         "(2.95)",
         "8.03",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "Ce2S(c)"
+          "raw": "Ce2S3(c)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "(.42)",
@@ -334,7 +336,21 @@
     "sha256": "1e695a3ddffed07ae4141e5d7f84fa1006d2712cad528b8722755cd7c6f60bbe"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 109,
+      "page": 105,
+      "source_row_index": 8,
+      "column": "substance",
+      "ocr_token": "Ce2S(c)",
+      "printed_token": "Ce2S3(c)",
+      "quote": "Ce₂S₃(c)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0290"
+    }
+  ],
   "heading_context_as_published": "Cerium:",
+  "metadata_ocr_token": "Ce2S(c)",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

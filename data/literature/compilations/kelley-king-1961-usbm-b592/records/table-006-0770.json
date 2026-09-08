@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0770",
   "table_number": 6,
-  "substance_as_published": "Ni(CO)4(I)†",
-  "formula_as_published": "Ni(CO)4(I)",
-  "formula": "Ni(CO)4(I)",
-  "name_as_published": "Ni(CO)4(I)",
-  "phase_as_published": null,
-  "state_as_published": null,
+  "substance_as_published": "Ni(CO)4(l)†",
+  "formula_as_published": "Ni(CO)4(l)",
+  "formula": "Ni(CO)4(l)",
+  "name_as_published": "Ni(CO)4(l)",
+  "phase_as_published": "(l)",
+  "state_as_published": "(l)",
   "footnote_markers": "†",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 110,
   "pdf_page": 114,
   "caption_raw": "TABLE 6.—Low temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 83,
       "raw": [
-        "Ni(CO)4(I)†",
+        "Ni(CO)4(l)†",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "Ni(CO)4(I)†"
+          "raw": "Ni(CO)4(l)†",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -322,7 +324,21 @@
     "sha256": "eef448fbbc7c73428231eb453e84a38bd4235bf4dd14299c7e3631312c99ae47"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 114,
+      "page": 110,
+      "source_row_index": 83,
+      "column": "substance",
+      "ocr_token": "Ni(CO)4(I)†",
+      "printed_token": "Ni(CO)4(l)†",
+      "quote": "Ni(CO)₄(l)†",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0770"
+    }
+  ],
   "heading_context_as_published": "Nickel:",
+  "metadata_ocr_token": "Ni(CO)4(I)†",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

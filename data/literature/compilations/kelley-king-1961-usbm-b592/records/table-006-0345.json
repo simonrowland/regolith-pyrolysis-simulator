@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0345",
   "table_number": 6,
-  "substance_as_published": "Cu2.7Fe2.2O4(c)",
-  "formula_as_published": "Cu2.7Fe2.2O4(c)",
-  "formula": "Cu2.7Fe2.2O4(c)",
-  "name_as_published": "Cu2.7Fe2.2O4(c)",
+  "substance_as_published": "Cu0.75Fe2.25O4(c)",
+  "formula_as_published": "Cu0.75Fe2.25O4(c)",
+  "formula": "Cu0.75Fe2.25O4(c)",
+  "name_as_published": "Cu0.75Fe2.25O4(c)",
   "phase_as_published": "(c)",
   "state_as_published": "(c)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 105,
   "pdf_page": 109,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 68,
       "raw": [
-        "Cu2.7Fe2.2O4(c)",
+        "Cu0.75Fe2.25O4(c)",
         "(.07)",
         "(1.00)",
         "4.21",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "Cu2.7Fe2.2O4(c)"
+          "raw": "Cu0.75Fe2.25O4(c)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "(.07)",
@@ -334,7 +336,21 @@
     "sha256": "1e695a3ddffed07ae4141e5d7f84fa1006d2712cad528b8722755cd7c6f60bbe"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 109,
+      "page": 105,
+      "source_row_index": 68,
+      "column": "substance",
+      "ocr_token": "Cu2.7Fe2.2O4(c)",
+      "printed_token": "Cu0.75Fe2.25O4(c)",
+      "quote": "Cu₀.₇₅Fe₂.₂₅O₄(c)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0345"
+    }
+  ],
   "heading_context_as_published": "Copper:",
+  "metadata_ocr_token": "Cu2.7Fe2.2O4(c)",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

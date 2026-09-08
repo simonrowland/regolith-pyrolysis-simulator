@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0783",
   "table_number": 6,
-  "substance_as_published": "$Ni_{0.2}Zn_{0.4}Fe_{2}O_{4}(c)$",
-  "formula_as_published": "$Ni_{0.2}Zn_{0.4}Fe_{2}O_{4}(c)$",
-  "formula": "$Ni_{0.2}Zn_{0.4}Fe_{2}O_{4}(c)$",
-  "name_as_published": "Ni_0.2Zn_0.4Fe_2O_4(c)",
+  "substance_as_published": "Ni0.2Zn0.8Fe2O4(c)",
+  "formula_as_published": "Ni0.2Zn0.8Fe2O4(c)",
+  "formula": "Ni0.2Zn0.8Fe2O4(c)",
+  "name_as_published": "Ni0.2Zn0.8Fe2O4(c)",
   "phase_as_published": "(c)",
   "state_as_published": "(c)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 111,
   "pdf_page": 115,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 7,
       "raw": [
-        "$Ni_{0.2}Zn_{0.4}Fe_{2}O_{4}(c)$",
+        "Ni0.2Zn0.8Fe2O4(c)",
         ".85",
         "1.66",
         "4.92",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$Ni_{0.2}Zn_{0.4}Fe_{2}O_{4}(c)$"
+          "raw": "Ni0.2Zn0.8Fe2O4(c)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": ".85",
@@ -334,7 +336,21 @@
     "sha256": "173ead55ff5bc4a48da889358ba7937e495f02a7357500882347fe687eb332c7"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 115,
+      "page": 111,
+      "source_row_index": 7,
+      "column": "substance",
+      "ocr_token": "$Ni_{0.2}Zn_{0.4}Fe_{2}O_{4}(c)$",
+      "printed_token": "Ni0.2Zn0.8Fe2O4(c)",
+      "quote": "Ni₀.₂Zn₀.₈Fe₂O₄(c)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0783"
+    }
+  ],
   "heading_context_as_published": "Nickel:",
+  "metadata_ocr_token": "$Ni_{0.2}Zn_{0.4}Fe_{2}O_{4}(c)$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

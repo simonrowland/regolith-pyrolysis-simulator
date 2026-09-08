@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0196",
   "table_number": 6,
-  "substance_as_published": "$\\mathrm{CaCl}_{3}$ (calcite)",
-  "formula_as_published": "\\mathrm{CaCl}_{3}$ (calcite)",
-  "formula": "\\mathrm{CaCl}_{3}$(calcite)",
-  "name_as_published": "CaCl_3$ (calcite)",
+  "substance_as_published": "CaCO3(calcite)",
+  "formula_as_published": "CaCO3(calcite)",
+  "formula": "CaCO3(calcite)",
+  "name_as_published": "CaCO3(calcite)",
   "phase_as_published": null,
   "state_as_published": null,
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 103,
   "pdf_page": 107,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 82,
       "raw": [
-        "$\\mathrm{CaCl}_{3}$ (calcite)",
+        "CaCO3(calcite)",
         "(.05)",
         ".77",
         "3.73",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$\\mathrm{CaCl}_{3}$ (calcite)"
+          "raw": "CaCO3(calcite)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "(.05)",
@@ -334,7 +336,21 @@
     "sha256": "dd35b86c09bb097d1ff11ae330c92fbfe03e8dea19906a9be43594576b1cecaa"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 107,
+      "page": 103,
+      "source_row_index": 82,
+      "column": "substance",
+      "ocr_token": "$\\mathrm{CaCl}_{3}$ (calcite)",
+      "printed_token": "CaCO3(calcite)",
+      "quote": "CaCO₃(calcite)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0196"
+    }
+  ],
   "heading_context_as_published": "Calcium:",
+  "metadata_ocr_token": "$\\mathrm{CaCl}_{3}$ (calcite)",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

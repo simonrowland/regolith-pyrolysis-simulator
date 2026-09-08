@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0603",
   "table_number": 6,
-  "substance_as_published": "$PbO_4(c)$",
-  "formula_as_published": "$PbO_4(c)$",
-  "formula": "$PbO_4(c)$",
-  "name_as_published": "PbO_4(c)",
+  "substance_as_published": "Pb3O4(c)",
+  "formula_as_published": "Pb3O4(c)",
+  "formula": "Pb3O4(c)",
+  "name_as_published": "Pb3O4(c)",
   "phase_as_published": "(c)",
   "state_as_published": "(c)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 108,
   "pdf_page": 112,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 83,
       "raw": [
-        "$PbO_4(c)$",
+        "Pb3O4(c)",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$PbO_4(c)$"
+          "raw": "Pb3O4(c)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -322,7 +324,21 @@
     "sha256": "65ad2da120a4239903f903e0c9f4dd8946505132dec748da00ae472782bd3cb1"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 112,
+      "page": 108,
+      "source_row_index": 83,
+      "column": "substance",
+      "ocr_token": "$PbO_4(c)$",
+      "printed_token": "Pb3O4(c)",
+      "quote": "Pb₃O₄(c)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0603"
+    }
+  ],
   "heading_context_as_published": "Lead:",
+  "metadata_ocr_token": "$PbO_4(c)$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

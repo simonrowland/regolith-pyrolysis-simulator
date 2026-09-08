@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0464",
   "table_number": 6,
-  "substance_as_published": "HNO2(g)",
-  "formula_as_published": "HNO2(g)",
-  "formula": "HNO2(g)",
-  "name_as_published": "HNO2(g)",
+  "substance_as_published": "HNO3(g)",
+  "formula_as_published": "HNO3(g)",
+  "formula": "HNO3(g)",
+  "name_as_published": "HNO3(g)",
   "phase_as_published": "(g)",
   "state_as_published": "(g)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 107,
   "pdf_page": 111,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 25,
       "raw": [
-        "HNO2(g)",
+        "HNO3(g)",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "HNO2(g)"
+          "raw": "HNO3(g)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -316,7 +318,21 @@
     "sha256": "a8db397a4df7fff0e6027f385ca1ad5efe3925411170faab854e1ad3c49001a2"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 111,
+      "page": 107,
+      "source_row_index": 25,
+      "column": "substance",
+      "ocr_token": "HNO2(g)",
+      "printed_token": "HNO3(g)",
+      "quote": "HNO₃(g)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0464"
+    }
+  ],
   "heading_context_as_published": "Hydrogen:",
+  "metadata_ocr_token": "HNO2(g)",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

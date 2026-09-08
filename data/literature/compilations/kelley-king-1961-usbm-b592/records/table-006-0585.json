@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0585",
   "table_number": 6,
-  "substance_as_published": "$Pb^{++}(ng)$",
-  "formula_as_published": "$Pb^{++}(ng)$",
-  "formula": "$Pb^{++}(ng)$",
-  "name_as_published": "Pb^++(ng)",
-  "phase_as_published": null,
-  "state_as_published": null,
+  "substance_as_published": "Pb++(aq)",
+  "formula_as_published": "Pb++(aq)",
+  "formula": "Pb++(aq)",
+  "name_as_published": "Pb++(aq)",
+  "phase_as_published": "(aq)",
+  "state_as_published": "(aq)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 108,
   "pdf_page": 112,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 65,
       "raw": [
-        "$Pb^{++}(ng)$",
+        "Pb++(aq)",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$Pb^{++}(ng)$"
+          "raw": "Pb++(aq)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -306,7 +308,21 @@
     "sha256": "65ad2da120a4239903f903e0c9f4dd8946505132dec748da00ae472782bd3cb1"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 112,
+      "page": 108,
+      "source_row_index": 65,
+      "column": "substance",
+      "ocr_token": "$Pb^{++}(ng)$",
+      "printed_token": "Pb++(aq)",
+      "quote": "Pb⁺⁺(aq)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0585"
+    }
+  ],
   "heading_context_as_published": "Lead:",
+  "metadata_ocr_token": "$Pb^{++}(ng)$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

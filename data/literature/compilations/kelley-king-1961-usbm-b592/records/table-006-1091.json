@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-1091",
   "table_number": 6,
-  "substance_as_published": "NaSiO4(c)",
-  "formula_as_published": "NaSiO4(c)",
-  "formula": "NaSiO4(c)",
-  "name_as_published": "NaSiO4(c)",
+  "substance_as_published": "Na4SiO4(c)",
+  "formula_as_published": "Na4SiO4(c)",
+  "formula": "Na4SiO4(c)",
+  "name_as_published": "Na4SiO4(c)",
   "phase_as_published": "(c)",
   "state_as_published": "(c)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 114,
   "pdf_page": 118,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 75,
       "raw": [
-        "NaSiO4(c)",
+        "Na4SiO4(c)",
         "(.04)",
         "(.68)",
         "6.37",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "NaSiO4(c)"
+          "raw": "Na4SiO4(c)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "(.04)",
@@ -334,7 +336,21 @@
     "sha256": "0c29f38012983191ef30e8082a8e665ff27d57cbe4cc8e36f5f6ffb88e4fbb7b"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 118,
+      "page": 114,
+      "source_row_index": 75,
+      "column": "substance",
+      "ocr_token": "NaSiO4(c)",
+      "printed_token": "Na4SiO4(c)",
+      "quote": "Na₄SiO₄(c)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-1091"
+    }
+  ],
   "heading_context_as_published": "Sodium:",
+  "metadata_ocr_token": "NaSiO4(c)",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

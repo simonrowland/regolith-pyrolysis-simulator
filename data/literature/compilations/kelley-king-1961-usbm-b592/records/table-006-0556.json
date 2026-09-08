@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0556",
   "table_number": 6,
-  "substance_as_published": "$Fe_2Cl_5(g)$",
-  "formula_as_published": "$Fe_2Cl_5(g)$",
-  "formula": "$Fe_2Cl_5(g)$",
-  "name_as_published": "Fe_2Cl_5(g)",
+  "substance_as_published": "Fe2Cl6(g)",
+  "formula_as_published": "Fe2Cl6(g)",
+  "formula": "Fe2Cl6(g)",
+  "name_as_published": "Fe2Cl6(g)",
   "phase_as_published": "(g)",
   "state_as_published": "(g)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 108,
   "pdf_page": 112,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 33,
       "raw": [
-        "$Fe_2Cl_5(g)$",
+        "Fe2Cl6(g)",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$Fe_2Cl_5(g)$"
+          "raw": "Fe2Cl6(g)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -302,7 +304,21 @@
     "sha256": "65ad2da120a4239903f903e0c9f4dd8946505132dec748da00ae472782bd3cb1"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 112,
+      "page": 108,
+      "source_row_index": 33,
+      "column": "substance",
+      "ocr_token": "$Fe_2Cl_5(g)$",
+      "printed_token": "Fe2Cl6(g)",
+      "quote": "Fe₂Cl₆(g)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0556"
+    }
+  ],
   "heading_context_as_published": "Iron:",
+  "metadata_ocr_token": "$Fe_2Cl_5(g)$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

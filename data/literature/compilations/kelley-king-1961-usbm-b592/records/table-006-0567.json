@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0567",
   "table_number": 6,
-  "substance_as_published": "$FeSO_4\\cdot7H_2O(c)*$",
-  "formula_as_published": "FeSO_4\\cdot7H_2O(c)",
-  "formula": "FeSO_4\\cdot7H_2O(c)",
-  "name_as_published": "FeSO_47H_2O(c)",
+  "substance_as_published": "FeSO4·7H2O(c)*",
+  "formula_as_published": "FeSO4·7H2O(c)",
+  "formula": "FeSO4·7H2O(c)",
+  "name_as_published": "FeSO4·7H2O(c)",
   "phase_as_published": "(c)",
   "state_as_published": "(c)",
   "footnote_markers": "*",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 108,
   "pdf_page": 112,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 44,
       "raw": [
-        "$FeSO_4\\cdot7H_2O(c)*$",
+        "FeSO4·7H2O(c)*",
         "1.35",
         "5.77",
         "16.94",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$FeSO_4\\cdot7H_2O(c)*$"
+          "raw": "FeSO4·7H2O(c)*",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "1.35",
@@ -334,7 +336,21 @@
     "sha256": "65ad2da120a4239903f903e0c9f4dd8946505132dec748da00ae472782bd3cb1"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 112,
+      "page": 108,
+      "source_row_index": 44,
+      "column": "substance",
+      "ocr_token": "$FeSO_4\\cdot7H_2O(c)*$",
+      "printed_token": "FeSO4·7H2O(c)*",
+      "quote": "FeSO₄·7H₂O(c)*",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0567"
+    }
+  ],
   "heading_context_as_published": "Iron:",
+  "metadata_ocr_token": "$FeSO_4\\cdot7H_2O(c)*$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

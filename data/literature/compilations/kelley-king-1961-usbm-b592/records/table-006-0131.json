@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0131",
   "table_number": 6,
-  "substance_as_published": "$\\mathrm{B}_{4}\\mathrm{H}_{5}(l)\\dagger$",
-  "formula_as_published": "\\mathrm{B}_{4}\\mathrm{H}_{5}(l)",
-  "formula": "\\mathrm{B}_{4}\\mathrm{H}_{5}(l)",
-  "name_as_published": "B_4H_5(l)",
+  "substance_as_published": "B5H9(l)†",
+  "formula_as_published": "B5H9(l)",
+  "formula": "B5H9(l)",
+  "name_as_published": "B5H9(l)",
   "phase_as_published": "(l)",
   "state_as_published": "(l)",
   "footnote_markers": "†",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 103,
   "pdf_page": 107,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 14,
       "raw": [
-        "$\\mathrm{B}_{4}\\mathrm{H}_{5}(l)\\dagger$",
+        "B5H9(l)†",
         "",
         "",
         "7.62",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$\\mathrm{B}_{4}\\mathrm{H}_{5}(l)\\dagger$"
+          "raw": "B5H9(l)†",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -326,7 +328,21 @@
     "sha256": "dd35b86c09bb097d1ff11ae330c92fbfe03e8dea19906a9be43594576b1cecaa"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 107,
+      "page": 103,
+      "source_row_index": 14,
+      "column": "substance",
+      "ocr_token": "$\\mathrm{B}_{4}\\mathrm{H}_{5}(l)\\dagger$",
+      "printed_token": "B5H9(l)†",
+      "quote": "B₅H₉(l)†",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0131"
+    }
+  ],
   "heading_context_as_published": "Boron:",
+  "metadata_ocr_token": "$\\mathrm{B}_{4}\\mathrm{H}_{5}(l)\\dagger$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

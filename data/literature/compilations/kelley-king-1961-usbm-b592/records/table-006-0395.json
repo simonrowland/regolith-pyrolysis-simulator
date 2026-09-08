@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0395",
   "table_number": 6,
-  "substance_as_published": "GeF3(g)",
-  "formula_as_published": "GeF3(g)",
-  "formula": "GeF3(g)",
-  "name_as_published": "GeF3(g)",
+  "substance_as_published": "GeF4(g)",
+  "formula_as_published": "GeF4(g)",
+  "formula": "GeF4(g)",
+  "name_as_published": "GeF4(g)",
   "phase_as_published": "(g)",
   "state_as_published": "(g)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 106,
   "pdf_page": 110,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 39,
       "raw": [
-        "GeF3(g)",
+        "GeF4(g)",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "GeF3(g)"
+          "raw": "GeF4(g)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -310,7 +312,21 @@
     "sha256": "4f439ac43fee1b899d8962983cefe6982ac1a524413c1e6ce0f6c35d1f3fb1f6"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 110,
+      "page": 106,
+      "source_row_index": 39,
+      "column": "substance",
+      "ocr_token": "GeF3(g)",
+      "printed_token": "GeF4(g)",
+      "quote": "GeF₄(g)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0395"
+    }
+  ],
   "heading_context_as_published": "Germanium:",
+  "metadata_ocr_token": "GeF3(g)",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

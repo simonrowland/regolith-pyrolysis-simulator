@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-1142",
   "table_number": 6,
-  "substance_as_published": "$SO_3Cl_3(l)$",
-  "formula_as_published": "$SO_3Cl_3(l)$",
-  "formula": "$SO_3Cl_3(l)$",
-  "name_as_published": "SO_3Cl_3(l)",
+  "substance_as_published": "SO2Cl2(l)",
+  "formula_as_published": "SO2Cl2(l)",
+  "formula": "SO2Cl2(l)",
+  "name_as_published": "SO2Cl2(l)",
   "phase_as_published": "(l)",
   "state_as_published": "(l)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 115,
   "pdf_page": 119,
   "caption_raw": "TABLE 6.—Low temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 39,
       "raw": [
-        "$SO_3Cl_3(l)$",
+        "SO2Cl2(l)",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$SO_3Cl_3(l)$"
+          "raw": "SO2Cl2(l)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -306,7 +308,21 @@
     "sha256": "0c315ca84ef7e4059f40413c3e03fa23d19e9610ce910248769903707c7d7023"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 119,
+      "page": 115,
+      "source_row_index": 39,
+      "column": "substance",
+      "ocr_token": "$SO_3Cl_3(l)$",
+      "printed_token": "SO2Cl2(l)",
+      "quote": "SO₂Cl₂(l)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-1142"
+    }
+  ],
   "heading_context_as_published": "Sulfur:",
+  "metadata_ocr_token": "$SO_3Cl_3(l)$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

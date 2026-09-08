@@ -21,6 +21,8 @@ Element-name grouping rows in Table 6 are stored as heading context, not mistake
 
 Each JSON file under `records/` preserves the printed substance/formula, phase or state, page, numbered table, caption, column labels, units, temperature grid, every native row and cell string, parsed numeric values, footnote markers, OCR status, ambiguities, and corrections. `source/mineru-tables.jsonl` retains the 25 primary MinerU HTML blocks plus a Tesseract reading and image hash for each table crop. `source/image-verified-fixture.json` contains independent cells checked visually against the scan.
 
+`source/formula-audit.jsonl` records the 300-dpi image audit of all 1,418 formula/name identities, including unchanged matches: 1,408 verified, with 210 corrected identities, and 10 explicitly unverified records. Each entry retains the printed quote, expected identity fields, and original tokens. Unresolved records concern a duplicate barium row, an iodine heading, a damaged platinum subscript, and seven sulfur charge glyphs; their identities have not been guessed. The 27 existing structural records retain their types. Image coverage does not certify numeric cells.
+
 No unit conversion, interpolation, extrapolation, smoothing, inferred zero, or silent OCR repair is performed. Cp monotonicity, recommended-entropy agreement, and approximately factor-1000 magnitude checks are detectors only.
 
 ## Loader contract

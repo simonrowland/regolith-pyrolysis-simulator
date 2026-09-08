@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0266",
   "table_number": 6,
-  "substance_as_published": "COBr3(g)",
-  "formula_as_published": "COBr3(g)",
-  "formula": "COBr3(g)",
-  "name_as_published": "COBr3(g)",
+  "substance_as_published": "COBr2(g)",
+  "formula_as_published": "COBr2(g)",
+  "formula": "COBr2(g)",
+  "name_as_published": "COBr2(g)",
   "phase_as_published": "(g)",
   "state_as_published": "(g)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 104,
   "pdf_page": 108,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 66,
       "raw": [
-        "COBr3(g)",
+        "COBr2(g)",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "COBr3(g)"
+          "raw": "COBr2(g)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "",
@@ -312,7 +314,21 @@
     "sha256": "155a3174740aba5fa5e03df5a982c40e8e1699c523524d623f1e023d2493b455"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 108,
+      "page": 104,
+      "source_row_index": 66,
+      "column": "substance",
+      "ocr_token": "COBr3(g)",
+      "printed_token": "COBr2(g)",
+      "quote": "COBr₂(g)",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-0266"
+    }
+  ],
   "heading_context_as_published": "Carbon:",
+  "metadata_ocr_token": "COBr3(g)",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }
