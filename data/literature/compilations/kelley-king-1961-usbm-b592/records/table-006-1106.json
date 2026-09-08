@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-1106",
   "table_number": 6,
-  "substance_as_published": "Strontium-Con.",
-  "formula_as_published": "Strontium-Con.",
-  "formula": "Strontium-Con.",
-  "name_as_published": "Strontium-Con.",
+  "substance_as_published": "Strontium—Con.",
+  "formula_as_published": null,
+  "formula": null,
+  "name_as_published": "Strontium—Con.",
   "phase_as_published": null,
   "state_as_published": null,
   "footnote_markers": "",
-  "metadata_ocr_suspect": false,
-  "metadata_ocr_check": "raster_ocr_text_agreement",
+  "metadata_ocr_suspect": true,
+  "metadata_ocr_check": "image_verified_section_continuation_header_reclassification",
   "page": 115,
   "pdf_page": 119,
   "caption_raw": "TABLE 6.—Low temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 2,
       "raw": [
-        "Strontium-Con.",
+        "Strontium—Con.",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "Strontium-Con."
+          "raw": "Strontium—Con.",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_section_continuation_header_reclassification"
         },
         "cp_10_k": {
           "raw": "",
@@ -294,7 +296,22 @@
     "sha256": "0c315ca84ef7e4059f40413c3e03fa23d19e9610ce910248769903707c7d7023"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_section_continuation_header_reclassification",
+      "pdf_page": 119,
+      "page": 115,
+      "source_row_index": 2,
+      "column": "substance",
+      "ocr_token": "Strontium-Con.",
+      "printed_token": "Strontium—Con.",
+      "quote": "Strontium—Con.",
+      "basis": "The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.",
+      "record_id": "table-006-1106"
+    }
+  ],
   "heading_context_as_published": "Strontium:",
-  "transcription_status": "transcribed"
+  "record_kind": "section_continuation_header",
+  "metadata_ocr_token": "Strontium-Con.",
+  "transcription_status": "transcribed_with_ocr_ambiguities"
 }

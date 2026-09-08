@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0861",
   "table_number": 6,
-  "substance_as_published": "Phosphorus-Con.",
-  "formula_as_published": "Phosphorus-Con.",
-  "formula": "Phosphorus-Con.",
-  "name_as_published": "Phosphorus-Con.",
+  "substance_as_published": "Phosphorus—Con.",
+  "formula_as_published": null,
+  "formula": null,
+  "name_as_published": "Phosphorus—Con.",
   "phase_as_published": null,
   "state_as_published": null,
   "footnote_markers": "",
-  "metadata_ocr_suspect": false,
-  "metadata_ocr_check": "raster_ocr_text_agreement",
+  "metadata_ocr_suspect": true,
+  "metadata_ocr_check": "image_verified_section_continuation_header_reclassification",
   "page": 112,
   "pdf_page": 116,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 2,
       "raw": [
-        "Phosphorus-Con.",
+        "Phosphorus—Con.",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "Phosphorus-Con."
+          "raw": "Phosphorus—Con.",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_section_continuation_header_reclassification"
         },
         "cp_10_k": {
           "raw": "",
@@ -294,7 +296,22 @@
     "sha256": "c8d85b1f018767232cdfeb75f8215c27a3a20ff39c79f5fb1f3f2d91c0c6edca"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_section_continuation_header_reclassification",
+      "pdf_page": 116,
+      "page": 112,
+      "source_row_index": 2,
+      "column": "substance",
+      "ocr_token": "Phosphorus-Con.",
+      "printed_token": "Phosphorus—Con.",
+      "quote": "Phosphorus—Con.",
+      "basis": "The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.",
+      "record_id": "table-006-0861"
+    }
+  ],
   "heading_context_as_published": "Phosphorus:",
-  "transcription_status": "transcribed"
+  "record_kind": "section_continuation_header",
+  "metadata_ocr_token": "Phosphorus-Con.",
+  "transcription_status": "transcribed_with_ocr_ambiguities"
 }

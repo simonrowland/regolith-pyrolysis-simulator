@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0470",
   "table_number": 6,
-  "substance_as_published": "HNO2(equl,g)",
-  "formula_as_published": "HNO2(equl,g)",
-  "formula": "HNO2(equl,g)",
-  "name_as_published": "HNO2(equl,g)",
+  "substance_as_published": "HNO2(equ1,g)",
+  "formula_as_published": "HNO2(equ1,g)",
+  "formula": "HNO2(equ1,g)",
+  "name_as_published": "HNO2(equ1,g)",
   "phase_as_published": null,
   "state_as_published": null,
-  "footnote_markers": "",
-  "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "image_verified_metadata_token_correction",
+  "footnote_markers": "1",
+  "metadata_ocr_suspect": false,
+  "metadata_ocr_check": "image_verified_printed_superscript_footnote_marker",
   "page": 107,
   "pdf_page": 111,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 31,
       "raw": [
-        "HNO2(equl,g)",
+        "HNO2(equ1,g)",
         "",
         "",
         "",
@@ -170,9 +170,7 @@
       ],
       "cells": {
         "substance": {
-          "raw": "HNO2(equl,g)",
-          "ocr_suspect": true,
-          "ocr_check": "image_verified_metadata_token_correction"
+          "raw": "HNO2(equ1,g)"
         },
         "cp_10_k": {
           "raw": "",
@@ -312,21 +310,21 @@
     "sha256": "a8db397a4df7fff0e6027f385ca1ad5efe3925411170faab854e1ad3c49001a2"
   },
   "ambiguities": [],
-  "corrections": [
+  "corrections": [],
+  "heading_context_as_published": "Hydrogen:",
+  "metadata_annotations": [
     {
-      "kind": "image_verified_metadata_token_correction",
+      "record_id": "table-006-0470",
       "pdf_page": 111,
       "page": 107,
       "source_row_index": 31,
       "column": "substance",
-      "ocr_token": "HNO2(equ1,g)",
-      "printed_token": "HNO2(equl,g)",
-      "quote": "HNO2(equl,g) ... 60.8±0.3",
-      "basis": "The 300-dpi PDF page render proves the printed substance token.",
-      "record_id": "table-006-0470"
+      "kind": "image_verified_printed_superscript_footnote_marker",
+      "printed_token": "HNO2(equ¹,g)",
+      "footnote_marker": "1",
+      "quote": "HNO2(equ¹,g) ... 60.8±0.3; ¹equ = equilibrium.",
+      "basis": "The 300-dpi PDF page render proves 1 is a printed superscript footnote marker, not an OCR error or phase qualifier."
     }
   ],
-  "heading_context_as_published": "Hydrogen:",
-  "metadata_ocr_token": "HNO2(equ1,g)",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

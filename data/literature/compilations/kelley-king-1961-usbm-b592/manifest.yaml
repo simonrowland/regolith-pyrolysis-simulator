@@ -1559,10 +1559,10 @@ summary:
   temperature_grid_token_count: 9416
   row_numeric_ocr_suspect_count: 4781
   temperature_grid_ocr_suspect_count: 1002
-  metadata_ocr_suspect_count: 1185
-  ocr_suspect_count: 6968
+  metadata_ocr_suspect_count: 1194
+  ocr_suspect_count: 6977
   identity_check_disagreement_count: 8
-  correction_count: 36
+  correction_count: 54
 ocr_policy:
   primary: MinerU table HTML from five page-aligned chunks
   second_reading: Tesseract on every MinerU table crop; exact token sequence agreement required for a clean numeric cell
@@ -1701,6 +1701,16 @@ corrections:
   printed_token: 15.0±1.0
   quote: 'Actinium: / Ac(c) ... 15.0±1.0'
   basis: MinerU table crop inspected at original resolution; value is printed on the Ac(c) row.
+- record_id: table-006-0036
+  kind: image_verified_section_continuation_header_reclassification
+  pdf_page: 106
+  page: 102
+  source_row_index: 2
+  column: substance
+  ocr_token: Antimony-Con.
+  printed_token: Antimony—Con.
+  quote: Antimony—Con.
+  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
 - record_id: table-006-0049
   kind: image_verified_metadata_token_correction
   pdf_page: 106
@@ -1801,6 +1811,16 @@ corrections:
   printed_token: 40.67±0.01
   quote: $Ba(g)$ ... 40.67±0.01
   basis: Original-resolution page image proves two printed substance rows were merged into one MinerU row.
+- record_id: table-006-0119
+  kind: image_verified_section_continuation_header_reclassification
+  pdf_page: 107
+  page: 103
+  source_row_index: 2
+  column: substance
+  ocr_token: Boron-Con.
+  printed_token: Boron—Con.
+  quote: Boron—Con.
+  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
 - record_id: table-006-0130
   kind: image_verified_token_correction
   pdf_page: 107
@@ -1811,6 +1831,16 @@ corrections:
   printed_token: $\mathrm{B}_{2}\mathrm{H}_{6}(g)\dagger$
   quote: $\mathrm{B}_{2}\mathrm{H}_{6}(g)\dagger$ ... $\mathrm{B}_{2}\mathrm{H}_{6}(g)\dagger$
   basis: Original-resolution page image proves the printed token.
+- record_id: table-006-0203
+  kind: image_verified_section_continuation_header_reclassification
+  pdf_page: 108
+  page: 104
+  source_row_index: 2
+  column: substance
+  ocr_token: Calcium-Con.
+  printed_token: Calcium—Con.
+  quote: Calcium—Con.
+  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
 - record_id: table-006-0267
   kind: image_verified_token_correction
   pdf_page: 108
@@ -1981,15 +2011,65 @@ corrections:
   printed_token: 45.6±0.6
   quote: HfCl4(c) ... 45.6±0.6
   basis: Original-resolution page image proves two printed substance rows were merged into one MinerU row.
-- record_id: table-006-0470
+- record_id: table-006-0441
+  kind: image_verified_section_continuation_header_reclassification
+  pdf_page: 111
+  page: 107
+  source_row_index: 2
+  column: substance
+  ocr_token: Hydrogen-Con.
+  printed_token: Hydrogen—Con.
+  quote: Hydrogen—Con.
+  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0447
   kind: image_verified_metadata_token_correction
   pdf_page: 111
   page: 107
-  source_row_index: 31
+  source_row_index: 8
   column: substance
-  ocr_token: HNO2(equ1,g)
-  printed_token: HNO2(equl,g)
-  quote: HNO2(equl,g) ... 60.8±0.3
+  ocr_token: DCIO(g)
+  printed_token: DClO(g)
+  quote: DClO(g) ... 57.9±0.5
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0536
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 11
+  column: substance
+  ocr_token: $IF_8(g)$
+  printed_token: $IF_5(g)$
+  quote: IF5(g) ... 78.7±1.0
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0541
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 17
+  column: substance
+  ocr_token: $IR_6(g)$
+  printed_token: $IrF_6(g)$
+  quote: IrF6(g) ... 84.5±3.0
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0610
+  kind: image_verified_section_continuation_header_reclassification
+  pdf_page: 113
+  page: 109
+  source_row_index: 2
+  column: substance
+  ocr_token: Lead-Con.
+  printed_token: Lead—Con.
+  quote: Lead—Con.
+  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0678
+  kind: image_verified_metadata_token_correction
+  pdf_page: 113
+  page: 109
+  source_row_index: 73
+  column: substance
+  ocr_token: $Mg(OH_2(c)$
+  printed_token: $Mg(OH)_2(c)$
+  quote: Mg(OH)2(c) ... 15.09±0.05
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0777
   kind: image_verified_metadata_token_correction
@@ -2001,6 +2081,46 @@ corrections:
   printed_token: NiTe1.1(c)
   quote: NiTe1.1(c) ... 20.10±0.08
   basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0778
+  kind: image_verified_section_continuation_header_reclassification
+  pdf_page: 115
+  page: 111
+  source_row_index: 2
+  column: substance
+  ocr_token: Nickel-Con.
+  printed_token: Nickel—Con.
+  quote: Nickel—Con.
+  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0861
+  kind: image_verified_section_continuation_header_reclassification
+  pdf_page: 116
+  page: 112
+  source_row_index: 2
+  column: substance
+  ocr_token: Phosphorus-Con.
+  printed_token: Phosphorus—Con.
+  quote: Phosphorus—Con.
+  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0931
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 116
+  page: 112
+  source_row_index: 76
+  column: substance
+  ocr_token: KMg2AlSi3-
+  printed_token: KMg3AlSi3-
+  quote: KMg3AlSi3- / O10F2(c) ... 75.9±0.5
+  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0932
+  kind: image_verified_metadata_token_correction
+  pdf_page: 116
+  page: 112
+  source_row_index: 77
+  column: substance
+  ocr_token: O10F2(c)
+  printed_token: KMg3AlSi3-O10F2(c)
+  quote: KMg3AlSi3-O10F2(c) ... 75.9±0.5
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-1014
   kind: image_verified_metadata_token_correction
   pdf_page: 117
@@ -2011,6 +2131,56 @@ corrections:
   printed_token: Si3N4(c)
   quote: Si3N4(c) ... 22.8
   basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1020
+  kind: image_verified_section_continuation_header_reclassification
+  pdf_page: 118
+  page: 114
+  source_row_index: 2
+  column: substance
+  ocr_token: Silicon-Con.
+  printed_token: Silicon—Con.
+  quote: Silicon—Con.
+  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-1094
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 118
+  page: 114
+  source_row_index: 78
+  column: substance
+  ocr_token: Na2SO4
+  printed_token: Na2SO4·
+  quote: Na2SO4· / 10H2O(c) ... 140.0±0.2
+  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-1095
+  kind: image_verified_metadata_token_correction
+  pdf_page: 118
+  page: 114
+  source_row_index: 79
+  column: substance
+  ocr_token: 10H2O(c)
+  printed_token: Na2SO4·10H2O(c)
+  quote: Na2SO4·10H2O(c) ... 140.0±0.2
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1106
+  kind: image_verified_section_continuation_header_reclassification
+  pdf_page: 119
+  page: 115
+  source_row_index: 2
+  column: substance
+  ocr_token: Strontium-Con.
+  printed_token: Strontium—Con.
+  quote: Strontium—Con.
+  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-1186
+  kind: image_verified_section_continuation_header_reclassification
+  pdf_page: 120
+  page: 116
+  source_row_index: 2
+  column: substance
+  ocr_token: Tin-Con.
+  printed_token: Tin—Con.
+  quote: Tin—Con.
+  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
 - record_id: table-006-1196
   kind: image_verified_metadata_token_correction
   pdf_page: 120
@@ -2041,6 +2211,16 @@ corrections:
   printed_token: $U_3O_8(c)$
   quote: U3O8(c) ... 67.5±0.2
   basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1269
+  kind: image_verified_metadata_token_correction
+  pdf_page: 121
+  page: 117
+  source_row_index: 15
+  column: substance
+  ocr_token: VOCI3(g)
+  printed_token: VOCl3(g)
+  quote: VOCl3(g) ... 82.2±1.0
+  basis: The 300-dpi PDF page render proves the printed substance token.
 untranscribed: []
 feedstock_element_coverage:
   Ag: 26
@@ -2051,19 +2231,19 @@ feedstock_element_coverage:
   Ba: 22
   Bi: 13
   Br: 94
-  C: 107
-  Ca: 60
+  C: 105
+  Ca: 59
   Cd: 28
   Ce: 6
-  Cl: 159
-  Co: 19
+  Cl: 161
+  Co: 9
   Cr: 18
   Cs: 15
   Cu: 28
   Dy: 1
   Er: 1
   Eu: 2
-  F: 120
+  F: 121
   Fe: 52
   Ga: 13
   Gd: 4
@@ -2071,9 +2251,9 @@ feedstock_element_coverage:
   H: 302
   Hf: 13
   Ho: 1
-  I: 88
+  I: 85
   In: 8
-  Ir: 2
+  Ir: 3
   K: 46
   La: 6
   Li: 29
@@ -2085,8 +2265,8 @@ feedstock_element_coverage:
   Na: 48
   Nb: 7
   Nd: 3
-  Ni: 21
-  O: 538
+  Ni: 20
+  O: 537
   Os: 5
   P: 47
   Pb: 36
@@ -2097,14 +2277,14 @@ feedstock_element_coverage:
   Sb: 20
   Sc: 3
   Se: 27
-  Si: 75
+  Si: 74
   Sm: 3
   Sn: 25
   Sr: 22
   Tb: 1
   Te: 21
   Th: 7
-  Ti: 51
+  Ti: 50
   Tm: 1
   U: 17
   V: 17
@@ -3391,11 +3571,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0036
-  formula: Antimony-Con.
-  formula_as_published: Antimony-Con.
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Antimony-Con.
-  metadata_ocr_suspect: false
+  name_as_published: Antimony—Con.
+  metadata_ocr_suspect: true
+  record_kind: section_continuation_header
+  metadata_ocr_token: Antimony-Con.
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -3406,7 +3588,7 @@ entries:
     table_number: 6
   path: records/table-006-0036.json
   row_count: 1
-  ocr_suspect_count: 0
+  ocr_suspect_count: 1
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -5087,11 +5269,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0119
-  formula: Boron-Con.
-  formula_as_published: Boron-Con.
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Boron-Con.
-  metadata_ocr_suspect: false
+  name_as_published: Boron—Con.
+  metadata_ocr_suspect: true
+  record_kind: section_continuation_header
+  metadata_ocr_token: Boron-Con.
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -5102,7 +5286,7 @@ entries:
     table_number: 6
   path: records/table-006-0119.json
   row_count: 1
-  ocr_suspect_count: 0
+  ocr_suspect_count: 1
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -6789,11 +6973,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0203
-  formula: Calcium-Con.
-  formula_as_published: Calcium-Con.
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Calcium-Con.
-  metadata_ocr_suspect: false
+  name_as_published: Calcium—Con.
+  metadata_ocr_suspect: true
+  record_kind: section_continuation_header
+  metadata_ocr_token: Calcium-Con.
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -6804,7 +6990,7 @@ entries:
     table_number: 6
   path: records/table-006-0203.json
   row_count: 1
-  ocr_suspect_count: 0
+  ocr_suspect_count: 1
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -11770,11 +11956,13 @@ entries:
     note: Detector only; phase changes and printed values retained unchanged.
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0441
-  formula: Hydrogen-Con.
-  formula_as_published: Hydrogen-Con.
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Hydrogen-Con.
-  metadata_ocr_suspect: false
+  name_as_published: Hydrogen—Con.
+  metadata_ocr_suspect: true
+  record_kind: section_continuation_header
+  metadata_ocr_token: Hydrogen-Con.
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -11785,7 +11973,7 @@ entries:
     table_number: 6
   path: records/table-006-0441.json
   row_count: 1
-  ocr_suspect_count: 1
+  ocr_suspect_count: 2
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -11901,11 +12089,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0447
-  formula: DCIO(g)
-  formula_as_published: DCIO(g)
+  formula: DClO(g)
+  formula_as_published: DClO(g)
   phase: (g)
-  name_as_published: DCIO(g)
+  name_as_published: DClO(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: DCIO(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -12394,12 +12583,22 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0470
-  formula: HNO2(equl,g)
-  formula_as_published: HNO2(equl,g)
+  formula: HNO2(equ1,g)
+  formula_as_published: HNO2(equ1,g)
   phase: null
-  name_as_published: HNO2(equl,g)
-  metadata_ocr_suspect: true
-  metadata_ocr_token: HNO2(equ1,g)
+  name_as_published: HNO2(equ1,g)
+  metadata_ocr_suspect: false
+  metadata_annotations:
+  - record_id: table-006-0470
+    pdf_page: 111
+    page: 107
+    source_row_index: 31
+    column: substance
+    kind: image_verified_printed_superscript_footnote_marker
+    printed_token: HNO2(equ¹,g)
+    footnote_marker: '1'
+    quote: HNO2(equ¹,g) ... 60.8±0.3; ¹equ = equilibrium.
+    basis: The 300-dpi PDF page render proves 1 is a printed superscript footnote marker, not an OCR error or phase qualifier.
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -12410,7 +12609,7 @@ entries:
     table_number: 6
   path: records/table-006-0470.json
   row_count: 1
-  ocr_suspect_count: 4
+  ocr_suspect_count: 3
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -13726,11 +13925,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0536
-  formula: $IF_8(g)$
-  formula_as_published: $IF_8(g)$
+  formula: $IF_5(g)$
+  formula_as_published: $IF_5(g)$
   phase: (g)
-  name_as_published: IF_8(g)
+  name_as_published: IF_5(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $IF_8(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -13826,11 +14026,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0541
-  formula: $IR_6(g)$
-  formula_as_published: $IR_6(g)$
+  formula: $IrF_6(g)$
+  formula_as_published: $IrF_6(g)$
   phase: (g)
-  name_as_published: IR_6(g)
+  name_as_published: IrF_6(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $IR_6(g)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15224,11 +15425,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0610
-  formula: Lead-Con.
-  formula_as_published: Lead-Con.
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Lead-Con.
-  metadata_ocr_suspect: false
+  name_as_published: Lead—Con.
+  metadata_ocr_suspect: true
+  record_kind: section_continuation_header
+  metadata_ocr_token: Lead-Con.
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -15239,7 +15442,7 @@ entries:
     table_number: 6
   path: records/table-006-0610.json
   row_count: 1
-  ocr_suspect_count: 4
+  ocr_suspect_count: 5
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -16595,11 +16798,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0678
-  formula: $Mg(OH_2(c)$
-  formula_as_published: $Mg(OH_2(c)$
+  formula: $Mg(OH)_2(c)$
+  formula_as_published: $Mg(OH)_2(c)$
   phase: (c)
-  name_as_published: Mg(OH_2(c)
+  name_as_published: Mg(OH)_2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Mg(OH_2(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18625,11 +18829,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0778
-  formula: Nickel-Con.
-  formula_as_published: Nickel-Con.
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Nickel-Con.
-  metadata_ocr_suspect: false
+  name_as_published: Nickel—Con.
+  metadata_ocr_suspect: true
+  record_kind: section_continuation_header
+  metadata_ocr_token: Nickel-Con.
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -18640,7 +18846,7 @@ entries:
     table_number: 6
   path: records/table-006-0778.json
   row_count: 1
-  ocr_suspect_count: 0
+  ocr_suspect_count: 1
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -20395,11 +20601,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0861
-  formula: Phosphorus-Con.
-  formula_as_published: Phosphorus-Con.
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Phosphorus-Con.
-  metadata_ocr_suspect: false
+  name_as_published: Phosphorus—Con.
+  metadata_ocr_suspect: true
+  record_kind: section_continuation_header
+  metadata_ocr_token: Phosphorus-Con.
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -20410,7 +20618,7 @@ entries:
     table_number: 6
   path: records/table-006-0861.json
   row_count: 1
-  ocr_suspect_count: 0
+  ocr_suspect_count: 1
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -21813,11 +22021,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0931
-  formula: KMg2AlSi3-
-  formula_as_published: KMg2AlSi3-
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: KMg2AlSi3-
+  name_as_published: KMg3AlSi3-
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: KMg2AlSi3-
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21833,11 +22043,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0932
-  formula: O10F2(c)
-  formula_as_published: O10F2(c)
+  formula: KMg3AlSi3-O10F2(c)
+  formula_as_published: KMg3AlSi3-O10F2(c)
   phase: (c)
-  name_as_published: O10F2(c)
+  name_as_published: KMg3AlSi3-O10F2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: O10F2(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -23605,11 +23816,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1020
-  formula: Silicon-Con.
-  formula_as_published: Silicon-Con.
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Silicon-Con.
-  metadata_ocr_suspect: false
+  name_as_published: Silicon—Con.
+  metadata_ocr_suspect: true
+  record_kind: section_continuation_header
+  metadata_ocr_token: Silicon-Con.
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -23620,7 +23833,7 @@ entries:
     table_number: 6
   path: records/table-006-1020.json
   row_count: 1
-  ocr_suspect_count: 1
+  ocr_suspect_count: 2
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -25096,11 +25309,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1094
-  formula: Na2SO4
-  formula_as_published: Na2SO4
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Na2SO4
+  name_as_published: Na2SO4·
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: Na2SO4
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25116,11 +25331,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1095
-  formula: 10H2O(c)
-  formula_as_published: 10H2O(c)
+  formula: Na2SO4·10H2O(c)
+  formula_as_published: Na2SO4·10H2O(c)
   phase: (c)
-  name_as_published: 10H2O(c)
+  name_as_published: Na2SO4·10H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: 10H2O(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25336,11 +25552,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1106
-  formula: Strontium-Con.
-  formula_as_published: Strontium-Con.
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Strontium-Con.
-  metadata_ocr_suspect: false
+  name_as_published: Strontium—Con.
+  metadata_ocr_suspect: true
+  record_kind: section_continuation_header
+  metadata_ocr_token: Strontium-Con.
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -25351,7 +25569,7 @@ entries:
     table_number: 6
   path: records/table-006-1106.json
   row_count: 1
-  ocr_suspect_count: 1
+  ocr_suspect_count: 2
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -26983,11 +27201,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1186
-  formula: Tin-Con.
-  formula_as_published: Tin-Con.
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Tin-Con.
-  metadata_ocr_suspect: false
+  name_as_published: Tin—Con.
+  metadata_ocr_suspect: true
+  record_kind: section_continuation_header
+  metadata_ocr_token: Tin-Con.
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -26998,7 +27218,7 @@ entries:
     table_number: 6
   path: records/table-006-1186.json
   row_count: 1
-  ocr_suspect_count: 0
+  ocr_suspect_count: 1
   ambiguity_count: 0
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
@@ -28667,11 +28887,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1269
-  formula: VOCI3(g)
-  formula_as_published: VOCI3(g)
+  formula: VOCl3(g)
+  formula_as_published: VOCl3(g)
   phase: (g)
-  name_as_published: VOCI3(g)
+  name_as_published: VOCl3(g)
   metadata_ocr_suspect: true
+  metadata_ocr_token: VOCI3(g)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl

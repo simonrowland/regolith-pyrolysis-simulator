@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-1020",
   "table_number": 6,
-  "substance_as_published": "Silicon-Con.",
-  "formula_as_published": "Silicon-Con.",
-  "formula": "Silicon-Con.",
-  "name_as_published": "Silicon-Con.",
+  "substance_as_published": "Silicon—Con.",
+  "formula_as_published": null,
+  "formula": null,
+  "name_as_published": "Silicon—Con.",
   "phase_as_published": null,
   "state_as_published": null,
   "footnote_markers": "",
-  "metadata_ocr_suspect": false,
-  "metadata_ocr_check": "raster_ocr_text_agreement",
+  "metadata_ocr_suspect": true,
+  "metadata_ocr_check": "image_verified_section_continuation_header_reclassification",
   "page": 114,
   "pdf_page": 118,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 2,
       "raw": [
-        "Silicon-Con.",
+        "Silicon—Con.",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "Silicon-Con."
+          "raw": "Silicon—Con.",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_section_continuation_header_reclassification"
         },
         "cp_10_k": {
           "raw": "",
@@ -294,7 +296,22 @@
     "sha256": "0c29f38012983191ef30e8082a8e665ff27d57cbe4cc8e36f5f6ffb88e4fbb7b"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_section_continuation_header_reclassification",
+      "pdf_page": 118,
+      "page": 114,
+      "source_row_index": 2,
+      "column": "substance",
+      "ocr_token": "Silicon-Con.",
+      "printed_token": "Silicon—Con.",
+      "quote": "Silicon—Con.",
+      "basis": "The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.",
+      "record_id": "table-006-1020"
+    }
+  ],
   "heading_context_as_published": "Silicon:",
-  "transcription_status": "transcribed"
+  "record_kind": "section_continuation_header",
+  "metadata_ocr_token": "Silicon-Con.",
+  "transcription_status": "transcribed_with_ocr_ambiguities"
 }

@@ -10,8 +10,20 @@ from typing import Any, Iterable
 
 import yaml
 
+from simulator.reference_data.nasa_glenn import ELEMENT_SYMBOLS
+
 
 COMPILATION_ROOT = Path(__file__).resolve().parents[2] / "data/literature/compilations/kelley-king-1961-usbm-b592"
+
+_STRUCTURAL_RECORD_KINDS = frozenset(
+    {"section_continuation_header", "formula_continuation_prefix"}
+)
+_B592_ELEMENT_TOKENS = ELEMENT_SYMBOLS | {"A", "D"}
+_FORMULA_IDENTITY_FIELDS = ("formula", "formula_as_published", "name_as_published")
+_ORPHAN_FORMULA_FRAGMENTS = frozenset({"O10F2(c)", "10H2O(c)"})
+_CONTINUATION_HEADER = re.compile(r"(?:[-\u2013\u2014]\s*)?(?:Con\.|Continued)$", re.IGNORECASE)
+_CL_AS_I_CONFUSABLE = re.compile(r"CI(?=\d|[A-Z(])")
+_IODINE_FLUORIDE = re.compile(r"(?<![A-Za-z])IF(\d+)")
 
 
 class PrintedTemperatureUnavailable(LookupError):
@@ -41,19 +53,84 @@ class OCRSuspectRow(LookupError):
         super().__init__(f"{record_id} (printed page {printed_page}) has OCR-suspect source material")
 
 
-def _metadata_digit_ocr_candidate(token: str | None) -> bool:
-    if not token:
-        return False
-    plain = re.sub(r"[^A-Za-z0-9.,/()]+", "", token)
-    return bool(re.search(r"(?<![\d./])1(?=[A-Za-z,(]|$)", plain))
+def _plain_formula(token: str) -> str:
+    value = token.strip().strip("$")
+    value = re.sub(r"\\(?:mathrm|text|operatorname)\s*\{([^{}]*)\}", r"\1", value)
+    value = value.replace("\\cdot", "\u00b7")
+    value = re.sub(r"[{}]", "", value)
+    value = re.sub(r"\\[A-Za-z]+", "", value)
+    return re.sub(r"[_\s]", "", value)
+
+
+def _formula_token_issues(token: str) -> tuple[str, ...]:
+    plain = _plain_formula(token)
+    issues = []
+    if _CONTINUATION_HEADER.search(plain):
+        issues.append("continued-section label is not a chemical formula")
+
+    closing = {")": "(", "]": "["}
+    stack = []
+    for character in plain:
+        if character in "([":
+            stack.append(character)
+        elif character in closing and (not stack or stack.pop() != closing[character]):
+            issues.append("unbalanced chemical-formula delimiters")
+            break
+    else:
+        if stack:
+            issues.append("unbalanced chemical-formula delimiters")
+
+    invalid_symbols = sorted(
+        {
+            match.group(0)
+            for match in re.finditer(r"[A-Z][a-z]?", plain)
+            if match.group(0) not in _B592_ELEMENT_TOKENS
+        }
+    )
+    if invalid_symbols:
+        issues.append(f"unknown chemical element token(s): {', '.join(invalid_symbols)}")
+    if _CL_AS_I_CONFUSABLE.search(plain):
+        issues.append("uppercase I in a Cl-shaped formula position")
+    iodine_fluoride = _IODINE_FLUORIDE.search(plain)
+    if iodine_fluoride and int(iodine_fluoride.group(1)) not in {3, 5, 7}:
+        issues.append("invalid iodine-fluoride stoichiometry")
+    if plain in _ORPHAN_FORMULA_FRAGMENTS:
+        issues.append("orphaned wrapped-formula continuation")
+    return tuple(issues)
+
+
+def _formula_integrity_issues(metadata: dict[str, Any]) -> tuple[tuple[str, str, str], ...]:
+    record_kind = metadata.get("record_kind", "substance")
+    if record_kind in _STRUCTURAL_RECORD_KINDS:
+        return tuple(
+            (field, str(metadata[field]), "structural record must not carry a canonical formula")
+            for field in ("formula", "formula_as_published")
+            if metadata.get(field) is not None
+        )
+
+    formula = metadata.get("formula")
+    issues = []
+    for field in _FORMULA_IDENTITY_FIELDS:
+        token = metadata.get(field)
+        if not isinstance(token, str) or not token:
+            continue
+        if field == "name_as_published" and (
+            formula is None or _plain_formula(token) != _plain_formula(str(formula))
+        ):
+            continue
+        issues.extend((field, token, reason) for reason in _formula_token_issues(token))
+    return tuple(issues)
+
+
+def _metadata_integrity_suspects(metadata: dict[str, Any]) -> list[OCRSuspectCell]:
+    return [
+        OCRSuspectCell(-1, field, token, f"formula integrity: {reason}")
+        for field, token, reason in _formula_integrity_issues(metadata)
+    ]
 
 
 def _manifest_suspect_cells(entry: dict[str, Any]) -> tuple[OCRSuspectCell, ...]:
-    suspects = []
-    for field in ("formula", "formula_as_published", "name_as_published"):
-        token = entry.get(field)
-        if _metadata_digit_ocr_candidate(token):
-            suspects.append(OCRSuspectCell(-1, field, token, "unresolved metadata digit OCR candidate"))
+    suspects = _metadata_integrity_suspects(entry)
     if entry.get("metadata_ocr_suspect") and not suspects:
         suspects.append(
             OCRSuspectCell(
@@ -93,8 +170,8 @@ def _numeric_cells(value: Any, *, source_row_index: int = -1):
 
 
 def _suspect_cells(record: dict[str, Any], value: Any) -> tuple[OCRSuspectCell, ...]:
-    suspects = []
-    if record.get("metadata_ocr_suspect"):
+    suspects = _metadata_integrity_suspects(record)
+    if record.get("metadata_ocr_suspect") and not suspects:
         suspects.append(
             OCRSuspectCell(
                 source_row_index=-1,

@@ -16,6 +16,9 @@ from typing import Any
 
 import yaml
 
+from simulator.reference_data.kelley_king_1961_usbm_b592_loader import (
+    _formula_integrity_issues,
+)
 from tools.harvest_atct_compilation import feedstock_coverage
 
 
@@ -369,19 +372,51 @@ TABLE6_IMAGE_VERIFIED_METADATA_CORRECTIONS = {
     (102, "$AsF_1(l) \\dagger$"): ("$AsF_3(l) \\dagger$", "AsF3(l)† ... 43.3±0.1"),
     (105, "Cs1(g)"): ("CsI(g)", "CsI(g) ... 65.5±0.5"),
     (106, "Ga3C1(g)"): ("Ga3Cl(g)", "Ga3Cl(g) ... 71.4±1.5"),
-    (107, "HNO2(equ1,g)"): ("HNO2(equl,g)", "HNO2(equl,g) ... 60.8±0.3"),
+    (107, "DCIO(g)"): ("DClO(g)", "DClO(g) ... 57.9±0.5"),
+    (108, "$IF_8(g)$"): ("$IF_5(g)$", "IF5(g) ... 78.7±1.0"),
+    (108, "$IR_6(g)$"): ("$IrF_6(g)$", "IrF6(g) ... 84.5±3.0"),
+    (109, "$Mg(OH_2(c)$"): ("$Mg(OH)_2(c)$", "Mg(OH)2(c) ... 15.09±0.05"),
     (110, "NiTe1(c)"): ("NiTe1.1(c)", "NiTe1.1(c) ... 20.10±0.08"),
+    (112, "O10F2(c)"): ("KMg3AlSi3-O10F2(c)", "KMg3AlSi3-O10F2(c) ... 75.9±0.5"),
     (113, "Si1N4(c)"): ("Si3N4(c)", "Si3N4(c) ... 22.8"),
+    (114, "10H2O(c)"): ("Na2SO4·10H2O(c)", "Na2SO4·10H2O(c) ... 140.0±0.2"),
     (116, "$SnI_1(g)$"): ("$SnI_2(g)$", "SnI2(g) ... 52.4±0.2"),
     (116, "$U_1O_9(c)$"): ("$U_3O_8(c)$", "U3O8(c) ... 67.5±0.2"),
+    (117, "VOCI3(g)"): ("VOCl3(g)", "VOCl3(g) ... 82.2±1.0"),
 }
 
 
-def metadata_digit_ocr_candidate(token: str | None) -> bool:
-    """Flag standalone OCR 1s while excluding real decimals and fractions."""
-    if not token:
-        return False
-    return bool(re.search(r"(?<![\d./])1(?=[A-Za-z,(]|$)", plain_text(token)))
+TABLE6_IMAGE_VERIFIED_STRUCTURAL_METADATA = {
+    (102, "Antimony-Con."): ("section_continuation_header", "Antimony—Con.", "Antimony—Con."),
+    (103, "Boron-Con."): ("section_continuation_header", "Boron—Con.", "Boron—Con."),
+    (104, "Calcium-Con."): ("section_continuation_header", "Calcium—Con.", "Calcium—Con."),
+    (107, "Hydrogen-Con."): ("section_continuation_header", "Hydrogen—Con.", "Hydrogen—Con."),
+    (109, "Lead-Con."): ("section_continuation_header", "Lead—Con.", "Lead—Con."),
+    (111, "Nickel-Con."): ("section_continuation_header", "Nickel—Con.", "Nickel—Con."),
+    (112, "Phosphorus-Con."): ("section_continuation_header", "Phosphorus—Con.", "Phosphorus—Con."),
+    (112, "KMg2AlSi3-"): (
+        "formula_continuation_prefix",
+        "KMg3AlSi3-",
+        "KMg3AlSi3- / O10F2(c) ... 75.9±0.5",
+    ),
+    (114, "Silicon-Con."): ("section_continuation_header", "Silicon—Con.", "Silicon—Con."),
+    (114, "Na2SO4"): (
+        "formula_continuation_prefix",
+        "Na2SO4·",
+        "Na2SO4· / 10H2O(c) ... 140.0±0.2",
+    ),
+    (115, "Strontium-Con."): ("section_continuation_header", "Strontium—Con.", "Strontium—Con."),
+    (116, "Tin-Con."): ("section_continuation_header", "Tin—Con.", "Tin—Con."),
+}
+TABLE6_IMAGE_VERIFIED_METADATA_ANNOTATIONS = {
+    (107, "HNO2(equ1,g)"): {
+        "kind": "image_verified_printed_superscript_footnote_marker",
+        "printed_token": "HNO2(equ¹,g)",
+        "footnote_marker": "1",
+        "quote": "HNO2(equ¹,g) ... 60.8±0.3; ¹equ = equilibrium.",
+        "basis": "The 300-dpi PDF page render proves 1 is a printed superscript footnote marker, not an OCR error or phase qualifier.",
+    }
+}
 
 
 def native_row(
@@ -550,13 +585,32 @@ def build_records(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                             "basis": "Original-resolution page image proves the printed token.",
                         })
                     raw_row = corrected
+                structural_metadata = TABLE6_IMAGE_VERIFIED_STRUCTURAL_METADATA.get(
+                    (block["printed_page"], raw_row[0])
+                )
+                metadata_annotation = TABLE6_IMAGE_VERIFIED_METADATA_ANNOTATIONS.get(
+                    (block["printed_page"], raw_row[0])
+                )
+                if structural_metadata:
+                    record_kind, printed_token, quote = structural_metadata
+                    ocr_token = raw_row[0]
+                    corrected = list(raw_row)
+                    corrected[0] = printed_token
+                    corrections.append({
+                        "kind": f"image_verified_{record_kind}_reclassification",
+                        "pdf_page": block["pdf_page"],
+                        "page": block["printed_page"],
+                        "source_row_index": row_index,
+                        "column": "substance",
+                        "ocr_token": ocr_token,
+                        "printed_token": printed_token,
+                        "quote": quote,
+                        "basis": "The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.",
+                    })
+                    raw_row = corrected
                 metadata_correction = TABLE6_IMAGE_VERIFIED_METADATA_CORRECTIONS.get(
                     (block["printed_page"], raw_row[0])
                 )
-                if metadata_digit_ocr_candidate(raw_row[0]) and metadata_correction is None:
-                    raise RuntimeError(
-                        f"unreviewed metadata digit OCR candidate on printed page {block['printed_page']}: {raw_row[0]!r}"
-                    )
                 if metadata_correction:
                     ocr_token = raw_row[0]
                     printed_token, quote = metadata_correction
@@ -614,15 +668,43 @@ def build_records(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                         cell["ocr_suspect"] = True
                         cell["ocr_check"] = correction["kind"]
                     metadata = substance_metadata(variant[0])
+                    if structural_metadata:
+                        metadata.update(
+                            {
+                                "formula_as_published": None,
+                                "formula": None,
+                                "name_as_published": structural_metadata[1],
+                                "phase_as_published": None,
+                                "state_as_published": None,
+                            }
+                        )
                     record_id = f"table-006-{ordinals[number]:04d}"
                     record = record_base(record_id, number, block, metadata, [row], grid, raw_rows[0] + raw_rows[1])
                     record["heading_context_as_published"] = table6_heading
+                    if structural_metadata:
+                        record["record_kind"] = structural_metadata[0]
                     for correction in variant_corrections:
-                        if correction["kind"] == "image_verified_metadata_token_correction":
+                        if correction["kind"] == "image_verified_metadata_token_correction" or correction[
+                            "kind"
+                        ].endswith("_reclassification"):
                             correction["record_id"] = record_id
                             record["metadata_ocr_token"] = correction["ocr_token"]
                             record["metadata_ocr_suspect"] = True
                             record["metadata_ocr_check"] = correction["kind"]
+                    if metadata_annotation:
+                        record["footnote_markers"] = metadata_annotation["footnote_marker"]
+                        record["metadata_ocr_suspect"] = False
+                        record["metadata_ocr_check"] = metadata_annotation["kind"]
+                        record["metadata_annotations"] = [
+                            {
+                                "record_id": record_id,
+                                "pdf_page": block["pdf_page"],
+                                "page": block["printed_page"],
+                                "source_row_index": row_index,
+                                "column": "substance",
+                                **metadata_annotation,
+                            }
+                        ]
                     record["corrections"].extend(variant_corrections)
                     record["ambiguities"].extend(cp_monotonicity(record))
                     record["ambiguities"].extend(recommendation_disagreement(record))
@@ -651,15 +733,16 @@ def build_records(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     raise RuntimeError(f"unrecoverable Table 7 row shape at PDF page {block['pdf_page']}: {raw_row}")
         print(f"TABLE {block['block_index']:02d}/{EXPECTED_BLOCKS}: transcribed ({len(records)} records)", flush=True)
     if len(records) != EXPECTED_RECORDS:
-        raise RuntimeError(f"expected {EXPECTED_RECORDS} substance records, found {len(records)}")
-    unresolved_metadata = [
-        (record["record_id"], field, record.get(field))
+        raise RuntimeError(f"expected {EXPECTED_RECORDS} source records, found {len(records)}")
+    unresolved_formula_integrity = [
+        (record["record_id"], field, token, reason)
         for record in records
-        for field in ("formula", "formula_as_published", "name_as_published")
-        if metadata_digit_ocr_candidate(record.get(field))
+        for field, token, reason in _formula_integrity_issues(record)
     ]
-    if unresolved_metadata:
-        raise RuntimeError(f"unreviewed metadata digit OCR candidates: {unresolved_metadata}")
+    if unresolved_formula_integrity:
+        raise RuntimeError(
+            f"unreviewed formula-integrity candidates: {unresolved_formula_integrity}"
+        )
     return records
 
 
@@ -811,6 +894,12 @@ def build(workers: int) -> None:
             "phase": record["phase_as_published"],
             "name_as_published": record["name_as_published"],
             "metadata_ocr_suspect": record["metadata_ocr_suspect"],
+            **({"record_kind": record["record_kind"]} if record.get("record_kind") else {}),
+            **(
+                {"metadata_annotations": record["metadata_annotations"]}
+                if record.get("metadata_annotations")
+                else {}
+            ),
             **(
                 {"metadata_ocr_token": record["metadata_ocr_token"]}
                 if record.get("metadata_ocr_token")

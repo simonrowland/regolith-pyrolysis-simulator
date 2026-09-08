@@ -72,13 +72,6 @@ def _numeric_cells(value):
             yield from _numeric_cells(child)
 
 
-def _metadata_digit_ocr_candidate(token):
-    if not token:
-        return False
-    plain = re.sub(r"[^A-Za-z0-9.,/()]+", "", token)
-    return bool(re.search(r"(?<![\d./])1(?=[A-Za-z,(]|$)", plain))
-
-
 def _assert_fixture(records, fixture):
     by_id = {record["record_id"]: record for record in records}
     for expected in fixture["cells"]:
@@ -179,7 +172,10 @@ def test_formula_keys_have_no_whitespace_and_metadata_clean_requires_image_check
         if record["formula"] is not None:
             assert not re.search(r"\s", record["formula"]), record["record_id"]
         if not record["metadata_ocr_suspect"]:
-            assert record["metadata_ocr_check"] == "raster_ocr_text_agreement"
+            assert record["metadata_ocr_check"] in {
+                "raster_ocr_text_agreement",
+                "image_verified_printed_superscript_footnote_marker",
+            }
         assert record["formula_as_published"] is None or isinstance(record["formula_as_published"], str)
         assert isinstance(record["name_as_published"], str)
 
@@ -196,10 +192,10 @@ def test_actinium_image_proven_row_alignment_correction_is_explicit():
         assert correction["printed_token"] == correction["ocr_token"] == "15.0±1.0"
         assert correction["quote"]
         assert record["rows"][0]["cells"][correction["column"]]["ocr_suspect"]
-    assert load_manifest(include_ocr_suspect=True)["summary"]["correction_count"] == 36
+    assert load_manifest(include_ocr_suspect=True)["summary"]["correction_count"] == 54
 
 
-def test_metadata_digit_ocr_census_is_fully_image_corrected():
+def test_formula_integrity_census_is_fully_image_corrected():
     records = _records()
     corrections = [
         correction
@@ -207,13 +203,13 @@ def test_metadata_digit_ocr_census_is_fully_image_corrected():
         for correction in record["corrections"]
         if correction["kind"] == "image_verified_metadata_token_correction"
     ]
-    assert len(corrections) == 10
-    assert sum(
-        _metadata_digit_ocr_candidate(record.get(field))
+    issues = [
+        (record["record_id"], field, token, reason)
         for record in records
-        for field in ("formula", "formula_as_published", "name_as_published")
-    ) == 0
-    assert all(_metadata_digit_ocr_candidate(correction["ocr_token"]) for correction in corrections)
+        for field, token, reason in b592_loader._formula_integrity_issues(record)
+    ]
+    assert issues == []
+    assert len(corrections) == 16
     assert all(
         correction["record_id"]
         and correction["page"]
@@ -228,12 +224,60 @@ def test_metadata_digit_ocr_census_is_fully_image_corrected():
         "table-006-0053",
         "table-006-0300",
         "table-006-0380",
-        "table-006-0470",
+        "table-006-0447",
+        "table-006-0536",
+        "table-006-0541",
+        "table-006-0678",
         "table-006-0777",
+        "table-006-0932",
         "table-006-1014",
+        "table-006-1095",
         "table-006-1196",
         "table-006-1248",
+        "table-006-1269",
     }
+
+
+@pytest.mark.parametrize(
+    ("token", "reason"),
+    [
+        ("DCIO(g)", "uppercase I in a Cl-shaped formula position"),
+        ("$IF_8(g)$", "invalid iodine-fluoride stoichiometry"),
+        ("$IR_6(g)$", "unknown chemical element token(s): R"),
+        ("$Mg(OH_2(c)$", "unbalanced chemical-formula delimiters"),
+        ("Antimony-Con.", "continued-section label is not a chemical formula"),
+        ("O10F2(c)", "orphaned wrapped-formula continuation"),
+    ],
+)
+def test_formula_integrity_predicate_covers_each_reviewed_failure_class(token, reason):
+    issues = b592_loader._formula_integrity_issues(
+        {"formula": token, "formula_as_published": token, "name_as_published": token}
+    )
+    assert any(issue_reason == reason for _, _, issue_reason in issues)
+
+
+def test_hno2_superscript_one_is_a_printed_footnote_marker_not_a_repair():
+    record = next(record for record in _records() if record["record_id"] == "table-006-0470")
+    assert record["substance_as_published"] == "HNO2(equ1,g)"
+    assert record["formula"] == record["formula_as_published"] == "HNO2(equ1,g)"
+    assert record["footnote_markers"] == "1"
+    assert not record["metadata_ocr_suspect"]
+    assert record["metadata_ocr_check"] == "image_verified_printed_superscript_footnote_marker"
+    assert not record["corrections"]
+    assert record["metadata_annotations"] == [
+        {
+            "record_id": "table-006-0470",
+            "pdf_page": 111,
+            "page": 107,
+            "source_row_index": 31,
+            "column": "substance",
+            "kind": "image_verified_printed_superscript_footnote_marker",
+            "printed_token": "HNO2(equ¹,g)",
+            "footnote_marker": "1",
+            "quote": "HNO2(equ¹,g) ... 60.8±0.3; ¹equ = equilibrium.",
+            "basis": "The 300-dpi PDF page render proves 1 is a printed superscript footnote marker, not an OCR error or phase qualifier.",
+        }
+    ]
 
 
 def test_image_proven_merged_rows_are_split_without_cross_substance_values():
@@ -277,6 +321,52 @@ def test_group_headings_are_context_not_substance_records():
     records = [record for record in _records() if record["table_number"] == 6]
     assert all(not record["substance_as_published"].strip().endswith(":") for record in records)
     assert {record.get("heading_context_as_published") for record in records} >= {"Actinium:", "Aluminum:", "Zirconium:"}
+    by_id = {record["record_id"]: record for record in records}
+    continuation_ids = {
+        "table-006-0036",
+        "table-006-0119",
+        "table-006-0203",
+        "table-006-0441",
+        "table-006-0610",
+        "table-006-0778",
+        "table-006-0861",
+        "table-006-1020",
+        "table-006-1106",
+        "table-006-1186",
+    }
+    assert {
+        record_id
+        for record_id, record in by_id.items()
+        if record.get("record_kind") == "section_continuation_header"
+    } == continuation_ids
+    for record_id in continuation_ids:
+        record = by_id[record_id]
+        assert record["formula"] is record["formula_as_published"] is None
+        assert record["name_as_published"].endswith("—Con.")
+        correction = record["corrections"][0]
+        assert correction["record_id"] == record_id
+        assert correction["page"] and correction["pdf_page"] and correction["quote"]
+        assert correction["kind"] == "image_verified_section_continuation_header_reclassification"
+
+
+def test_wrapped_formula_fragments_are_typed_and_reconstructed_from_the_image():
+    by_id = {record["record_id"]: record for record in _records()}
+    expected = {
+        "table-006-0931": ("KMg3AlSi3-", "table-006-0932", "KMg3AlSi3-O10F2(c)"),
+        "table-006-1094": ("Na2SO4·", "table-006-1095", "Na2SO4·10H2O(c)"),
+    }
+    for prefix_id, (printed_prefix, substance_id, formula) in expected.items():
+        prefix = by_id[prefix_id]
+        assert prefix["record_kind"] == "formula_continuation_prefix"
+        assert prefix["formula"] is prefix["formula_as_published"] is None
+        assert prefix["name_as_published"] == printed_prefix
+        assert prefix["corrections"][0]["quote"]
+        substance = by_id[substance_id]
+        assert substance.get("record_kind", "substance") == "substance"
+        assert substance["formula"] == substance["formula_as_published"] == formula
+        correction = substance["corrections"][0]
+        assert correction["record_id"] == substance_id
+        assert correction["page"] and correction["pdf_page"] and correction["quote"]
 
 
 @pytest.mark.parametrize("temperature", [0, 9.99, 10.01, 298.14, 298.16, 300, float("nan"), float("inf")])
@@ -339,9 +429,9 @@ def test_all_public_loader_entry_points_preserve_suspect_safety(tmp_path):
 
     mutated = copy.deepcopy(manifest)
     mutated_entry = next(entry for entry in mutated["entries"] if not entry["metadata_ocr_suspect"])
-    mutated_entry["formula"] = "Cs1(g)"
-    mutated_entry["formula_as_published"] = "Cs1(g)"
-    mutated_entry["name_as_published"] = "Cs1(g)"
+    mutated_entry["formula"] = "DCIO(g)"
+    mutated_entry["formula_as_published"] = "DCIO(g)"
+    mutated_entry["name_as_published"] = "DCIO(g)"
     mutated["entries"] = [mutated_entry]
     (tmp_path / "manifest.yaml").write_text(yaml.safe_dump(mutated, sort_keys=False))
     with pytest.raises(OCRSuspectRow) as error:
@@ -351,7 +441,40 @@ def test_all_public_loader_entry_points_preserve_suspect_safety(tmp_path):
         "formula_as_published",
         "name_as_published",
     }
-    assert load_manifest(tmp_path, include_ocr_suspect=True)["entries"][0]["formula"] == "Cs1(g)"
+    assert load_manifest(tmp_path, include_ocr_suspect=True)["entries"][0]["formula"] == "DCIO(g)"
+
+    record_probe_root = tmp_path / "record-probe"
+    record_entry = next(
+        copy.deepcopy(entry)
+        for entry in manifest["entries"]
+        if not entry["metadata_ocr_suspect"]
+    )
+    record_entry["ocr_suspect_count"] = 0
+    record = json.loads((COMPILATION_ROOT / record_entry["path"]).read_text())
+    for cell in _numeric_cells(record):
+        cell["ocr_suspect"] = False
+    for field in ("substance_as_published", "formula", "formula_as_published", "name_as_published"):
+        record[field] = "DCIO(g)"
+    record["metadata_ocr_suspect"] = False
+    record["metadata_ocr_check"] = "raster_ocr_text_agreement"
+    record_manifest = copy.deepcopy(manifest)
+    record_manifest["entries"] = [record_entry]
+    record_probe_root.mkdir()
+    (record_probe_root / "manifest.yaml").write_text(
+        yaml.safe_dump(record_manifest, sort_keys=False)
+    )
+    record_path = record_probe_root / record_entry["path"]
+    record_path.parent.mkdir(parents=True)
+    record_path.write_text(json.dumps(record))
+    with pytest.raises(OCRSuspectRow) as record_error:
+        list(load_records(record_probe_root))
+    assert {cell.column for cell in record_error.value.suspect_cells} == {
+        "formula",
+        "formula_as_published",
+        "name_as_published",
+    }
+    explicit_record = list(load_records(record_probe_root, include_ocr_suspect=True))[0]
+    assert explicit_record["contains_ocr_suspect_cells"]
 
 
 def test_factor_1000_and_monotonicity_detectors_are_complete_and_non_correcting():
