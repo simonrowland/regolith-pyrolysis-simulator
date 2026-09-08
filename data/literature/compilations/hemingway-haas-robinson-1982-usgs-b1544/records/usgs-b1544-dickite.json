@@ -252,10 +252,11 @@
     },
     {
       "temperature": {
-        "as_published": "1100",
-        "value": "1100",
-        "ocr_suspect": false,
-        "flags": []
+        "layout_as_extracted": "1100",
+        "as_published": "400",
+        "value": "400",
+        "ocr_suspect": true,
+        "flags": ["image_verified_correction"]
       },
       "enthalpy_increment_over_T": {
         "as_published": "67.647",
@@ -342,9 +343,9 @@
           "relation": "-(G-H298)/T = S - (H-H298)/T"
         },
         "logKf_vs_dG_from_the_elements": {
-          "ok": false,
-          "delta": "-306.2571875656077083895696869",
-          "predicted_log_kf": "175.0028124343922916104303131",
+          "ok": true,
+          "delta": "0.0022658054211320286822358117739046435",
+          "predicted_log_kf": "481.2577341945788679713177641882260953565",
           "relation": "log Kf = -delta_f G / (R T ln 10) with R=8.3143 J/mol/K"
         },
         "logKf_vs_dG_from_the_oxides": {
@@ -889,17 +890,22 @@
   ],
   "row_count": 7,
   "ocr_suspect_row_count": 1,
-  "identity_disagreements": [
-    {
-      "row_index": 1,
-      "temperature_as_published": "1100",
-      "check": "logKf_vs_dG_from_the_elements",
-      "delta": "-306.2571875656077083895696869"
-    }
-  ],
+  "identity_disagreements": [],
   "ambiguities": [
     "formula_omitted_in_ocr_layer; transcribed from page image as a second reading",
-    "identity_disagreement logKf_vs_dG_from_the_elements T=1100 delta=-306.2571875656077083895696869"
+    "temperature OCR token corrected from 1100 to image-verified printed 400; raw token retained"
+  ],
+  "corrections": [
+    {
+      "record_id": "usgs-b1544-dickite",
+      "pdf_page": 67,
+      "printed_page": 61,
+      "row_index": 1,
+      "column": "temperature",
+      "ocr_token": "1100",
+      "printed_token": "400",
+      "image_quote": "400 | 67.647 | 274.79 | 207.14 | 287.84 | -4120.356 | -3685.353 | 481.260"
+    }
   ],
   "source_locator": {
     "pdf": "source/hemingway-haas-robinson-1982-usgs-b1544.pdf",

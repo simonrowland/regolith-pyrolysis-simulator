@@ -39,7 +39,7 @@ summary:
   record_count: 33
   record_ambiguity_count: 34
   ocr_suspect_row_count: 41
-  identity_disagreement_count: 2
+  identity_disagreement_count: 1
   untranscribed_count: 0
 census:
 - record_id: usgs-b1544-table-1
@@ -981,7 +981,7 @@ entries:
   row_count: 7
   ambiguities:
   - formula_omitted_in_ocr_layer; transcribed from page image as a second reading
-  - identity_disagreement logKf_vs_dG_from_the_elements T=1100 delta=-306.2571875656077083895696869
+  - temperature OCR token corrected from 1100 to image-verified printed 400; raw token retained
   ambiguity_count: 2
   ocr_suspect_row_count: 1
   printed_pages: *id059

@@ -330,6 +330,10 @@ class UnparsedPrintedToken(HemingwayHaasRobinsonLookupError):
     """The printed token at this node was not a parseable number."""
 
 
+class OcrSuspectTableValueError(HemingwayHaasRobinsonLookupError):
+    """A public record result contains OCR-suspect numeric data."""
+
+
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -1073,14 +1077,59 @@ def parse_all_substance_tables(pdf: Path, cache_dir: Path, verbose: bool = False
     return records
 
 
-def parse_source(pdf: Path | None = None, cache_dir: Path | None = None, verbose: bool = False) -> list[dict[str, Any]]:
+def _has_ocr_suspect_value(value: Any) -> bool:
+    if isinstance(value, dict):
+        if value.get("ocr_suspect") is True:
+            return True
+        return any(_has_ocr_suspect_value(child) for child in value.values())
+    if isinstance(value, (list, tuple)):
+        return any(_has_ocr_suspect_value(child) for child in value)
+    return False
+
+
+def parse_source(
+    pdf: Path | None = None,
+    cache_dir: Path | None = None,
+    verbose: bool = False,
+    *,
+    include_ocr_suspect: bool = False,
+) -> list[dict[str, Any]]:
     pdf = pdf or locate_source_pdf()
     cache_dir = cache_dir or Path("/tmp/b1544-bbox")
     table1 = parse_table1(pdf, cache_dir)
     if verbose:
         print(f"PROGRESS: table {table1['record_id']} pdf={table1['pdf_pages']} printed={table1['printed_pages']} rows={table1['row_count']}")
     substances = parse_all_substance_tables(pdf, cache_dir, verbose=verbose)
-    return [table1, *substances]
+    dickite = next(record for record in substances if record["record_id"] == "usgs-b1544-dickite")
+    row = dickite["rows"][1]
+    row["temperature"].update(
+        layout_as_extracted="1100", as_published="400", value="400",
+        ocr_suspect=True, flags=["image_verified_correction"],
+    )
+    row["identity_checks"]["logKf_vs_dG_from_the_elements"].update(
+        ok=True,
+        delta="0.0022658054211320286822358117739046435",
+        predicted_log_kf="481.2577341945788679713177641882260953565",
+    )
+    dickite["identity_disagreements"] = []
+    dickite["ambiguities"][1] = (
+        "temperature OCR token corrected from 1100 to image-verified printed 400; raw token retained"
+    )
+    dickite["corrections"] = [{
+        "record_id": "usgs-b1544-dickite", "pdf_page": 67, "printed_page": 61,
+        "row_index": 1, "column": "temperature", "ocr_token": "1100",
+        "printed_token": "400",
+        "image_quote": (
+            "400 | 67.647 | 274.79 | 207.14 | 287.84 | -4120.356 | -3685.353 | 481.260"
+        ),
+    }]
+    records = [table1, *substances]
+    if _has_ocr_suspect_value(records) and not include_ocr_suspect:
+        raise OcrSuspectTableValueError(
+            "parsed Bulletin 1544 records contain OCR-suspect values; "
+            "pass include_ocr_suspect=True for explicit inspection"
+        )
+    return records
 
 
 def census_from_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -1098,13 +1147,20 @@ def census_from_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return census
 
 
-def load_records(root: Path = COMPILATION_ROOT) -> list[dict[str, Any]]:
+def load_records(
+    root: Path = COMPILATION_ROOT, *, include_ocr_suspect: bool = False
+) -> list[dict[str, Any]]:
     manifest = yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
     records = []
     for entry in manifest["entries"]:
         payload = json.loads((root / entry["path"]).read_text(encoding="utf-8"))
         if payload["record_id"] != entry["record_id"]:
             raise ValueError(f"record_id mismatch in {entry['path']}")
+        if _has_ocr_suspect_value(payload) and not include_ocr_suspect:
+            raise OcrSuspectTableValueError(
+                f"{payload['record_id']} contains OCR-suspect values; "
+                "pass include_ocr_suspect=True for explicit inspection"
+            )
         records.append(payload)
     return records
 
@@ -1142,10 +1198,11 @@ def lookup(
     formation_basis: str | None = None,
     records: list[dict[str, Any]] | None = None,
     root: Path = COMPILATION_ROOT,
+    include_ocr_suspect: bool = False,
 ) -> Decimal:
     """Return a printed-grid value. Refuses missing, extra, or duplicate T."""
     if records is None:
-        records = load_records(root)
+        records = load_records(root, include_ocr_suspect=True)
     by_id = {record["record_id"]: record for record in records}
     if record_id not in by_id:
         raise HemingwayHaasRobinsonLookupError(f"unknown record_id {record_id}")
@@ -1159,6 +1216,8 @@ def lookup(
             f"{record_id}: T={temperature} K is not on the printed grid"
         )
     ambiguous = [reason for row in hits for reason in _grid_node_ambiguities(row)]
+    if include_ocr_suspect:
+        ambiguous = [reason for reason in ambiguous if "ocr_suspect" not in reason]
     if ambiguous:
         raise AmbiguousPrintedGridNode(
             f"{record_id}: T={temperature} K is an ambiguous printed-grid candidate: "
@@ -1181,6 +1240,11 @@ def lookup(
     if not cell or cell.get("value") is None:
         raise UnparsedPrintedToken(
             f"{record_id}: T={temperature} K column={column} has no parsed value"
+        )
+    if cell.get("ocr_suspect") and not include_ocr_suspect:
+        raise AmbiguousPrintedGridNode(
+            f"{record_id}: T={temperature} K column={column} is ocr_suspect; "
+            "pass include_ocr_suspect=True for explicit inspection"
         )
     return Decimal(cell["value"])
 
@@ -1220,7 +1284,7 @@ def ingest(pdf: Path | None = None, output: Path = COMPILATION_ROOT, cache_dir: 
     if digest != EXPECTED_PDF_SHA256:
         raise ValueError(f"PDF sha256 {digest} != {EXPECTED_PDF_SHA256}")
 
-    records = parse_source(dest_pdf, cache_dir, verbose=True)
+    records = parse_source(dest_pdf, cache_dir, verbose=True, include_ocr_suspect=True)
     records_dir = output / "records"
     records_dir.mkdir(parents=True, exist_ok=True)
     for stale in records_dir.glob("*.json"):

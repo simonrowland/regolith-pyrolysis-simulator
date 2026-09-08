@@ -10,6 +10,7 @@ import yaml
 from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader import (
     COMPILATION_ROOT,
     EXPECTED_PDF_SHA256,
+    OcrSuspectTableValueError,
     ROLE,
     SOURCE_PDF_NAME,
     AmbiguousPrintedGridNode,
@@ -26,11 +27,21 @@ from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader imp
 
 PDF = COMPILATION_ROOT / "source" / SOURCE_PDF_NAME
 
+PRINTED_CP_REVERSALS = (
+    ("usgs-b1544-al2sio5-reference", "153.47", "153.27", 29),
+    ("usgs-b1544-calcium-olivine-reference", "216.88", "199.60", 43),
+    ("usgs-b1544-casio3-reference", "129.65", "129.53", 55),
+    ("usgs-b1544-h2o-reference", "75.99", "34.04", 27),
+    ("usgs-b1544-larnite-reference", "182.45", "179.40", 39),
+    ("usgs-b1544-larnite-reference", "216.88", "199.60", 39),
+    ("usgs-b1544-quartz", "75.01", "67.39", 28),
+)
+
 
 @pytest.fixture(scope="module")
 def corpus():
     manifest = yaml.safe_load((COMPILATION_ROOT / "manifest.yaml").read_text(encoding="utf-8"))
-    records = load_records()
+    records = load_records(include_ocr_suspect=True)
     return manifest, records
 
 
@@ -82,15 +93,76 @@ def numeric_cells(value, path="record"):
             yield from numeric_cells(child, f"{path}[{index}]")
 
 
-def test_round_trip_every_stored_field(corpus):
+def test_parser_parity_is_secondary_to_image_fixtures(corpus):
     _, records = corpus
-    parsed = parse_source(PDF, verbose=False)
+    parsed = parse_source(PDF, verbose=False, include_ocr_suspect=True)
     for loaded, fresh in zip(records, parsed, strict=True):
         path = loaded["record_id"]
         assert_nested_equal(loaded, fresh, path)
         for cell_path, cell in numeric_cells(loaded, path):
             reparsed = parse_number_token(cell["as_published"])
             assert cell["value"] == reparsed["value"], f"{cell_path}: raw token does not parse back"
+
+
+def _assert_dickite_image_correction(records):
+    record = next(item for item in records if item["record_id"] == "usgs-b1544-dickite")
+    cell = record["rows"][1]["temperature"]
+    assert record["pdf_pages"] == [67, 68]
+    assert cell["layout_as_extracted"] == "1100"
+    assert cell["as_published"] == "400"
+    assert cell["value"] == "400"
+    assert cell["ocr_suspect"] is True
+    correction = record["corrections"][0]
+    assert correction["ocr_token"] == "1100"
+    assert correction["printed_token"] == "400"
+    assert correction["pdf_page"] == 67
+    assert correction["image_quote"] == (
+        "400 | 67.647 | 274.79 | 207.14 | 287.84 | -4120.356 | -3685.353 | 481.260"
+    )
+
+
+def test_dickite_image_correction_and_mutation_probe(corpus):
+    _, records = corpus
+    _assert_dickite_image_correction(records)
+    mutated = copy.deepcopy(records)
+    cell = next(item for item in mutated if item["record_id"] == "usgs-b1544-dickite")[
+        "rows"
+    ][1]["temperature"]
+    cell["as_published"] = "1100"
+    cell["value"] = "1100"
+    with pytest.raises(AssertionError):
+        _assert_dickite_image_correction(mutated)
+
+
+def _nonsuspect_cp_reversals(records):
+    reversals = []
+    for record in records[1:]:
+        for left, right in zip(record["rows"], record["rows"][1:]):
+            left_cell, right_cell = left["heat_capacity"], right["heat_capacity"]
+            if left_cell["ocr_suspect"] or right_cell["ocr_suspect"]:
+                continue
+            if Decimal(right_cell["value"]) < Decimal(left_cell["value"]):
+                reversals.append(
+                    (
+                        record["record_id"], left_cell["value"], right_cell["value"],
+                        record["pdf_pages"][0],
+                    )
+                )
+    return tuple(reversals)
+
+
+def test_image_verified_printed_phase_reversal_allowlist(corpus):
+    _, records = corpus
+    assert set(_nonsuspect_cp_reversals(records)) == set(PRINTED_CP_REVERSALS)
+    h2o = next(item for item in records if item["record_id"] == "usgs-b1544-h2o-reference")
+    hht = [row["enthalpy_increment_over_T"]["value"] for row in h2o["rows"][:3]]
+    assert hht == ["0.000", "15.094", "124.724"]
+    mutated = copy.deepcopy(records)
+    quartz = next(item for item in mutated if item["record_id"] == "usgs-b1544-quartz")
+    next(row for row in quartz["rows"] if row["heat_capacity"]["value"] == "67.39")[
+        "heat_capacity"
+    ]["value"] = "75.02"
+    assert set(_nonsuspect_cp_reversals(mutated)) != set(PRINTED_CP_REVERSALS)
 
 
 @pytest.mark.parametrize(
@@ -103,7 +175,11 @@ def test_round_trip_every_stored_field(corpus):
 )
 def test_round_trip_mutation_probe_rejects_any_nested_field(corpus, record_id, row_index, field):
     _, records = corpus
-    fresh = next(record for record in parse_source(PDF) if record["record_id"] == record_id)
+    fresh = next(
+        record
+        for record in parse_source(PDF, include_ocr_suspect=True)
+        if record["record_id"] == record_id
+    )
     mutated = copy.deepcopy(next(record for record in records if record["record_id"] == record_id))
     cell = mutated["rows"][row_index]
     for part in field.split("."):
@@ -115,7 +191,7 @@ def test_round_trip_mutation_probe_rejects_any_nested_field(corpus, record_id, r
 
 
 def test_corundum_printed_298_nodes():
-    records = load_records()
+    records = load_records(include_ocr_suspect=True)
     corundum = next(r for r in records if r["record_id"] == "usgs-b1544-corundum")
     row0 = corundum["rows"][0]
     assert row0["temperature"]["as_published"] == "298.15"
@@ -142,8 +218,13 @@ def test_lookup_refuses_off_grid_and_duplicates():
         lookup("usgs-b1544-quartz", "844", "entropy")
     with pytest.raises(AmbiguousPrintedGridNode, match="ocr_suspect"):
         lookup("usgs-b1544-kaolinite", "198.15", "entropy")
-    with pytest.raises(AmbiguousPrintedGridNode, match="identity check"):
+    with pytest.raises(TemperatureNotOnPrintedGrid, match="not on the printed grid"):
         lookup("usgs-b1544-dickite", "1100", "entropy")
+    with pytest.raises(AmbiguousPrintedGridNode, match="ocr_suspect"):
+        lookup("usgs-b1544-dickite", "400", "entropy")
+    assert lookup(
+        "usgs-b1544-dickite", "400", "entropy", include_ocr_suspect=True
+    ) == Decimal("274.79")
 
 
 def test_every_ambiguous_grid_node_is_a_typed_refusal(corpus):
@@ -232,12 +313,31 @@ def test_marks_equations_metadata_and_formula_coverage(corpus):
 
 
 def test_ocr_suspect_keeps_raw_token():
-    records = load_records()
+    records = load_records(include_ocr_suspect=True)
     corundum = next(r for r in records if r["record_id"] == "usgs-b1544-corundum")
     hht = corundum["rows"][0]["enthalpy_increment_over_T"]
     assert hht["as_published"] == "o.ooo"
     assert hht["ocr_suspect"] is True
     assert hht["value"] == "0.000"
+
+
+def test_public_row_loaders_require_explicit_suspect_opt_in():
+    with pytest.raises(OcrSuspectTableValueError):
+        load_records()
+    with pytest.raises(OcrSuspectTableValueError):
+        parse_source(PDF)
+    with pytest.raises(AmbiguousPrintedGridNode, match="ocr_suspect"):
+        lookup(
+            "usgs-b1544-al2sio5-reference", "298.15", "enthalpy_increment_over_T"
+        )
+    assert lookup(
+        "usgs-b1544-al2sio5-reference",
+        "298.15",
+        "enthalpy_increment_over_T",
+        include_ocr_suspect=True,
+    ) == Decimal("0.000")
+    with pytest.raises(AmbiguousPrintedGridNode, match="ocr_suspect"):
+        lookup("usgs-b1544-andalusite", "1400", "entropy")
 
 
 def test_nothing_typed_measured(corpus):
