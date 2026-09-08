@@ -10,7 +10,6 @@ from functools import lru_cache
 from pathlib import Path
 
 import pytest
-
 from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
     COMPILATION_ROOT,
     ROLE,
@@ -22,6 +21,7 @@ from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader impo
     feedstock_coverage,
     iter_published_numbers,
     load_manifest,
+    load_record,
     load_records,
     lookup_temperature,
     parse_mineru_table_html,
@@ -48,10 +48,36 @@ SOURCE_PDF = Path(
     "robie-hemingway-fisher-1978-usgs-b1452.pdf"
 )
 
+IMAGE_VERIFIED_CORRECTIONS = (
+    (f"{SOURCE_ID}-0040-phase-02", 24, "formation_enthalpy", ".1100", ".000", 0.0, 72),
+    (f"{SOURCE_ID}-0040-phase-02", 26, "log_kf", ".1100", ".000", 0.0, 72),
+    (f"{SOURCE_ID}-0040-phase-02", 31, "heat_capacity", "311.36", "30.36", 30.36, 72),
+    (f"{SOURCE_ID}-0040-phase-02", 31, "log_kf", ".0011", ".000", 0.0, 72),
+    (f"{SOURCE_ID}-0049-phase-02", 25, "entropy", "711.07", "74.07", 74.07, 81),
+    (f"{SOURCE_ID}-0066", 27, "entropy", "119.68", "49.68", 49.68, 98),
+    (f"{SOURCE_ID}-0083", 19, "entropy", "711.01", "74.01", 74.01, 115),
+    (f"{SOURCE_ID}-0117", 31, "entropy", "111.96", "74.96", 74.96, 149),
+    (f"{SOURCE_ID}-0150", 25, "entropy", "217.68", "277.68", 277.68, 182),
+    (f"{SOURCE_ID}-0162", 21, "heat_capacity", "109e02", "109.02", 109.02, 194),
+    (f"{SOURCE_ID}-0211", 24, "entropy", "2144.76", "244.76", 244.76, 243),
+    (f"{SOURCE_ID}-0242", 25, "entropy", "217.76", "277.76", 277.76, 274),
+    (f"{SOURCE_ID}-0250", 18, "entropy", "1112.26", "142.26", 142.26, 282),
+    (f"{SOURCE_ID}-0266", 41, "formation_enthalpy", "-121111.243", "-1244.243", -1244.243, 298),
+    (f"{SOURCE_ID}-0295", 24, "entropy", "1145.29", "445.29", 445.29, 327),
+    (f"{SOURCE_ID}-0300", 23, "entropy", "311.22", "377.22", 377.22, 332),
+)
+
+PRINTED_REVERSAL_ALLOWLIST = (
+    (f"{SOURCE_ID}-0051-phase-02", 1200.0, 120.82, 1289.0, 118.44, 83),
+    (f"{SOURCE_ID}-0165", 1000.0, 187.26, 1074.0, 149.70, 197),
+    (f"{SOURCE_ID}-0171-phase-02", 1785.0, 544.04, 1800.0, 490.99, 203),
+    (f"{SOURCE_ID}-0180", 1100.0, 136.50, 1170.0, 118.42, 212),
+)
+
 
 @pytest.fixture(scope="module")
 def compilation():
-    return load_manifest(), list(load_records())
+    return load_manifest(), list(load_records(include_ocr_suspect=True))
 
 
 @pytest.fixture(scope="module")
@@ -138,7 +164,7 @@ def assert_record_matches_mineru(record, layouts):
     page_lines = layouts[record["source_locator"]["pdf_pages"][0]]
     collapsed_layout = "\n".join(page_lines)
     for number in [record["formula_weight"], *record["uncertainty_values"]]:
-        token = number["as_published"]
+        token = number.get("layout_as_extracted", number["as_published"])
         if not token:
             continue
         in_mineru = token in page_text or any(token in cell for row in grid for cell in row)
@@ -157,10 +183,13 @@ def assert_record_matches_mineru(record, layouts):
         for column, span in row["source_text_spans"].items():
             line_cells = grid[span["line"] - 1]
             raw = line_cells[span["start"]] if span["start"] < len(line_cells) else ""
-            assert row["cells"][column]["as_published"] == raw, (
+            token = row["cells"][column].get(
+                "layout_as_extracted", row["cells"][column]["as_published"]
+            )
+            assert token == raw, (
                 record["record_id"],
                 column,
-                row["cells"][column]["as_published"],
+                token,
                 raw,
             )
 
@@ -170,12 +199,13 @@ def assert_record_matches_source(record, layouts):
         assert_record_matches_mineru(record, layouts)
         return
     for number in [record["formula_weight"], *record["uncertainty_values"]]:
-        if number["as_published"]:
+        token = number.get("layout_as_extracted", number["as_published"])
+        if token:
             span = number["source_text_span"]
             assert span is not None
             page_lines = layouts[record["source_locator"]["pdf_pages"][0]]
             raw = page_lines[span["line"] - 1][span["start"] : span["end"]]
-            assert number["as_published"] == raw
+            assert token == raw
     if not record["rows"]:
         return
     page_lines = layouts[record["source_locator"]["pdf_pages"][0]]
@@ -183,7 +213,10 @@ def assert_record_matches_source(record, layouts):
         for column, span in row["source_text_spans"].items():
             source_line = page_lines[span["line"] - 1]
             raw = source_line[span["start"] : span["end"]]
-            assert row["cells"][column]["as_published"] == raw
+            token = row["cells"][column].get(
+                "layout_as_extracted", row["cells"][column]["as_published"]
+            )
+            assert token == raw
             assert span["start"] == 0 or source_line[span["start"] - 1].isspace()
             assert span["end"] == len(source_line) or source_line[span["end"]].isspace()
 
@@ -288,6 +321,97 @@ def test_source_round_trip_rejects_consistent_token_value_mutation(compilation, 
     metadata_record["formula_weight"]["value"] = 400.0
     with pytest.raises(AssertionError):
         assert_record_matches_source(metadata_record, source_layout)
+
+
+def _assert_image_verified_corrections(records):
+    by_id = {record["record_id"]: record for record in records}
+    for record_id, line, column, ocr_token, printed_token, value, pdf_page in (
+        IMAGE_VERIFIED_CORRECTIONS
+    ):
+        record = by_id[record_id]
+        assert record["source_locator"]["pdf_pages"] == [pdf_page]
+        row = next(item for item in record["rows"] if item["source_text_line"] == line)
+        cell = row["cells"][column]
+        assert cell == {
+            "layout_as_extracted": ocr_token,
+            "as_published": printed_token,
+            "value": value,
+            "ocr_suspect": True,
+            "footnote_markers": [],
+        }
+
+
+def test_image_verified_corrections_and_mutation_probe(compilation):
+    _, records = compilation
+    _assert_image_verified_corrections(records)
+    mutated = copy.deepcopy(records)
+    target = next(record for record in mutated if record["record_id"] == f"{SOURCE_ID}-0162")
+    cell = next(row for row in target["rows"] if row["source_text_line"] == 21)["cells"][
+        "heat_capacity"
+    ]
+    cell["as_published"] = "109e02"
+    cell["value"] = 10900.0
+    with pytest.raises(AssertionError):
+        _assert_image_verified_corrections(mutated)
+
+
+def _unsuspect_adjacent_entropy_reversals(records):
+    reversals = []
+    for record in records:
+        if not {"temperature", "entropy"} <= set(record["column_ids"]):
+            continue
+        for left, right in zip(record["rows"], record["rows"][1:]):
+            left_t, right_t = left["cells"]["temperature"], right["cells"]["temperature"]
+            left_s, right_s = left["cells"]["entropy"], right["cells"]["entropy"]
+            if any(cell["value"] is None for cell in (left_t, right_t, left_s, right_s)):
+                continue
+            if left_s["ocr_suspect"] or right_s["ocr_suspect"]:
+                continue
+            if right_t["value"] > left_t["value"] and right_s["value"] < left_s["value"]:
+                reversals.append(
+                    (
+                        record["record_id"],
+                        left_t["value"],
+                        left_s["value"],
+                        right_t["value"],
+                        right_s["value"],
+                        record["source_locator"]["pdf_pages"][0],
+                    )
+                )
+    return tuple(reversals)
+
+
+def test_image_verified_printed_entropy_reversal_allowlist(compilation):
+    _, records = compilation
+    assert _unsuspect_adjacent_entropy_reversals(records) == PRINTED_REVERSAL_ALLOWLIST
+
+    mutated = copy.deepcopy(records)
+    record = next(item for item in mutated if item["record_id"] == f"{SOURCE_ID}-0180")
+    row = next(item for item in record["rows"] if item["cells"]["temperature"]["value"] == 1170)
+    row["cells"]["entropy"]["value"] = 136.51
+    assert _unsuspect_adjacent_entropy_reversals(mutated) != PRINTED_REVERSAL_ALLOWLIST
+
+
+def test_public_loaders_refuse_bare_ocr_suspect_records(tmp_path):
+    suspect_id = f"{SOURCE_ID}-0005"
+    with pytest.raises(OcrSuspectTableValueError):
+        next(load_records())
+    with pytest.raises(OcrSuspectTableValueError):
+        load_record(suspect_id)
+    assert load_record(suspect_id, include_ocr_suspect=True)["record_id"] == suspect_id
+
+    manifest = load_manifest()
+    first_entry = manifest["entries"][0]
+    source_record = COMPILATION_ROOT / first_entry["path"]
+    drift_root = tmp_path / SOURCE_ID
+    (drift_root / "records").mkdir(parents=True)
+    shutil.copy2(COMPILATION_ROOT / "manifest.yaml", drift_root / "manifest.yaml")
+    record = json.loads(source_record.read_text(encoding="utf-8"))
+    assert any(number.ocr_suspect for number in iter_published_numbers(record))
+    record["ocr_suspect"] = False
+    (drift_root / first_entry["path"]).write_text(json.dumps(record), encoding="utf-8")
+    with pytest.raises(OcrSuspectTableValueError):
+        next(load_records(drift_root))
 
 
 def test_shape_failures_are_suspect_and_never_admitted(compilation):
@@ -588,6 +712,18 @@ def test_corrections_ledger_covers_withheld_numeric_values(compilation):
     withheld = set()
     for item in manifest["corrections"]:
         record = by_id[item["record_id"]]
+        if item["action"] == "image_verified_correction":
+            rows = [
+                row for row in record["rows"] if row["source_text_line"] == item["source_text_line"]
+            ]
+            assert len(rows) == 1, item
+            cell = rows[0]["cells"][item["column"]]
+            assert cell["layout_as_extracted"] == item["ocr_token"]
+            assert cell["as_published"] == item["printed_token"]
+            assert cell["value"] == item["value"]
+            assert cell["ocr_suspect"] is True
+            assert item["printed_token"] in item["image_quote"]
+            continue
         if item["column"] == "formula_weight":
             field = record["formula_weight"]
             assert field["as_published"] == item["as_published"]

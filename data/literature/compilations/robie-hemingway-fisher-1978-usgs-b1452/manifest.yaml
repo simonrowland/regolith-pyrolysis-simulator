@@ -457,14 +457,14 @@ summary:
   temperature_row_count: 6453
   phase_split_record_count: 206
   ocr_suspect_record_count: 578
-  ocr_suspect_numeric_cell_count: 14370
+  ocr_suspect_numeric_cell_count: 14384
   printed_shape_failure_count: 10062
   admitted_shape_failure_count: 0
   identity_check_disagreement_count: 1187
   image_temperature_disagreement_count: 356
   image_temperature_grid_unconfirmed_count: 115
   ambiguity_count: 1659
-  correction_count: 82
+  correction_count: 98
 ambiguities:
 - record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
   kind: image_column_merge
@@ -39871,6 +39871,182 @@ feedstock_element_coverage:
   Zn: 4
   Zr: 2
 corrections:
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0040-phase-02
+  census_id: high-temperature-printed-page-066
+  pdf_page: 72
+  source_text_line: 24
+  column: formation_enthalpy
+  ocr_token: '.1100'
+  printed_token: '.000'
+  value: 0.0
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '336.35 10.424 75.32 64.92 32.14 .000 .000 .000'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0040-phase-02
+  census_id: high-temperature-printed-page-066
+  pdf_page: 72
+  source_text_line: 26
+  column: log_kf
+  ocr_token: '.1100'
+  printed_token: '.000'
+  value: 0.0
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '500 17.284 87.78 70.50 30.69 .000 .000 .000'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0040-phase-02
+  census_id: high-temperature-printed-page-066
+  pdf_page: 72
+  source_text_line: 31
+  column: heat_capacity
+  ocr_token: '311.36'
+  printed_token: '30.36'
+  value: 30.36
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '1000 23.658 108.61 84.95 30.36 .000 .000 .000'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0040-phase-02
+  census_id: high-temperature-printed-page-066
+  pdf_page: 72
+  source_text_line: 31
+  column: log_kf
+  ocr_token: '.0011'
+  printed_token: '.000'
+  value: 0.0
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '1000 23.658 108.61 84.95 30.36 .000 .000 .000'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0049-phase-02
+  census_id: high-temperature-printed-page-075
+  pdf_page: 81
+  source_text_line: 25
+  column: entropy
+  ocr_token: '711.07'
+  printed_token: '74.07'
+  value: 74.07
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '500 17.554 74.07 56.52 30.55 .000 .000 .000'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0066
+  census_id: high-temperature-printed-page-092
+  pdf_page: 98
+  source_text_line: 27
+  column: entropy
+  ocr_token: '119.68'
+  printed_token: '49.68'
+  value: 49.68
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '700 14.407 49.68 35.37 26.05 .000 .000 .000'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0083
+  census_id: high-temperature-printed-page-109
+  pdf_page: 115
+  source_text_line: 19
+  column: entropy
+  ocr_token: '711.01'
+  printed_token: '74.01'
+  value: 74.01
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '298.15 0.000 74.01 74.01 27.03 0.000 0.000 0.000'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0117
+  census_id: high-temperature-printed-page-143
+  pdf_page: 149
+  source_text_line: 31
+  column: entropy
+  ocr_token: '111.96'
+  printed_token: '74.96'
+  value: 74.96
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '1300 34.280 74.96 40.67 52.14 -606.471 -482.243 19.377'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0150
+  census_id: high-temperature-printed-page-176
+  pdf_page: 182
+  source_text_line: 25
+  column: entropy
+  ocr_token: '217.68'
+  printed_token: '277.68'
+  value: 277.68
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '800 77.120 277.68 200.56 128.15 -1871.040 -1645.732 107.456'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0162
+  census_id: high-temperature-printed-page-188
+  pdf_page: 194
+  source_text_line: 21
+  column: heat_capacity
+  ocr_token: '109e02'
+  printed_token: '109.02'
+  value: 109.02
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '400 27.475 142.15 114.67 109.02 -958.072 -854.602 111.600'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0211
+  census_id: high-temperature-printed-page-237
+  pdf_page: 243
+  source_text_line: 24
+  column: entropy
+  ocr_token: '2144.76'
+  printed_token: '244.76'
+  value: 244.76
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '700 71.336 244.76 173.42 129.23 -1879.363 -1671.687 124.743'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0242
+  census_id: high-temperature-printed-page-268
+  pdf_page: 274
+  source_text_line: 25
+  column: entropy
+  ocr_token: '217.76'
+  printed_token: '277.76'
+  value: 277.76
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '700 92.333 277.76 185.43 177.63 -1655.715 -1382.995 103.201'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0250
+  census_id: high-temperature-printed-page-276
+  pdf_page: 282
+  source_text_line: 18
+  column: entropy
+  ocr_token: '1112.26'
+  printed_token: '142.26'
+  value: 142.26
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '298.15 0.000 142.26 142.26 94.93 -399.240 -333.754 58.473'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0266
+  census_id: high-temperature-printed-page-292
+  pdf_page: 298
+  source_text_line: 41
+  column: formation_enthalpy
+  ocr_token: '-121111.243'
+  printed_token: '-1244.243'
+  value: -1244.243
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '1536 63.233 181.66 118.42 87.02 -1244.243 -841.187 28.606'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0295
+  census_id: high-temperature-printed-page-321
+  pdf_page: 327
+  source_text_line: 24
+  column: entropy
+  ocr_token: '1145.29'
+  printed_token: '445.29'
+  value: 445.29
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '500 128.144 445.29 317.15 351.28 -2586.067 -2024.444 211.493'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0300
+  census_id: high-temperature-printed-page-326
+  pdf_page: 332
+  source_text_line: 23
+  column: entropy
+  ocr_token: '311.22'
+  printed_token: '377.22'
+  value: 377.22
+  action: image_verified_correction
+  evidence: 300 dpi page image, inspected 2026-09-08
+  image_quote: '600 115.488 377.22 261.73 271.64 -1186.375 -614.781 53.522'
 - record_id: robie-hemingway-fisher-1978-usgs-b1452-0005
   census_id: high-temperature-printed-page-031
   column: temperature

@@ -119,7 +119,21 @@ def load_manifest(root: Path = COMPILATION_ROOT) -> dict[str, Any]:
     return manifest
 
 
-def load_records(root: Path = COMPILATION_ROOT) -> Iterator[dict[str, Any]]:
+def _record_has_ocr_suspect_values(record: Mapping[str, Any]) -> bool:
+    numbers = [record["formula_weight"], *record["uncertainty_values"]]
+    numbers.extend(
+        row["cells"][column]
+        for row in record["rows"]
+        for column in record["column_ids"]
+    )
+    return any(number["ocr_suspect"] for number in numbers)
+
+
+def load_records(
+    root: Path = COMPILATION_ROOT,
+    *,
+    include_ocr_suspect: bool = False,
+) -> Iterator[dict[str, Any]]:
     manifest = load_manifest(root)
     for entry in manifest["entries"]:
         record = json.loads((root / entry["path"]).read_text(encoding="utf-8"))
@@ -128,12 +142,27 @@ def load_records(root: Path = COMPILATION_ROOT) -> Iterator[dict[str, Any]]:
         if record["source_sha256"] != SOURCE_SHA256 or record["compilation_role"] != ROLE:
             raise ValueError(f"source identity or role differs from manifest: {entry['path']}")
         validate_record_round_trip(record)
+        if _record_has_ocr_suspect_values(record) and not include_ocr_suspect:
+            raise OcrSuspectTableValueError(
+                f"{record['record_id']} contains OCR-suspect values; "
+                "pass include_ocr_suspect=True for explicit inspection"
+            )
         yield record
 
 
-def load_record(record_id: str, root: Path = COMPILATION_ROOT) -> dict[str, Any]:
-    for record in load_records(root):
+def load_record(
+    record_id: str,
+    root: Path = COMPILATION_ROOT,
+    *,
+    include_ocr_suspect: bool = False,
+) -> dict[str, Any]:
+    for record in load_records(root, include_ocr_suspect=True):
         if record["record_id"] == record_id:
+            if _record_has_ocr_suspect_values(record) and not include_ocr_suspect:
+                raise OcrSuspectTableValueError(
+                    f"{record_id} contains OCR-suspect values; "
+                    "pass include_ocr_suspect=True for explicit inspection"
+                )
             return record
     raise UnknownRecordError(f"unknown Bulletin 1452 record: {record_id}")
 
@@ -219,7 +248,7 @@ def lookup_temperature(
 ) -> tuple[dict[str, Any], ...]:
     """Return every row printed at exactly ``temperature``; never interpolate."""
 
-    record = load_record(record_id, root)
+    record = load_record(record_id, root, include_ocr_suspect=True)
     if record["transcription_status"] != "transcribed":
         reasons = "; ".join(record["untranscribed_reasons"])
         raise UntranscribedTableError(f"{record_id} is untranscribed: {reasons}")
