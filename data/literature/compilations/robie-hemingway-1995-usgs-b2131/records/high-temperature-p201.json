@@ -301,7 +301,8 @@
         },
         "enthalpy_function": {
           "raw": "0.153",
-          "value": 0.153,
+          "printed_token": "0.63",
+          "value": 0.63,
           "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_disagreement"
         },
@@ -937,6 +938,11 @@
       }
     }
   ],
+  "corrections": [{
+    "record_id": "high-temperature-p201", "page": 207, "source_line": 23,
+    "column": "enthalpy_function", "raw_token": "0.153", "printed_token": "0.63",
+    "image_quote": "300 101.93 114.33 0.63 113.70 -959.0 -881.6 153.49"
+  }],
   "ambiguities": [
     {
       "kind": "ocr_suspect",

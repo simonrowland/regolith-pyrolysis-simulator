@@ -362,7 +362,8 @@
       "cells": {
         "temperature": {
           "raw": ".500",
-          "value": 0.5,
+          "printed_token": "500",
+          "value": 500.0,
           "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_disagreement"
         },
@@ -851,6 +852,11 @@
       }
     }
   ],
+  "corrections": [{
+    "record_id": "high-temperature-p223", "page": 229, "source_line": 25,
+    "column": "temperature", "raw_token": ".500", "printed_token": "500",
+    "image_quote": "500 68.60 82.60 25.76 56.85 -937.3 -846.0 88.38"
+  }],
   "ambiguities": [
     {
       "kind": "ocr_suspect",
