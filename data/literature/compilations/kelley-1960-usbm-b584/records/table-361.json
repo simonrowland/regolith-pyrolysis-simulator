@@ -155,8 +155,8 @@
         },
         "heat_content": {
           "raw": "5.390",
-          "value": 5.39,
-          "ocr_suspect": false,
+          "value": 5390.0,
+          "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_agreement"
         },
         "entropy_increment": {
@@ -358,7 +358,7 @@
         },
         "heat_content": {
           "raw": "3.760",
-          "value": 3.76,
+          "value": 3760.0,
           "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_disagreement"
         },
@@ -525,87 +525,29 @@
     "sha256": "c041ebc1db642de463f2e460a2cdad30d831639b4ec34e3a831d90fdbed8a9be"
   },
   "transcription_status": "transcribed_with_ocr_ambiguities",
-  "ambiguities": [
+  "ambiguities": [],
+  "corrections": [
     {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        700.0,
-        800.0
-      ],
-      "entropy_residual_cal_per_deg_mole": 5.0209,
-      "source_rows": [
-        [
-          4,
-          0
-        ],
-        [
-          5,
-          0
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
+      "pdf_page": 102,
+      "page": 86,
+      "source_row_index": 1,
+      "panel_index": 1,
+      "column": "heat_content",
+      "printed_token": "5,390",
+      "ocr_token": "5.390",
+      "quote": "1,000 | 5,390 | 9.13",
+      "basis": "300 dpi PDF page image"
     },
     {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        800.0,
-        900.0
-      ],
-      "entropy_residual_cal_per_deg_mole": -4.4324,
-      "source_rows": [
-        [
-          5,
-          0
-        ],
-        [
-          6,
-          0
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
-    },
-    {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        900.0,
-        1000.0
-      ],
-      "entropy_residual_cal_per_deg_mole": 5.674,
-      "source_rows": [
-        [
-          6,
-          0
-        ],
-        [
-          1,
-          1
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
-    },
-    {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        1000.0,
-        1200.0
-      ],
-      "entropy_residual_cal_per_deg_mole": -4.9065,
-      "source_rows": [
-        [
-          1,
-          1
-        ],
-        [
-          2,
-          1
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
+      "pdf_page": 102,
+      "page": 86,
+      "source_row_index": 5,
+      "panel_index": 0,
+      "column": "heat_content",
+      "printed_token": "3,760",
+      "ocr_token": "3.760",
+      "quote": "800 | 3,760 | 7.32",
+      "basis": "300 dpi PDF page image"
     }
-  ],
-  "corrections": []
+  ]
 }

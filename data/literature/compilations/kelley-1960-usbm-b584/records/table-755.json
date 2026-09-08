@@ -521,7 +521,7 @@
         },
         "heat_content": {
           "raw": "43.830",
-          "value": 43.83,
+          "value": 43830.0,
           "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_disagreement"
         },
@@ -652,27 +652,19 @@
       "census_raw": "SrTiO2(c)",
       "caption_raw": "SrTiO_{3}(c)",
       "note": "Caption is the record metadata source; both OCR readings retained without repair."
-    },
-    {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        1700.0,
-        1800.0
-      ],
-      "entropy_residual_cal_per_deg_mole": 25.027,
-      "source_rows": [
-        [
-          6,
-          1
-        ],
-        [
-          7,
-          1
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
     }
   ],
-  "corrections": []
+  "corrections": [
+    {
+      "pdf_page": 196,
+      "page": 180,
+      "source_row_index": 7,
+      "panel_index": 1,
+      "column": "heat_content",
+      "printed_token": "43,830",
+      "ocr_token": "43.830",
+      "quote": "1,800 | 43,830 | 50.81",
+      "basis": "300 dpi PDF page image"
+    }
+  ]
 }

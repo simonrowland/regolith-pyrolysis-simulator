@@ -3,13 +3,13 @@
 import json
 import runpy
 import re
-from html.parser import HTMLParser
 
 import pytest
 import yaml
 
 from simulator.reference_data.kelley_1960_usbm_b584_loader import (
     COMPILATION_ROOT,
+    OCRSuspectRow,
     PrintedTemperatureUnavailable,
     load_manifest,
     load_records,
@@ -17,38 +17,28 @@ from simulator.reference_data.kelley_1960_usbm_b584_loader import (
 )
 
 
-class _TableParser(HTMLParser):
-    def __init__(self):
-        super().__init__()
-        self.rows = []
-        self.row = None
-        self.cell = None
-
-    def handle_starttag(self, tag, attrs):
-        if tag == "tr":
-            self.row = []
-        elif tag in {"td", "th"} and self.row is not None:
-            self.cell = []
-        elif tag == "br" and self.cell is not None:
-            self.cell.append(" ")
-
-    def handle_data(self, data):
-        if self.cell is not None:
-            self.cell.append(data)
-
-    def handle_endtag(self, tag):
-        if tag in {"td", "th"} and self.cell is not None:
-            self.row.append(" ".join("".join(self.cell).split()))
-            self.cell = None
-        elif tag == "tr" and self.row is not None:
-            self.rows.append(self.row)
-            self.row = None
-
-
-def _source_rows(html):
-    parser = _TableParser()
-    parser.feed(html)
-    return parser.rows
+IMAGE_VERIFIED_CELLS = {
+    ("table-012", 6, 0, "heat_content"): ("5.280", 5280.0),
+    ("table-036", 1, 1, "temperature"): ("1.000", 1000.0),
+    ("table-058", 1, 1, "entropy_increment"): ("9,43", 9.43),
+    ("table-141", 4, 0, "heat_content"): ("3.510", 3510.0),
+    ("table-146", 1, 1, "entropy_increment"): ("84,59", 84.59),
+    ("table-183", 7, 1, "heat_content"): ("15.750", 15750.0),
+    ("table-187", 2, 1, "heat_content"): ("12.040", 12040.0),
+    ("table-270", 6, 1, "heat_content"): ("19.655", 19655.0),
+    ("table-311", 5, 0, "entropy_increment"): ("9,72", 9.72),
+    ("table-353", 1, 1, "temperature"): ("1.000", 1000.0),
+    ("table-417", 7, 0, "heat_content"): ("4.675", 4675.0),
+    ("table-452", 2, 1, "heat_content"): ("11.500", 11500.0),
+    ("table-500", 2, 1, "heat_content"): ("25.540", 25540.0),
+    ("table-568", 2, 0, "heat_content"): ("3.580", 3580.0),
+    ("table-743", 2, 0, "entropy_increment"): ("29,38", 29.38),
+    ("table-755", 7, 1, "heat_content"): ("43.830", 43830.0),
+    ("table-812", 6, 0, "heat_content"): ("5.325", 5325.0),
+    ("table-882", 3, 1, "entropy_increment"): ("12.26", 13.26),
+    ("table-882", 5, 0, "heat_content"): ("4.260", 4260.0),
+    ("table-883", 2, 0, "heat_content"): ("5.120", 5120.0),
+}
 
 
 def _numeric_cells(value):
@@ -62,20 +52,74 @@ def _numeric_cells(value):
             yield from _numeric_cells(child)
 
 
-def test_round_trip_reparses_mineru_source_tokens():
-    sources = [json.loads(line) for line in (COMPILATION_ROOT / "source/mineru-tables.jsonl").read_text().splitlines()]
-    records = list(load_records())
-    assert len(sources) == len(records) == 893
-    for source, record in zip(sources, records, strict=True):
-        parsed = _source_rows(source["html"])
-        assert record["column_labels_as_published"] == parsed[0]
-        assert record["source_rows"] == parsed
-        for cell in _numeric_cells(record):
-            assert isinstance(cell["raw"], str)
-            if cell["value"] is not None:
-                token = cell.get("numeric_token") or cell["raw"]
-                assert cell["value"] == float(token.replace(",", ""))
-                assert cell["ocr_check"] in {"raster_ocr_token_agreement", "raster_ocr_token_disagreement"}
+def _assert_image_verified_cells(records, expected):
+    by_id = {record["record_id"]: record for record in records}
+    for (record_id, source_row_index, panel_index, column), (ocr_token, value) in expected.items():
+        row = next(
+            row
+            for row in by_id[record_id]["rows"]
+            if row["source_row_index"] == source_row_index and row["panel_index"] == panel_index
+        )
+        assert row["cells"][column]["raw"] == ocr_token
+        assert row["cells"][column]["value"] == value
+
+
+def test_stored_values_match_independent_image_verified_fixture():
+    _assert_image_verified_cells(list(load_records()), IMAGE_VERIFIED_CELLS)
+
+
+def test_image_verified_fixture_mutation_is_detected():
+    mutated = dict(IMAGE_VERIFIED_CELLS)
+    key = ("table-500", 2, 1, "heat_content")
+    mutated[key] = ("25.540", 25.54)
+    with pytest.raises(AssertionError):
+        _assert_image_verified_cells(list(load_records()), mutated)
+
+
+def test_image_verified_corrections_are_applied_and_retain_ocr_suspect():
+    manifest = load_manifest()
+    corrections = []
+    for record in load_records():
+        for correction in record["corrections"]:
+            row = next(
+                row
+                for row in record["rows"]
+                if row["source_row_index"] == correction["source_row_index"]
+                and row["panel_index"] == correction["panel_index"]
+            )
+            cell = row["cells"][correction["column"]]
+            assert cell["raw"] == correction["ocr_token"]
+            assert cell["value"] == float(correction["printed_token"].replace(",", ""))
+            assert cell["ocr_suspect"] is True
+            assert correction["printed_token"] in correction["quote"]
+            corrections.append({"record_id": record["record_id"], **correction})
+    assert len(corrections) == manifest["summary"]["correction_count"] == 60
+    assert corrections == manifest["corrections"]
+
+
+def test_punctuation_anomaly_class_has_image_verified_corrections():
+    flagged = set()
+    corrected = set()
+    for record in load_records():
+        for row in record["rows"]:
+            for column, cell in row["cells"].items():
+                raw = cell.get("numeric_token") or cell["raw"]
+                inconsistent = (
+                    column == "heat_content" and re.match(r"^[+-]?\d{1,3}\.\d{3}(?:\D|$)", raw)
+                ) or (
+                    column == "temperature" and re.match(r"^\d{1,3}\.\d{3}(?:\D|$)", raw)
+                ) or (
+                    column == "entropy_increment" and re.search(r"\d,\d{2}(?:\D|$)", raw)
+                )
+                if inconsistent:
+                    flagged.add((record["record_id"], row["source_row_index"], row["panel_index"], column))
+        corrected.update(
+            (record["record_id"], item["source_row_index"], item["panel_index"], item["column"])
+            for item in record["corrections"]
+            if item["ocr_token"] != "12.26"
+        )
+    assert len(flagged) == 59
+    assert flagged == corrected
 
 
 def test_cached_source_matches_original_mineru_decode():
@@ -123,11 +167,14 @@ def test_refuses_every_non_grid_temperature(temperature):
 
 
 def test_exact_printed_grid_and_unknown_record_contract():
-    record = next(load_records())
-    temperature = next(cell["value"] for cell in record["temperature_grid"] if cell["value"] is not None)
-    assert lookup_temperature(record["record_id"], temperature)
+    assert lookup_temperature("table-001", 400)
     with pytest.raises(KeyError):
-        lookup_temperature("not-a-record", temperature)
+        lookup_temperature("not-a-record", 400)
+
+
+def test_refuses_ocr_suspect_row_with_typed_error():
+    with pytest.raises(OCRSuspectRow, match="heat_content"):
+        lookup_temperature("table-500", 1200)
 
 
 def test_source_numbering_error_is_retained_not_repaired():

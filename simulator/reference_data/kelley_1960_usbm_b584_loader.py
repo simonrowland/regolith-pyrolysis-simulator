@@ -15,6 +15,10 @@ class PrintedTemperatureUnavailable(LookupError):
     """Requested temperature is absent from the printed table grid."""
 
 
+class OCRSuspectRow(LookupError):
+    """Requested row contains one or more OCR-suspect cells."""
+
+
 def load_manifest(root: Path = COMPILATION_ROOT) -> dict:
     return yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
 
@@ -40,4 +44,16 @@ def lookup_temperature(record_id: str, temperature: float, root: Path = COMPILAT
     )
     if not matches:
         raise PrintedTemperatureUnavailable(f"{record_id}: {temperature!r} is not in the printed grid")
+    suspect_columns = sorted(
+        {
+            column
+            for row in matches
+            for column, cell in row["cells"].items()
+            if cell["ocr_suspect"]
+        }
+    )
+    if suspect_columns:
+        raise OCRSuspectRow(
+            f"{record_id}: {temperature!r} has OCR-suspect cells: {', '.join(suspect_columns)}"
+        )
     return matches

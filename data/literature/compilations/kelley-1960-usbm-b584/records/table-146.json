@@ -179,7 +179,7 @@
         },
         "entropy_increment": {
           "raw": "84,59",
-          "value": null,
+          "value": 84.59,
           "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_disagreement"
         }
@@ -654,5 +654,17 @@
       "note": "Caption is the record metadata source; both OCR readings retained without repair."
     }
   ],
-  "corrections": []
+  "corrections": [
+    {
+      "pdf_page": 56,
+      "page": 40,
+      "source_row_index": 1,
+      "panel_index": 1,
+      "column": "entropy_increment",
+      "printed_token": "84.59",
+      "ocr_token": "84,59",
+      "quote": "1,200 | 56,460 | 84.59",
+      "basis": "300 dpi PDF page image"
+    }
+  ]
 }

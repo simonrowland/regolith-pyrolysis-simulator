@@ -177,7 +177,7 @@
         },
         "heat_content": {
           "raw": "25.540",
-          "value": 25.54,
+          "value": 25540.0,
           "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_disagreement"
         },
@@ -245,27 +245,19 @@
         ]
       ],
       "note": "Detector only; printed tokens retained unchanged."
-    },
-    {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        1100.0,
-        1200.0
-      ],
-      "entropy_residual_cal_per_deg_mole": 22.1983,
-      "source_rows": [
-        [
-          1,
-          1
-        ],
-        [
-          2,
-          1
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
     }
   ],
-  "corrections": []
+  "corrections": [
+    {
+      "pdf_page": 135,
+      "page": 119,
+      "source_row_index": 2,
+      "panel_index": 1,
+      "column": "heat_content",
+      "printed_token": "25,540",
+      "ocr_token": "25.540",
+      "quote": "1,200 | 25,540 | 38.10",
+      "basis": "300 dpi PDF page image"
+    }
+  ]
 }

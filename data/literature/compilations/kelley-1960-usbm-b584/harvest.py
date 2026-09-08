@@ -145,7 +145,7 @@ def build_census(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "page": block["printed_page"],
                 "page_ocr_raw": page_raw,
                 "ambiguities": census_ambiguities,
-                "census_source": {"pdf_page_range": [4, 14], "mineru_markdown_line": source_line},
+                "census_source": {"pdf_page_range": [3, 15], "mineru_markdown_line": source_line},
             }
         )
     return census
@@ -223,6 +223,69 @@ def add_raster_readings(blocks: list[dict[str, Any]], workers: int) -> None:
 NUMBER = re.compile(r"^[^0-9+\-]*([+\-]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?)(?:\.{2,}|[^0-9]*)$")
 CONFUSABLE = re.compile(r"[lIOSB]", re.IGNORECASE)
 
+IMAGE_VERIFIED_CORRECTIONS = {
+    (12, 6, 0, "heat_content"): ("5.280", "5,280", "900 | 5,280 | 9.66"),
+    (18, 1, 1, "heat_content"): ("6.200", "6,200", "1,000 | 6,200 | 10.66"),
+    (35, 2, 0, "heat_content"): ("3.840", "3,840", "500 | 3,840 | 9.82"),
+    (36, 1, 1, "temperature"): ("1.000", "1,000", "1,000 | 6,025 | 10.29"),
+    (39, 2, 1, "heat_content"): ("9.730", "9,730", "800 | 9,730 | 18.76"),
+    (58, 1, 1, "entropy_increment"): ("9,43", "9.43", "1,000 | 8,430 | 9.43"),
+    (74, 4, 0, "heat_content"): ("3.600", "3,600", "700 | 3,600 | 7.36"),
+    (82, 1, 1, "temperature"): ("1.000....", "1,000", "1,000 | 5,870 | 10.18"),
+    (127, 2, 0, "heat_content"): ("3.720", "3,720", "500 | 3,720 | 9.46"),
+    (141, 1, 1, "heat_content"): ("6.175", "6,175", "1,000 | 6,175 | 10.60"),
+    (141, 3, 0, "heat_content"): ("2.625", "2,625", "600 | 2,625 | 6.07"),
+    (141, 4, 0, "heat_content"): ("3.510", "3,510", "700 | 3,510 | 7.44"),
+    (141, 5, 0, "heat_content"): ("4.395", "4,395", "800 | 4,395 | 8.62"),
+    (146, 1, 1, "entropy_increment"): ("84,59", "84.59", "1,200 | 56,460 | 84.59"),
+    (183, 1, 1, "heat_content"): ("9.620", "9,620", "1,500 | 9,620 | 12.54"),
+    (183, 7, 1, "heat_content"): ("15.750", "15,750", "2,200 | 15,750 | 15.89"),
+    (184, 4, 0, "heat_content"): ("4.700", "4,700", "700 | 4,700 | 9.84"),
+    (184, 5, 0, "heat_content"): ("5.980", "5,980", "800 | 5,980 | 11.55"),
+    (184, 7, 0, "heat_content"): ("8.650", "8,650", "1,000 | 8,650 | 14.53"),
+    (184, 8, 0, "heat_content"): ("10.010", "10,010", "1,100 | 10,010 | 15.83"),
+    (187, 1, 1, "heat_content"): ("9.790", "9,790", "800 | 9,790 | 18.76"),
+    (187, 2, 0, "heat_content"): ("3.550", "3,550", "500 | 3,550 | 9.02"),
+    (187, 2, 1, "heat_content"): ("12.040", "12,040", "900 | 12,040 | 21.41"),
+    (187, 3, 0, "heat_content"): ("5.650", "5,650", "600 | 5,650 | 12.68"),
+    (187, 3, 1, "heat_content"): ("14.330", "14,330", "1,000 | 14,330 | 23.82"),
+    (270, 6, 1, "heat_content"): ("19.655", "19,655", "2,500 | 19,655 | 18.37"),
+    (292, 4, 0, "heat_content"): ("10.110", "10,110", "700 | 10,110 | 21.41"),
+    (311, 5, 0, "entropy_increment"): ("9,72", "9.72", "800 | 5,010 | 9.72"),
+    (327, 8, 1, "heat_content"): ("12.865", "12,865", "2,000 | 12,865 | 13.98"),
+    (353, 1, 1, "temperature"): ("1.000", "1,000", "1,000 | 5,430 | 9.19"),
+    (361, 1, 1, "heat_content"): ("5.390", "5,390", "1,000 | 5,390 | 9.13"),
+    (361, 5, 0, "heat_content"): ("3.760", "3,760", "800 | 3,760 | 7.32"),
+    (407, 4, 0, "heat_content"): ("15.220", "15,220", "700 | 15,220 | 31.74"),
+    (417, 5, 0, "heat_content"): ("3.160", "3,160", "600.6(l) | 3,160 | 6.55"),
+    (417, 6, 0, "heat_content"): ("3.885", "3,885", "700 | 3,885 | 7.06"),
+    (417, 7, 0, "heat_content"): ("4.675", "4,675", "800 | 4,675 | 8.63"),
+    (417, 9, 0, "heat_content"): ("6.025", "6,025", "1,000 | 6,025 | 10.21"),
+    (417, 10, 0, "heat_content"): ("6.725", "6,725", "1,100 | 6,725 | 10.88"),
+    (422, 4, 0, "heat_content"): ("3.340", "3,340", "700 | 3,340 | 7.04"),
+    (423, 1, 0, "heat_content"): ("1.240", "1,240", "400 | 1,240 | 3.58"),
+    (424, 5, 1, "heat_content"): ("13.270", "13,270", "1,800 | 13,270 | 15.76"),
+    (452, 1, 1, "heat_content"): ("5.380", "5,380", "525(c) | 5,380 | 13.29"),
+    (452, 2, 1, "heat_content"): ("11.500", "11,500", "525(l) | 11,500 | 24.95"),
+    (452, 3, 1, "heat_content"): ("12.160", "12,160", "550 | 12,160 | 26.18"),
+    (452, 4, 1, "heat_content"): ("13.490", "13,490", "600 | 13,490 | 28.49"),
+    (492, 5, 1, "heat_content"): ("9.570", "9,570", "1,374 | 9,570 | 12.81"),
+    (495, 1, 1, "heat_content"): ("5.870", "5,870", "1,000 | 5,870 | 9.98"),
+    (498, 5, 0, "heat_content"): ("19.980", "19,980", "800 | 19,980 | 38.70"),
+    (500, 2, 1, "heat_content"): ("25.540", "25,540", "1,200 | 25,540 | 38.10"),
+    (507, 5, 0, "heat_content"): ("4.265", "4,265", "800 | 4,265 | 8.33"),
+    (507, 6, 0, "heat_content"): ("5.145", "5,145", "900 | 5,145 | 9.36"),
+    (556, 3, 0, "heat_content"): ("2.365", "2,365", "600 | 2,365 | 5.46"),
+    (568, 2, 0, "heat_content"): ("3.580", "3,580", "400 | 3,580 | 10.29"),
+    (670, 6, 1, "heat_content"): ("12.530", "12,530", "1,800 | 12,530 | 14.56"),
+    (743, 2, 0, "entropy_increment"): ("29,38", "29.38", "500 | 11,580 | 29.38"),
+    (755, 7, 1, "heat_content"): ("43.830", "43,830", "1,800 | 43,830 | 50.81"),
+    (812, 6, 0, "heat_content"): ("5.325", "5,325", "900 | 5,325 | 9.63"),
+    (882, 3, 1, "entropy_increment"): ("12.26", "13.26", "1,400 | 9,560 | 13.26"),
+    (882, 5, 0, "heat_content"): ("4.260", "4,260", "800 | 4,260 | 8.32"),
+    (883, 2, 0, "heat_content"): ("5.120", "5,120", "500 | 5,120 | 13.05"),
+}
+
 
 def normalized_number(token: str) -> str:
     return token.replace(",", "").lstrip("+")
@@ -274,6 +337,37 @@ def parse_cell(raw: str, raster_agrees: bool) -> dict[str, Any]:
         cell["numeric_token"] = token
         cell["footnote_or_leader_marker"] = stripped.replace(token, "", 1)
     return cell
+
+
+def apply_image_verified_corrections(
+    number: int, rows: list[dict[str, Any]], pdf_page: int, printed_page: int
+) -> list[dict[str, Any]]:
+    corrections = []
+    for row in rows:
+        for column, cell in row["cells"].items():
+            key = (number, row["source_row_index"], row["panel_index"], column)
+            correction = IMAGE_VERIFIED_CORRECTIONS.get(key)
+            if correction is None:
+                continue
+            ocr_token, printed_token, quote = correction
+            if cell["raw"] != ocr_token:
+                raise RuntimeError(f"image-verified correction source drifted: {key}")
+            cell["value"] = float(printed_token.replace(",", ""))
+            cell["ocr_suspect"] = True
+            corrections.append(
+                {
+                    "pdf_page": pdf_page,
+                    "page": printed_page,
+                    "source_row_index": row["source_row_index"],
+                    "panel_index": row["panel_index"],
+                    "column": column,
+                    "printed_token": printed_token,
+                    "ocr_token": ocr_token,
+                    "quote": quote,
+                    "basis": "300 dpi PDF page image",
+                }
+            )
+    return corrections
 
 
 def substance_fields(title: str) -> tuple[str, str | None, str]:
@@ -353,6 +447,9 @@ def build_record(number: int, census: dict[str, Any], block: dict[str, Any]) -> 
                     "cells": cells,
                 }
             )
+    corrections = apply_image_verified_corrections(
+        number, logical_rows, block["pdf_page"], census["page"]
+    )
     caption_substance_match = re.search(
         r"entropy\s+of\s+(.+?)(?:[\[(]?Base(?:,|\s)|$)", block["caption_raw"], re.IGNORECASE | re.DOTALL
     )
@@ -414,9 +511,11 @@ def build_record(number: int, census: dict[str, Any], block: dict[str, Any]) -> 
         "source_rows": all_source_rows,
         "source_ref": {"path": "source/mineru-tables.jsonl", "line": number},
         "source_image": {"path": block["image_path"], "sha256": block["image_sha256"]},
-        "transcription_status": "transcribed_with_ocr_ambiguities" if ambiguities else "transcribed",
+        "transcription_status": (
+            "transcribed_with_ocr_ambiguities" if ambiguities or corrections else "transcribed"
+        ),
         "ambiguities": ambiguities,
-        "corrections": [],
+        "corrections": corrections,
     }
 
 
@@ -519,6 +618,7 @@ def build(workers: int) -> None:
         summary["identity_check_disagreement_count"] += sum(
             item.get("kind") == "identity_disagreement" for item in record["ambiguities"]
         )
+        summary["correction_count"] += len(record["corrections"])
         if suspects and len(suspect_examples) < 15:
             suspect_examples.append(
                 {"record_id": record["record_id"], "tokens": [cell["raw"] for cell in suspects[:5]]}
@@ -546,7 +646,7 @@ def build(workers: int) -> None:
             }
         )
     census = {
-        "basis": "Bulletin's TABLES list, PDF pages 4-14",
+        "basis": "Bulletin's TABLES list, PDF pages 3-15",
         "record_count": len(census_entries),
         "table_number_range": [1, EXPECTED_TABLES],
         "printed_page_range": [min(item["page"] for item in census_entries), max(item["page"] for item in census_entries)],
@@ -574,11 +674,15 @@ def build(workers: int) -> None:
         "ocr_policy": {
             "primary": "MinerU table HTML from six page-aligned chunks",
             "second_reading": "Tesseract on each MinerU page-image table crop; disagreements remain suspect",
-            "numeric_repairs": False,
+            "numeric_repairs": True,
             "identity_checks": "finite-difference thermodynamic detector only; never corrects values",
         },
         "ocr_suspect_examples": suspect_examples,
-        "corrections": [],
+        "corrections": [
+            {"record_id": record["record_id"], **correction}
+            for record in records
+            for correction in record["corrections"]
+        ],
         "untranscribed": [],
         "feedstock_element_coverage": feedstock_coverage(
             [{"formula": record["formula_as_published"]} for record in records]

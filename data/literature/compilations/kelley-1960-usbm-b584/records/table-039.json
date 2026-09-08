@@ -177,7 +177,7 @@
         },
         "heat_content": {
           "raw": "9.730",
-          "value": 9.73,
+          "value": 9730.0,
           "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_disagreement"
         },
@@ -291,47 +291,18 @@
     "sha256": "318c01af1ac798245c64f1fa652a30e441817416f66d3801bdb9b40a0c4e106e"
   },
   "transcription_status": "transcribed_with_ocr_ambiguities",
-  "ambiguities": [
+  "ambiguities": [],
+  "corrections": [
     {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        700.0,
-        800.0
-      ],
-      "entropy_residual_cal_per_deg_mole": 12.982,
-      "source_rows": [
-        [
-          1,
-          1
-        ],
-        [
-          2,
-          1
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
-    },
-    {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        800.0,
-        900.0
-      ],
-      "entropy_residual_cal_per_deg_mole": -11.4483,
-      "source_rows": [
-        [
-          2,
-          1
-        ],
-        [
-          3,
-          1
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
+      "pdf_page": 33,
+      "page": 17,
+      "source_row_index": 2,
+      "panel_index": 1,
+      "column": "heat_content",
+      "printed_token": "9,730",
+      "ocr_token": "9.730",
+      "quote": "800 | 9,730 | 18.76",
+      "basis": "300 dpi PDF page image"
     }
-  ],
-  "corrections": []
+  ]
 }

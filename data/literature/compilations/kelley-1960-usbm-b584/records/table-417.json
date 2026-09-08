@@ -408,7 +408,7 @@
         },
         "heat_content": {
           "raw": "3.160",
-          "value": 3.16,
+          "value": 3160.0,
           "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_disagreement"
         },
@@ -466,7 +466,7 @@
         },
         "heat_content": {
           "raw": "3.885",
-          "value": 3.885,
+          "value": 3885.0,
           "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_disagreement"
         },
@@ -524,7 +524,7 @@
         },
         "heat_content": {
           "raw": "4.675",
-          "value": 4.675,
+          "value": 4675.0,
           "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_disagreement"
         },
@@ -640,8 +640,8 @@
         },
         "heat_content": {
           "raw": "6.025",
-          "value": 6.025,
-          "ocr_suspect": false,
+          "value": 6025.0,
+          "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_agreement"
         },
         "entropy_increment": {
@@ -698,8 +698,8 @@
         },
         "heat_content": {
           "raw": "6.725",
-          "value": 6.725,
-          "ocr_suspect": false,
+          "value": 6725.0,
+          "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_agreement"
         },
         "entropy_increment": {
@@ -818,7 +818,7 @@
         600.6,
         700.0
       ],
-      "entropy_residual_cal_per_deg_mole": 0.5089,
+      "entropy_residual_cal_per_deg_mole": -0.607,
       "source_rows": [
         [
           5,
@@ -838,7 +838,7 @@
         700.0,
         800.0
       ],
-      "entropy_residual_cal_per_deg_mole": 1.5689,
+      "entropy_residual_cal_per_deg_mole": 0.5151,
       "source_rows": [
         [
           6,
@@ -850,67 +850,63 @@
         ]
       ],
       "note": "Detector only; printed tokens retained unchanged."
-    },
-    {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        800.0,
-        1000.0
-      ],
-      "entropy_residual_cal_per_deg_mole": 1.5785,
-      "source_rows": [
-        [
-          7,
-          0
-        ],
-        [
-          9,
-          0
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
-    },
-    {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        1000.0,
-        1100.0
-      ],
-      "entropy_residual_cal_per_deg_mole": 0.6693,
-      "source_rows": [
-        [
-          9,
-          0
-        ],
-        [
-          10,
-          0
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
-    },
-    {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        1100.0,
-        1200.0
-      ],
-      "entropy_residual_cal_per_deg_mole": -5.846,
-      "source_rows": [
-        [
-          10,
-          0
-        ],
-        [
-          1,
-          1
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
     }
   ],
-  "corrections": []
+  "corrections": [
+    {
+      "pdf_page": 116,
+      "page": 100,
+      "source_row_index": 5,
+      "panel_index": 0,
+      "column": "heat_content",
+      "printed_token": "3,160",
+      "ocr_token": "3.160",
+      "quote": "600.6(l) | 3,160 | 6.55",
+      "basis": "300 dpi PDF page image"
+    },
+    {
+      "pdf_page": 116,
+      "page": 100,
+      "source_row_index": 6,
+      "panel_index": 0,
+      "column": "heat_content",
+      "printed_token": "3,885",
+      "ocr_token": "3.885",
+      "quote": "700 | 3,885 | 7.06",
+      "basis": "300 dpi PDF page image"
+    },
+    {
+      "pdf_page": 116,
+      "page": 100,
+      "source_row_index": 7,
+      "panel_index": 0,
+      "column": "heat_content",
+      "printed_token": "4,675",
+      "ocr_token": "4.675",
+      "quote": "800 | 4,675 | 8.63",
+      "basis": "300 dpi PDF page image"
+    },
+    {
+      "pdf_page": 116,
+      "page": 100,
+      "source_row_index": 9,
+      "panel_index": 0,
+      "column": "heat_content",
+      "printed_token": "6,025",
+      "ocr_token": "6.025",
+      "quote": "1,000 | 6,025 | 10.21",
+      "basis": "300 dpi PDF page image"
+    },
+    {
+      "pdf_page": 116,
+      "page": 100,
+      "source_row_index": 10,
+      "panel_index": 0,
+      "column": "heat_content",
+      "printed_token": "6,725",
+      "ocr_token": "6.725",
+      "quote": "1,100 | 6,725 | 10.88",
+      "basis": "300 dpi PDF page image"
+    }
+  ]
 }

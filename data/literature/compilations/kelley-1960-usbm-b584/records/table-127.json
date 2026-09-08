@@ -148,8 +148,8 @@
         },
         "heat_content": {
           "raw": "3.720",
-          "value": 3.72,
-          "ocr_suspect": false,
+          "value": 3720.0,
+          "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_agreement"
         },
         "entropy_increment": {
@@ -297,47 +297,19 @@
       "census_raw": "$CdCl_{3}(c)$",
       "caption_raw": "CdCl_{2}(c)",
       "note": "Caption is the record metadata source; both OCR readings retained without repair."
-    },
-    {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        400.0,
-        500.0
-      ],
-      "entropy_residual_cal_per_deg_mole": 8.2937,
-      "source_rows": [
-        [
-          1,
-          0
-        ],
-        [
-          2,
-          0
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
-    },
-    {
-      "kind": "identity_disagreement",
-      "detector": "finite_difference_dS_equals_dH_over_T",
-      "temperature_pair": [
-        500.0,
-        600.0
-      ],
-      "entropy_residual_cal_per_deg_mole": -6.7767,
-      "source_rows": [
-        [
-          2,
-          0
-        ],
-        [
-          3,
-          0
-        ]
-      ],
-      "note": "Detector only; printed tokens retained unchanged."
     }
   ],
-  "corrections": []
+  "corrections": [
+    {
+      "pdf_page": 51,
+      "page": 35,
+      "source_row_index": 2,
+      "panel_index": 0,
+      "column": "heat_content",
+      "printed_token": "3,720",
+      "ocr_token": "3.720",
+      "quote": "500 | 3,720 | 9.46",
+      "basis": "300 dpi PDF page image"
+    }
+  ]
 }

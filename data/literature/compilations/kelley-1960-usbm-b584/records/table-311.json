@@ -446,7 +446,7 @@
         },
         "entropy_increment": {
           "raw": "9,72",
-          "value": null,
+          "value": 9.72,
           "ocr_suspect": true,
           "ocr_check": "raster_ocr_token_disagreement"
         }
@@ -791,7 +791,19 @@
     "path": "chunk-p081-p120/images/d296911619a3729da7f19c44bd754a01c03ab2f18fcf7a8b8d616e33590452c3.jpg",
     "sha256": "b11be936113118cf887688254c0b400971c42098c6450d510ff7d22f53e1d62a"
   },
-  "transcription_status": "transcribed",
+  "transcription_status": "transcribed_with_ocr_ambiguities",
   "ambiguities": [],
-  "corrections": []
+  "corrections": [
+    {
+      "pdf_page": 92,
+      "page": 76,
+      "source_row_index": 5,
+      "panel_index": 0,
+      "column": "entropy_increment",
+      "printed_token": "9.72",
+      "ocr_token": "9,72",
+      "quote": "800 | 5,010 | 9.72",
+      "basis": "300 dpi PDF page image"
+    }
+  ]
 }
