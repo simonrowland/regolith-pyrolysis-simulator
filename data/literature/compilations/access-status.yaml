@@ -19,10 +19,17 @@ sources:
     evidence: data/literature/compilations/robie-hemingway-1995-usgs-b2131/source/sidecar.yaml
     harvested_path: data/literature/compilations/robie-hemingway-1995-usgs-b2131/
     local_status: whole_bulletin_census_pass2_mineru_image_transcription
+<<<<<<< HEAD
     note: All numeric table sections inventoried. Pass 2 transcribed the 111 pass-1 OCR/layout gaps from MinerU tables cross-checked
       against page images. No silent numeric repairs, no unit conversion, no battery scoring rows.
+=======
+    note: All numeric table sections inventoried. Pass 2 transcribed the 111 pass-1 OCR/layout gaps from MinerU
+      tables cross-checked against page images. No silent numeric repairs, no unit conversion, no battery scoring
+      rows.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
   atct_anl_1_222:
-    citation: Ruscic, B. and Bross, D. H., Active Thermochemical Tables, ANL, Thermochemical Network version 1.222 (2026).
+    citation: Ruscic, B. and Bross, D. H., Active Thermochemical Tables, ANL, Thermochemical Network version 1.222
+      (2026).
     doi: 10.17038/CSE/2440256
     access: open_public_reusable_data
     official_url: https://atct.anl.gov/Thermochemical%20Data/version%201.222/index.php
@@ -34,12 +41,19 @@ sources:
     harvested_path: data/literature/compilations/atct/
     harvested_record_count: 3442
     source_claimed_record_count: 3444
-    known_gap: Page and sidecar claim 3444 species; supplied HTML contains 3442 species rows. Discrepancy preserved in manifest.
+    known_gap: Page and sidecar claim 3444 species; supplied HTML contains 3442 species rows. Discrepancy preserved
+      in manifest.
     note: Formation enthalpies only; no Cp, entropy or Gibbs functions; no battery scoring rows.
   usgs_bulletin_1452:
+<<<<<<< HEAD
     citation: 'Robie, R. A., Hemingway, B. S. and Fisher, J. R., 1978 (reprinted 1979), Thermodynamic properties of minerals
       and related substances at 298.15 K and 1 bar (10^5 pascals) pressure and at higher temperatures: U.S. Geological Survey
       Bulletin 1452, 456 p.'
+=======
+    citation: 'Robie, R. A., Hemingway, B. S. and Fisher, J. R., 1978 (reprinted 1979), Thermodynamic properties
+      of minerals and related substances at 298.15 K and 1 bar (10^5 pascals) pressure and at higher temperatures:
+      U.S. Geological Survey Bulletin 1452, 456 p.'
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     doi: 10.3133/b1452
     access: open_public_domain_us_government_work
     official_url: https://pubs.usgs.gov/bul/1452/report.pdf
@@ -55,7 +69,8 @@ sources:
     temperature_row_count: 1528
     note: Assessed reference functions only; never measured validation evidence and no battery scoring rows.
   nist_janaf_4th:
-    citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, Fourth Edition, J. Phys. Chem. Ref. Data Monograph 9 (1998).
+    citation: Chase, M. W. Jr., NIST-JANAF Thermochemical Tables, Fourth Edition, J. Phys. Chem. Ref. Data Monograph
+      9 (1998).
     identifier: NIST Standard Reference Database 13
     doi: 10.18434/T42S31
     access: open_public_web
@@ -63,8 +78,13 @@ sources:
     formula_index_url: https://janaf.nist.gov/formula.html
     licence_quoted:
       srd13_data_nist_gov: These data are public.
+<<<<<<< HEAD
       nist_copyrights: With the exception of material marked as copyrighted, information presented on NIST sites are considered
         public information and may be distributed or copied.
+=======
+      nist_copyrights: With the exception of material marked as copyrighted, information presented on NIST sites
+        are considered public information and may be distributed or copied.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     local_status: feedstock_element_complete_harvest
     harvested_path: data/literature/compilations/janaf/
     harvested_table_count: 1655
@@ -99,10 +119,18 @@ sources:
     - U
     - Y
     - Yb
+<<<<<<< HEAD
     remaining_action: HTML-era 380 tables diverge from current NIST .txt (missing rows); held in place. Source .txt cache
       is gitignored; hashes in janaf/source/sidecar.yaml.
     acquisition_constraint: Source .txt bytes stay in data/literature/compilations/janaf/source-cache/ (gitignored). The 1275
       2026-09-06 tables were parsed from those downloads; the 380 2026-08-27 tables were parsed from HTML and were not overwritten.
+=======
+    remaining_action: HTML-era 380 tables diverge from current NIST .txt (missing rows); held in place. Source .txt
+      cache is gitignored; hashes in janaf/source/sidecar.yaml.
+    acquisition_constraint: Source .txt bytes stay in data/literature/compilations/janaf/source-cache/ (gitignored).
+      The 1275 2026-09-06 tables were parsed from those downloads; the 380 2026-08-27 tables were parsed from HTML
+      and were not overwritten.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
   nist_webbook_srd69:
     citation: P. J. Linstrom and W. G. Mallard, eds., NIST Chemistry WebBook, NIST Standard Reference Database 69.
     doi: 10.18434/T4D303
@@ -112,12 +140,21 @@ sources:
     existing_path: data/literature/extracts/nist-webbook.yaml
     existing_species_count: 22
     harvest_status: not_bulk_harvested_in_this_pass
+<<<<<<< HEAD
     reason: No stable bulk snapshot was acquired under worker network isolation; individual pages remain legitimately obtainable
       from NIST.
     note: WebBook pages vary by species and do not guarantee a complete thermochemical function table.
   nasa_cea:
     citation: McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties
       of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.
+=======
+    reason: No stable bulk snapshot was acquired under worker network isolation; individual pages remain legitimately
+      obtainable from NIST.
+    note: WebBook pages vary by species and do not guarantee a complete thermochemical function table.
+  nasa_cea:
+    citation: McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic
+      Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     access: open_public_source
     official_repository_url: https://github.com/nasa/cea/blob/main/data/thermo.inp
     official_software_url: https://www.nasa.gov/glenn/research/chemical-equilibrium-with-applications/
@@ -129,8 +166,13 @@ sources:
     harvest_status: complete_at_data/literature/compilations/nasa-glenn/
     harvested_record_count: 2111
   nasa_glenn:
+<<<<<<< HEAD
     citation: McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties
       of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp (9/8/2021 Snyder snapshot).
+=======
+    citation: McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic
+      Properties of Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp (9/8/2021 Snyder snapshot).
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     identifier: NASA/TP-2002-211556
     access: open_public_source
     official_url: https://www.grc.nasa.gov/www/CEAWeb/
@@ -142,19 +184,33 @@ sources:
     source_path: data/literature/compilations/nasa-glenn/source/thermo.inp
     source_sha256: fa7746572952d74e249e818a82a35c113829742fb421a308e167185528884363
     date: '2026-09-06'
+<<<<<<< HEAD
     evidence: Byte-copied thermo.inp from docs-private/research/2026-08-01-cea-sweep/; fixed-column parse of every PRODUCTS
       and REACTANTS record; round-trip test in tests/test_nasa_glenn_compilation.py.
   burcat:
     citation: 'Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion
       with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960; current electronic files (species last added
       3 January 2023). Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.'
+=======
+    evidence: Byte-copied thermo.inp from docs-private/research/2026-08-01-cea-sweep/; fixed-column parse of every
+      PRODUCTS and REACTANTS record; round-trip test in tests/test_nasa_glenn_compilation.py.
+  burcat:
+    citation: 'Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database
+      for Combustion with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960; current electronic files
+      (species last added 3 January 2023). Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.'
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     identifier: ANL-05/20; TAE 960
     doi: 10.2172/925269
     access: open_non_commercial_with_citation
     official_url: https://respecth.elte.hu/burcat.php
     technion_url: http://burcat.technion.ac.il/dir
+<<<<<<< HEAD
     licence: Free for non-commercial use with citation. Commercial inclusion forbidden without written permission from the
       authors (quoted from BURCAT.THR.txt header). Printed 2005 report is US DOE ANL-05/20.
+=======
+    licence: Free for non-commercial use with citation. Commercial inclusion forbidden without written permission
+      from the authors (quoted from BURCAT.THR.txt header). Printed 2005 report is US DOE ANL-05/20.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     local_status: complete_harvest
     harvested_path: data/literature/compilations/burcat/
     harvested_record_count: 3446
@@ -165,12 +221,21 @@ sources:
     xml_path: data/literature/compilations/burcat/source/BURCAT_THR.xml
     xml_sha256: 0f4cfd21cfa19f620110bbe63bbb96beff112a2c5e8cf38c885c6d7b3d00a3af
     date: '2026-09-06'
+<<<<<<< HEAD
     evidence: Byte-copied BURCAT.THR.txt, BURCAT_THR.xml, and sidecar.yaml from the corpus clone; NASA-7 4-line parse of every
       polynomial plus comment-only CAS stanzas; XML used only as a cross-check (2005 snapshot); round-trip test in tests/test_burcat_compilation.py.
       Archives.zip not committed.
   ivtanthermo_glushko:
     citation: IVTANTHERMO thermodynamic database, Institute for High Temperatures, Russian Academy of Sciences; Glushko thermodynamic-property
       compilation.
+=======
+    evidence: Byte-copied BURCAT.THR.txt, BURCAT_THR.xml, and sidecar.yaml from the corpus clone; NASA-7 4-line
+      parse of every polynomial plus comment-only CAS stanzas; XML used only as a cross-check (2005 snapshot); round-trip
+      test in tests/test_burcat_compilation.py. Archives.zip not committed.
+  ivtanthermo_glushko:
+    citation: IVTANTHERMO thermodynamic database, Institute for High Temperatures, Russian Academy of Sciences;
+      Glushko thermodynamic-property compilation.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     access: current_open_bulk_distribution_not_located
     historical_nist_catalog_url: https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication782.pdf
     database_interface_url: http://www.chem.msu.ru/cgi-bin/tkv.pl?show=welcome.html/welcome.html
@@ -178,7 +243,8 @@ sources:
     coverage_note: Historical descriptions report thermodynamic properties for approximately 2300 substances.
     access_note: Ownership, licensing, and current distribution terms were not clear enough to justify acquisition.
   landolt_boernstein_sgte:
-    citation: SGTE, Thermodynamic Properties of Inorganic Materials, Landolt-Börnstein, New Series, Group IV, Volume 19, Springer.
+    citation: SGTE, Thermodynamic Properties of Inorganic Materials, Landolt-Börnstein, New Series, Group IV, Volume
+      19, Springer.
     isbn: '3540653279'
     access: copyrighted_book_or_subscription
     publisher_url: https://link.springer.com/book/10.1007/b71126
@@ -198,8 +264,13 @@ sources:
     - WorldCat participating libraries
     local_status: citation_only_not_obtained
   knacke_kubaschewski_hesselmann:
+<<<<<<< HEAD
     citation: O. Knacke, O. Kubaschewski and K. Hesselmann, Thermochemical Properties of Inorganic Substances, Second Edition,
       Springer/Verlag Stahleisen, 1991, two volumes.
+=======
+    citation: O. Knacke, O. Kubaschewski and K. Hesselmann, Thermochemical Properties of Inorganic Substances, Second
+      Edition, Springer/Verlag Stahleisen, 1991, two volumes.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     isbn:
     - '9783540540144'
     - '9780387540146'
@@ -211,8 +282,13 @@ sources:
     - CiNii Books participating libraries
     local_status: citation_only_not_obtained
   hultgren:
+<<<<<<< HEAD
     citation: R. Hultgren et al., Selected Values of the Thermodynamic Properties of the Elements, American Society for Metals,
       1973.
+=======
+    citation: R. Hultgren et al., Selected Values of the Thermodynamic Properties of the Elements, American Society
+      for Metals, 1973.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     isbn: '9780608101187'
     access: copyrighted_book
     catalog_url: https://books.google.com/books?id=nd9QAAAAYAAJ
@@ -233,9 +309,11 @@ sources:
     local_status: citation_only_not_obtained
   sgte:
     citation: Scientific Group Thermodata Europe databases and unary reference data.
-    access: mixed; selected publications/data are open, production databases are licensed through compatible software vendors
+    access: mixed; selected publications/data are open, production databases are licensed through compatible software
+      vendors
     official_url: https://www.sgte.net/
     local_status: production_database_not_obtained
+<<<<<<< HEAD
     note: Open SGTE publications must not be conflated with licensed production database releases. The free unary TDB is a
       separate row (sgte_unary_50).
   sgte_unary_50:
@@ -248,10 +326,25 @@ sources:
       elements.
     licence_basis: Verbatim quote from the official SGTE free-pure-elements page; unary50.tdb offered as a free download without
       login.
+=======
+    note: Open SGTE publications must not be conflated with licensed production database releases. The free unary
+      TDB is a separate row (sgte_unary_50).
+  sgte_unary_50:
+    citation: SGTE Pure Element Database (UNARY) version 5.0 (2 June 2009). Dinsdale, A. T. (1991). SGTE data for
+      pure elements. CALPHAD 15, 317-425.
+    doi: 10.1016/0364-5916(91)90011-S
+    access: open_public_web
+    official_url: https://www.sgte.net/en/free-pure-elements-database
+    licence: This database can only be used for extracting data for assessment work or to tabulate or plot data
+      for the pure elements.
+    licence_basis: Verbatim quote from the official SGTE free-pure-elements page; unary50.tdb offered as a free
+      download without login.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     local_status: complete_ingest
     harvested_path: data/literature/compilations/sgte-unary/
     harvested_source: data/literature/compilations/sgte-unary/source/unary50.tdb
     harvested_source_sha256: 8e38dcefbeaad1f8ed83ed1f8ccceb0e1701fb584f1bf3798f217488253d4b3f
+<<<<<<< HEAD
     evidence: Copied from the read-only corpus clone at raw/sgte-unary-5.0/unary50.tdb (118145 bytes) matching the sidecar
       sha256; SPECIES, ELEMENT, FUNCTION, PHASE, PARAMETER G/TC/BM/BMAGN ingested without curation.
     access_date: '2026-09-06'
@@ -265,6 +358,21 @@ sources:
     official_url: https://pubs.usgs.gov/bul/1544/report.pdf
     licence_basis: United States government work. USGS numbered series; public domain in the United States. Fetched from the
       official pubs.usgs.gov host.
+=======
+    evidence: Copied from the read-only corpus clone at raw/sgte-unary-5.0/unary50.tdb (118145 bytes) matching the
+      sidecar sha256; SPECIES, ELEMENT, FUNCTION, PHASE, PARAMETER G/TC/BM/BMAGN ingested without curation.
+    access_date: '2026-09-06'
+    remaining_action: none for unary50.tdb; licensed SGTE solution databases remain unobtained.
+  usgs_bulletin_1544:
+    citation: 'Hemingway, B. S., Haas, J. L., Jr. and Robinson, G. R., Jr., 1982, Thermodynamic properties of selected
+      minerals in the system Al2O3-CaO-SiO2-H2O at 298.15 K and 1 bar (10^5 pascals) pressure and at higher temperatures
+      (Supplement to Bulletin 1452): U.S. Geological Survey Bulletin 1544, 70 p.'
+    doi: 10.3133/b1544
+    access: public_domain_us_government_work
+    official_url: https://pubs.usgs.gov/bul/1544/report.pdf
+    licence_basis: United States government work. USGS numbered series; public domain in the United States. Fetched
+      from the official pubs.usgs.gov host.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     retrieved_at: '2026-09-06T22:02:09Z'
     verified_date: '2026-09-06'
     access_date: '2026-09-06'
@@ -275,15 +383,26 @@ sources:
     harvested_record_count: 33
     note: Assessed thermodynamic functions vs T; not measurements. No battery scoring rows.
   robie_waldbaum_1968_usgs_b1259:
+<<<<<<< HEAD
     citation: 'Robie, R. A. and Waldbaum, D. R., 1968, Thermodynamic properties of minerals and related substances at 298.15
       K (25.0 C) and one atmosphere (1.013 bars) pressure and at higher temperatures: U.S. Geological Survey Bulletin 1259,
       256 p.'
+=======
+    citation: 'Robie, R. A. and Waldbaum, D. R., 1968, Thermodynamic properties of minerals and related substances
+      at 298.15 K (25.0 C) and one atmosphere (1.013 bars) pressure and at higher temperatures: U.S. Geological
+      Survey Bulletin 1259, 256 p.'
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     doi: 10.3133/b1259
     report_number: USGS Bulletin 1259
     access: public_domain_us_government_work
     official_url: https://pubs.usgs.gov/bul/1259/report.pdf
+<<<<<<< HEAD
     licence_basis: United States government work. USGS numbered series; public domain in the United States. Fetched from the
       official pubs.usgs.gov host.
+=======
+    licence_basis: United States government work. USGS numbered series; public domain in the United States. Fetched
+      from the official pubs.usgs.gov host.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
     retrieved_at: '2026-09-06T22:02:09Z'
     verified_date: '2026-09-06'
     access_date: '2026-09-06'
@@ -292,14 +411,20 @@ sources:
     harvested_record_count: 549
     source_pdf_sha256: 013abbde1aef291c7492f2eaf7ab552619699e558d741ae5f39a87830e080e83
     source_pdf_bytes: 9819644
+<<<<<<< HEAD
     note: Assessed thermodynamic functions at 298.15 K and high T; raw OCR retained, image corrections explicitly ledgered;
       one high-T page untranscribed (PDF p. 125, 180° rotation). No battery scoring rows.
+=======
+    note: Assessed thermodynamic functions at 298.15 K and high T; raw OCR retained, image corrections explicitly
+      ledgered; one high-T page untranscribed (PDF p. 125, 180° rotation). No battery scoring rows.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
   factsage:
     citation: FactSage thermochemical software and databases, Thermfact/CRCT and GTT-Technologies.
     access: commercial_license
     official_url: https://www.factsage.com/
     download_url: https://www.factsage.com/fs_general.php
-    coverage: pure compounds plus solution databases for gases, metals, slags, salts, oxides, and other application systems
+    coverage: pure compounds plus solution databases for gases, metals, slags, salts, oxides, and other application
+      systems
     local_status: not_obtained
     access_note: Current full downloads require customer credentials and maintenance entitlement.
   mtdata:
@@ -309,6 +434,7 @@ sources:
     npl_catalog_url: https://resource.npl.co.uk/docs/commercial/measurement_services/catalogue_09.pdf
     coverage: metals, oxides, mattes, semiconductors, aqueous systems, molten salts, and gases
     local_status: not_obtained
+<<<<<<< HEAD
   kelley_1960_usbm_b584:
     citation: 'Kelley, K. K., Contributions to the Data on Theoretical Metallurgy: XIII. High-Temperature Heat-Content, Heat-Capacity,
       and Entropy Data for the Elements and Inorganic Compounds, U.S. Bureau of Mines Bulletin 584 (1960)'
@@ -324,6 +450,22 @@ sources:
     source_pdf_bytes: 74873267
     harvested_record_count: 893
     note: Assessed heat-content and entropy tables; reference input only, never measured or battery-scored.
+=======
+  pankratz_1984_usbm_b677:
+    citation: Pankratz, L. B., Stuve, J. M. and Gokcen, N. A., 1984, Thermodynamic Data for Mineral Technology,
+      U.S. Bureau of Mines Bulletin 677, 360 pp.
+    report_number: USBM Bulletin 677
+    access: public_domain_us_government_work
+    official_url: https://digital.library.unt.edu/ark:/67531/metadc12819/
+    retrieved_url: https://web.archive.org/web/20251020214103id_/https://digital.library.unt.edu/ark:/67531/metadc12819/m2/1/high_res_d/Bulletin0677.pdf
+    licence_basis: United States government work. U.S. Bureau of Mines bulletin; public domain in the United States.
+    access_date: '2026-09-07'
+    local_status: complete_ingest
+    harvested_path: data/literature/compilations/pankratz-1984-usbm-b677/
+    harvested_record_count: 1571
+    source_pdf_sha256: 7739689d080073e9c2427ff718ce9e3c9c40a1149818c740a2d42dccb58ad250
+    note: Assessed thermodynamic reference tables; not measurements and never battery-scored.
+>>>>>>> 108e0be1c (data: complete Pankratz USBM Bulletin 677 ingest)
 acquisition_policy:
   paywalls_bypassed: false
   bot_protection_bypassed: false
