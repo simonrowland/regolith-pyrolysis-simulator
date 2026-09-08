@@ -115,6 +115,7 @@ def _assert_dickite_image_correction(records):
     correction = record["corrections"][0]
     assert correction["ocr_token"] == "1100"
     assert correction["printed_token"] == "400"
+    assert correction["correction_provenance"] == "image_read_reconstruction"
     assert correction["pdf_page"] == 67
     assert correction["image_quote"] == (
         "400 | 67.647 | 274.79 | 207.14 | 287.84 | -4120.356 | -3685.353 | 481.260"

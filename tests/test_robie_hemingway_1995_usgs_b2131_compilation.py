@@ -51,6 +51,7 @@ def numeric_cells(value):
 
 def _assert_image_verified_corrections(records):
     by_id = {record["record_id"]: record for record in records}
+    provenances = []
     for record_id, page, row_index, column, raw, printed, value in IMAGE_VERIFIED_CORRECTIONS:
         record = by_id[record_id]
         assert record["pdf_page"] == page
@@ -63,6 +64,15 @@ def _assert_image_verified_corrections(records):
         assert correction["raw_token"] == raw
         assert correction["printed_token"] == printed
         assert printed in correction["image_quote"]
+        separator_only = raw.replace(".", "").replace(",", "") == printed.replace(
+            ".", ""
+        ).replace(",", "")
+        assert correction["correction_provenance"] == (
+            "separator_repair" if separator_only else "image_read_reconstruction"
+        )
+        provenances.append(correction["correction_provenance"])
+    assert provenances.count("separator_repair") == 3
+    assert provenances.count("image_read_reconstruction") == 4
 
 
 def test_image_verified_corrections_and_mutation_probe():

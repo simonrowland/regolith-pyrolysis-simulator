@@ -342,8 +342,21 @@ def _assert_image_verified_corrections(records):
 
 
 def test_image_verified_corrections_and_mutation_probe(compilation):
-    _, records = compilation
+    manifest, records = compilation
     _assert_image_verified_corrections(records)
+    corrections = [
+        item
+        for item in manifest["corrections"]
+        if item.get("action") == "image_verified_correction"
+    ]
+    assert len(corrections) == len(IMAGE_VERIFIED_CORRECTIONS) == 16
+    assert {
+        (item["ocr_token"], item["printed_token"], item["correction_provenance"])
+        for item in corrections
+    } == {
+        (raw, printed, "image_read_reconstruction")
+        for _, _, _, raw, printed, _, _ in IMAGE_VERIFIED_CORRECTIONS
+    }
     mutated = copy.deepcopy(records)
     target = next(record for record in mutated if record["record_id"] == f"{SOURCE_ID}-0162")
     cell = next(row for row in target["rows"] if row["source_text_line"] == 21)["cells"][

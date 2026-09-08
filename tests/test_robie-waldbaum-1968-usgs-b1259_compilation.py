@@ -48,7 +48,7 @@ IMAGE_VERIFIED_OCR_SWEEP = (
     ("b1259-ht-0126-zincite", 157, 800, "H_minus_H298", "740", "5.740", "800 | 5.740 | 21.56 | 14.38"),
     ("b1259-ht-0136-geikelite", 167, 1000, "log_Kf", "557905", "66.905", "1000 | -376.086 | -306.130 | 66.905"),
     ("b1259-ht-0149-fluorite", 180, 1200, "delta_f_H", "-2897250", "-289.250", "1200 | 17.850 | 43.10 | 28.22 | -289.250"),
-    ("b1259-ht-0156-aragonite", 187, 800, "log_Kf", "657690", "65.690", "800 | -287.601 | -238.264 | 65.690"),
+    ("b1259-ht-0156-aragonite", 187, 800, "log_Kf", "657690", "65.090", "800 | -287.601 | -238.264 | 65.090"),
     ("b1259-ht-0161-strontianite", 192, 900, "delta_f_H", "-2957159", "-293.159", "900 | 15.250 | 50.45 | 33.51 | -293.159"),
     ("b1259-ht-0175-hydroxylapatite", 206, 800, "log_Kf", "8167026", "816.026", "800 | -3272.661 | -2987.065 | 816.026"),
     ("b1259-ht-0188-fayalite", 219, 1000, "H_minus_H298", "23.310", "28.310", "1000 | 28.310 | 82.78 | 54.47"),
@@ -230,6 +230,7 @@ def _assert_image_verified_ocr_sweep(records):
         )
         assert correction["record_id"] == record_id
         assert correction["image_quote"] == quote
+        assert correction["correction_provenance"] == "image_read_reconstruction"
         row, cell = next(
             (row, row[field])
             for row in record["rows"]
@@ -273,13 +274,14 @@ def test_image_verified_ocr_sweep_and_mutation_probe(corpus):
     _, records = corpus
     _assert_image_verified_ocr_sweep(records)
     corrupted = copy.deepcopy(records)
-    record = next(item for item in corrupted if item["record_id"] == "b1259-ht-0055-methane-ideal-gas")
+    record = next(item for item in corrupted if item["record_id"] == "b1259-ht-0156-aragonite")
     row = next(
         item
         for item in record["rows"]
-        if item.get("kind") == "data" and item["temperature"]["value"] == 500
+        if item.get("kind") == "data" and item["temperature"]["value"] == 800
     )
-    row["H_minus_H298"]["value"] = 960.0
+    row["log_Kf"]["as_published"] = "65.690"
+    row["log_Kf"]["value"] = 65.690
     with pytest.raises(AssertionError):
         _assert_image_verified_ocr_sweep(corrupted)
 

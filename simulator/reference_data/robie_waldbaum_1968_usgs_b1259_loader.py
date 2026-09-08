@@ -192,7 +192,7 @@ IMAGE_VERIFIED_CELLS = {
         )
         for field, printed in (("delta_f_H", delta_h), ("delta_f_G", delta_g))
     ],
-    187: [(800, 1, "log_Kf", "65.690")],
+    187: [(800, 1, "log_Kf", "65.090")],
     192: [(900, 1, "delta_f_H", "-293.159")],
     206: [(800, 1, "log_Kf", "816.026")],
     209: [
@@ -221,7 +221,7 @@ OCR_SWEEP_IMAGE_QUOTES = {
     (157, 400, 1, "H_minus_H298"): "400 | 1.070 | 13.51 | 10.83",
     (167, 1000, 1, "log_Kf"): "1000 | -376.086 | -306.130 | 66.905",
     (180, 1200, 1, "delta_f_H"): "1200 | 17.850 | 43.10 | 28.22 | -289.250",
-    (187, 800, 1, "log_Kf"): "800 | -287.601 | -238.264 | 65.690",
+    (187, 800, 1, "log_Kf"): "800 | -287.601 | -238.264 | 65.090",
     (192, 900, 1, "delta_f_H"): "900 | 15.250 | 50.45 | 33.51 | -293.159",
     (206, 800, 1, "log_Kf"): "800 | -3272.661 | -2987.065 | 816.026",
     (219, 1000, 1, "H_minus_H298"): "1000 | 28.310 | 82.78 | 54.47",
@@ -1069,7 +1069,10 @@ def _image_correction(
     }
     if retain_ocr_suspect:
         correction.update(
-            record_id=record.get("record_id"), ocr_token=raw, image_quote=quote
+            record_id=record.get("record_id"),
+            ocr_token=raw,
+            image_quote=quote,
+            correction_provenance="image_read_reconstruction",
         )
     record.setdefault("corrections", []).append(correction)
 
@@ -2164,6 +2167,7 @@ def parse_table2(text: str) -> dict:
                     "layout_as_extracted": "9994",
                     "ocr_token": "9994",
                     "printed_token": "15.9994",
+                    "correction_provenance": "image_read_reconstruction",
                     "evidence": "PDF page 10 image visibly prints 'Oxygen O 15.9994'",
                     "image_quote": "Oxygen | O | 15.9994",
                 }
@@ -2189,6 +2193,7 @@ def parse_table2(text: str) -> dict:
                     "layout_as_extracted": "01",
                     "ocr_token": "01",
                     "printed_token": "9.0122",
+                    "correction_provenance": "image_read_reconstruction",
                     "evidence": "PDF page 10 image visibly prints 'Beryllium Be 9.0122'",
                     "image_quote": "Beryllium | Be | 9.0122",
                 }
@@ -2212,6 +2217,7 @@ def parse_table2(text: str) -> dict:
                     "layout_as_extracted": "99",
                     "ocr_token": "99",
                     "printed_token": "",
+                    "correction_provenance": "image_read_reconstruction",
                     "evidence": "PDF page 10 image leaves the Protactinium weight blank",
                     "image_quote": "Protactinium | Pa | [blank]",
                 }

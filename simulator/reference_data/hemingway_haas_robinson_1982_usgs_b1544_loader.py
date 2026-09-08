@@ -1119,6 +1119,7 @@ def parse_source(
         "record_id": "usgs-b1544-dickite", "pdf_page": 67, "printed_page": 61,
         "row_index": 1, "column": "temperature", "ocr_token": "1100",
         "printed_token": "400",
+        "correction_provenance": "image_read_reconstruction",
         "image_quote": (
             "400 | 67.647 | 274.79 | 207.14 | 287.84 | -4120.356 | -3685.353 | 481.260"
         ),
