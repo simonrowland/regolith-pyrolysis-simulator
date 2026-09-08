@@ -13,7 +13,7 @@ Complete native transcription of every numeric table in *Entropies of the Elemen
 
 ## Census
 
-The bulletin's own list identifies seven numbered tables. MinerU recovered all 25 physical table blocks: Tables 1–5 occupy one block each, Table 6 spans printed pages 101–117, and Table 7 spans printed pages 118–120. The ingest contains 1,416 substance records: 1,319 Table 6 substances, 71 Table 7 substances, and 26 records from Tables 1–5. No listed table or substance row is untranscribed.
+The bulletin's own list identifies seven numbered tables. MinerU recovered all 25 physical table blocks: Tables 1–5 occupy one block each, Table 6 spans printed pages 101–117, and Table 7 spans printed pages 118–120. The ingest contains 1,418 source records: 1,391 substances and 27 structural continuation records. The substances comprise 1,294 from Table 6, 71 from Table 7, and 26 from Tables 1–5. No listed table or source row is untranscribed.
 
 Element-name grouping rows in Table 6 are stored as heading context, not mistaken for substances. The page-101 `Actinium: / Ac(c)` row shift is corrected only because the table crop proves the two entropy values belong to `Ac(c)`; both corrected cells remain OCR-suspect and the correction is explicit in the record and manifest.
 

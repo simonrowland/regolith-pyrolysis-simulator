@@ -9,7 +9,7 @@
   "state_as_published": "(c)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "image_verified_metadata_token_correction",
+  "metadata_ocr_check": "image_verified_wrapped_substance_reconstruction",
   "page": 114,
   "pdf_page": 118,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -172,7 +172,7 @@
         "substance": {
           "raw": "Na2SO4·10H2O(c)",
           "ocr_suspect": true,
-          "ocr_check": "image_verified_metadata_token_correction"
+          "ocr_check": "image_verified_wrapped_substance_reconstruction"
         },
         "cp_10_k": {
           "raw": "(.76)",
@@ -338,15 +338,15 @@
   "ambiguities": [],
   "corrections": [
     {
-      "kind": "image_verified_metadata_token_correction",
+      "kind": "image_verified_wrapped_substance_reconstruction",
       "pdf_page": 118,
       "page": 114,
       "source_row_index": 79,
       "column": "substance",
       "ocr_token": "10H2O(c)",
       "printed_token": "Na2SO4·10H2O(c)",
-      "quote": "Na2SO4·10H2O(c) ... 140.0±0.2",
-      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "quote": "Na2SO4·10H2O(c)",
+      "basis": "The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.",
       "record_id": "table-006-1095"
     }
   ],

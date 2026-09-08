@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0089",
   "table_number": 6,
-  "substance_as_published": "$Ba_{2.50}Sr_{10-47}$",
-  "formula_as_published": "$Ba_{2.50}Sr_{10-47}$",
-  "formula": "$Ba_{2.50}Sr_{10-47}$",
-  "name_as_published": "Ba_2.50Sr_10-47",
-  "phase_as_published": null,
-  "state_as_published": null,
+  "substance_as_published": "Ba0.543Sr0.457TiO3(c)",
+  "formula_as_published": "Ba0.543Sr0.457TiO3(c)",
+  "formula": "Ba0.543Sr0.457TiO3(c)",
+  "name_as_published": "Ba0.543Sr0.457TiO3(c)",
+  "phase_as_published": "(c)",
+  "state_as_published": "(c)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_wrapped_substance_reconstruction",
   "page": 102,
   "pdf_page": 106,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 58,
       "raw": [
-        "$Ba_{2.50}Sr_{10-47}$",
+        "Ba0.543Sr0.457TiO3(c)",
         "(.07)",
         "(.92)",
         "3.76",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$Ba_{2.50}Sr_{10-47}$"
+          "raw": "Ba0.543Sr0.457TiO3(c)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_wrapped_substance_reconstruction"
         },
         "cp_10_k": {
           "raw": "(.07)",
@@ -334,7 +336,21 @@
     "sha256": "cd495af2074f113694f3f4cf926ac0c02d4db3616105f24a9591a83685c02fc7"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_wrapped_substance_reconstruction",
+      "pdf_page": 106,
+      "page": 102,
+      "source_row_index": 58,
+      "column": "substance",
+      "ocr_token": "$Ba_{2.50}Sr_{10-47}$",
+      "printed_token": "Ba0.543Sr0.457TiO3(c)",
+      "quote": "Ba0.543Sr0.457TiO3(c)",
+      "basis": "The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.",
+      "record_id": "table-006-0089"
+    }
+  ],
   "heading_context_as_published": "Barium:",
+  "metadata_ocr_token": "$Ba_{2.50}Sr_{10-47}$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

@@ -9,7 +9,7 @@
   "state_as_published": "(c)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "image_verified_metadata_token_correction",
+  "metadata_ocr_check": "image_verified_wrapped_substance_reconstruction",
   "page": 112,
   "pdf_page": 116,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -172,7 +172,7 @@
         "substance": {
           "raw": "KMg3AlSi3-O10F2(c)",
           "ocr_suspect": true,
-          "ocr_check": "image_verified_metadata_token_correction"
+          "ocr_check": "image_verified_wrapped_substance_reconstruction"
         },
         "cp_10_k": {
           "raw": "(.27)",
@@ -338,15 +338,15 @@
   "ambiguities": [],
   "corrections": [
     {
-      "kind": "image_verified_metadata_token_correction",
+      "kind": "image_verified_wrapped_substance_reconstruction",
       "pdf_page": 116,
       "page": 112,
       "source_row_index": 77,
       "column": "substance",
       "ocr_token": "O10F2(c)",
       "printed_token": "KMg3AlSi3-O10F2(c)",
-      "quote": "KMg3AlSi3-O10F2(c) ... 75.9±0.5",
-      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "quote": "KMg3AlSi3-O10F2(c)",
+      "basis": "The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.",
       "record_id": "table-006-0932"
     }
   ],

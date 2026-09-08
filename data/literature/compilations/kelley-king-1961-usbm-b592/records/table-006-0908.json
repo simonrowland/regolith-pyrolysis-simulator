@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0908",
   "table_number": 6,
-  "substance_as_published": "4SO3-6H3O(c, synthetic)",
-  "formula_as_published": "4SO3-6H3O(c, synthetic)",
-  "formula": "4SO3-6H3O(c,synthetic)",
-  "name_as_published": "4SO3-6H3O(c, synthetic)",
-  "phase_as_published": "(c, synthetic)",
-  "state_as_published": "(c, synthetic)",
+  "substance_as_published": "K2O·3Al2O3·4SO3·6H2O(c,synthetic)",
+  "formula_as_published": "K2O·3Al2O3·4SO3·6H2O(c,synthetic)",
+  "formula": "K2O·3Al2O3·4SO3·6H2O(c,synthetic)",
+  "name_as_published": "K2O·3Al2O3·4SO3·6H2O(c,synthetic)",
+  "phase_as_published": "(c,synthetic)",
+  "state_as_published": "(c,synthetic)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_wrapped_substance_reconstruction",
   "page": 112,
   "pdf_page": 116,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 53,
       "raw": [
-        "4SO3-6H3O(c, synthetic)",
+        "K2O·3Al2O3·4SO3·6H2O(c,synthetic)",
         "(.25)",
         "(3.45)",
         "17.86",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "4SO3-6H3O(c, synthetic)"
+          "raw": "K2O·3Al2O3·4SO3·6H2O(c,synthetic)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_wrapped_substance_reconstruction"
         },
         "cp_10_k": {
           "raw": "(.25)",
@@ -334,7 +336,21 @@
     "sha256": "c8d85b1f018767232cdfeb75f8215c27a3a20ff39c79f5fb1f3f2d91c0c6edca"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_wrapped_substance_reconstruction",
+      "pdf_page": 116,
+      "page": 112,
+      "source_row_index": 53,
+      "column": "substance",
+      "ocr_token": "4SO3-6H3O(c, synthetic)",
+      "printed_token": "K2O·3Al2O3·4SO3·6H2O(c,synthetic)",
+      "quote": "K2O·3Al2O3·4SO3·6H2O(c,synthetic)",
+      "basis": "The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.",
+      "record_id": "table-006-0908"
+    }
+  ],
   "heading_context_as_published": "Potassium:",
+  "metadata_ocr_token": "4SO3-6H3O(c, synthetic)",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

@@ -18,6 +18,7 @@ import yaml
 
 from simulator.reference_data.kelley_king_1961_usbm_b592_loader import (
     _formula_integrity_issues,
+    _table6_line_wrap_groups,
 )
 from tools.harvest_atct_compilation import feedstock_coverage
 
@@ -383,6 +384,28 @@ TABLE6_IMAGE_VERIFIED_METADATA_CORRECTIONS = {
     (116, "$SnI_1(g)$"): ("$SnI_2(g)$", "SnI2(g) ... 52.4±0.2"),
     (116, "$U_1O_9(c)$"): ("$U_3O_8(c)$", "U3O8(c) ... 67.5±0.2"),
     (117, "VOCI3(g)"): ("VOCl3(g)", "VOCl3(g) ... 82.2±1.0"),
+    (104, "Ca2O4·H2O(c)"): ("CaC2O4·H2O(c)", "CaC2O4·H2O(c)"),
+    (104, "CaP2O7(β)"): ("Ca2P2O7(β)", "Ca2P2O7(β)"),
+    (104, "CaP2O8(α)"): ("Ca3P2O8(α)", "Ca3P2O8(α)"),
+    (104, "CaP2O8(β)"): ("Ca3P2O8(β)", "Ca3P2O8(β)"),
+    (104, "Ca10(PO4)5P2(c)"): ("Ca10(PO4)6F2(c)", "Ca10(PO4)6F2(c)"),
+    (104, "Ca10(PO4)5(OH)2(c)"): ("Ca10(PO4)6(OH)2(c)", "Ca10(PO4)6(OH)2(c)"),
+    (104, "CaSiO4(β)"): ("Ca2SiO4(β)", "Ca2SiO4(β)"),
+    (104, "CaSiO4(γ)"): ("Ca2SiO4(γ)", "Ca2SiO4(γ)"),
+    (104, "CaSiO5(c)"): ("Ca3SiO5(c)", "Ca3SiO5(c)"),
+    (104, "CaSiO2(γ)"): ("Ca3Si2O7(c)", "Ca3Si2O7(c)"),
+    (104, "CaSiO4(insol.)"): ("CaSO4(insol.)", "CaSO4(insol.)"),
+    (104, "CaSiO4(sol.α)"): ("CaSO4(sol.α)", "CaSO4(sol.α)"),
+    (104, "CaSiO4(sol.β)"): ("CaSO4(sol.β)", "CaSO4(sol.β)"),
+    (104, "CaSiO4/12H2O(α)"): ("CaSO4·1/2H2O(α)", "CaSO4·1/2H2O(α)"),
+    (104, "CaSiO4/12H2O(β)"): ("CaSO4·1/2H2O(β)", "CaSO4·1/2H2O(β)"),
+    (104, "CaSiO4·2H2O(selenite)"): ("CaSO4·2H2O(selenite)", "CaSO4·2H2O(selenite)"),
+    (104, "CaSiO3(c)"): ("CaSO3(c)", "CaSO3(c)"),
+    (104, "CaTiO3(γ)(c)"): ("Ca3Ti2O7(c)", "Ca3Ti2O7(c)"),
+    (106, "Eu2(SO4)·8H2O(c)"): ("Eu2(SO4)3·8H2O(c)", "Eu2(SO4)3·8H2O(c)"),
+    (106, "Gd2(SO4)·8H2O(c)*"): ("Gd2(SO4)3·8H2O(c)*", "Gd2(SO4)3·8H2O(c)*"),
+    (108, "$Fe_9.94O(c)*$"): ("Fe.947O(c)*", "Fe.947O(c)*"),
+    (108, "$Fe_2.7S(c)*$"): ("Fe.877S(c)*", "Fe.877S(c)*"),
 }
 
 
@@ -416,6 +439,84 @@ TABLE6_IMAGE_VERIFIED_METADATA_ANNOTATIONS = {
         "quote": "HNO2(equ¹,g) ... 60.8±0.3; ¹equ = equilibrium.",
         "basis": "The 300-dpi PDF page render proves 1 is a printed superscript footnote marker, not an OCR error or phase qualifier.",
     }
+}
+
+TABLE6_IMAGE_VERIFIED_WRAPPED_SUBSTANCES = {
+    (102, ("$Ba_{2.50}Sr_{10-47}$", "$TiO_3(c)$")): {
+        "substance_offset": 0,
+        "printed_fragments": ("Ba0.543Sr0.457", "TiO3(c)"),
+        "formula": "Ba0.543Sr0.457TiO3(c)",
+    },
+    (109, ("$Li_0.05Zn_0.90$", "$Fe_2.05O_4(c)$", "(annealed)*")): {
+        "substance_offset": 2,
+        "printed_fragments": ("Li0.05Zn0.90", "Fe2.05O4(c)", "(annealed)*"),
+        "formula": "Li0.05Zn0.90Fe2.05O4(c,annealed)*",
+    },
+    (109, ("$Li_0.05Zn_0.90$", "$Fe_2.05O_4(c)$", "(guenched)")): {
+        "substance_offset": 2,
+        "printed_fragments": ("Li0.05Zn0.90", "Fe2.05O4(c)", "(quenched)"),
+        "formula": "Li0.05Zn0.90Fe2.05O4(c,quenched)",
+    },
+    (109, ("$Mg_3La_2(NO_2)_12$", "$2H_2O(c)*$")): {
+        "substance_offset": 1,
+        "printed_fragments": ("Mg3La2(NO3)12·", "24H2O(c)*"),
+        "formula": "Mg3La2(NO3)12·24H2O(c)*",
+    },
+    (111, ("$NH_{4}Al(SO_{4})_{2}$", "$12H_{2}O(c) \\uparrow$")): {
+        "substance_offset": 1,
+        "printed_fragments": ("NH4Al(SO4)2·", "12H2O(c)†"),
+        "formula": "NH4Al(SO4)2·12H2O(c)†",
+    },
+    (111, ("$(NH_{4})_{2}O-3Al_{2}O_{3}$", "$4SO_{3} \\cdot 6H_{2}O(c)$")): {
+        "substance_offset": 1,
+        "printed_fragments": ("(NH4)2O·3Al2O3·", "4SO3·6H2O(c)"),
+        "formula": "(NH4)2O·3Al2O3·4SO3·6H2O(c)",
+    },
+    (111, ("$NH_{4}Cr(SO_{4})_{2}$", "$12H_{2}O(c) \\uparrow$")): {
+        "substance_offset": 1,
+        "printed_fragments": ("NH4Cr(SO4)2·", "12H2O(c)†"),
+        "formula": "NH4Cr(SO4)2·12H2O(c)†",
+    },
+    (112, ("KAl(SO4)2", "12H3O(c)†")): {
+        "substance_offset": 1,
+        "printed_fragments": ("KAl(SO4)2·", "12H2O(c)†"),
+        "formula": "KAl(SO4)2·12H2O(c)†",
+    },
+    (112, ("K2O-3Al2O3", "5SO3-9H3O(c)")): {
+        "substance_offset": 1,
+        "printed_fragments": ("K2O·3Al2O3·", "5SO3·9H2O(c)"),
+        "formula": "K2O·3Al2O3·5SO3·9H2O(c)",
+    },
+    (112, ("K2O-3Al2O3", "4SO3-6H3O(c, natural)")): {
+        "substance_offset": 1,
+        "printed_fragments": ("K2O·3Al2O3·", "4SO3·6H2O(c,natural)"),
+        "formula": "K2O·3Al2O3·4SO3·6H2O(c,natural)",
+    },
+    (112, ("K2O-3Al2O3", "4SO3-6H3O(c, synthetic)")): {
+        "substance_offset": 1,
+        "printed_fragments": ("K2O·3Al2O3·", "4SO3·6H2O(c,synthetic)"),
+        "formula": "K2O·3Al2O3·4SO3·6H2O(c,synthetic)",
+    },
+    (112, ("KMg2AlSi3-", "O10F2(c)")): {
+        "substance_offset": 1,
+        "printed_fragments": ("KMg3AlSi3-", "O10F2(c)"),
+        "formula": "KMg3AlSi3-O10F2(c)",
+    },
+    (114, ("NaAlSi2O6", "H2O(c)")): {
+        "substance_offset": 1,
+        "printed_fragments": ("NaAlSi2O6·", "H2O(c)"),
+        "formula": "NaAlSi2O6·H2O(c)",
+    },
+    (114, ("Na2SO4", "10H2O(c)")): {
+        "substance_offset": 1,
+        "printed_fragments": ("Na2SO4·", "10H2O(c)"),
+        "formula": "Na2SO4·10H2O(c)",
+    },
+    (116, ("$UO_2(NO_3)_2$", "$6H_2O(c)$")): {
+        "substance_offset": 1,
+        "printed_fragments": ("UO2(NO3)2·", "6H2O(c)"),
+        "formula": "UO2(NO3)2·6H2O(c)",
+    },
 }
 
 
@@ -534,6 +635,28 @@ def build_records(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 cell["column"] = "temperature"
                 cell["expected_printed_form"] = expected_raw
                 grid.append(cell)
+            detected_wraps = _table6_line_wrap_groups(raw_rows)
+            detected_tokens = {
+                tuple(raw_rows[index][0] for index in group): group
+                for group in detected_wraps
+            }
+            expected_tokens = {
+                tokens
+                for page, tokens in TABLE6_IMAGE_VERIFIED_WRAPPED_SUBSTANCES
+                if page == block["printed_page"]
+            }
+            if set(detected_tokens) != expected_tokens:
+                raise RuntimeError(
+                    f"unreviewed Table 6 line-wrap candidates on printed page {block['printed_page']}: "
+                    f"detected={sorted(detected_tokens)} expected={sorted(expected_tokens)}"
+                )
+            wrap_parts = {}
+            for tokens, group in detected_tokens.items():
+                spec = TABLE6_IMAGE_VERIFIED_WRAPPED_SUBSTANCES[
+                    (block["printed_page"], tokens)
+                ]
+                for offset, row_index in enumerate(group):
+                    wrap_parts[row_index] = (spec, offset)
             for row_index, raw_row in enumerate(raw_rows[2:], start=2):
                 if raw_row[0].strip().endswith(":"):
                     table6_heading = raw_row[0].strip()
@@ -545,6 +668,44 @@ def build_records(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                         pending_table6_shift = {"source_row_index": row_index, "cells": nonempty}
                     continue
                 corrections = []
+                wrap_part = wrap_parts.get(row_index)
+                wrap_record_kind = None
+                if wrap_part:
+                    spec, offset = wrap_part
+                    ocr_token = raw_row[0]
+                    substance_offset = spec["substance_offset"]
+                    printed_token = (
+                        spec["formula"]
+                        if offset == substance_offset
+                        else spec["printed_fragments"][offset]
+                    )
+                    wrap_record_kind = (
+                        None
+                        if offset == substance_offset
+                        else (
+                            "formula_continuation_prefix"
+                            if offset < substance_offset
+                            else "formula_continuation_suffix"
+                        )
+                    )
+                    corrected = list(raw_row)
+                    corrected[0] = printed_token
+                    corrections.append({
+                        "kind": (
+                            "image_verified_wrapped_substance_reconstruction"
+                            if wrap_record_kind is None
+                            else f"image_verified_{wrap_record_kind}_reclassification"
+                        ),
+                        "pdf_page": block["pdf_page"],
+                        "page": block["printed_page"],
+                        "source_row_index": row_index,
+                        "column": "substance",
+                        "ocr_token": ocr_token,
+                        "printed_token": printed_token,
+                        "quote": spec["formula"],
+                        "basis": "The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.",
+                    })
+                    raw_row = corrected
                 if pending_table6_shift is not None:
                     corrected = list(raw_row)
                     for column_index, raw in pending_table6_shift["cells"].items():
@@ -588,10 +749,20 @@ def build_records(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 structural_metadata = TABLE6_IMAGE_VERIFIED_STRUCTURAL_METADATA.get(
                     (block["printed_page"], raw_row[0])
                 )
+                if wrap_record_kind:
+                    structural_metadata = (
+                        wrap_record_kind,
+                        raw_row[0],
+                        next(
+                            correction["quote"]
+                            for correction in corrections
+                            if correction["kind"].endswith("_reclassification")
+                        ),
+                    )
                 metadata_annotation = TABLE6_IMAGE_VERIFIED_METADATA_ANNOTATIONS.get(
                     (block["printed_page"], raw_row[0])
                 )
-                if structural_metadata:
+                if structural_metadata and not wrap_record_kind:
                     record_kind, printed_token, quote = structural_metadata
                     ocr_token = raw_row[0]
                     corrected = list(raw_row)
@@ -684,9 +855,10 @@ def build_records(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     if structural_metadata:
                         record["record_kind"] = structural_metadata[0]
                     for correction in variant_corrections:
-                        if correction["kind"] == "image_verified_metadata_token_correction" or correction[
-                            "kind"
-                        ].endswith("_reclassification"):
+                        if correction["kind"] in {
+                            "image_verified_metadata_token_correction",
+                            "image_verified_wrapped_substance_reconstruction",
+                        } or correction["kind"].endswith("_reclassification"):
                             correction["record_id"] = record_id
                             record["metadata_ocr_token"] = correction["ocr_token"]
                             record["metadata_ocr_suspect"] = True
@@ -853,6 +1025,10 @@ def build(workers: int) -> None:
         "numbered_table_count": 7,
         "physical_table_block_count": len(blocks),
         "record_count": len(records),
+        "substance_count": sum(
+            record.get("record_kind", "substance") == "substance"
+            for record in records
+        ),
         "transcribed_record_count": len(records),
         "untranscribed_record_count": 0,
         "numeric_cell_count": sum(1 for record in records for cell in all_cells(record["rows"])),
@@ -921,6 +1097,10 @@ def build(workers: int) -> None:
         "numbered_table_count": 7,
         "physical_table_block_count": len(blocks),
         "record_count": len(records),
+        "substance_count": sum(
+            record.get("record_kind", "substance") == "substance"
+            for record in records
+        ),
         "record_ids": [record["record_id"] for record in records],
         "record_counts_by_table": record_counts,
         "tables": [{**entry, "record_count": record_counts[str(entry["table_number"])]} for entry in census_entries],

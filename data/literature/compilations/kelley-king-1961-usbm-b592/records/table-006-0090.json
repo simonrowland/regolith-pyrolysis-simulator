@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0090",
   "table_number": 6,
-  "substance_as_published": "$TiO_3(c)$",
-  "formula_as_published": "$TiO_3(c)$",
-  "formula": "$TiO_3(c)$",
-  "name_as_published": "TiO_3(c)",
-  "phase_as_published": "(c)",
-  "state_as_published": "(c)",
+  "substance_as_published": "TiO3(c)",
+  "formula_as_published": null,
+  "formula": null,
+  "name_as_published": "TiO3(c)",
+  "phase_as_published": null,
+  "state_as_published": null,
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_formula_continuation_suffix_reclassification",
   "page": 102,
   "pdf_page": 106,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 59,
       "raw": [
-        "$TiO_3(c)$",
+        "TiO3(c)",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$TiO_3(c)$"
+          "raw": "TiO3(c)",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_formula_continuation_suffix_reclassification"
         },
         "cp_10_k": {
           "raw": "",
@@ -294,7 +296,22 @@
     "sha256": "cd495af2074f113694f3f4cf926ac0c02d4db3616105f24a9591a83685c02fc7"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_formula_continuation_suffix_reclassification",
+      "pdf_page": 106,
+      "page": 102,
+      "source_row_index": 59,
+      "column": "substance",
+      "ocr_token": "$TiO_3(c)$",
+      "printed_token": "TiO3(c)",
+      "quote": "Ba0.543Sr0.457TiO3(c)",
+      "basis": "The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.",
+      "record_id": "table-006-0090"
+    }
+  ],
   "heading_context_as_published": "Barium:",
+  "record_kind": "formula_continuation_suffix",
+  "metadata_ocr_token": "$TiO_3(c)$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

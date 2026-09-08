@@ -58,6 +58,10 @@ def _parse_html_table(source):
 
 
 def _records():
+    return list(load_records(include_ocr_suspect=True, include_structural=True))
+
+
+def _substances():
     return list(load_records(include_ocr_suspect=True))
 
 
@@ -140,6 +144,7 @@ def test_manifest_record_and_bulletin_census_coverage_match():
     ids = [record["record_id"] for record in records]
     assert len(ids) == len(set(ids))
     assert len(records) == manifest["summary"]["record_count"] == census["record_count"] == 1418
+    assert len(_substances()) == manifest["summary"]["substance_count"] == census["substance_count"] == 1391
     assert manifest["census"] == census
     assert ids == census["record_ids"]
     assert census["numbered_table_count"] == 7
@@ -192,7 +197,7 @@ def test_actinium_image_proven_row_alignment_correction_is_explicit():
         assert correction["printed_token"] == correction["ocr_token"] == "15.0±1.0"
         assert correction["quote"]
         assert record["rows"][0]["cells"][correction["column"]]["ocr_suspect"]
-    assert load_manifest(include_ocr_suspect=True)["summary"]["correction_count"] == 54
+    assert load_manifest(include_ocr_suspect=True)["summary"]["correction_count"] == 104
 
 
 def test_formula_integrity_census_is_fully_image_corrected():
@@ -209,7 +214,7 @@ def test_formula_integrity_census_is_fully_image_corrected():
         for field, token, reason in b592_loader._formula_integrity_issues(record)
     ]
     assert issues == []
-    assert len(corrections) == 16
+    assert len(corrections) == 36
     assert all(
         correction["record_id"]
         and correction["page"]
@@ -229,12 +234,32 @@ def test_formula_integrity_census_is_fully_image_corrected():
         "table-006-0541",
         "table-006-0678",
         "table-006-0777",
-        "table-006-0932",
         "table-006-1014",
-        "table-006-1095",
         "table-006-1196",
         "table-006-1248",
         "table-006-1269",
+        "table-006-0213",
+        "table-006-0217",
+        "table-006-0218",
+        "table-006-0219",
+        "table-006-0221",
+        "table-006-0222",
+        "table-006-0225",
+        "table-006-0226",
+        "table-006-0227",
+        "table-006-0228",
+        "table-006-0229",
+        "table-006-0230",
+        "table-006-0231",
+        "table-006-0232",
+        "table-006-0233",
+        "table-006-0234",
+        "table-006-0236",
+        "table-006-0238",
+        "table-006-0365",
+        "table-006-0375",
+        "table-006-0562",
+        "table-006-0569",
     }
 
 
@@ -242,6 +267,9 @@ def test_formula_integrity_census_is_fully_image_corrected():
     ("token", "reason"),
     [
         ("DCIO(g)", "uppercase I in a Cl-shaped formula position"),
+        ("Cs1(g)", "digit in an element-symbol or subscript position"),
+        ("NiTe1(c)", "digit in an element-symbol or subscript position"),
+        ("Si1N4(c)", "digit in an element-symbol or subscript position"),
         ("$IF_8(g)$", "invalid iodine-fluoride stoichiometry"),
         ("$IR_6(g)$", "unknown chemical element token(s): R"),
         ("$Mg(OH_2(c)$", "unbalanced chemical-formula delimiters"),
@@ -367,6 +395,70 @@ def test_wrapped_formula_fragments_are_typed_and_reconstructed_from_the_image():
         correction = substance["corrections"][0]
         assert correction["record_id"] == substance_id
         assert correction["page"] and correction["pdf_page"] and correction["quote"]
+
+
+def test_line_wrap_detector_census_matches_image_adjudication():
+    blocks = [
+        json.loads(line)
+        for line in (COMPILATION_ROOT / "source/mineru-tables.jsonl").read_text().splitlines()
+    ]
+    detected = []
+    for block in blocks:
+        if block["table_number"] != 6:
+            continue
+        rows = _parse_html_table(block["html"])
+        detected.extend(
+            (block["printed_page"], tuple(rows[index][0] for index in group))
+            for group in b592_loader._table6_line_wrap_groups(rows)
+        )
+    assert len(detected) == 15
+    assert (102, ("$Ba_{2.50}Sr_{10-47}$", "$TiO_3(c)$")) in detected
+    assert (112, ("KMg2AlSi3-", "O10F2(c)")) in detected
+    assert (114, ("Na2SO4", "10H2O(c)")) in detected
+    kinds = {}
+    for record in _records():
+        kinds[record.get("record_kind", "substance")] = kinds.get(record.get("record_kind", "substance"), 0) + 1
+    assert kinds == {
+        "substance": 1391,
+        "section_continuation_header": 10,
+        "formula_continuation_prefix": 16,
+        "formula_continuation_suffix": 1,
+    }
+
+
+def test_additional_image_proven_wrapped_substances_are_reconstructed():
+    by_id = {record["record_id"]: record for record in _records()}
+    expected = {
+        "table-006-0089": "Ba0.543Sr0.457TiO3(c)",
+        "table-006-0648": "Li0.05Zn0.90Fe2.05O4(c,annealed)",
+        "table-006-0651": "Li0.05Zn0.90Fe2.05O4(c,quenched)",
+        "table-006-0683": "Mg3La2(NO3)12·24H2O(c)",
+        "table-006-0818": "NH4Al(SO4)2·12H2O(c)",
+        "table-006-0820": "(NH4)2O·3Al2O3·4SO3·6H2O(c)",
+        "table-006-0828": "NH4Cr(SO4)2·12H2O(c)",
+        "table-006-0902": "KAl(SO4)2·12H2O(c)",
+        "table-006-0904": "K2O·3Al2O3·5SO3·9H2O(c)",
+        "table-006-0906": "K2O·3Al2O3·4SO3·6H2O(c,natural)",
+        "table-006-0908": "K2O·3Al2O3·4SO3·6H2O(c,synthetic)",
+        "table-006-1061": "NaAlSi2O6·H2O(c)",
+        "table-006-1254": "UO2(NO3)2·6H2O(c)",
+    }
+    for record_id, formula in expected.items():
+        record = by_id[record_id]
+        assert record["formula"] == record["formula_as_published"] == formula
+        correction = record["corrections"][0]
+        assert correction["kind"] == "image_verified_wrapped_substance_reconstruction"
+        assert correction["ocr_token"] and correction["printed_token"] and correction["quote"]
+
+
+def test_structural_records_require_source_audit_opt_in_and_cannot_be_looked_up():
+    substances = _substances()
+    source_records = _records()
+    assert len(substances) == 1391
+    assert len(source_records) == 1418
+    assert all(record.get("record_kind", "substance") == "substance" for record in substances)
+    with pytest.raises(KeyError, match="structural source record"):
+        lookup_temperature("table-006-0036", 298.15, include_ocr_suspect=True)
 
 
 @pytest.mark.parametrize("temperature", [0, 9.99, 10.01, 298.14, 298.16, 300, float("nan"), float("inf")])
@@ -508,6 +600,10 @@ def test_every_manifest_summary_field_matches_an_independent_census():
         "numbered_table_count": len({record["table_number"] for record in records}),
         "physical_table_block_count": len(blocks),
         "record_count": len(records),
+        "substance_count": sum(
+            record.get("record_kind", "substance") == "substance"
+            for record in records
+        ),
         "transcribed_record_count": sum(record["transcription_status"].startswith("transcribed") for record in records),
         "untranscribed_record_count": len(manifest["untranscribed"]),
         "numeric_cell_count": len(row_cells),

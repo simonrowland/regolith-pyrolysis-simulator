@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0648",
   "table_number": 6,
-  "substance_as_published": "(annealed)*",
-  "formula_as_published": "(annealed)",
-  "formula": "(annealed)",
-  "name_as_published": "(annealed)",
-  "phase_as_published": null,
-  "state_as_published": null,
+  "substance_as_published": "Li0.05Zn0.90Fe2.05O4(c,annealed)*",
+  "formula_as_published": "Li0.05Zn0.90Fe2.05O4(c,annealed)",
+  "formula": "Li0.05Zn0.90Fe2.05O4(c,annealed)",
+  "name_as_published": "Li0.05Zn0.90Fe2.05O4(c,annealed)",
+  "phase_as_published": "(c,annealed)",
+  "state_as_published": "(c,annealed)",
   "footnote_markers": "*",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_wrapped_substance_reconstruction",
   "page": 109,
   "pdf_page": 113,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 41,
       "raw": [
-        "(annealed)*",
+        "Li0.05Zn0.90Fe2.05O4(c,annealed)*",
         "2.52",
         "1.88",
         "4.42",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "(annealed)*"
+          "raw": "Li0.05Zn0.90Fe2.05O4(c,annealed)*",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_wrapped_substance_reconstruction"
         },
         "cp_10_k": {
           "raw": "2.52",
@@ -351,7 +353,21 @@
       "note": "Detector only; phase changes and printed values retained unchanged."
     }
   ],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_wrapped_substance_reconstruction",
+      "pdf_page": 113,
+      "page": 109,
+      "source_row_index": 41,
+      "column": "substance",
+      "ocr_token": "(annealed)*",
+      "printed_token": "Li0.05Zn0.90Fe2.05O4(c,annealed)*",
+      "quote": "Li0.05Zn0.90Fe2.05O4(c,annealed)*",
+      "basis": "The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.",
+      "record_id": "table-006-0648"
+    }
+  ],
   "heading_context_as_published": "Lithium:",
+  "metadata_ocr_token": "(annealed)*",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

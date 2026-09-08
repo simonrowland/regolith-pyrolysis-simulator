@@ -29,6 +29,7 @@ census:
   numbered_table_count: 7
   physical_table_block_count: 25
   record_count: 1418
+  substance_count: 1391
   record_ids:
   - table-001-0001
   - table-001-0002
@@ -1552,6 +1553,7 @@ summary:
   numbered_table_count: 7
   physical_table_block_count: 25
   record_count: 1418
+  substance_count: 1391
   transcribed_record_count: 1418
   untranscribed_record_count: 0
   numeric_cell_count: 15127
@@ -1562,7 +1564,7 @@ summary:
   metadata_ocr_suspect_count: 1194
   ocr_suspect_count: 6977
   identity_check_disagreement_count: 8
-  correction_count: 54
+  correction_count: 104
 ocr_policy:
   primary: MinerU table HTML from five page-aligned chunks
   second_reading: Tesseract on every MinerU table crop; exact token sequence agreement required for a clean numeric cell
@@ -1811,6 +1813,26 @@ corrections:
   printed_token: 40.67±0.01
   quote: $Ba(g)$ ... 40.67±0.01
   basis: Original-resolution page image proves two printed substance rows were merged into one MinerU row.
+- record_id: table-006-0089
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 106
+  page: 102
+  source_row_index: 58
+  column: substance
+  ocr_token: $Ba_{2.50}Sr_{10-47}$
+  printed_token: Ba0.543Sr0.457TiO3(c)
+  quote: Ba0.543Sr0.457TiO3(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0090
+  kind: image_verified_formula_continuation_suffix_reclassification
+  pdf_page: 106
+  page: 102
+  source_row_index: 59
+  column: substance
+  ocr_token: $TiO_3(c)$
+  printed_token: TiO3(c)
+  quote: Ba0.543Sr0.457TiO3(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
 - record_id: table-006-0119
   kind: image_verified_section_continuation_header_reclassification
   pdf_page: 107
@@ -1841,6 +1863,186 @@ corrections:
   printed_token: Calcium—Con.
   quote: Calcium—Con.
   basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0213
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 12
+  column: substance
+  ocr_token: Ca2O4·H2O(c)
+  printed_token: CaC2O4·H2O(c)
+  quote: CaC2O4·H2O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0217
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 16
+  column: substance
+  ocr_token: CaP2O7(β)
+  printed_token: Ca2P2O7(β)
+  quote: Ca2P2O7(β)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0218
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 17
+  column: substance
+  ocr_token: CaP2O8(α)
+  printed_token: Ca3P2O8(α)
+  quote: Ca3P2O8(α)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0219
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 18
+  column: substance
+  ocr_token: CaP2O8(β)
+  printed_token: Ca3P2O8(β)
+  quote: Ca3P2O8(β)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0221
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 20
+  column: substance
+  ocr_token: Ca10(PO4)5P2(c)
+  printed_token: Ca10(PO4)6F2(c)
+  quote: Ca10(PO4)6F2(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0222
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 21
+  column: substance
+  ocr_token: Ca10(PO4)5(OH)2(c)
+  printed_token: Ca10(PO4)6(OH)2(c)
+  quote: Ca10(PO4)6(OH)2(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0225
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 24
+  column: substance
+  ocr_token: CaSiO4(β)
+  printed_token: Ca2SiO4(β)
+  quote: Ca2SiO4(β)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0226
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 25
+  column: substance
+  ocr_token: CaSiO4(γ)
+  printed_token: Ca2SiO4(γ)
+  quote: Ca2SiO4(γ)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0227
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 26
+  column: substance
+  ocr_token: CaSiO5(c)
+  printed_token: Ca3SiO5(c)
+  quote: Ca3SiO5(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0228
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 27
+  column: substance
+  ocr_token: CaSiO2(γ)
+  printed_token: Ca3Si2O7(c)
+  quote: Ca3Si2O7(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0229
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 28
+  column: substance
+  ocr_token: CaSiO4(insol.)
+  printed_token: CaSO4(insol.)
+  quote: CaSO4(insol.)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0230
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 29
+  column: substance
+  ocr_token: CaSiO4(sol.α)
+  printed_token: CaSO4(sol.α)
+  quote: CaSO4(sol.α)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0231
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 30
+  column: substance
+  ocr_token: CaSiO4(sol.β)
+  printed_token: CaSO4(sol.β)
+  quote: CaSO4(sol.β)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0232
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 31
+  column: substance
+  ocr_token: CaSiO4/12H2O(α)
+  printed_token: CaSO4·1/2H2O(α)
+  quote: CaSO4·1/2H2O(α)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0233
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 32
+  column: substance
+  ocr_token: CaSiO4/12H2O(β)
+  printed_token: CaSO4·1/2H2O(β)
+  quote: CaSO4·1/2H2O(β)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0234
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 33
+  column: substance
+  ocr_token: CaSiO4·2H2O(selenite)
+  printed_token: CaSO4·2H2O(selenite)
+  quote: CaSO4·2H2O(selenite)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0236
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 35
+  column: substance
+  ocr_token: CaSiO3(c)
+  printed_token: CaSO3(c)
+  quote: CaSO3(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0238
+  kind: image_verified_metadata_token_correction
+  pdf_page: 108
+  page: 104
+  source_row_index: 37
+  column: substance
+  ocr_token: CaTiO3(γ)(c)
+  printed_token: Ca3Ti2O7(c)
+  quote: Ca3Ti2O7(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0267
   kind: image_verified_token_correction
   pdf_page: 108
@@ -1870,6 +2072,26 @@ corrections:
   ocr_token: Cs1(g)
   printed_token: CsI(g)
   quote: CsI(g) ... 65.5±0.5
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0365
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 4
+  column: substance
+  ocr_token: Eu2(SO4)·8H2O(c)
+  printed_token: Eu2(SO4)3·8H2O(c)
+  quote: Eu2(SO4)3·8H2O(c)
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0375
+  kind: image_verified_metadata_token_correction
+  pdf_page: 110
+  page: 106
+  source_row_index: 17
+  column: substance
+  ocr_token: Gd2(SO4)·8H2O(c)*
+  printed_token: Gd2(SO4)3·8H2O(c)*
+  quote: Gd2(SO4)3·8H2O(c)*
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0380
   kind: image_verified_metadata_token_correction
@@ -2051,6 +2273,26 @@ corrections:
   printed_token: $IrF_6(g)$
   quote: IrF6(g) ... 84.5±3.0
   basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0562
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 39
+  column: substance
+  ocr_token: $Fe_9.94O(c)*$
+  printed_token: Fe.947O(c)*
+  quote: Fe.947O(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0569
+  kind: image_verified_metadata_token_correction
+  pdf_page: 112
+  page: 108
+  source_row_index: 46
+  column: substance
+  ocr_token: $Fe_2.7S(c)*$
+  printed_token: Fe.877S(c)*
+  quote: Fe.877S(c)*
+  basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-0610
   kind: image_verified_section_continuation_header_reclassification
   pdf_page: 113
@@ -2061,6 +2303,66 @@ corrections:
   printed_token: Lead—Con.
   quote: Lead—Con.
   basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0646
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 113
+  page: 109
+  source_row_index: 39
+  column: substance
+  ocr_token: $Li_0.05Zn_0.90$
+  printed_token: Li0.05Zn0.90
+  quote: Li0.05Zn0.90Fe2.05O4(c,annealed)*
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0647
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 113
+  page: 109
+  source_row_index: 40
+  column: substance
+  ocr_token: $Fe_2.05O_4(c)$
+  printed_token: Fe2.05O4(c)
+  quote: Li0.05Zn0.90Fe2.05O4(c,annealed)*
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0648
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 113
+  page: 109
+  source_row_index: 41
+  column: substance
+  ocr_token: (annealed)*
+  printed_token: Li0.05Zn0.90Fe2.05O4(c,annealed)*
+  quote: Li0.05Zn0.90Fe2.05O4(c,annealed)*
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0649
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 113
+  page: 109
+  source_row_index: 42
+  column: substance
+  ocr_token: $Li_0.05Zn_0.90$
+  printed_token: Li0.05Zn0.90
+  quote: Li0.05Zn0.90Fe2.05O4(c,quenched)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0650
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 113
+  page: 109
+  source_row_index: 43
+  column: substance
+  ocr_token: $Fe_2.05O_4(c)$
+  printed_token: Fe2.05O4(c)
+  quote: Li0.05Zn0.90Fe2.05O4(c,quenched)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0651
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 113
+  page: 109
+  source_row_index: 44
+  column: substance
+  ocr_token: (guenched)
+  printed_token: Li0.05Zn0.90Fe2.05O4(c,quenched)
+  quote: Li0.05Zn0.90Fe2.05O4(c,quenched)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
 - record_id: table-006-0678
   kind: image_verified_metadata_token_correction
   pdf_page: 113
@@ -2071,6 +2373,26 @@ corrections:
   printed_token: $Mg(OH)_2(c)$
   quote: Mg(OH)2(c) ... 15.09±0.05
   basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-0682
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 113
+  page: 109
+  source_row_index: 77
+  column: substance
+  ocr_token: $Mg_3La_2(NO_2)_12$
+  printed_token: Mg3La2(NO3)12·
+  quote: Mg3La2(NO3)12·24H2O(c)*
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0683
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 113
+  page: 109
+  source_row_index: 78
+  column: substance
+  ocr_token: $2H_2O(c)*$
+  printed_token: Mg3La2(NO3)12·24H2O(c)*
+  quote: Mg3La2(NO3)12·24H2O(c)*
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
 - record_id: table-006-0777
   kind: image_verified_metadata_token_correction
   pdf_page: 114
@@ -2091,6 +2413,66 @@ corrections:
   printed_token: Nickel—Con.
   quote: Nickel—Con.
   basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0817
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 115
+  page: 111
+  source_row_index: 43
+  column: substance
+  ocr_token: $NH_{4}Al(SO_{4})_{2}$
+  printed_token: NH4Al(SO4)2·
+  quote: NH4Al(SO4)2·12H2O(c)†
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0818
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 115
+  page: 111
+  source_row_index: 44
+  column: substance
+  ocr_token: $12H_{2}O(c) \uparrow$
+  printed_token: NH4Al(SO4)2·12H2O(c)†
+  quote: NH4Al(SO4)2·12H2O(c)†
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0819
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 115
+  page: 111
+  source_row_index: 45
+  column: substance
+  ocr_token: $(NH_{4})_{2}O-3Al_{2}O_{3}$
+  printed_token: (NH4)2O·3Al2O3·
+  quote: (NH4)2O·3Al2O3·4SO3·6H2O(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0820
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 115
+  page: 111
+  source_row_index: 46
+  column: substance
+  ocr_token: $4SO_{3} \cdot 6H_{2}O(c)$
+  printed_token: (NH4)2O·3Al2O3·4SO3·6H2O(c)
+  quote: (NH4)2O·3Al2O3·4SO3·6H2O(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0827
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 115
+  page: 111
+  source_row_index: 53
+  column: substance
+  ocr_token: $NH_{4}Cr(SO_{4})_{2}$
+  printed_token: NH4Cr(SO4)2·
+  quote: NH4Cr(SO4)2·12H2O(c)†
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0828
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 115
+  page: 111
+  source_row_index: 54
+  column: substance
+  ocr_token: $12H_{2}O(c) \uparrow$
+  printed_token: NH4Cr(SO4)2·12H2O(c)†
+  quote: NH4Cr(SO4)2·12H2O(c)†
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
 - record_id: table-006-0861
   kind: image_verified_section_continuation_header_reclassification
   pdf_page: 116
@@ -2101,6 +2483,86 @@ corrections:
   printed_token: Phosphorus—Con.
   quote: Phosphorus—Con.
   basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-0901
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 116
+  page: 112
+  source_row_index: 46
+  column: substance
+  ocr_token: KAl(SO4)2
+  printed_token: KAl(SO4)2·
+  quote: KAl(SO4)2·12H2O(c)†
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0902
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 116
+  page: 112
+  source_row_index: 47
+  column: substance
+  ocr_token: 12H3O(c)†
+  printed_token: KAl(SO4)2·12H2O(c)†
+  quote: KAl(SO4)2·12H2O(c)†
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0903
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 116
+  page: 112
+  source_row_index: 48
+  column: substance
+  ocr_token: K2O-3Al2O3
+  printed_token: K2O·3Al2O3·
+  quote: K2O·3Al2O3·5SO3·9H2O(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0904
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 116
+  page: 112
+  source_row_index: 49
+  column: substance
+  ocr_token: 5SO3-9H3O(c)
+  printed_token: K2O·3Al2O3·5SO3·9H2O(c)
+  quote: K2O·3Al2O3·5SO3·9H2O(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0905
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 116
+  page: 112
+  source_row_index: 50
+  column: substance
+  ocr_token: K2O-3Al2O3
+  printed_token: K2O·3Al2O3·
+  quote: K2O·3Al2O3·4SO3·6H2O(c,natural)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0906
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 116
+  page: 112
+  source_row_index: 51
+  column: substance
+  ocr_token: 4SO3-6H3O(c, natural)
+  printed_token: K2O·3Al2O3·4SO3·6H2O(c,natural)
+  quote: K2O·3Al2O3·4SO3·6H2O(c,natural)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0907
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 116
+  page: 112
+  source_row_index: 52
+  column: substance
+  ocr_token: K2O-3Al2O3
+  printed_token: K2O·3Al2O3·
+  quote: K2O·3Al2O3·4SO3·6H2O(c,synthetic)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-0908
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 116
+  page: 112
+  source_row_index: 53
+  column: substance
+  ocr_token: 4SO3-6H3O(c, synthetic)
+  printed_token: K2O·3Al2O3·4SO3·6H2O(c,synthetic)
+  quote: K2O·3Al2O3·4SO3·6H2O(c,synthetic)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
 - record_id: table-006-0931
   kind: image_verified_formula_continuation_prefix_reclassification
   pdf_page: 116
@@ -2109,18 +2571,18 @@ corrections:
   column: substance
   ocr_token: KMg2AlSi3-
   printed_token: KMg3AlSi3-
-  quote: KMg3AlSi3- / O10F2(c) ... 75.9±0.5
-  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+  quote: KMg3AlSi3-O10F2(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
 - record_id: table-006-0932
-  kind: image_verified_metadata_token_correction
+  kind: image_verified_wrapped_substance_reconstruction
   pdf_page: 116
   page: 112
   source_row_index: 77
   column: substance
   ocr_token: O10F2(c)
   printed_token: KMg3AlSi3-O10F2(c)
-  quote: KMg3AlSi3-O10F2(c) ... 75.9±0.5
-  basis: The 300-dpi PDF page render proves the printed substance token.
+  quote: KMg3AlSi3-O10F2(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
 - record_id: table-006-1014
   kind: image_verified_metadata_token_correction
   pdf_page: 117
@@ -2141,6 +2603,26 @@ corrections:
   printed_token: Silicon—Con.
   quote: Silicon—Con.
   basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+- record_id: table-006-1060
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 118
+  page: 114
+  source_row_index: 44
+  column: substance
+  ocr_token: NaAlSi2O6
+  printed_token: NaAlSi2O6·
+  quote: NaAlSi2O6·H2O(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-1061
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 118
+  page: 114
+  source_row_index: 45
+  column: substance
+  ocr_token: H2O(c)
+  printed_token: NaAlSi2O6·H2O(c)
+  quote: NaAlSi2O6·H2O(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
 - record_id: table-006-1094
   kind: image_verified_formula_continuation_prefix_reclassification
   pdf_page: 118
@@ -2149,18 +2631,18 @@ corrections:
   column: substance
   ocr_token: Na2SO4
   printed_token: Na2SO4·
-  quote: Na2SO4· / 10H2O(c) ... 140.0±0.2
-  basis: The 300-dpi PDF page render proves this source row is structural metadata, not an independent substance formula.
+  quote: Na2SO4·10H2O(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
 - record_id: table-006-1095
-  kind: image_verified_metadata_token_correction
+  kind: image_verified_wrapped_substance_reconstruction
   pdf_page: 118
   page: 114
   source_row_index: 79
   column: substance
   ocr_token: 10H2O(c)
   printed_token: Na2SO4·10H2O(c)
-  quote: Na2SO4·10H2O(c) ... 140.0±0.2
-  basis: The 300-dpi PDF page render proves the printed substance token.
+  quote: Na2SO4·10H2O(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
 - record_id: table-006-1106
   kind: image_verified_section_continuation_header_reclassification
   pdf_page: 119
@@ -2211,6 +2693,26 @@ corrections:
   printed_token: $U_3O_8(c)$
   quote: U3O8(c) ... 67.5±0.2
   basis: The 300-dpi PDF page render proves the printed substance token.
+- record_id: table-006-1253
+  kind: image_verified_formula_continuation_prefix_reclassification
+  pdf_page: 120
+  page: 116
+  source_row_index: 72
+  column: substance
+  ocr_token: $UO_2(NO_3)_2$
+  printed_token: UO2(NO3)2·
+  quote: UO2(NO3)2·6H2O(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
+- record_id: table-006-1254
+  kind: image_verified_wrapped_substance_reconstruction
+  pdf_page: 120
+  page: 116
+  source_row_index: 73
+  column: substance
+  ocr_token: $6H_2O(c)$
+  printed_token: UO2(NO3)2·6H2O(c)
+  quote: UO2(NO3)2·6H2O(c)
+  basis: The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.
 - record_id: table-006-1269
   kind: image_verified_metadata_token_correction
   pdf_page: 121
@@ -2231,7 +2733,7 @@ feedstock_element_coverage:
   Ba: 22
   Bi: 13
   Br: 94
-  C: 105
+  C: 106
   Ca: 59
   Cd: 28
   Ce: 6
@@ -2243,12 +2745,12 @@ feedstock_element_coverage:
   Dy: 1
   Er: 1
   Eu: 2
-  F: 121
+  F: 122
   Fe: 52
   Ga: 13
   Gd: 4
   Ge: 19
-  H: 302
+  H: 299
   Hf: 13
   Ho: 1
   I: 85
@@ -2266,18 +2768,18 @@ feedstock_element_coverage:
   Nb: 7
   Nd: 3
   Ni: 20
-  O: 537
+  O: 527
   Os: 5
   P: 47
   Pb: 36
   Pr: 1
   Pt: 6
   Rb: 19
-  S: 158
+  S: 165
   Sb: 20
   Sc: 3
   Se: 27
-  Si: 74
+  Si: 67
   Sm: 3
   Sn: 25
   Sr: 22
@@ -4669,11 +5171,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0089
-  formula: $Ba_{2.50}Sr_{10-47}$
-  formula_as_published: $Ba_{2.50}Sr_{10-47}$
-  phase: null
-  name_as_published: Ba_2.50Sr_10-47
+  formula: Ba0.543Sr0.457TiO3(c)
+  formula_as_published: Ba0.543Sr0.457TiO3(c)
+  phase: (c)
+  name_as_published: Ba0.543Sr0.457TiO3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Ba_{2.50}Sr_{10-47}$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -4689,11 +5192,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0090
-  formula: $TiO_3(c)$
-  formula_as_published: $TiO_3(c)$
-  phase: (c)
-  name_as_published: TiO_3(c)
+  formula: null
+  formula_as_published: null
+  phase: null
+  name_as_published: TiO3(c)
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_suffix
+  metadata_ocr_token: $TiO_3(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7175,11 +7680,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0213
-  formula: Ca2O4·H2O(c)
-  formula_as_published: Ca2O4·H2O(c)
+  formula: CaC2O4·H2O(c)
+  formula_as_published: CaC2O4·H2O(c)
   phase: (c)
-  name_as_published: Ca2O4·H2O(c)
+  name_as_published: CaC2O4·H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Ca2O4·H2O(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7255,11 +7761,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0217
-  formula: CaP2O7(β)
-  formula_as_published: CaP2O7(β)
+  formula: Ca2P2O7(β)
+  formula_as_published: Ca2P2O7(β)
   phase: null
-  name_as_published: CaP2O7(β)
+  name_as_published: Ca2P2O7(β)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaP2O7(β)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7275,11 +7782,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0218
-  formula: CaP2O8(α)
-  formula_as_published: CaP2O8(α)
+  formula: Ca3P2O8(α)
+  formula_as_published: Ca3P2O8(α)
   phase: null
-  name_as_published: CaP2O8(α)
+  name_as_published: Ca3P2O8(α)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaP2O8(α)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7295,11 +7803,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0219
-  formula: CaP2O8(β)
-  formula_as_published: CaP2O8(β)
+  formula: Ca3P2O8(β)
+  formula_as_published: Ca3P2O8(β)
   phase: null
-  name_as_published: CaP2O8(β)
+  name_as_published: Ca3P2O8(β)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaP2O8(β)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7335,11 +7844,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0221
-  formula: Ca10(PO4)5P2(c)
-  formula_as_published: Ca10(PO4)5P2(c)
+  formula: Ca10(PO4)6F2(c)
+  formula_as_published: Ca10(PO4)6F2(c)
   phase: (c)
-  name_as_published: Ca10(PO4)5P2(c)
+  name_as_published: Ca10(PO4)6F2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Ca10(PO4)5P2(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7355,11 +7865,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0222
-  formula: Ca10(PO4)5(OH)2(c)
-  formula_as_published: Ca10(PO4)5(OH)2(c)
+  formula: Ca10(PO4)6(OH)2(c)
+  formula_as_published: Ca10(PO4)6(OH)2(c)
   phase: (c)
-  name_as_published: Ca10(PO4)5(OH)2(c)
+  name_as_published: Ca10(PO4)6(OH)2(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Ca10(PO4)5(OH)2(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7415,11 +7926,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0225
-  formula: CaSiO4(β)
-  formula_as_published: CaSiO4(β)
+  formula: Ca2SiO4(β)
+  formula_as_published: Ca2SiO4(β)
   phase: null
-  name_as_published: CaSiO4(β)
+  name_as_published: Ca2SiO4(β)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaSiO4(β)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7435,11 +7947,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0226
-  formula: CaSiO4(γ)
-  formula_as_published: CaSiO4(γ)
+  formula: Ca2SiO4(γ)
+  formula_as_published: Ca2SiO4(γ)
   phase: null
-  name_as_published: CaSiO4(γ)
+  name_as_published: Ca2SiO4(γ)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaSiO4(γ)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7455,11 +7968,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0227
-  formula: CaSiO5(c)
-  formula_as_published: CaSiO5(c)
+  formula: Ca3SiO5(c)
+  formula_as_published: Ca3SiO5(c)
   phase: (c)
-  name_as_published: CaSiO5(c)
+  name_as_published: Ca3SiO5(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaSiO5(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7475,11 +7989,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0228
-  formula: CaSiO2(γ)
-  formula_as_published: CaSiO2(γ)
-  phase: null
-  name_as_published: CaSiO2(γ)
+  formula: Ca3Si2O7(c)
+  formula_as_published: Ca3Si2O7(c)
+  phase: (c)
+  name_as_published: Ca3Si2O7(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaSiO2(γ)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7495,11 +8010,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0229
-  formula: CaSiO4(insol.)
-  formula_as_published: CaSiO4(insol.)
+  formula: CaSO4(insol.)
+  formula_as_published: CaSO4(insol.)
   phase: null
-  name_as_published: CaSiO4(insol.)
+  name_as_published: CaSO4(insol.)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaSiO4(insol.)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7515,11 +8031,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0230
-  formula: CaSiO4(sol.α)
-  formula_as_published: CaSiO4(sol.α)
+  formula: CaSO4(sol.α)
+  formula_as_published: CaSO4(sol.α)
   phase: null
-  name_as_published: CaSiO4(sol.α)
+  name_as_published: CaSO4(sol.α)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaSiO4(sol.α)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7535,11 +8052,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0231
-  formula: CaSiO4(sol.β)
-  formula_as_published: CaSiO4(sol.β)
+  formula: CaSO4(sol.β)
+  formula_as_published: CaSO4(sol.β)
   phase: null
-  name_as_published: CaSiO4(sol.β)
+  name_as_published: CaSO4(sol.β)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaSiO4(sol.β)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7555,11 +8073,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0232
-  formula: CaSiO4/12H2O(α)
-  formula_as_published: CaSiO4/12H2O(α)
+  formula: CaSO4·1/2H2O(α)
+  formula_as_published: CaSO4·1/2H2O(α)
   phase: null
-  name_as_published: CaSiO4/12H2O(α)
+  name_as_published: CaSO4·1/2H2O(α)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaSiO4/12H2O(α)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7575,11 +8094,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0233
-  formula: CaSiO4/12H2O(β)
-  formula_as_published: CaSiO4/12H2O(β)
+  formula: CaSO4·1/2H2O(β)
+  formula_as_published: CaSO4·1/2H2O(β)
   phase: null
-  name_as_published: CaSiO4/12H2O(β)
+  name_as_published: CaSO4·1/2H2O(β)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaSiO4/12H2O(β)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7595,11 +8115,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0234
-  formula: CaSiO4·2H2O(selenite)
-  formula_as_published: CaSiO4·2H2O(selenite)
+  formula: CaSO4·2H2O(selenite)
+  formula_as_published: CaSO4·2H2O(selenite)
   phase: null
-  name_as_published: CaSiO4·2H2O(selenite)
+  name_as_published: CaSO4·2H2O(selenite)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaSiO4·2H2O(selenite)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7635,11 +8156,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0236
-  formula: CaSiO3(c)
-  formula_as_published: CaSiO3(c)
+  formula: CaSO3(c)
+  formula_as_published: CaSO3(c)
   phase: (c)
-  name_as_published: CaSiO3(c)
+  name_as_published: CaSO3(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaSiO3(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -7675,11 +8197,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0238
-  formula: CaTiO3(γ)(c)
-  formula_as_published: CaTiO3(γ)(c)
+  formula: Ca3Ti2O7(c)
+  formula_as_published: Ca3Ti2O7(c)
   phase: (c)
-  name_as_published: CaTiO3(γ)(c)
+  name_as_published: Ca3Ti2O7(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: CaTiO3(γ)(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -10384,11 +10907,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0365
-  formula: Eu2(SO4)·8H2O(c)
-  formula_as_published: Eu2(SO4)·8H2O(c)
+  formula: Eu2(SO4)3·8H2O(c)
+  formula_as_published: Eu2(SO4)3·8H2O(c)
   phase: (c)
-  name_as_published: Eu2(SO4)·8H2O(c)
+  name_as_published: Eu2(SO4)3·8H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Eu2(SO4)·8H2O(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -10584,11 +11108,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0375
-  formula: Gd2(SO4)·8H2O(c)
-  formula_as_published: Gd2(SO4)·8H2O(c)
+  formula: Gd2(SO4)3·8H2O(c)
+  formula_as_published: Gd2(SO4)3·8H2O(c)
   phase: (c)
-  name_as_published: Gd2(SO4)·8H2O(c)
+  name_as_published: Gd2(SO4)3·8H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: Gd2(SO4)·8H2O(c)*
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -14454,11 +14979,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0562
-  formula: Fe_9.94O(c)
-  formula_as_published: Fe_9.94O(c)
+  formula: Fe.947O(c)
+  formula_as_published: Fe.947O(c)
   phase: (c)
-  name_as_published: Fe_9.94O(c)
+  name_as_published: Fe.947O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Fe_9.94O(c)*$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -14594,11 +15120,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0569
-  formula: Fe_2.7S(c)
-  formula_as_published: Fe_2.7S(c)
+  formula: Fe.877S(c)
+  formula_as_published: Fe.877S(c)
   phase: (c)
-  name_as_published: Fe_2.7S(c)
+  name_as_published: Fe.877S(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $Fe_2.7S(c)*$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16147,11 +16674,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0646
-  formula: $Li_0.05Zn_0.90$
-  formula_as_published: $Li_0.05Zn_0.90$
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Li_0.05Zn_0.90
+  name_as_published: Li0.05Zn0.90
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: $Li_0.05Zn_0.90$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16167,11 +16696,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0647
-  formula: $Fe_2.05O_4(c)$
-  formula_as_published: $Fe_2.05O_4(c)$
-  phase: (c)
-  name_as_published: Fe_2.05O_4(c)
+  formula: null
+  formula_as_published: null
+  phase: null
+  name_as_published: Fe2.05O4(c)
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: $Fe_2.05O_4(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16187,11 +16718,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0648
-  formula: (annealed)
-  formula_as_published: (annealed)
-  phase: null
-  name_as_published: (annealed)
+  formula: Li0.05Zn0.90Fe2.05O4(c,annealed)
+  formula_as_published: Li0.05Zn0.90Fe2.05O4(c,annealed)
+  phase: (c,annealed)
+  name_as_published: Li0.05Zn0.90Fe2.05O4(c,annealed)
   metadata_ocr_suspect: true
+  metadata_ocr_token: (annealed)*
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16218,11 +16750,13 @@ entries:
     note: Detector only; phase changes and printed values retained unchanged.
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0649
-  formula: $Li_0.05Zn_0.90$
-  formula_as_published: $Li_0.05Zn_0.90$
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Li_0.05Zn_0.90
+  name_as_published: Li0.05Zn0.90
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: $Li_0.05Zn_0.90$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16238,11 +16772,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0650
-  formula: $Fe_2.05O_4(c)$
-  formula_as_published: $Fe_2.05O_4(c)$
-  phase: (c)
-  name_as_published: Fe_2.05O_4(c)
+  formula: null
+  formula_as_published: null
+  phase: null
+  name_as_published: Fe2.05O4(c)
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: $Fe_2.05O_4(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16258,11 +16794,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0651
-  formula: (guenched)
-  formula_as_published: (guenched)
-  phase: null
-  name_as_published: (guenched)
+  formula: Li0.05Zn0.90Fe2.05O4(c,quenched)
+  formula_as_published: Li0.05Zn0.90Fe2.05O4(c,quenched)
+  phase: (c,quenched)
+  name_as_published: Li0.05Zn0.90Fe2.05O4(c,quenched)
   metadata_ocr_suspect: true
+  metadata_ocr_token: (guenched)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16879,11 +17416,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0682
-  formula: $Mg_3La_2(NO_2)_12$
-  formula_as_published: $Mg_3La_2(NO_2)_12$
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: Mg_3La_2(NO_2)_12
+  name_as_published: Mg3La2(NO3)12·
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: $Mg_3La_2(NO_2)_12$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16899,11 +17438,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0683
-  formula: 2H_2O(c)
-  formula_as_published: 2H_2O(c)
+  formula: Mg3La2(NO3)12·24H2O(c)
+  formula_as_published: Mg3La2(NO3)12·24H2O(c)
   phase: (c)
-  name_as_published: 2H_2O(c)
+  name_as_published: Mg3La2(NO3)12·24H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $2H_2O(c)*$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19699,11 +20239,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0817
-  formula: $NH_{4}Al(SO_{4})_{2}$
-  formula_as_published: $NH_{4}Al(SO_{4})_{2}$
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: NH_4Al(SO_4)_2
+  name_as_published: NH4Al(SO4)2·
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: $NH_{4}Al(SO_{4})_{2}$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19719,11 +20261,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0818
-  formula: $12H_{2}O(c)\uparrow$
-  formula_as_published: $12H_{2}O(c) \uparrow$
+  formula: NH4Al(SO4)2·12H2O(c)
+  formula_as_published: NH4Al(SO4)2·12H2O(c)
   phase: (c)
-  name_as_published: 12H_2O(c)
+  name_as_published: NH4Al(SO4)2·12H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $12H_{2}O(c) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19739,11 +20282,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0819
-  formula: $(NH_{4})_{2}O-3Al_{2}O_{3}$
-  formula_as_published: $(NH_{4})_{2}O-3Al_{2}O_{3}$
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: (NH_4)_2O-3Al_2O_3
+  name_as_published: (NH4)2O·3Al2O3·
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: $(NH_{4})_{2}O-3Al_{2}O_{3}$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19759,11 +20304,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0820
-  formula: $4SO_{3}\cdot6H_{2}O(c)$
-  formula_as_published: $4SO_{3} \cdot 6H_{2}O(c)$
+  formula: (NH4)2O·3Al2O3·4SO3·6H2O(c)
+  formula_as_published: (NH4)2O·3Al2O3·4SO3·6H2O(c)
   phase: (c)
-  name_as_published: 4SO_3 6H_2O(c)
+  name_as_published: (NH4)2O·3Al2O3·4SO3·6H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $4SO_{3} \cdot 6H_{2}O(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19899,11 +20445,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0827
-  formula: $NH_{4}Cr(SO_{4})_{2}$
-  formula_as_published: $NH_{4}Cr(SO_{4})_{2}$
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: NH_4Cr(SO_4)_2
+  name_as_published: NH4Cr(SO4)2·
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: $NH_{4}Cr(SO_{4})_{2}$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -19919,11 +20467,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0828
-  formula: $12H_{2}O(c)\uparrow$
-  formula_as_published: $12H_{2}O(c) \uparrow$
+  formula: NH4Cr(SO4)2·12H2O(c)
+  formula_as_published: NH4Cr(SO4)2·12H2O(c)
   phase: (c)
-  name_as_published: 12H_2O(c)
+  name_as_published: NH4Cr(SO4)2·12H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $12H_{2}O(c) \uparrow$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21421,11 +21970,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0901
-  formula: KAl(SO4)2
-  formula_as_published: KAl(SO4)2
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: KAl(SO4)2
+  name_as_published: KAl(SO4)2·
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: KAl(SO4)2
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21441,11 +21992,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0902
-  formula: 12H3O(c)
-  formula_as_published: 12H3O(c)
+  formula: KAl(SO4)2·12H2O(c)
+  formula_as_published: KAl(SO4)2·12H2O(c)
   phase: (c)
-  name_as_published: 12H3O(c)
+  name_as_published: KAl(SO4)2·12H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: 12H3O(c)†
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21461,11 +22013,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0903
-  formula: K2O-3Al2O3
-  formula_as_published: K2O-3Al2O3
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: K2O-3Al2O3
+  name_as_published: K2O·3Al2O3·
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: K2O-3Al2O3
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21481,11 +22035,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0904
-  formula: 5SO3-9H3O(c)
-  formula_as_published: 5SO3-9H3O(c)
+  formula: K2O·3Al2O3·5SO3·9H2O(c)
+  formula_as_published: K2O·3Al2O3·5SO3·9H2O(c)
   phase: (c)
-  name_as_published: 5SO3-9H3O(c)
+  name_as_published: K2O·3Al2O3·5SO3·9H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: 5SO3-9H3O(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21501,11 +22056,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0905
-  formula: K2O-3Al2O3
-  formula_as_published: K2O-3Al2O3
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: K2O-3Al2O3
+  name_as_published: K2O·3Al2O3·
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: K2O-3Al2O3
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21521,11 +22078,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0906
-  formula: 4SO3-6H3O(c,natural)
-  formula_as_published: 4SO3-6H3O(c, natural)
-  phase: (c, natural)
-  name_as_published: 4SO3-6H3O(c, natural)
+  formula: K2O·3Al2O3·4SO3·6H2O(c,natural)
+  formula_as_published: K2O·3Al2O3·4SO3·6H2O(c,natural)
+  phase: (c,natural)
+  name_as_published: K2O·3Al2O3·4SO3·6H2O(c,natural)
   metadata_ocr_suspect: true
+  metadata_ocr_token: 4SO3-6H3O(c, natural)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21541,11 +22099,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0907
-  formula: K2O-3Al2O3
-  formula_as_published: K2O-3Al2O3
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: K2O-3Al2O3
+  name_as_published: K2O·3Al2O3·
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: K2O-3Al2O3
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -21561,11 +22121,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-0908
-  formula: 4SO3-6H3O(c,synthetic)
-  formula_as_published: 4SO3-6H3O(c, synthetic)
-  phase: (c, synthetic)
-  name_as_published: 4SO3-6H3O(c, synthetic)
+  formula: K2O·3Al2O3·4SO3·6H2O(c,synthetic)
+  formula_as_published: K2O·3Al2O3·4SO3·6H2O(c,synthetic)
+  phase: (c,synthetic)
+  name_as_published: K2O·3Al2O3·4SO3·6H2O(c,synthetic)
   metadata_ocr_suspect: true
+  metadata_ocr_token: 4SO3-6H3O(c, synthetic)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -24618,11 +25179,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1060
-  formula: NaAlSi2O6
-  formula_as_published: NaAlSi2O6
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: NaAlSi2O6
+  name_as_published: NaAlSi2O6·
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: NaAlSi2O6
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -24638,11 +25201,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1061
-  formula: H2O(c)
-  formula_as_published: H2O(c)
+  formula: NaAlSi2O6·H2O(c)
+  formula_as_published: NaAlSi2O6·H2O(c)
   phase: (c)
-  name_as_published: H2O(c)
+  name_as_published: NaAlSi2O6·H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: H2O(c)
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -28567,11 +29131,13 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1253
-  formula: $UO_2(NO_3)_2$
-  formula_as_published: $UO_2(NO_3)_2$
+  formula: null
+  formula_as_published: null
   phase: null
-  name_as_published: UO_2(NO_3)_2
+  name_as_published: UO2(NO3)2·
   metadata_ocr_suspect: true
+  record_kind: formula_continuation_prefix
+  metadata_ocr_token: $UO_2(NO_3)_2$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -28587,11 +29153,12 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1254
-  formula: $6H_2O(c)$
-  formula_as_published: $6H_2O(c)$
+  formula: UO2(NO3)2·6H2O(c)
+  formula_as_published: UO2(NO3)2·6H2O(c)
   phase: (c)
-  name_as_published: 6H_2O(c)
+  name_as_published: UO2(NO3)2·6H2O(c)
   metadata_ocr_suspect: true
+  metadata_ocr_token: $6H_2O(c)$
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl

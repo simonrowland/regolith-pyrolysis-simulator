@@ -16,7 +16,11 @@ from simulator.reference_data.nasa_glenn import ELEMENT_SYMBOLS
 COMPILATION_ROOT = Path(__file__).resolve().parents[2] / "data/literature/compilations/kelley-king-1961-usbm-b592"
 
 _STRUCTURAL_RECORD_KINDS = frozenset(
-    {"section_continuation_header", "formula_continuation_prefix"}
+    {
+        "section_continuation_header",
+        "formula_continuation_prefix",
+        "formula_continuation_suffix",
+    }
 )
 _B592_ELEMENT_TOKENS = ELEMENT_SYMBOLS | {"A", "D"}
 _FORMULA_IDENTITY_FIELDS = ("formula", "formula_as_published", "name_as_published")
@@ -24,6 +28,8 @@ _ORPHAN_FORMULA_FRAGMENTS = frozenset({"O10F2(c)", "10H2O(c)"})
 _CONTINUATION_HEADER = re.compile(r"(?:[-\u2013\u2014]\s*)?(?:Con\.|Continued)$", re.IGNORECASE)
 _CL_AS_I_CONFUSABLE = re.compile(r"CI(?=\d|[A-Z(])")
 _IODINE_FLUORIDE = re.compile(r"(?<![A-Za-z])IF(\d+)")
+_DIGIT_CONFUSABLE = re.compile(r"(?<![\d./])1(?=[A-Za-z,(]|$)")
+_IMAGE_VERIFIED_DIGIT_EXCEPTION = "HNO2(equ1,g)"
 
 
 class PrintedTemperatureUnavailable(LookupError):
@@ -62,6 +68,54 @@ def _plain_formula(token: str) -> str:
     return re.sub(r"[_\s]", "", value)
 
 
+def _table6_line_wrap_groups(raw_rows: list[list[str]]) -> list[tuple[int, ...]]:
+    groups = []
+    index = 2
+    while index < len(raw_rows):
+        row = raw_rows[index]
+        plain = _plain_formula(row[0])
+        has_values = any(value.strip() for value in row[1:])
+        has_phase = bool(re.search(r"\((?:c|l|g|aq|gl)(?:,[^)]*)?\)$", plain, re.IGNORECASE))
+        if (
+            row[0].strip().endswith(":")
+            or _CONTINUATION_HEADER.search(plain)
+            or re.fullmatch(r"[A-Z][a-z]+[†‡*]*", plain)
+        ):
+            index += 1
+            continue
+        if not has_values and plain and not has_phase:
+            end = index
+            while end < len(raw_rows) and not any(value.strip() for value in raw_rows[end][1:]):
+                end += 1
+            if end < len(raw_rows):
+                groups.append(tuple(range(index, end + 1)))
+                index = end + 1
+                continue
+        next_has_phase = (
+            index + 1 < len(raw_rows)
+            and bool(
+                re.search(
+                    r"\((?:c|l|g|aq|gl)(?:,[^)]*)?\)$",
+                    _plain_formula(raw_rows[index + 1][0]),
+                    re.IGNORECASE,
+                )
+            )
+        )
+        if (
+            has_values
+            and plain
+            and not has_phase
+            and index + 1 < len(raw_rows)
+            and not any(value.strip() for value in raw_rows[index + 1][1:])
+            and next_has_phase
+        ):
+            groups.append((index, index + 1))
+            index += 2
+            continue
+        index += 1
+    return groups
+
+
 def _formula_token_issues(token: str) -> tuple[str, ...]:
     plain = _plain_formula(token)
     issues = []
@@ -91,6 +145,8 @@ def _formula_token_issues(token: str) -> tuple[str, ...]:
         issues.append(f"unknown chemical element token(s): {', '.join(invalid_symbols)}")
     if _CL_AS_I_CONFUSABLE.search(plain):
         issues.append("uppercase I in a Cl-shaped formula position")
+    if _DIGIT_CONFUSABLE.search(plain) and plain != _IMAGE_VERIFIED_DIGIT_EXCEPTION:
+        issues.append("digit in an element-symbol or subscript position")
     iodine_fluoride = _IODINE_FLUORIDE.search(plain)
     if iodine_fluoride and int(iodine_fluoride.group(1)) not in {3, 5, 7}:
         issues.append("invalid iodine-fluoride stoichiometry")
@@ -199,9 +255,16 @@ def _raise_for_ocr_suspect(record: dict[str, Any], value: Any) -> None:
         raise OCRSuspectRow(record_id=record["record_id"], printed_page=record["page"], suspect_cells=suspects)
 
 
-def load_records(root: Path = COMPILATION_ROOT, *, include_ocr_suspect: bool = False):
-    """Yield records; suspect material requires an explicit flag and retains flags."""
+def load_records(
+    root: Path = COMPILATION_ROOT,
+    *,
+    include_ocr_suspect: bool = False,
+    include_structural: bool = False,
+):
+    """Yield substances by default; source-structural rows require explicit opt-in."""
     for entry in load_manifest(root, include_ocr_suspect=include_ocr_suspect)["entries"]:
+        if entry.get("record_kind", "substance") in _STRUCTURAL_RECORD_KINDS and not include_structural:
+            continue
         record = json.loads((root / entry["path"]).read_text(encoding="utf-8"))
         if record["record_id"] != entry["record_id"]:
             raise ValueError(f"record identity differs from manifest: {entry['path']}")
@@ -240,6 +303,8 @@ def lookup_temperature(
     )
     if entry is None:
         raise KeyError(record_id)
+    if entry.get("record_kind", "substance") in _STRUCTURAL_RECORD_KINDS:
+        raise KeyError(f"{record_id} is a structural source record, not a substance")
     record = json.loads((root / entry["path"]).read_text(encoding="utf-8"))
     grid_cell = next(
         (cell for cell in record["temperature_grid"] if cell.get("value") == temperature),

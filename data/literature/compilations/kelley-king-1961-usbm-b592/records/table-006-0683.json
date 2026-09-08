@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0683",
   "table_number": 6,
-  "substance_as_published": "$2H_2O(c)*$",
-  "formula_as_published": "2H_2O(c)",
-  "formula": "2H_2O(c)",
-  "name_as_published": "2H_2O(c)",
+  "substance_as_published": "Mg3La2(NO3)12·24H2O(c)*",
+  "formula_as_published": "Mg3La2(NO3)12·24H2O(c)",
+  "formula": "Mg3La2(NO3)12·24H2O(c)",
+  "name_as_published": "Mg3La2(NO3)12·24H2O(c)",
   "phase_as_published": "(c)",
   "state_as_published": "(c)",
   "footnote_markers": "*",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_wrapped_substance_reconstruction",
   "page": 109,
   "pdf_page": 113,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 78,
       "raw": [
-        "$2H_2O(c)*$",
+        "Mg3La2(NO3)12·24H2O(c)*",
         "(2.31)",
         "27.36",
         "97.32",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$2H_2O(c)*$"
+          "raw": "Mg3La2(NO3)12·24H2O(c)*",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_wrapped_substance_reconstruction"
         },
         "cp_10_k": {
           "raw": "(2.31)",
@@ -334,7 +336,21 @@
     "sha256": "888060f17452fc6a7611dbde684e78910d4135e01fa94c9defdbdf7e2137f46f"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_wrapped_substance_reconstruction",
+      "pdf_page": 113,
+      "page": 109,
+      "source_row_index": 78,
+      "column": "substance",
+      "ocr_token": "$2H_2O(c)*$",
+      "printed_token": "Mg3La2(NO3)12·24H2O(c)*",
+      "quote": "Mg3La2(NO3)12·24H2O(c)*",
+      "basis": "The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.",
+      "record_id": "table-006-0683"
+    }
+  ],
   "heading_context_as_published": "Magnesium:",
+  "metadata_ocr_token": "$2H_2O(c)*$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

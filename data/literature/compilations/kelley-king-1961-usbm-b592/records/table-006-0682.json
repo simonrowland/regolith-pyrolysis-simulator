@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-0682",
   "table_number": 6,
-  "substance_as_published": "$Mg_3La_2(NO_2)_12$",
-  "formula_as_published": "$Mg_3La_2(NO_2)_12$",
-  "formula": "$Mg_3La_2(NO_2)_12$",
-  "name_as_published": "Mg_3La_2(NO_2)_12",
+  "substance_as_published": "Mg3La2(NO3)12·",
+  "formula_as_published": null,
+  "formula": null,
+  "name_as_published": "Mg3La2(NO3)12·",
   "phase_as_published": null,
   "state_as_published": null,
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_formula_continuation_prefix_reclassification",
   "page": 109,
   "pdf_page": 113,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 77,
       "raw": [
-        "$Mg_3La_2(NO_2)_12$",
+        "Mg3La2(NO3)12·",
         "",
         "",
         "",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$Mg_3La_2(NO_2)_12$"
+          "raw": "Mg3La2(NO3)12·",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_formula_continuation_prefix_reclassification"
         },
         "cp_10_k": {
           "raw": "",
@@ -294,7 +296,22 @@
     "sha256": "888060f17452fc6a7611dbde684e78910d4135e01fa94c9defdbdf7e2137f46f"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_formula_continuation_prefix_reclassification",
+      "pdf_page": 113,
+      "page": 109,
+      "source_row_index": 77,
+      "column": "substance",
+      "ocr_token": "$Mg_3La_2(NO_2)_12$",
+      "printed_token": "Mg3La2(NO3)12·",
+      "quote": "Mg3La2(NO3)12·24H2O(c)*",
+      "basis": "The 300-dpi PDF page render proves these adjacent source rows are one wrapped substance formula.",
+      "record_id": "table-006-0682"
+    }
+  ],
   "heading_context_as_published": "Magnesium:",
+  "record_kind": "formula_continuation_prefix",
+  "metadata_ocr_token": "$Mg_3La_2(NO_2)_12$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }
