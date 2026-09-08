@@ -1,0 +1,100 @@
+{
+  "record_id": "table-004-0001",
+  "table_number": 4,
+  "substance_as_published": "$\\text{HCl}(g)$",
+  "formula_as_published": "$\\text{HCl}(g)$",
+  "formula": "$\\text{HCl}(g)$",
+  "name_as_published": "HCl(g)",
+  "phase_as_published": "(g)",
+  "state_as_published": "(g)",
+  "footnote_markers": "",
+  "metadata_ocr_suspect": false,
+  "metadata_ocr_check": "raster_ocr_text_agreement",
+  "page": 10,
+  "pdf_page": 14,
+  "caption_raw": "TABLE 4.—Entropies at 298.15°K.",
+  "post_table_notes_verbatim": "",
+  "column_labels_as_published": [
+    "Substance",
+    "$S_{298.15}^{*}$ (spectroscopic)",
+    "$S_{298.15}^{*}$ (third law)"
+  ],
+  "units_as_published": {
+    "substance": null,
+    "entropy_spectroscopic": null,
+    "entropy_third_law": null
+  },
+  "temperature_grid": [
+    {
+      "raw": "298.15",
+      "value": 298.15,
+      "parsed_values": [
+        298.15
+      ],
+      "numeric_tokens": [
+        "298.15"
+      ],
+      "ocr_suspect": true,
+      "ocr_check": "raster_ocr_caption_disagreement",
+      "column": "temperature"
+    }
+  ],
+  "rows": [
+    {
+      "source_row_index": 1,
+      "raw": [
+        "$\\text{HCl}(g)$",
+        "$44.64 \\pm 0.05$",
+        "$44.49 \\pm 0.15$"
+      ],
+      "cells": {
+        "substance": {
+          "raw": "$\\text{HCl}(g)$"
+        },
+        "entropy_spectroscopic": {
+          "raw": "$44.64 \\pm 0.05$",
+          "value": 44.64,
+          "parsed_values": [
+            44.64,
+            0.05
+          ],
+          "numeric_tokens": [
+            "44.64",
+            "0.05"
+          ],
+          "footnote_markers": [],
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement",
+          "column": "entropy_spectroscopic"
+        },
+        "entropy_third_law": {
+          "raw": "$44.49 \\pm 0.15$",
+          "value": 44.49,
+          "parsed_values": [
+            44.49,
+            0.15
+          ],
+          "numeric_tokens": [
+            "44.49",
+            "0.15"
+          ],
+          "footnote_markers": [],
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement",
+          "column": "entropy_third_law"
+        }
+      }
+    }
+  ],
+  "source_ref": {
+    "path": "source/mineru-tables.jsonl",
+    "line": 4
+  },
+  "source_image": {
+    "path": "chunk-p001-p040/images/5bf944e1ca4834626b0bf5223f5686fffd8852ec830f26c676db853501299561.jpg",
+    "sha256": "91f7a79d1f63f52a583bd9de4ded313394a4b0d40b5ea843bd071c678837560c"
+  },
+  "ambiguities": [],
+  "corrections": [],
+  "transcription_status": "transcribed_with_ocr_ambiguities"
+}

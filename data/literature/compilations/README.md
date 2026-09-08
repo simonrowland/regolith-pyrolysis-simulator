@@ -80,5 +80,6 @@ ions and condensed phases included). See `nasa-glenn/README.md`.
 |---|---|
 | [Robie & Hemingway 1995, USGS Bulletin 2131](robie-hemingway-1995-usgs-b2131/) | Whole-bulletin numeric-table census (1,277 records); native OCR records. Pass 2 transcribed the 111 pass-1 OCR/layout gaps from MinerU tables plus page images. Public domain; reference input only, never battery-scored. |
 | [Kelley 1960, U.S. Bureau of Mines Bulletin 584](kelley-1960-usbm-b584/) | Complete 893-table bulletin census; MinerU-native tokens cross-checked against every table crop. Public domain U.S. government work; reference input only, never measured or battery-scored. |
+| [Kelley & King 1961, U.S. Bureau of Mines Bulletin 592](kelley-king-1961-usbm-b592/) | Complete seven-table/25-block bulletin census (1,416 substance records); MinerU-native strings cross-checked against every table crop. Public domain U.S. government work; reference input only, never measured or battery-scored. |
 
 | [Pankratz, Stuve & Gokcen 1984, USBM Bulletin 677](pankratz-1984-usbm-b677/) | Complete 1,571-table census (Chapter 1 examples plus every Chapter 2 property table); native MinerU tokens cross-checked against rendered pages. Public domain; reference input only, never battery-scored. |

@@ -1,0 +1,94 @@
+{
+  "record_id": "table-001-0005",
+  "table_number": 1,
+  "substance_as_published": "Radon",
+  "formula_as_published": null,
+  "formula": null,
+  "name_as_published": "Radon",
+  "phase_as_published": null,
+  "state_as_published": null,
+  "footnote_markers": "",
+  "metadata_ocr_suspect": false,
+  "metadata_ocr_check": "raster_ocr_text_agreement",
+  "page": 7,
+  "pdf_page": 11,
+  "caption_raw": "TABLE 1.—Entropies of rare gases at 298.15° K.",
+  "post_table_notes_verbatim": "",
+  "column_labels_as_published": [
+    "Substance",
+    "$S_{298.15}^{\\circ}$ (theory)",
+    "$S_{298.15}^{\\circ}$ (experimental)"
+  ],
+  "units_as_published": {
+    "substance": null,
+    "entropy_theory": null,
+    "entropy_experimental": null
+  },
+  "temperature_grid": [
+    {
+      "raw": "298.15",
+      "value": 298.15,
+      "parsed_values": [
+        298.15
+      ],
+      "numeric_tokens": [
+        "298.15"
+      ],
+      "ocr_suspect": true,
+      "ocr_check": "raster_ocr_caption_disagreement",
+      "column": "temperature"
+    }
+  ],
+  "rows": [
+    {
+      "source_row_index": 5,
+      "raw": [
+        "Radon",
+        "$42.10 \\pm 0.01$",
+        "----"
+      ],
+      "cells": {
+        "substance": {
+          "raw": "Radon"
+        },
+        "entropy_theory": {
+          "raw": "$42.10 \\pm 0.01$",
+          "value": 42.1,
+          "parsed_values": [
+            42.1,
+            0.01
+          ],
+          "numeric_tokens": [
+            "42.10",
+            "0.01"
+          ],
+          "footnote_markers": [],
+          "ocr_suspect": true,
+          "ocr_check": "raster_ocr_token_disagreement",
+          "column": "entropy_theory"
+        },
+        "entropy_experimental": {
+          "raw": "----",
+          "value": null,
+          "parsed_values": [],
+          "numeric_tokens": [],
+          "footnote_markers": [],
+          "ocr_suspect": false,
+          "ocr_check": "raster_ocr_token_disagreement",
+          "column": "entropy_experimental"
+        }
+      }
+    }
+  ],
+  "source_ref": {
+    "path": "source/mineru-tables.jsonl",
+    "line": 1
+  },
+  "source_image": {
+    "path": "chunk-p001-p040/images/3670aaf516fa84757306bcdb0596f282628142a3aa96e20dc5674e6029ea0b35.jpg",
+    "sha256": "2b2bd0773ebcdbfb17746d1792fe0efd37e97d797c60b8d57e9438e3c72c2d4c"
+  },
+  "ambiguities": [],
+  "corrections": [],
+  "transcription_status": "transcribed_with_ocr_ambiguities"
+}

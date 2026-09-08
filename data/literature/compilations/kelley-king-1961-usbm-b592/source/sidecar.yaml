@@ -1,0 +1,79 @@
+citation: 'Kelley, K. K. & King, E. G., Contributions to the Data on Theoretical Metallurgy: XIV. Entropies of the Elements
+  and Inorganic Compounds, U.S. Bureau of Mines Bulletin 592 (1961)'
+doi: null
+publisher: U.S. Bureau of Mines / GPO
+licence: US government work (USBM Bulletin 592; public domain in the United States)
+access: open
+present: 'yes'
+sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
+size: 27323016
+retrieved_at: '2026-09-06T22:57:49Z'
+retrieved_url: https://web.archive.org/web/20170816073111id_/https://digital.library.unt.edu/ark:/67531/metadc12746/m2/1/high_res_d/Bulletin0592.pdf
+attempts:
+- at: '2026-09-06T21:54:29Z'
+  url: https://digital.library.unt.edu/ark:/67531/metadc12746/
+  status: 302
+  final: https://digital.library.unt.edu/dam/?next=%2Fark%3A%2F67531%2Fmetadc12746%2F
+  note: UNT Digital Library redirected to DAM Altcha JS challenge (altcha.min.js); stopped, no bypass
+- at: '2026-09-06T22:49:15Z'
+  url: https://archive.org/advancedsearch.php
+  status: 200
+  note: creator:kelley AND (bulletin 592 OR theoretical metallurgy); numFound 0 for B592
+- at: '2026-09-06T22:49:46Z'
+  url: https://archive.org/advancedsearch.php
+  status: 200
+  note: title:"Bulletin 592" AND (kelley OR mines); numFound 0
+- at: '2026-09-06T22:50:29Z'
+  url: https://archive.org/advancedsearch.php
+  status: 200
+  note: identifier:metadc12746; numFound 0 (UNT not mirrored as an IA item)
+- at: '2026-09-06T22:52:06Z'
+  url: https://openlibrary.org/search.json?q=kelley+king+entropies+inorganic+1961
+  status: 200
+  note: numFound 0 on that query; B584 sibling work found separately
+- at: '2026-09-06T22:52:14Z'
+  url: https://www.googleapis.com/books/v1/volumes?q=Kelley+High-temperature+Heat-content+Bulletin+584
+  status: 429
+  note: Google Books API rate-limited (same host); not retried for B592
+- at: '2026-09-06T22:53:24Z'
+  url: https://www.loc.gov/search/?q=kelley+bulletin+584+bureau+mines&fo=json
+  status: 403
+  note: Cloudflare JS challenge on loc.gov; stopped (same host class for B592)
+- at: '2026-09-06T22:56:46Z'
+  url: https://web.archive.org/cdx/search/cdx?url=digital.library.unt.edu/ark:/67531/metadc12746/m2/*
+  status: 200
+  note: CDX found 2017 snapshot of Bulletin0592.pdf (application/pdf, 25853820 orig)
+- at: '2026-09-06T22:57:49Z'
+  url: https://web.archive.org/web/20170816073111id_/https://digital.library.unt.edu/ark:/67531/metadc12746/m2/1/high_res_d/Bulletin0592.pdf
+  status: 200
+  final: https://web.archive.org/web/20170816073111id_/https://digital.library.unt.edu/ark:/67531/metadc12746/m2/1/high_res_d/Bulletin0592.pdf
+  ctype: application/pdf
+- at: '2026-09-06T22:59:44Z'
+  url: https://pubs.usgs.gov/pubs-services/publication/?q=kelley+bulletin+584
+  status: 200
+  note: USGS Publications Warehouse JSON; no USBM 584/592 records (recordCount 0 on kelley bulletin 584)
+- at: '2026-09-06T23:00:14Z'
+  url: https://www.osti.gov/api/v1/records?q=%22theoretical%20metallurgy%22%20Kelley
+  status: 200
+  note: OSTI catalogue; no USBM Bulletin 592 record
+- at: '2026-09-06T23:00:19Z'
+  url: https://catalog.hathitrust.org/api/volumes/brief/json/recordnumber:012278663
+  status: 200
+  note: full-view htid pst.000003233283 (no.14) and uva.x004168621 (v.14 1961); rights pd
+- at: '2026-09-06T23:01:05Z'
+  url: https://babel.hathitrust.org/cgi/imgsrv/download/pdf?id=uva.x004168623
+  status: 403
+  note: Cloudflare on babel download (probed for sibling B584 htid); stopped, did not retry B592 babel URL
+- at: '2026-09-06T23:00:25Z'
+  url: https://ntrl.ntis.gov/NTRL/
+  status: 200
+  note: NTRL JSF/PrimeFaces app with jsessionid; needs a browser session; stopped
+topic: thermochemistry
+pages: 154
+title_page: Bulletin 592 Bureau of Mines; Contributions to the Data on Theoretical Metallurgy XIV. Entropies of the Elements
+  and Inorganic Compounds; By K. K. Kelley and E. G. King; GPO Washington 1961
+located_by:
+  worker: thermo-db-vacuum
+  dispatch_id: thermo-db-vacuum
+  note: Official copies located at UNT TRAIL; fetch blocked by Altcha challenge.
+  official_url: https://digital.library.unt.edu/ark:/67531/metadc12746/
