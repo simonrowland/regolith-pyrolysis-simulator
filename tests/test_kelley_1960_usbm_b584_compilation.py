@@ -1,5 +1,7 @@
 """Completeness, source round-trip, OCR, and exact-grid contracts for B584."""
 
+import copy
+import inspect
 import json
 import runpy
 import re
@@ -7,6 +9,7 @@ import re
 import pytest
 import yaml
 
+from simulator.reference_data import kelley_1960_usbm_b584_loader as loader
 from simulator.reference_data.kelley_1960_usbm_b584_loader import (
     COMPILATION_ROOT,
     OCRSuspectRow,
@@ -41,6 +44,22 @@ IMAGE_VERIFIED_CELLS = {
 }
 
 
+MONOTONICITY_REVERSAL_ALLOWLIST = {
+    ("table-058", 0, "heat_content", 8, 9, 3985.0, 3485.0):
+        "PDF page 37 prints 3,985 -> 3,485; source-published irregularity",
+    ("table-073", 0, "entropy_increment", 10, 11, 7.32, 6.69):
+        "PDF page 41 prints 7.32 -> 6.69; source-published irregularity",
+    ("table-096", 0, "entropy_increment", 6, 7, 25.52, 23.61):
+        "PDF page 45 prints 25.52 -> 23.61 after the 723 K liquid transition row",
+    ("table-215", 0, "heat_content", 10, 11, 4980.0, 4475.0):
+        "PDF page 70 prints 4,980 -> 4,475; source-published irregularity",
+    ("table-368", 0, "entropy_increment", 3, 4, 7.06, 3.8):
+        "PDF page 103 prints 7.06 -> 3.80; source-published irregularity",
+    ("table-400", 0, "temperature", 2, 3, 500.0, 411.0):
+        "PDF page 111 prints 500 -> 411(alpha); phase-transition ordering",
+}
+
+
 def _numeric_cells(value):
     if isinstance(value, dict):
         if "raw" in value and "value" in value:
@@ -64,8 +83,32 @@ def _assert_image_verified_cells(records, expected):
         assert row["cells"][column]["value"] == value
 
 
+def _monotonicity_reversals(records):
+    reversals = set()
+    for record in records:
+        for panel_index in (0, 1):
+            rows = [row for row in record["rows"] if row["panel_index"] == panel_index]
+            for left, right in zip(rows, rows[1:]):
+                for column in ("temperature", "heat_content", "entropy_increment"):
+                    left_value = left["cells"][column]["value"]
+                    right_value = right["cells"][column]["value"]
+                    if left_value is not None and right_value is not None and right_value < left_value:
+                        reversals.add(
+                            (
+                                record["record_id"],
+                                panel_index,
+                                column,
+                                left["source_row_index"],
+                                right["source_row_index"],
+                                left_value,
+                                right_value,
+                            )
+                        )
+    return reversals
+
+
 def test_stored_values_match_independent_image_verified_fixture():
-    _assert_image_verified_cells(list(load_records()), IMAGE_VERIFIED_CELLS)
+    _assert_image_verified_cells(list(load_records(include_ocr_suspect=True)), IMAGE_VERIFIED_CELLS)
 
 
 def test_image_verified_fixture_mutation_is_detected():
@@ -73,13 +116,13 @@ def test_image_verified_fixture_mutation_is_detected():
     key = ("table-500", 2, 1, "heat_content")
     mutated[key] = ("25.540", 25.54)
     with pytest.raises(AssertionError):
-        _assert_image_verified_cells(list(load_records()), mutated)
+        _assert_image_verified_cells(list(load_records(include_ocr_suspect=True)), mutated)
 
 
 def test_image_verified_corrections_are_applied_and_retain_ocr_suspect():
     manifest = load_manifest()
     corrections = []
-    for record in load_records():
+    for record in load_records(include_ocr_suspect=True):
         for correction in record["corrections"]:
             row = next(
                 row
@@ -100,7 +143,7 @@ def test_image_verified_corrections_are_applied_and_retain_ocr_suspect():
 def test_punctuation_anomaly_class_has_image_verified_corrections():
     flagged = set()
     corrected = set()
-    for record in load_records():
+    for record in load_records(include_ocr_suspect=True):
         for row in record["rows"]:
             for column, cell in row["cells"].items():
                 raw = cell.get("numeric_token") or cell["raw"]
@@ -141,7 +184,7 @@ def test_raster_agreement_is_position_aligned_not_table_global():
 
 def test_manifest_record_and_bulletin_census_coverage_match():
     manifest = load_manifest()
-    records = list(load_records())
+    records = list(load_records(include_ocr_suspect=True))
     census = json.loads((COMPILATION_ROOT / "census.json").read_text())
     ids = [record["record_id"] for record in records]
     assert len(ids) == len(set(ids)) == 893
@@ -173,12 +216,82 @@ def test_exact_printed_grid_and_unknown_record_contract():
 
 
 def test_refuses_ocr_suspect_row_with_typed_error():
-    with pytest.raises(OCRSuspectRow, match="heat_content"):
+    with pytest.raises(OCRSuspectRow, match="heat_content") as caught:
         lookup_temperature("table-500", 1200)
+    error = caught.value
+    assert error.record_id == "table-500"
+    assert error.printed_page == 119
+    assert error.source_row_index == 2
+    assert error.panel_index == 1
+    assert error.column == "heat_content"
+    assert error.raw_ocr_token == "25.540"
+    assert error.corrected_value == 25540.0
+    assert error.reason == "300 dpi PDF page image; image-verified correction remains OCR-suspect"
+
+
+def test_duplicate_temperature_refusal_identifies_each_suspect_cell():
+    with pytest.raises(OCRSuspectRow) as caught:
+        lookup_temperature("table-001", 1470)
+    cells = caught.value.suspect_cells
+    assert {
+        (cell.source_row_index, cell.panel_index, cell.column, cell.raw_ocr_token)
+        for cell in cells
+    } == {
+        (1, 1, "entropy_increment", "14.08"),
+        (1, 1, "heat_content", "12,410"),
+        (12, 0, "heat_content", "8,990"),
+    }
+    assert all(cell.corrected_value is None for cell in cells)
+    assert {cell.reason for cell in cells} == {"raster_ocr_token_disagreement"}
+
+
+def test_no_public_loader_entry_point_returns_a_suspect_cell_bare():
+    public_entry_points = {
+        name
+        for name, value in inspect.getmembers(loader, inspect.isfunction)
+        if not name.startswith("_") and value.__module__ == loader.__name__
+    }
+    assert public_entry_points == {"load_manifest", "load_records", "lookup_temperature"}
+
+    manifest = load_manifest()
+    assert all("rows" not in entry for entry in manifest["entries"])
+    with pytest.raises(OCRSuspectRow):
+        next(load_records())
+    records = list(load_records(include_ocr_suspect=True))
+    for record in records:
+        contains_suspect = any(
+            cell["ocr_suspect"]
+            for row in record["rows"]
+            for cell in row["cells"].values()
+        )
+        assert record["contains_ocr_suspect_cells"] is contains_suspect
+    assert all(
+        not cell["ocr_suspect"]
+        for row in lookup_temperature("table-001", 400)
+        for cell in row["cells"].values()
+    )
+
+
+def test_monotonicity_detector_matches_image_verified_allowlist():
+    records = list(load_records(include_ocr_suspect=True))
+    assert _monotonicity_reversals(records) == set(MONOTONICITY_REVERSAL_ALLOWLIST)
+
+
+def test_monotonicity_detector_catches_non_allowlisted_reversal():
+    records = list(load_records(include_ocr_suspect=True))
+    mutated = copy.deepcopy(records[0])
+    target = next(
+        row
+        for row in mutated["rows"]
+        if row["source_row_index"] == 2 and row["panel_index"] == 0
+    )
+    target["cells"]["heat_content"]["value"] = 1.0
+    reversals = _monotonicity_reversals([mutated])
+    assert reversals - set(MONOTONICITY_REVERSAL_ALLOWLIST)
 
 
 def test_source_numbering_error_is_retained_not_repaired():
-    records = list(load_records())
+    records = list(load_records(include_ocr_suspect=True))
     assert records[41]["census_table_number"] == 42
     assert records[42]["census_table_number"] == 43
     assert records[41]["table_number_as_printed_or_ocr"] == 42
@@ -187,7 +300,7 @@ def test_source_numbering_error_is_retained_not_repaired():
 
 
 def test_caption_metadata_wins_without_hiding_census_ocr_disagreements():
-    records = list(load_records())
+    records = list(load_records(include_ocr_suspect=True))
     assert records[0]["formula_as_published"] == "Ac"
     assert records[0]["phase_as_published"] == "(c, l)"
     assert records[10]["formula_as_published"] == "AlD"
@@ -199,7 +312,7 @@ def test_caption_metadata_wins_without_hiding_census_ocr_disagreements():
 
 
 def test_plausible_ocr_confusions_are_never_promoted_to_numbers():
-    for record in load_records():
+    for record in load_records(include_ocr_suspect=True):
         for cell in _numeric_cells(record["rows"]):
             confusion_surface = re.sub(r"\([^)]*\)", "", cell["raw"])
             if re.search(r"[lIOSB]", confusion_surface, re.IGNORECASE):

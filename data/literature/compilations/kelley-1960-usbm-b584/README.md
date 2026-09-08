@@ -33,11 +33,22 @@ list ordinal remains the record identity while both readings are retained.
 
 MinerU HTML is the primary reading. Tesseract reading of each printed table crop
 checks every parsed number. Disagreement or a plausible OCR confusion marks the
-cell `ocr_suspect: true`; raw tokens remain unchanged. No value is repaired,
-interpolated, extrapolated, smoothed, or inferred. Finite-difference
-thermodynamic identities are detectors only and append manifest ambiguities.
+cell `ocr_suspect: true`; raw tokens remain unchanged. The compilation applies
+60 corrections read from the PDF page images while retaining the original OCR
+token and the suspect flag. Each repair is coordinate-pinned in the record and
+in `manifest.yaml`'s corrections ledger with the printed token, page, row,
+column, quote, and image basis. No value is interpolated, extrapolated, smoothed,
+or inferred. Finite-difference thermodynamic identities are detectors only and
+append manifest ambiguities.
 
-`lookup_temperature(record_id, temperature)` returns every row at an exact
-printed temperature, including duplicate transition rows. It raises
+`lookup_temperature(record_id, temperature)` returns every clean row at an
+exact printed temperature, including duplicate transition rows. It raises
+`OCRSuspectRow` when any matching cell remains suspect and
 `PrintedTemperatureUnavailable` for every off-grid request; there is no zero
-default.
+default. `OCRSuspectRow` identifies the record, printed page, source row, panel,
+column, raw OCR token, corrected value when present, and refusal reason.
+
+`load_records()` likewise refuses at the first record containing a suspect
+cell. Audit tooling must opt in with `load_records(include_ocr_suspect=True)`;
+every returned record then carries the top-level
+`contains_ocr_suspect_cells` flag in addition to its per-cell flags.
