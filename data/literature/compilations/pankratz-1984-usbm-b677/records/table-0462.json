@@ -1,0 +1,715 @@
+{
+  "schema_version": "pankratz_b677_native_table.v1",
+  "record_id": "table-0462",
+  "ordinal": 462,
+  "formula_as_published": "MgCO3",
+  "formula_heading_raw": "$\\mathrm{MgCO_3(c)}$",
+  "name_as_published": "Magnesium carbonate",
+  "name_heading_raw": "Magnesium carbonate",
+  "phase_as_published": "(c)",
+  "formula_token": {
+    "raw": "$\\mathrm{MgCO_3(c)}$",
+    "value": "MgCO3",
+    "ocr_suspect": false,
+    "ocr_check": "no_shape_confusion_detected"
+  },
+  "page": 142,
+  "pdf_page": 146,
+  "table_number": null,
+  "toc_section": "carbonates",
+  "table_kind": "thermodynamic_temperature_grid",
+  "transcription_status": "transcribed",
+  "units_statement_as_published": "T is in K; Cp° and S° are in cal/mol·K; H°-H°298, ΔHf° and ΔGf° are in kcal/mol.",
+  "columns": [
+    {
+      "index": 0,
+      "heading_raw": "T",
+      "units_as_published": "K"
+    },
+    {
+      "index": 1,
+      "heading_raw": "$Cp^o$",
+      "units_as_published": "cal/mol·K"
+    },
+    {
+      "index": 2,
+      "heading_raw": "$S^o$",
+      "units_as_published": "cal/mol·K"
+    },
+    {
+      "index": 3,
+      "heading_raw": "$H^o-H_{298}^o$",
+      "units_as_published": "kcal/mol"
+    },
+    {
+      "index": 4,
+      "heading_raw": "$\\Delta Hf^o$",
+      "units_as_published": "kcal/mol"
+    },
+    {
+      "index": 5,
+      "heading_raw": "$\\Delta Gf^o$",
+      "units_as_published": "kcal/mol"
+    }
+  ],
+  "header_rows_raw": [
+    [
+      "T",
+      "$Cp^o$",
+      "$S^o$",
+      "$H^o-H_{298}^o$",
+      "$\\Delta Hf^o$",
+      "$\\Delta Gf^o$"
+    ]
+  ],
+  "source_table_rows_raw": [
+    [
+      "T",
+      "$Cp^o$",
+      "$S^o$",
+      "$H^o-H_{298}^o$",
+      "$\\Delta Hf^o$",
+      "$\\Delta Gf^o$"
+    ],
+    [
+      "298",
+      "18.190",
+      "15.560",
+      "0",
+      "-266.035",
+      "-246.020"
+    ],
+    [
+      "300",
+      "18.250",
+      "15.670",
+      ".034",
+      "-266.035",
+      "-245.894"
+    ],
+    [
+      "400",
+      "21.650",
+      "21.430",
+      "2.046",
+      "-265.943",
+      "-239.187"
+    ],
+    [
+      "500",
+      "23.880",
+      "26.520",
+      "4.327",
+      "-265.714",
+      "-232.530"
+    ],
+    [
+      "600",
+      "25.660",
+      "31.030",
+      "6.806",
+      "-265.410",
+      "-225.913"
+    ],
+    [
+      "700",
+      "27.240",
+      "35.110",
+      "9.453",
+      "-265.048",
+      "-219.359"
+    ],
+    [
+      "800",
+      "28.700",
+      "38.840",
+      "12.250",
+      "-264.630",
+      "-212.862"
+    ],
+    [
+      "900",
+      "29.910",
+      "42.300",
+      "15.189",
+      "-264.150",
+      "-206.415"
+    ],
+    [
+      "1000",
+      "31.440",
+      "45.540",
+      "18.266",
+      "-265.737",
+      "-199.857"
+    ]
+  ],
+  "source_orientation": "rows_as_printed",
+  "temperature_grid": [
+    {
+      "raw": "298",
+      "value": 298.0,
+      "ocr_suspect": false,
+      "ocr_check": "raster_table_bbox_token_agreement",
+      "source_row_index": 1,
+      "source_column_index": 0
+    },
+    {
+      "raw": "300",
+      "value": 300.0,
+      "ocr_suspect": true,
+      "ocr_check": "raster_table_bbox_token_disagreement",
+      "source_row_index": 2,
+      "source_column_index": 0
+    },
+    {
+      "raw": "400",
+      "value": 400.0,
+      "ocr_suspect": false,
+      "ocr_check": "raster_table_bbox_token_agreement",
+      "source_row_index": 3,
+      "source_column_index": 0
+    },
+    {
+      "raw": "500",
+      "value": 500.0,
+      "ocr_suspect": false,
+      "ocr_check": "raster_table_bbox_token_agreement",
+      "source_row_index": 4,
+      "source_column_index": 0
+    },
+    {
+      "raw": "600",
+      "value": 600.0,
+      "ocr_suspect": false,
+      "ocr_check": "raster_table_bbox_token_agreement",
+      "source_row_index": 5,
+      "source_column_index": 0
+    },
+    {
+      "raw": "700",
+      "value": 700.0,
+      "ocr_suspect": false,
+      "ocr_check": "raster_table_bbox_token_agreement",
+      "source_row_index": 6,
+      "source_column_index": 0
+    },
+    {
+      "raw": "800",
+      "value": 800.0,
+      "ocr_suspect": false,
+      "ocr_check": "raster_table_bbox_token_agreement",
+      "source_row_index": 7,
+      "source_column_index": 0
+    },
+    {
+      "raw": "900",
+      "value": 900.0,
+      "ocr_suspect": false,
+      "ocr_check": "raster_table_bbox_token_agreement",
+      "source_row_index": 8,
+      "source_column_index": 0
+    },
+    {
+      "raw": "1000",
+      "value": 1000.0,
+      "ocr_suspect": false,
+      "ocr_check": "raster_table_bbox_token_agreement",
+      "source_row_index": 9,
+      "source_column_index": 0
+    }
+  ],
+  "rows": [
+    {
+      "source_row_index": 1,
+      "cells": [
+        {
+          "raw": "298",
+          "value": 298.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 1,
+          "source_column_index": 0
+        },
+        {
+          "raw": "18.190",
+          "value": 18.19,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 1,
+          "source_column_index": 1
+        },
+        {
+          "raw": "15.560",
+          "value": 15.56,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 1,
+          "source_column_index": 2
+        },
+        {
+          "raw": "0",
+          "value": 0.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "source_row_index": 1,
+          "source_column_index": 3
+        },
+        {
+          "raw": "-266.035",
+          "value": -266.035,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 1,
+          "source_column_index": 4
+        },
+        {
+          "raw": "-246.020",
+          "value": -246.02,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 1,
+          "source_column_index": 5
+        }
+      ]
+    },
+    {
+      "source_row_index": 2,
+      "cells": [
+        {
+          "raw": "300",
+          "value": 300.0,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "source_row_index": 2,
+          "source_column_index": 0
+        },
+        {
+          "raw": "18.250",
+          "value": 18.25,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "source_row_index": 2,
+          "source_column_index": 1
+        },
+        {
+          "raw": "15.670",
+          "value": 15.67,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "source_row_index": 2,
+          "source_column_index": 2
+        },
+        {
+          "raw": ".034",
+          "value": 0.034,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "source_row_index": 2,
+          "source_column_index": 3
+        },
+        {
+          "raw": "-266.035",
+          "value": -266.035,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 2,
+          "source_column_index": 4
+        },
+        {
+          "raw": "-245.894",
+          "value": -245.894,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 2,
+          "source_column_index": 5
+        }
+      ]
+    },
+    {
+      "source_row_index": 3,
+      "cells": [
+        {
+          "raw": "400",
+          "value": 400.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 3,
+          "source_column_index": 0
+        },
+        {
+          "raw": "21.650",
+          "value": 21.65,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 3,
+          "source_column_index": 1
+        },
+        {
+          "raw": "21.430",
+          "value": 21.43,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 3,
+          "source_column_index": 2
+        },
+        {
+          "raw": "2.046",
+          "value": 2.046,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 3,
+          "source_column_index": 3
+        },
+        {
+          "raw": "-265.943",
+          "value": -265.943,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 3,
+          "source_column_index": 4
+        },
+        {
+          "raw": "-239.187",
+          "value": -239.187,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 3,
+          "source_column_index": 5
+        }
+      ]
+    },
+    {
+      "source_row_index": 4,
+      "cells": [
+        {
+          "raw": "500",
+          "value": 500.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 4,
+          "source_column_index": 0
+        },
+        {
+          "raw": "23.880",
+          "value": 23.88,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 4,
+          "source_column_index": 1
+        },
+        {
+          "raw": "26.520",
+          "value": 26.52,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 4,
+          "source_column_index": 2
+        },
+        {
+          "raw": "4.327",
+          "value": 4.327,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 4,
+          "source_column_index": 3
+        },
+        {
+          "raw": "-265.714",
+          "value": -265.714,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 4,
+          "source_column_index": 4
+        },
+        {
+          "raw": "-232.530",
+          "value": -232.53,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 4,
+          "source_column_index": 5
+        }
+      ]
+    },
+    {
+      "source_row_index": 5,
+      "cells": [
+        {
+          "raw": "600",
+          "value": 600.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 5,
+          "source_column_index": 0
+        },
+        {
+          "raw": "25.660",
+          "value": 25.66,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 5,
+          "source_column_index": 1
+        },
+        {
+          "raw": "31.030",
+          "value": 31.03,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 5,
+          "source_column_index": 2
+        },
+        {
+          "raw": "6.806",
+          "value": 6.806,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 5,
+          "source_column_index": 3
+        },
+        {
+          "raw": "-265.410",
+          "value": -265.41,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "source_row_index": 5,
+          "source_column_index": 4
+        },
+        {
+          "raw": "-225.913",
+          "value": -225.913,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 5,
+          "source_column_index": 5
+        }
+      ]
+    },
+    {
+      "source_row_index": 6,
+      "cells": [
+        {
+          "raw": "700",
+          "value": 700.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 6,
+          "source_column_index": 0
+        },
+        {
+          "raw": "27.240",
+          "value": 27.24,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 6,
+          "source_column_index": 1
+        },
+        {
+          "raw": "35.110",
+          "value": 35.11,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 6,
+          "source_column_index": 2
+        },
+        {
+          "raw": "9.453",
+          "value": 9.453,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 6,
+          "source_column_index": 3
+        },
+        {
+          "raw": "-265.048",
+          "value": -265.048,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 6,
+          "source_column_index": 4
+        },
+        {
+          "raw": "-219.359",
+          "value": -219.359,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 6,
+          "source_column_index": 5
+        }
+      ]
+    },
+    {
+      "source_row_index": 7,
+      "cells": [
+        {
+          "raw": "800",
+          "value": 800.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 7,
+          "source_column_index": 0
+        },
+        {
+          "raw": "28.700",
+          "value": 28.7,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "source_row_index": 7,
+          "source_column_index": 1
+        },
+        {
+          "raw": "38.840",
+          "value": 38.84,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 7,
+          "source_column_index": 2
+        },
+        {
+          "raw": "12.250",
+          "value": 12.25,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 7,
+          "source_column_index": 3
+        },
+        {
+          "raw": "-264.630",
+          "value": -264.63,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 7,
+          "source_column_index": 4
+        },
+        {
+          "raw": "-212.862",
+          "value": -212.862,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 7,
+          "source_column_index": 5
+        }
+      ]
+    },
+    {
+      "source_row_index": 8,
+      "cells": [
+        {
+          "raw": "900",
+          "value": 900.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 8,
+          "source_column_index": 0
+        },
+        {
+          "raw": "29.910",
+          "value": 29.91,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 8,
+          "source_column_index": 1
+        },
+        {
+          "raw": "42.300",
+          "value": 42.3,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "source_row_index": 8,
+          "source_column_index": 2
+        },
+        {
+          "raw": "15.189",
+          "value": 15.189,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 8,
+          "source_column_index": 3
+        },
+        {
+          "raw": "-264.150",
+          "value": -264.15,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 8,
+          "source_column_index": 4
+        },
+        {
+          "raw": "-206.415",
+          "value": -206.415,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 8,
+          "source_column_index": 5
+        }
+      ]
+    },
+    {
+      "source_row_index": 9,
+      "cells": [
+        {
+          "raw": "1000",
+          "value": 1000.0,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 9,
+          "source_column_index": 0
+        },
+        {
+          "raw": "31.440",
+          "value": 31.44,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 9,
+          "source_column_index": 1
+        },
+        {
+          "raw": "45.540",
+          "value": 45.54,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 9,
+          "source_column_index": 2
+        },
+        {
+          "raw": "18.266",
+          "value": 18.266,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 9,
+          "source_column_index": 3
+        },
+        {
+          "raw": "-265.737",
+          "value": -265.737,
+          "ocr_suspect": true,
+          "ocr_check": "raster_table_bbox_token_disagreement",
+          "source_row_index": 9,
+          "source_column_index": 4
+        },
+        {
+          "raw": "-199.857",
+          "value": -199.857,
+          "ocr_suspect": false,
+          "ocr_check": "raster_table_bbox_token_agreement",
+          "source_row_index": 9,
+          "source_column_index": 5
+        }
+      ]
+    }
+  ],
+  "footnote_markers": [],
+  "source_locator": {
+    "file": "source/mineru/pankratz-1984-usbm-b677-p121-p160.md",
+    "table_index": 117,
+    "table_sha256": "d1248f8e017e49bfa91a4d1620e507cd102b32a5ff1a301596daa57301e592f8",
+    "bbox": [
+      531,
+      112,
+      935,
+      280
+    ]
+  },
+  "ambiguities": [],
+  "corrections": []
+}
