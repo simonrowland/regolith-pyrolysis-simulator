@@ -10,8 +10,20 @@
   "formula_token": {
     "raw": "$Na_{2}S(c,l)$",
     "value": "Na2S",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "name_token": {
+    "raw": "Disodium monosulfide",
+    "value": "Disodium monosulfide",
     "ocr_suspect": false,
-    "ocr_check": "no_shape_confusion_detected"
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c,l)",
+    "value": "(c,l)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 339,
   "pdf_page": 343,
@@ -24,32 +36,74 @@
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$Cp^o$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$Cp^o$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$Cp^o$",
+        "value": "$Cp^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "$S^o$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$S^o$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$S^o$",
+        "value": "$S^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "$H^o-H_{298}^o$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$H^o-H_{298}^o$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$H^o-H_{298}^o$",
+        "value": "$H^o-H_{298}^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "$\\Delta Hf^o$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Hf^o$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Hf^o$",
+        "value": "$\\Delta Hf^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "$\\Delta Gf^o$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Gf^o$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Gf^o$",
+        "value": "$\\Delta Gf^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -906,10 +960,39 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "1445 K, melting point; $\\Delta H^{\\circ} = 4.608$",
+    "lines_raw": [
+      "1445 K, melting point; $\\Delta H^{\\circ} = 4.608$"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "1445 K, melting point; $\\Delta H^{\\circ} = 4.608$",
+        "temperature_K": 1445.0,
+        "temperature_uncertainty_K": null,
+        "kind": "melting",
+        "enthalpy_as_published": 4.608,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p321-p360.md",
     "table_index": 115,
     "table_sha256": "bac1ba705a41c4f9b5028a9457fe276dd8dbeadf2d8678f34f532929d3a58fe6",
+    "note_block_sha256": "5f693613298f6d3f11cb7ded74c2837313b9a93636e0f1a8cbd9f18e428fddc7",
+    "complete_source_block_sha256": "f8d95a7c8ba59b74461439d50a67f768a25fa48321a5ece815b0cf19f8d9d265",
     "bbox": [
       501,
       112,
@@ -918,6 +1001,53 @@
     ]
   },
   "ambiguities": [
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "formula_as_published",
+      "raw_token": "$Na_{2}S(c,l)$",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "(c,l)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$Cp^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "$S^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "$H^o-H_{298}^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 4,
+      "raw_token": "$\\Delta Hf^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 5,
+      "raw_token": "$\\Delta Gf^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
     {
       "kind": "identity_disagreement",
       "record_id": "table-1508",

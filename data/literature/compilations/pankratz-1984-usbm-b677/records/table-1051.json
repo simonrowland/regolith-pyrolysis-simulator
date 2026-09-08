@@ -2,54 +2,108 @@
   "schema_version": "pankratz_b677_native_table.v1",
   "record_id": "table-1051",
   "ordinal": 1051,
-  "formula_as_published": "IiI4",
+  "formula_as_published": "TiI4",
   "formula_heading_raw": "$\\mathrm{IiI}_{4}(\\mathrm{g})$",
   "name_as_published": "Titanium tetraiodide (ideal gas)",
   "name_heading_raw": "Titanium tetraiodide (ideal gas)",
   "phase_as_published": "(g)",
   "formula_token": {
     "raw": "$\\mathrm{IiI}_{4}(\\mathrm{g})$",
-    "value": "IiI4",
-    "ocr_suspect": false,
-    "ocr_check": "no_shape_confusion_detected"
+    "value": "TiI4",
+    "ocr_suspect": true,
+    "ocr_check": "image_proven_correction"
+  },
+  "name_token": {
+    "raw": "Titanium tetraiodide (ideal gas)",
+    "value": "Titanium tetraiodide (ideal gas)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "phase_token": {
+    "raw": "(g)",
+    "value": "(g)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 245,
   "pdf_page": 249,
   "table_number": null,
   "toc_section": "iodides",
   "table_kind": "thermodynamic_temperature_grid",
-  "transcription_status": "transcribed",
+  "transcription_status": "transcribed_with_ocr_ambiguities",
   "units_statement_as_published": "T is in K; Cp° and S° are in cal/mol·K; H°-H°298, ΔHf° and ΔGf° are in kcal/mol.",
   "columns": [
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$Cp^o$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$Cp^o$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$Cp^o$",
+        "value": "$Cp^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "$S^o$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$S^o$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$S^o$",
+        "value": "$S^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "$H^o-H_{298}^o$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$H^o-H_{298}^o$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$H^o-H_{298}^o$",
+        "value": "$H^o-H_{298}^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "$\\Delta Hf^o$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Hf^o$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Hf^o$",
+        "value": "$\\Delta Hf^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "$\\Delta Gf^o$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Gf^o$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Gf^o$",
+        "value": "$\\Delta Gf^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -778,10 +832,34 @@
   "footnote_markers": [
     "*"
   ],
+  "post_table_note_block": {
+    "raw": "\\*Data except enthalpy of formation at 298 K estimated.",
+    "lines_raw": [
+      "\\*Data except enthalpy of formation at 298 K estimated."
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [
+      {
+        "raw": "\\*Data except enthalpy of formation at 298 K estimated."
+      }
+    ],
+    "uncertainties": [],
+    "transitions": []
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p241-p280.md",
     "table_index": 52,
     "table_sha256": "2c66ae92b4e7fa8927d157a4ecdace15fc896afc980fd2bcf9c92ea68077cba2",
+    "note_block_sha256": "ccf5c5b2580d6f56e804c9a9d96b9ef1e964f488453de0733c8da75fc3bf0a09",
+    "complete_source_block_sha256": "0d3f42bf09778dcc285956c53903da0fdca28b91fd3b7762ecdf786950e69ddd",
     "bbox": [
       500,
       496,
@@ -789,6 +867,71 @@
       676
     ]
   },
-  "ambiguities": [],
-  "corrections": []
+  "ambiguities": [
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "name_as_published",
+      "raw_token": "Titanium tetraiodide (ideal gas)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "(g)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 0,
+      "raw_token": "T",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$Cp^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "$S^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "$H^o-H_{298}^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 4,
+      "raw_token": "$\\Delta Hf^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 5,
+      "raw_token": "$\\Delta Gf^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    }
+  ],
+  "corrections": [
+    {
+      "record_id": "table-1051",
+      "field": "formula_as_published",
+      "raw_token": "$\\mathrm{IiI}_{4}(\\mathrm{g})$",
+      "printed_token": "TiI4",
+      "page": 245,
+      "image_quote": "TiI4(g) / Titanium tetraiodide (ideal gas)",
+      "reason": "Rendered page proves MinerU confused the printed Ti prefix with Ii."
+    }
+  ]
 }

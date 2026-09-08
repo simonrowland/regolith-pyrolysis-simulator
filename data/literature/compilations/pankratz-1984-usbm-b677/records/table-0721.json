@@ -11,45 +11,99 @@
     "raw": "$\\mathrm{CuF}_{2}(\\mathrm{g})$",
     "value": "CuF2",
     "ocr_suspect": false,
-    "ocr_check": "no_shape_confusion_detected"
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "name_token": {
+    "raw": "Copper difluoride (ideal gas)",
+    "value": "Copper difluoride (ideal gas)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "phase_token": {
+    "raw": "(g)",
+    "value": "(g)",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
   },
   "page": 188,
   "pdf_page": 192,
   "table_number": null,
   "toc_section": "fluorides",
   "table_kind": "thermodynamic_temperature_grid",
-  "transcription_status": "transcribed",
+  "transcription_status": "transcribed_with_ocr_ambiguities",
   "units_statement_as_published": "T is in K; Cp° and S° are in cal/mol·K; H°-H°298, ΔHf° and ΔGf° are in kcal/mol.",
   "columns": [
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "Cp°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "Cp°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "Cp°",
+        "value": "Cp°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "S°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "S°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "S°",
+        "value": "S°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "H°-H°298",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "H°-H°298",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "H°-H°298",
+        "value": "H°-H°298",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "ΔHf°",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "ΔHf°",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "ΔHf°",
+        "value": "ΔHf°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "ΔGf°",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "ΔGf°",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "ΔGf°",
+        "value": "ΔGf°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -768,10 +822,23 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "",
+    "lines_raw": [],
+    "ocr_suspect": false,
+    "ocr_check": "no_post_table_text",
+    "ambiguities": [],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": []
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p161-p200.md",
     "table_index": 179,
     "table_sha256": "883e3d06034c5a0e54332dd714382411b3d37d162ab4fc8aa6575dfa6c5fc9bf",
+    "note_block_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "complete_source_block_sha256": "357a784cc29d46e7e763c0595a93ba2c380a4de7198c4bf8aa62ed57bc84aa97",
     "bbox": [
       83,
       109,
@@ -779,6 +846,27 @@
       292
     ]
   },
-  "ambiguities": [],
+  "ambiguities": [
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "name_as_published",
+      "raw_token": "Copper difluoride (ideal gas)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 0,
+      "raw_token": "T",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "H°-H°298",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    }
+  ],
   "corrections": []
 }

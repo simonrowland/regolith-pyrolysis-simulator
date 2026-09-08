@@ -10,8 +10,20 @@
   "formula_token": {
     "raw": "$\\operatorname{PrCl}_3(c,1)$",
     "value": "PrCl3",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "name_token": {
+    "raw": "Praseodymium trichloride",
+    "value": "Praseodymium trichloride",
     "ocr_suspect": true,
-    "ocr_check": "plausible_character_confusion"
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "phase_token": {
+    "raw": "(c,1)",
+    "value": "(c,1)",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
   },
   "page": 166,
   "pdf_page": 170,
@@ -24,32 +36,74 @@
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "Cp°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "Cp°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "Cp°",
+        "value": "Cp°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "S°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "S°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "S°",
+        "value": "S°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "H°-H°298",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "H°-H°298",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "H°-H°298",
+        "value": "H°-H°298",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "ΔHf°",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "ΔHf°",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "ΔHf°",
+        "value": "ΔHf°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "ΔGf°",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "ΔGf°",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "ΔGf°",
+        "value": "ΔGf°",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -709,10 +763,44 @@
   "footnote_markers": [
     "*"
   ],
+  "post_table_note_block": {
+    "raw": "\\*Data 300-1000 K estimated.   \n1059 K, melting point; $\\Delta H^{\\circ} = 12.100$",
+    "lines_raw": [
+      "\\*Data 300-1000 K estimated.",
+      "1059 K, melting point; $\\Delta H^{\\circ} = 12.100$"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [
+      {
+        "raw": "\\*Data 300-1000 K estimated."
+      }
+    ],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "1059 K, melting point; $\\Delta H^{\\circ} = 12.100$",
+        "temperature_K": 1059.0,
+        "temperature_uncertainty_K": null,
+        "kind": "melting",
+        "enthalpy_as_published": 12.1,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p161-p200.md",
     "table_index": 58,
     "table_sha256": "b8cb20034db1fbda95e4b5805f6f56e466705edd83e1683f0cbd7e747f0e48fb",
+    "note_block_sha256": "2ab04d366400794a1353c129c778367c921c103963fd358ca65d5ca3c281c98d",
+    "complete_source_block_sha256": "78a41cabd9f021554169c526dacc2edebbb6ab7212243e10172fa0e431641a67",
     "bbox": [
       531,
       112,
@@ -722,9 +810,17 @@
   },
   "ambiguities": [
     {
-      "kind": "ocr_heading_confusion",
-      "raw_token": "$\\operatorname{PrCl}_3(c,1)$",
-      "reason": "l/1/I shape is ambiguous in scanned formula or phase text"
+      "kind": "ocr_heading_unresolved",
+      "field": "name_as_published",
+      "raw_token": "Praseodymium trichloride",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 5,
+      "raw_token": "ΔGf°",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
     }
   ],
   "corrections": []

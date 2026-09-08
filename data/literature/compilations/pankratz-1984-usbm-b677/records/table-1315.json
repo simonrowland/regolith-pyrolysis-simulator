@@ -10,46 +10,100 @@
   "formula_token": {
     "raw": "$Y_{2}O_{3}(c)$",
     "value": "Y2O3",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "name_token": {
+    "raw": "Diyttrium trioxide",
+    "value": "Diyttrium trioxide",
     "ocr_suspect": false,
-    "ocr_check": "no_shape_confusion_detected"
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c)",
+    "value": "(c)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 294,
   "pdf_page": 298,
   "table_number": null,
   "toc_section": "oxides",
   "table_kind": "thermodynamic_temperature_grid",
-  "transcription_status": "transcribed",
+  "transcription_status": "transcribed_with_ocr_ambiguities",
   "units_statement_as_published": "T is in K; Cp° and S° are in cal/mol·K; H°-H°298, ΔHf° and ΔGf° are in kcal/mol.",
   "columns": [
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "Cp°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "Cp°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "Cp°",
+        "value": "Cp°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "S°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "S°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "S°",
+        "value": "S°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "H°-H°298",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "H°-H°298",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "H°-H°298",
+        "value": "H°-H°298",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "ΔHf°",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "ΔHf°",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "ΔHf°",
+        "value": "ΔHf°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "ΔGf°",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "ΔGf°",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "ΔGf°",
+        "value": "ΔGf°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -906,10 +960,39 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "1330 K, transition point; $\\Delta H^{\\circ} = 0.310$",
+    "lines_raw": [
+      "1330 K, transition point; $\\Delta H^{\\circ} = 0.310$"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "1330 K, transition point; $\\Delta H^{\\circ} = 0.310$",
+        "temperature_K": 1330.0,
+        "temperature_uncertainty_K": null,
+        "kind": "transition",
+        "enthalpy_as_published": 0.31,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p281-p320.md",
     "table_index": 104,
     "table_sha256": "5d1d5f144dcb2517dcdb317892128609a827cd9477239215c7d217d862eea9ef",
+    "note_block_sha256": "1c2627fa050e8abc3030791a15293dfa519a135bc711741823b4504464825845",
+    "complete_source_block_sha256": "56e3bda5d2b853c1a4c8530a6a31ea87b22a57a8e5bd3c9b3c7320cf1ae72761",
     "bbox": [
       532,
       454,
@@ -917,6 +1000,26 @@
       662
     ]
   },
-  "ambiguities": [],
+  "ambiguities": [
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "formula_as_published",
+      "raw_token": "$Y_{2}O_{3}(c)$",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "(c)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "H°-H°298",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    }
+  ],
   "corrections": []
 }

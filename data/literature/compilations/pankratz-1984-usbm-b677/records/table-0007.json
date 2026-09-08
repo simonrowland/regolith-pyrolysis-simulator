@@ -10,8 +10,20 @@
   "formula_token": {
     "raw": "$\\mathbf{Ag}(\\mathbf{c},1)$",
     "value": "Ag",
-    "ocr_suspect": true,
-    "ocr_check": "plausible_character_confusion"
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "name_token": {
+    "raw": "Silver",
+    "value": "Silver",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c,1)",
+    "value": "(c,1)",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
   },
   "page": 48,
   "pdf_page": 52,
@@ -24,22 +36,50 @@
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$Cp^o$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$Cp^o$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$Cp^o$",
+        "value": "$Cp^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "$S^o$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$S^o$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$S^o$",
+        "value": "$S^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "$H^o-H_{298}^o$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$H^o-H_{298}^o$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$H^o-H_{298}^o$",
+        "value": "$H^o-H_{298}^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -686,10 +726,40 @@
   "footnote_markers": [
     "*"
   ],
+  "post_table_note_block": {
+    "raw": "\\*Data extrapolated above 1600 K.   \n1235.08 K, melting point; $\\Delta H^{\\circ} = 2.700$",
+    "lines_raw": [
+      "\\*Data extrapolated above 1600 K.",
+      "1235.08 K, melting point; $\\Delta H^{\\circ} = 2.700$"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "1235.08 K, melting point; $\\Delta H^{\\circ} = 2.700$",
+        "temperature_K": 1235.08,
+        "temperature_uncertainty_K": null,
+        "kind": "melting",
+        "enthalpy_as_published": 2.7,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p041-p080.md",
     "table_index": 1,
     "table_sha256": "748981b12231b45b6d9564c685855e0545336fa92dc58600cb0350e6dfb63445",
+    "note_block_sha256": "1d6290ba13e6aac94cdb3857b0986abc1fe2d9a6fd0622281ea587b549a04ef5",
+    "complete_source_block_sha256": "3aafe74835a1ca78f2c4a52217c7ecd019049d11218d72d46ad649419d8e5b20",
     "bbox": [
       178,
       107,
@@ -699,9 +769,25 @@
   },
   "ambiguities": [
     {
-      "kind": "ocr_heading_confusion",
-      "raw_token": "$\\mathbf{Ag}(\\mathbf{c},1)$",
-      "reason": "l/1/I shape is ambiguous in scanned formula or phase text"
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$Cp^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "$S^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "$H^o-H_{298}^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
     }
   ],
   "corrections": []

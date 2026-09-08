@@ -10,8 +10,20 @@
   "formula_token": {
     "raw": "GaSb(c,1)",
     "value": "GaSb",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "name_token": {
+    "raw": "Gallium monoantimonide",
+    "value": "Gallium monoantimonide",
     "ocr_suspect": true,
-    "ocr_check": "plausible_character_confusion"
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "phase_token": {
+    "raw": "(c,1)",
+    "value": "(c,1)",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
   },
   "page": 93,
   "pdf_page": 97,
@@ -24,32 +36,74 @@
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$Cp^{\\circ}$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$Cp^{\\circ}$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$Cp^{\\circ}$",
+        "value": "$Cp^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "$S^{\\circ}$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$S^{\\circ}$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$S^{\\circ}$",
+        "value": "$S^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "$H^{\\circ}-H_{298}^{\\circ}$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$H^{\\circ}-H_{298}^{\\circ}$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$H^{\\circ}-H_{298}^{\\circ}$",
+        "value": "$H^{\\circ}-H_{298}^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "$\\Delta Hf^{\\circ}$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Hf^{\\circ}$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Hf^{\\circ}$",
+        "value": "$\\Delta Hf^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "$\\Delta Gf^{\\circ}$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Gf^{\\circ}$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Gf^{\\circ}$",
+        "value": "$\\Delta Gf^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -630,10 +684,39 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "985 K, melting point; $\\Delta H^{\\circ} = 15.560$",
+    "lines_raw": [
+      "985 K, melting point; $\\Delta H^{\\circ} = 15.560$"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "985 K, melting point; $\\Delta H^{\\circ} = 15.560$",
+        "temperature_K": 985.0,
+        "temperature_uncertainty_K": null,
+        "kind": "melting",
+        "enthalpy_as_published": 15.56,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p081-p120.md",
     "table_index": 77,
     "table_sha256": "c2869fb7213a1bc82fdd2fd575bb061c0678a504130b3e01d07ce2385f432803",
+    "note_block_sha256": "d612a3c5806f070d4d5d2f831eda3a365ccab61e21e799a9ac13fa3018ed1f78",
+    "complete_source_block_sha256": "d7ac7617285dd1095b740242a9041cae9b36c3c85858316e3fb9da42fe469c9a",
     "bbox": [
       496,
       406,
@@ -643,9 +726,45 @@
   },
   "ambiguities": [
     {
-      "kind": "ocr_heading_confusion",
-      "raw_token": "GaSb(c,1)",
-      "reason": "l/1/I shape is ambiguous in scanned formula or phase text"
+      "kind": "ocr_heading_unresolved",
+      "field": "name_as_published",
+      "raw_token": "Gallium monoantimonide",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$Cp^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "$S^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "$H^{\\circ}-H_{298}^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 4,
+      "raw_token": "$\\Delta Hf^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 5,
+      "raw_token": "$\\Delta Gf^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
     }
   ],
   "corrections": []

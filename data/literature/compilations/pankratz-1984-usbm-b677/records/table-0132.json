@@ -11,7 +11,19 @@
     "raw": "$P[c,1,1/4P_{4}(g)]$",
     "value": "P",
     "ocr_suspect": true,
-    "ocr_check": "plausible_character_confusion"
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "name_token": {
+    "raw": "Phosphorus (white)",
+    "value": "Phosphorus (white)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "phase_token": {
+    "raw": "[c,1,1/4P4(g)]",
+    "value": "[c,1,1/4P4(g)]",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 72,
   "pdf_page": 76,
@@ -24,22 +36,50 @@
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$Cp^o$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$Cp^o$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$Cp^o$",
+        "value": "$Cp^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "$S^o$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$S^o$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$S^o$",
+        "value": "$S^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "$H^o-H_{298}^o$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$H^o-H_{298}^o$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$H^o-H_{298}^o$",
+        "value": "$H^o-H_{298}^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -788,10 +828,50 @@
   "footnote_markers": [
     "*"
   ],
+  "post_table_note_block": {
+    "raw": "\\*Data extrapolated 400-550 K.   \n317.3 K, melting point; $\\Delta H^{\\circ} = 0.157$   \n550 K, boiling point; $\\Delta H^{\\circ}$   \n= 2.908/mol of P.",
+    "lines_raw": [
+      "\\*Data extrapolated 400-550 K.",
+      "317.3 K, melting point; $\\Delta H^{\\circ} = 0.157$",
+      "550 K, boiling point; $\\Delta H^{\\circ}$",
+      "= 2.908/mol of P."
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "317.3 K, melting point; $\\Delta H^{\\circ} = 0.157$",
+        "temperature_K": 317.3,
+        "temperature_uncertainty_K": null,
+        "kind": "melting",
+        "enthalpy_as_published": 0.157,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "550 K, boiling point; $\\Delta H^{\\circ}$",
+        "temperature_K": 550.0,
+        "temperature_uncertainty_K": null,
+        "kind": "boiling",
+        "enthalpy_as_published": null,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p041-p080.md",
     "table_index": 126,
     "table_sha256": "307ab52103e6bf33ba36a9465b0a5913ae072df355f4f4fd67975733b6eccdf4",
+    "note_block_sha256": "4737351dba5d1dda08f604073a0b02228b0a6759cbf8d199cd12ac3746ad26db",
+    "complete_source_block_sha256": "f3c527cc6e61edabfd1a5a44bd3e337096b603fa764f0435a4136bf9fa8464ad",
     "bbox": [
       607,
       608,
@@ -801,9 +881,43 @@
   },
   "ambiguities": [
     {
-      "kind": "ocr_heading_confusion",
+      "kind": "ocr_heading_unresolved",
+      "field": "formula_as_published",
       "raw_token": "$P[c,1,1/4P_{4}(g)]$",
-      "reason": "l/1/I shape is ambiguous in scanned formula or phase text"
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "name_as_published",
+      "raw_token": "Phosphorus (white)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "[c,1,1/4P4(g)]",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$Cp^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "$S^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "$H^o-H_{298}^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
     }
   ],
   "corrections": []

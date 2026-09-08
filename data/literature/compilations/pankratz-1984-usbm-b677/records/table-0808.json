@@ -11,45 +11,99 @@
     "raw": "$\\mathrm{PF}_{2}(\\mathrm{g})$",
     "value": "PF2",
     "ocr_suspect": false,
-    "ocr_check": "no_shape_confusion_detected"
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "name_token": {
+    "raw": "Phosphorus difluoride (ideal gas)",
+    "value": "Phosphorus difluoride (ideal gas)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "phase_token": {
+    "raw": "(g)",
+    "value": "(g)",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
   },
   "page": 202,
   "pdf_page": 206,
   "table_number": null,
   "toc_section": "fluorides",
   "table_kind": "thermodynamic_temperature_grid",
-  "transcription_status": "transcribed",
+  "transcription_status": "transcribed_with_ocr_ambiguities",
   "units_statement_as_published": "T is in K; Cp° and S° are in cal/mol·K; H°-H°298, ΔHf° and ΔGf° are in kcal/mol.",
   "columns": [
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$C_{p}^{\\circ}$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$C_{p}^{\\circ}$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$C_{p}^{\\circ}$",
+        "value": "$C_{p}^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "$S^{\\circ}$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$S^{\\circ}$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$S^{\\circ}$",
+        "value": "$S^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "$H^{\\circ}-H_{298}^{\\circ}$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$H^{\\circ}-H_{298}^{\\circ}$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$H^{\\circ}-H_{298}^{\\circ}$",
+        "value": "$H^{\\circ}-H_{298}^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "$\\Delta Hf^{\\circ}$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Hf^{\\circ}$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Hf^{\\circ}$",
+        "value": "$\\Delta Hf^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "$\\Delta Gf^{\\circ}$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Gf^{\\circ}$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Gf^{\\circ}$",
+        "value": "$\\Delta Gf^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -778,10 +832,34 @@
   "footnote_markers": [
     "*"
   ],
+  "post_table_note_block": {
+    "raw": "\\*Data estimated.",
+    "lines_raw": [
+      "\\*Data estimated."
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [
+      {
+        "raw": "\\*Data estimated."
+      }
+    ],
+    "uncertainties": [],
+    "transitions": []
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p201-p240.md",
     "table_index": 34,
     "table_sha256": "905283013e99731922fe05cb647505b7290b5f18fb40624c96b3a26caacc8e54",
+    "note_block_sha256": "9a1fb5b8df759d4dc1b43759d9ba93f2726d55d767c0171b32d1f75953be3243",
+    "complete_source_block_sha256": "6ff2dceb547f28ab21ca1dfd43d96918945a06a5b22bef686eabe39751ffbd27",
     "bbox": [
       529,
       117,
@@ -789,6 +867,48 @@
       297
     ]
   },
-  "ambiguities": [],
+  "ambiguities": [
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "name_as_published",
+      "raw_token": "Phosphorus difluoride (ideal gas)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$C_{p}^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "$S^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "$H^{\\circ}-H_{298}^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 4,
+      "raw_token": "$\\Delta Hf^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 5,
+      "raw_token": "$\\Delta Gf^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    }
+  ],
   "corrections": []
 }

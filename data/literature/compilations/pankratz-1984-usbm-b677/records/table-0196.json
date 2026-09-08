@@ -11,7 +11,19 @@
     "raw": "Ib(c,1)",
     "value": "Ib",
     "ocr_suspect": true,
-    "ocr_check": "plausible_character_confusion"
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "name_token": {
+    "raw": "Terbium",
+    "value": "Terbium",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c,1)",
+    "value": "(c,1)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 85,
   "pdf_page": 89,
@@ -24,22 +36,50 @@
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "Cp°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "Cp°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "Cp°",
+        "value": "Cp°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "S°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "S°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "S°",
+        "value": "S°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "H°-H298",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "H°-H298",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "H°-H298",
+        "value": "H°-H298",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -778,10 +818,48 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "1560 K, transition point; $\\Delta H^{\\circ} = 1.200$   \n1630 K, melting point; $\\Delta H^{\\circ} = 2.580$",
+    "lines_raw": [
+      "1560 K, transition point; $\\Delta H^{\\circ} = 1.200$",
+      "1630 K, melting point; $\\Delta H^{\\circ} = 2.580$"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "1560 K, transition point; $\\Delta H^{\\circ} = 1.200$",
+        "temperature_K": 1560.0,
+        "temperature_uncertainty_K": null,
+        "kind": "transition",
+        "enthalpy_as_published": 1.2,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "1630 K, melting point; $\\Delta H^{\\circ} = 2.580$",
+        "temperature_K": 1630.0,
+        "temperature_uncertainty_K": null,
+        "kind": "melting",
+        "enthalpy_as_published": 2.58,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p081-p120.md",
     "table_index": 44,
     "table_sha256": "be2c6d76e9f2c2398eaf70828007880e55e94c346147783fef62ec5c92944908",
+    "note_block_sha256": "993cf60a4a82d6d8d7cee91f94d1d7fe65a6d2741dcefdf32b0635c348be7fbd",
+    "complete_source_block_sha256": "a75a432a84e912b2500a05688cb6a9b3b34b432b0cf3b1fedd544f44ed57e4a4",
     "bbox": [
       578,
       112,
@@ -791,9 +869,23 @@
   },
   "ambiguities": [
     {
-      "kind": "ocr_heading_confusion",
+      "kind": "ocr_heading_unresolved",
+      "field": "formula_as_published",
       "raw_token": "Ib(c,1)",
-      "reason": "l/1/I shape is ambiguous in scanned formula or phase text"
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "(c,1)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "H°-H298",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
     }
   ],
   "corrections": []

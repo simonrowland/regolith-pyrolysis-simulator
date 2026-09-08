@@ -11,7 +11,19 @@
     "raw": "$\\mathsf{FeBr}_2(\\mathbf{c},1)$",
     "value": "FeBr2",
     "ocr_suspect": true,
-    "ocr_check": "plausible_character_confusion"
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "name_token": {
+    "raw": "Iron dibromide",
+    "value": "Iron dibromide",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c,1)",
+    "value": "(c,1)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 110,
   "pdf_page": 114,
@@ -24,32 +36,74 @@
     {
       "index": 0,
       "heading_raw": "$\\Gamma$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Gamma$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Gamma$",
+        "value": "$\\Gamma$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$Cp^{\\circ}$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$Cp^{\\circ}$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$Cp^{\\circ}$",
+        "value": "$Cp^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "$S^{\\circ}$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$S^{\\circ}$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$S^{\\circ}$",
+        "value": "$S^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "$H^{\\circ}-H_{298}^{\\circ}$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$H^{\\circ}-H_{298}^{\\circ}$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$H^{\\circ}-H_{298}^{\\circ}$",
+        "value": "$H^{\\circ}-H_{298}^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "$\\Delta Hf^{\\circ}$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Hf^{\\circ}$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Hf^{\\circ}$",
+        "value": "$\\Delta Hf^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "$\\Delta Gf^{\\circ}$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Gf^{\\circ}$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Gf^{\\circ}$",
+        "value": "$\\Delta Gf^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -778,10 +832,62 @@
   "footnote_markers": [
     "*"
   ],
+  "post_table_note_block": {
+    "raw": "\\*Enthalpy of fusion and heat capacity of liquid estimated.   \n650 K, transition point; $\\Delta H^{\\circ} = 0.10$   \n964 K, melting point; $\\Delta H^{\\circ} = 12.0$   \n1207 K, boiling point to equilibrium mixture of monomer and dimer; $\\Delta H^{\\circ} = 29.4$",
+    "lines_raw": [
+      "\\*Enthalpy of fusion and heat capacity of liquid estimated.",
+      "650 K, transition point; $\\Delta H^{\\circ} = 0.10$",
+      "964 K, melting point; $\\Delta H^{\\circ} = 12.0$",
+      "1207 K, boiling point to equilibrium mixture of monomer and dimer; $\\Delta H^{\\circ} = 29.4$"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [
+      {
+        "raw": "\\*Enthalpy of fusion and heat capacity of liquid estimated."
+      }
+    ],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "650 K, transition point; $\\Delta H^{\\circ} = 0.10$",
+        "temperature_K": 650.0,
+        "temperature_uncertainty_K": null,
+        "kind": "transition",
+        "enthalpy_as_published": 0.1,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "964 K, melting point; $\\Delta H^{\\circ} = 12.0$",
+        "temperature_K": 964.0,
+        "temperature_uncertainty_K": null,
+        "kind": "melting",
+        "enthalpy_as_published": 12.0,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "1207 K, boiling point to equilibrium mixture of monomer and dimer; $\\Delta H^{\\circ} = 29.4$",
+        "temperature_K": 1207.0,
+        "temperature_uncertainty_K": null,
+        "kind": "boiling",
+        "enthalpy_as_published": 29.4,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p081-p120.md",
     "table_index": 153,
     "table_sha256": "65223289c6dfc2e68251aa34f40d5486f7817b45a1fcaaeceefb4b97b0da7c05",
+    "note_block_sha256": "4b5123360bdbf25ea71f189c1f99b8135f79acc6901515bfc7f72cdc94f157e1",
+    "complete_source_block_sha256": "c545089a1d9caf727bc70504a6debdcad8de64c3bd4431a6b93438299660580e",
     "bbox": [
       81,
       329,
@@ -791,9 +897,58 @@
   },
   "ambiguities": [
     {
-      "kind": "ocr_heading_confusion",
+      "kind": "ocr_heading_unresolved",
+      "field": "formula_as_published",
       "raw_token": "$\\mathsf{FeBr}_2(\\mathbf{c},1)$",
-      "reason": "l/1/I shape is ambiguous in scanned formula or phase text"
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "(c,1)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 0,
+      "raw_token": "$\\Gamma$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$Cp^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "$S^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "$H^{\\circ}-H_{298}^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 4,
+      "raw_token": "$\\Delta Hf^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 5,
+      "raw_token": "$\\Delta Gf^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
     }
   ],
   "corrections": []

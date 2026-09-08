@@ -10,46 +10,100 @@
   "formula_token": {
     "raw": "$NbCl_{5}(c,l,g)$",
     "value": "NbCl5",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "name_token": {
+    "raw": "Niobium pentachloride",
+    "value": "Niobium pentachloride",
     "ocr_suspect": false,
-    "ocr_check": "no_shape_confusion_detected"
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c,l,g)",
+    "value": "(c,l,g)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 164,
   "pdf_page": 168,
   "table_number": null,
   "toc_section": "chlorides",
   "table_kind": "thermodynamic_temperature_grid",
-  "transcription_status": "transcribed",
+  "transcription_status": "transcribed_with_ocr_ambiguities",
   "units_statement_as_published": "T is in K; Cp° and S° are in cal/mol·K; H°-H°298, ΔHf° and ΔGf° are in kcal/mol.",
   "columns": [
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "Cp°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "Cp°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "Cp°",
+        "value": "Cp°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "S°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "S°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "S°",
+        "value": "S°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "H°-H°298",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "H°-H°298",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "H°-H°298",
+        "value": "H°-H°298",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "ΔHf°",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "ΔHf°",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "ΔHf°",
+        "value": "ΔHf°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "ΔGf°",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "ΔGf°",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "ΔGf°",
+        "value": "ΔGf°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -1044,10 +1098,48 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "478.9 K, melting point; $\\Delta H^{\\circ} = 8.097$   \n519.7 K, boiling point; $\\Delta H^{\\circ} = 12.462$",
+    "lines_raw": [
+      "478.9 K, melting point; $\\Delta H^{\\circ} = 8.097$",
+      "519.7 K, boiling point; $\\Delta H^{\\circ} = 12.462$"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "478.9 K, melting point; $\\Delta H^{\\circ} = 8.097$",
+        "temperature_K": 478.9,
+        "temperature_uncertainty_K": null,
+        "kind": "melting",
+        "enthalpy_as_published": 8.097,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "519.7 K, boiling point; $\\Delta H^{\\circ} = 12.462$",
+        "temperature_K": 519.7,
+        "temperature_uncertainty_K": null,
+        "kind": "boiling",
+        "enthalpy_as_published": 12.462,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p161-p200.md",
     "table_index": 45,
     "table_sha256": "be763443483b5eaf63e25c4cbafe876039fb794d465956ff6bd233ada077e296",
+    "note_block_sha256": "b4168edd44bfcdef3c26dbe7b72ec7c6fc23762ecffaf8fabb7a7859514d1c54",
+    "complete_source_block_sha256": "cba2dc97b38b77c09ac7bf67d38679f68e8cdde63f468c4eeee5d735061b566e",
     "bbox": [
       81,
       354,
@@ -1055,6 +1147,26 @@
       589
     ]
   },
-  "ambiguities": [],
+  "ambiguities": [
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "formula_as_published",
+      "raw_token": "$NbCl_{5}(c,l,g)$",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "(c,l,g)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "H°-H°298",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    }
+  ],
   "corrections": []
 }

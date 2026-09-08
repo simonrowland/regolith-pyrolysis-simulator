@@ -11,45 +11,99 @@
     "raw": "PbTe(c)",
     "value": "PbTe",
     "ocr_suspect": false,
-    "ocr_check": "no_shape_confusion_detected"
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "name_token": {
+    "raw": "Lead monotelluride",
+    "value": "Lead monotelluride",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c)",
+    "value": "(c)",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
   },
   "page": 351,
   "pdf_page": 355,
   "table_number": null,
   "toc_section": "tellurides",
   "table_kind": "thermodynamic_temperature_grid",
-  "transcription_status": "transcribed",
+  "transcription_status": "transcribed_with_ocr_ambiguities",
   "units_statement_as_published": "T is in K; Cp° and S° are in cal/mol·K; H°-H°298, ΔHf° and ΔGf° are in kcal/mol.",
   "columns": [
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "Cp°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "Cp°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "Cp°",
+        "value": "Cp°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "S°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "S°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "S°",
+        "value": "S°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "H°-H298°",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "H°-H298°",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "H°-H298°",
+        "value": "H°-H298°",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "ΔHf°",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "ΔHf°",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "ΔHf°",
+        "value": "ΔHf°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "ΔGf°",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "ΔGf°",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "ΔGf°",
+        "value": "ΔGf°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -709,10 +763,34 @@
   "footnote_markers": [
     "*"
   ],
+  "post_table_note_block": {
+    "raw": "\\*Data above 298 K estimated.",
+    "lines_raw": [
+      "\\*Data above 298 K estimated."
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [
+      {
+        "raw": "\\*Data above 298 K estimated."
+      }
+    ],
+    "uncertainties": [],
+    "transitions": []
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p321-p360.md",
     "table_index": 170,
     "table_sha256": "4a157ee1a969911adfe5c3c579b990a50917474799ad38bb09f8c0f60b5759e2",
+    "note_block_sha256": "776690228dd5900eb3f5ade1a6d8b817d2d4ce7e1eae267b543f9c157bd8464e",
+    "complete_source_block_sha256": "6a7f0d23269120820c463ea9dcc8bd4b6c80f701c9b1238387e476603f186e4e",
     "bbox": [
       53,
       342,
@@ -720,6 +798,21 @@
       508
     ]
   },
-  "ambiguities": [],
+  "ambiguities": [
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 0,
+      "raw_token": "T",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "H°-H298°",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    }
+  ],
   "corrections": []
 }

@@ -76,6 +76,54 @@ HEADING_CORRECTIONS = {
         "image_quote": "Er2O3(c) / Dierbium trioxide",
         "reason": "Rendered page proves MinerU confused printed O with 0.",
     },
+    "table-1051": {
+        "field": "formula_as_published",
+        "raw_token": "$\\mathrm{IiI}_{4}(\\mathrm{g})$",
+        "printed_token": "TiI4",
+        "page": 245,
+        "image_quote": "TiI4(g) / Titanium tetraiodide (ideal gas)",
+        "reason": "Rendered page proves MinerU confused the printed Ti prefix with Ii.",
+    },
+    "table-1439": {
+        "field": "formula_as_published",
+        "raw_token": "NiSO $_{4}$ (c)",
+        "printed_token": "NiSO4",
+        "page": 324,
+        "image_quote": "NiSO4(c) / Nickel sulfate",
+        "reason": "Rendered page proves the subscript belongs to the formula without an embedded space.",
+    },
+    "table-1301": {
+        "field": "formula_as_published",
+        "raw_token": "V0(c)",
+        "printed_token": "VO",
+        "page": 292,
+        "image_quote": "VO(c) / Vanadium monoxide",
+        "reason": "Rendered page proves MinerU confused the printed O with zero.",
+    },
+}
+
+COLUMN_HEADING_CORRECTIONS = {
+    ("table-0984", 0): {
+        "field": "column_heading",
+        "raw_token": "I",
+        "printed_token": "T",
+        "page": 234,
+        "image_quote": "T | Cp° | S° | H°-H°298 | ΔHf° | ΔGf°",
+        "reason": "Rendered page proves MinerU confused the temperature heading T with I.",
+    },
+    ("table-1079", 0): {
+        "field": "column_heading",
+        "raw_token": "I",
+        "printed_token": "T",
+        "page": 253,
+        "image_quote": "T | Cp° | S° | H°-H°298 | ΔHf° | ΔGf°",
+        "reason": "Rendered page proves MinerU confused the temperature heading T with I.",
+    },
+}
+
+IMAGE_VERIFIED_NOTE_RECORDS = {
+    "table-0050", "table-0198", "table-0352", "table-0500", "table-0652",
+    "table-0800", "table-0951", "table-1100", "table-1251", "table-1400",
 }
 
 
@@ -203,7 +251,7 @@ def visible(text: str) -> str:
 
 def looks_like_formula(text: str) -> bool:
     plain = visible(text)
-    return bool(re.search(r"\([^)]*[cglv1][^)]*\)\s*$", plain, re.I)) and bool(re.search(r"[A-Z]", plain))
+    return bool(re.search(r"(?:\([^)]*[cglv1][^)]*\)|\[[^]]+\])\s*$", plain, re.I)) and bool(re.search(r"[A-Z]", plain))
 
 
 def heading(lines: list[str], chapter_two: bool) -> tuple[str | None, str | None, str | None, str | None, str | None]:
@@ -259,6 +307,105 @@ def column_unit(heading_raw: str, chapter_two: bool) -> str | None:
     return None
 
 
+def post_table_note_block(text: str, next_chapter_two: bool, has_next_table: bool) -> str:
+    lines = text.splitlines()
+    while lines and not lines[0].strip():
+        lines.pop(0)
+    while lines and not lines[-1].strip():
+        lines.pop()
+    next_caption = None
+    if not next_chapter_two:
+        next_caption = next((index for index, line in enumerate(lines) if re.match(r"\s*TABLE\s+\d+", line, re.I)), None)
+        if next_caption is not None:
+            lines = lines[:next_caption]
+    meaningful = [index for index, line in enumerate(lines) if line.strip() and not line.lstrip().startswith("#")]
+    if has_next_table and next_caption is None and meaningful:
+        last = meaningful[-1]
+        last_text = lines[last].strip()
+        inline_math = re.match(r"^(\$[^$]+\$)\s+(.+)$", last_text)
+        inline_plain = re.match(r"^(.+?\([^)]*[cglv1][^)]*\))\s+([A-Z].+)$", visible(last_text), re.I)
+        inline_word = re.match(r"^(.+?(?:\d|\)))\s+([A-Z][a-z]{2,}.+)$", visible(last_text))
+        inline_identity = (
+            (inline_math and looks_like_formula(inline_math.group(1)))
+            or (inline_plain and looks_like_formula(inline_plain.group(1)))
+            or inline_word
+        )
+        heading_start = last if inline_identity else (meaningful[-2] if len(meaningful) >= 2 else last)
+        if heading_start is not None:
+            lines = lines[:heading_start]
+    lines = [line for line in lines if not line.lstrip().startswith("#")]
+    raw = "\n".join(lines).strip()
+    return re.split(r"(?m)^\s*(?:Units:|Sources of data from general references|1\.\s+Barin,)", raw, maxsplit=1)[0].strip()
+
+
+def parse_note_block(raw: str, image_verified: bool = False) -> dict:
+    lines = [line.strip() for line in raw.splitlines() if line.strip()]
+    estimate_notes = [{"raw": line} for line in lines if re.search(r"\bestimat(?:e|ed|ion)", line, re.I)]
+    uncertainties = []
+    uncertainty_pattern = re.compile(
+        r"(?P<value>\d+(?:\.\d+)?)\s*(?:\\pm|±|\+/-)\s*(?P<uncertainty>\d+(?:\.\d+)?)\s*(?P<unit>[A-Za-z]+)?"
+    )
+    for line in lines:
+        for match in uncertainty_pattern.finditer(line.replace("$", "")):
+            uncertainties.append({
+                "raw": match.group(0),
+                "value": float(match.group("value")),
+                "uncertainty": float(match.group("uncertainty")),
+                "unit_as_published": match.group("unit"),
+                "source_line_raw": line,
+            })
+    transitions = []
+    transition_pattern = re.compile(
+        r"(?P<temperature>\d+(?:\.\d+)?)"
+        r"(?:\s*\\pm\s*(?P<temperature_uncertainty>\d+(?:\.\d+)?))?"
+        r"\s*(?:K|\\mathrm\{~?K\})\s*,\s*"
+        r"(?P<kind>transition|melting|boiling|sublimation|decomposition|fusion|vaporization)"
+        r"(?:\s+point|\s+to\b)",
+        re.I,
+    )
+    enthalpy_pattern = re.compile(
+        r"=\s*(?P<enthalpy>[+-]?\d+(?:\.\d+)?)"
+        r"(?:\s*\\pm\s*(?P<enthalpy_uncertainty>\d+(?:\.\d+)?))?"
+    )
+    for line in lines:
+        plain_line = line.replace("$", "")
+        for match in transition_pattern.finditer(plain_line):
+            tail = plain_line[match.end():]
+            enthalpy = enthalpy_pattern.search(tail)
+            transitions.append({
+                "raw": line,
+                "temperature_K": float(match.group("temperature")),
+                "temperature_uncertainty_K": (
+                    float(match.group("temperature_uncertainty"))
+                    if match.group("temperature_uncertainty") else None
+                ),
+                "kind": match.group("kind").lower(),
+                "enthalpy_as_published": float(enthalpy.group("enthalpy")) if enthalpy else None,
+                "enthalpy_uncertainty_as_published": (
+                    float(enthalpy.group("enthalpy_uncertainty"))
+                    if enthalpy and enthalpy.group("enthalpy_uncertainty") else None
+                ),
+            })
+    return {
+        "raw": raw,
+        "lines_raw": lines,
+        "ocr_suspect": bool(raw) and not image_verified,
+        "ocr_check": (
+            "image_verified_fixture_agreement" if raw and image_verified else
+            "mineru_post_table_text_retained_not_image_verified" if raw else
+            "no_post_table_text"
+        ),
+        "ambiguities": ([{
+            "kind": "post_table_note_ocr_unverified",
+            "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted.",
+        }] if raw and not image_verified else []),
+        "corrections": [],
+        "estimate_notes": estimate_notes,
+        "uncertainties": uncertainties,
+        "transitions": transitions,
+    }
+
+
 def section_for(page: int) -> str:
     for name, first, last in TOC_SECTIONS:
         if first <= page <= last:
@@ -287,12 +434,20 @@ def load_source_tables() -> list[dict]:
             if parse_table(match.group()) != parse_table(item["table_body"]):
                 raise ValueError(f"markdown/content-list disagreement: {directory.name} table {index}")
             context = [line.strip() for line in markdown[prior:match.start()].splitlines() if line.strip()]
+            next_start = matches[index].start() if index < len(matches) else len(markdown)
+            next_pdf_page = start + int(items[index]["page_idx"]) if index < len(items) else None
+            note_raw = post_table_note_block(
+                markdown[match.end():next_start],
+                bool(next_pdf_page is not None and next_pdf_page - 4 >= 47),
+                index < len(matches),
+            ) if start + int(item["page_idx"]) - 4 >= 47 else ""
             tables.append({
                 "chunk": directory.name,
                 "source_file": copied.name,
                 "source_table_index": index,
                 "html": match.group(),
                 "context": context[-12:],
+                "post_table_note_block_raw": note_raw,
                 "pdf_page": start + int(item["page_idx"]),
                 "bbox": item.get("bbox"),
             })
@@ -348,6 +503,58 @@ def table_image_words(scan: dict, bbox: list[int] | None) -> list[str]:
         if x1 - margin <= cx <= x2 + margin and y1 - margin <= cy <= y2 + margin:
             selected.append((top, left, text))
     return [text for _, _, text in sorted(selected)]
+
+
+def raster_region_words(scan: dict, bbox: list[int] | None, top_offset: int, bottom_offset: int) -> list[str]:
+    if not bbox:
+        return []
+    x1, y1, x2, _ = bbox
+    xscale = scan["width"] / 1000.0
+    yscale = scan["height"] / 1000.0
+    selected = []
+    for left, top, width, height, value in scan["words"]:
+        cx = (left + width / 2) / xscale
+        cy = (top + height / 2) / yscale
+        if x1 - 25 <= cx <= x2 + 25 and y1 + top_offset <= cy <= y1 + bottom_offset:
+            selected.append((top, left, value))
+    return [value for _, _, value in sorted(selected)]
+
+
+def raster_column_header_words(scan: dict, bbox: list[int] | None, index: int, count: int) -> list[str]:
+    if not bbox or count <= 0:
+        return []
+    x1, y1, x2, _ = bbox
+    column_width = (x2 - x1) / count
+    narrowed = [x1 + index * column_width, y1, x1 + (index + 1) * column_width, y1]
+    return raster_region_words(scan, narrowed, -5, 65)
+
+
+def image_token_agrees(value: str | None, words: list[str]) -> bool:
+    if not value:
+        return False
+    expected = re.sub(r"[^a-z0-9]+", "", visible(value).lower())
+    raster_text = re.sub(r"[^a-z0-9]+", "", " ".join(words).lower())
+    return bool(expected and expected in raster_text)
+
+
+def heading_token(
+    raw: str | None,
+    value: str | None,
+    words: list[str],
+    corrected: bool = False,
+    evidence_value: str | None = None,
+) -> dict:
+    agreed = image_token_agrees(evidence_value or value, words)
+    return {
+        "raw": raw or "",
+        "value": value,
+        "ocr_suspect": corrected or not agreed,
+        "ocr_check": (
+            "image_proven_correction" if corrected else
+            "raster_heading_region_token_agreement" if agreed else
+            "raster_heading_region_token_disagreement"
+        ),
+    }
 
 
 def source_cell_agreements(source_rows: list[list[str]], scan: dict, bbox: list[int] | None) -> set[tuple[int, int]]:
@@ -414,6 +621,7 @@ def build_records(tables: list[dict], raster: dict[int, str]) -> tuple[list[dict
     records = []
     manifest_entries = []
     for ordinal, table in enumerate(tables, 1):
+        record_id = f"table-{ordinal:04d}"
         page = table["pdf_page"] - 4
         chapter_two = page >= 47
         parsed = parse_table(table["html"])
@@ -439,7 +647,31 @@ def build_records(tables: list[dict], raster: dict[int, str]) -> tuple[list[dict
         width = max((len(row) for row in parsed), default=0)
         header_rows = [row + [""] * (width - len(row)) for row in parsed[:data_start]]
         headings = [" / ".join(row[i] for row in header_rows if row[i]).strip() for i in range(width)]
-        columns = [{"index": i, "heading_raw": headings[i], "units_as_published": column_unit(headings[i], chapter_two)} for i in range(width)]
+        corrections = []
+        columns = []
+        for column_index, raw_heading in enumerate(headings):
+            published_heading = raw_heading
+            correction = COLUMN_HEADING_CORRECTIONS.get((record_id, column_index))
+            if correction:
+                correction = {"record_id": record_id, "column_index": column_index, **correction}
+                if raw_heading != correction["raw_token"]:
+                    raise ValueError(f"{record_id} column correction raw token drifted")
+                published_heading = correction["printed_token"]
+                corrections.append(correction)
+            columns.append({
+                "index": column_index,
+                "heading_raw": raw_heading,
+                "heading_as_published": published_heading,
+                "units_as_published": column_unit(published_heading, chapter_two),
+                "heading_token": heading_token(
+                    raw_heading,
+                    published_heading,
+                    raster_column_header_words(
+                        raster[table["pdf_page"]], table["bbox"], column_index, width
+                    ),
+                    bool(correction),
+                ),
+            })
         image_agreements = source_cell_agreements(source_rows, raster[table["pdf_page"]], table["bbox"])
         rows = []
         for source_row_index, source_row in enumerate(parsed[data_start:], data_start):
@@ -451,8 +683,6 @@ def build_records(tables: list[dict], raster: dict[int, str]) -> tuple[list[dict
             })
         formula, name, phase, formula_raw, name_raw = heading(table["context"], chapter_two)
         table_number_match = next((re.search(r"TABLE\s+(\d+)", line, re.I) for line in reversed(table["context"]) if re.search(r"TABLE\s+\d+", line, re.I)), None)
-        record_id = f"table-{ordinal:04d}"
-        corrections = []
         if record_id in HEADING_CORRECTIONS:
             correction = {"record_id": record_id, **HEADING_CORRECTIONS[record_id]}
             if correction["field"] == "name_as_published" and name == correction["raw_token"]:
@@ -461,9 +691,39 @@ def build_records(tables: list[dict], raster: dict[int, str]) -> tuple[list[dict
             elif correction["field"] == "formula_as_published" and formula_raw == correction["raw_token"]:
                 formula = correction["printed_token"]
                 corrections.append(correction)
+            else:
+                raise ValueError(f"{record_id} heading correction raw token drifted")
+        identity_words = raster_region_words(raster[table["pdf_page"]], table["bbox"], -140, -3)
+        formula_corrected = any(item["field"] == "formula_as_published" for item in corrections)
+        name_corrected = any(item["field"] == "name_as_published" for item in corrections)
+        formula_phase_evidence = f"{formula or ''}{phase or ''}"
+        formula_state = heading_token(
+            formula_raw, formula, identity_words, formula_corrected, formula_phase_evidence
+        )
+        name_state = heading_token(name_raw, name, identity_words, name_corrected)
+        phase_state = heading_token(phase, phase, identity_words, False, formula_phase_evidence)
+        note_block = parse_note_block(
+            table["post_table_note_block_raw"], record_id in IMAGE_VERIFIED_NOTE_RECORDS
+        )
         ambiguities = []
-        if formula_raw and re.search(r"[01]|\bI\b", formula_raw):
-            ambiguities.append({"kind": "ocr_heading_confusion", "raw_token": formula_raw, "reason": "l/1/I shape is ambiguous in scanned formula or phase text"})
+        corrected_fields = {(item["field"], item.get("column_index")) for item in corrections}
+        for field, state in (("formula_as_published", formula_state), ("name_as_published", name_state), ("phase_as_published", phase_state)):
+            if state["ocr_suspect"] and (field, None) not in corrected_fields:
+                ambiguities.append({
+                    "kind": "ocr_heading_unresolved",
+                    "field": field,
+                    "raw_token": state["raw"],
+                    "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred.",
+                })
+        for column in columns:
+            if column["heading_token"]["ocr_suspect"] and ("column_heading", column["index"]) not in corrected_fields:
+                ambiguities.append({
+                    "kind": "ocr_heading_unresolved",
+                    "field": "column_heading",
+                    "column_index": column["index"],
+                    "raw_token": column["heading_raw"],
+                    "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred.",
+                })
         if data_start == len(parsed):
             ambiguities.append({"kind": "untranscribed", "reason": "MinerU table contains no recoverable numeric data row"})
         if any(len(row) != width for row in parsed):
@@ -481,11 +741,10 @@ def build_records(tables: list[dict], raster: dict[int, str]) -> tuple[list[dict
             "name_heading_raw": name_raw,
             "phase_as_published": phase,
             "formula_token": {
-                "raw": formula_raw or "",
-                "value": formula,
-                "ocr_suspect": bool(formula_raw and re.search(r"[01]|\\(?:operatorname|mathfrak)", formula_raw)),
-                "ocr_check": "plausible_character_confusion" if formula_raw and re.search(r"[01]|\\(?:operatorname|mathfrak)", formula_raw) else "no_shape_confusion_detected",
+                **formula_state,
             },
+            "name_token": name_state,
+            "phase_token": phase_state,
             "page": page,
             "pdf_page": table["pdf_page"],
             "table_number": table_number_match.group(1) if table_number_match else None,
@@ -500,10 +759,15 @@ def build_records(tables: list[dict], raster: dict[int, str]) -> tuple[list[dict
             "temperature_grid": [row["cells"][0] for row in rows if row["cells"]],
             "rows": rows,
             "footnote_markers": sorted({marker for row in rows for item in row["cells"] for marker in item.get("footnote_markers", [])}),
+            "post_table_note_block": note_block,
             "source_locator": {
                 "file": f"source/mineru/{table['source_file']}",
                 "table_index": table["source_table_index"],
                 "table_sha256": hashlib.sha256(table["html"].encode()).hexdigest(),
+                "note_block_sha256": hashlib.sha256(table["post_table_note_block_raw"].encode()).hexdigest(),
+                "complete_source_block_sha256": hashlib.sha256(
+                    (table["html"] + "\n" + table["post_table_note_block_raw"]).encode()
+                ).hexdigest(),
                 "bbox": table["bbox"],
             },
             "ambiguities": ambiguities,
@@ -527,12 +791,17 @@ def build_records(tables: list[dict], raster: dict[int, str]) -> tuple[list[dict
             "row_count": len(rows),
             "numeric_cell_count": len(numeric),
             "ocr_suspect_count": len(suspects),
+            "heading_ocr_suspect_count": sum(
+                token["ocr_suspect"] for token in (formula_state, name_state, phase_state)
+            ) + sum(column["heading_token"]["ocr_suspect"] for column in columns),
+            "post_table_note_block_present": bool(note_block["raw"]),
             "ambiguity_count": len(ambiguities),
             "ambiguities": ambiguities,
             "transcription_status": transcription_status,
         })
         records.append(record)
-        print(f"STATUS: {SOURCE_ID} table {ordinal:04d}/{len(tables)} page {page}", flush=True)
+        if ordinal % 50 == 0 or ordinal == len(tables):
+            print(f"STATUS: {SOURCE_ID} table {ordinal:04d}/{len(tables)} page {page}", flush=True)
     return records, manifest_entries
 
 
@@ -591,6 +860,25 @@ def main() -> None:
     suspects = [item for record in records for row in record["rows"] for item in row["cells"] if item["ocr_suspect"]]
     identity = [item for record in records for item in record["ambiguities"] if item.get("kind") == "identity_disagreement"]
     corrections = [item for record in records for item in record["corrections"]]
+    heading_suspects = [
+        token
+        for record in records
+        for token in (
+            record["formula_token"], record["name_token"], record["phase_token"],
+            *(column["heading_token"] for column in record["columns"]),
+        )
+        if token["ocr_suspect"]
+    ]
+    note_records = [record for record in records if record["post_table_note_block"]["raw"]]
+    uncertainties = [
+        item for record in note_records for item in record["post_table_note_block"]["uncertainties"]
+    ]
+    transitions = [
+        item for record in note_records for item in record["post_table_note_block"]["transitions"]
+    ]
+    estimate_notes = [
+        item for record in note_records for item in record["post_table_note_block"]["estimate_notes"]
+    ]
     source = {
         "database": "Thermodynamic Data for Mineral Technology",
         "authors": "Pankratz, L. B.; Stuve, J. M.; Gokcen, N. A.",
@@ -619,12 +907,18 @@ def main() -> None:
             "row_count": sum(len(record["rows"]) for record in records),
             "parsed_numeric_cell_count": len(numeric_cells),
             "ocr_suspect_count": len(suspects),
+            "heading_ocr_suspect_count": len(heading_suspects),
             "identity_check_disagreement_count": len(identity),
             "correction_count": len(corrections),
+            "post_table_note_record_count": len(note_records),
+            "estimate_note_count": len(estimate_notes),
+            "uncertainty_count": len(uncertainties),
+            "transition_count": len(transitions),
         },
         "ocr_policy": {
             "primary_reading": "MinerU markdown and table HTML from nine local decode chunks",
             "second_reading": "Occurrence-preserving sequence alignment of Tesseract word-box tokens inside each MinerU table rectangle on 180-dpi original-PDF renders",
+            "heading_reading": "Every formula, name, phase, and column heading is compared with Tesseract word boxes from its rendered page region; disagreement is suspect and unresolved unless a page-image correction is ledgered.",
             "numeric_rule": "Preserve raw printed/OCR token; parse only syntactically numeric tokens; any raster disagreement remains ocr_suspect and is never corrected.",
             "identity_checks": "Detector only; no value correction.",
         },

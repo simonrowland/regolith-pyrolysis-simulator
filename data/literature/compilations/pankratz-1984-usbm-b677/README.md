@@ -7,10 +7,13 @@ Chapter 2. `census.json` assigns every table to the printed CONTENTS page ranges
 
 `source/mineru/` contains the nine source markdown decodes used for round-trip
 verification. Each record retains its raw header matrix, raw cell strings, parsed
-floats where syntax permits, footnote markers, printed temperature grid, PDF/printed
-page locator, and source-table index. No values are interpolated, extrapolated,
-zero-filled, or silently repaired. Raster OCR of 180-dpi page renders is a second
-reading: disagreement marks the cell `ocr_suspect` while preserving the MinerU token.
+floats where syntax permits, cell footnote markers, the complete post-table note block,
+structured estimate/uncertainty/transition fields, printed temperature grid,
+PDF/printed page locator, and source-table index. Raw MinerU note prose is preserved;
+only the ten note fixtures identified as image-verified claim raster agreement. No
+values are interpolated, extrapolated, zero-filled, or silently repaired. Raster OCR
+of 180-dpi page renders is a second reading: disagreement marks cells and identity or
+heading tokens `ocr_suspect` while preserving the MinerU token.
 Thermodynamic identities are detectors only and never alter a value.
 
 Units remain as printed: T in K; Cp° and S° in cal/mol·K; H°−H°298, ΔHf°, and ΔGf°

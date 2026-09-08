@@ -10,8 +10,20 @@
   "formula_token": {
     "raw": "Cd(c,1,g)",
     "value": "Cd",
-    "ocr_suspect": true,
-    "ocr_check": "plausible_character_confusion"
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "name_token": {
+    "raw": "Cadmium",
+    "value": "Cadmium",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c,1,g)",
+    "value": "(c,1,g)",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
   },
   "page": 54,
   "pdf_page": 58,
@@ -24,22 +36,50 @@
     {
       "index": 0,
       "heading_raw": "Γ",
-      "units_as_published": null
+      "heading_as_published": "Γ",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "Γ",
+        "value": "Γ",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "Cp°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "Cp°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "Cp°",
+        "value": "Cp°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "S°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "S°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "S°",
+        "value": "S°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "H°-H298",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "H°-H298",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "H°-H298",
+        "value": "H°-H298",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -778,10 +818,48 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "594.26 K, melting point; $\\Delta H^{\\circ} = 1.480$   \n1040 K, boiling point; $\\Delta H^{\\circ} = 23.809$",
+    "lines_raw": [
+      "594.26 K, melting point; $\\Delta H^{\\circ} = 1.480$",
+      "1040 K, boiling point; $\\Delta H^{\\circ} = 23.809$"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "594.26 K, melting point; $\\Delta H^{\\circ} = 1.480$",
+        "temperature_K": 594.26,
+        "temperature_uncertainty_K": null,
+        "kind": "melting",
+        "enthalpy_as_published": 1.48,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "1040 K, boiling point; $\\Delta H^{\\circ} = 23.809$",
+        "temperature_K": 1040.0,
+        "temperature_uncertainty_K": null,
+        "kind": "boiling",
+        "enthalpy_as_published": 23.809,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p041-p080.md",
     "table_index": 38,
     "table_sha256": "37443e09cb9c48adc482a3ae75d79246b4c72e9c98299bb3a984d5cb54e9a7b9",
+    "note_block_sha256": "1027c6439b987257e3dd66b76322f8da3de322eb82ee180e2485380ece2e7ff1",
+    "complete_source_block_sha256": "551271b2bfdcf40fc793dd897ff2cff403c65e7d06cd9275548ec56817b74a96",
     "bbox": [
       593,
       112,
@@ -791,9 +869,18 @@
   },
   "ambiguities": [
     {
-      "kind": "ocr_heading_confusion",
-      "raw_token": "Cd(c,1,g)",
-      "reason": "l/1/I shape is ambiguous in scanned formula or phase text"
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 0,
+      "raw_token": "Γ",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "H°-H298",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
     }
   ],
   "corrections": []

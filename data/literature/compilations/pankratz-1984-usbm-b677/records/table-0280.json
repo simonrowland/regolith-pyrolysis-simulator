@@ -10,46 +10,100 @@
   "formula_token": {
     "raw": "BeBr $_{2}$ (c)",
     "value": "BeBr 2",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "name_token": {
+    "raw": "Beryllium dibromide",
+    "value": "Beryllium dibromide",
     "ocr_suspect": false,
-    "ocr_check": "no_shape_confusion_detected"
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c)",
+    "value": "(c)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 106,
   "pdf_page": 110,
   "table_number": null,
   "toc_section": "bromides",
   "table_kind": "thermodynamic_temperature_grid",
-  "transcription_status": "transcribed",
+  "transcription_status": "transcribed_with_ocr_ambiguities",
   "units_statement_as_published": "T is in K; Cp° and S° are in cal/mol·K; H°-H°298, ΔHf° and ΔGf° are in kcal/mol.",
   "columns": [
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$Cp^o$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$Cp^o$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$Cp^o$",
+        "value": "$Cp^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "$S^o$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$S^o$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$S^o$",
+        "value": "$S^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "$H^o-H_{298}^o$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$H^o-H_{298}^o$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$H^o-H_{298}^o$",
+        "value": "$H^o-H_{298}^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "$\\Delta Hf^o$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Hf^o$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Hf^o$",
+        "value": "$\\Delta Hf^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "$\\Delta Gf^o$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Gf^o$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Gf^o$",
+        "value": "$\\Delta Gf^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -502,10 +556,68 @@
   "footnote_markers": [
     "*"
   ],
+  "post_table_note_block": {
+    "raw": "\\*Data estimated.\n\n752 K, sublimation point to monomer; $\\Delta H^{\\circ}(298\\ K) = 30.2$\n\n$781 \\pm 15 \\mathrm{~K}$ , melting point; $\\Delta H^{\\circ} = 2.4 \\pm 2$",
+    "lines_raw": [
+      "\\*Data estimated.",
+      "752 K, sublimation point to monomer; $\\Delta H^{\\circ}(298\\ K) = 30.2$",
+      "$781 \\pm 15 \\mathrm{~K}$ , melting point; $\\Delta H^{\\circ} = 2.4 \\pm 2$"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [
+      {
+        "raw": "\\*Data estimated."
+      }
+    ],
+    "uncertainties": [
+      {
+        "raw": "781 \\pm 15 ",
+        "value": 781.0,
+        "uncertainty": 15.0,
+        "unit_as_published": null,
+        "source_line_raw": "$781 \\pm 15 \\mathrm{~K}$ , melting point; $\\Delta H^{\\circ} = 2.4 \\pm 2$"
+      },
+      {
+        "raw": "2.4 \\pm 2",
+        "value": 2.4,
+        "uncertainty": 2.0,
+        "unit_as_published": null,
+        "source_line_raw": "$781 \\pm 15 \\mathrm{~K}$ , melting point; $\\Delta H^{\\circ} = 2.4 \\pm 2$"
+      }
+    ],
+    "transitions": [
+      {
+        "raw": "752 K, sublimation point to monomer; $\\Delta H^{\\circ}(298\\ K) = 30.2$",
+        "temperature_K": 752.0,
+        "temperature_uncertainty_K": null,
+        "kind": "sublimation",
+        "enthalpy_as_published": 30.2,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "$781 \\pm 15 \\mathrm{~K}$ , melting point; $\\Delta H^{\\circ} = 2.4 \\pm 2$",
+        "temperature_K": 781.0,
+        "temperature_uncertainty_K": 15.0,
+        "kind": "melting",
+        "enthalpy_as_published": 2.4,
+        "enthalpy_uncertainty_as_published": 2.0
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p081-p120.md",
     "table_index": 128,
     "table_sha256": "eb7907998889e2a5bb332c805448b4722bb04db71f912ce60b9fd2935be6b29e",
+    "note_block_sha256": "153aff7ea2dd3940e4d58851a7d54e4fb87b3e24901fd33f25f5fd9264c09556",
+    "complete_source_block_sha256": "1e27a4195dbfb45cfb42212bf7e48ea210459714e305f329b3ce9bbab3c28ee7",
     "bbox": [
       86,
       357,
@@ -513,6 +625,54 @@
       483
     ]
   },
-  "ambiguities": [],
+  "ambiguities": [
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "formula_as_published",
+      "raw_token": "BeBr $_{2}$ (c)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "(c)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$Cp^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "$S^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "$H^o-H_{298}^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 4,
+      "raw_token": "$\\Delta Hf^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 5,
+      "raw_token": "$\\Delta Gf^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    }
+  ],
   "corrections": []
 }

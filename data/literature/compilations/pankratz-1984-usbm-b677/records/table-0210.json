@@ -10,8 +10,20 @@
   "formula_token": {
     "raw": "U(c,1)",
     "value": "U",
-    "ocr_suspect": true,
-    "ocr_check": "plausible_character_confusion"
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "name_token": {
+    "raw": "Uranium",
+    "value": "Uranium",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c,1)",
+    "value": "(c,1)",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
   },
   "page": 88,
   "pdf_page": 92,
@@ -24,22 +36,50 @@
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "Cp°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "Cp°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "Cp°",
+        "value": "Cp°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "S°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "S°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "S°",
+        "value": "S°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "H°-H°298",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "H°-H°298",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "H°-H°298",
+        "value": "H°-H°298",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -1247,10 +1287,58 @@
   "footnote_markers": [
     "*"
   ],
+  "post_table_note_block": {
+    "raw": "\\*Data extrapolated above 1600 K.   \n942 K, transition point; $\\Delta H^{\\circ} = 0.667$   \n1049 K, transition point; $\\Delta H^{\\circ} = 1.137$   \n1408 K, melting point; $\\Delta H^{\\circ} = 2.185$",
+    "lines_raw": [
+      "\\*Data extrapolated above 1600 K.",
+      "942 K, transition point; $\\Delta H^{\\circ} = 0.667$",
+      "1049 K, transition point; $\\Delta H^{\\circ} = 1.137$",
+      "1408 K, melting point; $\\Delta H^{\\circ} = 2.185$"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "942 K, transition point; $\\Delta H^{\\circ} = 0.667$",
+        "temperature_K": 942.0,
+        "temperature_uncertainty_K": null,
+        "kind": "transition",
+        "enthalpy_as_published": 0.667,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "1049 K, transition point; $\\Delta H^{\\circ} = 1.137$",
+        "temperature_K": 1049.0,
+        "temperature_uncertainty_K": null,
+        "kind": "transition",
+        "enthalpy_as_published": 1.137,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "1408 K, melting point; $\\Delta H^{\\circ} = 2.185$",
+        "temperature_K": 1408.0,
+        "temperature_uncertainty_K": null,
+        "kind": "melting",
+        "enthalpy_as_published": 2.185,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p081-p120.md",
     "table_index": 58,
     "table_sha256": "8174abc9c9f21445fa3d6e53b818dc4c6f93b76ef57879ba60b1917325c90ba9",
+    "note_block_sha256": "e361a6c61c6a48bda3ac8a78cc3324334311ebcec4c07def0728af4457dae70a",
+    "complete_source_block_sha256": "0127827552f044a6957b3175ca0cc8bcc0ff4d311965415dd7a80af22332f6c6",
     "bbox": [
       600,
       113,
@@ -1260,9 +1348,11 @@
   },
   "ambiguities": [
     {
-      "kind": "ocr_heading_confusion",
-      "raw_token": "U(c,1)",
-      "reason": "l/1/I shape is ambiguous in scanned formula or phase text"
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "H°-H°298",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
     }
   ],
   "corrections": []

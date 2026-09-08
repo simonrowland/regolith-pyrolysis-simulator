@@ -10,8 +10,20 @@
   "formula_token": {
     "raw": "$\\mathbf{Mg}(\\mathbf{c},1,\\mathbf{g})$",
     "value": "Mg",
-    "ocr_suspect": true,
-    "ocr_check": "plausible_character_confusion"
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "name_token": {
+    "raw": "Magnesium",
+    "value": "Magnesium",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c,1,g)",
+    "value": "(c,1,g)",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
   },
   "page": 8,
   "pdf_page": 12,
@@ -24,22 +36,50 @@
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": null
+      "heading_as_published": "T",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$Cp^o$",
-      "units_as_published": null
+      "heading_as_published": "$Cp^o$",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "$Cp^o$",
+        "value": "$Cp^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "$S^o$",
-      "units_as_published": null
+      "heading_as_published": "$S^o$",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "$S^o$",
+        "value": "$S^o$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "$H^o-H_2^o_{98}$",
-      "units_as_published": null
+      "heading_as_published": "$H^o-H_2^o_{98}$",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "$H^o-H_2^o_{98}$",
+        "value": "$H^o-H_2^o_{98}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -778,10 +818,23 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "",
+    "lines_raw": [],
+    "ocr_suspect": false,
+    "ocr_check": "no_post_table_text",
+    "ambiguities": [],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": []
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p001-p040.md",
     "table_index": 1,
     "table_sha256": "3dc54620122c055d329f33265dcc5333b955de74efc741c08ac33418e2a6242e",
+    "note_block_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "complete_source_block_sha256": "a7d093cda3b6d04789c0bc2311d72d1fc1d535c292c050d30135e7bfb553879e",
     "bbox": [
       256,
       215,
@@ -791,9 +844,25 @@
   },
   "ambiguities": [
     {
-      "kind": "ocr_heading_confusion",
-      "raw_token": "$\\mathbf{Mg}(\\mathbf{c},1,\\mathbf{g})$",
-      "reason": "l/1/I shape is ambiguous in scanned formula or phase text"
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$Cp^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "$S^o$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "$H^o-H_2^o_{98}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
     }
   ],
   "corrections": []

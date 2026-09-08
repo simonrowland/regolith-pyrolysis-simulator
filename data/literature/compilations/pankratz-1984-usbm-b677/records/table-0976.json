@@ -10,46 +10,100 @@
   "formula_token": {
     "raw": "$\\mathrm{CeI}_{3}(\\mathrm{g})$",
     "value": "CeI3",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "name_token": {
+    "raw": "Cerium triiodide (ideal gas)",
+    "value": "Cerium triiodide (ideal gas)",
     "ocr_suspect": false,
-    "ocr_check": "no_shape_confusion_detected"
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(g)",
+    "value": "(g)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 233,
   "pdf_page": 237,
   "table_number": null,
   "toc_section": "iodides",
   "table_kind": "thermodynamic_temperature_grid",
-  "transcription_status": "transcribed",
+  "transcription_status": "transcribed_with_ocr_ambiguities",
   "units_statement_as_published": "T is in K; Cp° and S° are in cal/mol·K; H°-H°298, ΔHf° and ΔGf° are in kcal/mol.",
   "columns": [
     {
       "index": 0,
       "heading_raw": "$\\mathrm{I}$",
-      "units_as_published": "K"
+      "heading_as_published": "$\\mathrm{I}$",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "$\\mathrm{I}$",
+        "value": "$\\mathrm{I}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$\\mathrm{Cp}^{\\circ}$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$\\mathrm{Cp}^{\\circ}$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$\\mathrm{Cp}^{\\circ}$",
+        "value": "$\\mathrm{Cp}^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "$\\mathrm{S}^{\\circ}$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$\\mathrm{S}^{\\circ}$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$\\mathrm{S}^{\\circ}$",
+        "value": "$\\mathrm{S}^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "$\\mathrm{H}^{\\circ}-\\mathrm{H}_{298}^{\\circ}$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\mathrm{H}^{\\circ}-\\mathrm{H}_{298}^{\\circ}$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\mathrm{H}^{\\circ}-\\mathrm{H}_{298}^{\\circ}$",
+        "value": "$\\mathrm{H}^{\\circ}-\\mathrm{H}_{298}^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "$\\Delta \\mathrm{Hf}^{\\circ}$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta \\mathrm{Hf}^{\\circ}$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta \\mathrm{Hf}^{\\circ}$",
+        "value": "$\\Delta \\mathrm{Hf}^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "$\\Delta \\mathrm{Gf}^{\\circ}$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta \\mathrm{Gf}^{\\circ}$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta \\mathrm{Gf}^{\\circ}$",
+        "value": "$\\Delta \\mathrm{Gf}^{\\circ}$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -768,10 +822,23 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "",
+    "lines_raw": [],
+    "ocr_suspect": false,
+    "ocr_check": "no_post_table_text",
+    "ambiguities": [],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": []
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p201-p240.md",
     "table_index": 202,
     "table_sha256": "547647666067a56e0a36b06d7cb9a6874bccda9bd7de18dc6ca05e24423a007c",
+    "note_block_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "complete_source_block_sha256": "946bc43aae910b8ead0481e8368990c7f1881639631edec31f7a634661fdce4c",
     "bbox": [
       53,
       106,
@@ -779,6 +846,61 @@
       292
     ]
   },
-  "ambiguities": [],
+  "ambiguities": [
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "formula_as_published",
+      "raw_token": "$\\mathrm{CeI}_{3}(\\mathrm{g})$",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "(g)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 0,
+      "raw_token": "$\\mathrm{I}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$\\mathrm{Cp}^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "$\\mathrm{S}^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "$\\mathrm{H}^{\\circ}-\\mathrm{H}_{298}^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 4,
+      "raw_token": "$\\Delta \\mathrm{Hf}^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 5,
+      "raw_token": "$\\Delta \\mathrm{Gf}^{\\circ}$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    }
+  ],
   "corrections": []
 }

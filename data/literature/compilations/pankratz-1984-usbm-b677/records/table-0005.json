@@ -10,8 +10,20 @@
   "formula_token": {
     "raw": "",
     "value": null,
-    "ocr_suspect": false,
-    "ocr_check": "no_shape_confusion_detected"
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "name_token": {
+    "raw": "",
+    "value": null,
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "phase_token": {
+    "raw": "",
+    "value": null,
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 29,
   "pdf_page": 33,
@@ -24,32 +36,74 @@
     {
       "index": 0,
       "heading_raw": "T, K / W(c)",
-      "units_as_published": null
+      "heading_as_published": "T, K / W(c)",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "T, K / W(c)",
+        "value": "T, K / W(c)",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "Gef / 2CO2(g)",
-      "units_as_published": null
+      "heading_as_published": "Gef / 2CO2(g)",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "Gef / 2CO2(g)",
+        "value": "Gef / 2CO2(g)",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "ΔGef for reaction 76 / WO2(c)",
-      "units_as_published": null
+      "heading_as_published": "ΔGef for reaction 76 / WO2(c)",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "ΔGef for reaction 76 / WO2(c)",
+        "value": "ΔGef for reaction 76 / WO2(c)",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "2CO(g)",
-      "units_as_published": null
+      "heading_as_published": "2CO(g)",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "2CO(g)",
+        "value": "2CO(g)",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "",
-      "units_as_published": null
+      "heading_as_published": "",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "",
+        "value": "",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "",
-      "units_as_published": null
+      "heading_as_published": "",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "",
+        "value": "",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -296,10 +350,23 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "",
+    "lines_raw": [],
+    "ocr_suspect": false,
+    "ocr_check": "no_post_table_text",
+    "ambiguities": [],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": []
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p001-p040.md",
     "table_index": 5,
     "table_sha256": "63c5c1cde2aae9d4c84a3ab23efa00ced70aa82e23b738c7eee5cd926daaaf68",
+    "note_block_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "complete_source_block_sha256": "a7182fa598deec1af6c007eaa08ec9de5472b16bd818aa3a87cd08ecf9d7e0cf",
     "bbox": [
       43,
       691,
@@ -308,6 +375,66 @@
     ]
   },
   "ambiguities": [
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "formula_as_published",
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "name_as_published",
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 0,
+      "raw_token": "T, K / W(c)",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "Gef / 2CO2(g)",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "ΔGef for reaction 76 / WO2(c)",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "2CO(g)",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 4,
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 5,
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
     {
       "kind": "column_shape",
       "reason": "MinerU rows have unequal cell counts; missing cells retained as blank padding",

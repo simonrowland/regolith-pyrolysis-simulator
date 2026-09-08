@@ -10,8 +10,20 @@
   "formula_token": {
     "raw": "S(c,1)",
     "value": "S",
-    "ocr_suspect": true,
-    "ocr_check": "plausible_character_confusion"
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "name_token": {
+    "raw": "Sulfur",
+    "value": "Sulfur",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c,1)",
+    "value": "(c,1)",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
   },
   "page": 78,
   "pdf_page": 82,
@@ -24,22 +36,50 @@
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "Cp°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "Cp°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "Cp°",
+        "value": "Cp°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "S°",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "S°",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "S°",
+        "value": "S°",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "H°-H°298",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "H°-H°298",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "H°-H°298",
+        "value": "H°-H°298",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -523,10 +563,66 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "368.3 K, transition point; $\\Delta H^{\\circ} = 0.096$   \n388.36 K, melting point; $\\Delta H^{\\circ} = 0.413$   \n432.02 K, transition point; $\\Delta H^{\\circ} = 0$   \n717.82 K, boiling point; mixed polymeric gases",
+    "lines_raw": [
+      "368.3 K, transition point; $\\Delta H^{\\circ} = 0.096$",
+      "388.36 K, melting point; $\\Delta H^{\\circ} = 0.413$",
+      "432.02 K, transition point; $\\Delta H^{\\circ} = 0$",
+      "717.82 K, boiling point; mixed polymeric gases"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "368.3 K, transition point; $\\Delta H^{\\circ} = 0.096$",
+        "temperature_K": 368.3,
+        "temperature_uncertainty_K": null,
+        "kind": "transition",
+        "enthalpy_as_published": 0.096,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "388.36 K, melting point; $\\Delta H^{\\circ} = 0.413$",
+        "temperature_K": 388.36,
+        "temperature_uncertainty_K": null,
+        "kind": "melting",
+        "enthalpy_as_published": 0.413,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "432.02 K, transition point; $\\Delta H^{\\circ} = 0$",
+        "temperature_K": 432.02,
+        "temperature_uncertainty_K": null,
+        "kind": "transition",
+        "enthalpy_as_published": 0.0,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "717.82 K, boiling point; mixed polymeric gases",
+        "temperature_K": 717.82,
+        "temperature_uncertainty_K": null,
+        "kind": "boiling",
+        "enthalpy_as_published": null,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p081-p120.md",
     "table_index": 6,
     "table_sha256": "28339310dc3ad435853ab79395e735f8f5700404dd35ed7f86f5ad2982ca7d6e",
+    "note_block_sha256": "33aba9e66df5ca8be83e819aac49ba29935e758f7d4922aded2340b99d87b266",
+    "complete_source_block_sha256": "03b55c3e78db9d70086ea71b130918cbd89d852188fa8f4aa41cfdc497433902",
     "bbox": [
       145,
       112,
@@ -536,9 +632,11 @@
   },
   "ambiguities": [
     {
-      "kind": "ocr_heading_confusion",
-      "raw_token": "S(c,1)",
-      "reason": "l/1/I shape is ambiguous in scanned formula or phase text"
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "H°-H°298",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
     }
   ],
   "corrections": []

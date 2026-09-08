@@ -10,26 +10,52 @@
   "formula_token": {
     "raw": "",
     "value": null,
-    "ocr_suspect": false,
-    "ocr_check": "no_shape_confusion_detected"
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "name_token": {
+    "raw": "",
+    "value": null,
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "phase_token": {
+    "raw": "",
+    "value": null,
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 26,
   "pdf_page": 30,
   "table_number": null,
   "toc_section": "chapter_1_examples",
   "table_kind": "thermodynamic_temperature_grid",
-  "transcription_status": "transcribed",
+  "transcription_status": "transcribed_with_ocr_ambiguities",
   "units_statement_as_published": null,
   "columns": [
     {
       "index": 0,
       "heading_raw": "T, K:",
-      "units_as_published": null
+      "heading_as_published": "T, K:",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "T, K:",
+        "value": "T, K:",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$CO/CO_{2}$ :",
-      "units_as_published": null
+      "heading_as_published": "$CO/CO_{2}$ :",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "$CO/CO_{2}$ :",
+        "value": "$CO/CO_{2}$ :",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -145,10 +171,23 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "",
+    "lines_raw": [],
+    "ocr_suspect": false,
+    "ocr_check": "no_post_table_text",
+    "ambiguities": [],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": []
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p001-p040.md",
     "table_index": 4,
     "table_sha256": "7fde96f36064f77cb6c28cef99d048a7b93dc4df074e49dac2a2934cef636aef",
+    "note_block_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "complete_source_block_sha256": "64c10937c6d6686a017ef3c84a59c20371c5643f4ba276dacb446b9c8bb1ad94",
     "bbox": [
       347,
       157,
@@ -156,6 +195,32 @@
       220
     ]
   },
-  "ambiguities": [],
+  "ambiguities": [
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "formula_as_published",
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "name_as_published",
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$CO/CO_{2}$ :",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    }
+  ],
   "corrections": []
 }

@@ -1,6 +1,7 @@
 """Completeness, source round-trip, OCR, and exact-grid contracts for B677."""
 
 import json
+import hashlib
 import re
 from html.parser import HTMLParser
 
@@ -14,6 +15,44 @@ from simulator.reference_data.pankratz_1984_usbm_b677_loader import (
     load_records,
     lookup_temperature,
 )
+
+
+STANDARD_HEADINGS = ("T", "$Cp^o$", "$S^o$", "$H^o-H_{298}^o$", "$\\Delta Hf^o$", "$\\Delta Gf^o$")
+IMAGE_VERIFIED_IDENTITIES = {
+    "table-0007": ("Ag", "Silver", "(c,1)", STANDARD_HEADINGS[:4]),
+    "table-0039": ("C4", "Carbon (ideal tetratomic gas)", "(g)", STANDARD_HEADINGS),
+    "table-0097": ("Kr", "Krypton", "(g)", ("T", "Cp°", "S°", "H°-H°298")),
+    "table-0224": ("Zr", "Zirconium (ideal monatomic gas)", "(g)", STANDARD_HEADINGS),
+    "table-0333": ("(MgBr2)2", "Dimeric magnesium dibromide (ideal gas)", "(g)", STANDARD_HEADINGS),
+    "table-0492": ("BrCl", "Bromine monochloride (ideal gas)", "(g)", STANDARD_HEADINGS),
+    "table-0518": ("CuCl", "Copper monochloride", "(c,1)", STANDARD_HEADINGS),
+    "table-0687": ("BeF2", "Beryllium difluoride", "(c,l)", STANDARD_HEADINGS),
+    "table-0810": ("PF5", "Phosphorus pentafluoride (ideal gas)", "(g)", STANDARD_HEADINGS),
+    "table-0984": ("FeI2", "Iron diiodide (ideal gas)", "(g)", STANDARD_HEADINGS),
+    "table-1051": ("TiI4", "Titanium tetraiodide (ideal gas)", "(g)", STANDARD_HEADINGS),
+    "table-1079": ("ErN", "Erbium nitride", "(c)", STANDARD_HEADINGS),
+    "table-1185": ("H2O", "Dihydrogen monoxide, water", "(l,g)", STANDARD_HEADINGS),
+    "table-1254": ("SO2", "Sulfur dioxide (ideal gas)", "(g)", STANDARD_HEADINGS),
+    "table-1301": ("VO", "Vanadium monoxide", "(c)", STANDARD_HEADINGS),
+    "table-1439": ("NiSO4", "Nickel sulfate", "(c)", STANDARD_HEADINGS),
+    "table-1500": ("K2S", "Potassium monosulfide", "(c,1)", STANDARD_HEADINGS),
+    "table-1513": ("Ni3S4", "Trinickel tetrasulfide", "(c)", STANDARD_HEADINGS),
+    "table-1555": ("GeTe", "Germanium monotelluride", "(c,1)", STANDARD_HEADINGS),
+    "table-1571": ("ZnTe", "Zinc monotelluride", "(c)", STANDARD_HEADINGS),
+}
+
+IMAGE_VERIFIED_NOTE_BLOCKS = {
+    "table-0050": "\\*All data except fusion   \ntemperature estimated.   \n1550 K, transition point; $\\Delta H^{\\circ} = 0.775$   \n1618 K, melting point; $\\Delta H^{\\circ} = 3.500$",
+    "table-0198": "\\*Data extrapolated 1100 - 1262 K.   \n722.65 K, melting point; $\\Delta H^{\\circ} = 4.180$   \n1262 K, boiling point; mixed polymeric gases.",
+    "table-0352": "\\*Data estimated",
+    "table-0500": "457.6 K, sublimation point; $\\Delta H^{\\circ} = 12.2$",
+    "table-0652": "247 K, melting point; $\\Delta H^{\\circ} = 0.550$\n\n428 K, boiling point; $\\Delta H^{\\circ} = 9.5$",
+    "table-0800": "1650 K, melting point; $\\Delta H^{\\circ} = 13.100$",
+    "table-0951": "\\*Data estimated.",
+    "table-1100": "\\*Data except enthalpy of formation at 298 K estimated.",
+    "table-1251": "413 K, transition point; $\\Delta H^{\\circ} = 0.020$   \n600 K, melting point; $\\Delta H^{\\circ} = 15.699$",
+    "table-1400": "1490 K, transition point; $\\Delta H^{\\circ} = 1.79$   \n1560 K, melting point: $\\Delta H^{\\circ} = 10.60$",
+}
 
 
 class TableParser(HTMLParser):
@@ -54,6 +93,55 @@ def source_tables(path):
     return result
 
 
+def source_table_matches(path):
+    source = path.read_text(encoding="utf-8")
+    return source, list(re.finditer(r"<table>[\s\S]*?</table>", source))
+
+
+def independent_note_block(inter_table_text, record, next_record):
+    if record["page"] < 47:
+        return ""
+    boundary = len(inter_table_text)
+    caption = re.search(r"(?m)^\s*TABLE\s+\d+", inter_table_text)
+    if caption:
+        boundary = caption.start()
+    if next_record is not None:
+        name_raw = next_record.get("name_heading_raw") or ""
+        name_position = inter_table_text.rfind(name_raw) if name_raw else -1
+        formula_raw = next_record.get("formula_heading_raw") or ""
+        formula_position = inter_table_text.rfind(formula_raw, 0, name_position + 1) if formula_raw else -1
+        identity_position = formula_position if formula_position >= 0 else name_position
+        if identity_position >= 0 and identity_position < boundary:
+            boundary = inter_table_text.rfind("\n", 0, identity_position) + 1
+    lines = inter_table_text[:boundary].splitlines()
+    lines = [line for line in lines if not line.lstrip().startswith("#")]
+    raw = "\n".join(lines).strip()
+    lines = raw.splitlines()
+    section_start = next((
+        index for index, line in enumerate(lines)
+        if re.match(r"\s*(?:Units:|Sources of data from general references|1\.\s+Barin,)", line)
+    ), len(lines))
+    return "\n".join(lines[:section_start]).strip()
+
+
+def assert_image_verified_fixture(records):
+    by_id = {record["record_id"]: record for record in records}
+    for record_id, expected in IMAGE_VERIFIED_IDENTITIES.items():
+        record = by_id[record_id]
+        actual = (
+            record["formula_as_published"],
+            record["name_as_published"],
+            record["phase_as_published"],
+            tuple(column["heading_as_published"] for column in record["columns"]),
+        )
+        assert actual == expected
+    for record_id, expected in IMAGE_VERIFIED_NOTE_BLOCKS.items():
+        note = by_id[record_id]["post_table_note_block"]
+        assert note["raw"] == expected
+        assert note["ocr_suspect"] is False
+        assert note["ocr_check"] == "image_verified_fixture_agreement"
+
+
 def test_round_trip_reparses_mineru_source_and_compares_every_printed_token():
     cache = {}
     for record in load_records():
@@ -71,6 +159,47 @@ def test_round_trip_reparses_mineru_source_and_compares_every_printed_token():
                     assert source_column is None and cell["raw"] == ""
                 else:
                     assert cell["raw"] == printed[source_row][source_column]
+
+
+def test_image_verified_heading_identity_and_note_fixtures():
+    records = list(load_records())
+    assert len(IMAGE_VERIFIED_IDENTITIES) >= 20
+    assert len(IMAGE_VERIFIED_NOTE_BLOCKS) >= 10
+    assert_image_verified_fixture(records)
+
+
+def test_every_record_maps_bijectively_to_its_complete_source_block():
+    records = list(load_records())
+    by_file = {}
+    for record in records:
+        by_file.setdefault(record["source_locator"]["file"], []).append(record)
+    seen = set()
+    for relative_path, file_records in by_file.items():
+        source, matches = source_table_matches(COMPILATION_ROOT / relative_path)
+        assert len(matches) == len(file_records)
+        file_records.sort(key=lambda record: record["source_locator"]["table_index"])
+        for index, (record, match) in enumerate(zip(file_records, matches, strict=True), 1):
+            locator = record["source_locator"]
+            assert locator["table_index"] == index
+            assert record["record_id"] not in seen
+            seen.add(record["record_id"])
+            next_record = file_records[index] if index < len(file_records) else None
+            next_start = matches[index].start() if index < len(matches) else len(source)
+            note_raw = independent_note_block(source[match.end():next_start], record, next_record)
+            assert note_raw == record["post_table_note_block"]["raw"]
+            assert hashlib.sha256(note_raw.encode()).hexdigest() == locator["note_block_sha256"]
+            complete = match.group() + "\n" + note_raw
+            assert hashlib.sha256(complete.encode()).hexdigest() == locator["complete_source_block_sha256"]
+    assert seen == {record["record_id"] for record in records}
+
+
+def test_clean_heading_tokens_are_backed_by_page_image_comparison():
+    for record in load_records():
+        tokens = [record["formula_token"], record["name_token"], record["phase_token"]]
+        tokens.extend(column["heading_token"] for column in record["columns"])
+        for token in tokens:
+            if not token["ocr_suspect"]:
+                assert token["ocr_check"] == "raster_heading_region_token_agreement"
 
 
 def test_manifest_record_and_toc_census_coverage_are_identical():
@@ -146,15 +275,40 @@ def test_ocr_disagreements_remain_raw_and_corrections_are_ledgered():
     manifest = load_manifest()
     assert manifest["summary"]["ocr_suspect_count"] > 0
     assert manifest["summary"]["identity_check_disagreement_count"] > 0
-    assert manifest["summary"]["correction_count"] == 2
-    assert manifest["corrections"][0]["record_id"] == "table-0393"
-    assert manifest["corrections"][0]["raw_token"] == "Lungsten hexabromide (ideal gas)"
-    assert manifest["corrections"][0]["printed_token"] == "Tungsten hexabromide (ideal gas)"
-    assert manifest["corrections"][1]["record_id"] == "table-1167"
-    assert manifest["corrections"][1]["printed_token"] == "Er2O3"
+    assert manifest["summary"]["correction_count"] == 7
+    corrections = {(item["record_id"], item["field"], item.get("column_index")): item for item in manifest["corrections"]}
+    assert corrections[("table-0393", "name_as_published", None)]["printed_token"] == "Tungsten hexabromide (ideal gas)"
+    assert corrections[("table-0984", "column_heading", 0)]["printed_token"] == "T"
+    assert corrections[("table-1051", "formula_as_published", None)]["printed_token"] == "TiI4"
+    assert corrections[("table-1079", "column_heading", 0)]["printed_token"] == "T"
+    assert corrections[("table-1167", "formula_as_published", None)]["printed_token"] == "Er2O3"
+    assert corrections[("table-1301", "formula_as_published", None)]["printed_token"] == "VO"
+    assert corrections[("table-1439", "formula_as_published", None)]["printed_token"] == "NiSO4"
     suspects = [cell for record in load_records() for row in record["rows"] for cell in row["cells"] if cell["ocr_suspect"]]
     assert suspects
     assert all(cell["ocr_check"] == "raster_table_bbox_token_disagreement" for cell in suspects)
+
+
+def test_post_table_notes_preserve_raw_prose_and_structured_meaning():
+    manifest = load_manifest()
+    assert manifest["summary"]["post_table_note_record_count"] > 500
+    assert manifest["summary"]["estimate_note_count"] > 250
+    assert manifest["summary"]["uncertainty_count"] > 0
+    assert manifest["summary"]["transition_count"] > 450
+    records = {record["record_id"]: record for record in load_records()}
+    assert "All data except enthalpy of formation at 298 K estimated" in records["table-0039"]["post_table_note_block"]["raw"]
+    transitions = records["table-0518"]["post_table_note_block"]["transitions"]
+    assert [(item["temperature_K"], item["kind"], item["enthalpy_as_published"]) for item in transitions] == [
+        (685.0, "transition", 1.165),
+        (696.0, "melting", 1.693),
+    ]
+    uncertain = records["table-0280"]["post_table_note_block"]["transitions"][-1]
+    assert (uncertain["temperature_K"], uncertain["temperature_uncertainty_K"], uncertain["kind"]) == (781.0, 15.0, "melting")
+    assert uncertain["enthalpy_uncertainty_as_published"] == 2.0
+    form_change = records["table-1182"]["post_table_note_block"]["transitions"]
+    assert [(item["temperature_K"], item["kind"]) for item in form_change] == [(1308.0, "transition")]
+    assert records["table-0224"]["post_table_note_block"]["raw"] == ""
+    assert all(not record["post_table_note_block"]["raw"].lstrip().startswith("Units:") for record in records.values())
 
 
 def test_unknown_record_refuses_without_default():

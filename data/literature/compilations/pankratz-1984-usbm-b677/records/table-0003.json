@@ -10,8 +10,20 @@
   "formula_token": {
     "raw": "",
     "value": null,
-    "ocr_suspect": false,
-    "ocr_check": "no_shape_confusion_detected"
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "name_token": {
+    "raw": "",
+    "value": null,
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "phase_token": {
+    "raw": "",
+    "value": null,
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 22,
   "pdf_page": 26,
@@ -24,32 +36,74 @@
     {
       "index": 0,
       "heading_raw": "T, K / CO",
-      "units_as_published": null
+      "heading_as_published": "T, K / CO",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "T, K / CO",
+        "value": "T, K / CO",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$\\Delta Gf^{\\circ}$ / 0.5  $O_2$",
-      "units_as_published": null
+      "heading_as_published": "$\\Delta Gf^{\\circ}$ / 0.5  $O_2$",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "$\\Delta Gf^{\\circ}$ / 0.5  $O_2$",
+        "value": "$\\Delta Gf^{\\circ}$ / 0.5  $O_2$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "$\\Delta G^{\\circ}$ (reaction 65) / $CO_2$",
-      "units_as_published": null
+      "heading_as_published": "$\\Delta G^{\\circ}$ (reaction 65) / $CO_2$",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "$\\Delta G^{\\circ}$ (reaction 65) / $CO_2$",
+        "value": "$\\Delta G^{\\circ}$ (reaction 65) / $CO_2$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "$K_p$",
-      "units_as_published": null
+      "heading_as_published": "$K_p$",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "$K_p$",
+        "value": "$K_p$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "",
-      "units_as_published": null
+      "heading_as_published": "",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "",
+        "value": "",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "",
-      "units_as_published": null
+      "heading_as_published": "",
+      "units_as_published": null,
+      "heading_token": {
+        "raw": "",
+        "value": "",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -228,10 +282,23 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "",
+    "lines_raw": [],
+    "ocr_suspect": false,
+    "ocr_check": "no_post_table_text",
+    "ambiguities": [],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": []
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p001-p040.md",
     "table_index": 3,
     "table_sha256": "7f70a59078ec0dc023f90d2c1160ce3fa5b49b754aa4511f99878d33c559786d",
+    "note_block_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "complete_source_block_sha256": "14c89ef91d00077d12343898ab27ab8f92f33c1e11396bd55ae17ebcbac1b116",
     "bbox": [
       147,
       125,
@@ -240,6 +307,59 @@
     ]
   },
   "ambiguities": [
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "formula_as_published",
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "name_as_published",
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$\\Delta Gf^{\\circ}$ / 0.5  $O_2$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "$\\Delta G^{\\circ}$ (reaction 65) / $CO_2$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "$K_p$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 4,
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 5,
+      "raw_token": "",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
     {
       "kind": "column_shape",
       "reason": "MinerU rows have unequal cell counts; missing cells retained as blank padding",

@@ -11,7 +11,19 @@
     "raw": "$B_{10}H_{14}(c,1,g)$",
     "value": "B10H14",
     "ocr_suspect": true,
-    "ocr_check": "plausible_character_confusion"
+    "ocr_check": "raster_heading_region_token_disagreement"
+  },
+  "name_token": {
+    "raw": "Decaborane",
+    "value": "Decaborane",
+    "ocr_suspect": false,
+    "ocr_check": "raster_heading_region_token_agreement"
+  },
+  "phase_token": {
+    "raw": "(c,1,g)",
+    "value": "(c,1,g)",
+    "ocr_suspect": true,
+    "ocr_check": "raster_heading_region_token_disagreement"
   },
   "page": 220,
   "pdf_page": 224,
@@ -24,32 +36,74 @@
     {
       "index": 0,
       "heading_raw": "T",
-      "units_as_published": "K"
+      "heading_as_published": "T",
+      "units_as_published": "K",
+      "heading_token": {
+        "raw": "T",
+        "value": "T",
+        "ocr_suspect": false,
+        "ocr_check": "raster_heading_region_token_agreement"
+      }
     },
     {
       "index": 1,
       "heading_raw": "$C_p^\\circ$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$C_p^\\circ$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$C_p^\\circ$",
+        "value": "$C_p^\\circ$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 2,
       "heading_raw": "$S^\\circ$",
-      "units_as_published": "cal/mol·K"
+      "heading_as_published": "$S^\\circ$",
+      "units_as_published": "cal/mol·K",
+      "heading_token": {
+        "raw": "$S^\\circ$",
+        "value": "$S^\\circ$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 3,
       "heading_raw": "$H^\\circ-H_{298}^\\circ$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$H^\\circ-H_{298}^\\circ$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$H^\\circ-H_{298}^\\circ$",
+        "value": "$H^\\circ-H_{298}^\\circ$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 4,
       "heading_raw": "$\\Delta Hf^\\circ$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Hf^\\circ$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Hf^\\circ$",
+        "value": "$\\Delta Hf^\\circ$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     },
     {
       "index": 5,
       "heading_raw": "$\\Delta Gf^\\circ$",
-      "units_as_published": "kcal/mol"
+      "heading_as_published": "$\\Delta Gf^\\circ$",
+      "units_as_published": "kcal/mol",
+      "heading_token": {
+        "raw": "$\\Delta Gf^\\circ$",
+        "value": "$\\Delta Gf^\\circ$",
+        "ocr_suspect": true,
+        "ocr_check": "raster_heading_region_token_disagreement"
+      }
     }
   ],
   "header_rows_raw": [
@@ -1044,10 +1098,47 @@
     }
   ],
   "footnote_markers": [],
+  "post_table_note_block": {
+    "raw": "371.93 K, melting point; $\\Delta H^{\\circ} = 5.250$ 492 K, boiling point; $\\Delta H^{\\circ} = 10.3$",
+    "lines_raw": [
+      "371.93 K, melting point; $\\Delta H^{\\circ} = 5.250$ 492 K, boiling point; $\\Delta H^{\\circ} = 10.3$"
+    ],
+    "ocr_suspect": true,
+    "ocr_check": "mineru_post_table_text_retained_not_image_verified",
+    "ambiguities": [
+      {
+        "kind": "post_table_note_ocr_unverified",
+        "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      }
+    ],
+    "corrections": [],
+    "estimate_notes": [],
+    "uncertainties": [],
+    "transitions": [
+      {
+        "raw": "371.93 K, melting point; $\\Delta H^{\\circ} = 5.250$ 492 K, boiling point; $\\Delta H^{\\circ} = 10.3$",
+        "temperature_K": 371.93,
+        "temperature_uncertainty_K": null,
+        "kind": "melting",
+        "enthalpy_as_published": 5.25,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "371.93 K, melting point; $\\Delta H^{\\circ} = 5.250$ 492 K, boiling point; $\\Delta H^{\\circ} = 10.3$",
+        "temperature_K": 492.0,
+        "temperature_uncertainty_K": null,
+        "kind": "boiling",
+        "enthalpy_as_published": 10.3,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
+  },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p201-p240.md",
     "table_index": 132,
     "table_sha256": "7299abef55657ef57afd11f46b3594550d44061d6398a27d227824726f33e5ff",
+    "note_block_sha256": "565d2b10b4cfc144cd6f5c575b1a767bb96d848b4a60b8fea37103c5637fa707",
+    "complete_source_block_sha256": "983ea3ab72474e5ebc761bb55c73bc929d1df361d632b923691c388555b6f6cb",
     "bbox": [
       531,
       113,
@@ -1057,9 +1148,51 @@
   },
   "ambiguities": [
     {
-      "kind": "ocr_heading_confusion",
+      "kind": "ocr_heading_unresolved",
+      "field": "formula_as_published",
       "raw_token": "$B_{10}H_{14}(c,1,g)$",
-      "reason": "l/1/I shape is ambiguous in scanned formula or phase text"
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "phase_as_published",
+      "raw_token": "(c,1,g)",
+      "reason": "Automated comparison with the rendered page heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 1,
+      "raw_token": "$C_p^\\circ$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 2,
+      "raw_token": "$S^\\circ$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 3,
+      "raw_token": "$H^\\circ-H_{298}^\\circ$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 4,
+      "raw_token": "$\\Delta Hf^\\circ$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
+    },
+    {
+      "kind": "ocr_heading_unresolved",
+      "field": "column_heading",
+      "column_index": 5,
+      "raw_token": "$\\Delta Gf^\\circ$",
+      "reason": "Automated comparison with the rendered table-heading region did not agree; no correction inferred."
     }
   ],
   "corrections": []
