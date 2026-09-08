@@ -31,6 +31,13 @@ SIDECAR = CORPUS / "raw" / SOURCE_ID / "sidecar.yaml"
 RASTER = Path("/private/tmp/pankratz-1984-usbm-b677-raster")
 NUMBER = re.compile(r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?\Z")
 FOOTNOTE = re.compile(r"([*†‡]+)$")
+NOTE_NUMBER = r"\d+(?:\.\d+)?"
+NOTE_UNCERTAINTY_MARK = r"(?:\\pm|±|\+/-)"
+NUMERIC_WITH_UNCERTAINTY = (
+    rf"(?P<value>{NOTE_NUMBER})"
+    rf"(?:\s*{NOTE_UNCERTAINTY_MARK}\s*(?P<uncertainty>{NOTE_NUMBER}))?"
+)
+NOTE_TEMPERATURE_UNIT = r"(?:K|\\mathrm\{~?K\})"
 TOC_SECTIONS = (
     ("chapter_1_examples", 1, 46),
     ("elements", 47, 91),
@@ -72,7 +79,7 @@ HEADING_CORRECTIONS = {
         "field": "formula_as_published",
         "raw_token": "$\\operatorname{Er}_{2}0_{3}(\\mathbf{c})$",
         "printed_token": "Er2O3",
-        "page": 270,
+        "page": 269,
         "image_quote": "Er2O3(c) / Dierbium trioxide",
         "reason": "Rendered page proves MinerU confused printed O with 0.",
     },
@@ -249,6 +256,10 @@ def visible(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def canonical_formula(text: str) -> str:
+    return re.sub(r"\s+", "", text)
+
+
 def looks_like_formula(text: str) -> bool:
     plain = visible(text)
     return bool(re.search(r"(?:\([^)]*[cglv1][^)]*\)|\[[^]]+\])\s*$", plain, re.I)) and bool(re.search(r"[A-Z]", plain))
@@ -290,7 +301,9 @@ def heading(lines: list[str], chapter_two: bool) -> tuple[str | None, str | None
     bracket_match = re.search(r"(\[[^]]*\])\s*$", formula_with_phase)
     state_match = phase_match or bracket_match
     phase = state_match.group(1) if state_match else None
-    formula = formula_with_phase[: state_match.start()].strip() if state_match else formula_with_phase
+    formula = canonical_formula(
+        formula_with_phase[: state_match.start()].strip() if state_match else formula_with_phase
+    )
     return formula, visible(name_raw) if name_raw else None, phase, formula_raw, name_raw
 
 
@@ -343,10 +356,12 @@ def parse_note_block(raw: str, image_verified: bool = False) -> dict:
     estimate_notes = [{"raw": line} for line in lines if re.search(r"\bestimat(?:e|ed|ion)", line, re.I)]
     uncertainties = []
     uncertainty_pattern = re.compile(
-        r"(?P<value>\d+(?:\.\d+)?)\s*(?:\\pm|±|\+/-)\s*(?P<uncertainty>\d+(?:\.\d+)?)\s*(?P<unit>[A-Za-z]+)?"
+        NUMERIC_WITH_UNCERTAINTY + r"\s*(?P<unit>[A-Za-z]+|\\mathrm\{~?[A-Za-z]+\})?"
     )
     for line in lines:
         for match in uncertainty_pattern.finditer(line.replace("$", "")):
+            if match.group("uncertainty") is None:
+                continue
             uncertainties.append({
                 "raw": match.group(0),
                 "value": float(match.group("value")),
@@ -355,37 +370,79 @@ def parse_note_block(raw: str, image_verified: bool = False) -> dict:
                 "source_line_raw": line,
             })
     transitions = []
-    transition_pattern = re.compile(
-        r"(?P<temperature>\d+(?:\.\d+)?)"
-        r"(?:\s*\\pm\s*(?P<temperature_uncertainty>\d+(?:\.\d+)?))?"
-        r"\s*(?:K|\\mathrm\{~?K\})\s*,\s*"
-        r"(?P<kind>transition|melting|boiling|sublimation|decomposition|fusion|vaporization)"
-        r"(?:\s+point|\s+to\b)",
-        re.I,
+    temperature = NUMERIC_WITH_UNCERTAINTY + rf"\s*{NOTE_TEMPERATURE_UNIT}"
+    transition_patterns = (
+        (re.compile(
+            temperature
+            + r"\s*,\s*(?:is\s+also\s+)?"
+            + r"(?:estimated\s+|peritectic\s+|second[ -]order\s+|cubic\s+to\s+monoclinic\s+)?"
+            + r"(?P<kind>transition|melting|boiling|sublimation|decomposition|fusion|vaporization|Curie|triple)"
+            + r"(?:\s+point|\s+temperature|\s+to\b|(?=\s*[;,.]))",
+            re.I,
+        ), None),
+        (re.compile(r"Sublimation\s+at\s+" + temperature, re.I), "sublimation"),
+        (re.compile(temperature + r"\s*,\s*decomposes\s+on\s+vaporization", re.I), "vaporization"),
+        (re.compile(temperature + r"\s*,\s*\S+\s+vaporizes\s+with\s+decomposition", re.I), "vaporization"),
+        (re.compile(temperature + r"\s*,\s*dissociates\s+to\b", re.I), "dissociation"),
     )
     enthalpy_pattern = re.compile(
-        r"=\s*(?P<enthalpy>[+-]?\d+(?:\.\d+)?)"
-        r"(?:\s*\\pm\s*(?P<enthalpy_uncertainty>\d+(?:\.\d+)?))?"
+        r"(?:\\Delta|Δ)\s*H(?:\^\{\\circ\}|°|\^o)?"
+        r"(?P<qualifier>\s*\([^)]*\))?\s*=\s*"
+        + NUMERIC_WITH_UNCERTAINTY,
+        re.I,
     )
-    for line in lines:
-        plain_line = line.replace("$", "")
-        for match in transition_pattern.finditer(plain_line):
-            tail = plain_line[match.end():]
-            enthalpy = enthalpy_pattern.search(tail)
-            transitions.append({
-                "raw": line,
-                "temperature_K": float(match.group("temperature")),
-                "temperature_uncertainty_K": (
-                    float(match.group("temperature_uncertainty"))
-                    if match.group("temperature_uncertainty") else None
-                ),
-                "kind": match.group("kind").lower(),
-                "enthalpy_as_published": float(enthalpy.group("enthalpy")) if enthalpy else None,
-                "enthalpy_uncertainty_as_published": (
-                    float(enthalpy.group("enthalpy_uncertainty"))
-                    if enthalpy and enthalpy.group("enthalpy_uncertainty") else None
-                ),
-            })
+    plain_block = "\n".join(lines).replace("$", "")
+    matches = []
+    for pattern, fixed_kind in transition_patterns:
+        matches.extend((match.start(), match.end(), match, fixed_kind) for match in pattern.finditer(plain_block))
+    matches.sort(key=lambda item: (item[0], -(item[1] - item[0])))
+    matches = [item for index, item in enumerate(matches) if index == 0 or item[0] >= matches[index - 1][1]]
+    candidate_patterns = (
+        re.compile(
+            temperature
+            + r"\s*,\s*[^;.\n]*(?:point|temperature|decompos\w*|vapor\s+pressure|vaporizes|dissociates|transition)\b[^;.\n]*",
+            re.I,
+        ),
+        re.compile(r"Sublimation\s+at\s+" + temperature, re.I),
+        re.compile(
+            r"\b(?:begins\s+to\s+)?(?:decomposes?|vaporizes\s+with\s+decomposition)\b"
+            + rf"[^;.\n]*\b(?:above|near|below)\s+{NOTE_NUMBER}\s*{NOTE_TEMPERATURE_UNIT}",
+            re.I,
+        ),
+    )
+    candidates = [match for pattern in candidate_patterns for match in pattern.finditer(plain_block)]
+    unparsed_transitions = [
+        match for match in candidates
+        if not any(start < match.end() and end > match.start() for start, end, _, _ in matches)
+    ]
+    for index, (start, end, match, fixed_kind) in enumerate(matches):
+        next_start = matches[index + 1][0] if index + 1 < len(matches) else len(plain_block)
+        enthalpy = enthalpy_pattern.search(plain_block, end, next_start)
+        event_kind = (fixed_kind or match.group("kind")).lower()
+        if enthalpy:
+            qualifier = (enthalpy.group("qualifier") or "").lower()
+            qualified_kind = next((
+                kind for kind in (
+                    "transition", "melting", "boiling", "sublimation", "decomposition",
+                    "fusion", "vaporization", "dissociation",
+                ) if kind in qualifier
+            ), None)
+            if qualified_kind and qualified_kind != event_kind:
+                enthalpy = None
+        source_line = plain_block[:start].count("\n")
+        transitions.append({
+            "raw": lines[source_line],
+            "temperature_K": float(match.group("value")),
+            "temperature_uncertainty_K": (
+                float(match.group("uncertainty")) if match.group("uncertainty") else None
+            ),
+            "kind": event_kind,
+            "enthalpy_as_published": float(enthalpy.group("value")) if enthalpy else None,
+            "enthalpy_uncertainty_as_published": (
+                float(enthalpy.group("uncertainty"))
+                if enthalpy and enthalpy.group("uncertainty") else None
+            ),
+        })
     return {
         "raw": raw,
         "lines_raw": lines,
@@ -398,7 +455,11 @@ def parse_note_block(raw: str, image_verified: bool = False) -> dict:
         "ambiguities": ([{
             "kind": "post_table_note_ocr_unverified",
             "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted.",
-        }] if raw and not image_verified else []),
+        }] if raw and not image_verified else []) + [{
+            "kind": "unparsed_transition_form",
+            "raw": match.group(0),
+            "reason": "Event-like source prose did not match a supported structured transition form.",
+        } for match in unparsed_transitions],
         "corrections": [],
         "estimate_notes": estimate_notes,
         "uncertainties": uncertainties,

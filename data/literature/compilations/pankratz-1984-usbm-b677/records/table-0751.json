@@ -2,14 +2,14 @@
   "schema_version": "pankratz_b677_native_table.v1",
   "record_id": "table-0751",
   "ordinal": 751,
-  "formula_as_published": "HfF 4",
+  "formula_as_published": "HfF4",
   "formula_heading_raw": "HfF $_{4}$ (c,g)",
   "name_as_published": "Hafnium tetrafluoride",
   "name_heading_raw": "Hafnium tetrafluoride",
   "phase_as_published": "(c,g)",
   "formula_token": {
     "raw": "HfF $_{4}$ (c,g)",
-    "value": "HfF 4",
+    "value": "HfF4",
     "ocr_suspect": true,
     "ocr_check": "raster_heading_region_token_disagreement"
   },
@@ -783,7 +783,16 @@
       }
     ],
     "uncertainties": [],
-    "transitions": []
+    "transitions": [
+      {
+        "raw": "\\*Heat capacity at 298 K and gas data estimated 1235.5 K, estimated sublimation point; $\\Delta H^{\\circ} = 57.008$",
+        "temperature_K": 1235.5,
+        "temperature_uncertainty_K": null,
+        "kind": "sublimation",
+        "enthalpy_as_published": 57.008,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
   },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p161-p200.md",

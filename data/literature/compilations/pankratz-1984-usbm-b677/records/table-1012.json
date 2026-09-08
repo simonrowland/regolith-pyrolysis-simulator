@@ -2,14 +2,14 @@
   "schema_version": "pankratz_b677_native_table.v1",
   "record_id": "table-1012",
   "ordinal": 1012,
-  "formula_as_published": "MoI 2",
+  "formula_as_published": "MoI2",
   "formula_heading_raw": "MoI $_{2}$ (c)",
   "name_as_published": "Molybdenum diiodide",
   "name_heading_raw": "Molybdenum diiodide",
   "phase_as_published": "(c)",
   "formula_token": {
     "raw": "MoI $_{2}$ (c)",
-    "value": "MoI 2",
+    "value": "MoI2",
     "ocr_suspect": true,
     "ocr_check": "raster_heading_region_token_disagreement"
   },
@@ -567,6 +567,11 @@
       {
         "kind": "post_table_note_ocr_unverified",
         "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      },
+      {
+        "kind": "unparsed_transition_form",
+        "raw": "1305 K, decomposition pressure = 1 atm",
+        "reason": "Event-like source prose did not match a supported structured transition form."
       }
     ],
     "corrections": [],

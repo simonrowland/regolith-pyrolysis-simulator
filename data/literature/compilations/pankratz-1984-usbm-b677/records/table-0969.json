@@ -2,14 +2,14 @@
   "schema_version": "pankratz_b677_native_table.v1",
   "record_id": "table-0969",
   "ordinal": 969,
-  "formula_as_published": "BiI 3",
+  "formula_as_published": "BiI3",
   "formula_heading_raw": "BiI $_{3}$ (g)",
   "name_as_published": "Bismuth triiodide (ideal gas)",
   "name_heading_raw": "Bismuth triiodide (ideal gas)",
   "phase_as_published": "(g)",
   "formula_token": {
     "raw": "BiI $_{3}$ (g)",
-    "value": "BiI 3",
+    "value": "BiI3",
     "ocr_suspect": true,
     "ocr_check": "raster_heading_region_token_disagreement"
   },
@@ -636,6 +636,11 @@
       {
         "kind": "post_table_note_ocr_unverified",
         "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      },
+      {
+        "kind": "unparsed_transition_form",
+        "raw": "Begins to decompose appreciably above 900 K",
+        "reason": "Event-like source prose did not match a supported structured transition form."
       }
     ],
     "corrections": [],

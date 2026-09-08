@@ -2,14 +2,14 @@
   "schema_version": "pankratz_b677_native_table.v1",
   "record_id": "table-0304",
   "ordinal": 304,
-  "formula_as_published": "EuBr 3",
+  "formula_as_published": "EuBr3",
   "formula_heading_raw": "EuBr $_{3}$ (c)",
   "name_as_published": "Europium tribromide",
   "name_heading_raw": "Europium tribromide",
   "phase_as_published": "(c)",
   "formula_token": {
     "raw": "EuBr $_{3}$ (c)",
-    "value": "EuBr 3",
+    "value": "EuBr3",
     "ocr_suspect": true,
     "ocr_check": "raster_heading_region_token_disagreement"
   },
@@ -508,7 +508,16 @@
       }
     ],
     "uncertainties": [],
-    "transitions": []
+    "transitions": [
+      {
+        "raw": "667 K, decomposes on vaporization; $\\mathrm{Br}_{2}(\\mathrm{~g})$ pressure = 1 atm.",
+        "temperature_K": 667.0,
+        "temperature_uncertainty_K": null,
+        "kind": "vaporization",
+        "enthalpy_as_published": null,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
   },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p081-p120.md",

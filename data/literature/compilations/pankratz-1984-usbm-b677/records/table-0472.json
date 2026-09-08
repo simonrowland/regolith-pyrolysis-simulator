@@ -628,6 +628,11 @@
       {
         "kind": "post_table_note_ocr_unverified",
         "reason": "Raw MinerU note text is retained verbatim; no image correction is asserted."
+      },
+      {
+        "kind": "unparsed_transition_form",
+        "raw": "453.8 K, vapor pressure (monomer and dimer) = 1 atm",
+        "reason": "Event-like source prose did not match a supported structured transition form."
       }
     ],
     "corrections": [],
@@ -640,6 +645,14 @@
         "temperature_uncertainty_K": null,
         "kind": "melting",
         "enthalpy_as_published": 8.45,
+        "enthalpy_uncertainty_as_published": null
+      },
+      {
+        "raw": "467 K, triple point; vapor pressure = 2.3 atm.",
+        "temperature_K": 467.0,
+        "temperature_uncertainty_K": null,
+        "kind": "triple",
+        "enthalpy_as_published": null,
         "enthalpy_uncertainty_as_published": null
       }
     ]

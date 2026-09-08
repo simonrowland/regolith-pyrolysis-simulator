@@ -2,14 +2,14 @@
   "schema_version": "pankratz_b677_native_table.v1",
   "record_id": "table-0228",
   "ordinal": 228,
-  "formula_as_published": "FeSb 2",
+  "formula_as_published": "FeSb2",
   "formula_heading_raw": "FeSb $_{2}$ (c, l)",
   "name_as_published": "Iron diantimonide",
   "name_heading_raw": "Iron diantimonide",
   "phase_as_published": "(c, l)",
   "formula_token": {
     "raw": "FeSb $_{2}$ (c, l)",
-    "value": "FeSb 2",
+    "value": "FeSb2",
     "ocr_suspect": true,
     "ocr_check": "raster_heading_region_token_disagreement"
   },
@@ -976,7 +976,16 @@
     "corrections": [],
     "estimate_notes": [],
     "uncertainties": [],
-    "transitions": []
+    "transitions": [
+      {
+        "raw": "1021.2 K, peritectic decomposition point; $\\Delta H^{\\circ} = 12.910$",
+        "temperature_K": 1021.2,
+        "temperature_uncertainty_K": null,
+        "kind": "decomposition",
+        "enthalpy_as_published": 12.91,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
   },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p081-p120.md",

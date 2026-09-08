@@ -2,14 +2,14 @@
   "schema_version": "pankratz_b677_native_table.v1",
   "record_id": "table-1453",
   "ordinal": 1453,
-  "formula_as_published": "ZnSO4· 6H2O",
+  "formula_as_published": "ZnSO4·6H2O",
   "formula_heading_raw": "$\\mathrm{ZnSO_{4}\\cdot 6H_{2}O(c)}$",
   "name_as_published": "Zinc sulfate hexahydrate",
   "name_heading_raw": "Zinc sulfate hexahydrate",
   "phase_as_published": "(c)",
   "formula_token": {
     "raw": "$\\mathrm{ZnSO_{4}\\cdot 6H_{2}O(c)}$",
-    "value": "ZnSO4· 6H2O",
+    "value": "ZnSO4·6H2O",
     "ocr_suspect": true,
     "ocr_check": "raster_heading_region_token_disagreement"
   },
@@ -508,7 +508,16 @@
       }
     ],
     "uncertainties": [],
-    "transitions": []
+    "transitions": [
+      {
+        "raw": "333.4 K, dissociates to $ZnSO_{4}\\cdot H_{2}O(c)$ and saturated solution.",
+        "temperature_K": 333.4,
+        "temperature_uncertainty_K": null,
+        "kind": "dissociation",
+        "enthalpy_as_published": null,
+        "enthalpy_uncertainty_as_published": null
+      }
+    ]
   },
   "source_locator": {
     "file": "source/mineru/pankratz-1984-usbm-b677-p321-p360.md",

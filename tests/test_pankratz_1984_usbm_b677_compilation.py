@@ -195,6 +195,7 @@ def test_every_record_maps_bijectively_to_its_complete_source_block():
 
 def test_clean_heading_tokens_are_backed_by_page_image_comparison():
     for record in load_records():
+        assert not re.search(r"\s", record["formula_as_published"] or "")
         tokens = [record["formula_token"], record["name_token"], record["phase_token"]]
         tokens.extend(column["heading_token"] for column in record["columns"])
         for token in tokens:
@@ -284,6 +285,8 @@ def test_ocr_disagreements_remain_raw_and_corrections_are_ledgered():
     assert corrections[("table-1167", "formula_as_published", None)]["printed_token"] == "Er2O3"
     assert corrections[("table-1301", "formula_as_published", None)]["printed_token"] == "VO"
     assert corrections[("table-1439", "formula_as_published", None)]["printed_token"] == "NiSO4"
+    records = {record["record_id"]: record for record in load_records()}
+    assert all(item["page"] == records[item["record_id"]]["page"] for item in corrections.values())
     suspects = [cell for record in load_records() for row in record["rows"] for cell in row["cells"] if cell["ocr_suspect"]]
     assert suspects
     assert all(cell["ocr_check"] == "raster_table_bbox_token_disagreement" for cell in suspects)
@@ -305,10 +308,44 @@ def test_post_table_notes_preserve_raw_prose_and_structured_meaning():
     uncertain = records["table-0280"]["post_table_note_block"]["transitions"][-1]
     assert (uncertain["temperature_K"], uncertain["temperature_uncertainty_K"], uncertain["kind"]) == (781.0, 15.0, "melting")
     assert uncertain["enthalpy_uncertainty_as_published"] == 2.0
+    for record_id, temperature, uncertainty, kind in (
+        ("table-0335", 1087.0, 20.0, "decomposition"),
+        ("table-0339", 413.0, 20.0, "decomposition"),
+        ("table-0385", 1100.0, 10.0, "boiling"),
+    ):
+        transition = records[record_id]["post_table_note_block"]["transitions"][-1]
+        assert (transition["temperature_K"], transition["temperature_uncertainty_K"], transition["kind"]) == (
+            temperature, uncertainty, kind
+        )
+    assert records["table-0385"]["post_table_note_block"]["transitions"][-1]["enthalpy_as_published"] is None
+    assert records["table-0388"]["post_table_note_block"]["transitions"][-1]["enthalpy_as_published"] is None
+    assert [(item["temperature_K"], item["kind"]) for item in records["table-0228"]["post_table_note_block"]["transitions"]] == [(1021.2, "decomposition")]
+    assert [(item["temperature_K"], item["kind"]) for item in records["table-0414"]["post_table_note_block"]["transitions"]] == [(478.0, "curie")]
+    assert [(item["temperature_K"], item["kind"]) for item in records["table-1226"]["post_table_note_block"]["transitions"]] == [(1090.0, "transition"), (1200.0, "transition")]
+    assert [(item["temperature_K"], item["kind"]) for item in records["table-1270"]["post_table_note_block"]["transitions"]] == [(1150.0, "transition")]
+    assert [(item["temperature_K"], item["kind"]) for item in records["table-1454"]["post_table_note_block"]["transitions"]] == [(311.27, "dissociation")]
     form_change = records["table-1182"]["post_table_note_block"]["transitions"]
     assert [(item["temperature_K"], item["kind"]) for item in form_change] == [(1308.0, "transition")]
     assert records["table-0224"]["post_table_note_block"]["raw"] == ""
     assert all(not record["post_table_note_block"]["raw"].lstrip().startswith("Units:") for record in records.values())
+    unparsed = {
+        record["record_id"]: [
+            ambiguity["raw"]
+            for ambiguity in record["post_table_note_block"]["ambiguities"]
+            if ambiguity["kind"] == "unparsed_transition_form"
+        ]
+        for record in records.values()
+        if any(
+            ambiguity["kind"] == "unparsed_transition_form"
+            for ambiguity in record["post_table_note_block"]["ambiguities"]
+        )
+    }
+    assert set(unparsed) == {
+        "table-0315", "table-0472", "table-0550", "table-0656", "table-0754", "table-0993", "table-1012",
+        "table-0969", "table-1021", "table-1120", "table-1163",
+        "table-1201", "table-1206", "table-1207", "table-1305",
+    }
+    assert all(len(items) == 1 for items in unparsed.values())
 
 
 def test_unknown_record_refuses_without_default():
