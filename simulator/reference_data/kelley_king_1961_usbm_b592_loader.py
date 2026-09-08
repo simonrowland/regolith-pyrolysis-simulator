@@ -22,6 +22,7 @@ _STRUCTURAL_RECORD_KINDS = frozenset(
         "formula_continuation_suffix",
     }
 )
+_UNVERIFIED_IDENTITY_RECORD_KIND = "unverified_identity"
 _B592_ELEMENT_TOKENS = ELEMENT_SYMBOLS | {"A", "D"}
 _FORMULA_IDENTITY_FIELDS = ("formula", "formula_as_published", "name_as_published")
 _ORPHAN_FORMULA_FRAGMENTS = frozenset({"O10F2(c)", "10H2O(c)"})
@@ -265,13 +266,17 @@ def load_records(
     include_ocr_suspect: bool = False,
     include_structural: bool = False,
 ):
-    """Yield substances by default; source-structural rows require explicit opt-in."""
+    """Yield substances by default; non-substance source rows require explicit opt-in."""
     for entry in load_manifest(root, include_ocr_suspect=include_ocr_suspect)["entries"]:
+        if entry.get("record_kind") == _UNVERIFIED_IDENTITY_RECORD_KIND:
+            continue
         if entry.get("record_kind", "substance") in _STRUCTURAL_RECORD_KINDS and not include_structural:
             continue
         record = json.loads((root / entry["path"]).read_text(encoding="utf-8"))
         if record["record_id"] != entry["record_id"]:
             raise ValueError(f"record identity differs from manifest: {entry['path']}")
+        if record.get("record_kind") == _UNVERIFIED_IDENTITY_RECORD_KIND:
+            continue
         if record.get("record_kind", "substance") in _STRUCTURAL_RECORD_KINDS and not include_structural:
             continue
         record["contains_ocr_suspect_cells"] = bool(_suspect_cells(record, record))
@@ -309,9 +314,13 @@ def lookup_temperature(
     )
     if entry is None:
         raise KeyError(record_id)
+    if entry.get("record_kind") == _UNVERIFIED_IDENTITY_RECORD_KIND:
+        raise KeyError(f"{record_id} has an unverified identity, not a runtime substance")
     if entry.get("record_kind", "substance") in _STRUCTURAL_RECORD_KINDS:
         raise KeyError(f"{record_id} is a structural source record, not a substance")
     record = json.loads((root / entry["path"]).read_text(encoding="utf-8"))
+    if record.get("record_kind") == _UNVERIFIED_IDENTITY_RECORD_KIND:
+        raise KeyError(f"{record_id} has an unverified identity, not a runtime substance")
     if record.get("record_kind", "substance") in _STRUCTURAL_RECORD_KINDS:
         raise KeyError(f"{record_id} is a structural source record, not a substance")
     grid_cell = next(

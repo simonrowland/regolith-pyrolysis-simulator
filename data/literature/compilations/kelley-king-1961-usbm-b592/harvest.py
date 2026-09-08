@@ -576,7 +576,7 @@ TABLE6_IMAGE_VERIFIED_METADATA_CORRECTIONS = {
     (114, 32): ('Ag2S(α)', 'Ag₂S(α)'),
     (114, 33): ('Ag(NH3)2+(aq)', 'Ag(NH₃)₂⁺(aq)'),
     (114, 39): ('NaAlO2(c)', 'NaAlO₂(c)'),
-    (114, 40): ('NaAlF6(c)', 'NaAlF₆(c)'),
+    (114, 40): ('Na3AlF6(c)', 'Na₃AlF₆(c)'),
     (114, 43): ('NaAlSi3O8(c)', 'NaAlSi₃O₈(c)'),
     (114, 47): ('Na2B4O7(c)', 'Na₂B₄O₇(c)'),
     (114, 48): ('Na2B4O7(gl)', 'Na₂B₄O₇(gl)'),
@@ -612,6 +612,22 @@ TABLE6_IMAGE_VERIFIED_METADATA_CORRECTIONS = {
     (117, 35): ('Zn4Sb3(c)', 'Zn₄Sb₃(c)'),
     (117, 50): ('Zn2SiO4(c)', 'Zn₂SiO₄(c)'),
 }
+
+
+TABLE6_UNVERIFIED_IDENTITY_ROWS = frozenset(
+    {
+        (102, 41),
+        (108, 2),
+        (112, 28),
+        (115, 24),
+        (115, 32),
+        (115, 33),
+        (115, 34),
+        (115, 35),
+        (115, 36),
+        (115, 37),
+    }
+)
 
 
 TABLE6_IMAGE_VERIFIED_STRUCTURAL_METADATA = {
@@ -1059,6 +1075,8 @@ def build_records(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     record["heading_context_as_published"] = table6_heading
                     if structural_metadata:
                         record["record_kind"] = structural_metadata[0]
+                    elif (block["printed_page"], row_index) in TABLE6_UNVERIFIED_IDENTITY_ROWS:
+                        record["record_kind"] = "unverified_identity"
                     for correction in variant_corrections:
                         if correction["kind"] in {
                             "image_verified_metadata_token_correction",

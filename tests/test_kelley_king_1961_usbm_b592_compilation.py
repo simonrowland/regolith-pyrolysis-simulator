@@ -58,7 +58,11 @@ def _parse_html_table(source):
 
 
 def _records():
-    return list(load_records(include_ocr_suspect=True, include_structural=True))
+    manifest = load_manifest(include_ocr_suspect=True)
+    return [
+        json.loads((COMPILATION_ROOT / entry["path"]).read_text())
+        for entry in manifest["entries"]
+    ]
 
 
 def _substances():
@@ -144,7 +148,7 @@ def test_manifest_record_and_bulletin_census_coverage_match():
     ids = [record["record_id"] for record in records]
     assert len(ids) == len(set(ids))
     assert len(records) == manifest["summary"]["record_count"] == census["record_count"] == 1418
-    assert len(_substances()) == manifest["summary"]["substance_count"] == census["substance_count"] == 1391
+    assert len(_substances()) == manifest["summary"]["substance_count"] == census["substance_count"] == 1381
     assert manifest["census"] == census
     assert ids == census["record_ids"]
     assert census["numbered_table_count"] == 7
@@ -212,6 +216,37 @@ def _assert_repaired_identities(records):
                 assert record[field] == expected["expected_fields"][field], (record["record_id"], field)
 
 
+_PRINTED_FORMULA_TRANSLATION = str.maketrans(
+    "₀₁₂₃₄₅₆₇₈₉₊₋⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻",
+    "0123456789+-0123456789+-",
+)
+
+
+def _normalized_printed_formula(token):
+    value = token.translate(_PRINTED_FORMULA_TRANSLATION).strip().strip("$")
+    value = value.replace("α", "alpha").replace("β", "beta").replace("γ", "gamma")
+    value = re.sub(r"[†‡*]+$", "", value)
+    value = re.sub(r"\\(?:mathrm|text|operatorname)\s*\{([^{}]*)\}", r"\1", value)
+    value = value.replace("\\cdot", "·")
+    value = re.sub(r"[{}_\s]", "", value)
+    return value.replace("\\alpha", "alpha").replace("\\beta", "beta").replace("\\gamma", "gamma")
+
+
+def _assert_corrected_identity_evidence(audit, records):
+    by_id = {record["record_id"]: record for record in records}
+    for item in audit:
+        if item["status"] != "corrected":
+            continue
+        expected = item["expected_fields"]["formula"]
+        assert _normalized_printed_formula(item["printed_quote"]) == _normalized_printed_formula(expected)
+        assert by_id[item["record_id"]]["formula"] == expected
+
+    cryolite = next(item for item in audit if item["record_id"] == "table-006-1056")
+    assert cryolite["printed_quote"] == "Na₃AlF₆(c)"
+    assert cryolite["expected_fields"]["formula"] == "Na3AlF6(c)"
+    assert by_id[cryolite["record_id"]]["formula"] == "Na3AlF6(c)"
+
+
 def test_per_record_image_audit_has_explicit_complete_coverage():
     audit = list(map(json.loads, (COMPILATION_ROOT / "source/formula-audit.jsonl").read_text().splitlines()))
     records = _records()
@@ -232,6 +267,24 @@ def test_per_record_image_audit_has_explicit_complete_coverage():
         else:
             assert item["status"] == "unverified"
             assert item["expected_fields"] is None
+
+
+def test_corrected_identity_quotes_match_formulas_and_cryolite_image_anchor():
+    audit = list(map(json.loads, (COMPILATION_ROOT / "source/formula-audit.jsonl").read_text().splitlines()))
+    _assert_corrected_identity_evidence(audit, _records())
+
+
+def test_cryolite_image_anchor_rejects_self_consistent_wrong_identity():
+    audit = list(map(json.loads, (COMPILATION_ROOT / "source/formula-audit.jsonl").read_text().splitlines()))
+    records = copy.deepcopy(_records())
+    record = next(record for record in records if record["record_id"] == "table-006-1056")
+    item = next(item for item in audit if item["record_id"] == record["record_id"])
+    for field in ("formula", "formula_as_published", "name_as_published"):
+        record[field] = "NaAlF6(c)"
+        item["expected_fields"][field] = "NaAlF6(c)"
+    item["printed_quote"] = "NaAlF₆(c)"
+    with pytest.raises(AssertionError):
+        _assert_corrected_identity_evidence(audit, records)
 
 
 def test_formula_integrity_census_and_recorded_repairs():
@@ -457,7 +510,8 @@ def test_line_wrap_detector_census_matches_image_adjudication():
     for record in _records():
         kinds[record.get("record_kind", "substance")] = kinds.get(record.get("record_kind", "substance"), 0) + 1
     assert kinds == {
-        "substance": 1391,
+        "substance": 1381,
+        "unverified_identity": 10,
         "section_continuation_header": 10,
         "formula_continuation_prefix": 16,
         "formula_continuation_suffix": 1,
@@ -492,11 +546,70 @@ def test_additional_image_proven_wrapped_substances_are_reconstructed():
 def test_structural_records_require_source_audit_opt_in_and_cannot_be_looked_up():
     substances = _substances()
     source_records = _records()
-    assert len(substances) == 1391
+    assert len(substances) == 1381
     assert len(source_records) == 1418
     assert all(record.get("record_kind", "substance") == "substance" for record in substances)
     with pytest.raises(KeyError, match="structural source record"):
         lookup_temperature("table-006-0036", 298.15, include_ocr_suspect=True)
+
+
+UNVERIFIED_IDENTITY_RECORD_IDS = {
+    "table-006-0072",
+    "table-006-0527",
+    "table-006-0886",
+    "table-006-1127",
+    "table-006-1135",
+    "table-006-1136",
+    "table-006-1137",
+    "table-006-1138",
+    "table-006-1139",
+    "table-006-1140",
+}
+
+
+def test_unverified_identities_are_typed_and_excluded_from_substance_boundaries():
+    records = {record["record_id"]: record for record in _records()}
+    entries = {
+        entry["record_id"]: entry
+        for entry in load_manifest(include_ocr_suspect=True)["entries"]
+    }
+    audit = {
+        item["record_id"]: item
+        for item in map(
+            json.loads,
+            (COMPILATION_ROOT / "source/formula-audit.jsonl").read_text().splitlines(),
+        )
+    }
+    assert {
+        record_id
+        for record_id, record in records.items()
+        if record.get("record_kind") == "unverified_identity"
+    } == UNVERIFIED_IDENTITY_RECORD_IDS
+    for record_id in UNVERIFIED_IDENTITY_RECORD_IDS:
+        assert entries[record_id]["record_kind"] == "unverified_identity"
+        assert audit[record_id]["record_kind"] == "unverified_identity"
+    assert not (UNVERIFIED_IDENTITY_RECORD_IDS & {record["record_id"] for record in _substances()})
+
+
+@pytest.mark.parametrize("record_id", ["table-006-0072", "table-006-0527"])
+def test_unverified_identity_refusal_does_not_depend_on_incidental_numeric_flags(tmp_path, record_id):
+    manifest = load_manifest(include_ocr_suspect=True)
+    entry = copy.deepcopy(next(item for item in manifest["entries"] if item["record_id"] == record_id))
+    record = json.loads((COMPILATION_ROOT / entry["path"]).read_text())
+    entry["metadata_ocr_suspect"] = record["metadata_ocr_suspect"] = False
+    entry["ocr_suspect_count"] = 0
+    for cell in _numeric_cells(record):
+        cell["ocr_suspect"] = False
+        cell["ocr_check"] = "mutation_probe_cleared"
+    path = tmp_path / entry["path"]
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps(record))
+    (tmp_path / "manifest.yaml").write_text(yaml.safe_dump({"entries": [entry]}))
+
+    assert list(load_records(tmp_path)) == []
+    assert list(load_records(tmp_path, include_ocr_suspect=True)) == []
+    with pytest.raises(KeyError, match="unverified identity"):
+        lookup_temperature(record_id, 298.15, tmp_path, include_ocr_suspect=True)
 
 
 @pytest.mark.parametrize("include_ocr_suspect", [False, True])
@@ -601,7 +714,7 @@ def test_suspect_record_and_lookup_require_typed_opt_in_or_refusal():
     assert error.value.suspect_cells
     with pytest.raises(OCRSuspectRow):
         list(load_records())
-    records = _records()
+    records = _substances()
     assert any(record["contains_ocr_suspect_cells"] for record in records)
     for record in records:
         if record["contains_ocr_suspect_cells"]:
@@ -623,7 +736,7 @@ def test_all_public_loader_entry_points_preserve_suspect_safety(tmp_path):
         list(load_records())
     with pytest.raises(OCRSuspectRow):
         lookup_temperature("table-006-0001", 298.15)
-    explicit = next(record for record in _records() if record["record_id"] == "table-006-0001")
+    explicit = next(record for record in _substances() if record["record_id"] == "table-006-0001")
     assert explicit["contains_ocr_suspect_cells"]
     assert all("ocr_suspect" in cell for cell in _numeric_cells(explicit))
     assert lookup_temperature("table-006-0001", 298.15, include_ocr_suspect=True)

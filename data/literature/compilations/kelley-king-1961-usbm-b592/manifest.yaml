@@ -25,13 +25,13 @@ source_files:
 - path: source/image-verified-fixture.json
   sha256: 48b0fcf97aefdd83d2481a364588c93aaded8121ef0b882d08f13c6a45e27d9d
 - path: source/formula-audit.jsonl
-  sha256: 48bd17bb27dda6933e52dc297417efff7ba94e891de99e904e9a34e817735c02
+  sha256: 4c867a1555a921352e82fd273eb05c65ad96812eb3532b898ff116af5f7b40a7
 census:
   basis: Bulletin's own TABLES list (PDF page 7) and all 25 physical table blocks
   numbered_table_count: 7
   physical_table_block_count: 25
   record_count: 1418
-  substance_count: 1391
+  substance_count: 1381
   record_ids:
   - table-001-0001
   - table-001-0002
@@ -1555,7 +1555,7 @@ summary:
   numbered_table_count: 7
   physical_table_block_count: 25
   record_count: 1418
-  substance_count: 1391
+  substance_count: 1381
   transcribed_record_count: 1418
   untranscribed_record_count: 0
   numeric_cell_count: 15127
@@ -4332,8 +4332,8 @@ corrections:
   source_row_index: 40
   column: substance
   ocr_token: NaAlF4(c)
-  printed_token: NaAlF6(c)
-  quote: NaAlF₆(c)
+  printed_token: Na3AlF6(c)
+  quote: Na₃AlF₆(c)
   basis: The 300-dpi PDF page render proves the printed substance token.
 - record_id: table-006-1059
   kind: image_verified_metadata_token_correction
@@ -6890,6 +6890,7 @@ entries:
   phase: (g)
   name_as_published: Ba(g)
   metadata_ocr_suspect: false
+  record_kind: unverified_identity
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -16390,6 +16391,7 @@ entries:
   phase: null
   name_as_published: Iodine
   metadata_ocr_suspect: false
+  record_kind: unverified_identity
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -23864,6 +23866,7 @@ entries:
   phase: (aq)
   name_as_published: PtCl2-(aq)
   metadata_ocr_suspect: true
+  record_kind: unverified_identity
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -27313,10 +27316,10 @@ entries:
   ambiguities: []
   sha256: 2ac2c85a27b6d3d123d680ecac3c68ac6046cd846ec6e4d59d63f1d7e3bfbfaa
 - record_id: table-006-1056
-  formula: NaAlF6(c)
-  formula_as_published: NaAlF6(c)
+  formula: Na3AlF6(c)
+  formula_as_published: Na3AlF6(c)
   phase: (c)
-  name_as_published: NaAlF6(c)
+  name_as_published: Na3AlF6(c)
   metadata_ocr_suspect: true
   metadata_ocr_token: NaAlF4(c)
   source: *id001
@@ -28786,6 +28789,7 @@ entries:
   phase: (aq)
   name_as_published: S-(aq)
   metadata_ocr_suspect: true
+  record_kind: unverified_identity
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -28971,6 +28975,7 @@ entries:
   phase: (aq)
   name_as_published: SO_4-(aq)
   metadata_ocr_suspect: true
+  record_kind: unverified_identity
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -28991,6 +28996,7 @@ entries:
   phase: (aq)
   name_as_published: SO_3-(aq)
   metadata_ocr_suspect: true
+  record_kind: unverified_identity
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -29011,6 +29017,7 @@ entries:
   phase: (aq)
   name_as_published: S_2O_3-(aq)
   metadata_ocr_suspect: true
+  record_kind: unverified_identity
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -29031,6 +29038,7 @@ entries:
   phase: (aq)
   name_as_published: S_2O_4-(aq)
   metadata_ocr_suspect: true
+  record_kind: unverified_identity
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -29051,6 +29059,7 @@ entries:
   phase: (aq)
   name_as_published: S_2O_5-(aq)
   metadata_ocr_suspect: true
+  record_kind: unverified_identity
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
@@ -29071,6 +29080,7 @@ entries:
   phase: (aq)
   name_as_published: S_4O_6-(aq)
   metadata_ocr_suspect: true
+  record_kind: unverified_identity
   source: *id001
   original_record_text_location:
     path: source/mineru-tables.jsonl
