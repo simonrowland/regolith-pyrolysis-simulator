@@ -72,6 +72,13 @@ def _numeric_cells(value):
             yield from _numeric_cells(child)
 
 
+def _metadata_digit_ocr_candidate(token):
+    if not token:
+        return False
+    plain = re.sub(r"[^A-Za-z0-9.,/()]+", "", token)
+    return bool(re.search(r"(?<![\d./])1(?=[A-Za-z,(]|$)", plain))
+
+
 def _assert_fixture(records, fixture):
     by_id = {record["record_id"]: record for record in records}
     for expected in fixture["cells"]:
@@ -134,7 +141,7 @@ def test_every_record_round_trips_to_cached_native_source_tokens():
 
 
 def test_manifest_record_and_bulletin_census_coverage_match():
-    manifest = load_manifest()
+    manifest = load_manifest(include_ocr_suspect=True)
     records = _records()
     census = json.loads((COMPILATION_ROOT / "census.json").read_text())
     ids = [record["record_id"] for record in records]
@@ -189,7 +196,44 @@ def test_actinium_image_proven_row_alignment_correction_is_explicit():
         assert correction["printed_token"] == correction["ocr_token"] == "15.0±1.0"
         assert correction["quote"]
         assert record["rows"][0]["cells"][correction["column"]]["ocr_suspect"]
-    assert load_manifest()["summary"]["correction_count"] == 26
+    assert load_manifest(include_ocr_suspect=True)["summary"]["correction_count"] == 36
+
+
+def test_metadata_digit_ocr_census_is_fully_image_corrected():
+    records = _records()
+    corrections = [
+        correction
+        for record in records
+        for correction in record["corrections"]
+        if correction["kind"] == "image_verified_metadata_token_correction"
+    ]
+    assert len(corrections) == 10
+    assert sum(
+        _metadata_digit_ocr_candidate(record.get(field))
+        for record in records
+        for field in ("formula", "formula_as_published", "name_as_published")
+    ) == 0
+    assert all(_metadata_digit_ocr_candidate(correction["ocr_token"]) for correction in corrections)
+    assert all(
+        correction["record_id"]
+        and correction["page"]
+        and correction["printed_token"]
+        and correction["ocr_token"]
+        and correction["quote"]
+        for correction in corrections
+    )
+    assert {correction["record_id"] for correction in corrections} == {
+        "table-006-0049",
+        "table-006-0052",
+        "table-006-0053",
+        "table-006-0300",
+        "table-006-0380",
+        "table-006-0470",
+        "table-006-0777",
+        "table-006-1014",
+        "table-006-1196",
+        "table-006-1248",
+    }
 
 
 def test_image_proven_merged_rows_are_split_without_cross_substance_values():
@@ -273,14 +317,17 @@ def test_suspect_record_and_lookup_require_typed_opt_in_or_refusal():
             assert record["metadata_ocr_suspect"] or any(cell["ocr_suspect"] for cell in _numeric_cells(record))
 
 
-def test_all_public_loader_entry_points_preserve_suspect_safety():
+def test_all_public_loader_entry_points_preserve_suspect_safety(tmp_path):
     public_functions = {
         name
         for name, value in inspect.getmembers(b592_loader, inspect.isfunction)
         if value.__module__ == b592_loader.__name__ and not name.startswith("_")
     }
     assert public_functions == {"load_manifest", "load_records", "lookup_temperature"}
-    assert "rows" not in load_manifest()["entries"][0]
+    with pytest.raises(OCRSuspectRow):
+        load_manifest()
+    manifest = load_manifest(include_ocr_suspect=True)
+    assert "rows" not in manifest["entries"][0]
     with pytest.raises(OCRSuspectRow):
         list(load_records())
     with pytest.raises(OCRSuspectRow):
@@ -288,6 +335,23 @@ def test_all_public_loader_entry_points_preserve_suspect_safety():
     explicit = next(record for record in _records() if record["record_id"] == "table-006-0001")
     assert explicit["contains_ocr_suspect_cells"]
     assert all("ocr_suspect" in cell for cell in _numeric_cells(explicit))
+    assert lookup_temperature("table-006-0001", 298.15, include_ocr_suspect=True)
+
+    mutated = copy.deepcopy(manifest)
+    mutated_entry = next(entry for entry in mutated["entries"] if not entry["metadata_ocr_suspect"])
+    mutated_entry["formula"] = "Cs1(g)"
+    mutated_entry["formula_as_published"] = "Cs1(g)"
+    mutated_entry["name_as_published"] = "Cs1(g)"
+    mutated["entries"] = [mutated_entry]
+    (tmp_path / "manifest.yaml").write_text(yaml.safe_dump(mutated, sort_keys=False))
+    with pytest.raises(OCRSuspectRow) as error:
+        load_manifest(tmp_path)
+    assert {cell.column for cell in error.value.suspect_cells} == {
+        "formula",
+        "formula_as_published",
+        "name_as_published",
+    }
+    assert load_manifest(tmp_path, include_ocr_suspect=True)["entries"][0]["formula"] == "Cs1(g)"
 
 
 def test_factor_1000_and_monotonicity_detectors_are_complete_and_non_correcting():
@@ -305,7 +369,76 @@ def test_factor_1000_and_monotonicity_detectors_are_complete_and_non_correcting(
         assert item["image_cross_check"] in {"raster_ocr_token_agreement", "raster_ocr_token_disagreement"}
         if item["image_cross_check"] == "raster_ocr_token_disagreement":
             assert any(cell["ocr_suspect"] for cell in candidates)
-    assert load_manifest()["summary"]["identity_check_disagreement_count"] == 68
+    assert load_manifest(include_ocr_suspect=True)["summary"]["identity_check_disagreement_count"] == 8
+
+
+def test_every_manifest_summary_field_matches_an_independent_census():
+    manifest = load_manifest(include_ocr_suspect=True)
+    records = _records()
+    blocks = [
+        json.loads(line)
+        for line in (COMPILATION_ROOT / "source/mineru-tables.jsonl").read_text().splitlines()
+    ]
+    row_cells = [cell for record in records for cell in _numeric_cells(record["rows"])]
+    grid_cells = [cell for record in records for cell in record["temperature_grid"]]
+    independently_counted = {
+        "numbered_table_count": len({record["table_number"] for record in records}),
+        "physical_table_block_count": len(blocks),
+        "record_count": len(records),
+        "transcribed_record_count": sum(record["transcription_status"].startswith("transcribed") for record in records),
+        "untranscribed_record_count": len(manifest["untranscribed"]),
+        "numeric_cell_count": len(row_cells),
+        "parsed_value_count": sum(cell["value"] is not None for cell in row_cells),
+        "temperature_grid_token_count": len(grid_cells),
+        "row_numeric_ocr_suspect_count": sum(cell["ocr_suspect"] for cell in row_cells),
+        "temperature_grid_ocr_suspect_count": sum(cell["ocr_suspect"] for cell in grid_cells),
+        "metadata_ocr_suspect_count": sum(record["metadata_ocr_suspect"] for record in records),
+        "ocr_suspect_count": sum(cell["ocr_suspect"] for cell in row_cells + grid_cells)
+        + sum(record["metadata_ocr_suspect"] for record in records),
+        "identity_check_disagreement_count": sum(
+            ambiguity["kind"] == "recommended_entropy_not_equal_to_printed_source_column"
+            for record in records
+            for ambiguity in record["ambiguities"]
+        ),
+        "correction_count": sum(len(record["corrections"]) for record in records),
+    }
+    assert manifest["summary"] == independently_counted
+
+
+def test_broad_magnitude_gap_and_comma_decimal_census_are_explained():
+    records = _records()
+    by_column = {}
+    for record in records:
+        for row in record["rows"]:
+            for column, cell in row["cells"].items():
+                value = cell.get("value")
+                if isinstance(value, (int, float)) and value:
+                    by_column.setdefault((record["table_number"], column), []).append(abs(value))
+    medians = {key: sorted(values)[len(values) // 2] for key, values in by_column.items()}
+    broad = []
+    comma_decimal = []
+    for record in records:
+        for cell in _numeric_cells(record["rows"]):
+            value = cell["value"]
+            median = medians.get((record["table_number"], cell["column"]))
+            if isinstance(value, (int, float)) and value and median:
+                factor = max(abs(value) / median, median / abs(value))
+                if 250 <= factor <= 3000:
+                    broad.append((record["record_id"], cell["column"], cell["raw"]))
+            if re.search(r"(?<!\d)\d+,\d{1,2}(?![\d.])", cell["raw"]):
+                comma_decimal.append((record["record_id"], cell["column"], cell["raw"]))
+    detector = {
+        (record["record_id"], ambiguity["column"], ambiguity["raw"])
+        for record in records
+        for ambiguity in record["ambiguities"]
+        if ambiguity["kind"] == "column_magnitude_factor_approximately_1000"
+    }
+    assert len(broad) == 10
+    assert set(broad) - detector == {
+        ("table-002-0001", "energy_partition_term", "$.005 \\times 10^{-14}$"),
+        ("table-003-0001", "partition_term", ".006"),
+    }
+    assert comma_decimal == []
 
 
 def test_post_table_note_prose_is_retained_verbatim():

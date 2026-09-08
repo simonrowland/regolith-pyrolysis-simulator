@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
@@ -40,8 +41,43 @@ class OCRSuspectRow(LookupError):
         super().__init__(f"{record_id} (printed page {printed_page}) has OCR-suspect source material")
 
 
-def load_manifest(root: Path = COMPILATION_ROOT) -> dict:
-    return yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
+def _metadata_digit_ocr_candidate(token: str | None) -> bool:
+    if not token:
+        return False
+    plain = re.sub(r"[^A-Za-z0-9.,/()]+", "", token)
+    return bool(re.search(r"(?<![\d./])1(?=[A-Za-z,(]|$)", plain))
+
+
+def _manifest_suspect_cells(entry: dict[str, Any]) -> tuple[OCRSuspectCell, ...]:
+    suspects = []
+    for field in ("formula", "formula_as_published", "name_as_published"):
+        token = entry.get(field)
+        if _metadata_digit_ocr_candidate(token):
+            suspects.append(OCRSuspectCell(-1, field, token, "unresolved metadata digit OCR candidate"))
+    if entry.get("metadata_ocr_suspect") and not suspects:
+        suspects.append(
+            OCRSuspectCell(
+                -1,
+                "substance_metadata",
+                entry.get("metadata_ocr_token") or entry.get("formula_as_published") or entry.get("name_as_published") or "",
+                entry.get("metadata_ocr_check") or "metadata raster disagreement",
+            )
+        )
+    return tuple(suspects)
+
+
+def load_manifest(root: Path = COMPILATION_ROOT, *, include_ocr_suspect: bool = False) -> dict:
+    manifest = yaml.safe_load((root / "manifest.yaml").read_text(encoding="utf-8"))
+    if not include_ocr_suspect:
+        for entry in manifest["entries"]:
+            suspects = _manifest_suspect_cells(entry)
+            if suspects:
+                raise OCRSuspectRow(
+                    record_id=entry["record_id"],
+                    printed_page=entry["source_locator"]["printed_page"],
+                    suspect_cells=suspects,
+                )
+    return manifest
 
 
 def _numeric_cells(value: Any, *, source_row_index: int = -1):
@@ -88,7 +124,7 @@ def _raise_for_ocr_suspect(record: dict[str, Any], value: Any) -> None:
 
 def load_records(root: Path = COMPILATION_ROOT, *, include_ocr_suspect: bool = False):
     """Yield records; suspect material requires an explicit flag and retains flags."""
-    for entry in load_manifest(root)["entries"]:
+    for entry in load_manifest(root, include_ocr_suspect=include_ocr_suspect)["entries"]:
         record = json.loads((root / entry["path"]).read_text(encoding="utf-8"))
         if record["record_id"] != entry["record_id"]:
             raise ValueError(f"record identity differs from manifest: {entry['path']}")
@@ -109,9 +145,22 @@ TABLE6_CP_COLUMNS = {
 }
 
 
-def lookup_temperature(record_id: str, temperature: float, root: Path = COMPILATION_ROOT) -> tuple[dict, ...]:
+def lookup_temperature(
+    record_id: str,
+    temperature: float,
+    root: Path = COMPILATION_ROOT,
+    *,
+    include_ocr_suspect: bool = False,
+) -> tuple[dict, ...]:
     """Return only exact printed-grid data; never expose suspect cells bare."""
-    entry = next((item for item in load_manifest(root)["entries"] if item["record_id"] == record_id), None)
+    entry = next(
+        (
+            item
+            for item in load_manifest(root, include_ocr_suspect=True)["entries"]
+            if item["record_id"] == record_id
+        ),
+        None,
+    )
     if entry is None:
         raise KeyError(record_id)
     record = json.loads((root / entry["path"]).read_text(encoding="utf-8"))
@@ -139,7 +188,8 @@ def lookup_temperature(record_id: str, temperature: float, root: Path = COMPILAT
                     "entropy_recommended",
                 )
             }
-        _raise_for_ocr_suspect(record, result)
+        if not include_ocr_suspect:
+            _raise_for_ocr_suspect(record, result)
         return (result,)
     if record["table_number"] == 7:
         matches = tuple(
@@ -147,5 +197,6 @@ def lookup_temperature(record_id: str, temperature: float, root: Path = COMPILAT
         )
     else:
         matches = tuple(record["rows"])
-    _raise_for_ocr_suspect(record, matches)
+    if not include_ocr_suspect:
+        _raise_for_ocr_suspect(record, matches)
     return matches

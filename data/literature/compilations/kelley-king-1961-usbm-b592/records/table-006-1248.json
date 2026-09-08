@@ -1,15 +1,15 @@
 {
   "record_id": "table-006-1248",
   "table_number": 6,
-  "substance_as_published": "$U_1O_9(c)$",
-  "formula_as_published": "$U_1O_9(c)$",
-  "formula": "$U_1O_9(c)$",
-  "name_as_published": "U_1O_9(c)",
+  "substance_as_published": "$U_3O_8(c)$",
+  "formula_as_published": "$U_3O_8(c)$",
+  "formula": "$U_3O_8(c)$",
+  "name_as_published": "U_3O_8(c)",
   "phase_as_published": "(c)",
   "state_as_published": "(c)",
   "footnote_markers": "",
   "metadata_ocr_suspect": true,
-  "metadata_ocr_check": "raster_ocr_text_disagreement",
+  "metadata_ocr_check": "image_verified_metadata_token_correction",
   "page": 116,
   "pdf_page": 120,
   "caption_raw": "TABLE 6.—Low-temperature heat capacities and entropies at 298.15° K.—Continued",
@@ -155,7 +155,7 @@
     {
       "source_row_index": 67,
       "raw": [
-        "$U_1O_9(c)$",
+        "$U_3O_8(c)$",
         "1.02",
         "4.95",
         "14.87",
@@ -170,7 +170,9 @@
       ],
       "cells": {
         "substance": {
-          "raw": "$U_1O_9(c)$"
+          "raw": "$U_3O_8(c)$",
+          "ocr_suspect": true,
+          "ocr_check": "image_verified_metadata_token_correction"
         },
         "cp_10_k": {
           "raw": "1.02",
@@ -334,7 +336,21 @@
     "sha256": "9de735bf80ec059a07471c1dcba09f2dc10189e71dd08c314914db811235fdcf"
   },
   "ambiguities": [],
-  "corrections": [],
+  "corrections": [
+    {
+      "kind": "image_verified_metadata_token_correction",
+      "pdf_page": 120,
+      "page": 116,
+      "source_row_index": 67,
+      "column": "substance",
+      "ocr_token": "$U_1O_9(c)$",
+      "printed_token": "$U_3O_8(c)$",
+      "quote": "U3O8(c) ... 67.5±0.2",
+      "basis": "The 300-dpi PDF page render proves the printed substance token.",
+      "record_id": "table-006-1248"
+    }
+  ],
   "heading_context_as_published": "Uranium:",
+  "metadata_ocr_token": "$U_1O_9(c)$",
   "transcription_status": "transcribed_with_ocr_ambiguities"
 }

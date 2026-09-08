@@ -363,6 +363,25 @@ TABLE6_IMAGE_VERIFIED_TOKEN_CORRECTIONS = {
     (104, "C2N4(g)†"): {0: "C2N2(g)†"},
     (116, "$TiBr_3(c)$ *"): {4: "16.92"},
 }
+TABLE6_IMAGE_VERIFIED_METADATA_CORRECTIONS = {
+    (102, "$As_1(g)$"): ("$As_4(g)$", "As4(g) ... 57.2±0.3"),
+    (102, "$AsF_1(g)$"): ("$AsF_3(g)$", "AsF3(g) ... 69.08±0.10"),
+    (102, "$AsF_1(l) \\dagger$"): ("$AsF_3(l) \\dagger$", "AsF3(l)† ... 43.3±0.1"),
+    (105, "Cs1(g)"): ("CsI(g)", "CsI(g) ... 65.5±0.5"),
+    (106, "Ga3C1(g)"): ("Ga3Cl(g)", "Ga3Cl(g) ... 71.4±1.5"),
+    (107, "HNO2(equ1,g)"): ("HNO2(equl,g)", "HNO2(equl,g) ... 60.8±0.3"),
+    (110, "NiTe1(c)"): ("NiTe1.1(c)", "NiTe1.1(c) ... 20.10±0.08"),
+    (113, "Si1N4(c)"): ("Si3N4(c)", "Si3N4(c) ... 22.8"),
+    (116, "$SnI_1(g)$"): ("$SnI_2(g)$", "SnI2(g) ... 52.4±0.2"),
+    (116, "$U_1O_9(c)$"): ("$U_3O_8(c)$", "U3O8(c) ... 67.5±0.2"),
+}
+
+
+def metadata_digit_ocr_candidate(token: str | None) -> bool:
+    """Flag standalone OCR 1s while excluding real decimals and fractions."""
+    if not token:
+        return False
+    return bool(re.search(r"(?<![\d./])1(?=[A-Za-z,(]|$)", plain_text(token)))
 
 
 def native_row(
@@ -531,6 +550,30 @@ def build_records(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                             "basis": "Original-resolution page image proves the printed token.",
                         })
                     raw_row = corrected
+                metadata_correction = TABLE6_IMAGE_VERIFIED_METADATA_CORRECTIONS.get(
+                    (block["printed_page"], raw_row[0])
+                )
+                if metadata_digit_ocr_candidate(raw_row[0]) and metadata_correction is None:
+                    raise RuntimeError(
+                        f"unreviewed metadata digit OCR candidate on printed page {block['printed_page']}: {raw_row[0]!r}"
+                    )
+                if metadata_correction:
+                    ocr_token = raw_row[0]
+                    printed_token, quote = metadata_correction
+                    corrected = list(raw_row)
+                    corrected[0] = printed_token
+                    corrections.append({
+                        "kind": "image_verified_metadata_token_correction",
+                        "pdf_page": block["pdf_page"],
+                        "page": block["printed_page"],
+                        "source_row_index": row_index,
+                        "column": "substance",
+                        "ocr_token": ocr_token,
+                        "printed_token": printed_token,
+                        "quote": quote,
+                        "basis": "The 300-dpi PDF page render proves the printed substance token.",
+                    })
+                    raw_row = corrected
                 variants = [(raw_row, corrections)]
                 split = TABLE6_IMAGE_VERIFIED_SPLITS.get((block["printed_page"], raw_row[0]))
                 if split:
@@ -571,8 +614,15 @@ def build_records(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
                         cell["ocr_suspect"] = True
                         cell["ocr_check"] = correction["kind"]
                     metadata = substance_metadata(variant[0])
-                    record = record_base(f"table-006-{ordinals[number]:04d}", number, block, metadata, [row], grid, raw_rows[0] + raw_rows[1])
+                    record_id = f"table-006-{ordinals[number]:04d}"
+                    record = record_base(record_id, number, block, metadata, [row], grid, raw_rows[0] + raw_rows[1])
                     record["heading_context_as_published"] = table6_heading
+                    for correction in variant_corrections:
+                        if correction["kind"] == "image_verified_metadata_token_correction":
+                            correction["record_id"] = record_id
+                            record["metadata_ocr_token"] = correction["ocr_token"]
+                            record["metadata_ocr_suspect"] = True
+                            record["metadata_ocr_check"] = correction["kind"]
                     record["corrections"].extend(variant_corrections)
                     record["ambiguities"].extend(cp_monotonicity(record))
                     record["ambiguities"].extend(recommendation_disagreement(record))
@@ -602,6 +652,14 @@ def build_records(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
         print(f"TABLE {block['block_index']:02d}/{EXPECTED_BLOCKS}: transcribed ({len(records)} records)", flush=True)
     if len(records) != EXPECTED_RECORDS:
         raise RuntimeError(f"expected {EXPECTED_RECORDS} substance records, found {len(records)}")
+    unresolved_metadata = [
+        (record["record_id"], field, record.get(field))
+        for record in records
+        for field in ("formula", "formula_as_published", "name_as_published")
+        if metadata_digit_ocr_candidate(record.get(field))
+    ]
+    if unresolved_metadata:
+        raise RuntimeError(f"unreviewed metadata digit OCR candidates: {unresolved_metadata}")
     return records
 
 
@@ -721,7 +779,11 @@ def build(workers: int) -> None:
         "temperature_grid_ocr_suspect_count": grid_suspect_count,
         "metadata_ocr_suspect_count": metadata_suspect_count,
         "ocr_suspect_count": row_suspect_count + grid_suspect_count + metadata_suspect_count,
-        "identity_check_disagreement_count": sum(len(record["ambiguities"]) for record in records),
+        "identity_check_disagreement_count": sum(
+            ambiguity["kind"] == "recommended_entropy_not_equal_to_printed_source_column"
+            for record in records
+            for ambiguity in record["ambiguities"]
+        ),
         "correction_count": sum(len(record["corrections"]) for record in records),
     }
     source = {
@@ -748,6 +810,12 @@ def build(workers: int) -> None:
             "formula_as_published": record["formula_as_published"],
             "phase": record["phase_as_published"],
             "name_as_published": record["name_as_published"],
+            "metadata_ocr_suspect": record["metadata_ocr_suspect"],
+            **(
+                {"metadata_ocr_token": record["metadata_ocr_token"]}
+                if record.get("metadata_ocr_token")
+                else {}
+            ),
             "source": source,
             "original_record_text_location": record["source_ref"],
             "source_locator": {"pdf_page": record["pdf_page"], "printed_page": record["page"], "table_number": record["table_number"]},
