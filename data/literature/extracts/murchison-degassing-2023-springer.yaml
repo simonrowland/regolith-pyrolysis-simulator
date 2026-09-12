@@ -1,0 +1,1964 @@
+schema_version: literature_extract.v1
+source_id: murchison-degassing-2023-springer
+source:
+  citation: 'Voropaev, S. A., Dushenko, N. V., Fedulov, V. S. and Korochantsev, A. V. (2023), Osobennosti
+    degazatsii uglistogo khondrita Murchison (CM2) v intervale temperatur 200-800 C, Astronomicheskii
+    Vestnik 57(6) 571-582. English translation: Features of Degassing of the Murchison (CM2) Carbonaceous
+    Chondrite in the Temperature Interval of 200-800 C, Solar System Research. Russian original DOI 10.31857/S0320930X23050067;
+    English DOI 10.1134/S0038094623050064.'
+  doi: 10.1134/S0038094623050064
+  url: https://doi.org/10.1134/S0038094623050064
+  year: 2023
+extraction:
+  method: Corpus PDF is the Russian Astronomicheskii Vestnik original (raw/murchison-degassing-2023-springer/murchison-degassing-2023-springer.pdf).
+    Born-digital. pdftotext -layout and MinerU were used only to locate tables; they are not data. Tables
+    1, 2 and 4 transcribed from a 400 dpi pdftoppm PNG render (docs-private/research/ocr-artifacts/murchison-degassing-2023-springer/p-06.png
+    and p-10.png). Printed units retained (mkg/g, deg C, bar) before converting T to K as T_K = t_C +
+    273.15. Authors' GC yields kept distinct from Chelyabinsk values they quote from Galimov/Voropaev
+    2013 and Stennikov 2019, and from the Boudouard Kp fit (model_derived). Fig. 3 IR spectra listed figure-only
+    and not digitised. Printed zeros in Table 2 recorded as printed cells, not invented. Sample mass is
+    not printed (omitted). Prose on p. 580 quotes CO2 4045 ug/g and CO 10218 ug/g at 800 C; Table 1/4
+    print 4040 +/- 40 and 10200 +/- 100. Table cells are the authority; prose not used to overwrite the
+    table.
+  date: '2026-09-12'
+  worker: extract-pyro-meteorite
+  provenance_path: docs-private/research/ocr-artifacts/murchison-degassing-2023-springer/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.CO.observations[voropaev_2023_murchison_isothermal_co_table1].values.points[2].yield_ug_g
+  value: 10200.0
+  locator:
+    table: '1'
+    published_page: 576
+    pdf_page_index: 6
+    note: 'Table 1 CO at T = 800 C: 10 200 +/- 100 ug/g'
+- path: species.CO2.observations[voropaev_2023_murchison_stepwise_co2_table2].values.points[7].yield_ug_g
+  value: 5910.0
+  locator:
+    table: '2'
+    published_page: 576
+    pdf_page_index: 6
+    note: 'Table 2 CO2 at T = 700 C: 5910 +/- 60 ug/g'
+- path: species.H2O.observations[voropaev_2023_murchison_stepwise_h2o_table2].values.points[0].yield_ug_g
+  value: 588.0
+  locator:
+    table: '2'
+    published_page: 576
+    pdf_page_index: 6
+    note: 'Table 2 H2O at T = 50 C: 588 +/- 5 ug/g'
+- path: species.Murchison_CM2.observations[voropaev_2023_murchison_cm2_method_and_feedstock].values.pressure_regime.absolute_pressure_bar
+  value: 1.1
+  locator:
+    published_page: 574
+    pdf_page_index: 4
+    note: 1.1 +/- 0.1 bar helium, approximately atmospheric, manometer (11)
+species:
+  Murchison_CM2:
+    observations:
+    - observation_id: voropaev_2023_murchison_cm2_method_and_feedstock
+      type: rate_series
+      locator:
+        published_page: 573
+        pdf_page_index: 3
+        section: Eksperimentalnye issledovaniya degazatsii
+        note: apparatus pp. 573-575; feedstock Murchison CM2; no aliquot mass printed
+      T_range_K:
+      - 323.15
+      - 1073.15
+      phase: Murchison_CM2_powder_in_quartz_boat
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2
+        metastable: false
+        basis: explicit_author
+        note: Murchison (type CM2) crushed and milled powder
+      standard_state: method geometry and thermal program; not a species yield
+      regime: isothermal_and_stepwise_degassing_helium
+      units: as published
+      values:
+        quantity: method_geometry_and_feedstock
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        feedstock:
+          name: Murchison
+          class_as_printed: CM2 carbonaceous chondrite
+          sample_id: null
+          sample_id_omitted_reason: no meteorite catalogue number or aliquot id printed
+          composition_table: null
+          composition_table_omitted_reason: no bulk oxide or mineral-mode table of the aliquot used in
+            these runs; organics concentrations quoted from Botta and Bada 2002 are not this work
+          grain_sizes_as_printed:
+          - crushed 2-3 mm in a ceramic mortar
+          - ball-milled powder ~100 um
+          grain_size_split_in_tables: each series used both crushed and milled powder; tables are not
+            split by grain size
+          storage: prepared powder stored in a desiccator
+        sample_mass_omitted_reason: no aliquot mass in g or mg is printed; yields are reported as ug/g
+          so a mass is not required to use the specific yields
+        thermal_program:
+          isothermal_T_C:
+          - 200
+          - 500
+          - 800
+          isothermal_hold_min: 15
+          isothermal_preheat: isothermal runs additionally calcined up to two hours at 100 C with He purge
+            until terrestrial-air impurities disappeared on the GC
+          stepwise_T_C:
+          - 50
+          - 110
+          - 200
+          - 300
+          - 400
+          - 500
+          - 600
+          - 700
+          - 800
+          stepwise_hold_min: 30
+          stepwise_step_C: 100
+          stepwise_no_preheat: true
+          heating_rate_C_per_s: 4.5
+          time_to_setpoint_min_max: 3
+          T_sensor_as_printed: Nicrobell D thermocouple in the immediate vicinity of the quartz boat;
+            temperature inside the system
+          max_T_C: 800
+          max_T_reason_as_printed: above 800 C nitrogen begins to react with hydrogen and particles sinter
+        pressure_regime:
+          absolute_pressure_as_printed: 1.1 +/- 0.1 bar
+          absolute_pressure_bar: 1.1
+          uncertainty_bar: 0.1
+          compared_to: approximately atmospheric
+          static_or_pumped: closed helium loop at manometer-controlled ~1.1 bar; helium inlet via vacuum
+            leak valve; piston reservoir equalizes pressure; not a pumped vacuum
+          sweep_gas: helium
+          purge: 'reactor preheated and purged with helium before the run (~3 h until atmospheric-gas
+            traces disappeared); stepwise: full He purge before each T step'
+          not_vacuum: true
+        apparatus:
+          instrument: purpose-built degassing rig (Stennikov et al. 2019)
+          heater: induction heater (furnace)
+          reactor: one-piece quartz-glass reactor, 80 mL
+          boat: quartz boat, 3 mL
+          stopper: rubber vacuum stopper allowing a gas-tight syringe needle
+          syringe_sample_uL: 500
+          vapour_path: headspace sampled by gas-tight syringe into GC; no cold-finger condensate collector
+            is described. Authors note the syringe needle itself admits a small air blank, accounted for
+            in GC calibration.
+          GC: Kristal-Lyuks 4000M
+          columns:
+          - HP-PLOT/Q 30 m x 0.537 mm x 40.0 um (PFD, TCD-2)
+          - CaA molecular sieves 2 m x 3 mm x 0.25-0.177 mm (TCD-1)
+          carrier: helium
+          column_inlet_pressure: 1 atm as printed
+          detectors:
+            PFD:
+            - H2S
+            TCD-1:
+            - H2
+            - N2
+            - CH4
+            - CO
+            TCD-2:
+            - CO2
+            - H2O
+          not_analyzed_this_work:
+          - SO2
+          - noble gases
+          - complex hydrocarbons
+          figures_apparatus:
+          - '1'
+          - '2'
+      equipment: &id001
+        cell_material:
+          value: quartz-glass reactor (80 mL) with quartz boat (3 mL) holding the sample; induction heater;
+            rubber vacuum stopper for syringe sampling
+          locator:
+            published_page: 573
+            pdf_page_index: 3
+            figure: '2'
+            paragraph: tselnyi reaktor iz kvartsevogo stekla; kvartsevaya lodochka obemom 3 ml; reaktor
+              obemom 80 ml
+        chamber_pressure:
+          value: 1.1
+          units: bar as printed (helium, approximately atmospheric)
+          uncertainty: 0.1
+          as_printed: 1.1 +/- 0.1 bar
+          locator:
+            published_page: 574
+            pdf_page_index: 4
+            paragraph: davlenie vnutri sistemy primerno ravnyalos atmosfernomu (1.1 +/- 0.1 bar), chto
+              registriruetsya po manometru (11)
+  H2:
+    observations:
+    - observation_id: voropaev_2023_murchison_isothermal_h2_table1
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
+      T_range_K:
+      - 473.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: crushed 2-3 mm and ball-milled ~100 um Murchison powder; both used in each series
+      standard_state: specific yield ug/g of powder after 15 min isothermal hold in He at ~1.1 bar; GC
+        (Kristal-Lyuks 4000M)
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: pokazatel tochnosti (granitsy, v kotorykh nakhoditsya pogreshnost rezultatov izmerenii,
+          poluchennykh po metodike izmerenii) +/- delta = 1%. Per-cell +/- in Table 1 retained verbatim.
+      values:
+        quantity: specific_gas_yield
+        gas_species: H2
+        method_class: measured_direct
+        hold_min: 15
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        heating_rate_C_per_s: 4.5
+        time_to_setpoint_min_max: 3
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        points:
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 4.98
+          uncertainty_ug_g: 0.05
+          as_printed: 4.98 +/- 0.05
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 58.9
+          uncertainty_ug_g: 0.5
+          as_printed: 58.9 +/- 0.5
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 372.0
+          uncertainty_ug_g: 3.0
+          as_printed: 372.0 +/- 3.0
+      equipment: *id001
+    - observation_id: voropaev_2023_murchison_stepwise_h2_table2
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
+      T_range_K:
+      - 323.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: no preliminary anneal or He purge of the powder, to avoid decomposing phyllosilicates and
+          to retain sorbed atmospheric water
+      standard_state: specific yield ug/g after 30 min hold at the stated T in He; reactor He-purged before
+        each T step (no gas accumulation)
+      regime: stepwise_degassing_helium_headspace_GC_no_accumulation
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: per-cell +/- in Table 2 retained verbatim; printed 0 cells have no +/-
+      values:
+        quantity: specific_gas_yield
+        gas_species: H2
+        method_class: measured_direct
+        hold_min: 30
+        T_step_C: 100
+        T_program_C_as_printed:
+        - 50
+        - 110
+        - 200
+        - 300
+        - 400
+        - 500
+        - 600
+        - 700
+        - 800
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        purge_between_steps: reactor fully purged with helium before each T increase
+        n_points_as_printed: 9
+        points:
+        - T_C_as_printed: 50
+          T_K: 323.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 110
+          T_K: 383.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 300
+          T_K: 573.15
+          yield_ug_g: 2.61
+          uncertainty_ug_g: 0.02
+          as_printed: 2.61 +/- 0.02
+        - T_C_as_printed: 400
+          T_K: 673.15
+          yield_ug_g: 2.23
+          uncertainty_ug_g: 0.02
+          as_printed: 2.23 +/- 0.02
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 6.07
+          uncertainty_ug_g: 0.06
+          as_printed: 6.07 +/- 0.06
+        - T_C_as_printed: 600
+          T_K: 873.15
+          yield_ug_g: 5.58
+          uncertainty_ug_g: 0.05
+          as_printed: 5.58 +/- 0.05
+        - T_C_as_printed: 700
+          T_K: 973.15
+          yield_ug_g: 31.1
+          uncertainty_ug_g: 0.3
+          as_printed: 31.1 +/- 0.3
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 22.7
+          uncertainty_ug_g: 0.2
+          as_printed: 22.7 +/- 0.2
+        - T_C_as_printed: 200-800
+          yield_ug_g: 70.4
+          T_range_C_as_printed:
+          - 200
+          - 800
+          T_range_K:
+          - 473.15
+          - 1073.15
+          column_as_printed: Vsego, T = 200-800 C
+          uncertainty_ug_g: 0.7
+          as_printed: 70.4 +/- 0.7
+          semantics: column_total_T_200_to_800_C_excludes_50_and_110
+      equipment: *id001
+    - observation_id: voropaev_2023_table4_chelyabinsk_quoted_h2
+      type: rate_series
+      locator:
+        table: '4'
+        published_page: 580
+        pdf_page_index: 10
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
+      T_range_K:
+      - 1073.15
+      - 1073.15
+      phase: gas_evolved_from_Chelyabinsk_LL5
+      standard_state: specific yield ug/g, isothermal 800 C after 15 min; Chelyabinsk column is not this
+        work's new measurement
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed
+      values:
+        quantity: specific_gas_yield
+        gas_species: H2
+        method_class: quoted_from_other_workers
+        quoted_from:
+        - Galimov et al. 2013 Geokhimiya
+        - Voropaev et al. 2013
+        - Stennikov et al. 2019 Astron. Vestn. 53(3) 214-223 / Sol. Syst. Res. 53(3) 199-207
+        as_printed_attribution: dannye degazatsii khorosho izuchennogo meteorita Chelyabinsk (obyknovennyi
+          khondrit, tip LL5) (sm. Galimov i dr., 2013; Voropaev i dr., 2013)
+        feedstock: Chelyabinsk LL5 ordinary chondrite
+        hold_min: 15
+        T_C_as_printed: 800
+        Murchison_column_this_work: Table 4 Murchison column reprints Table 1 T=800 C this-work values;
+          not stored again here
+        points:
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 17.6
+          uncertainty_ug_g: 0.1
+          as_printed: 17.6 +/- 0.1
+  N2:
+    observations:
+    - observation_id: voropaev_2023_murchison_isothermal_n2_table1
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
+      T_range_K:
+      - 473.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: crushed 2-3 mm and ball-milled ~100 um Murchison powder; both used in each series
+      standard_state: specific yield ug/g of powder after 15 min isothermal hold in He at ~1.1 bar; GC
+        (Kristal-Lyuks 4000M)
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: pokazatel tochnosti (granitsy, v kotorykh nakhoditsya pogreshnost rezultatov izmerenii,
+          poluchennykh po metodike izmerenii) +/- delta = 1%. Per-cell +/- in Table 1 retained verbatim.
+      values:
+        quantity: specific_gas_yield
+        gas_species: N2
+        method_class: measured_direct
+        hold_min: 15
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        heating_rate_C_per_s: 4.5
+        time_to_setpoint_min_max: 3
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        points:
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 352.0
+          uncertainty_ug_g: 3.0
+          as_printed: 352.0 +/- 3.0
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 92.8
+          uncertainty_ug_g: 0.9
+          as_printed: 92.8 +/- 0.9
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 503.0
+          uncertainty_ug_g: 5.0
+          as_printed: 503.0 +/- 5.0
+      equipment: *id001
+    - observation_id: voropaev_2023_murchison_stepwise_n2_table2
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
+      T_range_K:
+      - 323.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: no preliminary anneal or He purge of the powder, to avoid decomposing phyllosilicates and
+          to retain sorbed atmospheric water
+      standard_state: specific yield ug/g after 30 min hold at the stated T in He; reactor He-purged before
+        each T step (no gas accumulation)
+      regime: stepwise_degassing_helium_headspace_GC_no_accumulation
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: per-cell +/- in Table 2 retained verbatim; printed 0 cells have no +/-
+      values:
+        quantity: specific_gas_yield
+        gas_species: N2
+        method_class: measured_direct
+        hold_min: 30
+        T_step_C: 100
+        T_program_C_as_printed:
+        - 50
+        - 110
+        - 200
+        - 300
+        - 400
+        - 500
+        - 600
+        - 700
+        - 800
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        purge_between_steps: reactor fully purged with helium before each T increase
+        n_points_as_printed: 9
+        points:
+        - T_C_as_printed: 50
+          T_K: 323.15
+          yield_ug_g: 199.0
+          uncertainty_ug_g: 2.0
+          as_printed: 199.0 +/- 2.0
+        - T_C_as_printed: 110
+          T_K: 383.15
+          yield_ug_g: 177.0
+          uncertainty_ug_g: 1.0
+          as_printed: 177.0 +/- 1.0
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 765.0
+          uncertainty_ug_g: 7.0
+          as_printed: 765.0 +/- 7.0
+        - T_C_as_printed: 300
+          T_K: 573.15
+          yield_ug_g: 448.0
+          uncertainty_ug_g: 4.0
+          as_printed: 448.0 +/- 4.0
+        - T_C_as_printed: 400
+          T_K: 673.15
+          yield_ug_g: 449.0
+          uncertainty_ug_g: 4.0
+          as_printed: 449.0 +/- 4.0
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 649.0
+          uncertainty_ug_g: 6.0
+          as_printed: 649.0 +/- 6.0
+        - T_C_as_printed: 600
+          T_K: 873.15
+          yield_ug_g: 247.0
+          uncertainty_ug_g: 2.0
+          as_printed: 247.0 +/- 2.0
+        - T_C_as_printed: 700
+          T_K: 973.15
+          yield_ug_g: 253.0
+          uncertainty_ug_g: 2.0
+          as_printed: 253.0 +/- 2.0
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 251.0
+          uncertainty_ug_g: 2.0
+          as_printed: 251.0 +/- 2.0
+        - T_C_as_printed: 200-800
+          yield_ug_g: 3060.0
+          T_range_C_as_printed:
+          - 200
+          - 800
+          T_range_K:
+          - 473.15
+          - 1073.15
+          column_as_printed: Vsego, T = 200-800 C
+          uncertainty_ug_g: 30.0
+          as_printed: 3060.0 +/- 30.0
+          semantics: column_total_T_200_to_800_C_excludes_50_and_110
+      equipment: *id001
+    - observation_id: voropaev_2023_table4_chelyabinsk_quoted_n2
+      type: rate_series
+      locator:
+        table: '4'
+        published_page: 580
+        pdf_page_index: 10
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
+      T_range_K:
+      - 1073.15
+      - 1073.15
+      phase: gas_evolved_from_Chelyabinsk_LL5
+      standard_state: specific yield ug/g, isothermal 800 C after 15 min; Chelyabinsk column is not this
+        work's new measurement
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed
+      values:
+        quantity: specific_gas_yield
+        gas_species: N2
+        method_class: quoted_from_other_workers
+        quoted_from:
+        - Galimov et al. 2013 Geokhimiya
+        - Voropaev et al. 2013
+        - Stennikov et al. 2019 Astron. Vestn. 53(3) 214-223 / Sol. Syst. Res. 53(3) 199-207
+        as_printed_attribution: dannye degazatsii khorosho izuchennogo meteorita Chelyabinsk (obyknovennyi
+          khondrit, tip LL5) (sm. Galimov i dr., 2013; Voropaev i dr., 2013)
+        feedstock: Chelyabinsk LL5 ordinary chondrite
+        hold_min: 15
+        T_C_as_printed: 800
+        Murchison_column_this_work: Table 4 Murchison column reprints Table 1 T=800 C this-work values;
+          not stored again here
+        points:
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 699.0
+          uncertainty_ug_g: 7.0
+          as_printed: 699.0 +/- 7.0
+  CH4:
+    observations:
+    - observation_id: voropaev_2023_murchison_isothermal_ch4_table1
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
+      T_range_K:
+      - 473.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: crushed 2-3 mm and ball-milled ~100 um Murchison powder; both used in each series
+      standard_state: specific yield ug/g of powder after 15 min isothermal hold in He at ~1.1 bar; GC
+        (Kristal-Lyuks 4000M)
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: pokazatel tochnosti (granitsy, v kotorykh nakhoditsya pogreshnost rezultatov izmerenii,
+          poluchennykh po metodike izmerenii) +/- delta = 1%. Per-cell +/- in Table 1 retained verbatim.
+      values:
+        quantity: specific_gas_yield
+        gas_species: CH4
+        method_class: measured_direct
+        hold_min: 15
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        heating_rate_C_per_s: 4.5
+        time_to_setpoint_min_max: 3
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        points:
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 8.19
+          uncertainty_ug_g: 0.08
+          as_printed: 8.19 +/- 0.08
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 284.0
+          uncertainty_ug_g: 2.0
+          as_printed: 284.0 +/- 2.0
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 197.0
+          uncertainty_ug_g: 2.0
+          as_printed: 197.0 +/- 2.0
+      equipment: *id001
+    - observation_id: voropaev_2023_murchison_stepwise_ch4_table2
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
+      T_range_K:
+      - 323.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: no preliminary anneal or He purge of the powder, to avoid decomposing phyllosilicates and
+          to retain sorbed atmospheric water
+      standard_state: specific yield ug/g after 30 min hold at the stated T in He; reactor He-purged before
+        each T step (no gas accumulation)
+      regime: stepwise_degassing_helium_headspace_GC_no_accumulation
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: per-cell +/- in Table 2 retained verbatim; printed 0 cells have no +/-
+      values:
+        quantity: specific_gas_yield
+        gas_species: CH4
+        method_class: measured_direct
+        hold_min: 30
+        T_step_C: 100
+        T_program_C_as_printed:
+        - 50
+        - 110
+        - 200
+        - 300
+        - 400
+        - 500
+        - 600
+        - 700
+        - 800
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        purge_between_steps: reactor fully purged with helium before each T increase
+        n_points_as_printed: 9
+        points:
+        - T_C_as_printed: 50
+          T_K: 323.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 110
+          T_K: 383.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 29.5
+          uncertainty_ug_g: 0.3
+          as_printed: 29.5 +/- 0.3
+        - T_C_as_printed: 300
+          T_K: 573.15
+          yield_ug_g: 7.17
+          uncertainty_ug_g: 0.07
+          as_printed: 7.17 +/- 0.07
+        - T_C_as_printed: 400
+          T_K: 673.15
+          yield_ug_g: 115.0
+          uncertainty_ug_g: 1.0
+          as_printed: 115.0 +/- 1.0
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 64.9
+          uncertainty_ug_g: 0.6
+          as_printed: 64.9 +/- 0.6
+        - T_C_as_printed: 600
+          T_K: 873.15
+          yield_ug_g: 12.2
+          uncertainty_ug_g: 0.1
+          as_printed: 12.2 +/- 0.1
+        - T_C_as_printed: 700
+          T_K: 973.15
+          yield_ug_g: 8.51
+          uncertainty_ug_g: 0.08
+          as_printed: 8.51 +/- 0.08
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 1.12
+          uncertainty_ug_g: 0.01
+          as_printed: 1.12 +/- 0.01
+        - T_C_as_printed: 200-800
+          yield_ug_g: 238.0
+          T_range_C_as_printed:
+          - 200
+          - 800
+          T_range_K:
+          - 473.15
+          - 1073.15
+          column_as_printed: Vsego, T = 200-800 C
+          uncertainty_ug_g: 2.0
+          as_printed: 238.0 +/- 2.0
+          semantics: column_total_T_200_to_800_C_excludes_50_and_110
+      equipment: *id001
+    - observation_id: voropaev_2023_table4_chelyabinsk_quoted_ch4
+      type: rate_series
+      locator:
+        table: '4'
+        published_page: 580
+        pdf_page_index: 10
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
+      T_range_K:
+      - 1073.15
+      - 1073.15
+      phase: gas_evolved_from_Chelyabinsk_LL5
+      standard_state: specific yield ug/g, isothermal 800 C after 15 min; Chelyabinsk column is not this
+        work's new measurement
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed
+      values:
+        quantity: specific_gas_yield
+        gas_species: CH4
+        method_class: quoted_from_other_workers
+        quoted_from:
+        - Galimov et al. 2013 Geokhimiya
+        - Voropaev et al. 2013
+        - Stennikov et al. 2019 Astron. Vestn. 53(3) 214-223 / Sol. Syst. Res. 53(3) 199-207
+        as_printed_attribution: dannye degazatsii khorosho izuchennogo meteorita Chelyabinsk (obyknovennyi
+          khondrit, tip LL5) (sm. Galimov i dr., 2013; Voropaev i dr., 2013)
+        feedstock: Chelyabinsk LL5 ordinary chondrite
+        hold_min: 15
+        T_C_as_printed: 800
+        Murchison_column_this_work: Table 4 Murchison column reprints Table 1 T=800 C this-work values;
+          not stored again here
+        points:
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 11.7
+          uncertainty_ug_g: 0.1
+          as_printed: 11.7 +/- 0.1
+  CO:
+    observations:
+    - observation_id: voropaev_2023_murchison_isothermal_co_table1
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
+      T_range_K:
+      - 473.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: crushed 2-3 mm and ball-milled ~100 um Murchison powder; both used in each series
+      standard_state: specific yield ug/g of powder after 15 min isothermal hold in He at ~1.1 bar; GC
+        (Kristal-Lyuks 4000M)
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: pokazatel tochnosti (granitsy, v kotorykh nakhoditsya pogreshnost rezultatov izmerenii,
+          poluchennykh po metodike izmerenii) +/- delta = 1%. Per-cell +/- in Table 1 retained verbatim.
+      values:
+        quantity: specific_gas_yield
+        gas_species: CO
+        method_class: measured_direct
+        hold_min: 15
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        heating_rate_C_per_s: 4.5
+        time_to_setpoint_min_max: 3
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        points:
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 109.0
+          uncertainty_ug_g: 1.0
+          as_printed: 109.0 +/- 1.0
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 327.0
+          uncertainty_ug_g: 3.0
+          as_printed: 327.0 +/- 3.0
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 10200.0
+          uncertainty_ug_g: 100.0
+          as_printed: 10200.0 +/- 100.0
+      equipment: *id001
+    - observation_id: voropaev_2023_murchison_stepwise_co_table2
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
+      T_range_K:
+      - 323.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: no preliminary anneal or He purge of the powder, to avoid decomposing phyllosilicates and
+          to retain sorbed atmospheric water
+      standard_state: specific yield ug/g after 30 min hold at the stated T in He; reactor He-purged before
+        each T step (no gas accumulation)
+      regime: stepwise_degassing_helium_headspace_GC_no_accumulation
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: per-cell +/- in Table 2 retained verbatim; printed 0 cells have no +/-
+      values:
+        quantity: specific_gas_yield
+        gas_species: CO
+        method_class: measured_direct
+        hold_min: 30
+        T_step_C: 100
+        T_program_C_as_printed:
+        - 50
+        - 110
+        - 200
+        - 300
+        - 400
+        - 500
+        - 600
+        - 700
+        - 800
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        purge_between_steps: reactor fully purged with helium before each T increase
+        n_points_as_printed: 9
+        points:
+        - T_C_as_printed: 50
+          T_K: 323.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 110
+          T_K: 383.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 300
+          T_K: 573.15
+          yield_ug_g: 12.9
+          uncertainty_ug_g: 0.1
+          as_printed: 12.9 +/- 0.1
+        - T_C_as_printed: 400
+          T_K: 673.15
+          yield_ug_g: 39.8
+          uncertainty_ug_g: 0.4
+          as_printed: 39.8 +/- 0.4
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 65.8
+          uncertainty_ug_g: 0.6
+          as_printed: 65.8 +/- 0.6
+        - T_C_as_printed: 600
+          T_K: 873.15
+          yield_ug_g: 65.1
+          uncertainty_ug_g: 0.6
+          as_printed: 65.1 +/- 0.6
+        - T_C_as_printed: 700
+          T_K: 973.15
+          yield_ug_g: 1290.0
+          uncertainty_ug_g: 10.0
+          as_printed: 1290.0 +/- 10.0
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 4630.0
+          uncertainty_ug_g: 40.0
+          as_printed: 4630.0 +/- 40.0
+        - T_C_as_printed: 200-800
+          yield_ug_g: 6110.0
+          T_range_C_as_printed:
+          - 200
+          - 800
+          T_range_K:
+          - 473.15
+          - 1073.15
+          column_as_printed: Vsego, T = 200-800 C
+          uncertainty_ug_g: 60.0
+          as_printed: 6110.0 +/- 60.0
+          semantics: column_total_T_200_to_800_C_excludes_50_and_110
+      equipment: *id001
+    - observation_id: voropaev_2023_table4_chelyabinsk_quoted_co
+      type: rate_series
+      locator:
+        table: '4'
+        published_page: 580
+        pdf_page_index: 10
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
+      T_range_K:
+      - 1073.15
+      - 1073.15
+      phase: gas_evolved_from_Chelyabinsk_LL5
+      standard_state: specific yield ug/g, isothermal 800 C after 15 min; Chelyabinsk column is not this
+        work's new measurement
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed
+      values:
+        quantity: specific_gas_yield
+        gas_species: CO
+        method_class: quoted_from_other_workers
+        quoted_from:
+        - Galimov et al. 2013 Geokhimiya
+        - Voropaev et al. 2013
+        - Stennikov et al. 2019 Astron. Vestn. 53(3) 214-223 / Sol. Syst. Res. 53(3) 199-207
+        as_printed_attribution: dannye degazatsii khorosho izuchennogo meteorita Chelyabinsk (obyknovennyi
+          khondrit, tip LL5) (sm. Galimov i dr., 2013; Voropaev i dr., 2013)
+        feedstock: Chelyabinsk LL5 ordinary chondrite
+        hold_min: 15
+        T_C_as_printed: 800
+        Murchison_column_this_work: Table 4 Murchison column reprints Table 1 T=800 C this-work values;
+          not stored again here
+        points:
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 32.3
+          uncertainty_ug_g: 0.3
+          as_printed: 32.3 +/- 0.3
+    - observation_id: voropaev_2023_boudouard_kp_model_derived
+      type: rate_series
+      locator:
+        published_page: 576
+        pdf_page_index: 6
+        equation: '2'
+        paragraph: lg(Kp) = -9001/T + 9.28
+      T_range_K:
+      - 873.15
+      - 1073.15
+      phase: gas_phase_Boudouard_equilibrium
+      standard_state: Kp for C(s) + CO2(g) <-> 2 CO(g); T in K in the printed fit
+      regime: equilibrium_calculation
+      units: lg(Kp) as printed; T in K in eq. (2)
+      values:
+        quantity: Boudouard_equilibrium_constant_fit
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        reaction_as_printed: C(T) + CO2(G) <-> 2 CO(G)
+        reaction_number: 1
+        Kp_as_printed: lg(Kp) = -9001/T + 9.28
+        authors_text: At T > 700 C the reaction proceeds irreversibly toward CO (Kp > 1); at T < 600 C
+          in the opposite direction (Kp < 1). Reversibility window 600-700 C.
+        used_to_interpret: Table 2 CO rise at 700-800 C
+  CO2:
+    observations:
+    - observation_id: voropaev_2023_murchison_isothermal_co2_table1
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
+      T_range_K:
+      - 473.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: crushed 2-3 mm and ball-milled ~100 um Murchison powder; both used in each series
+      standard_state: specific yield ug/g of powder after 15 min isothermal hold in He at ~1.1 bar; GC
+        (Kristal-Lyuks 4000M)
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: pokazatel tochnosti (granitsy, v kotorykh nakhoditsya pogreshnost rezultatov izmerenii,
+          poluchennykh po metodike izmerenii) +/- delta = 1%. Per-cell +/- in Table 1 retained verbatim.
+      values:
+        quantity: specific_gas_yield
+        gas_species: CO2
+        method_class: measured_direct
+        hold_min: 15
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        heating_rate_C_per_s: 4.5
+        time_to_setpoint_min_max: 3
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        points:
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 4640.0
+          uncertainty_ug_g: 40.0
+          as_printed: 4640.0 +/- 40.0
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 6730.0
+          uncertainty_ug_g: 60.0
+          as_printed: 6730.0 +/- 60.0
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 4040.0
+          uncertainty_ug_g: 40.0
+          as_printed: 4040.0 +/- 40.0
+      equipment: *id001
+    - observation_id: voropaev_2023_murchison_stepwise_co2_table2
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
+      T_range_K:
+      - 323.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: no preliminary anneal or He purge of the powder, to avoid decomposing phyllosilicates and
+          to retain sorbed atmospheric water
+      standard_state: specific yield ug/g after 30 min hold at the stated T in He; reactor He-purged before
+        each T step (no gas accumulation)
+      regime: stepwise_degassing_helium_headspace_GC_no_accumulation
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: per-cell +/- in Table 2 retained verbatim; printed 0 cells have no +/-
+      values:
+        quantity: specific_gas_yield
+        gas_species: CO2
+        method_class: measured_direct
+        hold_min: 30
+        T_step_C: 100
+        T_program_C_as_printed:
+        - 50
+        - 110
+        - 200
+        - 300
+        - 400
+        - 500
+        - 600
+        - 700
+        - 800
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        purge_between_steps: reactor fully purged with helium before each T increase
+        n_points_as_printed: 9
+        points:
+        - T_C_as_printed: 50
+          T_K: 323.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 110
+          T_K: 383.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 1440.0
+          uncertainty_ug_g: 10.0
+          as_printed: 1440.0 +/- 10.0
+        - T_C_as_printed: 300
+          T_K: 573.15
+          yield_ug_g: 3910.0
+          uncertainty_ug_g: 30.0
+          as_printed: 3910.0 +/- 30.0
+        - T_C_as_printed: 400
+          T_K: 673.15
+          yield_ug_g: 5250.0
+          uncertainty_ug_g: 50.0
+          as_printed: 5250.0 +/- 50.0
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 5260.0
+          uncertainty_ug_g: 50.0
+          as_printed: 5260.0 +/- 50.0
+        - T_C_as_printed: 600
+          T_K: 873.15
+          yield_ug_g: 4660.0
+          uncertainty_ug_g: 40.0
+          as_printed: 4660.0 +/- 40.0
+        - T_C_as_printed: 700
+          T_K: 973.15
+          yield_ug_g: 5910.0
+          uncertainty_ug_g: 60.0
+          as_printed: 5910.0 +/- 60.0
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 3370.0
+          uncertainty_ug_g: 30.0
+          as_printed: 3370.0 +/- 30.0
+        - T_C_as_printed: 200-800
+          yield_ug_g: 29800.0
+          T_range_C_as_printed:
+          - 200
+          - 800
+          T_range_K:
+          - 473.15
+          - 1073.15
+          column_as_printed: Vsego, T = 200-800 C
+          uncertainty_ug_g: 300.0
+          as_printed: 29800.0 +/- 300.0
+          semantics: column_total_T_200_to_800_C_excludes_50_and_110
+      equipment: *id001
+    - observation_id: voropaev_2023_table4_chelyabinsk_quoted_co2
+      type: rate_series
+      locator:
+        table: '4'
+        published_page: 580
+        pdf_page_index: 10
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
+      T_range_K:
+      - 1073.15
+      - 1073.15
+      phase: gas_evolved_from_Chelyabinsk_LL5
+      standard_state: specific yield ug/g, isothermal 800 C after 15 min; Chelyabinsk column is not this
+        work's new measurement
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed
+      values:
+        quantity: specific_gas_yield
+        gas_species: CO2
+        method_class: quoted_from_other_workers
+        quoted_from:
+        - Galimov et al. 2013 Geokhimiya
+        - Voropaev et al. 2013
+        - Stennikov et al. 2019 Astron. Vestn. 53(3) 214-223 / Sol. Syst. Res. 53(3) 199-207
+        as_printed_attribution: dannye degazatsii khorosho izuchennogo meteorita Chelyabinsk (obyknovennyi
+          khondrit, tip LL5) (sm. Galimov i dr., 2013; Voropaev i dr., 2013)
+        feedstock: Chelyabinsk LL5 ordinary chondrite
+        hold_min: 15
+        T_C_as_printed: 800
+        Murchison_column_this_work: Table 4 Murchison column reprints Table 1 T=800 C this-work values;
+          not stored again here
+        points:
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 544.0
+          uncertainty_ug_g: 5.0
+          as_printed: 544.0 +/- 5.0
+  H2S:
+    observations:
+    - observation_id: voropaev_2023_murchison_isothermal_h2s_table1
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
+      T_range_K:
+      - 473.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: crushed 2-3 mm and ball-milled ~100 um Murchison powder; both used in each series
+      standard_state: specific yield ug/g of powder after 15 min isothermal hold in He at ~1.1 bar; GC
+        (Kristal-Lyuks 4000M)
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: pokazatel tochnosti (granitsy, v kotorykh nakhoditsya pogreshnost rezultatov izmerenii,
+          poluchennykh po metodike izmerenii) +/- delta = 1%. Per-cell +/- in Table 1 retained verbatim.
+      values:
+        quantity: specific_gas_yield
+        gas_species: H2S
+        method_class: measured_direct
+        hold_min: 15
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        heating_rate_C_per_s: 4.5
+        time_to_setpoint_min_max: 3
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        points:
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 8.46
+          uncertainty_ug_g: 0.08
+          as_printed: 8.46 +/- 0.08
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 199.0
+          uncertainty_ug_g: 2.0
+          as_printed: 199.0 +/- 2.0
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 543.0
+          uncertainty_ug_g: 5.0
+          as_printed: 543.0 +/- 5.0
+      equipment: *id001
+    - observation_id: voropaev_2023_murchison_stepwise_h2s_table2
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
+      T_range_K:
+      - 323.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: no preliminary anneal or He purge of the powder, to avoid decomposing phyllosilicates and
+          to retain sorbed atmospheric water
+      standard_state: specific yield ug/g after 30 min hold at the stated T in He; reactor He-purged before
+        each T step (no gas accumulation)
+      regime: stepwise_degassing_helium_headspace_GC_no_accumulation
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: per-cell +/- in Table 2 retained verbatim; printed 0 cells have no +/-
+      values:
+        quantity: specific_gas_yield
+        gas_species: H2S
+        method_class: measured_direct
+        hold_min: 30
+        T_step_C: 100
+        T_program_C_as_printed:
+        - 50
+        - 110
+        - 200
+        - 300
+        - 400
+        - 500
+        - 600
+        - 700
+        - 800
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        purge_between_steps: reactor fully purged with helium before each T increase
+        n_points_as_printed: 9
+        points:
+        - T_C_as_printed: 50
+          T_K: 323.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 110
+          T_K: 383.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 300
+          T_K: 573.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 400
+          T_K: 673.15
+          yield_ug_g: 2.06
+          uncertainty_ug_g: 0.02
+          as_printed: 2.06 +/- 0.02
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 7.53
+          uncertainty_ug_g: 0.07
+          as_printed: 7.53 +/- 0.07
+        - T_C_as_printed: 600
+          T_K: 873.15
+          yield_ug_g: 6.87
+          uncertainty_ug_g: 0.06
+          as_printed: 6.87 +/- 0.06
+        - T_C_as_printed: 700
+          T_K: 973.15
+          yield_ug_g: 7.47
+          uncertainty_ug_g: 0.07
+          as_printed: 7.47 +/- 0.07
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 3.55
+          uncertainty_ug_g: 0.03
+          as_printed: 3.55 +/- 0.03
+        - T_C_as_printed: 200-800
+          yield_ug_g: 27.5
+          T_range_C_as_printed:
+          - 200
+          - 800
+          T_range_K:
+          - 473.15
+          - 1073.15
+          column_as_printed: Vsego, T = 200-800 C
+          uncertainty_ug_g: 0.2
+          as_printed: 27.5 +/- 0.2
+          semantics: column_total_T_200_to_800_C_excludes_50_and_110
+      equipment: *id001
+    - observation_id: voropaev_2023_table4_chelyabinsk_quoted_h2s
+      type: rate_series
+      locator:
+        table: '4'
+        published_page: 580
+        pdf_page_index: 10
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
+      T_range_K:
+      - 1073.15
+      - 1073.15
+      phase: gas_evolved_from_Chelyabinsk_LL5
+      standard_state: specific yield ug/g, isothermal 800 C after 15 min; Chelyabinsk column is not this
+        work's new measurement
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed
+      values:
+        quantity: specific_gas_yield
+        gas_species: H2S
+        method_class: quoted_from_other_workers
+        quoted_from:
+        - Galimov et al. 2013 Geokhimiya
+        - Voropaev et al. 2013
+        - Stennikov et al. 2019 Astron. Vestn. 53(3) 214-223 / Sol. Syst. Res. 53(3) 199-207
+        as_printed_attribution: dannye degazatsii khorosho izuchennogo meteorita Chelyabinsk (obyknovennyi
+          khondrit, tip LL5) (sm. Galimov i dr., 2013; Voropaev i dr., 2013)
+        feedstock: Chelyabinsk LL5 ordinary chondrite
+        hold_min: 15
+        T_C_as_printed: 800
+        Murchison_column_this_work: Table 4 Murchison column reprints Table 1 T=800 C this-work values;
+          not stored again here
+        points:
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 8.82
+          uncertainty_ug_g: 0.08
+          as_printed: 8.82 +/- 0.08
+  COS:
+    observations:
+    - observation_id: voropaev_2023_murchison_isothermal_cos_table1
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
+      T_range_K:
+      - 473.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: crushed 2-3 mm and ball-milled ~100 um Murchison powder; both used in each series
+      standard_state: specific yield ug/g of powder after 15 min isothermal hold in He at ~1.1 bar; GC
+        (Kristal-Lyuks 4000M)
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: pokazatel tochnosti (granitsy, v kotorykh nakhoditsya pogreshnost rezultatov izmerenii,
+          poluchennykh po metodike izmerenii) +/- delta = 1%. Per-cell +/- in Table 1 retained verbatim.
+      values:
+        quantity: specific_gas_yield
+        gas_species: COS
+        method_class: measured_direct
+        hold_min: 15
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        heating_rate_C_per_s: 4.5
+        time_to_setpoint_min_max: 3
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        points:
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 10.9
+          uncertainty_ug_g: 0.1
+          as_printed: 10.9 +/- 0.1
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 2.13
+          uncertainty_ug_g: 0.02
+          as_printed: 2.13 +/- 0.02
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 7.39
+          uncertainty_ug_g: 0.07
+          as_printed: 7.39 +/- 0.07
+      equipment: *id001
+    - observation_id: voropaev_2023_murchison_stepwise_cos_table2
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
+      T_range_K:
+      - 323.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: no preliminary anneal or He purge of the powder, to avoid decomposing phyllosilicates and
+          to retain sorbed atmospheric water
+      standard_state: specific yield ug/g after 30 min hold at the stated T in He; reactor He-purged before
+        each T step (no gas accumulation)
+      regime: stepwise_degassing_helium_headspace_GC_no_accumulation
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: per-cell +/- in Table 2 retained verbatim; printed 0 cells have no +/-
+      values:
+        quantity: specific_gas_yield
+        gas_species: COS
+        method_class: measured_direct
+        hold_min: 30
+        T_step_C: 100
+        T_program_C_as_printed:
+        - 50
+        - 110
+        - 200
+        - 300
+        - 400
+        - 500
+        - 600
+        - 700
+        - 800
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        purge_between_steps: reactor fully purged with helium before each T increase
+        n_points_as_printed: 9
+        points:
+        - T_C_as_printed: 50
+          T_K: 323.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+        - T_C_as_printed: 110
+          T_K: 383.15
+          yield_ug_g: 0.063
+          uncertainty_ug_g: 0.001
+          as_printed: 0.063 +/- 0.001
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 0.92
+          uncertainty_ug_g: 0.01
+          as_printed: 0.92 +/- 0.01
+        - T_C_as_printed: 300
+          T_K: 573.15
+          yield_ug_g: 1.77
+          uncertainty_ug_g: 0.01
+          as_printed: 1.77 +/- 0.01
+        - T_C_as_printed: 400
+          T_K: 673.15
+          yield_ug_g: 0.51
+          uncertainty_ug_g: 0.01
+          as_printed: 0.51 +/- 0.01
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 0.22
+          uncertainty_ug_g: 0.01
+          as_printed: 0.22 +/- 0.01
+        - T_C_as_printed: 600
+          T_K: 873.15
+          yield_ug_g: 0.41
+          uncertainty_ug_g: 0.01
+          as_printed: 0.41 +/- 0.01
+        - T_C_as_printed: 700
+          T_K: 973.15
+          yield_ug_g: 1.59
+          uncertainty_ug_g: 0.01
+          as_printed: 1.59 +/- 0.01
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 2.1
+          uncertainty_ug_g: 0.02
+          as_printed: 2.1 +/- 0.02
+        - T_C_as_printed: 200-800
+          yield_ug_g: 7.53
+          T_range_C_as_printed:
+          - 200
+          - 800
+          T_range_K:
+          - 473.15
+          - 1073.15
+          column_as_printed: Vsego, T = 200-800 C
+          uncertainty_ug_g: 0.07
+          as_printed: 7.53 +/- 0.07
+          semantics: column_total_T_200_to_800_C_excludes_50_and_110
+      equipment: *id001
+    - observation_id: voropaev_2023_table4_chelyabinsk_quoted_cos
+      type: rate_series
+      locator:
+        table: '4'
+        published_page: 580
+        pdf_page_index: 10
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
+      T_range_K:
+      - 1073.15
+      - 1073.15
+      phase: gas_evolved_from_Chelyabinsk_LL5
+      standard_state: specific yield ug/g, isothermal 800 C after 15 min; Chelyabinsk column is not this
+        work's new measurement
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed
+      values:
+        quantity: specific_gas_yield
+        gas_species: COS
+        method_class: quoted_from_other_workers
+        quoted_from:
+        - Galimov et al. 2013 Geokhimiya
+        - Voropaev et al. 2013
+        - Stennikov et al. 2019 Astron. Vestn. 53(3) 214-223 / Sol. Syst. Res. 53(3) 199-207
+        as_printed_attribution: dannye degazatsii khorosho izuchennogo meteorita Chelyabinsk (obyknovennyi
+          khondrit, tip LL5) (sm. Galimov i dr., 2013; Voropaev i dr., 2013)
+        feedstock: Chelyabinsk LL5 ordinary chondrite
+        hold_min: 15
+        T_C_as_printed: 800
+        Murchison_column_this_work: Table 4 Murchison column reprints Table 1 T=800 C this-work values;
+          not stored again here
+        points:
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 0.0
+          uncertainty_ug_g: null
+          printed_as: '0'
+          printed_zero: true
+          note: Authors printed 0 with no plus/minus. Recorded as the printed cell, not an invented zero
+            and not an interpolation.
+  H2O:
+    observations:
+    - observation_id: voropaev_2023_murchison_isothermal_h2o_table1
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
+      T_range_K:
+      - 473.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: crushed 2-3 mm and ball-milled ~100 um Murchison powder; both used in each series
+      standard_state: specific yield ug/g of powder after 15 min isothermal hold in He at ~1.1 bar; GC
+        (Kristal-Lyuks 4000M)
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: pokazatel tochnosti (granitsy, v kotorykh nakhoditsya pogreshnost rezultatov izmerenii,
+          poluchennykh po metodike izmerenii) +/- delta = 1%. Per-cell +/- in Table 1 retained verbatim.
+      values:
+        quantity: specific_gas_yield
+        gas_species: H2O
+        method_class: measured_direct
+        hold_min: 15
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        heating_rate_C_per_s: 4.5
+        time_to_setpoint_min_max: 3
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        points:
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 2890.0
+          uncertainty_ug_g: 20.0
+          as_printed: 2890.0 +/- 20.0
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 3230.0
+          uncertainty_ug_g: 30.0
+          as_printed: 3230.0 +/- 30.0
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 3350.0
+          uncertainty_ug_g: 30.0
+          as_printed: 3350.0 +/- 30.0
+      equipment: *id001
+    - observation_id: voropaev_2023_murchison_stepwise_h2o_table2
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 576
+        pdf_page_index: 6
+        note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
+      T_range_K:
+      - 323.15
+      - 1073.15
+      phase: gas_evolved_from_Murchison_CM2_powder_in_He
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_CM2_powder
+        metastable: false
+        basis: explicit_author
+        note: no preliminary anneal or He purge of the powder, to avoid decomposing phyllosilicates and
+          to retain sorbed atmospheric water
+      standard_state: specific yield ug/g after 30 min hold at the stated T in He; reactor He-purged before
+        each T step (no gas accumulation)
+      regime: stepwise_degassing_helium_headspace_GC_no_accumulation
+      units: ug/g as printed (mkg/g); T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- delta = 1%
+        note: per-cell +/- in Table 2 retained verbatim; printed 0 cells have no +/-
+      values:
+        quantity: specific_gas_yield
+        gas_species: H2O
+        method_class: measured_direct
+        hold_min: 30
+        T_step_C: 100
+        T_program_C_as_printed:
+        - 50
+        - 110
+        - 200
+        - 300
+        - 400
+        - 500
+        - 600
+        - 700
+        - 800
+        T_kind_as_printed: temperature inside the system by Nicrobell D thermocouple next to the quartz
+          boat
+        atmosphere: helium
+        pressure_bar_as_printed: 1.1
+        pressure_uncertainty_bar: 0.1
+        not_vacuum: true
+        purge_between_steps: reactor fully purged with helium before each T increase
+        n_points_as_printed: 9
+        points:
+        - T_C_as_printed: 50
+          T_K: 323.15
+          yield_ug_g: 588.0
+          uncertainty_ug_g: 5.0
+          as_printed: 588.0 +/- 5.0
+        - T_C_as_printed: 110
+          T_K: 383.15
+          yield_ug_g: 3140.0
+          uncertainty_ug_g: 30.0
+          as_printed: 3140.0 +/- 30.0
+        - T_C_as_printed: 200
+          T_K: 473.15
+          yield_ug_g: 3440.0
+          uncertainty_ug_g: 30.0
+          as_printed: 3440.0 +/- 30.0
+        - T_C_as_printed: 300
+          T_K: 573.15
+          yield_ug_g: 3450.0
+          uncertainty_ug_g: 30.0
+          as_printed: 3450.0 +/- 30.0
+        - T_C_as_printed: 400
+          T_K: 673.15
+          yield_ug_g: 3540.0
+          uncertainty_ug_g: 30.0
+          as_printed: 3540.0 +/- 30.0
+        - T_C_as_printed: 500
+          T_K: 773.15
+          yield_ug_g: 3190.0
+          uncertainty_ug_g: 30.0
+          as_printed: 3190.0 +/- 30.0
+        - T_C_as_printed: 600
+          T_K: 873.15
+          yield_ug_g: 3640.0
+          uncertainty_ug_g: 30.0
+          as_printed: 3640.0 +/- 30.0
+        - T_C_as_printed: 700
+          T_K: 973.15
+          yield_ug_g: 1950.0
+          uncertainty_ug_g: 20.0
+          as_printed: 1950.0 +/- 20.0
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 422.0
+          uncertainty_ug_g: 4.0
+          as_printed: 422.0 +/- 4.0
+        - T_C_as_printed: 200-800
+          yield_ug_g: 19600.0
+          T_range_C_as_printed:
+          - 200
+          - 800
+          T_range_K:
+          - 473.15
+          - 1073.15
+          column_as_printed: Vsego, T = 200-800 C
+          uncertainty_ug_g: 200.0
+          as_printed: 19600.0 +/- 200.0
+          semantics: column_total_T_200_to_800_C_excludes_50_and_110
+        H2O_minus_vs_plus_note: 'Authors: stepwise heating separately estimates weakly and strongly bound
+          water (H2O- and H2O+). H2O- is released on heating to 110 C (physically sorbed). The Table 2
+          total column is H2O+ and is almost 2 wt%.'
+        H2O_plus_total_ug_g: 19600.0
+        H2O_plus_total_uncertainty_ug_g: 200.0
+        H2O_plus_as_printed: pochti 2 ves. %
+      equipment: *id001
+    - observation_id: voropaev_2023_table4_chelyabinsk_quoted_h2o
+      type: rate_series
+      locator:
+        table: '4'
+        published_page: 580
+        pdf_page_index: 10
+        note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
+      T_range_K:
+      - 1073.15
+      - 1073.15
+      phase: gas_evolved_from_Chelyabinsk_LL5
+      standard_state: specific yield ug/g, isothermal 800 C after 15 min; Chelyabinsk column is not this
+        work's new measurement
+      regime: isothermal_degassing_helium_headspace_GC
+      units: ug/g as printed
+      values:
+        quantity: specific_gas_yield
+        gas_species: H2O
+        method_class: quoted_from_other_workers
+        quoted_from:
+        - Galimov et al. 2013 Geokhimiya
+        - Voropaev et al. 2013
+        - Stennikov et al. 2019 Astron. Vestn. 53(3) 214-223 / Sol. Syst. Res. 53(3) 199-207
+        as_printed_attribution: dannye degazatsii khorosho izuchennogo meteorita Chelyabinsk (obyknovennyi
+          khondrit, tip LL5) (sm. Galimov i dr., 2013; Voropaev i dr., 2013)
+        feedstock: Chelyabinsk LL5 ordinary chondrite
+        hold_min: 15
+        T_C_as_printed: 800
+        Murchison_column_this_work: Table 4 Murchison column reprints Table 1 T=800 C this-work values;
+          not stored again here
+        points:
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          yield_ug_g: 2030.0
+          uncertainty_ug_g: 20.0
+          as_printed: 2030.0 +/- 20.0
+    - observation_id: voropaev_2023_murchison_ir_fig3_figure_only
+      type: rate_series
+      locator:
+        figure: '3'
+        published_page: 577
+        pdf_page_index: 7
+        note: Normalized IR transmittance of Murchison after annealing at 200, 500, 800 C
+      T_range_K:
+      - 473.15
+      - 1073.15
+      phase: solid_residue_after_anneal
+      standard_state: FTIR-ATR transmittance 4000-400 cm^-1
+      regime: FTIR_ATR_residue
+      units: wavenumber cm^-1 / transmittance as plotted
+      values:
+        quantity: IR_transmittance_spectrum
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        instrument: FT-801 FTIR with MICRAN-2 microscope and ZnSe ATR (NPO Simex, Novosibirsk)
+        range_cm_inv:
+        - 4000
+        - 400
+        resolution_cm_inv: 2
+        traces:
+        - 200 C red
+        - 500 C green
+        - 800 C blue
+        authors_text: OH bands persist at 500 C and are gone at 800 C; aliphatic 1460-1375 cm^-1; aromatic
+          1600 and 960-850 cm^-1
+        not_digitised: true
+deepening:
+  dispatch_id: extract-pyro-meteorite
+  date: '2026-09-12'
+  quote_convention: Russian printed text flattened to ASCII in notes; numeric cells transcribed from the
+    400 dpi page image.
+  table_inventory:
+  - table: '1'
+    published_page: 576
+    pdf_page_index: 6
+    completeness: full
+    note: 8 gases x 3 isothermal T; all cells transcribed
+  - table: '2'
+    published_page: 576
+    pdf_page_index: 6
+    completeness: full
+    note: 8 gases x (9 holds + 200-800 C total); printed zeros recorded as printed
+  - table: '3'
+    published_page: 579
+    pdf_page_index: 9
+    completeness: not_extracted
+    note: IR band-assignment literature table, not a thermal-release measurement; refused as not a pyrolysis
+      yield row
+  - table: '4'
+    published_page: 580
+    pdf_page_index: 10
+    completeness: Chelyabinsk_column_only
+    note: Murchison column reprints Table 1 800 C; Chelyabinsk column quoted from prior work of the same
+      group
+  class_ledger:
+    measured:
+    - voropaev_2023_murchison_isothermal_*_table1
+    - voropaev_2023_murchison_stepwise_*_table2
+    quoted:
+    - voropaev_2023_table4_chelyabinsk_quoted_*
+    model:
+    - voropaev_2023_boudouard_kp_model_derived
+    figure_only:
+    - voropaev_2023_murchison_ir_fig3_figure_only
+    method_only:
+    - voropaev_2023_murchison_cm2_method_and_feedstock
+  figure_only:
+  - Fig. 1 apparatus photograph, published p. 573, pdf_page_index 3
+  - Fig. 2 apparatus schematic, published p. 574, pdf_page_index 4
+  - Fig. 3 IR transmittance after 200/500/800 C, published p. 577, pdf_page_index 7
+  refused:
+  - what: aliquot mass
+    reason: not_printed
+  - what: this-aliquot bulk composition table
+    reason: not_printed; Botta and Bada 2002 organics are quoted, not this work
+  - what: SO2, noble gases, complex hydrocarbons
+    reason: authors state these require another column and are future work
+  - what: Table 3 IR assignments
+    reason: not a thermal-release measurement
+  - what: Fig. 3 IR curve ordinates
+    reason: figure_only_not_digitised
+  pressure_is_not_vacuum: Helium at 1.1 +/- 0.1 bar, approximately atmospheric. Useful Stage-0 volatile
+    release target, not a Knudsen/vacuum pyrolysis run.

@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 130
-  extracts: 127
+  sources: 132
+  extracts: 129
   pdfs_present_in_worktree: 44
   extracts_with_private_locators: 37
   pdfs_tracked_99_kems_langmuir: 39
   pdfs_without_extract: 3
-  extracts_without_pdf: 86
+  extracts_without_pdf: 88
   alias_groups_needing_resolution: 32
 gaps:
   pdfs_without_extract:
@@ -66,6 +66,8 @@ gaps:
   - lh87-mgo-g
   - lh87-pbo-g
   - lh87-sno-g
+  - murchison-degassing-2023-springer
+  - murchison-hydropyrolysis-1990s-gca
   - nasa-cea-thermo
   - nist-srd69-p4
   - nist-webbook
@@ -5137,6 +5139,127 @@ sources:
       present: true
       error: null
       last_stage: extracted
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: murchison-degassing-2023-springer
+  aliases: []
+  citation: 'Voropaev, S. A., Dushenko, N. V., Fedulov, V. S. and Korochantsev, A. V. (2023), Osobennosti
+    degazatsii uglistogo khondrita Murchison (CM2) v intervale temperatur 200-800 C, Astronomicheskii
+    Vestnik 57(6) 571-582. English translation: Features of Degassing of the Murchison (CM2) Carbonaceous
+    Chondrite in the Temperature Interval of 200-800 C, Solar System Research. Russian original DOI 10.31857/S0320930X23050067;
+    English DOI 10.1134/S0038094623050064.'
+  doi: 10.1134/S0038094623050064
+  report_number: null
+  identifier: 10.1134/S0038094623050064
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/murchison-degassing-2023-springer.yaml
+    review_status: draft
+    rows: 27
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/murchison-degassing-2023-springer/murchison-degassing-2023-springer.pdf
+      present: true
+      sha256: 906d6c2120a501201e3118c901e4fa62789d8cd96028839e4bba47a2ea542c7f
+      matches_simulator: null
+    sidecar:
+      path: raw/murchison-degassing-2023-springer/sidecar.yaml
+      present: true
+    text:
+      path: text/murchison-degassing-2023-springer
+      exists: true
+      file_count: 20
+    tables:
+      path: tables/murchison-degassing-2023-springer
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/murchison-degassing-2023-springer.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/murchison-degassing-2023-springer.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: murchison-hydropyrolysis-1990s-gca
+  aliases: []
+  citation: 'Sephton, M. A., Love, G. D., Watson, J. S., Verchovsky, A. B., Wright, I. P., Snape, C. E.
+    and Gilmour, I. (2004), Hydropyrolysis of insoluble carbonaceous matter in the Murchison meteorite:
+    new insights into its macromolecular structure, Geochimica et Cosmochimica Acta 68(6) 1385-1393, DOI
+    10.1016/j.gca.2003.08.019'
+  doi: 10.1016/j.gca.2003.08.019
+  report_number: null
+  identifier: 10.1016/j.gca.2003.08.019
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml
+    review_status: draft
+    rows: 10
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/murchison-hydropyrolysis-1990s-gca/murchison-hydropyrolysis-1990s-gca.pdf
+      present: true
+      sha256: b799d6c835330a0cef12ddbbf81847e75f3455b67fce61c4d04054485527595a
+      matches_simulator: null
+    sidecar:
+      path: raw/murchison-hydropyrolysis-1990s-gca/sidecar.yaml
+      present: true
+    text:
+      path: text/murchison-hydropyrolysis-1990s-gca
+      exists: true
+      file_count: 24
+    tables:
+      path: tables/murchison-hydropyrolysis-1990s-gca
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/murchison-hydropyrolysis-1990s-gca.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/murchison-hydropyrolysis-1990s-gca.yaml
+      present: true
+      error: null
+      last_stage: decoded
       date: '2026-09-06'
     commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
 - source_id: nasa-cea-thermo

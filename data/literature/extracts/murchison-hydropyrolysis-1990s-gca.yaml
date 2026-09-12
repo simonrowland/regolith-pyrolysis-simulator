@@ -1,0 +1,634 @@
+schema_version: literature_extract.v1
+source_id: murchison-hydropyrolysis-1990s-gca
+source:
+  citation: 'Sephton, M. A., Love, G. D., Watson, J. S., Verchovsky, A. B., Wright, I. P., Snape, C. E.
+    and Gilmour, I. (2004), Hydropyrolysis of insoluble carbonaceous matter in the Murchison meteorite:
+    new insights into its macromolecular structure, Geochimica et Cosmochimica Acta 68(6) 1385-1393, DOI
+    10.1016/j.gca.2003.08.019'
+  doi: 10.1016/j.gca.2003.08.019
+  url: https://doi.org/10.1016/j.gca.2003.08.019
+  year: 2004
+extraction:
+  method: 'Corpus PDF raw/murchison-hydropyrolysis-1990s-gca/murchison-hydropyrolysis-1990s-gca.pdf. Born-digital
+    Elsevier GCA. pdftotext -layout used only to locate tables; not data. Tables 1-3 transcribed from
+    a 400 dpi pdftoppm render (docs-private/research/ocr-artifacts/murchison-hydropyrolysis-1990s-gca/p-5.png
+    and p-6.png). Printed units retained (wt%, ppm, permil, deg C, MPa) before converting T to K as T_K
+    = t_C + 273.15. This work''s H2-pyrolysis IRMS (Table 1 plain text) kept distinct from italics mass-balance
+    totals (model_derived), from H2O-pyrolysis rows (Sephton 1998 experiment; quoted), and from Table
+    2 classification (Sephton 2003). Figs 2-7 listed figure-only and not digitised. Em-dash cells omitted
+    with reason em_dash_not_printed. Not vacuum: 15 MPa H2 open-system hydropyrolysis with dry-ice trap.'
+  date: '2026-09-12'
+  worker: extract-pyro-meteorite
+  provenance_path: docs-private/research/ocr-artifacts/murchison-hydropyrolysis-1990s-gca/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.C.observations[sephton_2004_table1_h2_pyrolysis_carbon_wt_percent].values.points[0].C_wt_percent
+  value: 4.39
+  locator:
+    table: '1'
+    published_page: 1389
+    pdf_page_index: 5
+    note: Table 1 solvent-extracted and decalcified C = 4.39 wt%
+- path: species.C.observations[sephton_2004_table1_h2_pyrolysis_carbon_wt_percent].values.points[1].C_wt_percent
+  value: 2.46
+  locator:
+    table: '1'
+    published_page: 1389
+    pdf_page_index: 5
+    note: Table 1 H2-pyrolysis residue C = 2.46 wt%
+- path: species.C.observations[sephton_2004_table3_stepped_combustion_carbon].values.total_C_ppm
+  value: 21727
+  locator:
+    table: '3'
+    published_page: 1390
+    pdf_page_index: 6
+    note: Table 3 Total C 21727^a (2.2%)
+- path: species.N.observations[sephton_2004_table3_stepped_combustion_nitrogen].values.points[2].N_ppm
+  value: 337.67
+  locator:
+    table: '3'
+    published_page: 1390
+    pdf_page_index: 6
+    note: Table 3 N experiment T=400 C, N = 337.67 ppm
+species:
+  Murchison_CM2:
+    observations:
+    - observation_id: sephton_2004_murchison_h2_pyrolysis_method
+      type: rate_series
+      locator:
+        published_page: 1386
+        pdf_page_index: 2
+        section: 2.1. H2-Pyrolysis
+        note: thermal program, 15 MPa H2, stainless-steel 316 reactor, dry-ice trap
+      T_range_K:
+      - 493.15
+      - 793.15
+      phase: Murchison_solvent_extracted_whole_rock_with_Mo_catalyst
+      condensed_form:
+        state: solid
+        polymorph_name: Murchison_macromolecular_organic_matter
+        metastable: false
+        basis: explicit_author
+        note: crushed whole Murchison meteorite, solvent-extracted to remove free organics, impregnated
+          with ammonium dioxydithiomolybdate to a nominal 2 wt% Mo
+      standard_state: method geometry; not a species yield
+      regime: open_system_hydropyrolysis_15_MPa_H2
+      units: as published
+      values:
+        quantity: method_geometry_and_feedstock
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        feedstock:
+          name: Murchison
+          class_as_printed: Murchison meteorite, crushed whole rock
+          sample_id: null
+          sample_id_omitted_reason: no catalogue number or aliquot id printed
+          composition_table: null
+          composition_table_omitted_reason: no bulk oxide table of the whole-rock aliquot; Table 1 gives
+            C and N of the solvent-extracted and decalcified starting material used for H2-pyrolysis
+          preparation: solvent extraction removed free organic matter; impregnation with aqueous (NH4)2MoO2S2
+            gave a nominal 2 wt% loading of molybdenum; catalyst reductively decomposes in situ above
+            250 C to Mo sulfide
+        thermal_program:
+          sample_mass_mg_range_as_printed: 50-300 mg of solvent-extracted sample
+          T_start_as_printed: ambient temperature
+          ramp1_to_C: 220
+          ramp1_rate_C_per_min: 300
+          ramp2_to_C: 520
+          ramp2_rate_C_per_min: 8
+          T_kind_as_printed: reactor / programmed temperature (not labelled sample vs furnace)
+        pressure_regime:
+          absolute_pressure_as_printed: 15 MPa
+          absolute_pressure_MPa: 15
+          gas: hydrogen
+          flow_as_printed: 6 dm3 min^-1, measured at ambient temperature and pressure
+          static_or_pumped: open-system flow; continually replenished high-speed hydrogen; residence time
+            of volatiles of the order of a few seconds
+          not_vacuum: true
+          sweep_gas: hydrogen
+        apparatus:
+          reactor: stainless steel 316 grade tube, open-system temperature-programmed
+          product_collection: H2-pyrolysate collected in a trap cooled with dry ice and recovered in dichloromethane
+            (DCM); copper turnings added to remove elemental sulfur
+          vapour_saw_cold_surface: true
+          cold_surface: dry-ice-cooled trap
+          cleaning_run: apparatus heated to 520 C at 300 C min^-1 under high hydrogen pressure before
+            the sample run
+          GC_MS: Agilent 6890 GC / 5973 MSD; BPX5 30 m x 0.25 mm x 0.25 um
+          GC_program: 1 min at 50 C, then 50 to 300 C at 5 C min^-1, hold 300 C for 39 min
+        H2O_pyrolysis_not_this_experiment:
+          as_printed: For H2O pyrolysis, GC-MS data can be found in Sephton et al. (1998), and stepped
+            combustion data were reported in Sephton et al. (2003).
+          conditions_quoted_in_text: 320 C, 72 h
+        C_and_N_loss_as_printed: 44 wt% C and 55 wt% N lost as organic matter (prose, published p. 1389,
+          from Table 1 starting vs residue)
+        C_loss_wt_percent_as_printed: 44
+        N_loss_wt_percent_as_printed: 55
+      equipment:
+        cell_material:
+          value: stainless steel (316 grade) reactor tube; open-system fixed-bed H2-pyrolysis
+          locator:
+            published_page: 1386
+            pdf_page_index: 2
+            paragraph: catalyst-loaded samples (50-300 mg) were initially heated in a stainless steel
+              (316 grade) reactor tube
+        chamber_pressure:
+          value: 15
+          units: MPa hydrogen as printed
+          locator:
+            published_page: 1386
+            pdf_page_index: 2
+            paragraph: using a hydrogen pressure of 15 MPa
+    - observation_id: sephton_2004_table2_component_classification_quoted
+      type: rate_series
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '2'
+        note: Four C/N-bearing components in Murchison HF/HCl residues; Sephton et al. 2003
+      T_range_K:
+      - 523.15
+      - 823.15
+      phase: Murchison_HF_HCl_residue_combustion_components
+      standard_state: operational classification by combustion temperature
+      regime: stepped_combustion_classification
+      units: deg C as printed
+      values:
+        quantity: component_classification
+        method_class: quoted_from_other_workers
+        caption_as_printed: Four obvious carbon- and nitrogen-bearing components observed in Murchison
+          HF/HCl residues. Other components combust at higher temperatures (e.g., Sephton et al., 2003).
+        components:
+        - name: Free organic
+          characteristic: Solvent extractable
+          combustion_T_C: <250
+          isotopes_as_printed: 13C and 15N-rich
+        - name: Macromolecular organic, labile
+          characteristic: Readily pyrolysable
+          combustion_T_C: 250-350
+          isotopes_as_printed: 13C and 15N-rich
+        - name: Macromolecular organic, refractory
+          characteristic: Not readily pyrolysable
+          combustion_T_C: 350-500
+          isotopes_as_printed: 13C and 15N-poor
+        - name: Diamond
+          characteristic: null
+          combustion_T_C: ~550
+          isotopes_as_printed: 13C and 15N-poor
+    - observation_id: sephton_2004_gcms_chromatograms_figure_only
+      type: rate_series
+      locator:
+        published_page: 1387
+        pdf_page_index: 3
+        figure: '2'
+        note: also Figs 3-6 SICs of PAH in the H2-pyrolysate; Fig. 7 stepped-combustion profiles
+      T_range_K:
+      - 493.15
+      - 793.15
+      phase: H2_pyrolysate_GCMS
+      standard_state: TIC/SIC chromatograms; not tabulated peak areas
+      regime: open_system_hydropyrolysis_15_MPa_H2
+      units: as plotted
+      values:
+        quantity: GCMS_chromatogram
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        not_digitised: true
+        figures:
+          '1': experimental flow chart, published p. 1386
+          '2': TIC of H2-pyrolysate, published p. 1387
+          '3': SIC parent PAH, published p. 1388
+          '4': SIC alkylpyrenes/fluoranthenes, published p. 1388
+          '5': SIC chrysene homologues (page with Fig. 5 in two-column layout)
+          '6': SIC benzofluoranthenes/benzopyrenes/perylene, published p. 1389
+          '7': stepped combustion-MS profiles; panels a-d from Sephton et al. 2003, e-f this residue
+        species_identified_qualitative: three- to seven-ring PAH and alkyl homologues; no long-chain aliphatics
+          as individual products; volatile 1-2 ring aromatics may have been lost in collection
+  C:
+    observations:
+    - observation_id: sephton_2004_table1_h2_pyrolysis_carbon_wt_percent
+      type: rate_series
+      locator:
+        published_page: 1389
+        pdf_page_index: 5
+        table: '1'
+        note: Bulk C (wt%) by IRMS; measured values plain text; calculated italics
+      T_range_K:
+      - 493.15
+      - 793.15
+      phase: Murchison_H2_pyrolysis_fractions
+      standard_state: bulk carbon wt% of starting material, residue, and pyrolysate
+      regime: open_system_hydropyrolysis_15_MPa_H2
+      units: wt% as printed
+      values:
+        quantity: bulk_carbon_wt_percent
+        method_class: measured_direct
+        instrument: PDZ Europa ANCA-SL on a Geo 20-20; Sn-bucket combustion
+        typical_sample_weight_mg_as_printed: 1-3 mg
+        points:
+        - fraction: solvent-extracted and decalcified starting material
+          C_wt_percent: 4.39
+          method_class: measured_direct
+        - fraction: H2-pyrolysis residue
+          C_wt_percent: 2.46
+          method_class: measured_direct
+        - fraction: H2-pyrolysate
+          C_wt_percent: null
+          omitted_reason: em_dash_not_printed
+          method_class: measured_direct
+          note: Table 1 prints an em dash for C and N of the collected pyrolysate
+        C_loss_from_starting_to_residue_wt_percent_as_printed: 44
+    - observation_id: sephton_2004_table1_h2_pyrolysis_isotopes
+      type: rate_series
+      locator:
+        published_page: 1389
+        pdf_page_index: 5
+        table: '1'
+        note: delta13C and delta15N (permil)
+      T_range_K:
+      - 493.15
+      - 793.15
+      phase: Murchison_H2_pyrolysis_fractions
+      standard_state: delta vs PDB (C) and air (N); permil as printed
+      regime: open_system_hydropyrolysis_15_MPa_H2
+      units: permil as printed
+      uncertainty:
+        as_printed: +/- 1 permil C for samples > 4 ng; +/- 3 permil N for samples > 5 ng
+        locator_page: 1387
+      values:
+        quantity: stable_isotope_delta
+        method_class: measured_direct
+        points:
+        - fraction: solvent-extracted and decalcified starting material
+          delta13C_permil: -12.7
+          delta15N_permil: 30.0
+          method_class: measured_direct
+          printed_as: delta13C -12.7; delta15N +30.0
+        - fraction: H2-pyrolysis residue
+          delta13C_permil: -20.7
+          delta15N_permil: -23.5
+          method_class: measured_direct
+        - fraction: H2-pyrolysate (collected)
+          delta13C_permil: -15.4
+          delta15N_permil: 9.2
+          method_class: measured_direct
+          printed_as: delta13C -15.4; delta15N +9.2
+        authors_note: Measured pyrolysate isotopes are much lighter than mass-balance totals, indicating
+          loss of isotopically heavy volatiles during collection
+    - observation_id: sephton_2004_table1_h2_total_pyrolysate_mass_balance
+      type: rate_series
+      locator:
+        published_page: 1389
+        pdf_page_index: 5
+        table: '1'
+        note: H2-total pyrolysate (by mass balance); printed in italics = calculated
+      T_range_K:
+      - 493.15
+      - 793.15
+      phase: Murchison_H2_pyrolysis_mass_balance
+      standard_state: calculated total pyrolysate isotopes by mass balance
+      regime: open_system_hydropyrolysis_15_MPa_H2
+      units: permil as printed
+      values:
+        quantity: stable_isotope_delta_mass_balance
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        caption: Measured values are in plain text; calculated values are in italics.
+        fraction: H2-total pyrolysate (by mass balance)
+        delta13C_permil: -2.5
+        delta15N_permil: 74.6
+        prose_rounded: around -3 permil and +74 permil respectively (published p. 1390)
+        C_wt_percent: null
+        N_wt_percent: null
+        omitted_reason: em_dash_not_printed_for_C_and_N
+    - observation_id: sephton_2004_table1_h2o_pyrolysis_irms
+      type: rate_series
+      locator:
+        published_page: 1389
+        pdf_page_index: 5
+        table: '1'
+        note: H2O-pyrolysis block; pyrolysis experiment is Sephton et al. 1998, IRMS this paper
+      T_range_K:
+      - 593.15
+      - 593.15
+      phase: Murchison_HF_HCl_residue_H2O_pyrolysis
+      standard_state: bulk C/N wt% and isotopes of prior H2O-pyrolysis samples
+      regime: H2O_pyrolysis_Sephton_1998_remeasured
+      units: wt% and permil as printed
+      values:
+        quantity: bulk_C_N_and_isotopes
+        method_class: quoted_from_other_workers
+        note: H2O-pyrolysis itself is Sephton et al. 1998 (320 C, 72 h). This paper solvent-extracted
+          that residue and reports IRMS in Table 1. Not this work's new pyrolysis experiment. Kept separate
+          from H2-pyrolysis rows.
+        H2O_pyrolysis_conditions_as_printed: 320 C, 72 h
+        points:
+        - fraction: HF/HCl residue
+          C_wt_percent: 8.76
+          N_wt_percent: 0.33
+          N_over_C: 0.04
+          delta13C_permil: -16.6
+          delta15N_permil: 23.6
+        - fraction: H2O-pyrolysis residue
+          C_wt_percent: 6.48
+          N_wt_percent: 0.31
+          N_over_C: 0.05
+          delta13C_permil: -18.8
+          delta15N_permil: 4.2
+        - fraction: H2O-pyrolysate
+          C_wt_percent: null
+          N_wt_percent: null
+          N_over_C: null
+          delta13C_permil: -4.7
+          delta15N_permil: null
+          omitted_reason: em_dash_for_C_N_N/C_and_delta15N
+        mass_balance_italics:
+          fraction: H2O-total pyrolysate (by mass balance)
+          method_class: model_derived
+          delta13C_permil: -10.4
+          delta15N_permil: 343.7
+    - observation_id: sephton_2004_table3_stepped_combustion_carbon
+      type: rate_series
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+      T_range_K:
+      - 573.15
+      - 1273.15
+      phase: H2_pyrolysis_residue_stepped_combustion
+      standard_state: C yield ppm and delta13C of residue under stepped combustion in O2
+      regime: stepped_combustion_MS_10_mbar_O2
+      units: ppm C and permil as printed; T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- 1 permil for carbon in samples greater than 4 ng
+      values:
+        quantity: stepped_combustion_carbon_yield
+        method_class: measured_direct
+        oxygen_pressure_as_printed: 10 mbar
+        step: 30 min heating with 10 mbar O2 then 20 min CuO resorb
+        instruments:
+        - Finesse
+        - MS86
+        total_C_ppm: 21727
+        total_C_as_printed: 21727^a (2.2%)
+        total_delta13C_permil: -21.4
+        total_note: Weighted average (footnote a)
+        points:
+        - T_C_as_printed: 300
+          T_K: 573.15
+          C_ppm: 16.27
+          delta13C_permil: -19.2
+        - T_C_as_printed: 325
+          T_K: 598.15
+          C_ppm: 34.97
+          delta13C_permil: -17.8
+        - T_C_as_printed: 350
+          T_K: 623.15
+          C_ppm: 39.29
+          delta13C_permil: -18.0
+        - T_C_as_printed: 375
+          T_K: 648.15
+          C_ppm: 51.8
+          delta13C_permil: -18.8
+        - T_C_as_printed: 400
+          T_K: 673.15
+          C_ppm: 76.56
+          delta13C_permil: -12.0
+        - T_C_as_printed: 425
+          T_K: 698.15
+          C_ppm: 117.23
+          delta13C_permil: -22.8
+        - T_C_as_printed: 450
+          T_K: 723.15
+          C_ppm: 166.22
+          delta13C_permil: -24.3
+        - T_C_as_printed: 475
+          T_K: 748.15
+          C_ppm: 149.39
+          delta13C_permil: -23.5
+        - T_C_as_printed: 500
+          T_K: 773.15
+          C_ppm: 81.26
+          delta13C_permil: -18.9
+        - T_C_as_printed: 525
+          T_K: 798.15
+          C_ppm: 43.21
+          delta13C_permil: -19.4
+        - T_C_as_printed: 550
+          T_K: 823.15
+          C_ppm: 32.43
+          delta13C_permil: -29.3
+        - T_C_as_printed: 600
+          T_K: 873.15
+          C_ppm: 9.03
+          delta13C_permil: -21.6
+        - T_C_as_printed: 650
+          T_K: 923.15
+          C_ppm: 3.66
+          delta13C_permil: -9.2
+        - T_C_as_printed: 700
+          T_K: 973.15
+          C_ppm: 2.99
+          delta13C_permil: -4.9
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          C_ppm: 2.39
+          delta13C_permil: -6.8
+        - T_C_as_printed: 900
+          T_K: 1173.15
+          C_ppm: 0.44
+          delta13C_permil: 2.2
+        - T_C_as_printed: 1000
+          T_K: 1273.15
+          C_ppm: 0.38
+          delta13C_permil: 10.8
+      equipment:
+        chamber_pressure:
+          value: 10
+          units: mbar oxygen as printed
+          locator:
+            published_page: 1387
+            pdf_page_index: 3
+            paragraph: One combustion step consists of 30 min heating with an oxygen pressure of 10 mbar
+  N:
+    observations:
+    - observation_id: sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent
+      type: rate_series
+      locator:
+        published_page: 1389
+        pdf_page_index: 5
+        table: '1'
+        note: Bulk N (wt%) and N/C by IRMS
+      T_range_K:
+      - 493.15
+      - 793.15
+      phase: Murchison_H2_pyrolysis_fractions
+      standard_state: bulk nitrogen wt% of starting material and residue
+      regime: open_system_hydropyrolysis_15_MPa_H2
+      units: wt% as printed; N/C as printed
+      values:
+        quantity: bulk_nitrogen_wt_percent
+        method_class: measured_direct
+        points:
+        - fraction: solvent-extracted and decalcified starting material
+          N_wt_percent: 0.22
+          N_over_C: 0.05
+          method_class: measured_direct
+        - fraction: H2-pyrolysis residue
+          N_wt_percent: 0.1
+          N_over_C: 0.04
+          method_class: measured_direct
+        - fraction: H2-pyrolysate
+          N_wt_percent: null
+          N_over_C: null
+          omitted_reason: em_dash_not_printed
+        N_loss_from_starting_to_residue_wt_percent_as_printed: 55
+    - observation_id: sephton_2004_table3_stepped_combustion_nitrogen
+      type: rate_series
+      locator:
+        published_page: 1390
+        pdf_page_index: 6
+        table: '3'
+        note: Nitrogen experiment (separate) on the same H2-pyrolysis residue
+      T_range_K:
+      - 573.15
+      - 1273.15
+      phase: H2_pyrolysis_residue_stepped_combustion
+      standard_state: N yield ppm, delta15N, companion C ppm and N/C; separate experiment
+      regime: stepped_combustion_MS_10_mbar_O2
+      units: ppm and permil as printed; T printed in deg C; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: +/- 3 permil for nitrogen in samples greater than 5 ng
+      values:
+        quantity: stepped_combustion_nitrogen_yield
+        method_class: measured_direct
+        note: Two separate experiments. N steps are coarser than the C experiment; C-only temperatures
+          325, 375, 425, 475, 525, 650 C have no N cell.
+        total_N_ppm: 748.12
+        total_N_as_printed: 748.12^a (0.8%)
+        total_delta15N_permil: -25.9
+        total_C_ppm_in_N_experiment: 19615
+        total_C_as_printed: 19615^a (2.0%)
+        total_N_over_C: 0.04
+        total_note: Weighted average (footnote a)
+        points:
+        - T_C_as_printed: 300
+          T_K: 573.15
+          N_ppm: 33.57
+          delta15N_permil: 8.9
+          C_ppm: 1536.3
+          N_over_C: 0.02
+        - T_C_as_printed: 350
+          T_K: 623.15
+          N_ppm: 100.07
+          delta15N_permil: -16.5
+          C_ppm: 3417.5
+          N_over_C: 0.03
+        - T_C_as_printed: 400
+          T_K: 673.15
+          N_ppm: 337.67
+          delta15N_permil: -47.9
+          C_ppm: 7909.8
+          N_over_C: 0.04
+        - T_C_as_printed: 450
+          T_K: 723.15
+          N_ppm: 181.33
+          delta15N_permil: 0.9
+          C_ppm: 5159.3
+          N_over_C: 0.04
+        - T_C_as_printed: 500
+          T_K: 773.15
+          N_ppm: 46.26
+          delta15N_permil: -41.8
+          C_ppm: 1302.3
+          N_over_C: 0.04
+        - T_C_as_printed: 550
+          T_K: 823.15
+          N_ppm: 14.79
+          delta15N_permil: -11.4
+          C_ppm: 110.4
+          N_over_C: 0.13
+        - T_C_as_printed: 600
+          T_K: 873.15
+          N_ppm: 9.47
+          delta15N_permil: -3.1
+          C_ppm: 45.23
+          N_over_C: 0.21
+        - T_C_as_printed: 700
+          T_K: 973.15
+          N_ppm: 8.67
+          delta15N_permil: 3.8
+          C_ppm: 39.0
+          N_over_C: 0.22
+        - T_C_as_printed: 800
+          T_K: 1073.15
+          N_ppm: 5.88
+          delta15N_permil: 5.6
+          C_ppm: 39.47
+          N_over_C: 0.15
+        - T_C_as_printed: 900
+          T_K: 1173.15
+          N_ppm: 4.57
+          delta15N_permil: 2.2
+          C_ppm: 27.74
+          N_over_C: 0.17
+        - T_C_as_printed: 1000
+          T_K: 1273.15
+          N_ppm: 5.86
+          delta15N_permil: 1.8
+          C_ppm: 27.43
+          N_over_C: 0.21
+deepening:
+  dispatch_id: extract-pyro-meteorite
+  date: '2026-09-12'
+  table_inventory:
+  - table: '1'
+    published_page: 1389
+    pdf_page_index: 5
+    completeness: full
+    note: plain-text measured vs italics calculated distinguished; em dashes omitted
+  - table: '2'
+    published_page: 1390
+    pdf_page_index: 6
+    completeness: full
+    note: classification quoted from Sephton et al. 2003
+  - table: '3'
+    published_page: 1390
+    pdf_page_index: 6
+    completeness: full
+    note: all C-experiment rows and all N-experiment rows transcribed
+  class_ledger:
+    measured:
+    - sephton_2004_table1_h2_pyrolysis_carbon_wt_percent
+    - sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent
+    - sephton_2004_table1_h2_pyrolysis_isotopes
+    - sephton_2004_table3_stepped_combustion_carbon
+    - sephton_2004_table3_stepped_combustion_nitrogen
+    quoted:
+    - sephton_2004_table1_h2o_pyrolysis_irms
+    - sephton_2004_table2_component_classification_quoted
+    model:
+    - sephton_2004_table1_h2_total_pyrolysate_mass_balance
+    figure_only:
+    - sephton_2004_gcms_chromatograms_figure_only
+    method_only:
+    - sephton_2004_murchison_h2_pyrolysis_method
+  figure_only:
+  - Fig. 1 flow chart p. 1386
+  - Figs 2-6 GC-MS chromatograms of the H2-pyrolysate; not digitised
+  - Fig. 7 stepped combustion-MS profiles; panels a-d from Sephton 2003
+  refused:
+  - what: aliquot catalogue id
+    reason: not_printed
+  - what: whole-rock oxide composition table
+    reason: not_printed
+  - what: H2-pyrolysate C and N wt%
+    reason: em_dash_not_printed
+  - what: GC-MS peak areas / PAH yields
+    reason: figure_only_not_digitised
+  pressure_is_not_vacuum: Open-system hydropyrolysis at 15 MPa H2 with a dry-ice trap. Useful as an IOM
+    yield bound for Stage 0 organics, not a vacuum-pyrolysis reproduction target.

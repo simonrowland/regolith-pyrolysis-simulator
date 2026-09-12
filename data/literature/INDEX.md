@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 130
-- Extracts (`literature_extract.v1`): 127
+- Sources: 132
+- Extracts (`literature_extract.v1`): 129
 - PDFs present in this worktree: 44
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 39
 - PDFs with no extract: 3
-- Extracts with no PDF: 86
+- Extracts with no PDF: 88
 - Alias groups needing owner/controller resolution: 32
 - Extracts with private/non-public row locators: 37
 
@@ -109,6 +109,8 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `lh87-mgo-g` | Lamoreaux, R.H., Hildenbrand, D.L. & Brewer, L. (1987), "High-Temperature Vaporization Behavior of Oxides. II. Oxides of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and Hg", J. Phys. Chem. Ref. Data 16:419–443, DOI 10.1063/1.555799 (LH87 Table 3 — MgO(g) thermochemistry). Cross-check NIST-JANAF MgO(g) Chase 1998 (REF-020). | 10.1063/1.555799 | ABSENT, `` | `raw/lh87-mgo-g/lh87-mgo-g.pdf` (ABSENT, ); `text/lh87-mgo-g/` (0 files, ABSENT); `tables/lh87-mgo-g/` (0 files, ABSENT) | `data/literature/extracts/lh87-mgo-g.yaml` (1 rows, draft) | `ledger/lh87-mgo-g.yaml`: extracted (2026-09-06) |
 | `lh87-pbo-g` | Lamoreaux, Hildenbrand & Brewer (1987) JPCRD 16:419–443 PbO(g); JANAF PbO(g); Kazenas oxide evaporation KEMS. |  | ABSENT, `` | `raw/lh87-pbo-g/lh87-pbo-g.pdf` (ABSENT, ); `text/lh87-pbo-g/` (0 files, ABSENT); `tables/lh87-pbo-g/` (0 files, ABSENT) | `data/literature/extracts/lh87-pbo-g.yaml` (1 rows, draft) | `ledger/lh87-pbo-g.yaml`: extracted (2026-09-06) |
 | `lh87-sno-g` | LH87 SnO(g); JANAF SnO(g) |  | ABSENT, `` | `raw/lh87-sno-g/lh87-sno-g.pdf` (ABSENT, ); `text/lh87-sno-g/` (0 files, ABSENT); `tables/lh87-sno-g/` (0 files, ABSENT) | `data/literature/extracts/lh87-sno-g.yaml` (1 rows, draft) | `ledger/lh87-sno-g.yaml`: extracted (2026-09-06) |
+| `murchison-degassing-2023-springer` | Voropaev, S. A., Dushenko, N. V., Fedulov, V. S. and Korochantsev, A. V. (2023), Osobennosti degazatsii uglistogo khondrita Murchison (CM2) v intervale temperatur 200-800 C, Astronomicheskii Vestnik 57(6) 571-582. English translation: Features of Degassing of the Murchison (CM2) Carbonaceous Chondrite in the Temperature Interval of 200-800 C, Solar System Research. Russian original DOI 10.31857/S0320930X23050067; English DOI 10.1134/S0038094623050064. | 10.1134/S0038094623050064 | ABSENT, `` | `raw/murchison-degassing-2023-springer/murchison-degassing-2023-springer.pdf` (present, 906d6c21); `text/murchison-degassing-2023-springer/` (20 files, exists); `tables/murchison-degassing-2023-springer/` (0 files, ABSENT) | `data/literature/extracts/murchison-degassing-2023-springer.yaml` (27 rows, draft) | `ledger/murchison-degassing-2023-springer.yaml`: decoded (2026-09-06) |
+| `murchison-hydropyrolysis-1990s-gca` | Sephton, M. A., Love, G. D., Watson, J. S., Verchovsky, A. B., Wright, I. P., Snape, C. E. and Gilmour, I. (2004), Hydropyrolysis of insoluble carbonaceous matter in the Murchison meteorite: new insights into its macromolecular structure, Geochimica et Cosmochimica Acta 68(6) 1385-1393, DOI 10.1016/j.gca.2003.08.019 | 10.1016/j.gca.2003.08.019 | ABSENT, `` | `raw/murchison-hydropyrolysis-1990s-gca/murchison-hydropyrolysis-1990s-gca.pdf` (present, b799d6c8); `text/murchison-hydropyrolysis-1990s-gca/` (24 files, exists); `tables/murchison-hydropyrolysis-1990s-gca/` (0 files, ABSENT) | `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` (10 rows, draft) | `ledger/murchison-hydropyrolysis-1990s-gca.yaml`: decoded (2026-09-06) |
 | `nasa-cea-thermo` | McBride, B. J., Zehe, M. J. & Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of Individual Species, NASA TP-2002-211556; NASA CEA thermo.inp (Glenn coefficient database). |  | ABSENT, `` | `raw/nasa-cea-thermo/nasa-cea-thermo.pdf` (present, 0ab4154b); `text/nasa-cea-thermo/` (0 files, ABSENT); `tables/nasa-cea-thermo/` (0 files, ABSENT) | `data/literature/extracts/nasa-cea-thermo.yaml` (1615 rows, draft, private_path) | `ledger/nasa-cea-thermo.yaml`: extracted (2026-09-06) |
 | `nist-srd69-p4` | Elemental white phosphorus: NIST Chemistry WebBook SRD 69 P4 vapor pressure (Stull 1947 lineage) — independent of oxide-carrier path. Plant carriers (preferred promotion targets): (1) PO/PO2 — JANAF PO(g)/PO2(g) Chase 1998 free energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto-class phosphate vaporization; Sossi & Fegley 2018 Table 5 speciation guidance. See docs-private/research/2026-07-30-vp-acquire-5/P-carriers.md. |  | ABSENT, `` | `raw/nist-srd69-p4/nist-srd69-p4.pdf` (ABSENT, ); `text/nist-srd69-p4/` (0 files, ABSENT); `tables/nist-srd69-p4/` (0 files, ABSENT) | `data/literature/extracts/nist-srd69-p4.yaml` (2 rows, draft) | `ledger/nist-srd69-p4.yaml`: extracted (2026-09-06) |
 | `nist-webbook` | NIST Chemistry WebBook, SRD 69 (species thermochemistry pages) |  | ABSENT, `` | `raw/nist-webbook/nist-webbook.pdf` (ABSENT, ); `text/nist-webbook/` (0 files, ABSENT); `tables/nist-webbook/` (0 files, ABSENT) | `data/literature/extracts/nist-webbook.yaml` (46 rows, draft) | `ledger/nist-webbook.yaml`: extracted (2026-09-06) |
@@ -210,6 +212,8 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `lh87-mgo-g`
 - `lh87-pbo-g`
 - `lh87-sno-g`
+- `murchison-degassing-2023-springer`
+- `murchison-hydropyrolysis-1990s-gca`
 - `nasa-cea-thermo`
 - `nist-srd69-p4`
 - `nist-webbook`
