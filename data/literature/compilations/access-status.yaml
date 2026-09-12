@@ -1,5 +1,5 @@
 schema_version: literature_compilation_access.v1
-updated: '2026-09-08'
+updated: '2026-09-12'
 compilation_role:
   engine_reference_input: true
   validation_measurement: false
@@ -353,6 +353,220 @@ sources:
     source_pdf_bytes: 27323016
     harvested_record_count: 1418
     note: Assessed entropy and heat-capacity tables; reference input only, never measured or battery-scored.
+  pankratz_1987_usbm_b689:
+    database: U.S. Bureau of Mines Bulletin 689
+    version: '1987'
+    citation: Pankratz, L. B., Mah, A. D. and Watson, S. W., 1987, Thermodynamic Properties of Sulfides, U.S. Bureau of Mines
+      Bulletin 689, iv, 427 pp.
+    official_url: https://digital.library.unt.edu/ark:/67531/metadc38801/
+    retrieved_url: https://web.archive.org/web/20170817002429id_/https://digital.library.unt.edu/ark:/67531/metadc38801/m2/1/high_res_d/metadc38801.pdf
+    licence: United States government work (USBM bulletin). Public domain in the United States.
+    access_date: '2026-09-12'
+    access: public_domain_us_government_work
+    local_status: partial_ingest
+    harvested_path: data/literature/compilations/pankratz-1987-usbm-b689
+    source_pdf_sha256: 0b4b37822a058193e2d912214d74e0a1884d604ee3dad798d90800cadff70771
+    harvested_record_count: 34
+    coverage:
+      status: partial
+      pdf_page_count: 432
+      decoded_pdf_pages:
+      - 1
+      - 40
+      ingested_printed_pages:
+      - 3
+      - 36
+      ingested_pdf_pages:
+      - 7
+      - 40
+      remaining_pdf_pages:
+      - 41
+      - 432
+      remaining_printed_pages:
+      - 37
+      - 427
+      remaining_note: PDF432 is the unnumbered terminal scan; printed37–427 not transcribed. Front matter and methods PDF1–6
+        retained as source only.
+      records_examined: 34
+      matched: 20
+      corrected: 13
+      unverified: 1
+      complete_numeric_image_audit_pdf_pages:
+      - 7
+      numeric_cell_count: 4048
+      numeric_cells_image_verified: 97
+      per_page:
+      - pdf_page: 7
+        printed_page: 3
+        record_id: page-0003
+        identity_status: matched
+        numeric_status: image_verified
+      - pdf_page: 8
+        printed_page: 4
+        record_id: page-0004
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 9
+        printed_page: 5
+        record_id: page-0005
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 10
+        printed_page: 6
+        record_id: page-0006
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 11
+        printed_page: 7
+        record_id: page-0007
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 12
+        printed_page: 8
+        record_id: page-0008
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 13
+        printed_page: 9
+        record_id: page-0009
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 14
+        printed_page: 10
+        record_id: page-0010
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 15
+        printed_page: 11
+        record_id: page-0011
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 16
+        printed_page: 12
+        record_id: page-0012
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 17
+        printed_page: 13
+        record_id: page-0013
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 18
+        printed_page: 14
+        record_id: page-0014
+        identity_status: unverified
+        numeric_status: unverified
+      - pdf_page: 19
+        printed_page: 15
+        record_id: page-0015
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 20
+        printed_page: 16
+        record_id: page-0016
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 21
+        printed_page: 17
+        record_id: page-0017
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 22
+        printed_page: 18
+        record_id: page-0018
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 23
+        printed_page: 19
+        record_id: page-0019
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 24
+        printed_page: 20
+        record_id: page-0020
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 25
+        printed_page: 21
+        record_id: page-0021
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 26
+        printed_page: 22
+        record_id: page-0022
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 27
+        printed_page: 23
+        record_id: page-0023
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 28
+        printed_page: 24
+        record_id: page-0024
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 29
+        printed_page: 25
+        record_id: page-0025
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 30
+        printed_page: 26
+        record_id: page-0026
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 31
+        printed_page: 27
+        record_id: page-0027
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 32
+        printed_page: 28
+        record_id: page-0028
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 33
+        printed_page: 29
+        record_id: page-0029
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 34
+        printed_page: 30
+        record_id: page-0030
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 35
+        printed_page: 31
+        record_id: page-0031
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 36
+        printed_page: 32
+        record_id: page-0032
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 37
+        printed_page: 33
+        record_id: page-0033
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 38
+        printed_page: 34
+        record_id: page-0034
+        identity_status: corrected
+        numeric_status: unverified
+      - pdf_page: 39
+        printed_page: 35
+        record_id: page-0035
+        identity_status: matched
+        numeric_status: unverified
+      - pdf_page: 40
+        printed_page: 36
+        record_id: page-0036
+        identity_status: matched
+        numeric_status: unverified
+    note: Non-oxide reference compilation; no battery scoring. Only first 40-page decode available locally.
 acquisition_policy:
   paywalls_bypassed: false
   bot_protection_bypassed: false
