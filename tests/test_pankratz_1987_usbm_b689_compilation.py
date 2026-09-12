@@ -238,8 +238,10 @@ def test_exact_grid_duplicate_rows_and_clean_lookup():
         with pytest.raises(KeyError):
             loader.lookup_temperature("page-0014", 298.15, include_ocr_suspect=opt_in)
     records = list(loader.load_records(include_ocr_suspect=True))
+    # The base prefix stays EXACT as a regression guard; the total grows with the ingest, so
+    # assert it against the manifest's substance count rather than a frozen number.
     assert len([r for r in records if r["printed_page"] <= 36]) == 33
-    assert len(records) == 41
+    assert len(records) == loader.load_manifest(include_ocr_suspect=True)["substance_count"]
 
 
 @pytest.fixture
@@ -422,9 +424,13 @@ def test_rebuild_preserves_native_chunk_offsets_and_artifacts(corpus):
             # accumulated page-range work; the harvest tool only sees its own base chunk and so
             # cannot reproduce them. Every other manifest field must still match exactly, and
             # the tallies themselves are checked against the records in the coverage test.
-            for field in ("coverage", "record_count", "substance_count"):
+            for field in ("coverage", "record_count", "substance_count", "entries"):
                 stored.pop(field, None); rebuilt.pop(field, None)
             assert stored == rebuilt, "manifest diverges outside its controller-maintained tallies"
+            # entries is rebuilt by the controller over all page ranges; assert it still
+            # describes exactly the records on disk rather than skipping it silently.
+            stored_entries = yaml.safe_load((harvest.ROOT / path).read_text())["entries"]
+            assert {e["record_id"] for e in stored_entries} == {r["record_id"] for r in _records()}
             checked += 1
             continue
         if record_id in audited:
