@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 140
-- Extracts (`literature_extract.v1`): 137
+- Sources: 143
+- Extracts (`literature_extract.v1`): 140
 - PDFs present in this worktree: 44
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 39
 - PDFs with no extract: 3
-- Extracts with no PDF: 96
+- Extracts with no PDF: 99
 - Alias groups needing owner/controller resolution: 32
 - Extracts with private/non-public row locators: 37
 
@@ -72,7 +72,10 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `kems-022-demaria-1971` | De Maria, G., Balducci, G., Guido, M. & Piacente, V. (1971), "Mass spectrometric investigation of the vaporization process of Apollo 12 lunar samples", Proc. Lunar Sci. Conf. 2, 1367–1380 |  | `docs/references/pdfs/99-kems-langmuir/kems-022-demaria-1971.pdf`, `6068fe24` | `raw/kems-022-demaria-1971/kems-022-demaria-1971.pdf` (present, 6068fe24); `text/kems-022-demaria-1971/` (27 files, exists); `tables/kems-022-demaria-1971/` (16 files, exists) | `data/literature/extracts/kems-022-demaria-1971.yaml` (31 rows, draft, private_path) | `ledger/kems-022-demaria-1971.yaml`: — (—) |
 | `kems-023-demaria-1973` | De Maria, G. & Piacente, V. (1973), "Vaporization Study of Selected Lunar Samples", Lunar Science IV, 175-177. ADS bibcode 1973LPI.....4..175D. |  | ABSENT, `` | `raw/kems-023-demaria-1973/kems-023-demaria-1973.pdf` (present, 66759c8d); `text/kems-023-demaria-1973/` (19 files, exists); `tables/kems-023-demaria-1973/` (0 files, ABSENT) | `data/literature/extracts/kems-023-demaria-1973.yaml` (28 rows, draft) | `ledger/kems-023-demaria-1973.yaml`: decoded (2026-09-06) |
 | `kems-025-markova-1983` | Markova, O. M., Yakovlev, O. I., Semenov, G. A. & Belov, A. N. (1983), "Vaporization of Lunar Highland Rocks: Experimental Investigation", Lunar and Planetary Science XIV, 460-461. ADS bibcode 1983LPI....14..460M. |  | ABSENT, `` | `raw/kems-025-markova-1983/kems-025-markova-1983.pdf` (present, 8885d193); `text/kems-025-markova-1983/` (20 files, exists); `tables/kems-025-markova-1983/` (0 files, ABSENT) | `data/literature/extracts/kems-025-markova-1983.yaml` (22 rows, draft) | `ledger/kems-025-markova-1983.yaml`: decoded (2026-09-06) |
+| `kems-026-markova-1984` | Markova, O.M., Yakovlev, O.I., Belov, A.N. & Semenov, G.A. (1984), "The role of the vaporization process in the impact-accretion history of the Moon", Lunar and Planetary Science XV, 509–510 |  | ABSENT, `` | `raw/kems-026-markova-1984/kems-026-markova-1984.pdf` (present, 4fbf0e84); `text/kems-026-markova-1984/` (18 files, exists); `tables/kems-026-markova-1984/` (0 files, ABSENT) | `data/literature/extracts/kems-026-markova-1984.yaml` (15 rows, draft) | `ledger/kems-026-markova-1984.yaml`: decoded (2026-09-06) |
 | `kems-027-plante-hastie-1983` | Hastie, J. W., Plante, E. R. & Bonnell, D. W. (1983), NBSIR 83-2731, "Vaporization of Simulated Nuclear Waste Glass", National Bureau of Standards, June 1983 (interim report). Hunt alias: alkali-bearing glass KMS/TMS vaporization methods. | 10.6028/NBS.IR.83-2731 | `docs/references/pdfs/99-kems-langmuir/kems-027-plante-hastie-1983.pdf`, `c246e186` | `raw/kems-027-plante-hastie-1983/kems-027-plante-hastie-1983.pdf` (present, c246e186); `text/kems-027-plante-hastie-1983/` (76 files, exists); `tables/kems-027-plante-hastie-1983/` (8 files, exists) | `data/literature/extracts/kems-027-plante-hastie-1983.yaml` (26 rows, draft, private_path) | `ledger/kems-027-plante-hastie-1983.yaml`: extracted (2026-09-06) |
+| `kems-028-yakovlev-1984` | Yakovlev, O.I., Markova, O.M., Semenov, G.A. & Belov, A.N. (1984), "The vaporization peculiarities of CAI inclusions in chondrites: experimental data", Lunar and Planetary Science XV, 945–946 |  | ABSENT, `` | `raw/kems-028-yakovlev-1984/kems-028-yakovlev-1984.pdf` (present, b56d27b4); `text/kems-028-yakovlev-1984/` (18 files, exists); `tables/kems-028-yakovlev-1984/` (0 files, ABSENT) | `data/literature/extracts/kems-028-yakovlev-1984.yaml` (19 rows, draft) | `ledger/kems-028-yakovlev-1984.yaml`: decoded (2026-09-06) |
+| `kems-029-yakovlev-shornikov-2011` | Yakovlev, O.I. & Shornikov, S.I. (2011), "Experimental study of meteorites and Ca–Al-inclusions", Vestn. Otd. nauk Zemle 3, NZ6104, doi:10.2205/2011NZ000234 | 10.2205/2011NZ000234 | ABSENT, `` | `raw/kems-029-yakovlev-shornikov-2011/kems-029-yakovlev-shornikov-2011.pdf` (present, 1381e9fe); `text/kems-029-yakovlev-shornikov-2011/` (18 files, exists); `tables/kems-029-yakovlev-shornikov-2011/` (0 files, ABSENT) | `data/literature/extracts/kems-029-yakovlev-shornikov-2011.yaml` (6 rows, draft) | `ledger/kems-029-yakovlev-shornikov-2011.yaml`: decoded (2026-09-06) |
 | `kems-031-halwax-2024` | Halwax, A., Sergeev, D., Müller, M. & Schenk, J. (2024), "Enthalpy of Formation of Calcium and Magnesium Oxide Obtained by Knudsen Effusion Mass Spectrometry", Metall. Mater. Trans. B, DOI 10.1007/s11663-024-02995-6 | 10.1007/s11663-024-02995-6 | `docs/references/pdfs/99-kems-langmuir/kems-031-halwax-2024.pdf`, `9d60e03e` | `raw/kems-031-halwax-2024/kems-031-halwax-2024.pdf` (present, 9d60e03e); `text/kems-031-halwax-2024/` (89 files, exists); `tables/kems-031-halwax-2024/` (14 files, exists) | `data/literature/extracts/kems-031-halwax-2024.yaml` (22 rows, draft, private_path) | `ledger/kems-031-halwax-2024.yaml`: extracted (2026-09-06) |
 | `kems-032-copland-jacobson-2010` | Copland, E. H. & Jacobson, N. S. (2010), "Measuring Thermodynamic Properties of Metals and Alloys With Knudsen Effusion Mass Spectrometry", NASA/TP—2010-216795 | NTRS 20110001597 | `docs/references/pdfs/99-kems-langmuir/kems-032-copland-jacobson-2010.pdf`, `a72ca745` | `raw/kems-032-copland-jacobson-2010/kems-032-copland-jacobson-2010.pdf` (present, a72ca745); `text/kems-032-copland-jacobson-2010/` (135 files, exists); `tables/kems-032-copland-jacobson-2010/` (0 files, ABSENT) | `data/literature/extracts/kems-032-copland-jacobson-2010.yaml` (5 rows, draft, private_path) | `ledger/kems-032-copland-jacobson-2010.yaml`: decoded (2026-09-06) |
 | `kems-035-sauerborn-2005` | Sauerborn, M. (2005), "Pyrolyse von Metalloxiden und Silikaten unter Vakuum mit konzentrierter Solarstrahlung", Dissertation, Rheinische Friedrich-Wilhelms-Universität Bonn |  | `docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.pdf`, `76484556` | `raw/kems-035-sauerborn-2005/kems-035-sauerborn-2005.pdf` (present, 76484556); `text/kems-035-sauerborn-2005/` (589 files, exists); `tables/kems-035-sauerborn-2005/` (16 files, exists) | `data/literature/extracts/kems-035-sauerborn-2005.yaml` (60 rows, draft, private_path) | `ledger/kems-035-sauerborn-2005.yaml`: deepened (2026-09-06) |
@@ -202,6 +205,9 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `kems-021-plante-1992-feo`
 - `kems-023-demaria-1973`
 - `kems-025-markova-1983`
+- `kems-026-markova-1984`
+- `kems-028-yakovlev-1984`
+- `kems-029-yakovlev-shornikov-2011`
 - `kems-036-sesko-2024`
 - `kems-038-matchett-2006`
 - `kems-040-stolyarova-2015`

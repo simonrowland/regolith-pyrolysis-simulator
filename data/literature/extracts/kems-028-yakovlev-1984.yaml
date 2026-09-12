@@ -1,0 +1,838 @@
+schema_version: literature_extract.v1
+source_id: kems-028-yakovlev-1984
+source:
+  citation: 'Yakovlev, O.I., Markova, O.M., Semenov, G.A. & Belov, A.N. (1984), "The vaporization peculiarities
+    of CAI inclusions in chondrites: experimental data", Lunar and Planetary Science XV, 945–946'
+  doi: null
+  url: https://ui.adsabs.harvard.edu/abs/1984LPSC...15..945Y
+  year: 1984
+extraction:
+  method: 'Corpus PDF is a 2009 Acrobat Paper Capture scan of the LPI/ADS LPSC XV abstract (2 letter pages,
+    published pp. 945–946). pdftotext -layout and MinerU are noisy OCR layers and were not used as data.
+    Printed partial-pressure sentences and the Po2 table transcribed from a 400 dpi pdftoppm PNG. Figs
+    1–2 listed figure-only and were not digitised. Authors'' measured KEMS partial pressures (torr as
+    printed) are kept distinct from the Po2 table, which the authors calculate from AlO=Al+O and O2=2O.
+    The sentence ''Maximum P_FeO=10^-2 torr'' in the 1450–1725 C window is recorded as P(Fe): Fig. 1 labels
+    Fe (not FeO) at lg P ≈ -2 in that band, and the next sentence separately gives the top pressure of
+    iron oxide P_FeO=8.1×10^-5 torr at 1650 C. Typewriter I for 1 in the Po2 table (I.4×10^-6) is read
+    as 1.4.'
+  date: '2026-09-12'
+  worker: extract-kems-026
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections:
+- observation_id: yakovlev_1984_murchison_Fe_max_1450_1725C
+  field: values.gas_species
+  old: FeO(g)
+  new: Fe(g)
+  page: 945
+  quote: Maximum P_FeO=10^-2 tor is watched in the wide temperature range (T=1450-1725 C). The top pressure
+    of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C. Fig. 1 (p. 946) labels Fe, not FeO, as the
+    species reaching lg P (tor) ≈ -2 in that temperature band.
+fidelity_samples:
+- species: Na
+  observable: psat_series
+  observation_id: yakovlev_1984_murchison_Na_P_1225C
+  field: p_torr
+  value: 0.00027
+  locator:
+    published_page: 945
+    pdf_page_index: 1
+    paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
+- species: SiO
+  observable: psat_series
+  observation_id: yakovlev_1984_CAI_SiO_max_1875C
+  field: p_torr
+  value: 0.0062
+  locator:
+    published_page: 946
+    pdf_page_index: 2
+    paragraph: SiO pressure reaches the maximum value P_SiO=6.2×10^-3 tor at T=1875 C
+- path: species.O2.observations[yakovlev_1984_Po2_table_calculated].values.points[0].p_torr
+  value: 1.4e-06
+  locator:
+    table: Po2
+    published_page: 946
+    pdf_page_index: 2
+    note: Table first Murchison cell T=2020 C, I.4×10^-6 torr
+- species: K
+  observable: psat_series
+  observation_id: yakovlev_1984_murchison_K_P_1225C
+  field: p_torr
+  value: 4.2e-05
+  locator:
+    published_page: 945
+    pdf_page_index: 1
+    paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
+species:
+  Na:
+    observations:
+    - observation_id: yakovlev_1984_kems_method
+      type: rate_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: The experiments were carried out using the Knudsen effusion cell
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: Murchison_and_Efremovka_CAI_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: Knudsen effusion cell; technique in Yakovlev et al. 14th LPS (1983) 869
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        cell: Knudsen effusion cell
+        technique_reference: Yakovlev O.I. et al. 14th LPS (1983) 869
+        T_C_range:
+        - 1000.0
+        - 2500.0
+        samples:
+        - Murchison chondrite
+        - CAI inclusions in Efremovka types A and B
+        observed_vapor_species:
+        - K
+        - Na
+        - Fe
+        - FeO
+        - Ni
+        - Co
+        - Cr
+        - SiO
+        - Mg
+        - Ca
+        - TiO
+        - TiO2
+        - Al
+        - AlO
+        - Al2O
+        - O2
+        - O
+        fugacity_sequence_as_printed: (K,Na)→(Fe,Ni,Co)→(SiO,Mg)→(TiO,TiO2,Ca)→(Al,AlO,Al2O)
+        oxygen_forms:
+        - O2
+        - O
+        missing_for_motzfeldt:
+        - orifice_area
+        - orifice_diameter
+        - clausing_factor
+        - sample_surface_area
+        - cell_material
+      uncertainty:
+        note: No orifice geometry or numeric calibration uncertainty printed in this abstract.
+    - observation_id: yakovlev_1984_murchison_Na_P_1225C
+      type: psat_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
+      T_range_K:
+      - 1498.15
+      - 1498.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: partial pressure over Murchison melt in a Knudsen cell; torr as printed
+      regime: kems_effusion
+      units: torr as published (p_Pa = p_torr × 133.322)
+      values:
+        quantity: partial_pressure
+        gas_species: Na(g)
+        method_class: measured_direct
+        T_C: 1225.0
+        p_torr: 0.00027
+        p_Pa: 0.03599694
+        p_Pa_conversion: p_Pa = p_torr × 133.322
+        Na_K_max_T_C_range:
+        - 1050.0
+        - 1250.0
+        Na_higher_than_K: true
+        as_printed: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor. As a rule, Na pressure is higher
+          than K one.
+      uncertainty:
+        note: No numeric uncertainty printed. Na exponent is a typewriter superscript; 10^-4 is required
+          by the printed statement that Na > K at this T given P_K=4.2×10^-5.
+    - observation_id: yakovlev_1984_fig1_murchison_psat_figure_only
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 946
+        pdf_page_index: 2
+        note: Partial pressures of the components in the vapor phase released from the heated samples
+          of Murchison (1)
+      T_range_K:
+      - 1273.15
+      - 2473.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: lg P_i (tor) vs T C; silver-or-other calibration not restated here
+      regime: kems_effusion
+      units: torr as published (ordinate lg P, tor)
+      values:
+        quantity: partial_pressure
+        gas_species: Na(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg10_P_torr vs T_C
+        co_species_this_work:
+        - Na
+        - K
+        - Fe
+        - SiO
+        - Mg
+        - Ca
+        - Al
+        - AlO
+        - Al2O
+        - TiO
+        - TiO2
+        T_axis_ticks_C_as_printed:
+        - 1000
+        - 1500
+        - 2000
+      uncertainty:
+        note: Figure-only; curve not digitised. Printed text anchors are the numeric P values.
+  K:
+    observations:
+    - observation_id: yakovlev_1984_murchison_K_P_1225C
+      type: psat_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
+      T_range_K:
+      - 1498.15
+      - 1498.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: partial pressure over Murchison melt; torr as printed
+      regime: kems_effusion
+      units: torr as published (p_Pa = p_torr × 133.322)
+      values:
+        quantity: partial_pressure
+        gas_species: K(g)
+        method_class: measured_direct
+        T_C: 1225.0
+        p_torr: 4.2e-05
+        p_Pa: 0.005599524
+        p_Pa_conversion: p_Pa = p_torr × 133.322
+        Na_K_max_T_C_range:
+        - 1050.0
+        - 1250.0
+      uncertainty:
+        note: No numeric uncertainty printed.
+  Fe:
+    observations:
+    - observation_id: yakovlev_1984_murchison_Fe_troilite_1050C
+      type: psat_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C
+          and that is clearly connected with the decay of troilite
+      T_range_K:
+      - 1323.15
+      - 1323.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: partial pressure of Fe over Murchison; torr as printed
+      regime: kems_effusion
+      units: torr as published (p_Pa = p_torr × 133.322)
+      values:
+        quantity: partial_pressure
+        gas_species: Fe(g)
+        method_class: measured_direct
+        T_C: 1050.0
+        p_torr: 1.8e-05
+        p_Pa: 0.002399796
+        p_Pa_conversion: p_Pa = p_torr × 133.322
+        source_as_printed: decay of troilite
+      uncertainty:
+        note: No numeric uncertainty printed.
+    - observation_id: yakovlev_1984_murchison_Fe_max_1450_1725C
+      type: psat_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Maximum P=10^-2 tor is watched in the wide temperature range (T=1450-1725 C)
+      T_range_K:
+      - 1723.15
+      - 1998.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: partial pressure of Fe over Murchison; torr as printed
+      regime: kems_effusion
+      units: torr as published (p_Pa = p_torr × 133.322)
+      values:
+        quantity: partial_pressure
+        gas_species: Fe(g)
+        method_class: measured_direct
+        T_C_range:
+        - 1450.0
+        - 1725.0
+        p_torr: 0.01
+        p_Pa: 1.33322
+        p_Pa_conversion: p_Pa = p_torr × 133.322
+        as_printed_species_glyph: P_FeO in the typewriter line; recorded as Fe(g) — see corrections
+        fig1_support: Fig. 1 labels Fe at lg P (tor) ≈ -2 across this T band
+      uncertainty:
+        note: Order-of-magnitude maximum (10^-2 torr) as printed; not a single T point.
+  FeO:
+    observations:
+    - observation_id: yakovlev_1984_murchison_FeO_top_1650C
+      type: psat_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
+      T_range_K:
+      - 1923.15
+      - 1923.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: partial pressure of FeO(g) over Murchison; torr as printed
+      regime: kems_effusion
+      units: torr as published (p_Pa = p_torr × 133.322)
+      values:
+        quantity: partial_pressure
+        gas_species: FeO(g)
+        method_class: measured_direct
+        T_C: 1650.0
+        p_torr: 8.1e-05
+        p_Pa: 0.010799082000000002
+        p_Pa_conversion: p_Pa = p_torr × 133.322
+      uncertainty:
+        note: No numeric uncertainty printed. Distinct from the 10^-2 torr Fe maximum in the same T window.
+  SiO:
+    observations:
+    - observation_id: yakovlev_1984_murchison_SiO_Mg_max_1750_1825C
+      type: psat_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2
+          tor and 8.3×10^-3 tor
+      T_range_K:
+      - 2023.15
+      - 2098.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: partial pressure of SiO over Murchison; torr as printed
+      regime: kems_effusion
+      units: torr as published (p_Pa = p_torr × 133.322)
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        T_C_range:
+        - 1750.0
+        - 1825.0
+        p_torr: 0.02
+        p_Pa: 2.66644
+        p_Pa_conversion: p_Pa = p_torr × 133.322
+        simultaneous_drop_T_C: 1825.0
+        simultaneous_drop_note: the decrease of SiO and Mg pressures takes place simultaneously at T=1825
+          C owing to their exhausting in the condensate phase. The pressure in the system falls sharply
+          (more than 10 times) after the vaporization of silica and magnesium.
+      uncertainty:
+        note: Maximum in a T window as printed; not a single T point.
+    - observation_id: yakovlev_1984_CAI_SiO_max_1875C
+      type: psat_series
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        paragraph: SiO pressure reaches the maximum value P_SiO=6.2×10^-3 tor at T=1875 C
+      T_range_K:
+      - 2148.15
+      - 2148.15
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: CAI inclusions in Efremovka (types A and B; Ulyanov et al. 13th LPS 1982 813).
+      standard_state: partial pressure of SiO over Efremovka CAI; torr as printed
+      regime: kems_effusion
+      units: torr as published (p_Pa = p_torr × 133.322)
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        T_C: 1875.0
+        p_torr: 0.0062
+        p_Pa: 0.8265964
+        p_Pa_conversion: p_Pa = p_torr × 133.322
+        sharp_leap_p_torr_about: 0.001
+        sharp_leap_as_printed: the sharp leap of SiO pressure (to ~10^-3 tor) as the temperature rises
+        after_max_note: Falling of SiO pressure at T=1875 C takes place together with the sharp falling
+          of Mg pressure. But if Mg goes out of the system totally, SiO may be watched in vapors up to
+          full vaporization of the sample. The pressure of SiO remains practically invariable.
+      uncertainty:
+        note: No numeric uncertainty printed. Leap ~10^-3 torr is an order-of-magnitude as printed.
+    - observation_id: yakovlev_1984_fig2_CAI_psat_figure_only
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 946
+        pdf_page_index: 2
+        note: Partial pressures of the components in the vapor phase released from CAI inclusions of Efremovka
+          (2)
+      T_range_K:
+      - 1873.15
+      - 2573.15
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: CAI inclusions in Efremovka (types A and B; Ulyanov et al. 13th LPS 1982 813).
+      standard_state: lg P_i (tor) vs T C
+      regime: kems_effusion
+      units: torr as published (ordinate lg P, tor)
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg10_P_torr vs T_C
+        co_species_this_work:
+        - SiO
+        - Mg
+        - Fe
+        - Ca
+        - Al
+        - AlO
+        - Al2O
+        - TiO
+        - TiO2
+        T_axis_ticks_C_as_printed:
+        - 1600
+        - 1800
+        - 2000
+        - 2200
+      uncertainty:
+        note: Figure-only; curve not digitised.
+  Mg:
+    observations:
+    - observation_id: yakovlev_1984_murchison_Mg_max_1750_1825C
+      type: psat_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Maximum P_SiO and P_Mg in the temperature range 1750-1825 C are accordingly 2×10^-2
+          tor and 8.3×10^-3 tor
+      T_range_K:
+      - 2023.15
+      - 2098.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: partial pressure of Mg over Murchison; torr as printed
+      regime: kems_effusion
+      units: torr as published (p_Pa = p_torr × 133.322)
+      values:
+        quantity: partial_pressure
+        gas_species: Mg(g)
+        method_class: measured_direct
+        T_C_range:
+        - 1750.0
+        - 1825.0
+        p_torr: 0.0083
+        p_Pa: 1.1065726
+        p_Pa_conversion: p_Pa = p_torr × 133.322
+        simultaneous_drop_T_C: 1825.0
+      uncertainty:
+        note: Maximum in a T window as printed.
+  Ca:
+    observations:
+    - observation_id: yakovlev_1984_murchison_Ca_1825C
+      type: psat_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Ca (P_Ca=7.5×10^-5 tor) are observed in vapor at this temperature
+      T_range_K:
+      - 2098.15
+      - 2098.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: partial pressure of Ca over Murchison after SiO+Mg drop; torr as printed
+      regime: kems_effusion
+      units: torr as published (p_Pa = p_torr × 133.322)
+      values:
+        quantity: partial_pressure
+        gas_species: Ca(g)
+        method_class: measured_direct
+        T_C: 1825.0
+        p_torr: 7.5e-05
+        p_Pa: 0.00999915
+        p_Pa_conversion: p_Pa = p_torr × 133.322
+        residual_from_T_C: 1850.0
+        residual_note: low volatile fractions in the carbonaceous chondrite inriched in Ca, Ti and Al
+          are in residual phase from the temperature 1850 C
+      uncertainty:
+        note: No numeric uncertainty printed.
+    - observation_id: yakovlev_1984_murchison_Ca_max_1950_2025C
+      type: psat_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Calcium reaches the maximum pressure (P_Ca=4.4×10^-4 tor) at temperatures 1950-2025
+          C
+      T_range_K:
+      - 2223.15
+      - 2298.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: partial pressure of Ca over Murchison; torr as printed
+      regime: kems_effusion
+      units: torr as published (p_Pa = p_torr × 133.322)
+      values:
+        quantity: partial_pressure
+        gas_species: Ca(g)
+        method_class: measured_direct
+        T_C_range:
+        - 1950.0
+        - 2025.0
+        p_torr: 0.00044
+        p_Pa: 0.05866168
+        p_Pa_conversion: p_Pa = p_torr × 133.322
+        TiO_and_TiO2_same_T: true
+        P_TiO_gt_P_TiO2: true
+      uncertainty:
+        note: Maximum in a T window as printed.
+  Al:
+    observations:
+    - observation_id: yakovlev_1984_murchison_Al_max_2100C
+      type: psat_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: The pressure of aluminium increases accordingly to the temperature rises to 2100 C
+          and reaches the maximum pressure P_Al=1.7×10^-3 tor
+      T_range_K:
+      - 2373.15
+      - 2373.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: partial pressure of Al over Murchison; torr as printed
+      regime: kems_effusion
+      units: torr as published (p_Pa = p_torr × 133.322)
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: measured_direct
+        T_C: 2100.0
+        p_torr: 0.0017
+        p_Pa: 0.2266474
+        p_Pa_conversion: p_Pa = p_torr × 133.322
+        AlO_plus_Al2O_fraction_le: 0.1
+        AlO_plus_Al2O_fraction_as_printed: The portion of suboxides AlO and Al2O is ≤ 0.1 of the total
+          pressure of aluminium
+      uncertainty:
+        note: No numeric uncertainty printed.
+  AlO:
+    observations:
+    - observation_id: yakovlev_1984_CAI_Al_suboxide_fraction
+      type: psat_series
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        paragraph: The ratio P_AlO+P_Al2O / P_Al+P_AlO+P_Al2O makes up 0.18-0.20 for the CAI inclusions
+          type A. For the B type inclusions the mean value is 0.4
+      T_range_K:
+      - 2148.15
+      - 2621.15
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: CAI inclusions in Efremovka (types A and B; Ulyanov et al. 13th LPS 1982 813).
+      standard_state: suboxide fraction of total Al pressure over Efremovka CAI
+      regime: kems_effusion
+      units: dimensionless pressure ratio as printed
+      values:
+        quantity: Al_suboxide_pressure_fraction
+        method_class: measured_direct
+        ratio_as_printed: P_AlO + P_Al2O / P_Al + P_AlO + P_Al2O
+        type_A_range:
+        - 0.18
+        - 0.2
+        type_B_mean: 0.4
+      uncertainty:
+        note: Type A given as a range 0.18–0.20; type B as a mean 0.4. No further uncertainty printed.
+  Al2O:
+    observations:
+    - observation_id: yakovlev_1984_CAI_Al2O_in_suboxide_fraction
+      type: psat_series
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        paragraph: The portion of aluminium suboxides AlO and Al2O in the total pressure of aluminium
+          is relatively high
+      T_range_K:
+      - 2148.15
+      - 2621.15
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: CAI inclusions in Efremovka (types A and B; Ulyanov et al. 13th LPS 1982 813).
+      standard_state: Al2O included in the CAI suboxide fraction; see AlO observation
+      regime: kems_effusion
+      units: dimensionless pressure ratio as printed
+      values:
+        quantity: Al_suboxide_pressure_fraction
+        gas_species: Al2O(g)
+        method_class: measured_direct
+        paired_observation: yakovlev_1984_CAI_Al_suboxide_fraction
+        type_A_range:
+        - 0.18
+        - 0.2
+        type_B_mean: 0.4
+      uncertainty:
+        note: No separate P_Al2O numeric; only the combined suboxide fraction is printed.
+  TiO:
+    observations:
+    - observation_id: yakovlev_1984_murchison_TiO_gt_TiO2_at_Ca_max
+      type: psat_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: TiO and TiO2 are observed in vapor at the same temperature and P_TiO > P_TiO2
+      T_range_K:
+      - 2223.15
+      - 2298.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: qualitative P(TiO) > P(TiO2) at the Ca-maximum T window
+      regime: kems_effusion
+      units: inequality as printed; no numeric P
+      values:
+        quantity: partial_pressure
+        gas_species: TiO(g)
+        method_class: measured_direct
+        admission_status: qualitative_not_numeric
+        semantics: bound_not_point_ordering
+        P_TiO_gt_P_TiO2: true
+        numeric_p: not_printed
+      uncertainty:
+        note: Inequality only; numeric P(TiO) is figure-only on Fig. 1.
+  S2:
+    observations:
+    - observation_id: yakovlev_1984_sulfur_900_1000C
+      type: psat_series
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Sulfer components (H2S, SO2, S2) were observed at temperatures 900-1000 C
+      T_range_K:
+      - 1173.15
+      - 1273.15
+      phase: Murchison_CM_chondrite_melt_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison chondrite, full vaporization 1000–2500 C in a Knudsen effusion cell.
+      standard_state: sulfur vapor species over Murchison during Knudsen heating
+      regime: kems_effusion
+      units: T window as printed; no numeric P
+      values:
+        quantity: partial_pressure
+        gas_species: S2(g)
+        method_class: measured_direct
+        admission_status: qualitative_not_numeric
+        semantics: bound_not_point_ordering
+        co_species:
+        - H2S
+        - SO2
+        - S2
+        T_C_range:
+        - 900.0
+        - 1000.0
+        numeric_p: not_printed
+      uncertainty:
+        note: Observation window only; no numeric partial pressures printed.
+  O2:
+    observations:
+    - observation_id: yakovlev_1984_Po2_table_calculated
+      type: psat_series
+      class_tag: model
+      locator:
+        table: Po2
+        published_page: 946
+        pdf_page_index: 2
+        note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite
+          Murchison and CAI inclusions of Efremovka
+      quote: The calculation of Po2 has been done using the equilibriums AlO=Al+O, O2=2O. The Po2 calculation
+        for the high temperature vaporization of Murchison and CAI inclusions of Efremovka shows that
+        vaporization of latter takes place at the conditions with higher Po2 (table).
+      T_range_K:
+      - 2293.15
+      - 2621.15
+      phase: high_T_residual_Murchison_and_Efremovka_CAI
+      standard_state: calculated p(O2) from AlO=Al+O and O2=2O; torr as printed
+      regime: kems_effusion
+      units: torr as published (p_Pa = p_torr × 133.322)
+      values:
+        quantity: partial_pressure
+        gas_species: O2(g)
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        equilibria_as_printed:
+        - AlO = Al + O
+        - O2 = 2 O
+        points:
+        - T_C: 2020
+          T_K: 2293.15
+          sample: Murchison
+          p_torr: 1.4e-06
+          p_Pa: 0.00018665079999999998
+        - T_C: 2072
+          T_K: 2345.15
+          sample: Murchison
+          p_torr: 1.6e-06
+          p_Pa: 0.0002133152
+        - T_C: 2130
+          T_K: 2403.15
+          sample: Murchison
+          p_torr: 1.5e-06
+          p_Pa: 0.000199983
+        - T_C: 2130
+          T_K: 2403.15
+          sample: Efremovka_type_A
+          p_torr: 2.0e-05
+          p_Pa: 0.0026664400000000004
+        - T_C: 2130
+          T_K: 2403.15
+          sample: Efremovka_type_B
+          p_torr: 0.00034
+          p_Pa: 0.045329480000000005
+        - T_C: 2180
+          T_K: 2453.15
+          sample: Efremovka_type_A
+          p_torr: 4.7e-06
+          p_Pa: 0.0006266134
+        - T_C: 2205
+          T_K: 2478.15
+          sample: Efremovka_type_A
+          p_torr: 3.6e-06
+          p_Pa: 0.0004799592
+        - T_C: 2205
+          T_K: 2478.15
+          sample: Efremovka_type_B
+          p_torr: 0.00028
+          p_Pa: 0.037330159999999994
+        - T_C: 2267
+          T_K: 2540.15
+          sample: Efremovka_type_A
+          p_torr: 5.5e-05
+          p_Pa: 0.00733271
+        - T_C: 2267
+          T_K: 2540.15
+          sample: Efremovka_type_B
+          p_torr: 4.1e-05
+          p_Pa: 0.005466202
+        - T_C: 2348
+          T_K: 2621.15
+          sample: Efremovka_type_A
+          p_torr: 0.00019
+          p_Pa: 0.025331180000000002
+        blank_cells_as_printed:
+        - Murchison blank at 2180, 2205, 2267, 2348 C
+        - Efremovka type B blank at 2180 and 2348 C
+        - Efremovka type A and B blank at 2020 and 2072 C
+      uncertainty:
+        note: Calculated p(O2); no numeric uncertainty printed. Typewriter I.4 read as 1.4.
+deepening:
+  dispatch_id: extract-kems-026
+  date: '2026-09-12'
+  parent_policy: First extract of this source; no parent observation objects.
+  quote_convention: Printed text transcribed with normalized whitespace and ASCII flattening of subscripts,
+    superscripts, and typewriter I-for-1.
+  table_inventory:
+  - table: Po2
+    published_page: 946
+    pdf_page_index: 2
+    completeness: full
+    note: Untitled Po2 (tor) table. Calculated from AlO=Al+O and O2=2O. Not a direct ion-current calibration.
+  class_ledger:
+    measured:
+    - yakovlev_1984_kems_method
+    - yakovlev_1984_murchison_Na_P_1225C
+    - yakovlev_1984_murchison_K_P_1225C
+    - yakovlev_1984_murchison_Fe_troilite_1050C
+    - yakovlev_1984_murchison_Fe_max_1450_1725C
+    - yakovlev_1984_murchison_FeO_top_1650C
+    - yakovlev_1984_murchison_SiO_Mg_max_1750_1825C
+    - yakovlev_1984_murchison_Ca_1825C
+    - yakovlev_1984_murchison_Ca_max_1950_2025C
+    - yakovlev_1984_murchison_Al_max_2100C
+    - yakovlev_1984_CAI_SiO_max_1875C
+    - yakovlev_1984_CAI_Al_suboxide_fraction
+    - yakovlev_1984_sulfur_900_1000C
+    figure_only:
+    - yakovlev_1984_fig1_murchison_psat_figure_only
+    - yakovlev_1984_fig2_CAI_psat_figure_only
+    model:
+    - yakovlev_1984_Po2_table_calculated
+  battery_limitation: Numeric P(T) points are the printed text maxima/anchors, not a digitised Clausius–Clapeyron
+    series. Figs 1–2 remain figure-only.

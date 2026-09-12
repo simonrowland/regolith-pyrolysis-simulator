@@ -1,0 +1,459 @@
+schema_version: literature_extract.v1
+source_id: kems-029-yakovlev-shornikov-2011
+source:
+  citation: Yakovlev, O.I. & Shornikov, S.I. (2011), "Experimental study of meteorites and Ca–Al-inclusions",
+    Vestn. Otd. nauk Zemle 3, NZ6104, doi:10.2205/2011NZ000234
+  doi: 10.2205/2011NZ000234
+  url: https://doi.org/10.2205/2011NZ000234
+  year: 2011
+extraction:
+  method: Corpus PDF is a born-digital 3-page Vestnik typeset PDF (not a scan). Table of O2 pressure transcribed
+    from a 400 dpi pdftoppm PNG of PDF page 2; method numbers from the same-resolution render of PDF page
+    1. MinerU figure grids were not used as data. Figs 1–2 (lg P_i atm vs T) listed figure-only and were
+    not digitised. The O2 table is the authors' calculated p(O2) in bar (thermodynamic analysis of CAI
+    vs chondrite vaporization) and is labelled model_derived; it is the torr table of Yakovlev et al.
+    LPSC XV 945–946 (kems-028) converted to bar (1.4×10^-6 torr ≈ 1.9×10^-9 bar). Complementary vapor
+    wt% are derived from this-work KEMS partial pressures via the Hertz–Knudsen equation, kept distinct
+    from the direct P(T) figures. Equipment (MS-1301, gold calibration, W cell, 15 mg Re boat, ±1 C) is
+    method metadata, not a measured rate.
+  date: '2026-09-12'
+  worker: extract-kems-026
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: Na
+  observable: rate_series
+  observation_id: yakovlev_shornikov_2011_kems_method_geometry
+  field: sample_mass_mg
+  value: 15.0
+  locator:
+    published_page: 1
+    pdf_page_index: 1
+    paragraph: a 15 mg sample was loaded into a rhenium boat placed on the bottom of the cell
+- path: species.O2.observations[yakovlev_shornikov_2011_Po2_table_bar_calculated].values.points[0].p_bar
+  value: 1.9e-09
+  locator:
+    table: O2
+    published_page: 2
+    pdf_page_index: 2
+    note: Table first Murchison cell T=2020 C, 1.9×10^-9 bar
+- species: SiO
+  observable: psat_series
+  observation_id: yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar
+  field: p_bar_about
+  value: 1.0e-06
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    paragraph: the partial pressure value of SiO is rather high (~10^-6 bar)
+- species: Na
+  observable: rate_series
+  observation_id: yakovlev_shornikov_2011_complementary_vapor_wt_pct
+  field: Na2O_wt_pct_up_to_about
+  value: 70.0
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    paragraph: the Na2O contents up to ~70 wt. %
+species:
+  Na:
+    observations:
+    - observation_id: yakovlev_shornikov_2011_kems_method_geometry
+      type: rate_series
+      locator:
+        published_page: 1
+        pdf_page_index: 1
+        note: Vestnik NZ6104 3-page PDF, page 1
+        paragraph: The Knudsen effusion method was used in combination with the mass spectrometric analysis
+          of the vapor phase (MS-1301 mass spectrometer)
+      T_range_K:
+      - 1173.15
+      - 2873.15
+      phase: chondrite_and_CAI_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
+      standard_state: gold-calibrated KEMS absolute partial pressures (mm Hg as printed for the instrument
+        range)
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: MS-1301 mass spectrometer
+        instrument_reference: Semenov, Nikolaev & Franceva 1976
+        T_C_up_to_about: 2600.0
+        measurable_p_mmHg_lower: 1.0e-07
+        measurable_p_mmHg_upper_range:
+        - 0.01
+        - 0.1
+        heating_regime: stepwise
+        temperature_step_C_about: 50.0
+        step_duration_min_about: 15.0
+        total_duration_hr_about: 5.0
+        T_start_C_about: 900.0
+        heating: electron beam
+        temperature_method: optical pyrometer in the pyrometric hole of the cell (black-body)
+        temperature_accuracy_C: 1.0
+        absolute_pressure_method: gold calibration (sequential ionic currents of standard and sample in
+          the same cell)
+        sample_mass_mg: 15.0
+        sample_container: rhenium boat on the bottom of a tungsten effusion cell
+        W_reduction_note: Evaporation in the rhenium container strongly depressed the reducing activity
+          of tungsten, although did not eliminate it completely. This is suggested by the presence of
+          WO2 and WO3, as well as Ca and Mg tungstates in the vapor.
+        observed_vapor_species:
+        - K
+        - Na
+        - Fe
+        - Mg
+        - Ca
+        - Al
+        - SiO
+        - TiO
+        - TiO2
+        - AlO
+        - Al2O
+        - Al2O2
+        - O
+        - O2
+        samples:
+        - Murchison chondrite (CM)
+        - Krymka chondrite (LL3)
+        - chondrules of Saratov chondrites (L4)
+        - CAI types A and B from Efremovka (CV)
+        missing_for_motzfeldt:
+        - orifice_area
+        - orifice_diameter
+        - clausing_factor
+        - sample_surface_area
+        missing_note: 15 mg in a rhenium boat is printed; orifice diameter/Clausing and melt free surface
+          area are not printed.
+      uncertainty:
+        temperature_accuracy_C: 1.0
+        as_printed: The accuracy of temperature measurement was ±1 C
+        note: No numeric uncertainty printed for gold calibration or ion currents.
+      equipment:
+        cell_material:
+          value: tungsten effusion cell; 15 mg sample in a rhenium boat on the cell bottom
+          locator:
+            published_page: 1
+            pdf_page_index: 1
+            note: Vestnik NZ6104 3-page PDF, page 1
+            paragraph: Evaporation was conducted in a tungsten effusion cell. In order to minimize the
+              interaction of tungsten with melt, a 15 mg sample was loaded into a rhenium boat
+    - observation_id: yakovlev_shornikov_2011_complementary_vapor_wt_pct
+      type: rate_series
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        note: Vestnik NZ6104 3-page PDF, page 2
+        paragraph: The calculation of complimentary vapor composition have showed that at the relatively
+          low temperature (up to 1300 C) the K2O contents reached 5–10 wt. % and the Na2O contents up
+          to ~70 wt. %
+      T_range_K:
+      - 1173.15
+      - 2273.15
+      phase: Murchison_CM_and_ordinary_chondrite_melts_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
+      standard_state: complementary vapor composition (oxide wt%) calculated from measured KEMS partial
+        pressures via Hertz–Knudsen rates
+      regime: kems_effusion
+      units: wt percent as published
+      values:
+        quantity: complementary_vapor_composition
+        method_class: derived_from_measured_kems_hertz_knudsen
+        evidence_class: authors_derived_from_this_work_pressures
+        Na2O_wt_pct_up_to_about: 70.0
+        Na2O_T_C_up_to: 1300.0
+        K2O_wt_pct_range:
+        - 5.0
+        - 10.0
+        K2O_T_C_up_to: 1300.0
+        Fe_wt_pct_about: 40.0
+        Fe_T_C_range:
+        - 1400.0
+        - 1700.0
+        SiO_disappears_T_C: 1800.0
+        Al2O3_wt_pct_range_at_2000C:
+        - 60.0
+        - 65.0
+        Al2O3_T_C_about: 2000.0
+        as_printed: at the relatively low temperature (up to 1300 C) the K2O contents reached 5–10 wt.
+          % and the Na2O contents up to ~70 wt. %. In the temperature interval 1400–1700 C the Fe vapor
+          was prevailed and reached ~40 wt. %. It is important to note that at the temperature 1800 C
+          and higher the SiO disappeared in the vapor phase while the Al2O3 and CaO increased. The Al2O3
+          contents reached 60-65 wt. % at the temperature ~2000 C.
+        derivation: Partial pressures were converted to evaporation rates with the Hertz–Knudsen equation;
+          rates were used to determine residual-melt and vapor compositions.
+      uncertainty:
+        note: Ranges and ~ values as printed; no further numeric uncertainty.
+    - observation_id: yakovlev_shornikov_2011_fig1_murchison_psat_figure_only
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 2
+        pdf_page_index: 2
+        note: Partial pressures dependences on temperature for Murchison chondrite vaporization
+      T_range_K:
+      - 1073.15
+      - 2673.15
+      phase: Murchison_CM_and_ordinary_chondrite_melts_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Murchison (CM), Krymka (LL3), Saratov chondrules (L4); tungsten cell, rhenium boat.
+      standard_state: lg P_i (atm) vs T C; gold-calibrated KEMS
+      regime: kems_effusion
+      units: atm as published (ordinate lg P_i, atm)
+      values:
+        quantity: partial_pressure
+        gas_species: Na(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg10_P_atm vs T_C
+        co_species_this_work:
+        - Na
+        - K
+        - Fe
+        - SiO
+        - Mg
+        - Al
+        - Ca
+        - TiO
+        T_axis_ticks_C_as_printed:
+        - 800
+        - 1000
+        - 1200
+        - 1400
+        - 1600
+        - 1800
+        - 2000
+        - 2200
+        - 2400
+        ordinate_ticks_as_printed:
+        - -4
+        - -5
+        - -6
+        - -7
+        - -8
+        - -9
+        - -10
+      uncertainty:
+        note: Figure-only; curve not digitised.
+  SiO:
+    observations:
+    - observation_id: yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar
+      type: psat_series
+      locator:
+        published_page: 2
+        pdf_page_index: 2
+        note: Vestnik NZ6104 3-page PDF, page 2
+        paragraph: the partial pressure value of SiO is rather high (~10^-6 bar) and it is approximately
+          equal to partial pressures of Ca and Al
+      T_range_K:
+      - 2273.15
+      - 2673.15
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: CAI types A and B from Efremovka (CV).
+      standard_state: partial pressure of SiO over Efremovka CAI; bar as printed
+      regime: kems_effusion
+      units: bar as published (p_Pa = p_bar × 1e5)
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        T_C_range:
+        - 2000.0
+        - 2400.0
+        p_bar_about: 1.0e-06
+        p_Pa: 0.09999999999999999
+        p_Pa_conversion: p_Pa = p_bar × 1e5
+        p_bar: 1.0e-06
+        approximately_equal_to:
+        - Ca
+        - Al
+        as_printed: At high temperature fields (2000–2400 C) one can see the SiO form together with low
+          fugacity components of Ca and Al. Besides the partial pressure value of SiO is rather high (~10^-6
+          bar) and it is approximately equal to partial pressures of Ca and Al.
+        authors_interpretation: unknown factor which controls the SiO2 vaporization at very high temperatures
+          (>2000 C); authors attribute the high SiO2 persistence to higher p(O2).
+      uncertainty:
+        note: Order-of-magnitude ~10^-6 bar as printed; not a single tabulated point.
+    - observation_id: yakovlev_shornikov_2011_fig2_CAI_psat_figure_only
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 2
+        pdf_page_index: 2
+        note: Partial pressures dependences on temperature for Ca-Al-inclusion vaporization
+      T_range_K:
+      - 1873.15
+      - 2673.15
+      phase: Efremovka_CAI_type_A_and_B_knudsen
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: CAI types A and B from Efremovka (CV).
+      standard_state: lg P_i (atm) vs T C
+      regime: kems_effusion
+      units: atm as published (ordinate lg P_i, atm)
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg10_P_atm vs T_C
+        co_species_this_work:
+        - SiO
+        - Mg
+        - Fe
+        - Ca
+        - Al
+        - TiO
+        T_axis_ticks_C_as_printed:
+        - 1600
+        - 1800
+        - 2000
+        - 2200
+        - 2400
+        ordinate_ticks_as_printed:
+        - -4
+        - -5
+        - -6
+        - -7
+        - -8
+        - -9
+      uncertainty:
+        note: Figure-only; curve not digitised.
+  O2:
+    observations:
+    - observation_id: yakovlev_shornikov_2011_Po2_table_bar_calculated
+      type: psat_series
+      class_tag: model
+      locator:
+        table: O2
+        published_page: 2
+        pdf_page_index: 2
+        note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+      quote: The thermodynamic analyses of the conditions of CAI vaporization showed that the vaporization
+        process proceeded at comparatively high oxygen pressure which was in 10 and 100 times higher then
+        oxygen pressure condition at the Murchison and Krymka high temperature vaporization (table).
+      T_range_K:
+      - 2293.15
+      - 2621.15
+      phase: high_T_residual_Murchison_and_Efremovka_CAI
+      standard_state: calculated p(O2) in bar; not a direct ion-current calibration
+      regime: kems_effusion
+      units: bar as published (p_Pa = p_bar × 1e5)
+      values:
+        quantity: partial_pressure
+        gas_species: O2(g)
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        related_source: kems-028-yakovlev-1984 torr table at the same T grid (1 torr = 1.33322e-3 bar)
+        CAI_vs_chondrite_factor_as_printed: 10 and 100 times higher
+        points:
+        - T_C: 2020
+          T_K: 2293.15
+          sample: Murchison
+          p_bar: 1.9e-09
+          p_Pa: 0.00019
+        - T_C: 2072
+          T_K: 2345.15
+          sample: Murchison
+          p_bar: 2.1e-09
+          p_Pa: 0.00021
+        - T_C: 2130
+          T_K: 2403.15
+          sample: Murchison
+          p_bar: 2.0e-09
+          p_Pa: 0.0002
+        - T_C: 2130
+          T_K: 2403.15
+          sample: Efremovka_type_A
+          p_bar: 2.7e-08
+          p_Pa: 0.0027
+        - T_C: 2130
+          T_K: 2403.15
+          sample: Efremovka_type_B
+          p_bar: 4.5e-07
+          p_Pa: 0.045
+        - T_C: 2180
+          T_K: 2453.15
+          sample: Efremovka_type_A
+          p_bar: 6.3e-09
+          p_Pa: 0.00063
+        - T_C: 2205
+          T_K: 2478.15
+          sample: Efremovka_type_A
+          p_bar: 4.8e-09
+          p_Pa: 0.00048
+        - T_C: 2205
+          T_K: 2478.15
+          sample: Efremovka_type_B
+          p_bar: 3.7e-07
+          p_Pa: 0.037
+        - T_C: 2267
+          T_K: 2540.15
+          sample: Efremovka_type_A
+          p_bar: 7.3e-08
+          p_Pa: 0.007300000000000001
+        - T_C: 2267
+          T_K: 2540.15
+          sample: Efremovka_type_B
+          p_bar: 5.5e-08
+          p_Pa: 0.0055000000000000005
+        - T_C: 2348
+          T_K: 2621.15
+          sample: Efremovka_type_A
+          p_bar: 2.5e-07
+          p_Pa: 0.024999999999999998
+        blank_cells_as_printed:
+        - Murchison blank at 2180, 2205, 2267, 2348 C
+        - Efremovka type B blank at 2180 and 2348 C
+        - Efremovka type A and B blank at 2020 and 2072 C
+      uncertainty:
+        note: Calculated p(O2); no numeric uncertainty printed.
+deepening:
+  dispatch_id: extract-kems-026
+  date: '2026-09-12'
+  parent_policy: First extract of this source; no parent observation objects.
+  quote_convention: Printed text transcribed with normalized whitespace and ASCII flattening of subscripts
+    and approximately-equal marks.
+  table_inventory:
+  - table: O2
+    published_page: 2
+    pdf_page_index: 2
+    completeness: full
+    note: Table. O2 pressure about meteorite and CAI melts. Pressure in bar. Calculated; same T grid as
+      kems-028 torr table.
+  class_ledger:
+    measured:
+    - yakovlev_shornikov_2011_kems_method_geometry
+    - yakovlev_shornikov_2011_CAI_SiO_highT_about_1e-6_bar
+    derived:
+    - yakovlev_shornikov_2011_complementary_vapor_wt_pct
+    figure_only:
+    - yakovlev_shornikov_2011_fig1_murchison_psat_figure_only
+    - yakovlev_shornikov_2011_fig2_CAI_psat_figure_only
+    model:
+    - yakovlev_shornikov_2011_Po2_table_bar_calculated
+  battery_limitation: Figs 1–2 are the P(T) series and were not digitised. Numeric P anchors in this paper
+    are the ~10^-6 bar CAI SiO statement and the calculated O2 table.

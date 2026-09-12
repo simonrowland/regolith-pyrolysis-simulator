@@ -1,0 +1,1007 @@
+schema_version: literature_extract.v1
+source_id: kems-026-markova-1984
+source:
+  citation: Markova, O.M., Yakovlev, O.I., Belov, A.N. & Semenov, G.A. (1984), "The role of the vaporization
+    process in the impact-accretion history of the Moon", Lunar and Planetary Science XV, 509–510
+  doi: null
+  url: https://ui.adsabs.harvard.edu/abs/1984LPSC...15..509M
+  year: 1984
+extraction:
+  method: Corpus PDF is a 2009 Acrobat Paper Capture scan of the LPI/ADS LPSC XV abstract (2 letter pages,
+    published pp. 509–510). pdftotext -layout and MinerU are noisy OCR layers and were not used as data.
+    Tables 1–2 transcribed from a 400 dpi pdftoppm PNG of PDF page 2; page-1 method numbers transcribed
+    from the same-resolution render of PDF page 1. Where MinerU/tesseract and the render disagree, the
+    render wins. Fig. 1 (ternary residual-melt tracks) and Fig. 2 (dissipation-level curves) listed figure-only
+    and were not digitised. Partial pressures, p(O2), total pressure and melt activities for compositions
+    I–IV are referred by the authors to Markova et al. 14th LPS (1983) 460 and are not tabulated here.
+    Dissipation percentages in the Discussion are model_derived (calculated from this-work vapor forms
+    plus an escape-velocity model), kept distinct from the tabulated residual-melt compositions. Damaged
+    typewriter 8/3/4/6 glyphs on Table 2 were resolved only when an independent printed-page constraint
+    (monotonic mass-loss or T, or Table 1 recast of sample VI) selects one reading; each such change is
+    a corrections entry. Unreadable Table 1 cells are omitted, not guessed.
+  date: '2026-09-12'
+  worker: extract-kems-026
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections:
+- observation_id: markova_1984_table2_residual_melt_VI_lherzolite
+  field: points[T_C=0].FeO
+  old: 4.04
+  new: 8.04
+  page: 510
+  table: '2'
+  quote: Table 2 left panel, T=0 row, FeO column. MinerU HTML read 4.04. The 400 dpi glyph is a damaged
+    8/4. Recast of Table 1 sample VI (all Fe as FeO, five oxides SiO2+Al2O3+FeO+MgO+CaO renormalized)
+    gives FeO=8.04, SiO2=44.02, Al2O3=4.56, MgO=36.44, CaO=6.95, matching the other four printed T=0 cells.
+    Five-oxide sum with FeO=8.04 is 100.01.
+- observation_id: markova_1984_table2_residual_melt_VI_lherzolite
+  field: points[T_C=1726].CaO
+  old: 4.79
+  new: 8.79
+  page: 510
+  table: '2'
+  quote: Table 2 left panel, T=1726 row, CaO column. MinerU HTML read 4.79. The 400 dpi glyph is a damaged
+    8/4. With the other four oxides as printed (41.77, 5.83, 1.57, 41.95) CaO=8.79 closes the five-oxide
+    sum to 99.91; neighboring CaO cells are 7.70 (1632 C) and 11.27 (1796 C).
+- observation_id: markova_1984_table2_residual_melt_VI_lherzolite
+  field: points[T_C=1960].mass_loss_pct
+  old: 36.05
+  new: 86.05
+  page: 510
+  table: '2'
+  quote: Table 2 left panel, T=1960 row, M% column. MinerU HTML read 36.05. Mass loss is monotonic in
+    every other VI row (65.21 at 1883 C, 89.25 at 2038 C), so 36.05 is impossible. The 400 dpi glyph is
+    a damaged 8/3; 86.05 sits between 65.21 and 89.25.
+- observation_id: markova_1984_table2_residual_melt_V_alumina_basalt
+  field: points[T_C=1640].T_C
+  old: 1540
+  new: 1640
+  page: 510
+  table: '2'
+  quote: Table 2 right panel, row after T=1544. MinerU HTML read 1540 C. Temperature is monotonic in every
+    other V row (1544 then 1719). The 400 dpi glyph is a damaged 6/5; 1640 C is the reading consistent
+    with increasing T.
+- observation_id: markova_1984_table2_residual_melt_V_alumina_basalt
+  field: points[T_C=1719].MgO
+  old: 3.11
+  new: 8.11
+  page: 510
+  table: '2'
+  quote: Table 2 right panel, T=1719 row, MgO column. MinerU HTML read 3.11. The 400 dpi glyph is a damaged
+    8/3. With the other four oxides as printed (40.46, 29.51, 1.97, 19.95) MgO=8.11 closes the five-oxide
+    sum to 100.00. Neighboring MgO cells are 7.17 (1640 C) and 7.20 (1790 C); 3.11 would be a one-row
+    collapse and rebound.
+- observation_id: markova_1984_table2_residual_melt_V_alumina_basalt
+  field: points[T_C=1809].T_C
+  old: 1309
+  new: 1809
+  page: 510
+  table: '2'
+  quote: Table 2 right panel, row after T=1790. MinerU HTML read 1309 C. Temperature is monotonic in every
+    other V row (1790 then 1957). The 400 dpi glyph is a damaged 8/3; 1809 C is the reading consistent
+    with increasing T.
+fidelity_samples:
+- path: species.SiO2.observations[markova_1984_table1_initial_sample_compositions].values.samples[0].oxides_wt_pct.SiO2
+  value: 42.94
+  locator:
+    table: '1'
+    published_page: 510
+    pdf_page_index: 2
+    note: Table 1 sample I (anorthite) SiO2 = 42.94
+- path: species.SiO2.observations[markova_1984_table2_residual_melt_V_alumina_basalt].values.points[0].SiO2
+  value: 52.32
+  locator:
+    table: '2'
+    published_page: 510
+    pdf_page_index: 2
+    note: Table 2 right panel T=0 SiO2 = 52.32 (composition V)
+- species: Na
+  observable: rate_series
+  observation_id: markova_1984_dissipation_1500C_reduced_lunar_mass_model
+  field: Na_pct
+  value: 14.0
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    paragraph: dissipation for SiO-2%, K-3%, Na-14%
+- path: species.SiO2.observations[markova_1984_kems_method_stepwise_heating].values.temperature_step_C
+  value: 70.0
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    paragraph: The temperature step was 70, duration of the temperature step 15 min
+species:
+  SiO2:
+    observations:
+    - observation_id: markova_1984_kems_method_stepwise_heating
+      type: rate_series
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        paragraph: The experiments were carried out in the step-wise heating regime till the complete
+          vaporization of the sample under study
+      T_range_K:
+      - 1748.15
+      - 2564.15
+      phase: silicate_melt_knudsen_stepwise_vaporization
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Knudsen-cell stepwise heating to complete vaporization of silicate samples I–VII (anorthite,
+          lunar basalt 68415,40, gabbroanorthosite, troctolite, alumina basalt, lherzolite, Krymka LL3).
+      standard_state: Knudsen effusion cell; technique described in Yakovlev et al. 14th LPS (1983) 869
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        cell: Knudsen effusion cell
+        technique_reference: Yakovlev O.I. et al. 14th LPS (1983) 869
+        heating_regime: step-wise to complete vaporization
+        temperature_step_C: 70.0
+        step_duration_min: 15.0
+        determined_as_printed:
+        - forms of the components in vapor
+        - partial pressures of the main components over the residuals (see /2/ for compositions I-IV)
+        - compositions of residual melts (see table 2 for compositions V and VI)
+        - compositions of complementary vapor
+        - partial pressure of oxygen
+        - total pressure of the components in vapor over the residual melts
+        - activities of components in these melts
+        missing_for_motzfeldt:
+        - orifice_area
+        - orifice_diameter
+        - clausing_factor
+        - sample_surface_area
+        - cell_material
+        missing_note: Orifice geometry and cell material are not printed in this two-page abstract; authors
+          point to Yakovlev et al. 14th LPS (1983) 869 for the technique.
+      uncertainty:
+        note: No numeric uncertainty printed for the temperature step or duration.
+    - observation_id: markova_1984_table1_initial_sample_compositions
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 510
+        pdf_page_index: 2
+        note: CHEMICAL COMPOSITIONS OF THE INITIAL SAMPLES TABLE 1; 400 dpi pdftoppm of corpus PDF page
+          2
+      T_range_K:
+      - 1748.15
+      - 2564.15
+      phase: starting_silicate_samples_I_to_VII
+      condensed_form:
+        state: solid_starting_material
+        metastable: false
+        basis: explicit_author
+        note: Chemical compositions of the initial samples, Table 1.
+      standard_state: bulk oxide wt percent of starting samples, as printed
+      regime: kems_effusion
+      units: wt percent as published
+      values:
+        quantity: starting_bulk_oxide_composition
+        method_class: measured_direct
+        evidence_class: authors_table_of_initial_samples
+        samples:
+        - sample_id: I
+          name: anorthite
+          oxides_wt_pct:
+            SiO2: 42.94
+            FeO: 0.55
+            MgO: 0.11
+            CaO: 19.16
+            Na2O: 0.55
+            K2O: 0.06
+          printed_sum_wt_pct: 100.05
+        - sample_id: II
+          name: lunar_leucocratic_basalt_68415_40
+          oxides_wt_pct:
+            SiO2: 45.4
+            TiO2: 0.32
+            FeO: 4.25
+            MnO: 0.06
+            MgO: 4.33
+            CaO: 16.39
+            Na2O: 0.41
+            K2O: 0.06
+          printed_sum_wt_pct: 99.9
+        - sample_id: III
+          name: gabbroanorthosite
+          oxides_wt_pct:
+            SiO2: 42.36
+            TiO2: 0.05
+            Al2O3: 20.72
+            FeO: 3.99
+            Fe2O3: 1.5
+            MnO: 0.09
+            MgO: 3.27
+            CaO: 14.31
+            Na2O: 1.26
+            K2O: 0.11
+          printed_sum_wt_pct: 99.25
+        - sample_id: IV
+          name: troctolite
+          oxides_wt_pct:
+            SiO2: 42.43
+            TiO2: 0.12
+            Al2O3: 19.5
+            MnO: 0.13
+            MgO: 14.97
+            CaO: 10.37
+            Na2O: 0.71
+            K2O: 0.03
+          printed_sum_wt_pct: 96.3
+        - sample_id: V
+          name: alumina_basalt
+          oxides_wt_pct:
+            SiO2: 50.01
+            TiO2: 0.95
+            Al2O3: 19.29
+            FeO: 3.93
+            Fe2O3: 5.59
+            MnO: 0.2
+            MgO: 5.95
+            CaO: 12.36
+            Na2O: 2.39
+            K2O: 0.42
+          printed_sum_wt_pct: 100.1
+        - sample_id: VI
+          name: lherzolite
+          oxides_wt_pct:
+            SiO2: 41.94
+            TiO2: 0.07
+            Al2O3: 4.34
+            FeO: 5.73
+            Fe2O3: 2.14
+            MnO: 0.14
+            MgO: 34.72
+            CaO: 6.62
+            Na2O: 0.16
+            K2O: 0.04
+          printed_sum_wt_pct: 95.9
+        - sample_id: VII
+          name: chondrite_Krymka_LL3
+          oxides_wt_pct:
+            SiO2: 41.1
+            TiO2: 0.1
+            Al2O3: 2.0
+            FeO: 25.9
+            MgO: 25.6
+            CaO: 1.9
+            Na2O: 0.9
+            K2O: 0.07
+          printed_sum_wt_pct: 97.17
+        omitted_cells:
+        - sample_id: I
+          oxide: TiO2
+          reason: typewriter_glyph_unreadable
+          note: Printed 0.0 with a damaged second decimal (0.00 vs 0.06 vs 0.60). Not guessed.
+        - sample_id: I
+          oxide: Al2O3
+          reason: typewriter_glyph_unreadable
+          note: Internal digit is 0 or 6 on the 400 dpi render (30.93 vs 36.93). Not guessed.
+        - sample_id: II
+          oxide: Al2O3
+          reason: typewriter_glyph_unreadable
+          note: Internal digit is 5 or 8 on the 400 dpi render (25.03 vs 28.03). Not guessed.
+        - sample_id: IV
+          oxide: FeO
+          reason: typewriter_glyph_unreadable
+          note: Leading digit is 3 or 4 on the 400 dpi render (3.49 vs 4.49). Not guessed.
+        blank_cells_as_printed:
+        - Fe2O3 blank for I, II, IV, VII
+        - MnO blank for I and VII
+        - TiO2 I omitted as unreadable rather than treated as a measured zero
+      uncertainty:
+        note: No per-cell uncertainty printed. Column totals are printed under the table (100.05, 99.9,
+          99.25, 96.30, 100.10, 95.9, 97.17) and are not recomputed here.
+    - observation_id: markova_1984_table2_residual_melt_VI_lherzolite
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 510
+        pdf_page_index: 2
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE
+          2; 400 dpi pdftoppm of corpus PDF page 2; left panel = composition VI (lherzolite)
+      T_range_K:
+      - 1748.15
+      - 2564.15
+      phase: residual_silicate_melt_composition_VI_lherzolite
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Knudsen-cell stepwise heating to complete vaporization of silicate samples I–VII (anorthite,
+          lunar basalt 68415,40, gabbroanorthosite, troctolite, alumina basalt, lherzolite, Krymka LL3).
+      standard_state: residual melt oxide wt percent during Knudsen stepwise vaporization of composition
+        VI
+      regime: kems_effusion
+      units: wt percent as published; T in C as printed; T_K = T_C + 273.15
+      values:
+        quantity: residual_melt_composition_vs_T_and_mass_loss
+        method_class: measured_direct
+        evidence_class: authors_table_from_this_work_kems
+        composition_id: VI
+        composition_name: lherzolite
+        panel: left
+        oxide_basis: SiO2 Al2O3 FeO MgO CaO as printed (header MgO is a damaged typewriter glyph)
+        T_C_0_note: T=0 / M=0 is the initial five-oxide recast, not a run temperature
+        points:
+        - T_C: 0
+          mass_loss_pct: 0.0
+          SiO2: 44.02
+          Al2O3: 4.56
+          FeO: 8.04
+          MgO: 36.44
+          CaO: 6.95
+          T_K: null
+          T_C_is_initial_composition: true
+        - T_C: 1475
+          mass_loss_pct: 1.46
+          SiO2: 44.4
+          Al2O3: 4.62
+          FeO: 7.01
+          MgO: 36.92
+          CaO: 7.05
+          T_K: 1748.15
+          T_C_is_initial_composition: false
+        - T_C: 1492
+          mass_loss_pct: 4.16
+          SiO2: 44.9
+          Al2O3: 4.75
+          FeO: 5.33
+          MgO: 37.72
+          CaO: 7.25
+          T_K: 1765.15
+          T_C_is_initial_composition: false
+        - T_C: 1632
+          mass_loss_pct: 9.74
+          SiO2: 44.9
+          Al2O3: 5.05
+          FeO: 3.23
+          MgO: 39.06
+          CaO: 7.7
+          T_K: 1905.15
+          T_C_is_initial_composition: false
+        - T_C: 1726
+          mass_loss_pct: 21.8
+          SiO2: 41.77
+          Al2O3: 5.83
+          FeO: 1.57
+          MgO: 41.95
+          CaO: 8.79
+          T_K: 1999.15
+          T_C_is_initial_composition: false
+        - T_C: 1796
+          mass_loss_pct: 38.35
+          SiO2: 35.57
+          Al2O3: 7.39
+          FeO: 1.11
+          MgO: 44.67
+          CaO: 11.27
+          T_K: 2069.15
+          T_C_is_initial_composition: false
+        - T_C: 1883
+          mass_loss_pct: 65.21
+          SiO2: 13.6
+          Al2O3: 13.09
+          FeO: 1.79
+          MgO: 46.61
+          CaO: 16.34
+          T_K: 2156.15
+          T_C_is_initial_composition: false
+        - T_C: 1960
+          mass_loss_pct: 86.05
+          SiO2: 1.17
+          Al2O3: 32.64
+          FeO: 1.66
+          MgO: 16.34
+          CaO: 43.2
+          T_K: 2233.15
+          T_C_is_initial_composition: false
+        - T_C: 2038
+          mass_loss_pct: 89.25
+          SiO2: 1.09
+          Al2O3: 42.1
+          FeO: 0.41
+          MgO: 0.0
+          CaO: 56.4
+          T_K: 2311.15
+          T_C_is_initial_composition: false
+        - T_C: 2118
+          mass_loss_pct: 91.81
+          SiO2: 0.23
+          Al2O3: 53.05
+          FeO: 0.14
+          MgO: 0.0
+          CaO: 46.59
+          T_K: 2391.15
+          T_C_is_initial_composition: false
+        - T_C: 2207
+          mass_loss_pct: 95.51
+          SiO2: 0.0
+          Al2O3: 79.28
+          FeO: 0.08
+          MgO: 0.0
+          CaO: 21.64
+          T_K: 2480.15
+          T_C_is_initial_composition: false
+        - T_C: 2291
+          mass_loss_pct: 98.34
+          SiO2: 0.0
+          Al2O3: 74.65
+          FeO: 0.0
+          MgO: 0.0
+          CaO: 25.36
+          T_K: 2564.15
+          T_C_is_initial_composition: false
+        row_sum_note: Most VI rows close to 100 wt% on the five printed oxides after the FeO and CaO glyph
+          corrections. The T=1883 C row sums to 91.43 as printed and was not renormalized. The T=1960
+          C row sums to 95.01 as printed after the M% correction and was not renormalized.
+      uncertainty:
+        note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+    - observation_id: markova_1984_table2_residual_melt_V_alumina_basalt
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 510
+        pdf_page_index: 2
+        note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE
+          2; 400 dpi pdftoppm of corpus PDF page 2; right panel = composition V (alumina basalt)
+      T_range_K:
+      - 1749.15
+      - 2528.15
+      phase: residual_silicate_melt_composition_V_alumina_basalt
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Knudsen-cell stepwise heating to complete vaporization of silicate samples I–VII (anorthite,
+          lunar basalt 68415,40, gabbroanorthosite, troctolite, alumina basalt, lherzolite, Krymka LL3).
+      standard_state: residual melt oxide wt percent during Knudsen stepwise vaporization of composition
+        V
+      regime: kems_effusion
+      units: wt percent as published; T in C as printed; T_K = T_C + 273.15
+      values:
+        quantity: residual_melt_composition_vs_T_and_mass_loss
+        method_class: measured_direct
+        evidence_class: authors_table_from_this_work_kems
+        composition_id: V
+        composition_name: alumina_basalt
+        panel: right
+        oxide_basis: SiO2 Al2O3 FeO MgO CaO as printed
+        T_C_0_note: T=0 / M=0 is the initial five-oxide recast, not a run temperature
+        points:
+        - T_C: 0
+          mass_loss_pct: 0.0
+          SiO2: 52.32
+          Al2O3: 19.13
+          FeO: 9.37
+          MgO: 6.25
+          CaO: 12.93
+          T_K: null
+          T_C_is_initial_composition: true
+        - T_C: 1476
+          mass_loss_pct: 1.17
+          SiO2: 52.4
+          Al2O3: 19.15
+          FeO: 8.63
+          MgO: 6.25
+          CaO: 12.94
+          T_K: 1749.15
+          T_C_is_initial_composition: false
+        - T_C: 1544
+          mass_loss_pct: 4.39
+          SiO2: 52.74
+          Al2O3: 20.12
+          FeO: 7.01
+          MgO: 6.54
+          CaO: 13.59
+          T_K: 1817.15
+          T_C_is_initial_composition: false
+        - T_C: 1640
+          mass_loss_pct: 14.41
+          SiO2: 50.9
+          Al2O3: 22.35
+          FeO: 4.46
+          MgO: 7.17
+          CaO: 15.11
+          T_K: 1913.15
+          T_C_is_initial_composition: false
+        - T_C: 1719
+          mass_loss_pct: 37.17
+          SiO2: 40.46
+          Al2O3: 29.51
+          FeO: 1.97
+          MgO: 8.11
+          CaO: 19.95
+          T_K: 1992.15
+          T_C_is_initial_composition: false
+        - T_C: 1790
+          mass_loss_pct: 53.53
+          SiO2: 22.94
+          Al2O3: 41.13
+          FeO: 1.03
+          MgO: 7.2
+          CaO: 27.66
+          T_K: 2063.15
+          T_C_is_initial_composition: false
+        - T_C: 1809
+          mass_loss_pct: 66.01
+          SiO2: 4.43
+          Al2O3: 56.29
+          FeO: 0.32
+          MgO: 1.69
+          CaO: 37.27
+          T_K: 2082.15
+          T_C_is_initial_composition: false
+        - T_C: 1957
+          mass_loss_pct: 69.35
+          SiO2: 0.15
+          Al2O3: 62.13
+          FeO: 0.0
+          MgO: 0.0
+          CaO: 37.72
+          T_K: 2230.15
+          T_C_is_initial_composition: false
+        - T_C: 2030
+          mass_loss_pct: 71.33
+          SiO2: 0.0
+          Al2O3: 65.62
+          FeO: 0.0
+          MgO: 0.0
+          CaO: 34.3
+          T_K: 2303.15
+          T_C_is_initial_composition: false
+        - T_C: 2119
+          mass_loss_pct: 76.19
+          SiO2: 0.0
+          Al2O3: 74.21
+          FeO: 0.0
+          MgO: 0.0
+          CaO: 25.29
+          T_K: 2392.15
+          T_C_is_initial_composition: false
+        - T_C: 2200
+          mass_loss_pct: 83.68
+          SiO2: 0.0
+          Al2O3: 81.43
+          FeO: 0.0
+          MgO: 0.0
+          CaO: 18.57
+          T_K: 2473.15
+          T_C_is_initial_composition: false
+        - T_C: 2255
+          mass_loss_pct: 97.99
+          SiO2: 0.0
+          Al2O3: 79.49
+          FeO: 0.0
+          MgO: 0.0
+          CaO: 20.51
+          T_K: 2528.15
+          T_C_is_initial_composition: false
+        row_sum_note: Most V rows close to 100 wt% on the five printed oxides after the MgO glyph correction.
+          The T=1476 C row sums to 99.37 as printed (FeO 8.63 kept; not forced to 9.26). The T=2030 C
+          CaO is printed to one decimal (34.3).
+      uncertainty:
+        note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+    - observation_id: markova_1984_text_basalt_ANT_window
+      type: rate_series
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        paragraph: During the vaporization of the basalt at T= 1600 -1700 C (mass losses 15-35%) the residual
+          compositions crosses the ANT field
+      T_range_K:
+      - 1873.15
+      - 1973.15
+      phase: residual_silicate_melt_composition_V_alumina_basalt
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Knudsen-cell stepwise heating to complete vaporization of silicate samples I–VII (anorthite,
+          lunar basalt 68415,40, gabbroanorthosite, troctolite, alumina basalt, lherzolite, Krymka LL3).
+      standard_state: residual melt of high-alumina basalt (composition V) during Knudsen vaporization
+      regime: kems_effusion
+      units: C and mass-loss percent as published
+      values:
+        quantity: residual_melt_composition_window
+        method_class: measured_direct
+        T_C_range:
+        - 1600.0
+        - 1700.0
+        mass_loss_pct_range:
+        - 15.0
+        - 35.0
+        as_printed: During the vaporization of the basalt at T= 1600 -1700 C (mass losses 15-35%) the
+          residual compositions crosses the ANT field.
+        highland_II_IV_mass_loss_pct_less_than: 5.0
+        highland_II_IV_note: The vaporization of the compositions imitating the lunar highland rocks (II-IV)
+          tends to the leaving the field of the lunar highland rocks already at mass losses < 5%.
+      uncertainty:
+        note: Window as printed; not a tabulated point series.
+    - observation_id: markova_1984_fig1_ternary_residual_tracks_figure_only
+      type: rate_series
+      locator:
+        figure: '1'
+        published_page: 510
+        pdf_page_index: 2
+        note: THE TRENDS OF THE COMPOSITIONAL EVOLUTION DURING THE VAPORIZATION IN COMPARISON WITH THE
+          COMPOSITION OF LUNAR HIGHLAND ROCKS
+      T_range_K:
+      - 1748.15
+      - 2564.15
+      phase: silicate_melt_knudsen_stepwise_vaporization
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Knudsen-cell stepwise heating to complete vaporization of silicate samples I–VII (anorthite,
+          lunar basalt 68415,40, gabbroanorthosite, troctolite, alumina basalt, lherzolite, Krymka LL3).
+      standard_state: residual melt tracks on SiO2–(MgO+FeO)–(Al2O3+CaO) ternary
+      regime: kems_effusion
+      units: ternary coordinates as plotted; not digitised
+      values:
+        quantity: residual_melt_ternary_track
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        vertices_as_printed:
+        - SiO2
+        - MgO+FeO
+        - Al2O3+CaO
+        labeled_starting_compositions:
+        - II
+        - III
+        - IV
+        - V
+        - VI
+        - VII
+        labeled_field: ANT
+        authors_text: In all studied cases along with the increasing of temperature and vaporization degree
+          the residual melts are depleted in Na, K, Fe and Si and are enriched in Ca, Ti and Al. The trends
+          of the compositional evolution (fig.1) contrast with the well-known trends typical for crystallization
+          differentiation. For example, the ratio FeO/FeO+MgO decreases in residual vaporization melts
+          and increases in crystallization melts.
+      uncertainty:
+        note: Figure-only; tracks not digitised.
+  Na:
+    observations:
+    - observation_id: markova_1984_dissipation_1500C_recent_moon_model
+      type: rate_series
+      class_tag: model
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        paragraph: Only for Na the level of dissipation reaches ~2%, for the others it is significantly
+          less than ~1%
+      quote: The calculation shows that losses of petrogenic elements at temperature ~1500 C from the
+        recent Moon is improbable. Only for Na the level of dissipation reaches ~2%, for the others it
+        is significantly less than ~1%.
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: model_dissipation_from_basalt_vaporization_experiment
+      standard_state: calculated dissipation from experimental vapor forms and masses, recent Moon
+      regime: kems_effusion
+      units: percent of petrogenic element as printed
+      values:
+        quantity: thermal_dissipation_fraction
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        T_C: 1500.0
+        body: recent_Moon
+        Na_pct_about: 2.0
+        other_elements_pct_less_than_about: 1.0
+        as_printed: Only for Na the level of dissipation reaches ~2%, for the others it is significantly
+          less than ~1%.
+        derivation: Calculated from experimental forms of components in vapor (and their masses) during
+          vaporization of silicate melts /2/, under ideal conditions. Not a directly tabulated ion-current
+          series.
+      uncertainty:
+        note: Authors print ~2% and ~1%; no numeric uncertainty.
+    - observation_id: markova_1984_dissipation_1500C_reduced_lunar_mass_model
+      type: rate_series
+      class_tag: model
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        paragraph: dissipation for SiO-2%, K-3%, Na-14%
+      quote: It may be seen, that at temperatures 1500 C the level of dissipation for SiO-2%, K-3%, Na-14%.
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: model_dissipation_from_basalt_vaporization_experiment
+      standard_state: calculated dissipation for lunar mass 3.53e25 g (escape 1.88 km/s)
+      regime: kems_effusion
+      units: percent as printed
+      values:
+        quantity: thermal_dissipation_fraction
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        T_C: 1500.0
+        lunar_mass_g: 3.53e+25
+        escape_velocity_km_s: 1.88
+        radius_less_than_recent_km: 400.0
+        radius_offset_note: 400 km is the assumed value of the magmatic ocean depth /3,4/
+        Na_pct: 14.0
+        K_pct: 3.0
+        SiO_pct: 2.0
+        curve_onset_p_torr_ge: 0.0001
+        curve_onset_note: Curves of Na, K, SiO and Fe begin from the temperatures at which pressures of
+          their vapors >= 10^-4 tor (the pressures have been taken from the basalt vaporization experiment).
+      uncertainty:
+        note: Model percentages as printed; no numeric uncertainty. Fig. 2 is the curve form of the same
+          calculation and was not digitised.
+    - observation_id: markova_1984_fig2_dissipation_curves_figure_only
+      type: rate_series
+      locator:
+        figure: '2'
+        published_page: 510
+        pdf_page_index: 2
+        note: CURVES OF THE DISSIPATION LEVELS OF THE VOLATILE PETROGENIC COMPONENTS IN DEPENDENCE ON
+          TEMPERATURE FOR THE LUNAR MASS 3.53e25 g AND ESCAPE VELOCITY 1.88 km/sek
+      T_range_K:
+      - 773.15
+      - 3173.15
+      phase: model_dissipation_from_basalt_vaporization_experiment
+      standard_state: calculated dissipation percent vs T; not a measured P(T) series
+      regime: kems_effusion
+      units: percent vs C as plotted; not digitised
+      values:
+        quantity: thermal_dissipation_fraction
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: dissipation_percent vs T_C
+        labeled_species_as_printed:
+        - Na
+        - K
+        - SiO
+        - Fe
+        - O2
+        labeled_mass_numbers_as_printed:
+        - 23Na
+        - 39K
+        - 44SiO
+        - 56Fe
+        - 32O2
+        T_axis_ticks_C_as_printed:
+        - 500
+        - 900
+        - 1300
+        - 1700
+        - 2100
+        - 2500
+        - 2900
+      uncertainty:
+        note: Figure-only model curves; not digitised. 1500 C intercepts are printed in the text (Na 14%,
+          K 3%, SiO 2%).
+  K:
+    observations:
+    - observation_id: markova_1984_K_dissipation_1500C_reduced_lunar_mass_model
+      type: rate_series
+      class_tag: model
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        paragraph: dissipation for SiO-2%, K-3%, Na-14%
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: model_dissipation_from_basalt_vaporization_experiment
+      standard_state: calculated dissipation for lunar mass 3.53e25 g
+      regime: kems_effusion
+      units: percent as printed
+      values:
+        quantity: thermal_dissipation_fraction
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: K(g)
+        T_C: 1500.0
+        K_pct: 3.0
+      uncertainty:
+        note: Model percentage as printed; curve in Fig. 2 not digitised.
+  SiO:
+    observations:
+    - observation_id: markova_1984_SiO_dissipation_1500C_reduced_lunar_mass_model
+      type: rate_series
+      class_tag: model
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        paragraph: dissipation for SiO-2%, K-3%, Na-14%
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: model_dissipation_from_basalt_vaporization_experiment
+      standard_state: calculated dissipation for lunar mass 3.53e25 g
+      regime: kems_effusion
+      units: percent as printed
+      values:
+        quantity: thermal_dissipation_fraction
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: SiO(g)
+        T_C: 1500.0
+        SiO_pct: 2.0
+      uncertainty:
+        note: Model percentage as printed; curve in Fig. 2 not digitised.
+    - observation_id: markova_1984_silica_partially_in_vapor_at_1500C
+      type: psat_series
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        paragraph: If the temperature of the lunar surface (magmatic ocean) and vapor ~1500 C silica is
+          partially in vapor as Mg is completely in melt
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: silicate_melt_knudsen_stepwise_vaporization
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Knudsen-cell stepwise heating to complete vaporization of silicate samples I–VII (anorthite,
+          lunar basalt 68415,40, gabbroanorthosite, troctolite, alumina basalt, lherzolite, Krymka LL3).
+      standard_state: qualitative vapor/melt split at ~1500 C from this-work vaporization experiments
+      regime: kems_effusion
+      units: qualitative as printed; no numeric p(SiO)
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        admission_status: qualitative_not_numeric
+        semantics: bound_not_point_ordering
+        T_C_about: 1500.0
+        as_printed: If the temperature of the lunar surface (magmatic ocean) and vapor ~1500 C silica
+          is partially in vapor as Mg is completely in melt.
+        numeric_p_SiO: not_printed
+        numeric_p_SiO_reason: No numeric p(SiO) is printed in this abstract. Partial pressures of the
+          main components over residuals I-IV are referred to /2/ (Markova et al. 14th LPS 1983 460).
+      uncertainty:
+        note: Qualitative split only; not a tabulated P(T) point.
+  Mg:
+    observations:
+    - observation_id: markova_1984_Mg_completely_in_melt_at_1500C
+      type: psat_series
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        paragraph: silica is partially in vapor as Mg is completely in melt
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: silicate_melt_knudsen_stepwise_vaporization
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Knudsen-cell stepwise heating to complete vaporization of silicate samples I–VII (anorthite,
+          lunar basalt 68415,40, gabbroanorthosite, troctolite, alumina basalt, lherzolite, Krymka LL3).
+      standard_state: qualitative vapor/melt split at ~1500 C from this-work vaporization experiments
+      regime: kems_effusion
+      units: qualitative as printed; no numeric p(Mg)
+      values:
+        quantity: partial_pressure
+        gas_species: Mg(g)
+        method_class: measured_direct
+        admission_status: qualitative_not_numeric
+        semantics: bound_not_point_ordering
+        T_C_about: 1500.0
+        status: completely_in_melt
+        as_printed: silica is partially in vapor as Mg is completely in melt
+        numeric_p_Mg: not_printed
+      uncertainty:
+        note: Qualitative split only; not a tabulated P(T) point.
+  Fe:
+    observations:
+    - observation_id: markova_1984_Fe_more_volatile_than_silica
+      type: rate_series
+      locator:
+        published_page: 510
+        pdf_page_index: 2
+        paragraph: As the experiments show, iron is more volatile than silica, but we haven't any signs
+          of its depletion
+      T_range_K:
+      - 1748.15
+      - 2564.15
+      phase: silicate_melt_knudsen_stepwise_vaporization
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Knudsen-cell stepwise heating to complete vaporization of silicate samples I–VII (anorthite,
+          lunar basalt 68415,40, gabbroanorthosite, troctolite, alumina basalt, lherzolite, Krymka LL3).
+      standard_state: relative volatility from this-work Knudsen vaporization of silicate melts
+      regime: kems_effusion
+      units: qualitative as printed
+      values:
+        quantity: relative_volatility
+        method_class: measured_direct
+        gas_species: Fe(g)
+        as_printed: As the experiments show, iron is more volatile than silica, but we haven't any signs
+          of its depletion. The possible cause of this may be the low possibility of its escape due to
+          relatively large mass of its atom.
+        FeO_over_FeO_plus_MgO_note: the ratio FeO/FeO+MgO decreases in residual vaporization melts and
+          increases in crystallization melts
+      uncertainty:
+        note: Qualitative ranking from the experiments; no numeric p(Fe) in this abstract.
+  Al2O3:
+    observations:
+    - observation_id: markova_1984_residual_enrichment_Ca_Ti_Al
+      type: rate_series
+      locator:
+        published_page: 509
+        pdf_page_index: 1
+        paragraph: the residual melts are depleted in Na, K, Fe and Si and are enriched in Ca, Ti and
+          Al
+      T_range_K:
+      - 1748.15
+      - 2564.15
+      phase: silicate_melt_knudsen_stepwise_vaporization
+      condensed_form:
+        state: liquid
+        metastable: false
+        basis: explicit_author
+        note: Knudsen-cell stepwise heating to complete vaporization of silicate samples I–VII (anorthite,
+          lunar basalt 68415,40, gabbroanorthosite, troctolite, alumina basalt, lherzolite, Krymka LL3).
+      standard_state: residual silicate melt during Knudsen stepwise vaporization
+      regime: kems_effusion
+      units: qualitative as printed; numeric residual Al2O3 in Table 2
+      values:
+        quantity: residual_melt_enrichment
+        method_class: measured_direct
+        depleted:
+        - Na
+        - K
+        - Fe
+        - Si
+        enriched:
+        - Ca
+        - Ti
+        - Al
+        numeric_series: Table 2 Al2O3 columns for compositions VI and V
+      uncertainty:
+        note: Qualitative ranking in the text; numeric Al2O3 wt% is in Table 2.
+deepening:
+  dispatch_id: extract-kems-026
+  date: '2026-09-12'
+  parent_policy: First extract of this source; no parent observation objects.
+  quote_convention: Printed text transcribed with normalized whitespace and ASCII flattening of subscripts,
+    superscripts, and approximately-equal marks.
+  table_inventory:
+  - table: '1'
+    published_page: 510
+    pdf_page_index: 2
+    completeness: partial
+    note: 'Seven starting compositions I–VII. Unreadable typewriter cells omitted: Al2O3 I, Al2O3 II,
+      TiO2 I, FeO IV. Printed column totals retained.'
+  - table: '2'
+    published_page: 510
+    pdf_page_index: 2
+    completeness: full_with_glyph_corrections
+    note: Twelve rows each for residual melts of composition VI (left) and V (right). T=0 is the initial
+      five-oxide recast. Six damaged-glyph cells corrected against independent printed-page constraints
+      (see corrections).
+  class_ledger:
+    measured:
+    - markova_1984_table1_initial_sample_compositions
+    - markova_1984_table2_residual_melt_VI_lherzolite
+    - markova_1984_table2_residual_melt_V_alumina_basalt
+    - markova_1984_kems_method_stepwise_heating
+    - markova_1984_text_basalt_ANT_window
+    figure_only:
+    - markova_1984_fig1_ternary_residual_tracks_figure_only
+    - markova_1984_fig2_dissipation_curves_figure_only
+    model:
+    - markova_1984_dissipation_1500C_recent_moon_model
+    - markova_1984_dissipation_1500C_reduced_lunar_mass_model
+    refused:
+    - partial_pressures_compositions_I_to_IV_referred_to_markova_1983_lpsc14_460
+    - pO2_total_P_and_activities_stated_as_determined_but_not_tabulated_here
+  battery_limitation: This abstract does not tabulate species partial pressures. Residual-melt compositions
+    are the measured rows. Fig. 2 dissipation curves were not digitised.

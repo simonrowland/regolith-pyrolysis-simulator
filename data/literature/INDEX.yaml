@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 140
-  extracts: 137
+  sources: 143
+  extracts: 140
   pdfs_present_in_worktree: 44
   extracts_with_private_locators: 37
   pdfs_tracked_99_kems_langmuir: 39
   pdfs_without_extract: 3
-  extracts_without_pdf: 96
+  extracts_without_pdf: 99
   alias_groups_needing_resolution: 32
 gaps:
   pdfs_without_extract:
@@ -48,6 +48,9 @@ gaps:
   - kems-021-plante-1992-feo
   - kems-023-demaria-1973
   - kems-025-markova-1983
+  - kems-026-markova-1984
+  - kems-028-yakovlev-1984
+  - kems-029-yakovlev-shornikov-2011
   - kems-036-sesko-2024
   - kems-038-matchett-2006
   - kems-040-stolyarova-2015
@@ -3085,6 +3088,64 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: kems-026-markova-1984
+  aliases: []
+  citation: Markova, O.M., Yakovlev, O.I., Belov, A.N. & Semenov, G.A. (1984), "The role of the vaporization
+    process in the impact-accretion history of the Moon", Lunar and Planetary Science XV, 509–510
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-026-markova-1984.yaml
+    review_status: draft
+    rows: 15
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-026-markova-1984/kems-026-markova-1984.pdf
+      present: true
+      sha256: 4fbf0e84facb8d76e57ec8db928316199ae28ebd7b71aef0ed2122568889fe31
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-026-markova-1984/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-026-markova-1984
+      exists: true
+      file_count: 18
+    tables:
+      path: tables/kems-026-markova-1984
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-026-markova-1984.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-026-markova-1984.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
 - source_id: kems-027-plante-hastie-1983
   aliases: []
   citation: 'Hastie, J. W., Plante, E. R. & Bonnell, D. W. (1983), NBSIR 83-2731, "Vaporization of Simulated
@@ -3137,6 +3198,122 @@ sources:
       present: true
       error: null
       last_stage: extracted
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: kems-028-yakovlev-1984
+  aliases: []
+  citation: 'Yakovlev, O.I., Markova, O.M., Semenov, G.A. & Belov, A.N. (1984), "The vaporization peculiarities
+    of CAI inclusions in chondrites: experimental data", Lunar and Planetary Science XV, 945–946'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-028-yakovlev-1984.yaml
+    review_status: draft
+    rows: 19
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-028-yakovlev-1984/kems-028-yakovlev-1984.pdf
+      present: true
+      sha256: b56d27b46e86b6a2358972a92dfa38f644dbc18eb9c0a9202571379f68b0a43f
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-028-yakovlev-1984/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-028-yakovlev-1984
+      exists: true
+      file_count: 18
+    tables:
+      path: tables/kems-028-yakovlev-1984
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-028-yakovlev-1984.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-028-yakovlev-1984.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: kems-029-yakovlev-shornikov-2011
+  aliases: []
+  citation: Yakovlev, O.I. & Shornikov, S.I. (2011), "Experimental study of meteorites and Ca–Al-inclusions",
+    Vestn. Otd. nauk Zemle 3, NZ6104, doi:10.2205/2011NZ000234
+  doi: 10.2205/2011NZ000234
+  report_number: null
+  identifier: 10.2205/2011NZ000234
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-029-yakovlev-shornikov-2011.yaml
+    review_status: draft
+    rows: 6
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-029-yakovlev-shornikov-2011/kems-029-yakovlev-shornikov-2011.pdf
+      present: true
+      sha256: 1381e9fe2ccac98428b467283d3661fc7408e86af9a2bdb3ead327da3e9b2484
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-029-yakovlev-shornikov-2011/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-029-yakovlev-shornikov-2011
+      exists: true
+      file_count: 18
+    tables:
+      path: tables/kems-029-yakovlev-shornikov-2011
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-029-yakovlev-shornikov-2011.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-029-yakovlev-shornikov-2011.yaml
+      present: true
+      error: null
+      last_stage: decoded
       date: '2026-09-06'
     commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
 - source_id: kems-031-halwax-2024
