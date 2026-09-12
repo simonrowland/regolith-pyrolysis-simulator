@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 132
-  extracts: 129
+  sources: 137
+  extracts: 134
   pdfs_present_in_worktree: 44
   extracts_with_private_locators: 37
   pdfs_tracked_99_kems_langmuir: 39
   pdfs_without_extract: 3
-  extracts_without_pdf: 88
+  extracts_without_pdf: 93
   alias_groups_needing_resolution: 32
 gaps:
   pdfs_without_extract:
@@ -27,6 +27,7 @@ gaps:
   - banchor-matsui-naito-1986
   - behrens-rosenblatt-1972
   - berkowitz-chupka-inghram-1957
+  - cardiff-2007-vacuum-pyrolysis-gsfc
   - costa-jacobson-2015
   - datz-1961-na2cl2
   - datz-and-smith-1961
@@ -102,14 +103,18 @@ gaps:
   - ref-032-zr
   - ref-052-k-o-gas
   - ref-052-na-o-gas
+  - reiss-2019-thermal-extraction-nulht2m
   - richter-et-al-2007
   - safarian-engh-2013-si-pure-langmuir
+  - schaefer-and-fegley-2007-icarus-outgassing-of-oc
   - sf04-magma-companion-workbook
   - slag-001-banya-1993
   - slag-002-banya-hino-nagasaka-1993
   - slag-003-hino-kitagawa-banya-1993
   - sossi-et-al-2019
   - span-wagner-1996-co2-psat
+  - steurer-1985-vapor-phase-pyrolysis
+  - steurer-1992-vapor-phase-pyrolysis
   - wetzel-gail-2013-sio-arrhenius
   untracked_files: []
   extracts_with_private_locators:
@@ -806,6 +811,65 @@ sources:
       present: true
       error: null
       last_stage: extracted
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: cardiff-2007-vacuum-pyrolysis-gsfc
+  aliases: []
+  citation: Cardiff, Eric H., Pomeroy, Brian R., Banks, Ian S. and Benz, Alexis (2007), "Vacuum Pyrolysis
+    and Related ISRU Techniques", Space Technology and Applications International Forum (STAIF). NTRS
+    20070014929
+  doi: null
+  report_number: NTRS 20070014929
+  identifier: NTRS 20070014929
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
+  extracts:
+  - path: data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml
+    review_status: draft
+    rows: 7
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/cardiff-2007-vacuum-pyrolysis-gsfc/cardiff-2007-vacuum-pyrolysis-gsfc.pdf
+      present: true
+      sha256: f9542e73aa0260673e4d2625edb576e5fea23a6f00853a6569c3f5157f89106f
+      matches_simulator: null
+    sidecar:
+      path: raw/cardiff-2007-vacuum-pyrolysis-gsfc/sidecar.yaml
+      present: true
+    text:
+      path: text/cardiff-2007-vacuum-pyrolysis-gsfc
+      exists: true
+      file_count: 28
+    tables:
+      path: tables/cardiff-2007-vacuum-pyrolysis-gsfc
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/cardiff-2007-vacuum-pyrolysis-gsfc.yaml
+      present: true
+      error: null
+      last_stage: decoded
       date: '2026-09-06'
     commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
 - source_id: costa-jacobson-2015
@@ -7262,6 +7326,65 @@ sources:
       last_stage: extracted
       date: '2026-09-06'
     commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: reiss-2019-thermal-extraction-nulht2m
+  aliases: []
+  citation: 'Reiss, P., Grill, L. & Barber, S.J. (2019), "Thermal extraction of volatiles from the lunar
+    regolith simulant NU-LHT-2M: Preparations for in-situ analyses on the Moon", Planetary and Space Science,
+    DOI 10.1016/j.pss.2019.05.001, accepted manuscript PII S0032-0633(18)30382-9, PSS 4666'
+  doi: 10.1016/j.pss.2019.05.001
+  report_number: null
+  identifier: 10.1016/j.pss.2019.05.001
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml
+    review_status: draft
+    rows: 10
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/reiss-2019-thermal-extraction-nulht2m/reiss-2019-thermal-extraction-nulht2m.pdf
+      present: true
+      sha256: 599403d1255a4705546de3f8c9e329b9b3b00b01989998c7fe67e9bac570b143
+      matches_simulator: null
+    sidecar:
+      path: raw/reiss-2019-thermal-extraction-nulht2m/sidecar.yaml
+      present: true
+    text:
+      path: text/reiss-2019-thermal-extraction-nulht2m
+      exists: true
+      file_count: 43
+    tables:
+      path: tables/reiss-2019-thermal-extraction-nulht2m
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/reiss-2019-thermal-extraction-nulht2m.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/reiss-2019-thermal-extraction-nulht2m.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
 - source_id: richter-et-al-2007
   aliases:
   - kems-010-richter-2007
@@ -7429,6 +7552,65 @@ sources:
       present: true
       error: null
       last_stage: extracted
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  aliases: []
+  citation: Schaefer, L. & Fegley, B., Jr. (2007), "Outgassing of ordinary chondritic material and some
+    of its implications for the chemistry of asteroids, planets, and satellites", Icarus 186:462–483,
+    DOI 10.1016/j.icarus.2006.09.002
+  doi: 10.1016/j.icarus.2006.09.002
+  report_number: null
+  identifier: 10.1016/j.icarus.2006.09.002
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml
+    review_status: draft
+    rows: 15
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/schaefer-and-fegley-2007-icarus-outgassing-of-oc/schaefer-and-fegley-2007-icarus-outgassing-of-oc.pdf
+      present: true
+      sha256: 737b5dee983f302e8db95c116cd9175c2c14faf8480600773c13529856eefc75
+      matches_simulator: null
+    sidecar:
+      path: raw/schaefer-and-fegley-2007-icarus-outgassing-of-oc/sidecar.yaml
+      present: true
+    text:
+      path: text/schaefer-and-fegley-2007-icarus-outgassing-of-oc
+      exists: true
+      file_count: 51
+    tables:
+      path: tables/schaefer-and-fegley-2007-icarus-outgassing-of-oc
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml
+      present: true
+      error: null
+      last_stage: decoded
       date: '2026-09-06'
     commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
 - source_id: sf04-magma-companion-workbook
@@ -7888,6 +8070,123 @@ sources:
       matches_simulator: true
     ledger:
       path: ledger/stebbins-carmichael-weill-1983.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: steurer-1985-vapor-phase-pyrolysis
+  aliases: []
+  citation: 'Steurer, Wolfgang H. (1985), "Lunar Oxygen Production by Vapor Phase Pyrolysis", Space Manufacturing
+    5: Engineering with Lunar and Asteroidal Materials, Proceedings of the 7th Princeton/AIAA/SSI Conference,
+    pp. 123–131'
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml
+    review_status: draft
+    rows: 8
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/steurer-1985-vapor-phase-pyrolysis/steurer-1985-vapor-phase-pyrolysis.pdf
+      present: true
+      sha256: 5461cd31e1dd9c5781c6b406c45cc7b4e72a9856cd06663d90a628ac7443e6e8
+      matches_simulator: null
+    sidecar:
+      path: raw/steurer-1985-vapor-phase-pyrolysis/sidecar.yaml
+      present: true
+    text:
+      path: text/steurer-1985-vapor-phase-pyrolysis
+      exists: true
+      file_count: 59
+    tables:
+      path: tables/steurer-1985-vapor-phase-pyrolysis
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/steurer-1985-vapor-phase-pyrolysis.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/steurer-1985-vapor-phase-pyrolysis.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: steurer-1992-vapor-phase-pyrolysis
+  aliases: []
+  citation: 'Steurer, Wolfgang (1992), "Vapor Phase Pyrolysis", in Space Resources, Volume 3: Materials,
+    NASA SP-509, pp. 210–213. NTRS 19930007702'
+  doi: null
+  report_number: NTRS 19930007702
+  identifier: NTRS 19930007702
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
+  extracts:
+  - path: data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml
+    review_status: draft
+    rows: 2
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/steurer-1992-vapor-phase-pyrolysis/steurer-1992-vapor-phase-pyrolysis.pdf
+      present: true
+      sha256: beb20e007497a16bc458ad9a282f0e1b9df87f75bb097288d9786fa2089b4bad
+      matches_simulator: null
+    sidecar:
+      path: raw/steurer-1992-vapor-phase-pyrolysis/sidecar.yaml
+      present: true
+    text:
+      path: text/steurer-1992-vapor-phase-pyrolysis
+      exists: true
+      file_count: 17
+    tables:
+      path: tables/steurer-1992-vapor-phase-pyrolysis
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/steurer-1992-vapor-phase-pyrolysis.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/steurer-1992-vapor-phase-pyrolysis.yaml
       present: true
       error: null
       last_stage: decoded

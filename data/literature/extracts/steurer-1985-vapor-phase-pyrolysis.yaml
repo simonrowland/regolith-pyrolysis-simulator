@@ -1,0 +1,640 @@
+schema_version: literature_extract.v1
+source_id: steurer-1985-vapor-phase-pyrolysis
+source:
+  citation: 'Steurer, Wolfgang H. (1985), "Lunar Oxygen Production by Vapor Phase Pyrolysis", Space Manufacturing
+    5: Engineering with Lunar and Asteroidal Materials, Proceedings of the 7th Princeton/AIAA/SSI Conference,
+    pp. 123–131'
+  url: https://smad.com/wp-content/uploads/2023/01/VOL.05-STEURER.pdf
+  year: 1985
+extraction:
+  method: Corpus PDF raw/steurer-1985-vapor-phase-pyrolysis/steurer-1985-vapor-phase-pyrolysis.pdf. Scanned
+    pages; pdftotext -layout is empty (9 bytes) and is not data. Tables 1–4, the unnumbered O2-fraction
+    and metal-yield tables, and the Experiments section transcribed from 400 dpi pdftoppm PNG renders
+    of PDF pages 4–7 (published pp. 126–129). MinerU used only as a page map and rejected as a data source.
+    Figure 2 Clausius–Clapeyron grids listed figure-only and not digitised. JANAF-derived Tables 1–4 kept
+    distinct from the SiO2 induction-heating experiment. Table 5 plant-mass and payback-ratio engineering
+    estimates omitted (not pyrolysis measurements).
+  date: '2026-09-12'
+  worker: extract-pyro-steurer
+  provenance_path: docs-private/research/2026-09-12-pyrolysis-extracts/steurer-1985-vapor-phase-pyrolysis/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: SiO2
+  observable: psat_series
+  observation_id: steurer_1985_table1_single_oxide_psat
+  field: SiO2_2000K_SiO2_P_torr
+  value: 0.000192
+  locator:
+    table: '1'
+    published_page: 126
+    pdf_page_index: 4
+    note: Table 1 SiO2/SiO2 at 2000 K = 1.92 x 10^{-4} torr
+- species: O2
+  observable: psat_series
+  observation_id: steurer_1985_table2_mixture_psat
+  field: O2_3000K_P_atm
+  value: 0.081
+  locator:
+    table: '2'
+    published_page: 127
+    pdf_page_index: 5
+    note: Table 2 O2(g) at 3000 K = 8.1 x 10^{-2} atm
+- species: SiO2
+  observable: rate_series
+  observation_id: steurer_1985_sio2_induction_experiment
+  field: T_K_as_printed
+  value: 2650.0
+  locator:
+    published_page: 128
+    pdf_page_index: 6
+    section: Experiments
+    note: each experiment run at a temperature of 2650 K
+species:
+  SiO2:
+    observations:
+    - observation_id: steurer_1985_table1_single_oxide_psat
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 126
+        pdf_page_index: 4
+        note: Table 1 vapor pressure of oxide dissociation species vs temperature
+      T_range_K:
+      - 2000.0
+      - 3000.0
+      phase: single_oxide_JANAF_equilibrium
+      standard_state: partial pressure of dissociation species; torr as printed
+      regime: janaf_equilibrium_calculation
+      units: torr as published; T in K as printed (header 2000 / 2500 / 3000)
+      uncertainty:
+        note: none printed; values are calculated from JANAF free energies
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        evidence_class: authors_janaf_equilibrium_not_measured
+        T_K:
+        - 2000.0
+        - 2500.0
+        - 3000.0
+        SiO2_2000K_SiO2_P_torr: 0.000192
+        caption_as_published: Table 1 Vapor pressure of oxide dissociation species vs. temperature
+        header_as_published: Vapor Pressure of Species (torr) at K
+        source_of_thermo: JANAF Thermochemical Tables 2nd ed. (Ref. 5)
+        rows:
+        - oxide: SiO2
+          vapor_species: SiO2
+          P_torr:
+          - P_as_printed: 1.92 x 10^{-4}
+            P: 0.000192
+          - P_as_printed: 1.77 x 10^{-1}
+            P: 0.177
+          - P_as_printed: 1.53 x 10^{1}
+            P: 15.3
+        - oxide: SiO2
+          vapor_species: SiO
+          P_torr:
+          - P_as_printed: 7.13 x 10^{-3}
+            P: 0.00713
+          - P_as_printed: '3.26'
+            P: 3.26
+          - P_as_printed: 1.80 x 10^{2}
+            P: 180.0
+        - oxide: SiO2
+          vapor_species: O2
+          P_torr:
+          - P_as_printed: 3.57 x 10^{-3}
+            P: 0.00357
+          - P_as_printed: '1.63'
+            P: 1.63
+          - P_as_printed: 9.00 x 10^{1}
+            P: 90.0
+        - oxide: TiO2
+          vapor_species: TiO2
+          P_torr:
+          - P_as_printed: 8.22 x 10^{-7}
+            P: 8.22e-07
+          - P_as_printed: 1.23 x 10^{-3}
+            P: 0.00123
+          - P_as_printed: 1.20 x 10^{-1}
+            P: 0.12
+        - oxide: TiO2
+          vapor_species: TiO
+          P_torr:
+          - P_as_printed: 4.78 x 10^{-5}
+            P: 4.78e-05
+          - P_as_printed: 5.36 x 10^{-2}
+            P: 0.0536
+          - P_as_printed: '4.71'
+            P: 4.71
+        - oxide: TiO2
+          vapor_species: O2
+          P_torr:
+          - P_as_printed: 2.39 x 10^{-5}
+            P: 2.39e-05
+          - P_as_printed: 2.68 x 10^{-2}
+            P: 0.0268
+          - P_as_printed: '2.34'
+            P: 2.34
+        - oxide: Al2O3
+          vapor_species: Al2O2
+          P_torr:
+          - P_as_printed: 8.13 x 10^{-11}
+            P: 8.13e-11
+          - P_as_printed: 1.50 x 10^{-6}
+            P: 1.5e-06
+          - P_as_printed: 5.46 x 10^{-3}
+            P: 0.00546
+        - oxide: Al2O3
+          vapor_species: AlO2
+          P_torr:
+          - P_as_printed: 5.72 x 10^{-9}
+            P: 5.72e-09
+          - P_as_printed: 7.30 x 10^{-5}
+            P: 7.3e-05
+          - P_as_printed: 2.84 x 10^{-2}
+            P: 0.0284
+        - oxide: Al2O3
+          vapor_species: Al2O
+          P_torr:
+          - P_as_printed: 4.63 x 10^{-8}
+            P: 4.63e-08
+          - P_as_printed: 2.99 x 10^{-4}
+            P: 0.000299
+          - P_as_printed: 6.43 x 10^{-2}
+            P: 0.0643
+        - oxide: Al2O3
+          vapor_species: AlO
+          P_torr:
+          - P_as_printed: 2.24 x 10^{-7}
+            P: 2.24e-07
+          - P_as_printed: 9.42 x 10^{-4}
+            P: 0.000942
+          - P_as_printed: 2.11 x 10^{-1}
+            P: 0.211
+        - oxide: Al2O3
+          vapor_species: O2
+          P_torr:
+          - P_as_printed: 1.01 x 10^{-7}
+            P: 1.01e-07
+          - P_as_printed: 5.17 x 10^{-4}
+            P: 0.000517
+          - P_as_printed: 1.09 x 10^{-1}
+            P: 0.109
+        - oxide: FeO
+          vapor_species: FeO
+          P_torr:
+          - P_as_printed: 2.56 x 10^{-3}
+            P: 0.00256
+          - P_as_printed: 5.81 x 10^{-1}
+            P: 0.581
+          - P_as_printed: 1.92 x 10^{1}
+            P: 19.2
+    - observation_id: steurer_1985_table3_o2_yield_wt_pct
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 127
+        pdf_page_index: 5
+        note: Table 3 Oxygen Yield (% by Weight) of Oxides vs Temperature
+      T_range_K:
+      - 1000.0
+      - 3000.0
+      phase: single_oxide_JANAF_equilibrium
+      standard_state: O2 weight fraction of total gas weight, eq. (14)–(15)
+      regime: janaf_equilibrium_calculation
+      units: percent by weight as published
+      uncertainty:
+        note: none printed
+      values:
+        quantity: oxygen_yield_wt_pct
+        method_class: model_derived
+        evidence_class: authors_janaf_equilibrium_not_measured
+        definition_as_printed: Weight of Gaseous Oxygen / Weight of Total Gas
+        rows:
+        - oxide: TiO2
+          yield_wt_pct:
+          - T_K: 1000.0
+            yield_wt_pct: 20.0
+          - T_K: 1500.0
+            yield_wt_pct: 19.9
+          - T_K: 2000.0
+            yield_wt_pct: 19.7
+          - T_K: 2500.0
+            yield_wt_pct: 19.6
+          - T_K: 3000.0
+            yield_wt_pct: 19.5
+        - oxide: SiO2
+          yield_wt_pct:
+          - T_K: 1000.0
+            yield_wt_pct: 26.6
+          - T_K: 1500.0
+            yield_wt_pct: 26.4
+          - T_K: 2000.0
+            yield_wt_pct: 25.9
+          - T_K: 2500.0
+            yield_wt_pct: 25.3
+          - T_K: 3000.0
+            yield_wt_pct: 24.5
+        - oxide: FeO
+          yield_wt_pct:
+          - T_K: 1000.0
+            yield_wt_pct: 0.0
+          - T_K: 1500.0
+            yield_wt_pct: 0.0
+          - T_K: 2000.0
+            yield_wt_pct: 0.0
+          - T_K: 2500.0
+            yield_wt_pct: 0.0
+          - T_K: 3000.0
+            yield_wt_pct: 0.0
+          note: Printed zeros. Authors state FeO yield by this process is zero.
+        - oxide: Al2O3
+          yield_wt_pct:
+          - T_K: 1000.0
+            yield_wt_pct: null
+            omitted_reason: printed_dash
+            as_printed: '-'
+          - T_K: 1500.0
+            yield_wt_pct: 17.7
+          - T_K: 2000.0
+            yield_wt_pct: 19.6
+          - T_K: 2500.0
+            yield_wt_pct: 20.1
+          - T_K: 3000.0
+            yield_wt_pct: 18.2
+        o2_fraction_of_oxide_unnumbered_table:
+        - oxide: TiO2
+          O2_yield_pct_of_oxide: 19.6
+          total_O2_pct_of_oxide: 40.1
+          O2_yield_pct_of_total_O2: 49.0
+        - oxide: SiO2
+          O2_yield_pct_of_oxide: 25.0
+          total_O2_pct_of_oxide: 53.2
+          O2_yield_pct_of_total_O2: 47.0
+        - oxide: FeO
+          O2_yield_pct_of_oxide: 0.0
+          total_O2_pct_of_oxide: 22.3
+          O2_yield_pct_of_total_O2: 0.0
+        - oxide: Al2O3
+          O2_yield_pct_of_oxide: 19.3
+          total_O2_pct_of_oxide: 47.1
+          O2_yield_pct_of_total_O2: 40.0
+        o2_fraction_table_note: Unnumbered comparison table on published p. 127; 2000–3000 K range. SiO2
+          O2 yield (% of oxide) printed as 25 (no trailing decimal).
+    - observation_id: steurer_1985_sio2_induction_experiment
+      type: rate_series
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        section: Experiments
+        note: SiO2 induction-heating feasibility runs at 2650 K; apparatus Fig. 3 p. 129
+      T_range_K:
+      - 2650.0
+      - 2650.0
+      phase: silica_feedstock_induction_heated
+      standard_state: 'authors wording: each experiment run at a temperature of 2650 K (not stated as
+        sample, furnace, or set-point)'
+      regime: induction_vacuum_pyrolysis_cold_finger
+      units: K as published; no numeric O2 concentration printed
+      uncertainty:
+        note: 'Second series: free oxygen concentrations in the order of the predicted values were found,
+          but the results are not yet considered conclusive. No numeric O2 concentration, mass loss, or
+          yield printed.'
+      values:
+        quantity: vacuum_pyrolysis_experiment_summary
+        method_class: measured_direct
+        T_K_as_printed: 2650.0
+        T_wording_as_printed: each experiment run at a temperature of 2650 K
+        feedstock_as_printed: Silica
+        feedstock_reason: predominant in the lunar soil; single oxide considered permissible for feasibility
+        heating_as_printed: induction heating via a susceptor instead of radiant heating
+        series_1:
+          result_as_printed: Upon completion of each experiment run at a temperature of 2650 K, substantial
+            deposits of free metal (silicon) and suboxides were found at the cooling loop.
+          authors_conclusions:
+          - free oxygen was generated
+          - the cooling rate is not as critical as anticipated
+          numeric_O2_yield:
+            status: omitted
+            reason: not_printed
+        series_2:
+          apparatus: modified apparatus; gas past a condensation path was sampled and analyzed
+          result_as_printed: Even though free oxygen concentrations in the order of the predicted values
+            were found, the results are not yet considered conclusive and have to be further verified.
+          numeric_O2_concentration:
+            status: omitted
+            reason: not_printed_only_order_of_predicted_values
+        predicted_O2_yield_context_wt_pct:
+          value: 25.3
+          method_class: model_derived
+          note: Table 3 SiO2 at 2500 K is 25.3 wt%; 2650 K is not a Table 3 column. Not used as a measured
+            yield.
+      equipment:
+        cell_material:
+          value: alumina tube / crucible / boron nitride / porous alumina insulation stack with heat shields;
+            cold finger in the gas path (Fig. 3 labels)
+          locator:
+            figure: '3'
+            published_page: 129
+            pdf_page_index: 7
+            paragraph: Figure 3 Experimental Apparatus
+        chamber_pressure:
+          value: not printed for the experiment; Fig. 3 labels VACUUM and ARGON
+          units: as published
+          locator:
+            figure: '3'
+            published_page: 129
+            pdf_page_index: 7
+            note: no numeric chamber pressure printed for the SiO2 runs
+    - observation_id: steurer_1985_metal_yield_sio2_model
+      type: rate_series
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: unnumbered metal-yield table; Si from 2 SiO(g) -> SiO2(s) + Si(s) eq. (18)
+      T_range_K:
+      - 1000.0
+      - 3000.0
+      phase: rapid_cooling_disproportionation_model
+      standard_state: metal yield maxima in % by weight of the original oxide
+      regime: janaf_equilibrium_calculation
+      units: percent by weight of original oxide as published
+      uncertainty:
+        note: authors call these tentative calculations
+      values:
+        quantity: metal_yield_wt_pct_of_oxide
+        method_class: model_derived
+        metal: Si
+        reaction_as_printed: 2 SiO(g) -> SiO2(s) + Si(s)
+        points:
+        - T_K: 1000.0
+          yield_wt_pct: 23.4
+        - T_K: 1500.0
+          yield_wt_pct: 23.2
+        - T_K: 2000.0
+          yield_wt_pct: 22.7
+        - T_K: 2500.0
+          yield_wt_pct: 22.2
+        - T_K: 3000.0
+          yield_wt_pct: 21.5
+        authors_note: close to half of all metal contained in the oxide (SiO2 = 46.8%)
+  O2:
+    observations:
+    - observation_id: steurer_1985_table2_mixture_psat
+      type: psat_series
+      locator:
+        table: '2'
+        published_page: 127
+        pdf_page_index: 5
+        note: Table 2 compositional vapor pressure (atm) of Al2O3+SiO2+TiO2+FeO mixture
+      T_range_K:
+      - 2000.0
+      - 3000.0
+      phase: ideal_oxide_mixture_representative_of_lunar_basalt
+      standard_state: partial pressure; atm as printed
+      regime: janaf_equilibrium_calculation
+      units: atm as published
+      uncertainty:
+        note: none printed
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        evidence_class: authors_janaf_equilibrium_not_measured
+        O2_3000K_P_atm: 0.081
+        T_K:
+        - 2000.0
+        - 2500.0
+        - 3000.0
+        feedstock_model_mixture_wt_pct:
+          Al2O3: 15.0
+          SiO2: 50.0
+          TiO2: 10.0
+          FeO: 25.0
+        feedstock_locator:
+          published_page: 127
+          pdf_page_index: 5
+          note: Oxides % (Weight) table above Table 2
+        activity_assumption_as_printed: ideal mixture; activity of all solids equivalent to the mole fraction;
+          activity of the gases equal to their respective partial pressures
+        rows:
+        - species: O2(g)
+          P_atm:
+          - P_as_printed: 3.2 x 10^{-6}
+            P: 3.2e-06
+          - P_as_printed: 1.5 x 10^{-3}
+            P: 0.0015
+          - P_as_printed: 8.1 x 10^{-2}
+            P: 0.081
+        - species: AlO(g)
+          P_atm:
+          - P_as_printed: 7.3 x 10^{-12}
+            P: 7.3e-12
+          - P_as_printed: 5.6 x 10^{-8}
+            P: 5.6e-08
+          - P_as_printed: 1.8 x 10^{-5}
+            P: 1.8e-05
+        - species: Al2O(g)
+          P_atm:
+          - P_as_printed: 2.5 x 10^{-16}
+            P: 2.5e-16
+          - P_as_printed: 1.6 x 10^{-11}
+            P: 1.6e-11
+          - P_as_printed: 1.6 x 10^{-8}
+            P: 1.6e-08
+        - species: AlO2(g)
+          P_atm:
+          - P_as_printed: 2.9 x 10^{-11}
+            P: 2.9e-11
+          - P_as_printed: 2.0 x 10^{-7}
+            P: 2.0e-07
+          - P_as_printed: 5.8 x 10^{-5}
+            P: 5.8e-05
+        - species: Al2O2(g)
+          P_atm:
+          - P_as_printed: 6.8 x 10^{-17}
+            P: 6.8e-17
+          - P_as_printed: 3.7 x 10^{-12}
+            P: 3.7e-12
+          - P_as_printed: 3.2 x 10^{-9}
+            P: 3.2e-09
+        - species: SiO(g)
+          P_atm:
+          - P_as_printed: 6.5 x 10^{-6}
+            P: 6.5e-06
+          - P_as_printed: 3.0 x 10^{-3}
+            P: 0.003
+          - P_as_printed: 1.6 x 10^{-1}
+            P: 0.16
+        - species: SiO2(g)
+          P_atm:
+          - P_as_printed: 1.4 x 10^{-7}
+            P: 1.4e-07
+          - P_as_printed: 1.4 x 10^{-4}
+            P: 0.00014
+          - P_as_printed: 1.1 x 10^{-2}
+            P: 0.011
+        - species: TiO(g)
+          P_atm:
+          - P_as_printed: 4.8 x 10^{-10}
+            P: 4.8e-10
+          - P_as_printed: 9.3 x 10^{-7}
+            P: 9.3e-07
+          - P_as_printed: 1.0 x 10^{-4}
+            P: 0.0001
+        - species: TiO2(g)
+          P_atm:
+          - P_as_printed: 8.4 x 10^{-11}
+            P: 8.4e-11
+          - P_as_printed: 1.4 x 10^{-7}
+            P: 1.4e-07
+          - P_as_printed: 1.3 x 10^{-5}
+            P: 1.3e-05
+        - species: FeO(g)
+          P_atm:
+          - P_as_printed: 8.1 x 10^{-7}
+            P: 8.1e-07
+          - P_as_printed: 2.0 x 10^{-4}
+            P: 0.0002
+          - P_as_printed: 5.9 x 10^{-3}
+            P: 0.0059
+        mixture_O2_yield_wt_pct_2500_to_3000K: 19.6
+        mixture_O2_yield_note: For the 2500-3000 K regime, a yield value of 19.6% (by weight) was obtained
+          from Table 2 partial pressures and molecular weights.
+    - observation_id: steurer_1985_table4_beneficiation_pO2
+      type: psat_series
+      locator:
+        table: '4'
+        published_page: 128
+        pdf_page_index: 6
+        note: Table 4 Oxygen Vapor Pressure of the Model Mixture With and Without Prior Beneficiation
+      T_range_K:
+      - 1000.0
+      - 3000.0
+      phase: ideal_oxide_mixture_with_and_without_Fe_beneficiation
+      standard_state: oxygen vapor pressure; atm as printed
+      regime: janaf_equilibrium_calculation
+      units: atm as published; enhancement in percent as published
+      uncertainty:
+        note: none printed
+      values:
+        quantity: partial_pressure_O2
+        method_class: model_derived
+        printed_format_note: Without/With columns print mantissa and exponent as separate cells (e.g.
+          5.43  10^{-20}), no multiplication sign.
+        rows:
+        - T_K: 1000.0
+          without_atm_as_printed: 5.43 10^{-20}
+          without_atm: 5.43e-20
+          with_atm_as_printed: 6.50 10^{-20}
+          with_atm: 6.5e-20
+          enhancement_pct: 19.7
+        - T_K: 1500.0
+          without_atm_as_printed: 9.25 10^{-11}
+          without_atm: 9.25e-11
+          with_atm_as_printed: 1.11 10^{-10}
+          with_atm: 1.11e-10
+          enhancement_pct: 20.0
+        - T_K: 2000.0
+          without_atm_as_printed: 3.23 10^{-6}
+          without_atm: 3.23e-06
+          with_atm_as_printed: 3.87 10^{-6}
+          with_atm: 3.87e-06
+          enhancement_pct: 19.8
+        - T_K: 2500.0
+          without_atm_as_printed: 1.51 10^{-3}
+          without_atm: 0.00151
+          with_atm_as_printed: 1.81 10^{-3}
+          with_atm: 0.00181
+          enhancement_pct: 19.9
+        - T_K: 3000.0
+          without_atm_as_printed: 8.12 10^{-2}
+          without_atm: 0.0812
+          with_atm_as_printed: 9.73 10^{-2}
+          with_atm: 0.0973
+          enhancement_pct: 19.8
+        unrefined_soil_O2_yield_wt_pct: 17.0
+        beneficiated_soil_O2_yield_wt_pct: 20.4
+        unrefined_yield_basis: 'computed from Ref. 2 Table III-3 weight fractions: SiO2 40%, FeO(Fe3O4)
+          19%, TiO2 13%, Al2O3 10%, CaO 9%, MgO 9% of lunar soil (wt); 17.0% for 2500-3000 K. Those fractions
+          are quoted from Ref. 2, not measured here.'
+        beneficiated_yield_note: 'Soil beneficiation would increase the yield values of 19.6 and 17%,
+          above, to 23.5 and 20.4%, respectively. Conservative figures adopted: Unrefined Soil 17.0% (wt);
+          Beneficiated Soil 20.4% (wt).'
+    - observation_id: steurer_1985_fig2_psat_figure_only
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 126
+        pdf_page_index: 4
+        note: Figure 2 Partial Pressures of Dissociation Species vs. Temperature; four panels
+      T_range_K:
+      - 2000.0
+      - 3000.0
+      phase: single_oxide_JANAF_equilibrium
+      standard_state: ln P / atm vs 1/T (10^{-4} K^{-1})
+      regime: janaf_equilibrium_calculation
+      units: ln(P/atm) as published on the figure axes
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: partial_pressure
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        panels:
+        - (a) SiO2
+        - (b) TiO2
+        - (c) Al2O3
+        - (d) FeO
+        axis_as_printed: ln(P/atm) vs 1/T (10^{-4} K^{-1})
+        species_labeled:
+        - SiO
+        - SiO2
+        - TiO
+        - O2
+        - TiO2
+        - AlO
+        - AlO2
+        - Al2O
+        - Al2O2
+        - FeO
+        authors_text: While the Clausius-Clapeyron equation postulates straight lines for ideal gases
+          and constant enthalpy changes vs temperature, the calculated data produce slightly bowed lines
+          due to the now-constant dH over the entire temperature range.
+  Al2O3:
+    observations:
+    - observation_id: steurer_1985_metal_yield_al2o3_model
+      type: rate_series
+      locator:
+        published_page: 128
+        pdf_page_index: 6
+        note: unnumbered metal-yield table; Al from AlO, AlO2, Al2O disproportionation eq. (19)
+      T_range_K:
+      - 1500.0
+      - 3000.0
+      phase: rapid_cooling_disproportionation_model
+      standard_state: metal yield maxima in % by weight of the original oxide
+      regime: janaf_equilibrium_calculation
+      units: percent by weight of original oxide as published
+      uncertainty:
+        note: authors call these tentative calculations
+      values:
+        quantity: metal_yield_wt_pct_of_oxide
+        method_class: model_derived
+        metal: Al
+        reaction_as_printed: AlO, AlO2, Al2O -> Al2O3(s) + Al(s)
+        points:
+        - T_K: 1000.0
+          yield_wt_pct: null
+          omitted_reason: printed_dash
+          as_printed: '-'
+        - T_K: 1500.0
+          yield_wt_pct: 19.9
+        - T_K: 2000.0
+          yield_wt_pct: 21.1
+        - T_K: 2500.0
+          yield_wt_pct: 22.6
+        - T_K: 3000.0
+          yield_wt_pct: 20.5
+        authors_note: close to half of all metal contained in the oxide (Al2O3 = 52.9%)

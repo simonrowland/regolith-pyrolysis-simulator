@@ -1,0 +1,540 @@
+schema_version: literature_extract.v1
+source_id: reiss-2019-thermal-extraction-nulht2m
+source:
+  citation: 'Reiss, P., Grill, L. & Barber, S.J. (2019), "Thermal extraction of volatiles from the lunar
+    regolith simulant NU-LHT-2M: Preparations for in-situ analyses on the Moon", Planetary and Space Science,
+    DOI 10.1016/j.pss.2019.05.001, accepted manuscript PII S0032-0633(18)30382-9, PSS 4666'
+  doi: 10.1016/j.pss.2019.05.001
+  url: http://dx.doi.org/10.1016/j.pss.2019.05.001
+  year: 2019
+extraction:
+  method: Accepted-manuscript PDF (corpus raw/reiss-2019-thermal-extraction-nulht2m; Open Research Online
+    cover is PDF page 1, Elsevier accepted-manuscript sheet is PDF page 2). Tables 1–2 and printed apparatus
+    / thermal-program / peak-band / yield numbers transcribed from 350 dpi pdftoppm renders of PDF pages
+    4–7, 10–13, 16–18 and 24. pdftotext-layout and MinerU used only as a table/figure inventory; they
+    are not data. Figs 5–11 (hydration mass-gain, RGA partial-pressure curves, mass spectra, parameter
+    comparisons) recorded figure-only except coefficients printed on Fig. 5. Figs 12–13 are simulated
+    temperature fields, model_derived and figure-only. Yield mass fractions in §Volatiles yield are authors'
+    integrals of the RGA curves with an assumed pump rate, labelled model_derived, not direct balance
+    measurements. Table 2 mineralogy is quoted from Rickman and Lowers (2012), not this work.
+  date: '2026-09-12'
+  worker: extract-pyro-outgas
+  provenance_path: docs-private/reviews/2026-09-12-pyrolysis-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: NU-LHT-2M
+  observable: rate_series
+  observation_id: reiss_2019_table1_test_parameters
+  field: sample_mass_mg_default_as_printed
+  value: 33-36
+  locator:
+    table: '1'
+    pdf_page_index: 10
+    note: Table 1 Sample mass 33-36 mg / 66-72 mg as printed on 350 dpi render
+- species: NU-LHT-2M
+  observable: gibbs_table
+  observation_id: reiss_2019_table2_nulht2m_mineralogy_quoted
+  field: plagioclase_vol_pct_all_fractions
+  value: 62
+  locator:
+    table: '2'
+    pdf_page_index: 18
+    note: Table 2 Plagioclase Volume across all particle size fractions 62 as printed
+- species: H2O
+  observable: rate_series
+  observation_id: reiss_2019_mz18_yield_phase2_model_derived
+  field: mz18_mass_content_pct_default_lo
+  value: 0.2
+  locator:
+    pdf_page_index: 17
+    paragraph: 297-301
+    note: 'default 70-80 µm, 33-36 mg, 10-70 % RH: m/z 18 between 0.2 % and 0.3 %'
+- species: H2O
+  observable: rate_series
+  observation_id: reiss_2019_fig5_printed_adsorption_fits
+  field: type_I_K_as_printed
+  value: 0.02
+  locator:
+    figure: '5'
+    pdf_page_index: 10
+    note: 'Fig. 5 legend Type I: K = 0.02 as printed on the plate'
+species:
+  NU-LHT-2M:
+    observations:
+    - observation_id: reiss_2019_table1_test_parameters
+      type: rate_series
+      locator:
+        table: '1'
+        pdf_page_index: 10
+        page: 10
+        note: Table 1 Test parameters for the volatiles extraction; 350 dpi pdftoppm of PDF page 10
+      T_range_K:
+      - 83.14999999999998
+      - 1073.15
+      phase: NU-LHT-2M_highland_simulant_sieved_fractions
+      condensed_form:
+        state: particulate_simulant
+        metastable: false
+        basis: explicit_author
+        note: highland-type lunar regolith simulant NU-LHT-2M, manually sieved
+      standard_state: as loaded after glovebox hydration; T is heating-mode set point as printed in Table
+        1
+      regime: pumped_high_vacuum_EGA
+      units: as printed in Table 1 (°C, mg, µm, g/cm³, % RH)
+      values:
+        quantity: experimental_matrix
+        method_class: measured_direct
+        feedstock: NU-LHT-2M
+        caption_as_published: 'Table 1: Test parameters for the volatiles extraction'
+        relative_humidity_for_hydration_as_printed: 1 % / 10 % / 30 % / 50 % / 70 % / saturated
+        sample_mass_mg_default_as_printed: 33-36
+        sample_mass_mg_double_as_printed: 66-72
+        particle_size_um_default_as_printed: 70-80
+        particle_size_um_coarse_as_printed: 100-110
+        bulk_density_loose_g_cm3_as_printed: approx. 1.3
+        bulk_density_compacted_g_cm3_as_printed: approx. 2.0
+        heating_mode_default_as_printed: -190 °C to 800 °C at 6 °C/min
+        heating_mode_slow_as_printed: -190 °C to 800 °C at 4 °C/min
+        T_start_C_as_printed: -190
+        T_end_C_as_printed: 800
+        T_start_K: 83.14999999999998
+        T_end_K: 1073.15
+        ramp_default_C_per_min: 6
+        ramp_slow_C_per_min: 4
+        conversion: T_K = t_C + 273.15
+        n_runs_as_printed: At least three runs for each configuration plus empty-holder reference measurements
+      uncertainty:
+        note: Table prints ranges (33-36 mg, approx. densities). No ± on the heating set points.
+      quote: 'Table 1: Test parameters for the volatiles extraction. Sample mass 33-36 mg / 66-72 mg.
+        Heating mode -190 °C to 800 °C at 6 °C/min / -190 °C to 800 °C at 4 °C/min.'
+      equipment:
+        cell_material:
+          value: modified stainless steel blind fitting; Macor ceramic heater mount; Kanthal A1 heating
+            wire
+          locator:
+            pdf_page_index: 5
+            figure: '4'
+            paragraph: 72-81
+            note: sample holder and heater; 350 dpi render of PDF pages 5-6
+        chamber_pressure:
+          value: lower section on the order of 10^-8 mbar; heating started at <10^-4 mbar; continuously
+            evacuated
+          units: mbar as printed
+          locator:
+            pdf_page_index: 5
+            paragraph: 65-67
+            note: RGA filament max 10^-4 mbar; lower section ~10^-8 mbar
+    - observation_id: reiss_2019_table2_nulht2m_mineralogy_quoted
+      type: gibbs_table
+      locator:
+        table: '2'
+        pdf_page_index: 18
+        page: 18
+        note: Table 2 Major mineral phase abundances in NU-LHT-2M according to Rickman and Lowers (2012)
+      phase: NU-LHT-2M_single_phase_particles
+      standard_state: volume %; 99.2 % of all particle compositions are a single phase
+      regime: quoted_composition
+      units: volume percent as printed
+      values:
+        quantity: mineral_phase_volume_percent
+        method_class: quoted_literature
+        quoted_from: Rickman and Lowers (2012)
+        caption_as_published: 'Table 2: Major mineral phase abundances in NU-LHT-2M according to Rickman
+          and Lowers (2012)'
+        plagioclase_vol_pct_all_fractions: 62
+        single_phase_particle_fraction_pct_as_printed: 99.2
+        minerals:
+        - mineral: Plagioclase
+          vol_pct_all_fractions: 62
+          vol_pct_75_150_um: 59
+        - mineral: Glass
+          vol_pct_all_fractions: 18.7
+          vol_pct_75_150_um: 17.3
+        - mineral: Clinopyroxene
+          vol_pct_all_fractions: 5.6
+          vol_pct_75_150_um: 3
+        - mineral: Orthopyroxene
+          vol_pct_all_fractions: 5.6
+          vol_pct_75_150_um: 8.3
+        - mineral: Olivine
+          vol_pct_all_fractions: 4.5
+          vol_pct_75_150_um: 6.6
+        - mineral: Chlorite
+          vol_pct_all_fractions: 1.7
+          vol_pct_75_150_um: 2.3
+        - mineral: Ilmenite
+          vol_pct_all_fractions: 0.6
+          vol_pct_75_150_um: 1.5
+        - mineral: Quartz
+          vol_pct_all_fractions: 0.4
+          vol_pct_75_150_um: 0.3
+        - mineral: Albite
+          vol_pct_all_fractions: 0.4
+          vol_pct_75_150_um: 0.9
+        total_vol_pct_all_fractions: 99.5
+        total_vol_pct_75_150_um: 99.2
+      uncertainty:
+        note: none printed in Table 2
+      quote: 'Table 2: Major mineral phase abundances in NU-LHT-2M according to Rickman and Lowers (2012).
+        Plagioclase 62 / 59; Glass 18.7 / 17.3; Total 99.5 / 99.2.'
+    - observation_id: reiss_2019_apparatus_and_pressure_regime
+      type: rate_series
+      locator:
+        pdf_page_index: 5
+        page: 5
+        section: '2.2'
+        figure: 2-4
+        note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
+      T_range_K:
+      - 83.14999999999998
+      - 1073.15
+      phase: NU-LHT-2M_in_stainless_steel_holder
+      standard_state: pumped high vacuum; T reported as set point / sample-holder thermocouple, not sample
+        T
+      regime: pumped_high_vacuum_EGA
+      units: mbar, °C, mm as printed
+      values:
+        quantity: apparatus_and_pressure_regime
+        method_class: measured_direct
+        vacuum: continuously evacuated (oil-free scroll + turbomolecular)
+        backing_pump: Leybold Scrollvac SC 5 D
+        high_vacuum_pump: Leybold Turbovac SL 80
+        rga: Stanford Research Systems RGA 200, 1 amu to 200 amu
+        rga_filament_max_mbar_as_printed: 10^{-4}
+        lower_section_operating_mbar_as_printed: 10^{-8}
+        heating_start_lower_section_mbar_as_printed: <10^{-4}
+        bakeout_glovebox_airlock_C_as_printed: 100 °C and 200 °C
+        bakeout_glovebox_airlock_mbar_as_printed: approximately 10^{-1}
+        bakeout_glovebox_airlock_duration_h_as_printed: at least 2 h
+        system_bakeout_C_as_printed: 120 °C (150 °C at the RGA) for about 1 h
+        hydration_hold_h_as_printed: at least 48 h
+        purge_gas: dry nitrogen (glovebox N2 purity 5.0, 99.999 % pure)
+        sweep_gas_during_extraction: none; continuously pumped, no sweep
+        sample_holder: modified stainless steel blind fitting
+        sample_cavity_mm_as_printed: up to 2.8 mm diameter and 4.5 mm in height
+        filter_pore_um_as_printed: 60
+        heater_mount: Macor ceramic
+        heater_wire_initial: 0.2 mm diameter Kanthal A1 (32 AWG, 46.2 Ω/m, total length ~0.3 m)
+        heater_wire_replacement: 0.25 mm diameter Kanthal A1 (30 AWG, 29.3 Ω/m, total length ~0.3 m)
+        thermocouple: 0.5 mm diameter Type K mantle thermocouple inserted into the heater to measure the
+          temperature of the sample holder
+        T_reported_as: Temperature set point [°C] on Figs 6 and 8; sample-holder thermocouple, not a sample-interior
+          measurement
+        cold_surface: LN2 bath around the sample holder at the start of the ramp; system otherwise heated
+          to 120 °C to avoid condensation
+        dosing_valve: manual dosing valve as orifice between lower and upper sections
+        up_downstream_pressure_offset_as_printed: same trends with an offset of two orders of magnitude
+        ega_masses_as_printed: m/z 2, 18, 28, 32, and 44
+        ega_interval_s_as_printed: 3
+        glovebox_volume_m3_as_printed: 0.8
+        balance: Sartorius Excellence E 1200 S (readability 0.001 g, standard deviation 0.001 g)
+        analysis_T_min_C_as_printed: -150
+        analysis_T_min_K: 123.14999999999998
+        conversion: T_K = t_C + 273.15
+      uncertainty:
+        note: pressures printed as orders of magnitude (10^{-8}, 10^{-4}, approximately 10^{-1}). Balance
+          readability 0.001 g.
+      quote: The RGA filament can be operated below its maximum gas pressure of 10^{-4} mbar. The operating
+        pressure of the lower section is on the order of 10^{-8} mbar. Sample heating was activated when
+        the pressure in the lower section of the volatiles extraction system reached values <10^{-4} mbar.
+        The system was continuously evacuated for the entire duration of the experiment. A 0.5 mm diameter
+        Type K mantle thermocouple was inserted into the heater to measure the temperature of the sample
+        holder.
+      equipment:
+        cell_material:
+          value: stainless steel sample holder; Macor heater mount
+          locator:
+            pdf_page_index: 5
+            figure: '4'
+            paragraph: 72-78
+        chamber_pressure:
+          value: lower section ~10^-8 mbar; continuously pumped
+          units: mbar as printed
+          locator:
+            pdf_page_index: 5
+            paragraph: 65-67
+  H2O:
+    observations:
+    - observation_id: reiss_2019_fig5_printed_adsorption_fits
+      type: rate_series
+      locator:
+        figure: '5'
+        pdf_page_index: 10
+        page: 10
+        note: Type I and Type II coefficients printed on Fig. 5 plate; curve itself not digitised
+      phase: NU-LHT-2M_humidified_nitrogen
+      standard_state: long-time exposure to humidified N2; mass gain normalised to initial dry mass
+      regime: glovebox_hydration
+      units: K, qmax, csat as printed on the figure legend (mass gain % scale)
+      values:
+        quantity: printed_on_figure_adsorption_fit_coefficients
+        method_class: model_derived
+        admission_status: printed_on_figure_not_axis_digitised
+        type_I_K_as_printed: 0.02
+        type_I_qmax_as_printed: 0.25
+        type_I_R2_as_printed: 0.995
+        type_II_K_as_printed: 12.5
+        type_II_qmax_as_printed: 0.13
+        type_II_csat_as_printed: 250.51
+        type_II_R2_as_printed: 0.998
+        curve_status: figure_only
+        reason_curve_not_digitised: mass-gain vs RH exists only as Fig. 5 points plus the printed fits;
+          points were not read off the axis
+      uncertainty:
+        note: R^2 printed; no ± on K, qmax, csat
+      quote: 'Figure 5: Mass gain and temperature over relative humidity for a long-time exposure of NU-LHT-2M
+        to humidified nitrogen gas. Type I: K = 0.02, qmax = 0.25, R² = 0.995. Type II: K = 12.50, qmax
+        = 0.13, csat = 250.51, R² = 0.998.'
+    - observation_id: reiss_2019_rga_release_curves_figure_only
+      type: rate_series
+      locator:
+        figure: 6-11
+        pdf_page_index: 12-20
+        note: RGA partial-pressure and total-pressure vs set-point T; not digitised
+      T_range_K:
+      - 123.14999999999998
+      - 1073.15
+      phase: NU-LHT-2M_pumped_vacuum_EGA
+      standard_state: Temperature set point [°C] as printed on the figure axes
+      regime: pumped_high_vacuum_EGA
+      units: mbar vs °C set point as plotted; no numeric table
+      values:
+        quantity: partial_pressure_vs_setpoint_T
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Partial-pressure and total-pressure release curves exist only as Figs 6–11. No printed
+          numeric table of p(T). Curves were not read off axes.
+        semantics: bound_not_point_ordering
+        T_axis_as_printed: Temperature set point [°C]
+        exemplary_run_as_printed: 6 °C/min, 33-36 mg, 70-80 µm, loose, conditioned at 30 % relative humidity
+        figures:
+        - figure: '6'
+          note: exemplary p vs T for m/z 2, 18, 44; peaks A–D labelled
+        - figure: '7'
+          note: mass spectra at peaks A–D
+        - figure: '8'
+          note: total gas pressure vs T for RH, particle size, compaction, mass, ramp
+        - figure: '9'
+          note: sulfur-bearing m/z fragments vs T
+        - figure: '10'
+          note: sample-treatment effect on high-T CO2
+        - figure: '11'
+          note: photograph of water-washed fines; not a data table
+      uncertainty:
+        note: not applicable; figures not digitised
+      quote: 'Figure 6 shows a typical progression of partial pressures of the predominant masses detected
+        by the RGA. For all parameter combinations in the experiments this typical diagram can be divided
+        into three distinct phases: An initial peak (A) between -100 °C and -50 °C (phase 1), a broader
+        feature (B) between -50 °C and 300 °C (phase 2), and two separately identifiable peaks (C-D) at
+        temperatures above 300 °C (phase 3).'
+    - observation_id: reiss_2019_printed_peak_temperature_bands
+      type: transition_point
+      locator:
+        pdf_page_index: 12
+        page: 12
+        figure: '6'
+        paragraph: 201-207
+        note: Printed peak-band temperatures in prose, not read off Fig. 6
+      T_range_K:
+      - 153.14999999999998
+      - 1073.15
+      phase: NU-LHT-2M_pumped_vacuum_EGA
+      standard_state: set-point temperature as printed
+      regime: pumped_high_vacuum_EGA
+      units: °C as printed; conversion T_K = t_C + 273.15
+      values:
+        quantity: printed_release_peak_temperature_bands
+        method_class: measured_direct
+        T_is: set_point
+        peak_A_C_as_printed: -100 °C and -50 °C
+        peak_A_K:
+        - 173.14999999999998
+        - 223.14999999999998
+        peak_B_C_as_printed: -50 °C and 300 °C
+        peak_B_K:
+        - 223.14999999999998
+        - 573.15
+        peaks_C_D_C_as_printed: above 300 °C
+        peaks_C_D_K_lower: 573.15
+        sample_present_pressure_rise_start_C_as_printed: around -120 °C to -110 C°
+        empty_holder_pressure_rise_start_C_as_printed: between -100 °C and -80 °C
+        mz32_peak_C_as_printed: around 550 °C
+        mz32_peak_K: 823.15
+        mz32_attributed_to: H2S (main) and traces of SO2
+        CO2_first_peak_C_as_printed: around 650 °C
+        CO2_first_peak_K: 923.15
+        prevailing_species_at_A_D_as_printed: H2O (m/z 16, 17, 18, 19, 20), H2 (m/z 1, 2), and CO2 (m/z
+          12, 16, 28, 44, 45, 46)
+        conversion: T_K = t_C + 273.15
+      uncertainty:
+        note: bands printed as between/around/above; no ± on the band edges
+      quote: An initial peak (A) between -100 °C and -50 °C (phase 1), a broader feature (B) between -50
+        °C and 300 °C (phase 2), and two separately identifiable peaks (C-D) at temperatures above 300
+        °C (phase 3). When a sample was present the pressure rise started at a set point temperature around
+        -120 °C to -110 C°, while for the empty sample holder the pressure rise started between -100 °C
+        and -80 °C. A significant peak in the m/z 32 signal was detected around 550 °C.
+    - observation_id: reiss_2019_mz18_yield_phase2_model_derived
+      type: rate_series
+      locator:
+        pdf_page_index: 17
+        page: 17
+        paragraph: 297-318
+        note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement
+      T_range_K:
+      - 123.14999999999998
+      - 573.15
+      phase: NU-LHT-2M_phase2_desorption
+      standard_state: ideal-gas integral of m/z 18 partial pressure; T_gas assumed 120 °C; background
+        subtracted
+      regime: pumped_high_vacuum_EGA
+      units: mass percent as printed
+      values:
+        quantity: indicative_mz18_mass_content_from_rga_integral
+        method_class: model_derived
+        admission_status: authors_integral_of_figure_curves_with_assumed_pump_rate
+        authors_caveat_as_printed: This approach can only yield indicative values for the gas masses,
+          since it implies major simplifications.
+        q_pump_l_s_assumed_as_printed: 65
+        q_pump_source: matching the manufacturer value for N2 (60 l/s for Ar, 55 l/s for He, and 49 l/s
+          for H2) (Leybold GmbH 2009)
+        T_gas_C_assumed_as_printed: 120
+        T_gas_K: 393.15
+        integration_window_C_as_printed: -150 °C to 300 °C
+        integration_window_note: phase 2 only
+        background: empty-holder reference subtracted
+        mz18_mass_content_pct_default_lo: 0.2
+        mz18_mass_content_pct_default_hi: 0.3
+        default_conditions_as_printed: 70 µm to 80 µm, 33 mg to 36 mg, relative humidity between 10 %
+          and 70 %
+        mz18_mass_content_pct_coarse_lo: 0.1
+        mz18_mass_content_pct_coarse_hi: 0.2
+        mz18_fragment_fraction_of_water_pct_as_printed: 74
+        saturated_mz18_mass_pct_maximum_as_printed: 6
+        saturated_run_1_mz18_mass_pct: 6.2
+        saturated_run_4_mz18_mass_pct: 6.3
+        saturated_run_2_mz18_mass_pct: 3.4
+        saturated_run_3_mz18_mass_pct: 0.4
+        saturated_prepared_mass_fraction_pct_as_printed: 15
+        saturated_mix_as_printed: 6.66 g sample with 1 ml distilled water (15 % mass content)
+        remaining_gases: about one order of magnitude less than m/z 18
+      uncertainty:
+        note: authors call the values indicative; saturated runs span 0.4 % to 6.3 %; no ± printed on
+          the default 0.2–0.3 % band
+      quote: The samples with default particle size and mass (70 µm to 80 µm, 33 mg to 36 mg), conditioned
+        at a relative humidity between 10 % and 70 %, yielded a mass content of m/z 18 between 0.2 % and
+        0.3 %. The larger particle fraction yielded a significantly lower mass content of m/z 18, between
+        0.1 % and 0.2 %. test run 1 and 4 yielded a mass fraction of 6.2 % and 6.3 % for m/z 18 respectively
+        ... test run 2 and 3 yielded only 3.4 % and 0.4 % for m/z 18 respectively.
+  H2:
+    observations:
+    - observation_id: reiss_2019_h2_identified_in_rga_figure_only
+      type: rate_series
+      locator:
+        figure: 6-7
+        pdf_page_index: 12
+        paragraph: 206-207
+      T_range_K:
+      - 123.14999999999998
+      - 1073.15
+      phase: NU-LHT-2M_pumped_vacuum_EGA
+      standard_state: identified from fragmentation pattern; partial-pressure curve figure-only
+      regime: pumped_high_vacuum_EGA
+      units: m/z identity as printed
+      values:
+        quantity: species_identity_from_fragmentation_pattern
+        method_class: measured_direct
+        admission_status: figure_only
+        status: typed_refusal
+        reason: H2 partial-pressure vs T exists only as the m/z 2 curve on Figs 6–8; not digitised
+        fragments_as_printed: H2 (m/z 1, 2)
+      uncertainty:
+        note: not applicable; figure not digitised
+      quote: 'the prevailing species in the gas mixture can be clearly identified by their fragmentation
+        pattern (major mass fragments underlined): H2O (m/z 16, 17, 18, 19, 20), H2 (m/z 1, 2), and CO2
+        (m/z 12, 16, 28, 44, 45, 46).'
+  CO2:
+    observations:
+    - observation_id: reiss_2019_co2_high_t_printed_and_figure_only
+      type: rate_series
+      locator:
+        figure: 6,10
+        pdf_page_index: 18
+        paragraph: conclusions 447-448
+        note: printed attribution calcite >650 °C; curve figure-only
+      T_range_K:
+      - 573.15
+      - 1073.15
+      phase: NU-LHT-2M_mineral_decomposition
+      standard_state: set-point T; CO2 identified from fragments
+      regime: pumped_high_vacuum_EGA
+      units: °C as printed
+      values:
+        quantity: CO2_release_from_mineral_decomposition
+        method_class: measured_direct
+        admission_status: figure_only_curve_plus_printed_T_attribution
+        curve_status: figure_only
+        reason: CO2 p(T) exists only as m/z 44 on Figs 6, 8, 10; not digitised
+        calcite_decomposition_above_C_as_printed: 650
+        calcite_decomposition_above_K: 923.15
+        first_peak_around_C_as_printed: 650
+        source_attribution_as_printed: traces of calcite in NU-LHT-2M
+        conversion: T_K = t_C + 273.15
+      uncertainty:
+        note: attribution printed as above 650 °C; no ±
+      quote: traces of calcite in NU-LHT-2M were found to decompose above 650 °C and produce CO2.
+  H2S:
+    observations:
+    - observation_id: reiss_2019_h2s_mz32_peak_around_550C
+      type: rate_series
+      locator:
+        figure: '9'
+        pdf_page_index: 18
+        paragraph: 336-337
+      T_range_K:
+      - 823.15
+      - 1073.15
+      phase: NU-LHT-2M_mineral_decomposition
+      standard_state: set-point T; m/z 32 attributed mainly to H2S
+      regime: pumped_high_vacuum_EGA
+      units: °C as printed
+      values:
+        quantity: H2S_release_from_sulfur_minerals
+        method_class: measured_direct
+        admission_status: figure_only_curve_plus_printed_T_attribution
+        curve_status: figure_only
+        reason: m/z 32 and sulfur-fragment curves exist only as Fig. 9; not digitised
+        peak_C_as_printed: around 550 °C
+        peak_K: 823.15
+        fragments_as_printed: H2S (fragments m/z 1, 32, 33, 34, 35, 36) and traces of SO2 (fragments at
+          m/z 16, 24, 32, 48, 50, 64, 65, 66)
+        O2_significant_amount: false
+        conversion: T_K = t_C + 273.15
+      uncertainty:
+        note: around 550 °C as printed; no ±
+      quote: In the experiments presented here, a significant peak in the m/z 32 signal was detected around
+        550 °C. This was mainly attributed to H2S (fragments m/z 1, 32, 33, 34, 35, 36) and traces of
+        SO2. Sulfur-bearing minerals in NU-LHT-2M were found to decompose above 550 °C and produce mainly
+        H2S.
+deepening:
+  date: '2026-09-12'
+  worker: extract-pyro-outgas
+  method: 350 dpi pdftoppm of the accepted manuscript. No axis digitisation. T on the release plots is
+    the printed set point; the Type K thermocouple measures the sample holder.
+  figure_only:
+  - Fig. 5 mass-gain vs RH points (coefficients printed on the plate were taken)
+  - Figs 6–10 RGA / total-pressure release curves
+  - Fig. 7 mass spectra at peaks A–D
+  - Figs 12–13 simulated sample-holder temperature fields (model_derived)
+  refused:
+  - axis values from Figs 5–13
+  - treating the §Volatiles yield mass fractions as gravimetric measurements (they are ideal-gas integrals
+    with q_pump = 65 l/s assumed)
+  - treating Table 2 as this work's mineral analysis (Rickman and Lowers 2012)
+  reproduction_target_note: A simulator reproduction is a pumped-vacuum EGA of NU-LHT-2M, 33–36 mg, 70–80
+    µm, loose ~1.3 g/cm³, hydrated in N2 at stated RH, ramped from a LN2-cooled set point of about -190
+    °C to 800 °C at 6 °C/min in a stainless-steel cell with a Macor/Kanthal heater, continuously pumped,
+    no sweep gas, vapour seeing a 120 °C baked line plus a dosing-valve orifice. Compare to printed peak
+    bands (A −100 to −50 °C, B −50 to 300 °C, C–D >300 °C, H2S ~550 °C, CO2 ~650 °C) and to the indicative
+    m/z 18 yields (0.2–0.3 % default), not to undigitised RGA curves.

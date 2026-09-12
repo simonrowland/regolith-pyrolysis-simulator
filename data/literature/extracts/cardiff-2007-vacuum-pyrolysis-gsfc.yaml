@@ -1,0 +1,470 @@
+schema_version: literature_extract.v1
+source_id: cardiff-2007-vacuum-pyrolysis-gsfc
+source:
+  citation: Cardiff, Eric H., Pomeroy, Brian R., Banks, Ian S. and Benz, Alexis (2007), "Vacuum Pyrolysis
+    and Related ISRU Techniques", Space Technology and Applications International Forum (STAIF). NTRS
+    20070014929
+  url: https://ntrs.nasa.gov/citations/20070014929
+  year: 2007
+extraction:
+  method: Corpus PDF raw/cardiff-2007-vacuum-pyrolysis-gsfc/cardiff-2007-vacuum-pyrolysis-gsfc.pdf. Scanned
+    STAIF pages. Table 1 and the printed Fe/O and Ti/O ratios on Figure 5 transcribed from 400 dpi pdftoppm
+    renders of PDF pages 3 and 5. pdftotext -layout is a noisy OCR layer and was not used as data. Figure
+    4 RGA traces, Figures 6–7 HSC equilibrium plots, and Figure 9 P–T curve are figure-only and were not
+    digitised. Printed caption numbers on Figure 8 (10 g MLS-1A, 10^{-5} Torr, 1400 C) are transcribed
+    as caption text, not as axis readings. Cardiff Table 1 mass-loss cells for tests 2b and 3 are 16.00%
+    and 37.00% as printed; they disagree with Matchett 2006 Table 3 (0.16% / 0.37%) and are not 'corrected'.
+  date: '2026-09-12'
+  worker: extract-pyro-steurer
+  provenance_path: docs-private/research/2026-09-12-pyrolysis-extracts/cardiff-2007-vacuum-pyrolysis-gsfc/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: MLS-1A
+  observable: rate_series
+  observation_id: cardiff_2007_table1_fresnel_pyrolysis_log
+  field: MLS1a_test11_mass_loss_pct
+  value: 10.1
+  locator:
+    table: '1'
+    pdf_page_index: 3
+    note: Table 1 test 11 MLS-1a mass loss 10.10%
+- species: MLS-1A
+  observable: rate_series
+  observation_id: cardiff_2007_table1_fresnel_pyrolysis_log
+  field: test2b_mass_loss_pct
+  value: 16.0
+  locator:
+    table: '1'
+    pdf_page_index: 3
+    note: Table 1 test 2b FeTiO3 mass loss 16.00% as printed
+- species: FeTiO3
+  observable: rate_series
+  observation_id: cardiff_2007_fig5_ilmenite_EDS_ratios
+  field: unvaporized_Fe_over_O
+  value: 0.93
+  locator:
+    figure: '5'
+    pdf_page_index: 5
+    note: Figure 5 printed Fe/O = 6.3/6.8 = 0.93 (unvaporized)
+species:
+  MLS-1A:
+    observations:
+    - observation_id: cardiff_2007_table1_fresnel_pyrolysis_log
+      type: rate_series
+      locator:
+        table: '1'
+        pdf_page_index: 3
+        note: TABLE 1. Results of 12 tests with the prototype system from 2005
+      T_range_K:
+      - 821.15
+      - 2140.15
+      phase: fresnel_lens_vacuum_pyrolysis_mixed_simulants
+      standard_state: Max Temp in C as printed; mass loss in percent as printed
+      regime: solar_fresnel_continuously_pumped_vacuum_pyrolysis
+      units: as published (mins, W/m^2, Torr, C, %)
+      uncertainty:
+        note: none printed. Approximate Duration (mins). Dashes, ~900, >800, and blank Max Temp (test
+          9) / blank mass loss (test 12) retained as printed and not interpolated.
+      values:
+        quantity: vacuum_pyrolysis_experiment_summary
+        method_class: measured_direct
+        MLS1a_test11_mass_loss_pct: 10.1
+        test2b_mass_loss_pct: 16.0
+        T_range_K_conversion: T_K = T_C + 273.15 from numeric Max Temp cells only (548 C and 1867 C);
+          ~900 and >800 excluded from the numeric range
+        sample_mass_as_printed: approximately one net gram of material have been vaporized with the small
+          prototype system
+        n_tests: 12
+        feedstock_composition_table:
+          status: omitted
+          reason: not_printed_in_this_source
+          cited: Weiblen, Murawa and Reid 1990 for MLS-1A
+        MLS-1A_as_printed: MLS-1A is derived from a high-titanium basalt that approximates the chemical
+          composition of Apollo 11 soil (Fig. 9 caption)
+        tests:
+        - test: 1
+          date: 10-Jan
+          sample: Zn
+          duration_min: 5.0
+          flux_W_m2: null
+          flux_as_printed: '-'
+          P_init_Torr_as_printed: <1x10^{-4}
+          P_test_Torr_as_printed: '5'
+          P_test_Torr: 5.0
+          Tmax_C_as_printed: ~900
+          Tmax_C: null
+          mass_loss_pct: null
+          mass_loss_as_printed: '-'
+          omitted:
+            flux_W_m2: printed_dash
+            Tmax_C: printed_as_approx_tilde_900_not_a_point
+            mass_loss_pct: printed_dash
+        - test: 2a
+          date: 7-Mar
+          sample: FeTiO3
+          duration_min: 10.0
+          flux_W_m2: 800.0
+          P_init_Torr_as_printed: <1x10^{-4}
+          P_test_Torr_as_printed: 1.1x10^{-1}
+          P_test_Torr: 0.11
+          Tmax_C: 620.0
+          Tmax_C_as_printed: '620'
+          mass_loss_pct: null
+          mass_loss_as_printed: '-'
+          omitted:
+            mass_loss_pct: printed_dash
+        - test: 2b
+          date: 7-Mar
+          sample: FeTiO3
+          duration_min: 15.0
+          flux_W_m2: 945.0
+          P_init_Torr_as_printed: <1x10^{-4}
+          P_test_Torr_as_printed: 2x10^{-2}
+          P_test_Torr: 0.02
+          Tmax_C_as_printed: '>800'
+          Tmax_C: null
+          mass_loss_pct: 16.0
+          mass_loss_as_printed: 16.00%
+          omitted:
+            Tmax_C: printed_as_greater_than_800_not_a_point
+        - test: 3
+          date: 18-Apr
+          sample: FeTiO3
+          duration_min: 20.0
+          flux_W_m2: 890.0
+          P_init_Torr_as_printed: 6.0x10^{-1}
+          P_test_Torr_as_printed: 8x10^{-1}
+          P_test_Torr: 0.8
+          Tmax_C: 700.0
+          Tmax_C_as_printed: '700'
+          mass_loss_pct: 37.0
+          mass_loss_as_printed: 37.00%
+        - test: 4
+          date: 3-May
+          sample: MgSiO3
+          duration_min: 1.0
+          flux_W_m2: 955.0
+          P_init_Torr_as_printed: 4.4x10^{-2}
+          P_test_Torr_as_printed: 4.4x10^{-2}
+          P_test_Torr: 0.044
+          Tmax_C: 548.0
+          Tmax_C_as_printed: '548'
+          mass_loss_pct: 0.05
+          mass_loss_as_printed: 0.05%
+        - test: 5
+          date: 6-Jun
+          sample: MgSiO3
+          duration_min: 30.0
+          flux_W_m2: 940.0
+          P_init_Torr_as_printed: 1.4x10^{-1}
+          P_test_Torr_as_printed: 2.3x10^{-1}
+          P_test_Torr: 0.23
+          Tmax_C: 1072.0
+          Tmax_C_as_printed: '1072'
+          mass_loss_pct: 0.92
+          mass_loss_as_printed: 0.92%
+        - test: 6
+          date: 16-Jun
+          sample: Al2O3
+          duration_min: 20.0
+          flux_W_m2: 950.0
+          P_init_Torr_as_printed: 1.4x10^{-1}
+          P_test_Torr_as_printed: '3'
+          P_test_Torr: 3.0
+          Tmax_C: 1800.0
+          Tmax_C_as_printed: '1800'
+          mass_loss_pct: null
+          mass_loss_as_printed: '-'
+          omitted:
+            mass_loss_pct: printed_dash
+        - test: 7
+          date: 17-Jun
+          sample: FeTiO3
+          duration_min: 67.0
+          flux_W_m2: 975.0
+          P_init_Torr_as_printed: 2.3x10^{-1}
+          P_test_Torr_as_printed: '3.20'
+          P_test_Torr: 3.2
+          Tmax_C: 1867.0
+          Tmax_C_as_printed: '1867'
+          mass_loss_pct: 0.47
+          mass_loss_as_printed: 0.47%
+        - test: 8
+          date: 12-Jul
+          sample: MgSiO3
+          duration_min: 30.0
+          flux_W_m2: 960.0
+          P_init_Torr_as_printed: '7'
+          P_test_Torr_as_printed: '10'
+          P_test_Torr: 10.0
+          Tmax_C: 1100.0
+          Tmax_C_as_printed: '1100'
+          mass_loss_pct: 10.66
+          mass_loss_as_printed: 10.66%
+        - test: 9
+          date: 27-Jul
+          sample: FeTiO3
+          duration_min: 30.0
+          flux_W_m2: 795.0
+          P_init_Torr_as_printed: 6.6x10^{-2}
+          P_test_Torr_as_printed: '1'
+          P_test_Torr: 1.0
+          Tmax_C: null
+          Tmax_C_as_printed: ''
+          mass_loss_pct: 0.73
+          mass_loss_as_printed: 0.73%
+          omitted:
+            Tmax_C: printed_blank_cell
+        - test: 10
+          date: 2-Aug
+          sample: FeTiO3
+          duration_min: 39.0
+          flux_W_m2: 880.0
+          P_init_Torr_as_printed: '1.4'
+          P_test_Torr_as_printed: '1.4'
+          P_test_Torr: 1.4
+          Tmax_C: 1436.0
+          Tmax_C_as_printed: '1436'
+          mass_loss_pct: 0.37
+          mass_loss_as_printed: 0.37%
+        - test: 11
+          date: 25-Aug
+          sample: MLS-1a
+          duration_min: 52.0
+          flux_W_m2: 1005.0
+          P_init_Torr_as_printed: 9.6x10^{-2}
+          P_test_Torr_as_printed: 1.4x10^{-1}
+          P_test_Torr: 0.14
+          Tmax_C: 1474.0
+          Tmax_C_as_printed: '1474'
+          mass_loss_pct: 10.1
+          mass_loss_as_printed: 10.10%
+        - test: 12
+          date: 17-Nov
+          sample: MLS-1a
+          duration_min: 9.0
+          flux_W_m2: 992.0
+          P_init_Torr_as_printed: 7x10^{-3}
+          P_test_Torr_as_printed: 1x10^{-2}
+          P_test_Torr: 0.01
+          Tmax_C: 684.0
+          Tmax_C_as_printed: '684'
+          mass_loss_pct: null
+          mass_loss_as_printed: ''
+          omitted:
+            mass_loss_pct: printed_blank_cell
+        contradiction_vs_matchett_2006_table3:
+          test_2b_mass_loss:
+            cardiff_table1: 16.00%
+            matchett_table3: 0.16%
+          test_3_mass_loss:
+            cardiff_table1: 37.00%
+            matchett_table3: 0.37%
+          resolution: none_both_printed_this_extract_keeps_cardiff_as_printed
+        note: Keyed under MLS-1A because that is the lunar-simulant feedstock of this project; Table 1
+          also contains Zn, FeTiO3, MgSiO3 and Al2O3 rows. T wording is Max Temp (C) as printed; not stated
+          as sample, furnace, or set-point.
+      equipment:
+        cell_material:
+          value: zirconia crucible (Cardiff et al. 2005 prototype described in this paper)
+          locator:
+            pdf_page_index: 2
+            section: SOLAR CONCENTRATION
+            paragraph: The work described in Cardiff et al. (2005) used a zirconia crucible
+        chamber_pressure:
+          value: per-test Testing Pressure (Torr) as printed in Table 1; continuously-pumped system
+          units: Torr
+          locator:
+            table: '1'
+            pdf_page_index: 3
+    - observation_id: cardiff_2007_psu_10g_mls1a_vaporization
+      type: rate_series
+      locator:
+        figure: '8'
+        pdf_page_index: 7
+        note: 'Figure 8 caption: pyrolysis in vacuum to 10^{-5} Torr and 1400 C at PSU; 10 g MLS-1A'
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: MLS-1A_in_PSU_high_temperature_vacuum_furnace
+      standard_state: complete vaporization of 10 g MLS-1A as captioned
+      regime: resistive_high_T_vacuum_furnace
+      units: as published (g, Torr, C)
+      uncertainty:
+        note: body text says samples of ~10 g; caption prints 10 g. No mass-loss percent printed.
+      values:
+        quantity: complete_vaporization
+        method_class: measured_direct
+        feedstock_as_printed: 10g of MLS-1A lunar simulant
+        mass_g_caption: 10.0
+        mass_g_body_as_printed: ~10 g
+        P_Torr_as_printed: 10^{-5}
+        P_Torr: 1.0e-05
+        T_C_as_printed: 1400.0
+        T_K: 1673.15
+        result_as_printed: completely vaporized (crucible empty after pyrolysis in Fig. 8)
+        site: Pennsylvania State University Sintering Lab
+        no_vaporization_companion:
+          status: omitted
+          reason: not_printed
+          as_printed: tests were conducted at slightly lower temperature that showed no vaporization
+      equipment:
+        chamber_pressure:
+          value: 1.0e-05
+          units: Torr
+          locator:
+            figure: '8'
+            pdf_page_index: 7
+            paragraph: pyrolysis in vacuum to 10^{-5} Torr and 1400 C at PSU
+    - observation_id: cardiff_2007_fig9_PT_figure_only
+      type: rate_series
+      locator:
+        figure: '9'
+        pdf_page_index: 7
+        note: Figure 9 System pressure and temperature required to vaporize an Apollo 11 soil simulant
+      T_range_K:
+      - 1273.15
+      - 2073.15
+      phase: MLS-1A_vaporization_envelope
+      standard_state: P (Torr) vs Temperature (Deg C)
+      regime: mixed_measured_points_and_HSC_model_curve
+      units: Torr and Deg C as published
+      uncertainty:
+        note: figure-only; points not digitised
+      values:
+        quantity: vaporization_P_T
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: Pressure (Torr) vs Temperature (Deg C)
+        labeled_regions:
+        - No Vaporization
+        - Complete Vaporization
+        - Complete Vaporization Conditions
+        - Ilmenite Reduction Conditions
+        body_text_as_printed: The vaporization temperature drops to the temperatures commonly used for
+          ilmenite reduction for pressures below ~10^{-5} Torr. A vacuum pyrolysis processing plant on
+          the lunar surface would operate around 10^{-7} Torr.
+    - observation_id: cardiff_2007_fig6_hsc_1e-1_Torr_figure_only
+      type: psat_series
+      locator:
+        figure: '6'
+        pdf_page_index: 6
+        note: Figure 6 Equilibrium composition of MLS-1A at 10^{-1} Torr
+      T_range_K:
+      - 273.15
+      - 3273.15
+      phase: MLS-1A_HSC_equilibrium
+      standard_state: percent composition vs T (C)
+      regime: HSC_gibbs_minimization_model
+      units: percent composition as published
+      uncertainty:
+        note: figure-only; not digitised
+      values:
+        quantity: equilibrium_composition
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis_T_as_printed: 0 to 3000 (same numeric labels as Fig. 7; treated as C and converted T_K =
+          T_C + 273.15; not digitised)
+        P_Torr_as_printed: 10^{-1}
+        software: HSC analysis package; minimization of the Gibbs free energy
+    - observation_id: cardiff_2007_fig7_hsc_1e-7_Torr_figure_only
+      type: psat_series
+      locator:
+        figure: '7'
+        pdf_page_index: 6
+        note: Figure 7 Equilibrium composition of MLS-1A at 10^{-7} Torr
+      T_range_K:
+      - 273.15
+      - 3273.15
+      phase: MLS-1A_HSC_equilibrium
+      standard_state: percent composition vs T (C)
+      regime: HSC_gibbs_minimization_model
+      units: percent composition as published
+      uncertainty:
+        note: figure-only; not digitised
+      values:
+        quantity: equilibrium_composition
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis_T_as_printed: 0 to 3000 (same numeric labels as Fig. 6; treated as C and converted T_K =
+          T_C + 273.15; not digitised)
+        P_Torr_as_printed: 10^{-7}
+        software: HSC analysis package
+  FeTiO3:
+    observations:
+    - observation_id: cardiff_2007_fig5_ilmenite_EDS_ratios
+      type: rate_series
+      locator:
+        figure: '5'
+        pdf_page_index: 5
+        note: printed Fe/O and Ti/O ratios on Figure 5 (not axis readings)
+      T_range_K:
+      - 821.15
+      - 2140.15
+      phase: ilmenite_slag_surface_EDS
+      standard_state: relative Fe/O and Ti/O count ratios as printed on the figure
+      regime: SEM_EDS_residue
+      units: dimensionless ratios as published
+      uncertainty:
+        note: none printed; ratios given as printed quotients
+      values:
+        quantity: residue_EDS_atomic_ratio
+        method_class: measured_direct
+        evidence_form: printed_on_figure_not_digitised_curve
+        unvaporized_Fe_over_O: 0.93
+        unvaporized_as_printed: Fe/O = 6.3/6.8 = 0.93; Ti/O = 0.5/6.8 = 0.07
+        unvaporized_Ti_over_O: 0.07
+        vaporized_Fe_over_O: 0.98
+        vaporized_as_printed: Fe/O = 4.9/5 = 0.98; Ti/O = 0.9/5 = 0.18
+        vaporized_Ti_over_O: 0.18
+        authors_text: The higher ratios of iron and titanium to oxygen indicate reduced oxygen in the
+          surface of the remaining material.
+        sample: ilmenite shown in Figure 3 (right)
+  O2:
+    observations:
+    - observation_id: cardiff_2007_fig4_rga_test12_figure_only
+      type: rate_series
+      locator:
+        figure: '4'
+        pdf_page_index: 4
+        note: Figure 4 Residual gas analysis from test 12
+      T_range_K:
+      - 957.15
+      - 957.15
+      phase: MLS-1A_effluent_RGA
+      standard_state: relative partial pressure vs time (RGA)
+      regime: leak_valve_RGA_on_pumped_chamber
+      units: relative partial pressure as plotted (not tabulated)
+      uncertainty:
+        note: figure-only; traces not digitised
+      values:
+        quantity: relative_partial_pressure
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        test: 12
+        sample: MLS-1A
+        RGA_operating_limit_Torr_as_printed: 10^{-5}
+        RGA_note: chamber pressure too high to operate the RGA directly in the flow; leak valve plus turbopump
+          downstream; RGA used only for the last test with MLS-1A
+        authors_text: The RGA did measure an increase in relative partial pressure of oxygen in the gas
+          flow when the simulant was observed to boil. This oxygen increase also occurred simultaneously
+          with an increase in the partial pressure of species with an atomic mass unit of 28. The partial
+          pressure of water (atomic mass of 18) did not increase.
+        amu_labeled_on_figure:
+        - 2
+        - 18
+        - 28
+        - 32
+        - 44
+      equipment:
+        chamber_pressure:
+          value: RGA limited to operating at pressures below 10^{-5} Torr
+          units: Torr
+          locator:
+            pdf_page_index: 3
+            paragraph: The RGA is limited to operating at pressures below 10^{-5} Torr

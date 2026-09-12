@@ -1,0 +1,977 @@
+schema_version: literature_extract.v1
+source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
+source:
+  citation: Schaefer, L. & Fegley, B., Jr. (2007), "Outgassing of ordinary chondritic material and some
+    of its implications for the chemistry of asteroids, planets, and satellites", Icarus 186:462–483,
+    DOI 10.1016/j.icarus.2006.09.002
+  doi: 10.1016/j.icarus.2006.09.002
+  url: https://solarsystem.wustl.edu/wp-content/uploads/reprints/2007/Schaefer%20and%20Fegley%202007%20Icarus%20outgassing%20of%20OC.pdf
+  year: 2007
+extraction:
+  method: Official Washington University reprint PDF (corpus raw/schaefer-and-fegley-2007-icarus-outgassing-of-oc).
+    Tables 1–3 and printed T–P / fO2 / quoted-heating numbers transcribed from 350 dpi pdftoppm renders
+    of PDF pages 3, 4, 5, 11 and 12 (published pp. 464–466, 472–473). pdftotext-layout and MinerU were
+    used only as a table/figure inventory; they are not data. Figs 1–17 recorded figure-only; no axis
+    digitisation. Authors' METBASE averages (Table 1) kept distinct from McSween et al. 1991 observed
+    mineralogy (Table 3 observed column), from this paper's Gibbs-minimization outputs (Table 2 Hebe column,
+    Table 3 Hebe column, all gas-chemistry figures), and from quoted heating experiments (Muenow, Gooding
+    and Muenow, Brett and Sato).
+  date: '2026-09-12'
+  worker: extract-pyro-outgas
+  provenance_path: docs-private/reviews/2026-09-12-pyrolysis-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: H_chondrite
+  observable: gibbs_table
+  observation_id: schaefer_2007_table1_h_chondrite_falls
+  field: SiO2_average_mass_pct
+  value: 36.49
+  locator:
+    table: '1'
+    published_page: 464
+    pdf_page_index: 3
+    note: Table 1 H chondrite SiO2 Average 36.49 as printed on 350 dpi render
+- species: H_chondrite
+  observable: gibbs_table
+  observation_id: schaefer_2007_table1_h_chondrite_falls
+  field: total_mass_pct
+  value: 99.98
+  locator:
+    table: '1'
+    published_page: 464
+    pdf_page_index: 3
+    note: Table 1 H chondrite Total 99.98 as printed
+- species: H_chondrite
+  observable: gibbs_table
+  observation_id: schaefer_2007_table3_h_normative_vs_hebe
+  field: Apatite_observed_mass_pct
+  value: 0.65 ± 0.07
+  locator:
+    table: '3'
+    published_page: 473
+    pdf_page_index: 12
+    note: Table 3 H chondrite Apatite observed 0.65 ± 0.07 as printed
+- species: H_chondrite
+  observable: rate_series
+  observation_id: schaefer_2007_hebe_tp_program_printed
+  field: Pgas_bars_all_C_as_CO_at_1200K_as_printed
+  value: 340
+  locator:
+    published_page: 465
+    pdf_page_index: 4
+    paragraph: '2.4'
+    note: Pgas ~ 340 bars within the pore spaces at 1200 K as printed
+species:
+  H_chondrite:
+    observations:
+    - observation_id: schaefer_2007_table1_h_chondrite_falls
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 464
+        pdf_page_index: 3
+        page: 464
+        note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
+      phase: average_H_chondrite_falls
+      condensed_form:
+        state: bulk_undifferentiated_chondrite
+        metastable: false
+        basis: explicit_author
+        note: Metal + sulfide + silicate ordinary chondrite falls; not a single specimen
+      standard_state: bulk composition as Mass % of component; N, Cl, F as ppm
+      regime: compiled_composition
+      units: mass percent except N, Cl, F in ppm as printed
+      values:
+        quantity: bulk_composition_average_ordinary_chondrite_falls
+        method_class: secondary_compilation
+        admission_status: authors_average_of_METBASE_falls_not_this_work_instrument
+        semantics: compiled_composition_not_gibbs_table
+        caption_as_published: Table 1 Composition of average ordinary chondrite falls
+        headers_as_published: Component | Mass % of component | Range | Average  for H, L, LL
+        chondrite_group: H
+        n_analyses_footnote_as_printed: 'a No. of analyses: oxides and metals (90), water (47), C (47),
+          N (60), Cl (30), F(7).'
+        n_analyses:
+          oxides_and_metals: 90
+          water: 47
+          C: 47
+          N: 60
+          Cl: 30
+          F: 7
+        database: METBASE (Koblitz, 2005); falls only; analyses with all major rock-forming elements
+        total_mass_pct: 99.98
+        SiO2_average_mass_pct: 36.49
+        components:
+        - component: SiO2
+          range_as_printed: 30.07–39.73
+          average_as_printed: 36.49
+        - component: TiO2
+          range_as_printed: 0.05–0.45
+          average_as_printed: 0.12
+        - component: Al2O3
+          range_as_printed: 1.46–4.48
+          average_as_printed: 2.35
+        - component: Cr2O3
+          range_as_printed: 0.10–0.73
+          average_as_printed: 0.47
+        - component: FeO
+          range_as_printed: 4.74–17.54
+          average_as_printed: 9.54
+        - component: MnO
+          range_as_printed: 0.21–0.50
+          average_as_printed: 0.3
+        - component: MgO
+          range_as_printed: 19.77–25.01
+          average_as_printed: 23.41
+        - component: CaO
+          range_as_printed: 1.18–2.66
+          average_as_printed: 1.7
+        - component: Na2O
+          range_as_printed: 0.35–1.29
+          average_as_printed: 0.87
+        - component: K2O
+          range_as_printed: 0.04–0.23
+          average_as_printed: 0.1
+        - component: P2O5
+          range_as_printed: 0.05–0.53
+          average_as_printed: 0.26
+        - component: Fe (m)
+          range_as_printed: 8.1–26.19
+          average_as_printed: 16.72
+        - component: Ni
+          range_as_printed: 1.15–2.24
+          average_as_printed: 1.7
+        - component: Co
+          range_as_printed: 0.01–0.17
+          average_as_printed: 0.08
+        - component: FeS
+          range_as_printed: 2.52–9.65
+          average_as_printed: 5.33
+        - component: H2O+
+          range_as_printed: 0–0.92
+          average_as_printed: 0.32
+        - component: H2O−
+          range_as_printed: 0–0.36
+          average_as_printed: 0.09
+        - component: C
+          range_as_printed: 0.01–0.34
+          average_as_printed: 0.12
+        - component: N
+          range_as_printed: 2.05–121
+          average_as_printed: 34
+          unit_as_printed: ppm
+        - component: Cl
+          range_as_printed: 7–210
+          average_as_printed: 77
+          unit_as_printed: ppm
+        - component: F
+          range_as_printed: 8–41
+          average_as_printed: 27
+          unit_as_printed: ppm
+      uncertainty:
+        note: Table prints Range and Average; no ± on the averages. Footnotes give n of analyses per constituent
+          class.
+      quote: Table 1 Composition of average ordinary chondrite falls. H chondrite SiO2 average 36.49;
+        Total 99.98.
+    - observation_id: schaefer_2007_table2_h_solid_solutions
+      type: gibbs_table
+      locator:
+        table: '2'
+        published_page: 472
+        pdf_page_index: 11
+        page: 472
+        note: Table 2 Solid solution compositions, H chondrites block; 350 dpi pdftoppm of PDF page 11
+      T_range_K:
+      - 300.0
+      - 1225.0
+      phase: olivine_orthopyroxene_plagioclase_solid_solutions
+      standard_state: observed literature compositions vs calculated Hebe 3.7 Ma (low T to high T)
+      regime: compiled_composition_and_equilibrium_model
+      units: mol% end-members as Fo/Fa, En/Fs/Wo, An/Ab/Or as printed
+      values:
+        quantity: solid_solution_compositions
+        method_class: mixed_quoted_literature_and_model_derived
+        observed_column:
+          method_class: quoted_literature
+          olivine_as_printed: Fo80–84 Fa20–16
+          ca_poor_pyroxene_as_printed: En86–80 Fs14–20
+          plagioclase_as_printed: An12 Ab82 Or6
+        hebe_column:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          olivine_as_printed: Fo77–86 Fa23–14
+          ca_poor_pyroxene_as_printed: En83–67 Fs17–28 Wo0–5
+          plagioclase_as_printed: An21–39 Ab73–50 Or6–11
+          footnote_a_example_as_printed: olv = Fo77 Fa23 @ 300 K, olv = Fo86 Fa14 @ 1225 K for H chondrites
+      uncertainty:
+        note: Observed column is a literature range; Hebe column is a T-range, not ±.
+      quote: 'Table 2 Solid solution compositions. H chondrites: Olivine observed Fo80–84 Fa20–16; Hebe
+        (3.7 Ma) Fo77–86 Fa23–14.'
+    - observation_id: schaefer_2007_table3_h_normative_vs_hebe
+      type: gibbs_table
+      locator:
+        table: '3'
+        published_page: 473
+        pdf_page_index: 12
+        page: 473
+        note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
+      T_range_K:
+      - 300.0
+      - 1225.0
+      phase: average_H_chondrite_normative_vs_calculated
+      standard_state: normative mineral mass % (McSween et al. 1991) vs calculated mineralogy along Hebe
+        3.7 Ma T/P
+      regime: compiled_composition_and_equilibrium_model
+      units: mass % as printed (H block header)
+      values:
+        quantity: normative_mineralogy_vs_calculated
+        method_class: mixed_quoted_literature_and_model_derived
+        observed_column:
+          method_class: quoted_literature
+          source: McSween et al. (1991)
+          total_as_printed: 99.99
+        hebe_column:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          profile: 3.7 Ma Hebe T/P; ranges low T to high T (300–1225 K)
+          total_as_printed: 98.78–96.41
+        Apatite_observed_mass_pct: 0.65 ± 0.07
+        minerals:
+        - mineral: Apatite
+          observed_as_printed: 0.65 ± 0.07
+          hebe_3_7_Ma_as_printed: '0.62'
+        - mineral: Chromite
+          observed_as_printed: 0.76 ± 0.05
+          hebe_3_7_Ma_as_printed: '0.70'
+        - mineral: Ilmenite
+          observed_as_printed: 0.23 ± 0.02
+          hebe_3_7_Ma_as_printed: '0.23'
+        - mineral: Orthoclase
+          observed_as_printed: 0.56 ± 0.07
+          hebe_3_7_Ma_as_printed: '0.60'
+        - mineral: Albite
+          observed_as_printed: 7.30 ± 0.31
+          hebe_3_7_Ma_as_printed: 7.33–2.72
+        - mineral: Anorthite
+          observed_as_printed: 1.70 ± 0.43
+          hebe_3_7_Ma_as_printed: 2.22–2.27
+        - mineral: Diopside
+          observed_as_printed: 4.11 ± 0.54
+          hebe_3_7_Ma_as_printed: 3.48–0
+        - mineral: Hypersthene
+          observed_as_printed: 26.15 ± 2.94
+          hebe_3_7_Ma_as_printed: 22.18–35.63
+        - mineral: Olivine
+          observed_as_printed: 35.04 ± 3.93
+          hebe_3_7_Ma_as_printed: 39.10–31.90
+        - mineral: Metal
+          observed_as_printed: 18.02 ± 1.65
+          hebe_3_7_Ma_as_printed: 17.36–16.78
+        - mineral: FeS
+          observed_as_printed: 5.47 ± 0.38
+          hebe_3_7_Ma_as_printed: '4.96'
+        other_phases_footnote_c_as_printed:
+          H: corundum, talc, Fe2C, MnS, sodalite, nepheline
+          L: C, Fe2C, sodalite, nepheline
+          LL: C, Fe2C, sodalite, nepheline, Ni3S2
+      uncertainty:
+        note: Observed column prints ± on each mineral; Hebe column is a T-range, not an uncertainty.
+      quote: 'Table 3 Normative mineralogy of ordinary chondrites compared with calculated mineralogies.
+        H: observed Total 99.99; Hebe (3.7 Ma) Total 98.78–96.41.'
+    - observation_id: schaefer_2007_hebe_tp_program_printed
+      type: rate_series
+      locator:
+        published_page: 465
+        pdf_page_index: 4
+        page: 465
+        section: '2.4'
+        figure: '1'
+        note: Printed T–P program numbers from §2.4 prose; Fig. 1 itself is figure-only
+      T_range_K:
+      - 300.0
+      - 1225.0
+      phase: asteroid_6_Hebe_thermal_profile
+      standard_state: Ghosh et al. (2003) T–depth for 6 Hebe; lithostatic Pgas = Plithostatic
+      regime: equilibrium_closed_system_model
+      units: K and bars as printed
+      values:
+        quantity: thermal_and_pressure_program
+        method_class: model_derived
+        admission_status: model_input_not_measurement
+        T_is: model_temperature_along_Hebe_profile_not_a_furnace_setpoint
+        nominal_profile: 3.7 Ma after accretion (also computed 5.7 and 7.3 Ma)
+        T_max_K: 1225.0
+        T_max_source: Ghosh et al. (2003) peak metamorphic temperature 1225 K (McSween et al., 1988)
+        T_range_K_table3_footnote:
+        - 300.0
+        - 1225.0
+        Hebe_bulk_density_g_cm3_as_printed: 3.7 ± 1.2
+        Hebe_bulk_density_source: Michalak (2001)
+        H_chondrite_density_g_cm3: 3.4
+        H_chondrite_porosity_pct: 10
+        density_porosity_source: Britt and Consolmagno (2003)
+        Pgas_bars_all_C_as_CO_at_1200K_as_printed: 340
+        Pgas_bars_all_H_as_H2_as_printed: 1120
+        Pgas_center_Hebe_bars_as_printed: 400
+        Pgas_relation_as_printed: Pgas = Plithostatic
+        code: Gibbs energy minimization (Van Zeggern and Storey 1970 type)
+        database: IVTANTHERMO (Belov et al., 1999) plus added chondrite minerals
+        n_condensed_phases: 224
+        n_gaseous_species: 704
+        elements_as_printed: Al, C, Ca, Cl, Co, Cr, F, Fe, H, K, Mg, Mn, N, Na, Ni, O, P, S, Si, and Ti
+        nominal_solid_solutions: ideal mineral solid solutions
+        fig1_status: figure_only
+        fig1_caption_as_printed: Fig. 1. Pressure vs temperature profiles for Asteroid 6 Hebe based on
+          the temperature vs depth profiles from Ghosh et al. (2003). The different lines refer to temperature
+          profiles at 3.7, 5.7, and 7.3 Ma after accretion.
+      uncertainty:
+        note: Hebe density printed 3.7 ± 1.2 g/cm3. Pgas values printed with ~. Fig. 1 not digitised.
+      quote: This gives Pgas ∼ 340 bars within the pore spaces at 1200 K, the maximum metamorphic temperature
+        for an H6 chondrite (Slater-Reynolds and McSween, 2005). If we assume all hydrogen in an average
+        H chondrite is present as H2 gas (as our results show), Pgas increases to ∼1120 bars. The maximum
+        temperature we used in our calculations is 1225 K.
+    - observation_id: schaefer_2007_gas_chemistry_figures_figure_only
+      type: rate_series
+      locator:
+        figure: 2–17
+        published_page: 466–479
+        pdf_page_index: 5–18
+        note: All calculated gas-chemistry / mineralogy / fO2 plots; not digitised
+      T_range_K:
+      - 300.0
+      - 1600.0
+      phase: equilibrium_gas_over_average_ordinary_chondrite
+      standard_state: closed-system chemical equilibrium along Hebe T–P unless a figure states otherwise
+      regime: equilibrium_closed_system_model
+      units: log mole fraction / fO2 as plotted; no numeric table
+      values:
+        quantity: equilibrium_outgassed_gas_composition_vs_T
+        method_class: model_derived
+        admission_status: figure_only
+        status: typed_refusal
+        reason: Gas speciation, elemental distribution, fO2, mineralogy, and sensitivity panels exist
+          only as Figs 2–17. No printed numeric table of mole fractions vs T. Curves were not read off
+          axes.
+        semantics: bound_not_point_ordering
+        major_outgassed_volatiles_as_printed: CH4, H2, H2O, N2, and NH3 (the latter at conditions where
+          hydrous minerals form)
+        CO_never_major_during_metamorphism_as_printed: true
+        oxygen_fugacity_buffer_as_printed: close to that of the quartz–fayalite–iron (QFI) buffer
+        figures:
+        - figure: '2'
+          note: Holbrook (L6) equilibrium gas vs T at 10^−3 bar total pressure
+        - figure: '3'
+          note: H-chondrite gas vs T for 3.7 / 5.7 / 7.3 Ma Hebe profiles
+        - figure: '4'
+          note: L-chondrite analog of Fig. 3a
+        - figure: '5'
+          note: LL-chondrite analog of Fig. 3a
+        - figure: '6'
+          note: H, C, O, S distribution solid vs gas, 3.7 Ma
+        - figure: '7'
+          note: CH4/CO/CO2 and N2/NH3 equal-abundance lines in T/P
+        - figure: '8'
+          note: calculated fO2 vs T vs solid-state buffers
+        - figure: '9'
+          note: H-chondrite mineralogy vs T and P along 3.7 Ma
+        - figure: '10'
+          note: H-chondrite gas chemistry panels
+        - figure: '11'
+          note: H-chondrite fO2
+        - figure: '12'
+          note: open-system gas chemistry
+        - figure: '13'
+          note: H-abundance sensitivity
+        - figure: '14'
+          note: C-abundance sensitivity
+        - figure: '15'
+          note: N-abundance sensitivity
+        - figure: '16'
+          note: O-abundance sensitivity
+        - figure: '17'
+          note: C and N solubility in metal
+      uncertainty:
+        note: not applicable; figures not digitised
+      quote: The major outgassed volatiles from ordinary chondritic material are CH4, H2, H2O, N2, and
+        NH3 (the latter at conditions where hydrous minerals form). Contrary to widely held assumptions,
+        CO is never the major C-bearing gas during ordinary chondrite metamorphism.
+  L_chondrite:
+    observations:
+    - observation_id: schaefer_2007_table1_l_chondrite_falls
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 464
+        pdf_page_index: 3
+        page: 464
+        note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
+      phase: average_L_chondrite_falls
+      condensed_form:
+        state: bulk_undifferentiated_chondrite
+        metastable: false
+        basis: explicit_author
+        note: Metal + sulfide + silicate ordinary chondrite falls; not a single specimen
+      standard_state: bulk composition as Mass % of component; N, Cl, F as ppm
+      regime: compiled_composition
+      units: mass percent except N, Cl, F in ppm as printed
+      values:
+        quantity: bulk_composition_average_ordinary_chondrite_falls
+        method_class: secondary_compilation
+        admission_status: authors_average_of_METBASE_falls_not_this_work_instrument
+        semantics: compiled_composition_not_gibbs_table
+        caption_as_published: Table 1 Composition of average ordinary chondrite falls
+        headers_as_published: Component | Mass % of component | Range | Average  for H, L, LL
+        chondrite_group: L
+        n_analyses_footnote_as_printed: 'b No. of analyses: oxides and metals (123), water (84), C (66),
+          N (88), Cl (22), F(11).'
+        n_analyses:
+          oxides_and_metals: 123
+          water: 84
+          C: 66
+          N: 88
+          Cl: 22
+          F: 11
+        database: METBASE (Koblitz, 2005); falls only; analyses with all major rock-forming elements
+        total_mass_pct: 100.24
+        SiO2_average_mass_pct: 39.66
+        components:
+        - component: SiO2
+          range_as_printed: 35.43–42.00
+          average_as_printed: 39.66
+        - component: TiO2
+          range_as_printed: 0.02–0.18
+          average_as_printed: 0.12
+        - component: Al2O3
+          range_as_printed: 1.35–4.26
+          average_as_printed: 2.32
+        - component: Cr2O3
+          range_as_printed: 0.05–0.76
+          average_as_printed: 0.5
+        - component: FeO
+          range_as_printed: 10.74–17.61
+          average_as_printed: 14.14
+        - component: MnO
+          range_as_printed: 0.07–1.21
+          average_as_printed: 0.34
+        - component: MgO
+          range_as_printed: 21.11–26.6
+          average_as_printed: 24.84
+        - component: CaO
+          range_as_printed: 1.41–2.48
+          average_as_printed: 1.84
+        - component: Na2O
+          range_as_printed: 0.50–2.29
+          average_as_printed: 0.98
+        - component: K2O
+          range_as_printed: 0.03–0.38
+          average_as_printed: 0.12
+        - component: P2O5
+          range_as_printed: 0.06–0.68
+          average_as_printed: 0.25
+        - component: Fe (m)
+          range_as_printed: 2.78–14.68
+          average_as_printed: 7.27
+        - component: Ni
+          range_as_printed: 0.70–1.67
+          average_as_printed: 1.23
+        - component: Co
+          range_as_printed: 0.01–0.14
+          average_as_printed: 0.06
+        - component: FeS
+          range_as_printed: 3.45–9.88
+          average_as_printed: 5.99
+        - component: H2O+
+          range_as_printed: 0–1.42
+          average_as_printed: 0.34
+        - component: H2O−
+          range_as_printed: 0–0.36
+          average_as_printed: 0.07
+        - component: C
+          range_as_printed: 0.01–0.90
+          average_as_printed: 0.16
+        - component: N
+          range_as_printed: 4.02–109
+          average_as_printed: 34
+          unit_as_printed: ppm
+        - component: Cl
+          range_as_printed: 15–212
+          average_as_printed: 76
+          unit_as_printed: ppm
+        - component: F
+          range_as_printed: 8–52
+          average_as_printed: 28
+          unit_as_printed: ppm
+      uncertainty:
+        note: Table prints Range and Average; no ± on the averages. Footnotes give n of analyses per constituent
+          class.
+      quote: Table 1 Composition of average ordinary chondrite falls. L chondrite SiO2 average 39.66;
+        Total 100.24.
+    - observation_id: schaefer_2007_table2_l_solid_solutions
+      type: gibbs_table
+      locator:
+        table: '2'
+        published_page: 472
+        pdf_page_index: 11
+        page: 472
+        note: Table 2 L chondrites block; 350 dpi pdftoppm of PDF page 11
+      T_range_K:
+      - 300.0
+      - 1225.0
+      phase: olivine_orthopyroxene_plagioclase_solid_solutions
+      standard_state: observed literature vs calculated Hebe 3.7 Ma
+      regime: compiled_composition_and_equilibrium_model
+      units: mol% end-members as printed
+      values:
+        quantity: solid_solution_compositions
+        method_class: mixed_quoted_literature_and_model_derived
+        observed_column:
+          method_class: quoted_literature
+          olivine_as_printed: Fo75–79 Fa25–21
+          ca_poor_pyroxene_as_printed: En81–78 Fs19–22
+          plagioclase_as_printed: An10 Ab84 Or6
+        hebe_column:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          olivine_as_printed: Fo71–80 Fa29–20
+          ca_poor_pyroxene_as_printed: En79–60 Fs19–31 Wo0–9
+          plagioclase_as_printed: An14–40 Ab79–42 Or6–18
+      uncertainty:
+        note: Observed column is a literature range; Hebe column is a T-range.
+      quote: 'Table 2 L chondrites: Olivine observed Fo75–79 Fa25–21; Hebe Fo71–80 Fa29–20.'
+    - observation_id: schaefer_2007_table3_l_normative_vs_hebe
+      type: gibbs_table
+      locator:
+        table: '3'
+        published_page: 473
+        pdf_page_index: 12
+        page: 473
+        note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
+      T_range_K:
+      - 300.0
+      - 1225.0
+      phase: average_L_chondrite_normative_vs_calculated
+      standard_state: normative mineral mass % (McSween et al. 1991) vs calculated mineralogy along Hebe
+        3.7 Ma T/P
+      regime: compiled_composition_and_equilibrium_model
+      units: wt% as printed (L block header)
+      values:
+        quantity: normative_mineralogy_vs_calculated
+        method_class: mixed_quoted_literature_and_model_derived
+        observed_column:
+          method_class: quoted_literature
+          source: McSween et al. (1991)
+          total_as_printed: 100.0
+        hebe_column:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          profile: 3.7 Ma Hebe T/P; ranges low T to high T (300–1225 K)
+          total_as_printed: 100.00–92.64
+        Apatite_observed_mass_pct: 0.54 ± 0.09
+        minerals:
+        - mineral: Apatite
+          observed_as_printed: 0.54 ± 0.09
+          hebe_3_7_Ma_as_printed: '0.59'
+        - mineral: Chromite
+          observed_as_printed: 0.78 ± 0.05
+          hebe_3_7_Ma_as_printed: '0.74'
+        - mineral: Ilmenite
+          observed_as_printed: 0.24 ± 0.02
+          hebe_3_7_Ma_as_printed: '0.23'
+        - mineral: Orthoclase
+          observed_as_printed: 0.64 ± 0.07
+          hebe_3_7_Ma_as_printed: '0.71'
+        - mineral: Albite
+          observed_as_printed: 8.07 ± 0.44
+          hebe_3_7_Ma_as_printed: 8.29–1.51
+        - mineral: Anorthite
+          observed_as_printed: 1.59 ± 0.49
+          hebe_3_7_Ma_as_printed: 1.58–1.55
+        - mineral: Diopside
+          observed_as_printed: 4.97 ± 0.66
+          hebe_3_7_Ma_as_printed: 4.59–0
+        - mineral: Hypersthene
+          observed_as_printed: 24.15 ± 2.59
+          hebe_3_7_Ma_as_printed: 20.66–38.44
+        - mineral: Olivine
+          observed_as_printed: 44.83 ± 3.02
+          hebe_3_7_Ma_as_printed: 49.32–38.39
+        - mineral: Metal
+          observed_as_printed: 8.39 ± 0.99
+          hebe_3_7_Ma_as_printed: 7.30–6.59
+        - mineral: FeS
+          observed_as_printed: 5.80 ± 0.80
+          hebe_3_7_Ma_as_printed: '5.99'
+        other_phases_footnote_c_as_printed:
+          H: corundum, talc, Fe2C, MnS, sodalite, nepheline
+          L: C, Fe2C, sodalite, nepheline
+          LL: C, Fe2C, sodalite, nepheline, Ni3S2
+      uncertainty:
+        note: Observed column prints ± on each mineral; Hebe column is a T-range, not an uncertainty.
+      quote: 'Table 3 Normative mineralogy of ordinary chondrites compared with calculated mineralogies.
+        L: observed Total 100.0; Hebe (3.7 Ma) Total 100.00–92.64.'
+  LL_chondrite:
+    observations:
+    - observation_id: schaefer_2007_table1_ll_chondrite_falls
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 464
+        pdf_page_index: 3
+        page: 464
+        note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
+      phase: average_LL_chondrite_falls
+      condensed_form:
+        state: bulk_undifferentiated_chondrite
+        metastable: false
+        basis: explicit_author
+        note: Metal + sulfide + silicate ordinary chondrite falls; not a single specimen
+      standard_state: bulk composition as Mass % of component; N, Cl, F as ppm
+      regime: compiled_composition
+      units: mass percent except N, Cl, F in ppm as printed
+      values:
+        quantity: bulk_composition_average_ordinary_chondrite_falls
+        method_class: secondary_compilation
+        admission_status: authors_average_of_METBASE_falls_not_this_work_instrument
+        semantics: compiled_composition_not_gibbs_table
+        caption_as_published: Table 1 Composition of average ordinary chondrite falls
+        headers_as_published: Component | Mass % of component | Range | Average  for H, L, LL
+        chondrite_group: LL
+        n_analyses_footnote_as_printed: 'c No. of analyses: oxides and metals (29), water (18), C (19),
+          N (39), Cl (2), F(3).'
+        n_analyses:
+          oxides_and_metals: 29
+          water: 18
+          C: 19
+          N: 39
+          Cl: 2
+          F: 3
+        database: METBASE (Koblitz, 2005); falls only; analyses with all major rock-forming elements
+        total_mass_pct: 100.4
+        SiO2_average_mass_pct: 40.48
+        components:
+        - component: SiO2
+          range_as_printed: 37.1–41.80
+          average_as_printed: 40.48
+        - component: TiO2
+          range_as_printed: 0.08–0.23
+          average_as_printed: 0.13
+        - component: Al2O3
+          range_as_printed: 1.84–3.91
+          average_as_printed: 2.38
+        - component: Cr2O3
+          range_as_printed: 0.36–0.72
+          average_as_printed: 0.55
+        - component: FeO
+          range_as_printed: 11.46–21.11
+          average_as_printed: 17.44
+        - component: MnO
+          range_as_printed: 0.05–0.45
+          average_as_printed: 0.33
+        - component: MgO
+          range_as_printed: 23.81–26.50
+          average_as_printed: 25.32
+        - component: CaO
+          range_as_printed: 1.47–2.24
+          average_as_printed: 1.82
+        - component: Na2O
+          range_as_printed: 0.75–1.21
+          average_as_printed: 0.96
+        - component: K2O
+          range_as_printed: 0.05–0.16
+          average_as_printed: 0.11
+        - component: P2O5
+          range_as_printed: 0.13–0.65
+          average_as_printed: 0.27
+        - component: Fe (m)
+          range_as_printed: 0.33–12.93
+          average_as_printed: 2.64
+        - component: Ni
+          range_as_printed: 0.73–1.39
+          average_as_printed: 1.03
+        - component: Co
+          range_as_printed: 0.02–0.09
+          average_as_printed: 0.054
+        - component: FeS
+          range_as_printed: 4.03–8.39
+          average_as_printed: 5.87
+        - component: H2O+
+          range_as_printed: 0–1.77
+          average_as_printed: 0.6
+        - component: H2O−
+          range_as_printed: 0–0.47
+          average_as_printed: 0.16
+        - component: C
+          range_as_printed: 0.02–0.57
+          average_as_printed: 0.235
+        - component: N
+          range_as_printed: 3–298
+          average_as_printed: 50
+          unit_as_printed: ppm
+        - component: Cl
+          range_as_printed: 121–131
+          average_as_printed: 126
+          unit_as_printed: ppm
+        - component: F
+          range_as_printed: 49–66
+          average_as_printed: 58
+          unit_as_printed: ppm
+      uncertainty:
+        note: Table prints Range and Average; no ± on the averages. Footnotes give n of analyses per constituent
+          class.
+      quote: Table 1 Composition of average ordinary chondrite falls. LL chondrite SiO2 average 40.48;
+        Total 100.4.
+    - observation_id: schaefer_2007_table2_ll_solid_solutions
+      type: gibbs_table
+      locator:
+        table: '2'
+        published_page: 472
+        pdf_page_index: 11
+        page: 472
+        note: Table 2 LL chondrites block; 350 dpi pdftoppm of PDF page 11
+      T_range_K:
+      - 300.0
+      - 1225.0
+      phase: olivine_orthopyroxene_plagioclase_solid_solutions
+      standard_state: observed literature vs calculated Hebe 3.7 Ma
+      regime: compiled_composition_and_equilibrium_model
+      units: mol% end-members as printed
+      values:
+        quantity: solid_solution_compositions
+        method_class: mixed_quoted_literature_and_model_derived
+        observed_column:
+          method_class: quoted_literature
+          olivine_as_printed: Fo68–74 Fa32–26
+          ca_poor_pyroxene_as_printed: En78–74 Fs22–26
+          plagioclase_as_printed: An10 Ab86 Or4
+        hebe_column:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          olivine_as_printed: Fo67–75 Fa33–25
+          ca_poor_pyroxene_as_printed: En77–56 Fs21–34 Wo0–9
+          plagioclase_as_printed: An17–47 Ab77–38 Or6–16
+      uncertainty:
+        note: Observed column is a literature range; Hebe column is a T-range.
+      quote: 'Table 2 LL chondrites: Olivine observed Fo68–74 Fa32–26; Hebe Fo67–75 Fa33–25.'
+    - observation_id: schaefer_2007_table3_ll_normative_vs_hebe
+      type: gibbs_table
+      locator:
+        table: '3'
+        published_page: 473
+        pdf_page_index: 12
+        page: 473
+        note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
+      T_range_K:
+      - 300.0
+      - 1225.0
+      phase: average_LL_chondrite_normative_vs_calculated
+      standard_state: normative mineral mass % (McSween et al. 1991) vs calculated mineralogy along Hebe
+        3.7 Ma T/P
+      regime: compiled_composition_and_equilibrium_model
+      units: wt% as printed (LL block header)
+      values:
+        quantity: normative_mineralogy_vs_calculated
+        method_class: mixed_quoted_literature_and_model_derived
+        observed_column:
+          method_class: quoted_literature
+          source: McSween et al. (1991)
+          total_as_printed: 100.0
+        hebe_column:
+          method_class: model_derived
+          admission_status: model_output_not_measurement
+          profile: 3.7 Ma Hebe T/P; ranges low T to high T (300–1225 K)
+          total_as_printed: 98.99–95.88
+        Apatite_observed_mass_pct: 0.54 ± 0.11
+        minerals:
+        - mineral: Apatite
+          observed_as_printed: 0.54 ± 0.11
+          hebe_3_7_Ma_as_printed: '0.64'
+        - mineral: Chromite
+          observed_as_printed: 0.80 ± 0.04
+          hebe_3_7_Ma_as_printed: '0.81'
+        - mineral: Ilmenite
+          observed_as_printed: 0.25 ± 0.04
+          hebe_3_7_Ma_as_printed: '0.25'
+        - mineral: Orthoclase
+          observed_as_printed: 0.61 ± 0.12
+          hebe_3_7_Ma_as_printed: '0.65'
+        - mineral: Albite
+          observed_as_printed: 8.11 ± 0.50
+          hebe_3_7_Ma_as_printed: 8.13–1.45
+        - mineral: Anorthite
+          observed_as_printed: 1.55 ± 0.40
+          hebe_3_7_Ma_as_printed: 1.86–1.91
+        - mineral: Diopside
+          observed_as_printed: 5.34 ± 0.53
+          hebe_3_7_Ma_as_printed: 4.19–0
+        - mineral: Hypersthene
+          observed_as_printed: 21.44 ± 3.74
+          hebe_3_7_Ma_as_printed: 17.10–35.83
+        - mineral: Olivine
+          observed_as_printed: 51.92 ± 5.57
+          hebe_3_7_Ma_as_printed: 58.60–46.04
+        - mineral: Metal
+          observed_as_printed: 3.59 ± 1.65
+          hebe_3_7_Ma_as_printed: 1.60–2.41
+        - mineral: FeS
+          observed_as_printed: 5.85 ± 1.06
+          hebe_3_7_Ma_as_printed: 5.16–5.89
+        other_phases_footnote_c_as_printed:
+          H: corundum, talc, Fe2C, MnS, sodalite, nepheline
+          L: C, Fe2C, sodalite, nepheline
+          LL: C, Fe2C, sodalite, nepheline, Ni3S2
+      uncertainty:
+        note: Observed column prints ± on each mineral; Hebe column is a T-range, not an uncertainty.
+      quote: 'Table 3 Normative mineralogy of ordinary chondrites compared with calculated mineralogies.
+        LL: observed Total 100.0; Hebe (3.7 Ma) Total 98.99–95.88.'
+  O2:
+    observations:
+    - observation_id: schaefer_2007_quoted_brett_sato_1984_fo2
+      type: psat_series
+      locator:
+        published_page: 472
+        pdf_page_index: 11
+        page: 472
+        paragraph: '3.1'
+        note: Quoted Brett and Sato (1984) measured log fO2; not this work
+      T_range_K:
+      - 1200.0
+      - 1200.0
+      phase: ordinary_chondrite_solid
+      standard_state: log fO2 (bars) at 1200 K as quoted
+      regime: quoted_solid_electrolyte_or_equivalent
+      units: log10 fO2 in bars as printed
+      values:
+        quantity: log10_fO2_bars
+        method_class: quoted_literature
+        T_K: 1200.0
+        Ochansk_H4_log_fO2_bars: -17.1
+        Guarena_H6_log_fO2_bars: -17.3
+        quoted_uncertainty_as_printed: ± 0.6
+        this_work_calculated_H_log_fO2_bars: -17.4
+        this_work_calculated_uncertainty_as_printed: ± 0.4
+        this_work_calculated_method_class: model_derived
+        Williams_1971_calculated_log_fO2: -17.5
+        Williams_1971_uncertainty_as_printed: ± 1.2
+        McSween_Labotka_1993_calculated_log_fO2: -18.8
+      uncertainty:
+        as_printed: Brett and Sato ±0.6; this work calculated ±0.4; Williams ±1.2
+      quote: For example, at 1200 K Brett and Sato (1984) measured log fO2 (bars) = −17.1 ± 0.6 for the
+        Ochansk H4 chondrite and −17.3 ± 0.6 for the Guareña H6 chondrite. At the same temperature we
+        calculate log fO2 = −17.4 ± 0.4 for H chondritic material, Williams (1971) calculated −17.5 ±
+        1.2, and McSween and Labotka (1993) calculated −18.8 for log fO2.
+  H2O:
+    observations:
+    - observation_id: schaefer_2007_quoted_muenow_1995_heating
+      type: rate_series
+      locator:
+        published_page: 466
+        pdf_page_index: 5
+        page: 466
+        section: '2.5'
+        note: Quoted Muenow et al. (1995) vacuum heating of ordinary chondrites; not this work
+      T_range_K:
+      - 600.0
+      - 1300.0
+      phase: ordinary_chondrite_vacuum_heating_quoted
+      standard_state: species released vs T as stated by Muenow et al. 1995
+      regime: quoted_vacuum_heating
+      units: K as printed
+      values:
+        quantity: quoted_evolved_species_vs_T
+        method_class: quoted_literature
+        quoted_from: Muenow et al. (1995)
+        apparatus_as_printed: heated several ordinary chondrites in a vacuum
+        H2O_and_CH4_outgassed_below_K_as_printed: 900
+        CO2_formed_around_K_as_printed: 1023
+        CO_released_from_to_K_as_printed: 1100–1300
+        this_work_comment_H2_most_abundant: true
+        this_work_comment_CH4_only_abundant_below_K_as_printed: 600
+        this_work_comment_method_class: model_derived
+      uncertainty:
+        note: quoted with ~ as printed; no ±
+      quote: Muenow et al. (1995) heated several ordinary chondrites in a vacuum and measured the gases
+        that were evolved. They found that H2O and CH4 outgassed below ∼900 K. Carbon dioxide formed around
+        1023 K, and CO was released from ∼1100–1300 K.
+    - observation_id: schaefer_2007_quoted_gooding_muenow_1977_holbrook
+      type: rate_series
+      locator:
+        published_page: 466
+        pdf_page_index: 5
+        page: 466
+        section: '2.5'
+        figure: '2'
+        note: Quoted Gooding and Muenow (1977) Holbrook L6 vacuum stepwise heating; Fig. 2 is this work's
+          model overlay
+      T_range_K:
+      - 600.0
+      - 1600.0
+      phase: Holbrook_L6_quoted_stepwise_vacuum_heating
+      standard_state: open system with evolving bulk composition (gases removed as evolved)
+      regime: quoted_vacuum_heating
+      units: K as printed
+      values:
+        quantity: quoted_evolved_species_vs_T
+        method_class: quoted_literature
+        quoted_from: Gooding and Muenow (1977)
+        sample: Holbrook L6 fall, recovered 1912
+        mode_as_printed: under vacuum in a stepwise fashion; gas evolved from the chondrite was removed
+          and the temperature was gradually increased
+        primary_H_and_C_species_as_printed: H2O and CO2
+        S2_and_SO2_above_K_as_printed: 1073
+        this_work_fig2_total_pressure_bar_as_printed: 10−3
+        this_work_fig2_method_class: model_derived
+        this_work_fig2_admission_status: figure_only
+        this_work_H2O_CO2_most_abundant_below_K_as_printed: 1050
+      uncertainty:
+        note: quoted; Fig. 2 not digitised
+      quote: They found that H2O and CO2 were the primary hydrogen and carbon bearing species, with S2
+        and minor amounts of SO2 becoming abundant above 1073 K. Our results (Fig. 2) show that H2O and
+        CO2 are the most abundant gases below ∼1050 K.
+  CH4:
+    observations:
+    - observation_id: schaefer_2007_ch4_major_gas_model_claim
+      type: rate_series
+      locator:
+        published_page: 462
+        pdf_page_index: 1
+        page: 462
+        paragraph: Abstract
+      T_range_K:
+      - 300.0
+      - 1225.0
+      phase: equilibrium_gas_over_average_ordinary_chondrite
+      standard_state: closed-system chemical equilibrium
+      regime: equilibrium_closed_system_model
+      units: dimensionless identity claim as printed
+      values:
+        quantity: identity_of_major_C_bearing_gas
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        major_C_bearing_gas_during_metamorphism: CH4
+        CO_never_major_during_ordinary_chondrite_metamorphism: true
+        numeric_mole_fractions: figure_only
+      uncertainty:
+        note: not applicable; no numeric mole-fraction table
+      quote: The major outgassed volatiles from ordinary chondritic material are CH4, H2, H2O, N2, and
+        NH3 (the latter at conditions where hydrous minerals form). Contrary to widely held assumptions,
+        CO is never the major C-bearing gas during ordinary chondrite metamorphism.
+deepening:
+  date: '2026-09-12'
+  worker: extract-pyro-outgas
+  method: 350 dpi pdftoppm of the WUSTL reprint. No figure digitisation. Table 1 is the authors' METBASE
+    average of falls, not an instrument measurement of a named stone. Tables 2–3 split observed (quoted)
+    from Hebe-calculated (model_derived) columns. Gas-release curves are figure-only.
+  authors_own_instrument_measurements: none; this paper is a Gibbs-energy minimization study
+  figure_only:
+  - Fig. 1 Hebe T–P profiles (Ghosh et al. 2003 input)
+  - Figs 2–17 calculated gas chemistry, fO2, mineralogy, sensitivity, C/N metal solubility
+  refused:
+  - axis values from Figs 1–17
+  - interpolation of Table 1 averages from ranges
+  - treating quoted Muenow / Gooding and Muenow / Brett and Sato numbers as this work
+  reproduction_target_note: A simulator reproduction of this paper is a closed-system equilibrium outgassing
+    of the Table 1 H/L/LL bulk compositions along the Hebe 3.7 Ma T–P path (T up to 1225 K; P lithostatic,
+    printed ~340 bar at 1200 K if all C as CO). Residual comparison is to the printed tables and to the
+    qualitative major-gas identity (CH4, H2, H2O, N2, NH3; CO never major during metamorphism), not to
+    undigitised figure curves.
