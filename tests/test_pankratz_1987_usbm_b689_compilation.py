@@ -19,6 +19,32 @@ from tools import ingest_pankratz_1987_usbm_b689 as harvest
 ROOT = loader.COMPILATION_ROOT
 
 
+def _jsonl_union(*names):
+    """Read a base JSONL plus any sibling `-pNNNN-pNNNN` shards.
+
+    Parallel page-range workers own disjoint printed pages, so each writes its own
+    shard rather than appending to a shared file -- five concurrent appenders would
+    collide. The coverage invariant is over the UNION, not over one file.
+    """
+    out = []
+    for name in names:
+        stem = name[:-len(".jsonl")]
+        paths = [ROOT / name] + sorted(ROOT.glob(f"{stem}-p*.jsonl"))
+        for path in paths:
+            if not path.exists():
+                continue
+            out.extend(json.loads(line) for line in path.read_text().splitlines() if line.strip())
+    return out
+
+
+def _audits():
+    return _jsonl_union("source/formula-audit.jsonl")
+
+
+def _source_pages():
+    return _jsonl_union("source/mineru-pages.jsonl")
+
+
 def _records():
     return [json.loads(path.read_text()) for path in sorted((ROOT / "records").glob("*.json"))]
 
@@ -62,7 +88,7 @@ def test_independent_image_anchors():
 
 def test_self_consistent_wrong_identity_and_audit_cannot_certify():
     records = _records()
-    audits = [json.loads(x) for x in (ROOT / "source/formula-audit.jsonl").read_text().splitlines()]
+    audits = _audits()
     for item in records + audits:
         if item["record_id"] == "page-0007":
             item["formula"] = "A1S"
@@ -89,7 +115,7 @@ def test_complete_page_three_numeric_image_fixture():
 
 
 def test_native_tokens_notes_and_html_census():
-    pages = [json.loads(x) for x in (ROOT / "source/mineru-pages.jsonl").read_text().splitlines()]
+    pages = _source_pages()
     assert len(pages) == 48
     assert sum(x["type"] == "table" for p in pages[:40] for x in p["items"]) == 59
     assert sum(x["type"] == "table" for p in pages for x in p["items"]) == 70
@@ -131,7 +157,7 @@ def test_coverage_and_nonoxide_policy():
     assert not manifest["compilation_role"]["scoring_eligible"]
     assert not manifest["compilation_role"]["validation_measurement"]
     assert not manifest["compilation_role"]["oxide_rail_default"]
-    audits = [json.loads(x) for x in (ROOT / "source/formula-audit.jsonl").read_text().splitlines()]
+    audits = _audits()
     assert [a["pdf_page"] for a in audits[:34]] == list(range(7, 41))
     assert [a["pdf_page"] for a in audits] == list(range(7, 49))
     assert tuple(sum(a["status"] == status for a in audits[:34]) for status in ("matched", "corrected", "unverified")) == (20, 13, 1)
@@ -290,7 +316,7 @@ def test_continuation_repair_and_prose_image_anchors():
     assert correction["ocr_token"][0] == "$B_{2}S_{3}(c,1)$ "
     assert correction["printed_token"] == "B₂S₃(c,l) / Diboron Trisulfide"
     assert correction["image_quote"] == "B₂S₃(c,l)\nDiboron Trisulfide"
-    audits = {a["record_id"]: a for a in map(json.loads, (ROOT / "source/formula-audit.jsonl").read_text().splitlines())}
+    audits = {a["record_id"]: a for a in _audits()}
     assert "*Data except enthalpy of formation at 298 K estimated." in audits["page-0039"]["notes"]
     assert "*Data except enthalpy of formation at 298 K and temperature and enthalpy of fusion estimated." in audits["page-0040"]["notes"]
     assert "Phase change: 836 K, melting point of B₂S₃; ΔH° = 11.500 kcal/mol." in audits["page-0040"]["notes"]
@@ -308,7 +334,7 @@ def test_continuation_repair_and_prose_image_anchors():
 
 def test_valid_but_wrong_continuation_formula_cannot_certify():
     records = _records()
-    audits = [json.loads(x) for x in (ROOT / "source/formula-audit.jsonl").read_text().splitlines()]
+    audits = _audits()
     for item in records + audits:
         if item["record_id"] == "page-0041":
             item.update(formula="B2S2", formula_as_published="B₂S₂(g)")
@@ -331,7 +357,7 @@ def test_rebuild_preserves_native_chunk_offsets_and_artifacts(corpus):
         assert (harvest.ROOT / path).read_text() == content, path
     manifest = yaml.safe_load(artifacts[str((ROOT / "manifest.yaml").relative_to(harvest.ROOT))])
     assert len(manifest["source_files"]) == 12
-    pages = [json.loads(x) for x in (ROOT / "source/mineru-pages.jsonl").read_text().splitlines()]
+    pages = _source_pages()
     source = corpus / "text" / harvest.SOURCE_ID / "mineru/chunk-p041-p080" / f"{harvest.SOURCE_ID}-p041-p080_content_list.json"
     items = json.loads(source.read_text())
     for pdf_page in range(41, 49):
@@ -351,7 +377,7 @@ def test_rebuild_refuses_missing_later_decode(corpus, tmp_path):
 
 def test_rebuild_refuses_audit_gap(corpus, tmp_path, monkeypatch):
     (tmp_path / "source").mkdir()
-    audits = [json.loads(x) for x in (ROOT / "source/formula-audit.jsonl").read_text().splitlines()]
+    audits = _audits()
     (tmp_path / "source/formula-audit.jsonl").write_text("\n".join(json.dumps(a) for a in audits if a["pdf_page"] != 41))
     monkeypatch.setattr(harvest, "DEST", tmp_path)
     with pytest.raises(ValueError, match="every table page"):
