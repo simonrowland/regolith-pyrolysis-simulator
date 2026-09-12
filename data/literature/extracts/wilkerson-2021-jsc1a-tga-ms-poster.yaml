@@ -1,0 +1,573 @@
+schema_version: literature_extract.v1
+source_id: wilkerson-2021-jsc1a-tga-ms-poster
+source:
+  citation: Wilkerson, Ryan P., Voecks, Gerald, Shulman, Holly S., Rickman, Doug L. and Effinger, Mike
+    R. (2021), Characterizing the effects of thermal profile and gas environment on the heat treatment
+    of JSC-1A lunar simulant using combined thermogravimetry and mass spectroscopy. Prepared for the Lunar
+    Surface Science Workshop, Fundamental and Applied Lunar Surface Research in Physical Sciences, 19
+    August 2021. NTRS 20210020017.
+  url: https://ntrs.nasa.gov/citations/20210020017
+  year: 2021
+extraction:
+  method: Born-digital NASA workshop poster PDF from regolith-corpus raw/wilkerson-2021-jsc1a-tga-ms-poster/wilkerson-2021-jsc1a-tga-ms-poster.pdf.
+    Transcribed from 400 dpi pdftoppm PNG renders of all 12 PDF pages. pdftotext-layout and MinerU were
+    used only to locate slides, not as data. Conclusions table (pdf page 11) is the only printed numeric
+    yield table. TG and MS traces on pdf pages 4, 5, 6 and 8 exist only as plots and were recorded figure-only;
+    no axis digitisation. Suspected-reaction table on pdf page 7 is authors' hypothesis, not a measurement.
+    No JSC-1A composition table is printed.
+  date: '2026-09-12'
+  worker: extract-pyro-simulant
+  provenance_path: docs-private/research/2026-09-12-pyrolysis-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: H2O
+  observable: rate_series
+  observation_id: wilkerson_2021_h2o_total_loss_wt_pct
+  field: total_loss_wt_pct
+  value: 0.16
+  locator:
+    pdf_page_index: 11
+    table: conclusions_total_gas_evolutions
+    note: Conclusions table H2O Total Loss (wt. %) = 0.160 +/- 0.014
+- species: CO2
+  observable: rate_series
+  observation_id: wilkerson_2021_co2_total_loss_wt_pct
+  field: total_loss_wt_pct
+  value: 0.12
+  locator:
+    pdf_page_index: 11
+    table: conclusions_total_gas_evolutions
+    note: Conclusions table CO2 Total Loss (wt. %) = 0.120 +/- 0.013
+- species: SO2
+  observable: rate_series
+  observation_id: wilkerson_2021_so2_total_loss_wt_pct
+  field: total_loss_wt_pct
+  value: 0.079
+  locator:
+    pdf_page_index: 11
+    table: conclusions_total_gas_evolutions
+    note: Conclusions table SO2 Total Loss (wt. %) = 0.079 +/- 0.011
+species:
+  H2O:
+    observations:
+    - observation_id: wilkerson_2021_h2o_total_loss_wt_pct
+      type: rate_series
+      locator:
+        table: conclusions_total_gas_evolutions
+        pdf_page_index: 11
+        note: 'Conclusions slide table headed Species | Total Loss (wt. %). Caption: Total gas evolutions
+          of non-lunar mineral decomposition in JSC-1A. Workshop poster; no printed page numbers.'
+      phase: JSC-1A_lunar_simulant_powder
+      condensed_form:
+        state: powder
+        polymorph_name: JSC-1A
+        metastable: false
+        basis: explicit_author
+        note: Feedstock named JSC-1A lunar simulant throughout the poster; no composition table is printed.
+      standard_state: wt. % of JSC-1A as printed (Total Loss)
+      regime: tga_ms_heat_treatment_unspecified_on_table
+      units: wt. % as printed
+      uncertainty:
+        as_printed: 0.160 +/- 0.014
+        total_loss_wt_pct: 0.014
+        note: Plus-minus printed in the conclusions table. The table does not print the thermal program
+          or atmosphere for these totals.
+      values:
+        quantity: total_gas_evolution_mass_loss
+        method_class: measured
+        evidence_class: authors_own_measurement
+        gas_species: H2O
+        total_loss_wt_pct: 0.16
+        as_printed: 0.160 +/- 0.014
+        table_caption_as_printed: Total gas evolutions of non-lunar mineral decomposition in JSC-1A
+        thermal_program_on_table: not_printed
+        omitted:
+          thermal_program: table_does_not_print_ramp_hold_or_atmosphere
+          feedstock_composition_table: not_printed_on_poster
+        T_conversion_note: No temperature is printed on this table; T_range_K omitted rather than inferred
+          from other slides.
+    - observation_id: wilkerson_2021_h2o_release_window_50_200_C
+      type: rate_series
+      locator:
+        pdf_page_index: 4
+        section: Integrated Mass Spectroscopy
+        note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: MS-identified decomposition event temperature window as printed in C
+      regime: tga_ms_he_and_stated_equivalent_in_vacuum
+      units: degree_C as printed; T_range_K = t_C + 273.15 when both bounds printed
+      values:
+        quantity: evolved_gas_temperature_window
+        method_class: measured
+        evidence_class: authors_own_measurement
+        gas_species: H2O
+        T_window_C_as_printed: 50 - 200 C
+        quote: H2O @ 50 - 200 C
+        also_stated_for_vacuum: MS combined with a conventional vacuum furnace shows similar outgassing
+          events at equivalent temperatures
+        vacuum_ms_below_500_C: MS data below 500 C lost, in the process of reacquiring
+        T_range_K_conversion: '[50.0 C, 200.0 C] -> [323.15 K, 473.15 K] via T_K = t_C + 273.15'
+      T_range_K:
+      - 323.15
+      - 473.15
+    - observation_id: wilkerson_2021_he_tga_ms_h2o_page4_figure_only
+      type: rate_series
+      locator:
+        pdf_page_index: 4
+        section: Integrated Mass Spectroscopy
+        note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: TG percent and/or ion-gauge pressure vs time as plotted
+      regime: tga_ms_plotted_curve
+      units: as plotted (TG %; ion gauge pressure Torr); not digitised
+      values:
+        quantity: tga_ms_release_curve
+        method_class: figure_only
+        evidence_class: authors_own_measurement_plotted_only
+        status: figure_only
+        admission_status: rejected_no_complete_figure_digitization
+        caption_as_printed: He, 2.5 C/min, 1050 C hold, +MS
+        plotted_as_printed: TG (%), dTG (%/min), Temperature (C), ion gauge pressure (Torr) for 4 amu
+          (He) and 18 amu (H2O)
+        completeness_note: He TG, dTG, and 18 amu (H2O) ion-gauge trace vs time are plotted only. No table
+          of points.
+    - observation_id: wilkerson_2021_vacuum_ms_h2o_page5_figure_only
+      type: rate_series
+      locator:
+        pdf_page_index: 5
+        section: Integrated Mass Spectroscopy
+        note: 'Vacuum MS slide; caption under plots: vacuum, 2.5 C/min, 1200 C hold, +MS*'
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: TG percent and/or ion-gauge pressure vs time as plotted
+      regime: tga_ms_plotted_curve
+      units: as plotted (TG %; ion gauge pressure Torr); not digitised
+      values:
+        quantity: tga_ms_release_curve
+        method_class: figure_only
+        evidence_class: authors_own_measurement_plotted_only
+        status: figure_only
+        admission_status: rejected_no_complete_figure_digitization
+        caption_as_printed: vacuum, 2.5 C/min, 1200 C hold, +MS*
+        plotted_as_printed: Temperature (C) and Pressure (10^-3 Torr) vs time; ion gauge pressure (Torr)
+          traces labelled H2O, N2, O2, CO2, SO2
+        completeness_note: Vacuum ion-gauge traces including 18 amu (H2O) vs time are plotted only. MS
+          data below 500 C stated lost.
+  CO2:
+    observations:
+    - observation_id: wilkerson_2021_co2_total_loss_wt_pct
+      type: rate_series
+      locator:
+        table: conclusions_total_gas_evolutions
+        pdf_page_index: 11
+        note: 'Conclusions slide table headed Species | Total Loss (wt. %). Caption: Total gas evolutions
+          of non-lunar mineral decomposition in JSC-1A. Workshop poster; no printed page numbers.'
+      phase: JSC-1A_lunar_simulant_powder
+      condensed_form:
+        state: powder
+        polymorph_name: JSC-1A
+        metastable: false
+        basis: explicit_author
+        note: Feedstock named JSC-1A lunar simulant throughout the poster; no composition table is printed.
+      standard_state: wt. % of JSC-1A as printed (Total Loss)
+      regime: tga_ms_heat_treatment_unspecified_on_table
+      units: wt. % as printed
+      uncertainty:
+        as_printed: 0.120 +/- 0.013
+        total_loss_wt_pct: 0.013
+        note: Plus-minus printed in the conclusions table. The table does not print the thermal program
+          or atmosphere for these totals.
+      values:
+        quantity: total_gas_evolution_mass_loss
+        method_class: measured
+        evidence_class: authors_own_measurement
+        gas_species: CO2
+        total_loss_wt_pct: 0.12
+        as_printed: 0.120 +/- 0.013
+        table_caption_as_printed: Total gas evolutions of non-lunar mineral decomposition in JSC-1A
+        thermal_program_on_table: not_printed
+        omitted:
+          thermal_program: table_does_not_print_ramp_hold_or_atmosphere
+          feedstock_composition_table: not_printed_on_poster
+        T_conversion_note: No temperature is printed on this table; T_range_K omitted rather than inferred
+          from other slides.
+    - observation_id: wilkerson_2021_co2_release_window_500_750_C
+      type: rate_series
+      locator:
+        pdf_page_index: 4
+        section: Integrated Mass Spectroscopy
+        note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: MS-identified decomposition event temperature window as printed in C
+      regime: tga_ms_he_and_stated_equivalent_in_vacuum
+      units: degree_C as printed; T_range_K = t_C + 273.15 when both bounds printed
+      values:
+        quantity: evolved_gas_temperature_window
+        method_class: measured
+        evidence_class: authors_own_measurement
+        gas_species: CO2
+        T_window_C_as_printed: 500 - 750 C
+        quote: CO2 @ 500 - 750 C
+        also_stated_for_vacuum: MS combined with a conventional vacuum furnace shows similar outgassing
+          events at equivalent temperatures
+        vacuum_ms_below_500_C: MS data below 500 C lost, in the process of reacquiring
+        T_range_K_conversion: '[500.0 C, 750.0 C] -> [773.15 K, 1023.15 K] via T_K = t_C + 273.15'
+      T_range_K:
+      - 773.15
+      - 1023.15
+    - observation_id: wilkerson_2021_he_tga_ms_co2_page4_figure_only
+      type: rate_series
+      locator:
+        pdf_page_index: 4
+        section: Integrated Mass Spectroscopy
+        note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: TG percent and/or ion-gauge pressure vs time as plotted
+      regime: tga_ms_plotted_curve
+      units: as plotted (TG %; ion gauge pressure Torr); not digitised
+      values:
+        quantity: tga_ms_release_curve
+        method_class: figure_only
+        evidence_class: authors_own_measurement_plotted_only
+        status: figure_only
+        admission_status: rejected_no_complete_figure_digitization
+        caption_as_printed: He, 2.5 C/min, 1050 C hold, +MS
+        plotted_as_printed: ion gauge pressure (Torr) 44 amu (CO2)
+        completeness_note: 44 amu (CO2) ion-gauge trace vs time is plotted only.
+  SO2:
+    observations:
+    - observation_id: wilkerson_2021_so2_total_loss_wt_pct
+      type: rate_series
+      locator:
+        table: conclusions_total_gas_evolutions
+        pdf_page_index: 11
+        note: 'Conclusions slide table headed Species | Total Loss (wt. %). Caption: Total gas evolutions
+          of non-lunar mineral decomposition in JSC-1A. Workshop poster; no printed page numbers.'
+      phase: JSC-1A_lunar_simulant_powder
+      condensed_form:
+        state: powder
+        polymorph_name: JSC-1A
+        metastable: false
+        basis: explicit_author
+        note: Feedstock named JSC-1A lunar simulant throughout the poster; no composition table is printed.
+      standard_state: wt. % of JSC-1A as printed (Total Loss)
+      regime: tga_ms_heat_treatment_unspecified_on_table
+      units: wt. % as printed
+      uncertainty:
+        as_printed: 0.079 +/- 0.011
+        total_loss_wt_pct: 0.011
+        note: Plus-minus printed in the conclusions table. The table does not print the thermal program
+          or atmosphere for these totals.
+      values:
+        quantity: total_gas_evolution_mass_loss
+        method_class: measured
+        evidence_class: authors_own_measurement
+        gas_species: SO2
+        total_loss_wt_pct: 0.079
+        as_printed: 0.079 +/- 0.011
+        table_caption_as_printed: Total gas evolutions of non-lunar mineral decomposition in JSC-1A
+        thermal_program_on_table: not_printed
+        omitted:
+          thermal_program: table_does_not_print_ramp_hold_or_atmosphere
+          feedstock_composition_table: not_printed_on_poster
+        T_conversion_note: No temperature is printed on this table; T_range_K omitted rather than inferred
+          from other slides.
+    - observation_id: wilkerson_2021_so2_release_window_1000_C_plus
+      type: rate_series
+      locator:
+        pdf_page_index: 4
+        section: Integrated Mass Spectroscopy
+        note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: MS-identified decomposition event temperature window as printed in C
+      regime: tga_ms_he_and_stated_equivalent_in_vacuum
+      units: degree_C as printed; T_range_K = t_C + 273.15 when both bounds printed
+      values:
+        quantity: evolved_gas_temperature_window
+        method_class: measured
+        evidence_class: authors_own_measurement
+        gas_species: SO2
+        T_window_C_as_printed: 1000 C+
+        quote: SO2 @ 1000 C+
+        also_stated_for_vacuum: MS combined with a conventional vacuum furnace shows similar outgassing
+          events at equivalent temperatures
+        vacuum_ms_below_500_C: MS data below 500 C lost, in the process of reacquiring
+        T_range_K_omitted: open_ended_or_incomplete_printed_window; T_range_K not invented
+    - observation_id: wilkerson_2021_he_tga_ms_so2_page4_figure_only
+      type: rate_series
+      locator:
+        pdf_page_index: 4
+        section: Integrated Mass Spectroscopy
+        note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: TG percent and/or ion-gauge pressure vs time as plotted
+      regime: tga_ms_plotted_curve
+      units: as plotted (TG %; ion gauge pressure Torr); not digitised
+      values:
+        quantity: tga_ms_release_curve
+        method_class: figure_only
+        evidence_class: authors_own_measurement_plotted_only
+        status: figure_only
+        admission_status: rejected_no_complete_figure_digitization
+        caption_as_printed: He, 2.5 C/min, 1050 C hold, +MS
+        plotted_as_printed: ion gauge pressure (Torr) 64 amu (SO2)
+        completeness_note: 64 amu (SO2) ion-gauge trace vs time is plotted only.
+  JSC-1A:
+    observations:
+    - observation_id: wilkerson_2021_jsc1a_he_thermal_program
+      type: rate_series
+      locator:
+        pdf_page_index: 4
+        section: Integrated Mass Spectroscopy
+        note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+      T_range_K:
+      - 273.15
+      - 1323.15
+      phase: JSC-1A_lunar_simulant_powder
+      condensed_form:
+        state: powder
+        polymorph_name: JSC-1A
+        metastable: false
+        basis: explicit_author
+        note: Tests conducted on JSC-1A. No oxide composition table printed.
+      standard_state: set-point thermal program as printed on the He TGA-MS slide caption
+      regime: tga_ms_flowing_he
+      units: degree_C and C/min as printed; T_K = t_C + 273.15
+      values:
+        quantity: thermal_program
+        method_class: measured
+        evidence_class: authors_own_experiment
+        feedstock: JSC-1A
+        atmosphere_as_printed: inert gas (He)
+        ramp_C_per_min: 2.5
+        hold_C_as_printed: 1050.0
+        T_range_K_conversion: hold 1050 C -> 1323.15 K; plotted temperature axis starts near 0 C -> 273.15
+          K
+        ms: true
+        caption_as_printed: He, 2.5 C/min, 1050 C hold, +MS
+        pressure_absolute: not_printed
+        flow_rate: not_printed
+        crucible_material: not_printed
+        omitted:
+          chamber_pressure: not_printed_on_this_slide_except_as_figure_axis
+          sample_mass: not_printed
+    - observation_id: wilkerson_2021_jsc1a_vacuum_thermal_program
+      type: rate_series
+      locator:
+        pdf_page_index: 5
+        section: Integrated Mass Spectroscopy
+        note: 'Vacuum MS slide; caption under plots: vacuum, 2.5 C/min, 1200 C hold, +MS*'
+      T_range_K:
+      - 273.15
+      - 1473.15
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: set-point thermal program as printed on the vacuum MS slide caption
+      regime: conventional_vacuum_furnace_ms
+      units: degree_C and C/min as printed; T_K = t_C + 273.15
+      values:
+        quantity: thermal_program
+        method_class: measured
+        evidence_class: authors_own_experiment
+        feedstock: JSC-1A
+        atmosphere_as_printed: vacuum
+        ramp_C_per_min: 2.5
+        hold_C_as_printed: 1200.0
+        T_range_K_conversion: hold 1200 C -> 1473.15 K
+        ms: true
+        caption_as_printed: vacuum, 2.5 C/min, 1200 C hold, +MS*
+        ms_below_500_C: MS data below 500 C lost, in the process of reacquiring
+        absolute_pressure: not_printed_as_a_number; Pressure (10^-3 Torr) is a figure axis only and was
+          not digitised
+        pumping: not_printed_whether_static_or_pumped
+        crucible_or_cell_material: not_printed
+        cold_trap: not_printed
+    - observation_id: wilkerson_2021_jsc1a_arh2_thermal_program
+      type: rate_series
+      locator:
+        pdf_page_index: 6
+        section: Hydrogen Reduction of JSC-1A
+        note: 'Ar/5H2 TGA-MS slide; caption under plots: Ar/5H2, 2.5 C/min, 1050 C hold, +MS'
+      T_range_K:
+      - 273.15
+      - 1323.15
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: set-point thermal program as printed on the Ar/5H2 TGA-MS slide caption
+      regime: tga_ms_reducing_ar_5h2
+      units: degree_C and C/min as printed; T_K = t_C + 273.15
+      values:
+        quantity: thermal_program
+        method_class: measured
+        evidence_class: authors_own_experiment
+        feedstock: JSC-1A
+        atmosphere_as_printed: Ar/5H2
+        ramp_C_per_min: 2.5
+        hold_C_as_printed: 1050.0
+        T_range_K_conversion: hold 1050 C -> 1323.15 K
+        ms: true
+        caption_as_printed: Ar/5H2, 2.5 C/min, 1050 C hold, +MS
+        h2o_above_800_C: Distinct H2O evolution occurring at temperatures above 800 C coinciding with
+          H2 consumption from gas stream
+        sulfur_species_absent_as_printed:
+        - H2S
+        - SO2
+        - S2
+        - SO
+        - SO3
+        flow_rate: not_printed
+        absolute_pressure: not_printed
+    - observation_id: wilkerson_2021_jsc1a_arh2_750C_2hr_hold_mass_loss
+      type: rate_series
+      locator:
+        pdf_page_index: 8
+        section: Idealized Heat Treatment for Non-Lunar Species Removal
+        note: Printed bullets plus TG/dTG figure (figure-only curve)
+      T_range_K:
+      - 1023.15
+      - 1023.15
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: TG weight-loss percent as printed for the 750 C Ar/H2 hold
+      regime: tga_idealized_heat_treatment_he_then_ar_h2
+      units: wt % as printed (0.45 - 0.50 %); hold time hours; T_K = t_C + 273.15
+      uncertainty:
+        as_printed: 0.45 - 0.50 %
+        note: Printed as a range, not a plus-minus. The accompanying TG curve is figure-only and was not
+          digitised.
+      values:
+        quantity: isothermal_hold_mass_loss
+        method_class: measured
+        evidence_class: authors_own_measurement
+        hold_C_as_printed: 750.0
+        T_K: 1023.15
+        T_conversion: 750 C -> 1023.15 K via T_K = t_C + 273.15
+        atmosphere_as_printed: Ar/H2
+        hold_time_hr: 2.0
+        mass_loss_wt_pct_range:
+        - 0.45
+        - 0.5
+        as_printed: 2 hr sufficient for 0.45 - 0.50 %
+        quote: Hold at 750 C in Ar/H2 for sulfate reduction and iron reduction. Hold time determined by
+          desired amount of weight loss from Fe conversion. 2 hr sufficient for 0.45 - 0.50 %
+        preceding_ramp_as_printed: Slow ramp to temperature in flowing inert gas for H2O and CO2 removal
+        figure_curve: figure_only_not_digitised
+    - observation_id: wilkerson_2021_idealized_ht_tg_page8_figure_only
+      type: rate_series
+      locator:
+        pdf_page_index: 8
+        section: Idealized Heat Treatment for Non-Lunar Species Removal
+        note: Printed bullets plus TG/dTG figure (figure-only curve)
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: TG percent and/or ion-gauge pressure vs time as plotted
+      regime: tga_ms_plotted_curve
+      units: as plotted (TG %; ion gauge pressure Torr); not digitised
+      values:
+        quantity: tga_ms_release_curve
+        method_class: figure_only
+        evidence_class: authors_own_measurement_plotted_only
+        status: figure_only
+        admission_status: rejected_no_complete_figure_digitization
+        caption_as_printed: He then Ar/5H2 regions marked on the plot; no numeric table
+        plotted_as_printed: Temperature (C), TG (%), dTG (%/min) vs Time (s); He panel then Ar/5H2 panel
+        completeness_note: Idealized heat-treatment TG (%), dTG (%/min) and Temperature (C) vs Time (s)
+          under He then Ar/5H2 are plotted only.
+    - observation_id: wilkerson_2021_suspected_reactions_hypothesis
+      type: rate_series
+      locator:
+        pdf_page_index: 7
+        section: Suspected Reactions in These Environments
+        note: Authors label the reactions suspected; compounds listed are not necessarily all species
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: authors' suspected reactions, not a measured rate
+      regime: authors_hypothesis
+      units: degree_C windows as printed on the suspected-reaction table
+      values:
+        quantity: suspected_decomposition_and_reduction_reactions
+        method_class: authors_hypothesis
+        evidence_class: not_a_measurement
+        admission_status: hypothesis_not_measurement
+        quote: Compounds listed aren't necessarily all species, but representative of the type of reactions
+        inert_or_vacuum_as_printed:
+          H2O_loss_50_200_C:
+          - CaSO4.2H2O <-> CaSO4 + 2 H2O(g)
+          - Al2Si2O5(OH)4 -> 2 H2O(g) + Al2Si2O7
+          CO2_loss_500_750_C:
+          - CaCO3 -> CaO + CO2(g)
+          SO2_loss_1000_C_plus:
+          - 2 CaSO4 -> 2 CaO + O2(g) + 2 SO2(g)
+        hydrogen_as_printed:
+          H2O_and_CO2_loss_50_750_C: Same as those listed above
+          first_reduction_750_800_C: CaSO4 + 4 H2(g) -> CaS2 + 4 H2O(g)
+          second_reduction_850_C_plus:
+          - Fe3O4 + H2(g) -> 3 Fe + 4 H2O(g)
+          - Fe2SiO4 + H2(g) -> 2 Fe + SiO2 + 2 H2O(g)
+        citations_as_printed_for_sulfate_reduction:
+        - Sohn et al. 2002
+        - Tian et al. 2010
+        - Kim et al. 2002
+    - observation_id: wilkerson_2021_vacuum_bubbling_above_1100_C_qualitative
+      type: transition_point
+      locator:
+        pdf_page_index: 11
+        section: Conclusions
+        note: Qualitative conclusion; not a tabulated yield
+      T_range_K:
+      - 1373.15
+      - 1373.15
+      phase: JSC-1A_melt_or_glass
+      standard_state: qualitative expected vacuum bubbling temperature as printed
+      regime: vacuum_heat_treatment
+      units: degree_C as printed; T_K = t_C + 273.15
+      values:
+        quantity: vacuum_bubbling_onset_qualitative
+        method_class: authors_estimate
+        evidence_class: qualitative_conclusion
+        as_printed: Vacuum bubbling is still expected at temperatures in excess of 1100 C due to melt
+          degassing of fluid inclusions
+        T_C_as_printed: in excess of 1100 C
+        T_K_conversion: 1100 C -> 1373.15 K; 'in excess of' is an open bound, recorded as the printed
+          threshold only
+        also_expected_in_lunar_regolith: true
+        not_a_yield: true
+deepening:
+  dispatch_id: extract-pyro-simulant
+  date: '2026-09-12'
+  parent_policy: Printed-page transcription from 400 dpi pdftoppm. Figure curves not digitised. Hypothesis
+    reactions labelled authors_hypothesis.
+  quote_convention: Printed text transcribed with ASCII flattening of degree signs, subscripts, and plus/minus.
+  measured_rows_covered: 8
+  figure_only_rows: 5
+  hypothesis_rows: 2
+  table_inventory:
+  - table: conclusions_total_gas_evolutions
+    pdf_page_index: 11
+    completeness: full
+    note: Three printed rows H2O, CO2, SO2 with plus-minus. No thermal-program header.
+  class_ledger:
+    measured:
+    - wilkerson_2021_h2o_total_loss_wt_pct
+    - wilkerson_2021_co2_total_loss_wt_pct
+    - wilkerson_2021_so2_total_loss_wt_pct
+    - wilkerson_2021_h2o_release_window_50_200_C
+    - wilkerson_2021_co2_release_window_500_750_C
+    - wilkerson_2021_so2_release_window_1000_C_plus
+    - wilkerson_2021_jsc1a_he_thermal_program
+    - wilkerson_2021_jsc1a_vacuum_thermal_program
+    - wilkerson_2021_jsc1a_arh2_thermal_program
+    - wilkerson_2021_jsc1a_arh2_750C_2hr_hold_mass_loss
+    figure_only:
+    - wilkerson_2021_he_tga_ms_h2o_page4_figure_only
+    - wilkerson_2021_vacuum_ms_h2o_page5_figure_only
+    - wilkerson_2021_he_tga_ms_co2_page4_figure_only
+    - wilkerson_2021_he_tga_ms_so2_page4_figure_only
+    - wilkerson_2021_idealized_ht_tg_page8_figure_only
+    authors_hypothesis:
+    - wilkerson_2021_suspected_reactions_hypothesis
+    - wilkerson_2021_vacuum_bubbling_above_1100_C_qualitative
+  refused:
+  - what: JSC-1A oxide composition table
+    reason: not_printed
+  - what: absolute vacuum pressure as a number
+    reason: only_a_figure_axis_in_10^-3_Torr
+  - what: He and Ar/H2 flow rates, sample mass, crucible material
+    reason: not_printed
+  - what: TG/MS curve coordinates
+    reason: figure_only

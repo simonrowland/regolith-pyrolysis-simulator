@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 137
-- Extracts (`literature_extract.v1`): 134
+- Sources: 140
+- Extracts (`literature_extract.v1`): 137
 - PDFs present in this worktree: 44
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 39
 - PDFs with no extract: 3
-- Extracts with no PDF: 93
+- Extracts with no PDF: 96
 - Alias groups needing owner/controller resolution: 32
 - Extracts with private/non-public row locators: 37
 
@@ -161,8 +161,11 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `stebbins-carmichael-weill-1983` | Stebbins, J. F., Carmichael, I. S. E. & Weill, D. E. (1983), "The high temperature liquid and glass heat contents and the heats of fusion of diopside, albite, sanidine and nepheline", American Mineralogist 68, 717-730. |  | `docs/references/pdfs/02-thermochemistry/stebbins-carmichael-weill-1983.pdf`, `5246cf5b` | `raw/stebbins-carmichael-weill-1983/stebbins-carmichael-weill-1983.pdf` (present, 5246cf5b); `text/stebbins-carmichael-weill-1983/` (38 files, exists); `tables/stebbins-carmichael-weill-1983/` (0 files, ABSENT) | `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` (5 rows, draft, private_path) | `ledger/stebbins-carmichael-weill-1983.yaml`: decoded (2026-09-06) |
 | `steurer-1985-vapor-phase-pyrolysis` | Steurer, Wolfgang H. (1985), "Lunar Oxygen Production by Vapor Phase Pyrolysis", Space Manufacturing 5: Engineering with Lunar and Asteroidal Materials, Proceedings of the 7th Princeton/AIAA/SSI Conference, pp. 123–131 |  | ABSENT, `` | `raw/steurer-1985-vapor-phase-pyrolysis/steurer-1985-vapor-phase-pyrolysis.pdf` (present, 5461cd31); `text/steurer-1985-vapor-phase-pyrolysis/` (59 files, exists); `tables/steurer-1985-vapor-phase-pyrolysis/` (0 files, ABSENT) | `data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml` (8 rows, draft) | `ledger/steurer-1985-vapor-phase-pyrolysis.yaml`: decoded (2026-09-06) |
 | `steurer-1992-vapor-phase-pyrolysis` | Steurer, Wolfgang (1992), "Vapor Phase Pyrolysis", in Space Resources, Volume 3: Materials, NASA SP-509, pp. 210–213. NTRS 19930007702 | NTRS 19930007702 | ABSENT, `` | `raw/steurer-1992-vapor-phase-pyrolysis/steurer-1992-vapor-phase-pyrolysis.pdf` (present, beb20e00); `text/steurer-1992-vapor-phase-pyrolysis/` (17 files, exists); `tables/steurer-1992-vapor-phase-pyrolysis/` (0 files, ABSENT) | `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` (2 rows, draft) | `ledger/steurer-1992-vapor-phase-pyrolysis.yaml`: decoded (2026-09-06) |
+| `street-2010-thermal-properties-simulants` | Street Jr., Kenneth W., Ray, Chandra, Rickman, Doug and Scheiman, Daniel A. (2010), Thermal Properties of Lunar Regolith Simulants, NASA/TM—2010-216348. Prepared for the Earth and Space 2010 Conference, Honolulu, Hawaii, March 14-17, 2010. | NTRS 20100024178 | ABSENT, `` | `raw/street-2010-thermal-properties-simulants/street-2010-thermal-properties-simulants.pdf` (present, d198b496); `text/street-2010-thermal-properties-simulants/` (14 files, exists); `tables/street-2010-thermal-properties-simulants/` (0 files, ABSENT) | `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` (7 rows, draft) | `ledger/street-2010-thermal-properties-simulants.yaml`: decoded (2026-09-06) |
 | `ts1985` | Tsukihashi, F. & Sano, N. (1985), "Measurement of the Activity of Na2O in Na2O-SiO2 Melts by Chemical Equilibration Method" / 「化学平衡法による Na2O-SiO2 系融体中の Na2O の活量の測定」, Tetsu-to-Hagane (鉄と鋼) 71(7), 815-822. | 10.2355/tetsutohagane1955.71.7_815 | `docs/references/pdfs/99-kems-langmuir/ts1985.pdf`, `8345faa4` | `raw/ts1985/ts1985.pdf` (present, 8345faa4); `text/ts1985/` (51 files, exists); `tables/ts1985/` (0 files, ABSENT) | `data/literature/extracts/ts1985.yaml` (16 rows, draft) | `ledger/ts1985.yaml`: decoded (2026-09-06) |
 | `wetzel-gail-2013-sio-arrhenius` | Wetzel, S. & Gail, H.-P. (2013), Astron. Astrophys. 553:A92, DOI 10.1051/0004-6361/201220803 | 10.1051/0004-6361/201220803 | ABSENT, `` | `raw/wetzel-gail-2013-sio-arrhenius/wetzel-gail-2013-sio-arrhenius.pdf` (ABSENT, ); `text/wetzel-gail-2013-sio-arrhenius/` (0 files, ABSENT); `tables/wetzel-gail-2013-sio-arrhenius/` (0 files, ABSENT) | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` (1 rows, draft, private_path) | `ledger/wetzel-gail-2013-sio-arrhenius.yaml`: extracted (2026-09-06) |
+| `wilkerson-2021-jsc1a-tga-ms-poster` | Wilkerson, Ryan P., Voecks, Gerald, Shulman, Holly S., Rickman, Doug L. and Effinger, Mike R. (2021), Characterizing the effects of thermal profile and gas environment on the heat treatment of JSC-1A lunar simulant using combined thermogravimetry and mass spectroscopy. Prepared for the Lunar Surface Science Workshop, Fundamental and Applied Lunar Surface Research in Physical Sciences, 19 August 2021. NTRS 20210020017. | NTRS 20210020017 | ABSENT, `` | `raw/wilkerson-2021-jsc1a-tga-ms-poster/wilkerson-2021-jsc1a-tga-ms-poster.pdf` (present, 752ac5e8); `text/wilkerson-2021-jsc1a-tga-ms-poster/` (38 files, exists); `tables/wilkerson-2021-jsc1a-tga-ms-poster/` (0 files, ABSENT) | `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` (17 rows, draft) | `ledger/wilkerson-2021-jsc1a-tga-ms-poster.yaml`: decoded (2026-09-06) |
+| `wilkerson-2023-jsc1a-outgassing` | Wilkerson, Ryan P., Petkov, Mihail P., Voecks, Gerald E., Lynch, Catherine S., Shulman, Holly S., Sundaramoorthy, Santhoshkumar, Choudhury, Amitava, Rickman, Douglas L. and Effinger, Michael R. (2023), Outgassing behavior and heat treatment optimization of JSC-1A lunar regolith simulant, Icarus, DOI 10.1016/j.icarus.2023.115577 | 10.1016/j.icarus.2023.115577 | ABSENT, `` | `raw/wilkerson-2023-jsc1a-outgassing/wilkerson-2023-jsc1a-outgassing.pdf` (present, 4934f9d9); `text/wilkerson-2023-jsc1a-outgassing/` (39 files, exists); `tables/wilkerson-2023-jsc1a-outgassing/` (0 files, ABSENT) | `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` (15 rows, draft) | `ledger/wilkerson-2023-jsc1a-outgassing.yaml`: decoded (2026-09-06) |
 | `wu-1993-feo-mgo-sio2` | Wu, P., Eriksson, G., Pelton, A. D. & Blander, M. (1993), “Prediction of the Thermodynamic Properties and Phase Diagrams of Silicate Systems—Evaluation of the FeO-MgO-SiO2 System”, *ISIJ International* 33(1):26–35 | 10.2355/isijinternational.33.26 | `docs/references/pdfs/02-thermochemistry/wu-1993-feo-mgo-sio2.pdf`, `7f0812ef` | `raw/wu-1993-feo-mgo-sio2/wu-1993-feo-mgo-sio2.pdf` (ABSENT, ); `text/wu-1993-feo-mgo-sio2/` (0 files, ABSENT); `tables/wu-1993-feo-mgo-sio2/` (0 files, ABSENT) | — | `ledger/wu-1993-feo-mgo-sio2.yaml`: — (—) |
 | `yam1983` | Yamaguchi, S., Imai, A. & Goto, K.S. (1983), "Measurement of Activity of Na2O in Na2O-SiO2 Binary Melt Using Beta-Alumina as a Solid Electrolyte" / 「β-アルミナ固体電解質を用いた Na2O-SiO2 系融体中の Na2O の活量の測定」, J. Japan Inst. Metals (日本金属学会誌) 47(9), 736-742. | 10.2320/jinstmet1952.47.9_736 | `docs/references/pdfs/99-kems-langmuir/yam1983.pdf`, `cb29fbbb` | `raw/yam1983/yam1983.pdf` (present, cb29fbbb); `text/yam1983/` (32 files, exists); `tables/yam1983/` (0 files, ABSENT) | `data/literature/extracts/yam1983.yaml` (3 rows, draft) | `ledger/yam1983.yaml`: decoded (2026-09-06) |
 
@@ -266,7 +269,10 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `span-wagner-1996-co2-psat`
 - `steurer-1985-vapor-phase-pyrolysis`
 - `steurer-1992-vapor-phase-pyrolysis`
+- `street-2010-thermal-properties-simulants`
 - `wetzel-gail-2013-sio-arrhenius`
+- `wilkerson-2021-jsc1a-tga-ms-poster`
+- `wilkerson-2023-jsc1a-outgassing`
 
 ### Extracts needing public row locators (b-477)
 

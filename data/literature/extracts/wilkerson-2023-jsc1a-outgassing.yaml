@@ -1,0 +1,715 @@
+schema_version: literature_extract.v1
+source_id: wilkerson-2023-jsc1a-outgassing
+source:
+  citation: Wilkerson, Ryan P., Petkov, Mihail P., Voecks, Gerald E., Lynch, Catherine S., Shulman, Holly
+    S., Sundaramoorthy, Santhoshkumar, Choudhury, Amitava, Rickman, Douglas L. and Effinger, Michael R.
+    (2023), Outgassing behavior and heat treatment optimization of JSC-1A lunar regolith simulant, Icarus,
+    DOI 10.1016/j.icarus.2023.115577
+  doi: 10.1016/j.icarus.2023.115577
+  url: https://doi.org/10.1016/j.icarus.2023.115577
+  year: 2023
+extraction:
+  method: Born-digital Icarus journal pre-proof PDF from regolith-corpus raw/wilkerson-2023-jsc1a-outgassing/wilkerson-2023-jsc1a-outgassing.pdf.
+    Transcribed from 300 dpi pdftoppm of all 32 pages and 400 dpi renders of pdf pages 5-8, 12-14, 16-17
+    and 20. pdftotext-layout and MinerU were used only to locate tables, not as data. Table 1/2 cells
+    under the Journal Pre-proof watermark that could not be read from the 400 dpi crop were omitted with
+    reason watermark_obscured, never guessed. Figures 1-8 curves recorded figure-only; no axis digitisation.
+    Hill et al. 2007 bulk composition and McKay et al. 1994 LOI 0.71 are quoted from other workers.
+  date: '2026-09-12'
+  worker: extract-pyro-simulant
+  provenance_path: docs-private/research/2026-09-12-pyrolysis-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: JSC-1A
+  observable: rate_series
+  observation_id: wilkerson_2023_tga_1050C_total_mass_loss_vacuum_vs_he
+  field: vacuum_wt_pct
+  value: 0.4
+  locator:
+    pdf_page_index: 13
+    figure: '2'
+    note: printed 0.40 wt.% vs 0.35 wt.% in inert
+- species: C
+  observable: rate_series
+  observation_id: wilkerson_2023_table2_carbon_sulfur
+  field: untreated_C_wt_pct
+  value: 0.0253
+  locator:
+    pdf_page_index: 14
+    table: '2'
+    note: Table 2 untreated Carbon (wt.%) 0.0253 (22)
+- species: Fe
+  observable: gibbs_table
+  observation_id: wilkerson_2023_table1_mossbauer_metallic_fe_arh2
+  field: pct_area_as_printed
+  value: 11.34(6)
+  locator:
+    pdf_page_index: 8
+    table: '1'
+    note: Table 1 Metallic Fe Sextet 1 % Area 11.34(6) under Ar/H2 at 1050 C
+species:
+  JSC-1A:
+    observations:
+    - observation_id: wilkerson_2023_tga_apparatus_and_thermal_program
+      type: rate_series
+      locator:
+        pdf_page_index: 6
+        note: Icarus journal pre-proof; no printed pagination.
+        section: 2.1 Thermal Analysis and Mass Spectroscopy
+      T_range_K:
+      - 298.15
+      - 1473.15
+      phase: JSC-1A_lunar_simulant_powder
+      condensed_form:
+        state: powder
+        polymorph_name: JSC-1A
+        metastable: false
+        basis: explicit_author
+        note: JSC-1A lunar mare simulant from Merriam Crater ash. Bulk oxide table is not printed here
+          (Hill et al. 2007 cited).
+      standard_state: SETSYS Evolution TGA set-point program as printed
+      regime: tga_ms
+      units: as printed (C, C/min, ml/min, mbar, mg)
+      values:
+        quantity: thermal_program_and_apparatus
+        method_class: measured
+        evidence_class: authors_own_experiment
+        instrument: SETSYS Evolution (Setaram, Lyon, France)
+        T_range_C_as_printed: 25-1200
+        T_range_K_conversion: '[25 C, 1200 C] -> [298.15 K, 1473.15 K] via T_K = t_C + 273.15'
+        ramp_C_per_min: 2.5
+        inert_atmosphere_as_printed: flowing He at 20 ml/min
+        reducing_atmosphere_as_printed: flowing a 5%H2/Ar mixture at 20 ml/min
+        vacuum_as_printed: continuous vacuum of <1x10^-4 mbar using an attached HiCube 80 Eco turbo vacuum
+          (Pfeiffer Vacuum Inc., Nashua NH, USA)
+        specimen_mass_mg: 1500.0
+        ms_flowing_gas: Hiden QGA quadrupole mass spectrometer
+        T_is: not_printed_whether_sample_or_furnace; recorded as the printed TGA temperature range
+      equipment:
+        chamber_pressure:
+          value: <1x10^-4 mbar (continuous turbo; vacuum TGA runs)
+          locator:
+            pdf_page_index: 6
+            note: Icarus journal pre-proof; no printed pagination.
+            section: 2.1 Thermal Analysis and Mass Spectroscopy
+        cell_material:
+          value: Large volume TGA crucibles (material not named)
+          locator:
+            pdf_page_index: 6
+            note: Icarus journal pre-proof; no printed pagination.
+            section: 2.1 Thermal Analysis and Mass Spectroscopy
+    - observation_id: wilkerson_2023_vacuum_ms_apparatus
+      type: rate_series
+      locator:
+        pdf_page_index: 7
+        note: Icarus journal pre-proof; no printed pagination.
+        section: 2.1-2.2 vacuum MS and chemical analysis
+      T_range_K:
+      - 298.15
+      - 1473.15
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: custom vacuum-furnace MS; printed sample-side pressures
+      regime: pumped_vacuum_ms_quartz_tube
+      units: as printed (g, mbar, C, mbar.l/s)
+      values:
+        quantity: vacuum_ms_apparatus
+        method_class: measured
+        evidence_class: authors_own_experiment
+        sample_mass_g_as_printed: ~23 g
+        cell: sealed in quartz tubes, evacuated through a leak valve
+        base_vacuum_as_printed: ~1x10^-6 mbar
+        pump: HiCube 80 Eco turbo pump station
+        ramp_C_per_min: 2.5
+        T_max_C: 1200.0
+        furnace: vertical tube furnace type F21100 by Barnstead International; Watlow EZ-zone PID
+        condensable_protection: in-line liquid nitrogen (LN2) trap on the main pumping line
+        vapour_saw_cold_surface: true
+        ms: Pfeiffer OmniStar GSD 320 in split-flow; 130 C-heated gas transfer line
+        pressure_gauge: MKS 901P piezo-transducer / micro-Pirani (no ion gauge, to avoid gas consumption)
+        sample_pressure_as_printed: increased typically from ~1x10^-6 mbar (base pressure) to low-10^-4
+          mbar upon closing the MS aperture at the operational value, and peaked in the 0.01-0.1 mbar
+          range during maximum outgassing conditions for raw JSC-1A simulant
+        ms_constant_flow_as_printed: 100 mbar.l/s
+        partial_pressures_note: Reported partial pressures values attributed to various constituents do
+          not take into consideration their different ionization efficiencies.
+      equipment:
+        cell_material:
+          value: quartz tubes
+          locator:
+            pdf_page_index: 7
+            note: Icarus journal pre-proof; no printed pagination.
+            section: 2.1-2.2 vacuum MS and chemical analysis
+        chamber_pressure:
+          value: ~1x10^-6 mbar base; low-10^-4 mbar with MS aperture; 0.01-0.1 mbar peak outgassing (as
+            printed)
+          locator:
+            pdf_page_index: 7
+            note: Icarus journal pre-proof; no printed pagination.
+            section: 2.1-2.2 vacuum MS and chemical analysis
+    - observation_id: wilkerson_2023_tga_1050C_total_mass_loss_vacuum_vs_he
+      type: rate_series
+      locator:
+        pdf_page_index: 13
+        note: Icarus journal pre-proof; no printed pagination.
+        figure: '2'
+      T_range_K:
+      - 298.15
+      - 1323.15
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: TGA total mass loss to 1050 C as printed in wt. %
+      regime: tga_ms_to_1050C_avoid_vitrification
+      units: wt. % as printed
+      uncertainty:
+        as_printed: ~0.05 wt. % difference
+        note: Difference given as approximately 0.05 wt. %. Individual totals printed as 0.40 and 0.35
+          without plus-minus.
+      values:
+        quantity: total_mass_loss
+        method_class: measured
+        evidence_class: authors_own_measurement
+        vacuum_wt_pct: 0.4
+        inert_he_wt_pct: 0.35
+        difference_wt_pct_as_printed: ~0.05
+        as_printed: Total mass loss between inert and vacuum differ by ~0.05 wt. %, with the additional
+          loss in vacuum (0.40 wt.% vs 0.35 wt.% in inert)
+        attributed_to: more aggressive outgassing of sulfur in the form of SOx species
+        T_max_C: 1050.0
+        T_K_conversion: 1050 C -> 1323.15 K
+        reducing_total: not_printed_as_a_number; Figure 2C curve is figure-only
+    - observation_id: wilkerson_2023_idealized_heat_treatment_0p50_wt_pct
+      type: rate_series
+      locator:
+        pdf_page_index: 17
+        note: Icarus journal pre-proof; no printed pagination.
+        figure: '4'
+      T_range_K:
+      - 298.15
+      - 1023.15
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: TGA total mass loss on the idealized schedule as printed
+      regime: tga_he_ramp_then_ar5h2_750C_hold
+      units: wt. % and wt.%/min as printed
+      values:
+        quantity: total_mass_loss
+        method_class: measured
+        evidence_class: authors_own_measurement
+        ramp_C_per_min: 2.5
+        ramp_atmosphere: 20 ml/min of flowing He (Ar stated as acceptable replacement)
+        hold_C: 750.0
+        hold_T_K: 1023.15
+        hold_atmosphere: Ar/5H2
+        hold_time_hr: 2.0
+        hold_end_rate_as_printed: less than 0.001 wt.%/min of mass loss
+        total_mass_loss_wt_pct_target: 0.5
+        total_mass_loss_wt_pct_achieved: 0.5
+        quote_methods: A two hour hold time was selected to allow reduction to slow to less than 0.001
+          wt.%/min of mass loss, aiming for a target of 0.5 wt.% total mass loss on the TG signal.
+        quote_caption: A total mass loss target of 0.50 wt.% was achieved by the end of the isothermal
+          section.
+        figure_4_curve: figure_only_not_digitised
+    - observation_id: wilkerson_2023_printed_gas_release_windows
+      type: rate_series
+      locator:
+        pdf_page_index: 12
+        note: Icarus journal pre-proof; no printed pagination.
+        section: 3.1 Thermogravimetric Analysis
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: MS-identified mass-loss events as printed in C; not digitised curves
+      regime: tga_ms_high_vacuum
+      units: degree_C as printed
+      values:
+        quantity: evolved_gas_temperature_windows
+        method_class: measured
+        evidence_class: authors_own_measurement
+        windows_as_printed:
+        - T_C: below 200
+          species: H2O
+          note: physisorbed water
+        - T_C: 200-500
+          species:
+          - H2O
+          - CO/CO2
+          - SO2
+          - SO3
+          note: physisorbed gases or low-stability carbonates and sulfates
+        - T_C: 500, maximizing around 600
+          species: CO2
+          note: decomposition of a nonlunar trace carbonate such as CaCO3
+        - T_C: beyond 700, maximizing at 1050-1100
+          species:
+          - SO2
+          - SO3
+          note: suspected CaSO4.2H2O sulfate weathering species
+        - T_C: '>1100'
+          event: vitrification and vacuum bubbling
+        vitrification_as_printed: ~1100 C
+        figure_1_vacuum_as_printed: high vacuum of 1E-5 mbar
+        T_range_K_omitted: windows are open/approximate as printed; T_range_K not invented
+    - observation_id: wilkerson_2023_fig1_tgms_vacuum_vitrification_figure_only
+      type: rate_series
+      locator:
+        pdf_page_index: 12
+        note: Icarus journal pre-proof; no printed pagination.
+        figure: '1'
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: TG percent and ion-gauge pressure vs T as plotted
+      regime: tga_ms_plotted_curve
+      units: as plotted; not digitised
+      values:
+        quantity: tga_ms_release_curve
+        method_class: figure_only
+        evidence_class: authors_own_measurement_plotted_only
+        status: figure_only
+        admission_status: rejected_no_complete_figure_digitization
+        caption_as_printed: TG-MS of JSC-1A heated beyond vitrification point (~1100 C) in high vacuum
+          of 1E-5 mbar.
+        plotted_as_printed: TG (%), dTG (%/min), and ion gauge pressure (Torr) traces 18 amu (H2O), 44
+          amu (CO2), 28 amu (N2, CO), 32 amu (O2), 64 amu (SO2, S2), 80 amu (SO3) vs Temperature (C)
+        completeness_note: Curve coordinates were not digitised.
+    - observation_id: wilkerson_2023_fig2_tgms_vacuum_he_arh2_figure_only
+      type: rate_series
+      locator:
+        pdf_page_index: 13
+        note: Icarus journal pre-proof; no printed pagination.
+        figure: '2'
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: TG percent and ion-gauge pressure vs T as plotted
+      regime: tga_ms_plotted_curve
+      units: as plotted; not digitised
+      values:
+        quantity: tga_ms_release_curve
+        method_class: figure_only
+        evidence_class: authors_own_measurement_plotted_only
+        status: figure_only
+        admission_status: rejected_no_complete_figure_digitization
+        caption_as_printed: TG-MS curves of JSC-1A heated to 1050 C to avoid vitrification in A) vacuum,
+          B) inert gas, and C) reducing environment.
+        plotted_as_printed: Three-panel TG/dTG and ion-gauge traces; reducing panel shows 2 amu (H2),
+          18 amu (H2O), 44 amu (CO2), 64 amu (SO2, S2), 34 amu (H2S)
+        completeness_note: Curve coordinates were not digitised.
+    - observation_id: wilkerson_2023_fig4_idealized_ht_tg_figure_only
+      type: rate_series
+      locator:
+        pdf_page_index: 17
+        note: Icarus journal pre-proof; no printed pagination.
+        figure: '4'
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: TG percent and ion-gauge pressure vs T as plotted
+      regime: tga_ms_plotted_curve
+      units: as plotted; not digitised
+      values:
+        quantity: tga_ms_release_curve
+        method_class: figure_only
+        evidence_class: authors_own_measurement_plotted_only
+        status: figure_only
+        admission_status: rejected_no_complete_figure_digitization
+        caption_as_printed: TG of idealized heat treatment schedule of JSC-1A.
+        plotted_as_printed: Temperature (C), TG (%), dTG (%/min) vs Time (s); He then Ar/5H2 panels
+        completeness_note: Curve coordinates were not digitised.
+    - observation_id: wilkerson_2023_quoted_loi_mckay_1994
+      type: rate_series
+      locator:
+        pdf_page_index: 6
+        note: Icarus journal pre-proof; no printed pagination.
+        paragraph: LOI of 0.71
+      phase: JSC-1A_lunar_simulant
+      standard_state: loss-on-ignition quoted from McKay et al. 1994, not this work
+      regime: quoted_literature
+      units: LOI as printed (0.71); T 900-1000 C
+      values:
+        quantity: loss_on_ignition
+        method_class: quoted_from_other_workers
+        evidence_class: mckay_et_al_1994
+        LOI: 0.71
+        T_C_as_printed: 900 C to 1000 C
+        quote: The total mass of these non-lunar minerals is constrained by the measured loss-on-ignition
+          (LOI) of 0.71. LOI is easily volatilized mass on heating into the range 900 C to 1000 C (McKay
+          et al., 1994).
+    - observation_id: wilkerson_2023_table3_psd_bet_density
+      type: rate_series
+      locator:
+        pdf_page_index: 20
+        note: Icarus journal pre-proof; no printed pagination.
+        table: '3'
+      phase: JSC-1A_powder_untreated_and_heat_treated
+      standard_state: laser-diffraction PSD, BET surface area, apparent density as printed
+      regime: post_heat_treatment_powder_characterization
+      units: um, m2/g, g/cm3 as printed
+      uncertainty:
+        as_printed: Surface Area 1.007 (7) untreated and 0.262 (12) heat treated; parenthetical digits
+          as printed. D-values and density printed without plus-minus.
+      values:
+        quantity: powder_size_surface_density
+        method_class: measured
+        evidence_class: authors_own_measurement
+        untreated:
+          D10_um: 21.72
+          D50_um: 108.6
+          D90_um: 351.2
+          surface_area_m2_g_as_printed: 1.007 (7)
+          surface_area_m2_g: 1.007
+          apparent_density_g_cm3: 2.91
+        heat_treated:
+          D10_um: 22.68
+          D50_um: 129.8
+          D90_um: 336.8
+          surface_area_m2_g_as_printed: 0.262 (12)
+          surface_area_m2_g: 0.262
+          apparent_density_g_cm3: 2.97
+        surface_area_reduction_as_printed: 74%
+        heat_treatment: Figure 4 idealized schedule
+    - observation_id: wilkerson_2023_xrd_primary_phases_printed
+      type: gibbs_table
+      locator:
+        pdf_page_index: 17
+        note: Icarus journal pre-proof; no printed pagination.
+        section: 3.4 X-ray Diffraction and Phase Analysis
+      phase: JSC-1A_untreated_and_heat_treated
+      standard_state: ICDD PDF-4+ phase IDs as printed; not a bulk oxide table
+      regime: powder_xrd
+      units: phase identity and printed endmember percentages from PDF cards
+      values:
+        quantity: identified_crystalline_phases
+        method_class: measured
+        evidence_class: authors_own_measurement
+        primary_plagioclase:
+          pdf: 01-073-6461
+          family: labradorite-bytownite
+          as_printed: 66% anorthite, 34% albite
+        olivine:
+          pdf: 04-011-6662
+          as_printed: 82% forsterite and 18% fayalite
+        clinopyroxene:
+          pdf: 00-041-1370
+          family: diopside
+        same_phases_after_heat_treatment: true
+        bulk_oxide_table: not_printed; Hill et al. 2007 cited
+  H2O:
+    observations:
+    - observation_id: wilkerson_2023_h2_reduction_extra_water_windows
+      type: rate_series
+      locator:
+        pdf_page_index: 13
+        note: Icarus journal pre-proof; no printed pagination.
+        figure: '2'
+      phase: JSC-1A_lunar_simulant_powder
+      standard_state: MS-identified extra H2O under Ar/5H2 as printed
+      regime: tga_ms_reducing_ar_5h2
+      units: degree_C as printed
+      values:
+        quantity: evolved_gas_temperature_windows
+        method_class: measured
+        evidence_class: authors_own_measurement
+        initial_water_and_co2: occur at identical temperatures to vacuum and inert gas
+        extra_h2o_around_750_C: overlapping dTG peak at around 750 C corresponding to a new water evolution
+          and a dip in the hydrogen signal; expected sulfate to sulfide reduction
+        extra_h2o_750_800_C: another water outgassing starting at 750-800 C mirroring another drop in
+          the hydrogen signal; suspected iron-bearing mineral reduction
+        higher_T_SO2: lack of higher temperature SO2 outgassing similar to vacuum and inert profiles
+        figure_2C: figure_only_not_digitised
+  C:
+    observations:
+    - observation_id: wilkerson_2023_table2_carbon_sulfur
+      type: rate_series
+      locator:
+        pdf_page_index: 14
+        note: Icarus journal pre-proof; no printed pagination.
+        table: '2'
+      phase: JSC-1A_residue_after_1050C_treatments
+      standard_state: CS-800 carbon/sulfur analyzer wt. % as printed
+      regime: destructive_C_S_analysis
+      units: wt. % as printed; parenthetical digits retained verbatim
+      uncertainty:
+        as_printed: parenthetical last-digit form, e.g. 0.0253 (22); triplicate sampling stated in methods
+        n: triplicate
+      values:
+        quantity: residual_carbon_and_sulfur
+        method_class: measured
+        evidence_class: authors_own_measurement
+        instrument: CS-800 carbon/sulfur analyzer (Eltra GmbH)
+        untreated_C_wt_pct: 0.0253
+        untreated_C_as_printed: 0.0253 (22)
+        untreated_S_wt_pct: 0.01
+        untreated_S_as_printed: 0.0100 (19)
+        he_1050C_C_wt_pct: null
+        he_1050C_S_wt_pct: null
+        he_1050C_omitted_reason: watermark_obscured_digit on the 400 dpi render of Table 2 (printed form
+          0.0_64 (3) for C and 0.00_46 (25) for S); not guessed
+        vacuum_1050C_C_wt_pct: 0.0081
+        vacuum_1050C_C_as_printed: 0.0081 (4)
+        vacuum_1050C_S_wt_pct: 0.0036
+        vacuum_1050C_S_as_printed: 0.0036 (8)
+        arh2_1050C_C_wt_pct: 0.0069
+        arh2_1050C_C_as_printed: 0.0069 (19)
+        arh2_1050C_S_wt_pct: 0.0037
+        arh2_1050C_S_as_printed: 0.0037 (14)
+        text_summary_as_printed: untreated C around 0.025 wt.% dropping to between 0.006 and 0.008 wt.%;
+          S from 0.010 wt.% to 0.004-0.005 wt.%
+  S:
+    observations:
+    - observation_id: wilkerson_2023_table2_sulfur_pointer
+      type: rate_series
+      locator:
+        pdf_page_index: 14
+        note: Icarus journal pre-proof; no printed pagination.
+        table: '2'
+      phase: JSC-1A_residue_after_1050C_treatments
+      standard_state: same Table 2 as species.C observation wilkerson_2023_table2_carbon_sulfur
+      regime: destructive_C_S_analysis
+      units: wt. % as printed
+      values:
+        quantity: residual_sulfur
+        method_class: measured
+        evidence_class: authors_own_measurement
+        see_observation_id: wilkerson_2023_table2_carbon_sulfur
+        untreated_S_wt_pct: 0.01
+        vacuum_1050C_S_wt_pct: 0.0036
+        arh2_1050C_S_wt_pct: 0.0037
+        he_1050C_S_wt_pct_omitted_reason: watermark_obscured_digit
+  Fe:
+    observations:
+    - observation_id: wilkerson_2023_table1_mossbauer_metallic_fe_arh2
+      type: gibbs_table
+      locator:
+        pdf_page_index: 8
+        note: Icarus journal pre-proof; no printed pagination.
+        table: '1'
+        section: Table 1 Mössbauer
+      phase: JSC-1A_heated_under_Ar_H2_at_1050C
+      standard_state: 57Fe Mössbauer % Area of metallic Fe sextet as printed in Table 1
+      regime: mossbauer_room_temperature
+      units: mm/s, kOe, % Area as printed
+      uncertainty:
+        as_printed: parenthetical last-digit form, e.g. 11.34(6)
+      values:
+        quantity: mossbauer_metallic_fe_component
+        method_class: measured
+        evidence_class: authors_own_measurement
+        treatment: Heated under Ar/H2 at 1050 C
+        site: Sextet 1 Metallic Fe
+        CS_delta_mm_s: -0.0035(9)
+        delta_or_eps_mm_s: 0.0020(8)
+        Bhf_kOe: 329.4(5)
+        w_plus_mm_s: 0.26(2)
+        pct_area_as_printed: 11.34(6)
+        pct_area: 11.34
+        text_values_on_pdf_page_16:
+          delta_mm_s_as_printed: -0.003(5)
+          Bhf_kOe_as_printed: 329.41
+          note: Body text on pdf page 16 prints delta = -0.003(5) mm/sec and Bhf = 329.41 kOe, which is
+            not identical to Table 1 -0.0035(9) / 329.4(5). Both retained; not averaged.
+        table1_other_treatments:
+          untreated_rows_readable:
+          - assignment: Olivine M1
+            site: Fe2+ Doublet 1
+            CS_delta_mm_s: 1.15(2)
+            delta_or_eps_mm_s: 3.06(2)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.23(3)
+            pct_area: 11.0(5)
+            chi2: null
+          - assignment: Olivine M2
+            site: Fe2+ Doublet 2
+            CS_delta_mm_s: 1.13(2)
+            delta_or_eps_mm_s: 2.84(2)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.28(2)
+            pct_area: 15.4(7)
+            chi2: null
+          - assignment: Diopside M1
+            site: Fe2+ Doublet 3
+            CS_delta_mm_s: 1.16(2)
+            delta_or_eps_mm_s: 2.29(3)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.34(2)
+            pct_area: 6.9(8)
+            chi2: '0.59'
+          - assignment: Diopside M2
+            site: Fe2+ Doublet 4
+            CS_delta_mm_s: 1.15(3)
+            delta_or_eps_mm_s: 1.91(3)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.42(2)
+            pct_area: 11.0(5)
+            chi2: null
+          - assignment: Iron chromite
+            site: Fe2+ Doublet 5
+            CS_delta_mm_s: 0.89(2)
+            delta_or_eps_mm_s: 1.99(2)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.50(3)
+            pct_area: 17.0(9)
+            chi2: null
+          - assignment: Fe3+ Glassy
+            site: Fe3+ Doublet 6
+            CS_delta_mm_s: 0.53(3)
+            delta_or_eps_mm_s: 0.76(2)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.87(3)
+            pct_area: 22.1(5)
+            chi2: null
+          - assignment: Fe3+ clusters
+            site: Fe3+ Sextet 1
+            CS_delta_mm_s: 0.50(2)
+            delta_or_eps_mm_s: watermark_obscured_last_digit_of_uncertainty
+            Bhf_kOe: 427.6(9)
+            w_plus_mm_s: 0.33(2)
+            pct_area: 16.6(8)
+            chi2: null
+          arh2_1050C_rows_readable:
+          - assignment: Olivine M1
+            site: Doublet 1
+            CS_delta_mm_s: 1.16(2)
+            delta_or_eps_mm_s: 3.01(2)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.24(5)
+            pct_area: 24.3(8)
+            chi2: null
+          - assignment: Olivine M2
+            site: Doublet 2
+            CS_delta_mm_s: 1.14(4)
+            delta_or_eps_mm_s: 2.78(3)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.26(3)
+            pct_area: 27.4(4)
+            chi2: null
+          - assignment: Diopside M1/M2
+            site: Doublet 3
+            CS_delta_mm_s: 1.20(5)
+            delta_or_eps_mm_s: 1.89(3)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.686(7)
+            pct_area: 28.2(4)
+            chi2: null
+          - assignment: Fe2+ species
+            site: Doublet 4
+            CS_delta_mm_s: 0.76(3)
+            delta_or_eps_mm_s: 1.34(2)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.29(3)
+            pct_area: 5.69(5)
+            chi2: '0.76'
+          - assignment: Fe3+ species
+            site: Doublet 5
+            CS_delta_mm_s: 0.33(3)
+            delta_or_eps_mm_s: 0.83(3)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.20(8)
+            pct_area: 2.98(6)
+            chi2: null
+          - assignment: Metallic Fe
+            site: Sextet 1
+            CS_delta_mm_s: -0.0035(9)
+            delta_or_eps_mm_s: 0.0020(8)
+            Bhf_kOe: 329.4(5)
+            w_plus_mm_s: 0.26(2)
+            pct_area: 11.34(6)
+            chi2: null
+          heat_treatment_fig4_rows_readable:
+          - assignment: Olivine M1
+            site: Fe2+ Doublet 1
+            CS_delta_mm_s: 1.16(3)
+            delta_or_eps_mm_s: 3.04(3)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.22(3)
+            pct_area: 9.4(3)
+            chi2: null
+          - assignment: Olivine M2
+            site: Fe2+ Doublet 2
+            CS_delta_mm_s: 1.14(2)
+            delta_or_eps_mm_s: 2.81(2)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.32(2)
+            pct_area: 20.1(2)
+            chi2: null
+          - assignment: Diopside M1
+            site: Fe2+ Doublet 3
+            CS_delta_mm_s: 1.12(3)
+            delta_or_eps_mm_s: 2.24(3)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.45(3)
+            pct_area: 17(3)
+            chi2: null
+          - assignment: Diopside M2
+            site: Fe2+ Doublet 4
+            CS_delta_mm_s: 1.10(2)
+            delta_or_eps_mm_s: 1.77(2)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.52(3)
+            pct_area: 20.4(2)
+            chi2: '0.90'
+          - assignment: Iron chromite
+            site: Fe2+ Doublet 5
+            CS_delta_mm_s: 0.80(2)
+            delta_or_eps_mm_s: 1.60(3)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.45(2)
+            pct_area: 4.1(3)
+            chi2: null
+          - assignment: Fe3+ Glassy
+            site: Fe3+ Doublet 6
+            CS_delta_mm_s: 0.48(3)
+            delta_or_eps_mm_s: 0.70(2)
+            Bhf_kOe: null
+            w_plus_mm_s: 0.91(2)
+            pct_area: 16.2(4)
+            chi2: null
+          - assignment: Fe3+ clusters
+            site: Fe3+ Sextet 1
+            CS_delta_mm_s: 0.62(2)
+            delta_or_eps_mm_s: -0.039(4)
+            Bhf_kOe: 415.3(6)
+            w_plus_mm_s: 0.25(2)
+            pct_area: 13.3(3)
+            chi2: null
+          vacuum_and_he_1050C_rows: several CS/QS cells under the Journal Pre-proof watermark were unreadable
+            on the 400 dpi crop and are omitted rather than guessed
+deepening:
+  dispatch_id: extract-pyro-simulant
+  date: '2026-09-12'
+  parent_policy: Printed-page transcription from 300-400 dpi pdftoppm. Figure curves not digitised. Watermark-obscured
+    Table 1/2 cells omitted.
+  quote_convention: ASCII flattening of degree signs, subscripts, and scientific notation.
+  table_inventory:
+  - table: '1'
+    pdf_page_index: 8
+    completeness: partial_watermark
+    note: Mössbauer; untreated, Ar/H2, and heat-treatment blocks largely readable; vacuum/He blocks partly
+      obscured.
+  - table: '2'
+    pdf_page_index: 14
+    completeness: partial_watermark
+    note: C and S wt%; He column omitted.
+  - table: '3'
+    pdf_page_index: 20
+    completeness: full
+    note: PSD D10/D50/D90, BET, apparent density.
+  class_ledger:
+    measured:
+    - wilkerson_2023_tga_apparatus_and_thermal_program
+    - wilkerson_2023_vacuum_ms_apparatus
+    - wilkerson_2023_tga_1050C_total_mass_loss_vacuum_vs_he
+    - wilkerson_2023_idealized_heat_treatment_0p50_wt_pct
+    - wilkerson_2023_printed_gas_release_windows
+    - wilkerson_2023_table3_psd_bet_density
+    - wilkerson_2023_xrd_primary_phases_printed
+    - wilkerson_2023_h2_reduction_extra_water_windows
+    - wilkerson_2023_table2_carbon_sulfur
+    - wilkerson_2023_table2_sulfur_pointer
+    - wilkerson_2023_table1_mossbauer_metallic_fe_arh2
+    figure_only:
+    - wilkerson_2023_fig1_tgms_vacuum_vitrification_figure_only
+    - wilkerson_2023_fig2_tgms_vacuum_he_arh2_figure_only
+    - wilkerson_2023_fig4_idealized_ht_tg_figure_only
+    quoted_from_other_workers:
+    - wilkerson_2023_quoted_loi_mckay_1994
+  refused:
+  - what: JSC-1A bulk oxide composition table
+    reason: not_printed_cited_Hill_2007
+  - what: Table 2 He-column C and S
+    reason: watermark_obscured_digit
+  - what: TG/MS curve coordinates in Figs 1, 2, 4
+    reason: figure_only
+  - what: TGA crucible material
+    reason: not_named

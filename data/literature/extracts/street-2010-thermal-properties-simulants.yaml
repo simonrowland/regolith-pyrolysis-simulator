@@ -1,0 +1,327 @@
+schema_version: literature_extract.v1
+source_id: street-2010-thermal-properties-simulants
+source:
+  citation: Street Jr., Kenneth W., Ray, Chandra, Rickman, Doug and Scheiman, Daniel A. (2010), Thermal
+    Properties of Lunar Regolith Simulants, NASA/TM—2010-216348. Prepared for the Earth and Space 2010
+    Conference, Honolulu, Hawaii, March 14-17, 2010.
+  url: https://ntrs.nasa.gov/citations/20100024178
+  year: 2010
+  report_number: NASA/TM—2010-216348
+extraction:
+  method: Born-digital NASA/TM—2010-216348 PDF from regolith-corpus raw/street-2010-thermal-properties-simulants/street-2010-thermal-properties-simulants.pdf.
+    Transcribed from 400 dpi pdftoppm PNG renders. pdftotext-layout used only to locate Table 1 and figures,
+    not as data. Table 1 DTA transitions transcribed in full. TGA and DTA profiles in Figures 1-4 are
+    figure-only and were not digitised. Runs are flowing nitrogen, not vacuum. JSC-1AF mineral percentages
+    in the Discussion are quoted from Carpenter 2005 / Taylor 2005, not this work's table.
+  date: '2026-09-12'
+  worker: extract-pyro-simulant
+  provenance_path: docs-private/research/2026-09-12-pyrolysis-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: JSC-1AF
+  observable: transition_point
+  observation_id: street_2010_table1_dta_transitions
+  field: jsc1af_run_to_1050C_exotherms_C
+  value:
+  - 325
+  - 723
+  - 849
+  locator:
+    published_page: 3
+    pdf_page_index: 7
+    table: '1'
+    note: TABLE 1 JSC-1AFa 325 Ex, 723 Ex, 849 Ex
+- species: H2O
+  observable: rate_series
+  observation_id: street_2010_anorthosite_water_mass_loss_0p1_pct
+  field: mass_loss_percent
+  value: 0.1
+  locator:
+    published_page: 1
+    pdf_page_index: 5
+    section: Abstract
+    note: water is lost accounting for approximately 0.1 percent mass loss
+species:
+  JSC-1AF:
+    observations:
+    - observation_id: street_2010_table1_dta_transitions
+      type: transition_point
+      locator:
+        published_page: 3
+        pdf_page_index: 7
+        table: '1'
+        section: Equipment / Results
+      T_range_K:
+      - 563.15
+      - 1591.15
+      phase: simulant_and_feedstock_powders
+      standard_state: DTA exotherm/endotherm peak temperatures as printed in C
+      regime: dta_flowing_nitrogen
+      units: degree_C as printed; T_K = t_C + 273.15
+      values:
+        quantity: dta_transition_temperatures
+        method_class: measured
+        evidence_class: authors_own_measurement
+        header_as_printed: DTA transitions in order of appearance in C (Ex = Exothermic; en = Endothermic)
+        jsc1af_run_to_1050C_exotherms_C:
+        - 325
+        - 723
+        - 849
+        T_conversion: Table 1 values left in C; T_range_K spans the lowest printed 290 C and highest printed
+          1318 C
+        rows:
+        - sample: JSC-1AFa
+          transitions_C_as_printed:
+          - 325 Ex
+          - 723 Ex
+          - 849 Ex
+          note: Run to 1050 C
+        - sample: JSC-1AFb
+          transitions_C_as_printed:
+          - '---------'
+          - '---------'
+          - '---------'
+          - 1130 en
+          - 1170 en
+          - 1210 en
+          note: Rerun of sample previously run to 1050 C and cooled
+        - sample: NU-LHT-2M
+          transitions_C_as_printed:
+          - 290 Ex
+          - 500 Ex
+          - 740 Ex
+          - 924 Ex
+          - 1048 Ex
+          - 1244 en
+          note: null
+        - sample: Anorthosite
+          transitions_C_as_printed:
+          - 355 Ex
+          - 490 Ex
+          - 970 en
+          - '>=1235 en'
+          note: null
+        - sample: Dunitec
+          transitions_C_as_printed:
+          - 310 Ex
+          - '>1350 en'
+          note: Profile is fairly featureless with weak transitions
+        - sample: Norite
+          transitions_C_as_printed:
+          - 425 Ex
+          - 455 Ex
+          - 488 Ex
+          - '>1225 en'
+          note: null
+        - sample: HQ Glass
+          transitions_C_as_printed:
+          - 359 Ex
+          - 482 Ex
+          - 756 en
+          - 934 Ex
+          - 1215 en
+          - 1261 en
+          - 1318 en
+          note: null
+        body_text_mismatch: Results paragraph says TGA scans are found in Table 1; the printed table title
+          is SUMMARY OF DTA DATA FOR SAMPLES. DTA is what the table contains.
+    - observation_id: street_2010_apparatus_n2_tga_dta
+      type: rate_series
+      locator:
+        published_page: 3
+        pdf_page_index: 7
+        table: '1'
+        section: Equipment / Results
+      phase: simulant_powders_in_alumina_crucibles
+      standard_state: flowing nitrogen TGA/DTA/TGA-FTIR as printed
+      regime: flowing_nitrogen_not_vacuum
+      units: as printed (C/min, cm3/min, mm3, mg)
+      values:
+        quantity: thermal_program_and_apparatus
+        method_class: measured
+        evidence_class: authors_own_experiment
+        not_vacuum: true
+        dta_instrument: Perkin Elmer model DT-7
+        dta_ramp_C_per_min: 10.0
+        dta_gas_as_printed: flowing nitrogen gas (30 cm3/min)
+        dta_crucible: 60 mm3 internal volume high purity alumina (Al2O3)
+        dta_reference: 99.999 percent pure alumina powder
+        dta_sample_mass_mg_range:
+        - 45
+        - 60
+        tga_instrument: NETZSCH model STA 409
+        tga_ramp_C_per_min: 10.0
+        tga_gas_as_printed: flowing nitrogen gas (30 cm3/min)
+        tga_crucible: 100 mm3 internal volume, high purity alumina
+        tga_sample_mass_mg: 100.0
+        tga_ftir: TA Instruments TGA 2950 interfaced with Thermo Electron Nexus 470 FTIR; heated stainless
+          steel transfer line and heated gas cell with KBr windows
+        tga_ftir_ramp_C_per_min: 10.0
+        tga_ftir_gas_as_printed: flowing nitrogen gas (20 cm3/min and 40 cm3/min balance purge)
+        transfer_line_and_cell_C: 240.0
+        jsc1af_dta_special: A JSC-1AF sample was also run in the DTA to 1050 C allowed to cool, and then
+          rerun to 1250 C
+        duplicates: JSC-1AF and NU-LHT-2M were run in duplicate
+      equipment:
+        cell_material:
+          value: high purity alumina (Al2O3) crucible
+          locator:
+            published_page: 3
+            pdf_page_index: 7
+            table: '1'
+            section: Equipment / Results
+        chamber_pressure:
+          value: flowing nitrogen (not a vacuum run); 30 cm3/min DTA/TGA, 20+40 cm3/min TGA-FTIR
+          locator:
+            published_page: 3
+            pdf_page_index: 7
+            table: '1'
+            section: Equipment / Results
+    - observation_id: street_2010_jsc1af_tga_ftir_windows
+      type: rate_series
+      locator:
+        published_page: 1
+        pdf_page_index: 5
+        section: Abstract
+      phase: JSC-1AF_powder
+      standard_state: TGA-FTIR evolved H2O and CO2 temperature ranges as printed
+      regime: tga_ftir_flowing_nitrogen
+      units: degree_C as printed
+      values:
+        quantity: evolved_gas_temperature_windows
+        method_class: measured
+        evidence_class: authors_own_measurement
+        H2O_C_as_printed:
+        - 100 to 500
+        - 700 to 900
+        CO2_C_as_printed:
+        - 250 to 545
+        - 545 to 705
+        - 705 to 985
+        quote: For JSC-1A fine, the TGA-FTIR indicates at least two kinds of water are evolved in the
+          100 to 500 and the 700 to 900 C ranges. Evolution of carbon dioxide types occurs in the 250
+          to 545, 545 to 705, and 705 to 985 C ranges.
+        figure_2: figure_only_not_digitised
+    - observation_id: street_2010_fig1_jsc1af_dta_tga_figure_only
+      type: rate_series
+      locator:
+        published_page: 4
+        pdf_page_index: 8
+        figure: '1'
+      phase: JSC-1AF_powder
+      standard_state: DTA and TGA profiles as plotted
+      regime: dta_tga_flowing_nitrogen
+      units: as plotted; not digitised
+      values:
+        quantity: dta_tga_curves
+        method_class: figure_only
+        evidence_class: authors_own_measurement_plotted_only
+        status: figure_only
+        admission_status: rejected_no_complete_figure_digitization
+        caption_as_printed: Figure 1. DTA (top) and TGA (bottom) profiles for JSC-1AF. DTA to 1050 C and
+          rerun of same material after cooling. Duplicate DTA. TGA of duplicate runs.
+        discussion_note: The TGA data for JSC-1AF shows major gains in mass starting around 450 C. This
+          is due to the oxidation of Fe++ to Fe+++ ... interpretation of these data for JSC-1AF and the
+          other materials become problematic and are not discussed further here.
+        completeness_note: Mass-% vs T coordinates were not digitised.
+    - observation_id: street_2010_quoted_jsc1af_mineralogy_carpenter_taylor
+      type: gibbs_table
+      locator:
+        published_page: 6
+        pdf_page_index: 10
+        section: Discussion JSC-1AF
+      phase: JSC-1AF
+      standard_state: quoted mineral percentages from Carpenter 2005 and Taylor 2005, not this work
+      regime: quoted_literature
+      units: percent as printed
+      values:
+        quantity: quoted_mineralogy
+        method_class: quoted_from_other_workers
+        evidence_class: carpenter_2005_taylor_2005
+        glass_percent: 50
+        plagioclase_percent: 37
+        plagioclase_An: ~An70
+        olivine_percent: 9
+        other_minerals_percent: <1 percent each
+        quote: Typical volatiles include H2O and CO2. The source ash is high in glass content (around
+          50 percent) and has substantial amounts of plagioclase (37 percent) (Ca/(Ca+Na) = ~An70) and
+          lesser amounts of minerals such as olivine (9 percent) with traces of a number of other minerals
+          (<1 percent each) (Carpenter, 2005; Taylor, 2005).
+        lunar_analogue: designed to replicate the properties of lunar regolith sample 14163 (McKay et
+          al., 1994)
+  H2O:
+    observations:
+    - observation_id: street_2010_anorthosite_water_mass_loss_0p1_pct
+      type: rate_series
+      locator:
+        published_page: 1
+        pdf_page_index: 5
+        section: Abstract
+      phase: anorthosite_NU_LHT_2M_feedstock
+      standard_state: TGA mass loss attributed to water, as printed in the Abstract
+      regime: tga_flowing_nitrogen
+      units: percent mass loss as printed
+      uncertainty:
+        as_printed: approximately 0.1 percent
+        note: Approximate; no plus-minus.
+      values:
+        quantity: mass_loss
+        method_class: measured
+        evidence_class: authors_own_measurement
+        mass_loss_percent: 0.1
+        as_printed: approximately 0.1 percent mass loss
+        quote: Below the 355 C transition, water is lost accounting for approximately 0.1 percent mass
+          loss. Just above 490 C a second type of water is lost, presumably bound in lattices of secondary
+          minerals along with other volatile oxides.
+        feedstock: anorthosite (NU-LHT-2M component)
+        T_conversion: 355 C -> 628.15 K; T_range_K min omitted because the lower bound is not printed
+  NU-LHT-2M:
+    observations:
+    - observation_id: street_2010_fig3_nulht2m_dta_tga_figure_only
+      type: rate_series
+      locator:
+        published_page: 5
+        pdf_page_index: 9
+        figure: '3'
+      phase: NU-LHT-2M_powder
+      standard_state: DTA and TGA duplicate profiles as plotted
+      regime: dta_tga_flowing_nitrogen
+      units: as plotted; not digitised
+      values:
+        quantity: dta_tga_curves
+        method_class: figure_only
+        evidence_class: authors_own_measurement_plotted_only
+        status: figure_only
+        admission_status: rejected_no_complete_figure_digitization
+        caption_as_printed: Figure 3. Duplicate DTA (top) and TGA (bottom) profiles for NU-LHT-2M.
+        completeness_note: Curve coordinates were not digitised. DTA peak temperatures are in Table 1.
+deepening:
+  dispatch_id: extract-pyro-simulant
+  date: '2026-09-12'
+  parent_policy: Printed-page transcription from 400 dpi pdftoppm. TGA/DTA curves figure-only. Flowing
+    N2, not vacuum.
+  table_inventory:
+  - table: '1'
+    published_page: 3
+    pdf_page_index: 7
+    completeness: full
+    note: SUMMARY OF DTA DATA FOR SAMPLES; all printed rows transcribed.
+  class_ledger:
+    measured:
+    - street_2010_table1_dta_transitions
+    - street_2010_apparatus_n2_tga_dta
+    - street_2010_jsc1af_tga_ftir_windows
+    - street_2010_anorthosite_water_mass_loss_0p1_pct
+    figure_only:
+    - street_2010_fig1_jsc1af_dta_tga_figure_only
+    - street_2010_fig3_nulht2m_dta_tga_figure_only
+    quoted_from_other_workers:
+    - street_2010_quoted_jsc1af_mineralogy_carpenter_taylor
+  refused:
+  - what: vacuum pyrolysis yields
+    reason: this_study_is_flowing_nitrogen_not_vacuum; conclusions call for follow-on vacuum tests
+  - what: TGA mass-loss coordinates for JSC-1AF and NU-LHT-2M
+    reason: figure_only
+  - what: authors' own JSC-1AF oxide composition table
+    reason: not_printed; mineralogy quoted from Carpenter/Taylor

@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 137
-  extracts: 134
+  sources: 140
+  extracts: 137
   pdfs_present_in_worktree: 44
   extracts_with_private_locators: 37
   pdfs_tracked_99_kems_langmuir: 39
   pdfs_without_extract: 3
-  extracts_without_pdf: 93
+  extracts_without_pdf: 96
   alias_groups_needing_resolution: 32
 gaps:
   pdfs_without_extract:
@@ -115,7 +115,10 @@ gaps:
   - span-wagner-1996-co2-psat
   - steurer-1985-vapor-phase-pyrolysis
   - steurer-1992-vapor-phase-pyrolysis
+  - street-2010-thermal-properties-simulants
   - wetzel-gail-2013-sio-arrhenius
+  - wilkerson-2021-jsc1a-tga-ms-poster
+  - wilkerson-2023-jsc1a-outgassing
   untracked_files: []
   extracts_with_private_locators:
   - fegley-2023-chemical-equilibrium-calculations-bu
@@ -8192,6 +8195,65 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: street-2010-thermal-properties-simulants
+  aliases: []
+  citation: Street Jr., Kenneth W., Ray, Chandra, Rickman, Doug and Scheiman, Daniel A. (2010), Thermal
+    Properties of Lunar Regolith Simulants, NASA/TM—2010-216348. Prepared for the Earth and Space 2010
+    Conference, Honolulu, Hawaii, March 14-17, 2010.
+  doi: null
+  report_number: NTRS 20100024178
+  identifier: NTRS 20100024178
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
+  extracts:
+  - path: data/literature/extracts/street-2010-thermal-properties-simulants.yaml
+    review_status: draft
+    rows: 7
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/street-2010-thermal-properties-simulants/street-2010-thermal-properties-simulants.pdf
+      present: true
+      sha256: d198b496c7b08cf6e41de9bebf8bd04bf9fe103da6ac768c14092218e8e42b36
+      matches_simulator: null
+    sidecar:
+      path: raw/street-2010-thermal-properties-simulants/sidecar.yaml
+      present: true
+    text:
+      path: text/street-2010-thermal-properties-simulants
+      exists: true
+      file_count: 14
+    tables:
+      path: tables/street-2010-thermal-properties-simulants
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/street-2010-thermal-properties-simulants.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/street-2010-thermal-properties-simulants.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
 - source_id: ts1985
   aliases: []
   citation: Tsukihashi, F. & Sano, N. (1985), "Measurement of the Activity of Na2O in Na2O-SiO2 Melts
@@ -8302,6 +8364,127 @@ sources:
       present: true
       error: null
       last_stage: extracted
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  aliases: []
+  citation: Wilkerson, Ryan P., Voecks, Gerald, Shulman, Holly S., Rickman, Doug L. and Effinger, Mike
+    R. (2021), Characterizing the effects of thermal profile and gas environment on the heat treatment
+    of JSC-1A lunar simulant using combined thermogravimetry and mass spectroscopy. Prepared for the Lunar
+    Surface Science Workshop, Fundamental and Applied Lunar Surface Research in Physical Sciences, 19
+    August 2021. NTRS 20210020017.
+  doi: null
+  report_number: NTRS 20210020017
+  identifier: NTRS 20210020017
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: OA
+  extracts:
+  - path: data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml
+    review_status: draft
+    rows: 17
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/wilkerson-2021-jsc1a-tga-ms-poster/wilkerson-2021-jsc1a-tga-ms-poster.pdf
+      present: true
+      sha256: 752ac5e8705cbbee04729d55379cc6bf203ac027011f5e00c9f460676456a967
+      matches_simulator: null
+    sidecar:
+      path: raw/wilkerson-2021-jsc1a-tga-ms-poster/sidecar.yaml
+      present: true
+    text:
+      path: text/wilkerson-2021-jsc1a-tga-ms-poster
+      exists: true
+      file_count: 38
+    tables:
+      path: tables/wilkerson-2021-jsc1a-tga-ms-poster
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/wilkerson-2021-jsc1a-tga-ms-poster.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: wilkerson-2023-jsc1a-outgassing
+  aliases: []
+  citation: Wilkerson, Ryan P., Petkov, Mihail P., Voecks, Gerald E., Lynch, Catherine S., Shulman, Holly
+    S., Sundaramoorthy, Santhoshkumar, Choudhury, Amitava, Rickman, Douglas L. and Effinger, Michael R.
+    (2023), Outgassing behavior and heat treatment optimization of JSC-1A lunar regolith simulant, Icarus,
+    DOI 10.1016/j.icarus.2023.115577
+  doi: 10.1016/j.icarus.2023.115577
+  report_number: null
+  identifier: 10.1016/j.icarus.2023.115577
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml
+    review_status: draft
+    rows: 15
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/wilkerson-2023-jsc1a-outgassing/wilkerson-2023-jsc1a-outgassing.pdf
+      present: true
+      sha256: 4934f9d99fb1c4e8fa4909106bb899af1f1c9e23ccb6e919bc94427902cb7a99
+      matches_simulator: null
+    sidecar:
+      path: raw/wilkerson-2023-jsc1a-outgassing/sidecar.yaml
+      present: true
+    text:
+      path: text/wilkerson-2023-jsc1a-outgassing
+      exists: true
+      file_count: 39
+    tables:
+      path: tables/wilkerson-2023-jsc1a-outgassing
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/wilkerson-2023-jsc1a-outgassing.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/wilkerson-2023-jsc1a-outgassing.yaml
+      present: true
+      error: null
+      last_stage: decoded
       date: '2026-09-06'
     commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
 - source_id: wu-1993-feo-mgo-sio2
