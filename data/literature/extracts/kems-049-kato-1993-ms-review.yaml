@@ -1,0 +1,2319 @@
+schema_version: literature_extract.v1
+source_id: kems-049-kato-1993-ms-review
+source:
+  citation: Kato, Eiichi (1993), "Thermodynamic Studies of Metallurgical Systems by Mass Spectrometry",
+    J. Mass Spectrom. Soc. Jpn. 41(6):297-316 (REVIEW)
+  year: 1993
+extraction:
+  method: Official scanned J. Mass Spectrom. Soc. Jpn. PDF (corpus raw/kems-049-kato-1993-ms-review/,
+    sha256 b0bc110b0fc799afd378236b92ce7938c7fdfcdffb6e10dd5e58081021f1bf16). pdftotext-layout is empty.
+    Tables 1-5 and Figs 1-8 transcribed from a 300 dpi pdftoppm render (PDF pages 1-20 = published 297-316;
+    page 13 rotated 180 deg). Table 1 Psat column recorded as quoted_unattributed. Bibliographic rows
+    of Tables 1-5 go to deepening.primary_sources_cited with journal text from the printed References.
+    Figs 3, 5-8 listed figure-only; no numbers off axes. MinerU used only as a map; render wins.
+  date: '2026-09-12'
+  worker: extract-kems-048
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: Fe
+  observable: psat_series
+  observation_id: kato_1993_table1_fe_psat_1873k
+  field: P_Pa
+  value: 8.0
+  locator:
+    table: '1'
+    published_page: 302
+    pdf_page_index: 6
+    note: Table 1 Fe vapor pressure at 1873 K = 8.0 Pa
+- species: Si
+  observable: psat_series
+  observation_id: kato_1993_table1_si_psat_1873k
+  field: P_as_printed
+  value: 8.8 × 10^{-1}
+  locator:
+    table: '1'
+    published_page: 302
+    pdf_page_index: 6
+    note: Table 1 Si vapor pressure at 1873 K = 8.8 x 10^{-1} Pa
+- species: Al
+  observable: activity_coefficient
+  observation_id: kato_1993_p300_al2o3_cell_a_al_model_derived
+  field: log10_pO2_MPa
+  value: -1.27
+  locator:
+    published_page: 300
+    pdf_page_index: 4
+    note: printed log(p_O2/MPa) = -1.27
+species:
+  Fe:
+    observations:
+    - observation_id: kato_1993_table1_fe_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Fe vapor pressure at 1873 K = 8.0 Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 8.0
+        P_as_printed: '8.0'
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+    - observation_id: kato_1993_fig6_fe_mo_ion_intensity_figure_only
+      type: psat_series
+      locator:
+        figure: '6'
+        published_page: 304
+        pdf_page_index: 8
+        note: log I_Fe T vs 1/T for Fe in low Mo (Ichise et al.)
+      T_range_K:
+      - 1723.0
+      - 1823.0
+      phase: Fe on Mo; solid/liquid iron and alloy
+      standard_state: ion intensity of Fe; reprint
+      regime: kems_effusion
+      units: log I_Fe T as plotted; not digitised
+      values:
+        quantity: ion_intensity
+        gas_species: Fe
+        method_class: quoted_measurement
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        quoted_from: Ichise et al. (ref 45)
+        labeled_T_K_as_printed:
+        - 1823.0
+        - 1758.0
+        - 1723.0
+      uncertainty:
+        note: figure-only reprint
+  S:
+    observations:
+    - observation_id: kato_1993_table1_s_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 S vapor pressure at 1873 K = 1.7 Pa (1 mass%)
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-S at 1 mass% (not pure S)
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 1.7
+        P_as_printed: '1.7'
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+        composition_as_printed: 1 mass%
+      uncertainty:
+        note: none printed on the Psat column
+  P:
+    observations:
+    - observation_id: kato_1993_table1_p_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 P vapor pressure at 1873 K = 1.4 × 10^{-4} Pa (1 mass%)
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-P at 1 mass% (not pure P)
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 0.00014
+        P_as_printed: 1.4 × 10^{-4}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+        composition_as_printed: 1 mass%
+      uncertainty:
+        note: none printed on the Psat column
+    - observation_id: kato_1993_fig5_fe_p_p_p2_figure_only
+      type: psat_series
+      locator:
+        figure: '5'
+        published_page: 304
+        pdf_page_index: 8
+        note: Vapor pressures of P, P2 from Fe-P alloys (Yamamoto et al.)
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-P alloys
+      standard_state: P and P2 partial pressures; reprint of Yamamoto et al. 48
+      regime: kems_effusion
+      units: 10^{-3} Pa as plotted; not digitised
+      values:
+        quantity: partial_pressure
+        gas_species:
+        - P
+        - P2
+        method_class: quoted_measurement
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        quoted_from: Yamamoto et al. (ref 48)
+        axis_as_printed: P_P, P_P2 (x 10^{-3} Pa) vs (P) (at%)
+      uncertainty:
+        note: figure-only reprint; error bars visible, not digitised
+  Mn:
+    observations:
+    - observation_id: kato_1993_table1_mn_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Mn vapor pressure at 1873 K = 5.2 × 10^{3} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 5200.0
+        P_as_printed: 5.2 × 10^{3}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  Al:
+    observations:
+    - observation_id: kato_1993_table1_al_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Al vapor pressure at 1873 K = 1.8 × 10^{2} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 180.0
+        P_as_printed: 1.8 × 10^{2}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+    - observation_id: kato_1993_p300_al2o3_cell_a_al_model_derived
+      type: activity_coefficient
+      locator:
+        published_page: 300
+        pdf_page_index: 4
+        section: 2.3 Compatibility of cell material with samples
+        note: calculated a_Al in Fe in equilibrium with Al2O3 at the Fe-V example pO2
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Al in iron vs Al2O3 cell; Fe-V example
+      standard_state: Raoultian a_Al
+      regime: free_energy_function_assessment
+      units: dimensionless activity; log(p_O2/MPa) as printed
+      values:
+        quantity: activity_Al_and_pO2_from_oxide_equilibria
+        method_class: model_derived
+        a_V_as_printed: 0.1
+        a_V2O3_as_printed: 1.0
+        log10_pO2_MPa: -1.27
+        a_Al: 3.8e-06
+        a_Al_when_a_V2O3_0p1: 1.2e-05
+        data_source_as_printed: Delta-G_f of the oxides; Furukawa and Kato Fe-V Al2O3-cell example
+      uncertainty:
+        note: computed illustration; no numeric +/- printed
+  Sn:
+    observations:
+    - observation_id: kato_1993_table1_sn_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Sn vapor pressure at 1873 K = 1.2 × 10^{2} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 120.0
+        P_as_printed: 1.2 × 10^{2}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  Cu:
+    observations:
+    - observation_id: kato_1993_table1_cu_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Cu vapor pressure at 1873 K = 1.2 × 10^{2} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 120.0
+        P_as_printed: 1.2 × 10^{2}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  Ge:
+    observations:
+    - observation_id: kato_1993_table1_ge_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Ge vapor pressure at 1873 K = 4.6 × 10^{1} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 46.0
+        P_as_printed: 4.6 × 10^{1}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+    - observation_id: kato_1993_fig7_fe_ge_ion_ratio_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '7'
+        published_page: 311
+        pdf_page_index: 15
+        note: ln(I_Fe+/I_Ge+) vs 10^4/T for Fe-Ge (Nunoue and Kato)
+      T_range_K:
+      - 1333.0
+      - 2000.0
+      phase: Fe-Ge; homogeneous liquid and solid plus two-phase
+      standard_state: ion current ratio reprint
+      regime: kems_effusion
+      units: ln(I_Fe+/I_Ge+) as plotted; not digitised
+      values:
+        quantity: ion_current_ratio
+        method_class: quoted_measurement
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        quoted_from: Nunoue and Kato 1989 (ref 154)
+        N_Ge_labels_as_printed: 0.043 to 0.409 (composition labels on the figure; not a tabulated series)
+      uncertainty:
+        note: figure-only reprint; N_Ge labels are axis annotations, not extracted as a numeric series
+    - observation_id: kato_1993_fig8_fe_ge_phase_diagram_figure_only
+      type: transition_point
+      locator:
+        figure: '8'
+        published_page: 311
+        pdf_page_index: 15
+        note: Fe-Ge phase equilibria summary (Nunoue and Kato) with overlays
+      T_range_K:
+      - 1371.15
+      - 1773.15
+      phase: Fe-Ge liquid, alpha, epsilon, beta
+      standard_state: phase diagram reprint
+      regime: kems_effusion
+      units: temperature C as plotted; not digitised except printed labels recorded as figure-only
+      values:
+        quantity: phase_boundary
+        method_class: quoted_measurement
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        quoted_from: Nunoue and Kato 1989 (ref 154); overlays Ubelacker and Enoki et al.
+        printed_labels_C:
+        - 1122
+        - 1098
+        printed_labels_note: 1122 C and 1098 C are printed on the figure; not treated as a new Kato measurement
+      uncertainty:
+        note: figure-only reprint
+  Cr:
+    observations:
+    - observation_id: kato_1993_table1_cr_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Cr vapor pressure at 1873 K = 2.5 × 10^{1} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 25.0
+        P_as_printed: 2.5 × 10^{1}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  Au:
+    observations:
+    - observation_id: kato_1993_table1_au_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Au vapor pressure at 1873 K = 8.1 Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 8.1
+        P_as_printed: '8.1'
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  Pd:
+    observations:
+    - observation_id: kato_1993_table1_pd_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Pd vapor pressure at 1873 K = 7.3 Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 7.3
+        P_as_printed: '7.3'
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  Co:
+    observations:
+    - observation_id: kato_1993_table1_co_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Co vapor pressure at 1873 K = 3.7 Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 3.7
+        P_as_printed: '3.7'
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  Ni:
+    observations:
+    - observation_id: kato_1993_table1_ni_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Ni vapor pressure at 1873 K = 3.8 Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 3.8
+        P_as_printed: '3.8'
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  Si:
+    observations:
+    - observation_id: kato_1993_table1_si_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Si vapor pressure at 1873 K = 8.8 × 10^{-1} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 0.88
+        P_as_printed: 8.8 × 10^{-1}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  Ti:
+    observations:
+    - observation_id: kato_1993_table1_ti_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Ti vapor pressure at 1873 K = 1.5 × 10^{-1} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 0.15
+        P_as_printed: 1.5 × 10^{-1}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  V:
+    observations:
+    - observation_id: kato_1993_table1_v_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 V vapor pressure at 1873 K = 2.0 × 10^{-2} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 0.02
+        P_as_printed: 2.0 × 10^{-2}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+    - observation_id: kato_1993_fig3_fe_v_integration_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '3'
+        published_page: 300
+        pdf_page_index: 4
+        note: Belton-Fruehan integration curve Fe-V at 1600 C (Furukawa and Kato)
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-V liquid; Al-added vs without Al
+      standard_state: ion-intensity-ratio integration curve; reprint
+      regime: kems_effusion
+      units: as plotted; not digitised
+      values:
+        quantity: belton_fruehan_integration_curve
+        method_class: quoted_measurement
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        quoted_from: Furukawa and Kato 1975 (ref 8)
+        symbols_as_printed: filled circles Al added; open circles without Al
+      uncertainty:
+        note: figure-only reprint
+  Mo:
+    observations:
+    - observation_id: kato_1993_table1_mo_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Mo vapor pressure at 1873 K = 2.1 × 10^{-6} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 2.1e-06
+        P_as_printed: 2.1 × 10^{-6}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  Nb:
+    observations:
+    - observation_id: kato_1993_table1_nb_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Nb vapor pressure at 1873 K = 1.0 × 10^{-7} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 1.0e-07
+        P_as_printed: 1.0 × 10^{-7}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  Ta:
+    observations:
+    - observation_id: kato_1993_table1_ta_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 Ta vapor pressure at 1873 K = 4.3 × 10^{-10} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 4.3e-10
+        P_as_printed: 4.3 × 10^{-10}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+  W:
+    observations:
+    - observation_id: kato_1993_table1_w_psat_1873k
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 302
+        pdf_page_index: 6
+        note: Table 1 W vapor pressure at 1873 K = 6.7 × 10^{-11} Pa
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: pure_element_ranking_at_1873_K
+      standard_state: Pa as printed; ranking Psat, not a Kato-measured series in this paper
+      regime: quoted_compilation_ranking
+      units: Pa as published
+      values:
+        quantity: vapor_pressure
+        method_class: quoted_unattributed
+        P_Pa: 6.7e-11
+        P_as_printed: 6.7 × 10^{-11}
+        T_K_as_printed: 1873.0
+        T_C_as_printed: 1600.0
+        column_as_printed: Vapor pressure at 1,873 K (Pa)
+        source_of_Psat: Table 1 ranking column; no citation is printed for these pure-element (or 1 mass%
+          S, P) pressures. Investigators column is for Fe-X activity studies, not this Psat.
+      uncertainty:
+        note: none printed on the Psat column
+deepening:
+  dispatch_id: extract-kems-048
+  date: '2026-09-12'
+  paper_class: REVIEW; no new Kato measurements in this article
+  table_footnotes_as_printed:
+    table_1:
+    - l and s refer to the liquid and solid state, respectively.
+    - 'I.S./Fe: Fe is used as internal standard; "Other" refers to method not discussed here.'
+    - 'Ratio/G-D: Ion intensity ratio method by use of the Gibbs-Duhem relation.'
+    table_3: i=Al, Co, Cr, Mo, Nb, Ni, Si, Ti, and V.
+    table_4: i=CaO, MgO, MnO, and SiO2; j=BaO, CaO, CoO, MgO, and NiO.
+  primary_sources_cited:
+  - table: '1'
+    title_as_printed: Thermodynamic Measurements of Binary Ferrous Alloys by Mass Spectrometry
+    published_page: 302
+    pdf_page_index: 6
+    rows:
+    - system: Fe-S
+      state: l
+      method: I.S./Fe
+      investigators: Kato and Minami
+      year: 1973
+      ref_number: 14
+      journal_reference_as_printed: E. Kato and M. Minami, "Proc. 4th Inter. Conf. Vac. Metall," Iron
+        Steel Inst. Jpn. (1973), Section 1, p. 35.
+      alloying_element: S
+    - system: Fe-S
+      state: l
+      method: Ratio/G-D
+      investigators: Ichise, Kitao, and Mori
+      year: 1975
+      ref_number: 15
+      journal_reference_as_printed: E. Ichise, K. Kitao, and T. Mori, Trans. Iron Steel Inst. Jpn., 15,
+        115 (1975).
+      alloying_element: S
+    - system: Fe-P
+      state: l
+      method: Ratio/G-D
+      investigators: Yamada and Kato
+      year: 1980
+      ref_number: 16
+      journal_reference_as_printed: K. Yamada and E. Kato, Trans. Iron Steel Inst. Jpn., 20, 244 (1980).
+      alloying_element: P
+    - system: Fe-Mn
+      state: s
+      method: Other
+      investigators: Zaitsev, Zemchenko, and Mogutnov
+      year: 1989
+      ref_number: 17
+      journal_reference_as_printed: A. I. Zaitsev, M. A. Zemchenko, and B. M. Mogutnov, Zh. Fiz. Khim.,
+        63, 2951 (1989).
+      alloying_element: Mn
+    - system: Fe-Mn
+      state: s
+      method: Other
+      investigators: Zaitsev, Zemchenko, and Mogutnov
+      year: 1990
+      ref_number: 18
+      journal_reference_as_printed: A. I. Zaitsev, M. A. Zemchenko, and B. M. Mogutnov, Izv. Akad. Nauk.
+        SSSR, Met., 38, 6 (1990).
+      alloying_element: Mn
+    - system: Fe-Al
+      state: l
+      method: Ratio/G-D
+      investigators: Belton and Fruehan
+      year: 1969
+      ref_number: 19
+      journal_reference_as_printed: G. R. Belton and R. J. Fruehan, Trans. AIME, 245, 113 (1969).
+      alloying_element: Al
+    - system: Fe-Al
+      state: l, s
+      method: Ratio/G-D
+      investigators: Ichise, Yamauchi, and Mori
+      year: 1977
+      ref_number: 20
+      journal_reference_as_printed: E. Ichise, T. Yamauchi, and T. Mori, Tetsu-To-Hagane, 63, 417 (1977).
+      alloying_element: Al
+    - system: Fe-Sn
+      state: l
+      method: Ratio/G-D
+      investigators: Wagner and St. Pierre
+      year: 1972
+      ref_number: 21
+      journal_reference_as_printed: S. Wagner and G. R. St. Pierre, Metall. Trans., 3, 2873 (1972).
+      alloying_element: Sn
+    - system: Fe-Sn
+      state: l
+      method: Ratio/G-D
+      investigators: Yamamoto, Mori, and Kato
+      year: 1983
+      ref_number: 22
+      journal_reference_as_printed: M. Yamamoto, S. Mori, and E. Kato, Trans. Iron Steel Inst. Jpn., 23,
+        56 (1983).
+      alloying_element: Sn
+    - system: Fe-Sn
+      state: l
+      method: Ratio/G-D
+      investigators: Nunoue and Kato
+      year: 1987
+      ref_number: 23
+      journal_reference_as_printed: S. Nunoue and E. Kato, Tetsu-To-Hagane, 73, 868 (1987).
+      alloying_element: Sn
+    - system: Fe-Cu
+      state: l
+      method: Ratio/G-D
+      investigators: Choudary, Serkin, and Belton
+      year: 1975
+      ref_number: 24
+      journal_reference_as_printed: U. V. Choudary, J. A. Serkin, and G. R. Belton, Metall. Trans. B,
+        6B, 399 (1975).
+      alloying_element: Cu
+    - system: Fe-Cu
+      state: l
+      method: Ratio/G-D
+      investigators: Timberg, Toguri, and Azakami
+      year: 1981
+      ref_number: 25
+      journal_reference_as_printed: L. Timberg, J. Toguri, and T. Azakami, Metall. Trans. B, 12B, 275
+        (1981).
+      alloying_element: Cu
+    - system: Fe-Ge
+      state: l
+      method: Ratio/G-D
+      investigators: Erdelyi, Tomiska, Neckel, and Nowotny
+      year: 1978
+      ref_number: 26
+      journal_reference_as_printed: L. Erdelyi, J. Tomiska, A. Neckel, and H. Nowotny, Z. Metallkd., 69,
+        506 (1978).
+      alloying_element: Ge
+    - system: Fe-Ge
+      state: l
+      method: Ratio/G-D
+      investigators: Nunoue and Kato
+      year: 1988
+      ref_number: 27
+      journal_reference_as_printed: S. Nunoue and E. Kato, Metall. Trans. B, 19B, 511 (1988).
+      alloying_element: Ge
+    - system: Fe-Cr
+      state: l
+      method: Other
+      investigators: Reese, Rapp and St. Pierre
+      year: 1968
+      ref_number: 28
+      journal_reference_as_printed: R. B. Reese, R. A. Rapp, and G. R. St. Pierre, Trans. AIME, 242, 1719
+        (1968).
+      alloying_element: Cr
+    - system: Fe-Cr
+      state: l
+      method: Other
+      investigators: Gilby and St. Pierre
+      year: 1969
+      ref_number: 29
+      journal_reference_as_printed: W. Gilby and G. R. St. Pierre, Trans. AIME, 245, 1749 (1969).
+      alloying_element: Cr
+    - system: Fe-Cr
+      state: l, s
+      method: Ratio/G-D
+      investigators: Belton and Fruehan
+      year: 1970
+      ref_number: 30
+      journal_reference_as_printed: G. R. Belton and R. J. Fruehan, Metall. Trans., 1, 781 (1970).
+      alloying_element: Cr
+    - system: Fe-Cr
+      state: s
+      method: Other
+      investigators: Zaitsev, Zemchenko, and Mogutnov
+      year: 1990
+      ref_number: 31
+      journal_reference_as_printed: A. I. Zaitsev, M. A. Zemchenko, and B. M. Mogutnov, Zh. Fiz. Khim.,
+        64, 1187 (1990).
+      alloying_element: Cr
+    - system: Fe-Au
+      state: l
+      method: Ratio/G-D
+      investigators: Tomiska, Nowotny, Erdelyi, and Neckel
+      year: 1977
+      ref_number: 11
+      journal_reference_as_printed: J. Tomiska, H. Nowotny, L. Erdelyi, and A. Neckel, Z. Metallkd., 68,
+        350 (1977).
+      alloying_element: Au
+    - system: Fe-Pd
+      state: l
+      method: Ratio/G-D
+      investigators: Tomiska, Krajnik, and Neckel
+      year: 1989
+      ref_number: 32
+      journal_reference_as_printed: J. Tomiska, P. Krajnik, and A. Neckel, Z. Metallkd., 80, 258 (1989).
+      alloying_element: Pd
+    - system: Fe-Pd
+      state: s
+      method: Ratio/G-D
+      investigators: Tomiska
+      year: 1989
+      ref_number: 33
+      journal_reference_as_printed: J. Tomiska, Z. Metallkd., 80, 888 (1989).
+      alloying_element: Pd
+    - system: Fe-Co
+      state: l
+      method: Ratio/G-D
+      investigators: Lyubimov, Zobens, and Rakhovskii
+      year: 1958
+      ref_number: 34
+      journal_reference_as_printed: A. P. Lyubimov, V. Ya. Zobens, and V. E. Rakhovskii, Zh. Fiz. Khim.,
+        32, 1804 (1958).
+      alloying_element: Co
+    - system: Fe-Co
+      state: l
+      method: Ratio/G-D
+      investigators: Belton and Fruehan
+      year: 1967
+      ref_number: 9
+      journal_reference_as_printed: G. R. Belton and R. J. Fruehan, J. Phys. Chem., 71, 1403 (1967).
+      alloying_element: Co
+    - system: Fe-Co
+      state: l, s
+      method: Triple cell
+      investigators: Rammensee and Fraser
+      year: 1981
+      ref_number: 35
+      journal_reference_as_printed: W. Rammensee and D. G. Fraser, Ber. Bunsenges. Phys. Chem., 85, 588
+        (1981).
+      alloying_element: Co
+    - system: Fe-Co
+      state: s
+      method: Ratio/G-D
+      investigators: Tomiska
+      year: 1986
+      ref_number: 36
+      journal_reference_as_printed: J. Tomiska, Z. Metallkd., 77, 97 (1986).
+      alloying_element: Co
+    - system: Fe-Co
+      state: l
+      method: Ratio/G-D
+      investigators: Tomiska and Neckel
+      year: 1986
+      ref_number: 37
+      journal_reference_as_printed: J. Tomiska and A. Neckel, Z. Metallkd., 77, 649 (1986).
+      alloying_element: Co
+    - system: Fe-Ni
+      state: s
+      method: Ratio/G-D
+      investigators: Lyubimov Zobens, and Rakhovskii
+      year: 1958
+      ref_number: 34
+      journal_reference_as_printed: A. P. Lyubimov, V. Ya. Zobens, and V. E. Rakhovskii, Zh. Fiz. Khim.,
+        32, 1804 (1958).
+      alloying_element: Ni
+      investigators_as_printed: Lyubimov Zobens, and Rakhovskii (comma after Lyubimov missing as printed)
+    - system: Fe-Ni
+      state: l
+      method: Ratio/G-D
+      investigators: Belton and Fruehan
+      year: 1967
+      ref_number: 9
+      journal_reference_as_printed: G. R. Belton and R. J. Fruehan, J. Phys. Chem., 71, 1403 (1967).
+      alloying_element: Ni
+    - system: Fe-Ni
+      state: l
+      method: Ratio/G-D
+      investigators: Kubaschewski, Geiger, and Hack
+      year: 1977
+      ref_number: 38
+      journal_reference_as_printed: O. Kubaschewski, K. H. Geiger, and K. Hack, Z. Metallkd., 68, 337
+        (1977).
+      alloying_element: Ni
+    - system: Fe-Ni
+      state: l, s
+      method: Ratio/G-D
+      investigators: Conard, McAneney, and Sridhar
+      year: 1978
+      ref_number: 39
+      journal_reference_as_printed: B. R. Conard, T. B. McAneney, and R. Sridhar, Metall. Trans. B, 9B,
+        463 (1978).
+      alloying_element: Ni
+    - system: Fe-Ni
+      state: l, s
+      method: Ratio/G-D
+      investigators: Rammensee and Fraser
+      year: 1981
+      ref_number: 35
+      journal_reference_as_printed: W. Rammensee and D. G. Fraser, Ber. Bunsenges. Phys. Chem., 85, 588
+        (1981).
+      alloying_element: Ni
+    - system: Fe-Ni
+      state: l
+      method: Ratio/G-D
+      investigators: Tomiska
+      year: 1985
+      ref_number: 40
+      journal_reference_as_printed: J. Tomiska, Z. Metallkd., 76, 532 (1985).
+      alloying_element: Ni
+    - system: Fe-Ni
+      state: s
+      method: Ratio/G-D
+      investigators: Tomiska and Neckel
+      year: 1985
+      ref_number: 41
+      journal_reference_as_printed: J. Tomiska and A. Neckel, Ber. Bunsenges. Phys. Chem., 89, 1104 (1985).
+      alloying_element: Ni
+    - system: Fe-Si
+      state: l
+      method: Ratio/G-D
+      investigators: Yamada, Abe and Kato
+      year: 1980
+      ref_number: 42
+      journal_reference_as_printed: K. Yamada, H. Abe, and E. Kato, Tetsu-To-Hagane, 73, 868 (1980); "Symp.
+        Ser., Australia In. Min. Metall.," 23, 385 (1980).
+      alloying_element: Si
+    - system: Fe-Si
+      state: l, s
+      method: Ratio/G-D
+      investigators: Zaitsev, Zemchenko, and Mogutnov
+      year: 1991
+      ref_number: 43
+      journal_reference_as_printed: A. I. Zaitsev, M. A. Zemchenko, and B. M. Mogutnov, J. Chem. Thermodyn.,
+        23, 831 (1991).
+      alloying_element: Si
+    - system: Fe-Ti
+      state: l
+      method: Ratio/G-D
+      investigators: Furukawa and Kato
+      year: 1976
+      ref_number: 44
+      journal_reference_as_printed: T. Furukawa and E. Kato, Trans. Iron Steel Inst. Jpn., 16, 382 (1976).
+      alloying_element: Ti
+    - system: Fe-V
+      state: l
+      method: Ratio/G-D
+      investigators: Furukawa and Kato
+      year: 1975
+      ref_number: 8
+      journal_reference_as_printed: T. Furukawa and E. Kato, Tetsu-To-Hagane, 61, 3050 (1975). "The 4th
+        Japan-USSR Joint Symposium on Physical Chemistry of Metallurgical Processes," Iron Steel Inst.
+        Jpn. (1973), p. 201.
+      alloying_element: V
+    - system: Fe-Mo
+      state: l, s
+      method: I.S./Fe
+      investigators: Ichise, Maruo, Sasho, Ueshima, and Mori
+      year: 1982
+      ref_number: 45
+      journal_reference_as_printed: E. Ichise, T. Maruo, H. Sasho, Y. Uesima, and T. Mori, Trans. Iron
+        Steel Inst. Jpn., 22, 552 (1982).
+      alloying_element: Mo
+    - system: Fe-Nb
+      state: l, s
+      method: I.S./Fe
+      investigators: Ichise and Horikawa
+      year: 1989
+      ref_number: 46
+      journal_reference_as_printed: E. Ichise and K. Horikawa, Iron Steel Inst. Jpn., Inter., 29, 843
+        (1989).
+      alloying_element: Nb
+    - system: Fe-Ta
+      state: l, s
+      method: I.S./Fe
+      investigators: Ichise and Horikawa
+      year: 1989
+      ref_number: 46
+      journal_reference_as_printed: E. Ichise and K. Horikawa, Iron Steel Inst. Jpn., Inter., 29, 843
+        (1989).
+      alloying_element: Ta
+    - system: Fe-W
+      state: l, s
+      method: I.S./Fe
+      investigators: Ueshima, Yamana, Sugiyama, and Ichise
+      year: 1984
+      ref_number: 47
+      journal_reference_as_printed: Y. Ueshima, H. Yamana, T. Sugiyama, and E. Ichise, Tetsu-To-Hagane,
+        70, 549 (1984).
+      alloying_element: W
+  - table: '2'
+    title_as_printed: Thermodynamic Measurements of Binary Non-Ferrous Alloys by Mass Spectrometry
+    published_page: 306-307
+    pdf_page_index: 10-11
+    rows:
+    - system: Ag-Al
+      state: l
+      method: Ratio/G-D
+      investigators: Belton and Fruehan
+      year: 1969
+      ref_number: 19
+      journal_reference_as_printed: G. R. Belton and R. J. Fruehan, Trans. AIME, 245, 113 (1969).
+    - system: Ag-Al
+      state: l
+      method: Ratio/G-D
+      investigators: Cuthill, Brown, and Fabian
+      year: 1969
+      ref_number: 49
+      journal_reference_as_printed: A. M. Cuthill, P. B. Brown, and D. J. Fabian, Proc. Int. Conf. Mass
+        Spectrometry, Ljubljana (1969).
+    - system: Ag-Cu
+      state: l
+      method: Dual cell
+      investigators: Cameresi, DeMaria, Gigli, and Piacente
+      year: 1967
+      ref_number: 50
+      journal_reference_as_printed: G. G. Cameresi, G. DeMaria, R. Gigli, and V. Piacente, Ric. Sci. 37,
+        1092 (1967).
+    - system: Ag-Cu
+      state: l
+      method: Ratio/G-D
+      investigators: Nakamura, Yamaji, and Kato
+      year: 1970
+      ref_number: 51
+      journal_reference_as_printed: S. Nakamura, T. Yamaji, and E. Kato, Met. Trans., 1, 2645 (1970).
+    - system: Ag-Cu
+      state: l
+      method: Ratio/G-D
+      investigators: Wagner, Sodeck, and Neckel
+      year: 1971
+      ref_number: 52
+      journal_reference_as_printed: S. Wagner, G. Sodeck, and A. Neckel, High Temp. Sci., 3, 481 (1971).
+    - system: Ag-Cu
+      state: l
+      method: Ratio/G-D
+      investigators: Golonka, Botor, and Dulat
+      year: 1979
+      ref_number: 53
+      journal_reference_as_printed: J. Golonka, J. Botor, and M. Dulat, Met. Technol., 6, 267 (1979).
+    - system: Ag-Cu
+      state: l
+      method: Other
+      investigators: Howard
+      year: 1989
+      ref_number: 7
+      journal_reference_as_printed: S. M. Howard, Metall. Trans B, 20B, 845 (1989).
+    - system: Ag-Ga
+      state: l
+      method: Ratio/G-D
+      investigators: Qi, Hino, and Azakami
+      year: 1989
+      ref_number: 54
+      journal_reference_as_printed: G. Qi, M. Hino and T. Azakami, Mater. Trans., Jpn. Inst. Met., 30,
+        575 (1989).
+    - system: Ag-Ge
+      state: l
+      method: Multiple cell
+      investigators: Martin-Garin, Chatillon, and Allibert
+      year: 1979
+      ref_number: 55
+      journal_reference_as_printed: L. Martin-Garin, C. Chatillon, and M. Allibert, J. Less-Common Met.,
+        63, 9 (1979).
+    - system: Ag-In
+      state: l
+      method: Ratio/G-D
+      investigators: Alcock, Sridhar, and Svedberg
+      year: 1969
+      ref_number: 56
+      journal_reference_as_printed: C. B. Alcock, R. Sridhar, and R. C. Svedberg, Acta Metall., 17, 839
+        (1969).
+    - system: Ag-In
+      state: l
+      method: Ratio/G-D
+      investigators: Qi, Hino, and Azakami
+      year: 1989
+      ref_number: 54
+      journal_reference_as_printed: G. Qi, M. Hino and T. Azakami, Mater. Trans., Jpn. Inst. Met., 30,
+        575 (1989).
+    - system: Ag-Mn
+      state: s
+      method: Dual cell
+      investigators: Gingerich, Kingcade, Stickney, and Chandrasekharaiah
+      year: 1988
+      ref_number: 57
+      journal_reference_as_printed: K. A. Gingerich, J. E. Kingcade, JR, M. J. Stickney, and M. S. Chandrasekharaiah,
+        J. Less-Common Met., 143, 373 (1988).
+    - system: Ag-Pd
+      state: s
+      method: Dual cell
+      investigators: Raychaudhuri
+      year: 1971
+      ref_number: 58
+      journal_reference_as_printed: P. K. Raychaudhuri, "Ph. D. Thesis, Mass Spectrometric and Galvanic
+        Cell Studies of the Thermodynamic Properties of Solid Silver-Palldium Alloys," Northwestern Univ.,
+        Evanston (1971).
+    - system: Ag-Sn
+      state: l
+      method: Ratio/G-D
+      investigators: Yamaji and Kato
+      year: 1972
+      ref_number: 59
+      journal_reference_as_printed: T. Yamaji and E. Kato, Metall. Trans., 3, 1002 (1972).
+    - system: Al-Au
+      state: l
+      method: Ratio/G-D
+      investigators: Erdelyi, Tomiska, Neckel, Rose, Ramakrishnan, and Fabian
+      year: 1979
+      ref_number: 60
+      journal_reference_as_printed: L. Erdelyi, J. Tomiska, A. Neckel, G. Rose, E. S. Ramakrishnan, and
+        D. J. Fabian, Metall. Trans. A, 10A, 1437 (1979).
+    - system: Al-Co
+      state: l
+      method: ''
+      investigators: Levin and Gel'd
+      year: 1979
+      ref_number: 61
+      journal_reference_as_printed: E. S. Levin and P. V. Gel'd, Zh. Fiz. Khim., 53, 2846 (1979).
+    - system: Al-Cu
+      state: l
+      method: Ratio/G-D
+      investigators: Perakis, Chatillon, and Pattoret
+      year: 1973
+      ref_number: 62
+      journal_reference_as_printed: J. Perakis, C. Chatillon, and A. Pattoret, C. R. Acad. Sci., Ser.
+        C, 276, 1513 (1973).
+    - system: Al-Ni
+      state: l
+      method: Multiple cell
+      investigators: Jhonston, and Palmer
+      year: 1980
+      ref_number: 63
+      journal_reference_as_printed: G. R. Jhonston and L. D. Palmer, High Temp. High Press., 12, 261 (1980).
+    - system: Al-Si
+      state: l
+      method: Multiple cell
+      investigators: Chatillon, Allibert, and Pattoret
+      year: 1975
+      ref_number: 64
+      journal_reference_as_printed: C. Chatillon, M. Allibert, and A. Pattoret, High Temp. High Press.,
+        7, 583 (1975).
+    - system: Al-Te
+      state: l
+      method: Other
+      investigators: Said, Chastel, Bergman, and Castanet
+      year: 1981
+      ref_number: 65
+      journal_reference_as_printed: H. Said, R. Chastel, C. Bergman, and R. Castanet, Z. Metallkd., 72,
+        360 (1981).
+    - system: Al-Ti
+      state: s
+      method: Ratio/Model
+      investigators: Hoch and Usell, Jr.
+      year: 1971
+      ref_number: 66
+      journal_reference_as_printed: M. Hoch and R. J. Usell, Jr., Metall. Trans., 2, 2627 (1971).
+    - system: Al-Ti
+      state: s
+      method: Isotope
+      investigators: Hoch and Usell, Jr.
+      year: 1971
+      ref_number: 66
+      journal_reference_as_printed: M. Hoch and R. J. Usell, Jr., Metall. Trans., 2, 2627 (1971).
+    - system: As-Cu
+      state: l
+      method: Dual cell
+      investigators: Hino and Toguri
+      year: 1987
+      ref_number: 67
+      journal_reference_as_printed: M. Hino and J. M. Toguri, Metall. Trans. B, 18B, 189 (1987).
+    - system: As-Pd
+      state: l
+      method: Other
+      investigators: Storms and Szklarz
+      year: 1987
+      ref_number: 68
+      journal_reference_as_printed: E. K. Storms and E. G. Szklarz, J. Less-Common Met., 136, 61 (1987).
+    - system: Au-Cu
+      state: l
+      method: Ratio/G-D
+      investigators: Neckel and Wagner
+      year: 1969
+      ref_number: 69
+      journal_reference_as_printed: A. Neckel and S. Wagner, Ber. Bunsenges. Phys. Chem., 73, 210 (1969).
+    - system: Au-Cu
+      state: l
+      method: Ratio/G-D
+      investigators: Hager, Howard, and Jones
+      year: 1970
+      ref_number: 70
+      journal_reference_as_printed: J. P. Hager, S. M. Howard, and J. H. Jones, Metall. Trans., 1, 415
+        (1970).
+    - system: Au-Ge
+      state: l
+      method: Ratio/G-D
+      investigators: Neckel and Sodeck
+      year: 1969
+      ref_number: 71
+      journal_reference_as_printed: A. Neckel and G. Sodeck, paper presented at the First Intern. Conf.
+        on Calorimetry and Thermodynamics, Warsaw, (1969).
+    - system: Au-Ge
+      state: l
+      method: Ratio/G-D
+      investigators: Hager, Howard, and Jones
+      year: 1973
+      ref_number: 72
+      journal_reference_as_printed: J. P. Hager, S. M. Howard, and J. H. Jones, Metall. Trans., 4, 2383
+        (1973).
+    - system: Au-Ni
+      state: l
+      method: Ratio/G-D
+      investigators: Tomiska, Erdelyi, Neckel, and Nowotny
+      year: 1977
+      ref_number: 73
+      journal_reference_as_printed: J. Tomiska, L. Erdelyi, A. Neckel, and Nowotny, Z. Metallkd., 68,
+        734 (1977).
+    - system: Au-Pd
+      state: s
+      method: Dual cell
+      investigators: Bartosik
+      year: 1971
+      ref_number: 74
+      journal_reference_as_printed: D. C. Bartosik, "Ph. D. Thesis, Thermodynamic Properties of the Gold-Palladium
+        System as Measured with a Dual-Chamber Knudsen Cell Mass Spectrometer Combination Technique,"
+        Northwestern Univ. Evanston (1971).
+    - system: Au-Pd
+      state: s
+      method: Ratio/G-D
+      investigators: Bartosik
+      year: 1971
+      ref_number: 74
+      journal_reference_as_printed: D. C. Bartosik, "Ph. D. Thesis, Thermodynamic Properties of the Gold-Palladium
+        System as Measured with a Dual-Chamber Knudsen Cell Mass Spectrometer Combination Technique,"
+        Northwestern Univ. Evanston (1971).
+    - system: Au-Pd
+      state: l
+      method: Ratio/G-D
+      investigators: Tomiska, Kopecky, and Neckel
+      year: 1990
+      ref_number: 75
+      journal_reference_as_printed: J. Tomiska, K. Kopecky, and A. Neckel, Ber. Bunsen-Ges. Phys. Chem.,
+        94, 47 (1990).
+    - system: Au-Pd
+      state: s
+      method: Ratio/G-D
+      investigators: Tomiska
+      year: 1990
+      ref_number: 76
+      journal_reference_as_printed: J. Tomiska, Z. Metallkd., 81, 912 (1990).
+    - system: Au-Pt
+      state: s
+      method: Dual cell
+      investigators: Jones, Stafford, and Whitmore
+      year: 1970
+      ref_number: 77
+      journal_reference_as_printed: R. W. Jones, F. E. Stafford, and D. H. Whitmore, Metall. Trans., 1,
+        403 (1970).
+    - system: Au-Si
+      state: l
+      method: Ratio/G-D
+      investigators: Bergman, Chastel, Mathieu, and Castanet
+      year: 1978
+      ref_number: 78
+      journal_reference_as_printed: C. Bergman, R. Chastel M. Gilbert, and R. Castanet, High Temp. High
+        Press., 10, 581 (1978).
+    - system: Au-Sn
+      state: l
+      method: Ratio/G-D
+      investigators: Howard and Hager
+      year: 1978
+      ref_number: 79
+      journal_reference_as_printed: S. M. Howard and J. P. Hager, Metall. Trans. B, 9B, 51 (1978).
+    - system: B-La
+      state: s
+      method: Other
+      investigators: Storms and Mueller
+      year: 1978
+      ref_number: 80
+      journal_reference_as_printed: E. Storms and B. Mueller, J. Phys. Chem., 82, 51 (1978).
+    - system: B-Mo
+      state: s
+      method: Other
+      investigators: Storms and Mueller
+      year: 1977
+      ref_number: 81
+      journal_reference_as_printed: E. Storms and B. Mueller, J. Phys. Chem., 81, 318 (1977).
+    - system: B-Ni
+      state: l
+      method: Other
+      investigators: Storms and Szklarz
+      year: 1987
+      ref_number: 82
+      journal_reference_as_printed: E. K. Storms and E. G. Szklarz, J. Less-Common Met., 135, 229 (1987).
+    - system: B-Pd
+      state: l
+      method: Other
+      investigators: Storms and Szklarz
+      year: 1987
+      ref_number: 83
+      journal_reference_as_printed: E. K. Storms and E. G. Szklarz, J. Less-Common Met., 135, 217 (1987).
+    - system: B-Si
+      state: s
+      method: Multiple cell
+      investigators: Armas, Chatillon, and Allibert
+      year: 1981
+      ref_number: 84
+      journal_reference_as_printed: B. Armas, C. Chatillon, and M. Allibert, Rev. Int. Hautes Temp. Refract.,
+        18, 153 (1981).
+    - system: Ba-P
+      state: l
+      method: Other
+      investigators: Zaitsev, Zemchenko, Litvina, and Mogutnov
+      year: 1992
+      ref_number: 85
+      journal_reference_as_printed: A. I. Zaitsev, M. A. Zemchenko, A. D. Litvina, and Mogutnov, J. Chem.
+        Thermodyn., 24, 1127 (1992).
+    - system: Bi-In
+      state: l
+      method: Ratio/G-D
+      investigators: Lamparter, Cocke, and Steeb
+      year: 1982
+      ref_number: 86
+      journal_reference_as_printed: P. Lamparter, D. L. Cocke, and S. Steeb, Z. Metallkd., 73, 149 (1982).
+    - system: Bi-Pb
+      state: l
+      method: Ratio/G-D
+      investigators: Fruehan
+      year: 1971
+      ref_number: 87
+      journal_reference_as_printed: R. J. Fruehan, Met. Trans., 2, 1213 (1971).
+    - system: Bi-Te
+      state: l
+      method: Ratio/G-D
+      investigators: Belton and Fruehan
+      year: 1971
+      ref_number: 88
+      journal_reference_as_printed: G. R. Belton and R. J. Fruehan, Met. Trans., 2, 291 (1971).
+    - system: Bi-Tl
+      state: l
+      method: Ratio/G-D
+      investigators: Fruehan
+      year: 1971
+      ref_number: 87
+      journal_reference_as_printed: R. J. Fruehan, Met. Trans., 2, 1213 (1971).
+    - system: Bi-Tl
+      state: l
+      method: Monomer-dimer
+      investigators: Fruehan
+      year: 1971
+      ref_number: 87
+      journal_reference_as_printed: R. J. Fruehan, Met. Trans., 2, 1213 (1971).
+    - system: C-Nb
+      state: s
+      method: Other
+      investigators: Storms, Calkin, and Yencha
+      year: 1969
+      ref_number: 89
+      journal_reference_as_printed: E. Storms, B. Calkin, and A. Yencha, High Temp. Sci., 1, 430 (1969).
+    - system: C-V
+      state: s
+      method: Other
+      investigators: Storms, Lowe, Baca, and Griffin
+      year: 1973
+      ref_number: 90
+      journal_reference_as_printed: E. K. Storms, A. Lowe, E. Baca, and J. Griffin, High Temp. Sci., 5,
+        276 (1973).
+    - system: C-Y
+      state: s
+      method: Other
+      investigators: Storms
+      year: 1971
+      ref_number: 91
+      journal_reference_as_printed: E. K. Storms, High Temp. Sci., 3, 99 (1971).
+    - system: C-Zr
+      state: s
+      method: Other
+      investigators: Storms, and Griffin
+      year: 1973
+      ref_number: 92
+      journal_reference_as_printed: E. K. Storms and J. Griffin, High Temp. Sci., 5, 291 (1973).
+    - system: Ca-Ga
+      state: l
+      method: Dual cell
+      investigators: DeMaria and Piacente
+      year: 1972
+      ref_number: 93
+      journal_reference_as_printed: G. DeMaria and V. Piacente, Bull. Soc. Chim. Belges, 81, 155 (1972).
+    - system: Ca-Ga
+      state: l
+      method: Multiple cell
+      investigators: DeMaria and Piacente
+      year: 1972
+      ref_number: 93
+      journal_reference_as_printed: G. DeMaria and V. Piacente, Bull. Soc. Chim. Belges, 81, 155 (1972).
+    - system: Ca-P
+      state: l
+      method: Other
+      investigators: Zaitsev, Korolyov, and Mogutnov
+      year: 1991
+      ref_number: 94
+      journal_reference_as_printed: A. I. Zaitsev, N. V. Korolyov, and Mogutnov, J. Chem. Thermodyn.,
+        23, 11 (1991).
+    - system: Cd-Zn
+      state: l
+      method: Ratio/G-D
+      investigators: Nakazawa, Yazawa, and Taniuchi
+      year: 1976
+      ref_number: 95
+      journal_reference_as_printed: S. Nakazawa, A. Yazawa, and K. Taniuchi, J. Jpn. Inst. Met., 40, 526
+        (1976).
+    - system: Co-Cu
+      state: l
+      method: Ratio/G-D
+      investigators: Timberg, Toguri, and Azakami
+      year: 1981
+      ref_number: 25
+      journal_reference_as_printed: L. Timberg, J. Toguri, and T. Azakami, Metall. Trans. B, 12B, 275
+        (1981).
+    - system: Co-Ge
+      state: l
+      method: Ratio/G-D
+      investigators: Tomiska, Erdelyi, Nowotny, and Neckel
+      year: 1982
+      ref_number: 96
+      journal_reference_as_printed: J. Tomiska, L. Erdelyi, H. Nowotny, and A. Neckel, High Temp. Sci.,
+        15, 41 (1982).
+    - system: Co-Ni
+      state: l, s
+      method: Ratio/G-D
+      investigators: Tomiska, Nowotny, Erdelyi, and Neckel
+      year: 1979
+      ref_number: 97
+      journal_reference_as_printed: J. Tomiska, H. Nowotny, L. Erdelyi, and A. Neckel, Ber. Bunsenges.
+        Phys. Chem., 83, 1035 (1979).
+    - system: Co-Ti
+      state: l
+      method: Ratio/G-D
+      investigators: Ueda, Nishi, Oishi, and Ono
+      year: 1986
+      ref_number: 98
+      journal_reference_as_printed: Y. Ueda, T. Nishi, T. Oishi, and K. Ono, J. Jpn. Inst. Met., 50, 1081
+        (1986).
+    - system: Cr-Cu
+      state: l
+      method: Ratio/G-D
+      investigators: Timberg and Toguri
+      year: 1982
+      ref_number: 99
+      journal_reference_as_printed: L. Timberg and J. M. Toguri, J. Chem. Thermodyn., 4, 193 (1982).
+    - system: Cr-Mn
+      state: s
+      method: Other
+      investigators: Zaitsev, Zemchenko, and Mogutnov
+      year: 1990
+      ref_number: 100
+      journal_reference_as_printed: A. I. Zaitsev, M. A. Zemchenko, and M. Mogutnov, J. Chem. Thermodyn.,
+        22, 41 (1990).
+    - system: Cr-Ni
+      state: l
+      method: Other
+      investigators: Gilby and St.Pierre
+      year: 1969
+      ref_number: 101
+      journal_reference_as_printed: S. W. Gilby and G. R. St. Pierre, Trans. Metall. Soc. AIME, 245, 1749
+        (1969).
+    - system: Cr-Ni
+      state: l
+      method: Ratio/G-D
+      investigators: Wagner, Shade, and St.Pierre
+      year: 1972
+      ref_number: 102
+      journal_reference_as_printed: S. Wagner, D. J. Shade, and G. R. St. Pierre, Met. Trans., 3, 47 (1972).
+    - system: Cu-Ga
+      state: l
+      method: Ratio/G-D
+      investigators: Alcock, Sridhar, and Svedberg
+      year: 1970
+      ref_number: 103
+      journal_reference_as_printed: C. B. Alcock, R. Sridhar, and R. C. Svedberg, J. Chem. Thermodyn.,
+        2, 255 (1970).
+    - system: Cu-Ge
+      state: l
+      method: Ratio/G-D
+      investigators: Sodeck, Entner, and Neckel
+      year: 1970
+      ref_number: 104
+      journal_reference_as_printed: G. Sodeck, P. Entner, and A. Neckel, High Temp. Sci., 2, 311 (1970).
+    - system: Cu-Ge
+      state: l
+      method: Ratio/G-D
+      investigators: Alcock, Sridhar, and Svedberg
+      year: 1970
+      ref_number: 103
+      journal_reference_as_printed: C. B. Alcock, R. Sridhar, and R. C. Svedberg, J. Chem. Thermodyn.,
+        2, 255 (1970).
+    - system: Cu-Ge
+      state: l
+      method: Ratio/G-D
+      investigators: Hager, Howard, and Jones
+      year: 1973
+      ref_number: 72
+      journal_reference_as_printed: J. P. Hager, S. M. Howard, and J. H. Jones, Metall. Trans., 4, 2383
+        (1973).
+    - system: Cu-Ge
+      state: l
+      method: Ratio/G-D
+      investigators: Bergman, Chastel, Gilbert, and Castanet
+      year: 1978
+      ref_number: 78
+      journal_reference_as_printed: C. Bergman, R. Chastel M. Gilbert, and R. Castanet, High Temp. High
+        Press., 10, 581 (1978).
+    - system: Cu-Ni
+      state: s
+      method: Isotope
+      investigators: Hackworth, Hoch, and Gegel
+      year: 1971
+      ref_number: 105
+      journal_reference_as_printed: J. V. Hackworth, M. Hoch, and H. L. Gegel, Met. Trans., 2, 1799 (1971).
+    - system: Cu-Ni
+      state: l
+      method: Ratio/G-D
+      investigators: Tomiska and Neckel
+      year: 1983
+      ref_number: 106
+      journal_reference_as_printed: J. Tomiska and A. Neckel, Int. J. Mass Spectrom. Ion Proc., 47, 223
+        (1983).
+    - system: Cu-Ni
+      state: s
+      method: Ratio/G-D
+      investigators: Tomiska and Neckel
+      year: 1984
+      ref_number: 107
+      journal_reference_as_printed: J. Tomiska and A. Neckel, Ber. Bunsenges. Phys. Chem., 88, 551 (1984).
+    - system: Cu-Sb
+      state: l
+      method: Dual cell
+      investigators: Hino and Toguri
+      year: 1987
+      ref_number: 108
+      journal_reference_as_printed: M. Hino and J. M. Toguri, Metall. Trans. B, 18B, 189 (1987).
+    - system: Cu-Si
+      state: l
+      method: Ratio/G-D
+      investigators: Riekert, Lamparter, and Steeb
+      year: 1981
+      ref_number: 109
+      journal_reference_as_printed: G. Riekert, P. Lamparter, and S. Steeb, Z. Naturforsch, 36A, 447 (1981).
+    - system: Cu-Si
+      state: l
+      method: Ratio/G-D
+      investigators: Bergman, Chastel, and Mathieu
+      year: 1986
+      ref_number: 110
+      journal_reference_as_printed: C. Bergman, R. Chastel, and J. C. Mathieu, J. Chem. Thermodyn., 18,
+        835 (1986).
+    - system: Cu-Sn
+      state: l
+      method: Ratio/G-D
+      investigators: Alcock, Sridhar, and Svedberg
+      year: 1969
+      ref_number: 111
+      journal_reference_as_printed: C. B. Alcock, R. Shridhar, and R. C. Svedberg, Acta Metall., 17, 839
+        (1969).
+    - system: Cu-Sn
+      state: l
+      method: Ratio/G-D
+      investigators: Hager, Howard, and Jones
+      year: 1970
+      ref_number: 112
+      journal_reference_as_printed: J. P. Hager, S. M. Howard, and J. H. Jones, Metall. Trans., 1, 415
+        (1970).
+    - system: Cu-Sn
+      state: l
+      method: Multiple cell
+      investigators: Paulaitis and Eckert
+      year: 1983
+      ref_number: 113
+      journal_reference_as_printed: M. E. Paulaitis and C. A. Eckert, J. Chem. Thermodyn., 15, 55 (1983).
+    - system: Cu-Ti
+      state: s
+      method: Isotope
+      investigators: Hackworth, Hoch, and Gegel
+      year: 1971
+      ref_number: 114
+      journal_reference_as_printed: J. V. Hackworth, M. Hoch, and H. L. Gegel, Metall. Trans., 2, 1799
+        (1971).
+    - system: Cu-Ti
+      state: s
+      method: Ratio/G-D
+      investigators: Hackworth, Hoch, and Gegel
+      year: 1971
+      ref_number: 114
+      journal_reference_as_printed: J. V. Hackworth, M. Hoch, and H. L. Gegel, Metall. Trans., 2, 1799
+        (1971).
+    - system: Ga-Sb
+      state: l
+      method: Multiple cell
+      investigators: Bergman, Laffitte, and Muggianu
+      year: 1974
+      ref_number: 115
+      journal_reference_as_printed: C. Bergman, M. Laffitte, and Y. Muggianu, High Temp. High Press.,
+        6, 53 (1974).
+    - system: Ge-Sn
+      state: l
+      method: Ratio/G-D
+      investigators: Howard and Hager
+      year: 1978
+      ref_number: 79
+      journal_reference_as_printed: S. M. Howard and J. P. Hager, Metall. Trans. B, 9B, 51 (1978).
+    - system: Ge-Ni
+      state: l
+      method: Ratio/G-D
+      investigators: Erdelyi, Neckel, Tomiska, and Nowotny
+      year: 1977
+      ref_number: 116
+      journal_reference_as_printed: L. Erdelyi, A. Neckel, J. Tomiska, and H. Nowotny, Ber. Bunsenges.
+        Phys. Chem., 81, 1003 (1977).
+    - system: Ir-Ti
+      state: s
+      method: I.S.
+      investigators: Choudary, Gingerich, and Cornwell
+      year: 1976
+      ref_number: 117
+      journal_reference_as_printed: U. V. Choudary, K. A. Gingerich, and L. R. Cornwell, J. Less-Common
+        Met., 50, 201 (1976).
+    - system: Ir-Ti
+      state: l
+      method: I.S.
+      investigators: Pelino, Gupta, Cornwell, and Gingerich
+      year: 1979
+      ref_number: 118
+      journal_reference_as_printed: M. Pelino, S. K. Gupta, L. R. Cornwell, and K. A. Gingerich, J. Less-Common
+        Met., 68, 31 (1979).
+    - system: Mg-Sn
+      state: s
+      method: Other
+      investigators: Martin, and Paulaitis
+      year: 1979
+      ref_number: 119
+      journal_reference_as_printed: W. Martin and M. Paulaitis, Ind. Eng. Chem. Fundam., 18, 423 (1979).
+    - system: Ni-Pd
+      state: s
+      method: Ratio/G-D
+      investigators: Kopecky, Belegratis, Neckel, and Tomiska
+      year: 1992
+      ref_number: 120
+      journal_reference_as_printed: K. Kopecky, M. S. Belegratis, A. Neckel, and J. Tomiska, Ber. Bunsenges.
+        Phys. Chem., 96, 1658 (1992).
+    - system: Ni-Pd
+      state: l
+      method: Ratio/G-D
+      investigators: Bitterman, Kopecky, and Tomiska
+      year: 1993
+      ref_number: 121
+      journal_reference_as_printed: H. Bitterman, K. Kopecky, and J. Tomiska, J. Alloys and Compounds,
+        196, 53 (1993).
+    - system: Ni-Ti
+      state: l
+      method: Ratio/G-D
+      investigators: German and St. Pierre
+      year: 1972
+      ref_number: 122
+      journal_reference_as_printed: R. M. German and G. R. St. Pierre, Metall. Trans., 3, 2819 (1972).
+    - system: Se-Te
+      state: l
+      method: Ratio/G-D
+      investigators: Nanjo, Nakazawa, Yazawa, and Taniuchi
+      year: 1976
+      ref_number: 123
+      journal_reference_as_printed: M. Nanjo, S. Nakazawa, A. Yazawa, and K. Taniuchi, J. Jpn. Inst. Met.,
+        958, 40 (1976).
+    - system: Si-V
+      state: l, s
+      method: Other
+      investigators: Storms and Myers
+      year: 1985
+      ref_number: 124
+      journal_reference_as_printed: E. K. Storms and C. Myers, High Temp. Sci., 87, 20 (1985).
+    - system: Ti-V
+      state: s
+      method: Ratio/model
+      investigators: Rolinski, Hoch, and Oblinger
+      year: 1971
+      ref_number: 125
+      journal_reference_as_printed: E. J. Rolinski, M. Hoch, and C. J. Oblinger, Metall. Trans., 2, 2613
+        (1971).
+  - table: '3'
+    title_as_printed: Thermodyanmic Measurements of Ternary and Quaternary Alloys by Mass Spectrometry
+    title_note: Thermodyanmic is the printed spelling
+    published_page: 308
+    pdf_page_index: 12
+    rows:
+    - system: As-Cu-S
+      state: l
+      method: Dual cell
+      investigators: Hino and Toguri
+      year: 1987
+      ref_number: 67
+      journal_reference_as_printed: M. Hino and J. M. Toguri, Metall. Trans. B, 18B, 189 (1987).
+    - system: Au-Cu-Ge
+      state: ''
+      method: ''
+      investigators: Choudary and Gingerich
+      year: 1975
+      ref_number: 126
+      journal_reference_as_printed: U. V. Choudary and K. A. Gingerich, Conf. Int. Thermodyn. Chim., (C.
+        R.) 4th, 3, 5 (1975).
+    - system: C-Cu-Fe
+      state: l
+      method: Ratio/G-D
+      investigators: Choudary, Serkin, and Belton
+      year: 1975
+      ref_number: 24
+      journal_reference_as_printed: U. V. Choudary, J. A. Serkin, and G. R. Belton, Metall. Trans. B,
+        6B, 399 (1975).
+    - system: Co-Fe-Ni
+      state: l, s
+      method: Ratio/G-D
+      investigators: Fraser and Rammensee
+      year: 1982
+      ref_number: 127
+      journal_reference_as_printed: D. G. Fraser and W. Rammensee, Geochim. Cosmochim. Acta, 46, 549 (1982).
+    - system: Co-Fe-Ni
+      state: s
+      method: Ratio/G-D
+      investigators: Tomiska, Kopecky, Belegratis, and Neckel
+      year: 1993
+      ref_number: 128
+      journal_reference_as_printed: J. Tomiska, K. Kopecky, M. S. Belegratis, and A. Neckel, Z. Metall.,
+        84, 619 (1993).
+    - system: Co-Fe-Ni
+      state: l
+      method: Ratio/G-D
+      investigators: Tomiska, Belegratis, Kopecky, and Neckel
+      year: 1993
+      ref_number: 129
+      journal_reference_as_printed: J. Tomiska, M. S. Belegratis, K. Kopecky, and A. Neckel, J. Non-Crys.
+        Solid, 156-158, 425 (1993).
+    - system: Cr-Fe-Ni
+      state: l
+      method: Other
+      investigators: Gilby and St. Pierre
+      year: 1969
+      ref_number: 130
+      journal_reference_as_printed: W. Gilby and G. R. St. Pierre, Trans. AIME, 245, 1749 (1969).
+    - system: Cr-Fe-Ni
+      state: l
+      method: Ratio/G-D
+      investigators: Belton and Fruehan
+      year: 1970
+      ref_number: 30
+      journal_reference_as_printed: G. R. Belton and R. J. Fruehan, Metall. Trans., 1, 781 (1970).
+    - system: Cr-Fe-Ni
+      state: l
+      method: Ratio/G-D
+      investigators: Wagner and St. Pierre
+      year: 1971
+      ref_number: 131
+      journal_reference_as_printed: S. Wagner and G. R. St. Pierre, Adv. Mass Spectrom., 5, 388 (1971).
+    - system: Cr-Fe-Ni
+      state: l, s
+      method: Ratio/G-D
+      investigators: Wagner, Shade, and St. Pierre
+      year: 1972
+      ref_number: 132
+      journal_reference_as_printed: S. Wagner, D. J. Shade, and G. R. St. Pierre, Metall. Trans., 3, 47
+        (1972).
+    - system: Cr-Ti-V
+      state: s
+      method: Ratio/model
+      investigators: Rolinski, Hoch, and Oblinger
+      year: 1972
+      ref_number: 133
+      journal_reference_as_printed: E. J. Rolinski, M. Hoch, and C. J. Oblinger, Metall. Trans., 3, 1413
+        (1972).
+    - system: Cr-Fe-V
+      state: l
+      method: Ratio/G-D
+      investigators: Furukawa and Kato
+      year: 1975
+      ref_number: 8
+      journal_reference_as_printed: T. Furukawa and E. Kato, Tetsu-To-Hagane, 61, 3050 (1975). "The 4th
+        Japan-USSR Joint Symposium on Physical Chemistry of Metallurgical Processes," Iron Steel Inst.
+        Jpn. (1973), p. 201.
+    - system: Cu-Fe-Sn
+      state: l
+      method: Ratio/G-D
+      investigators: Yamamoto, Mori, and Kato
+      year: 1983
+      ref_number: 22
+      journal_reference_as_printed: M. Yamamoto, S. Mori, and E. Kato, Trans. Iron Steel Inst. Jpn., 23,
+        56 (1983).
+    - system: Cu-Sb-Sn
+      state: l
+      method: Monomer-dimer
+      investigators: Szemla, Dziewidek, and Norwisz
+      year: 1984
+      ref_number: 134
+      journal_reference_as_printed: G. Szelma, L. Dziewidek, and J. Norwisz, Metall. Odelw., 10, 259 (1984).
+    - system: Cu-Pb-Sb-Sn
+      state: l
+      method: Monomer-dimer
+      investigators: Szemla, Dziewidek, and Norwisz
+      year: 1984
+      ref_number: 134
+      journal_reference_as_printed: G. Szelma, L. Dziewidek, and J. Norwisz, Metall. Odelw., 10, 259 (1984).
+    - system: Cu-S-Sb
+      state: l
+      method: Dual cell
+      investigators: Hino and Toguri
+      year: 1987
+      ref_number: 108
+      journal_reference_as_printed: M. Hino and J. M. Toguri, Metall. Trans. B, 18B, 189 (1987).
+    - system: Fe-P-i
+      state: l
+      method: I.S.
+      investigators: Yamada and Kato
+      year: 1983
+      ref_number: 135
+      journal_reference_as_printed: K. Yamada and E. Kato, Trans. Iron Steel Inst. Jpn., 23, 51 (1983).
+      footnote: i=Al, Co, Cr, Mo, Nb, Ni, Si, Ti, and V
+    - system: In-Sb-Zn
+      state: l
+      method: Other
+      investigators: Norman, Winchell, and Staley
+      year: 1964
+      ref_number: 136
+      journal_reference_as_printed: J. H. Norman, P. Winchell, and H. G. Staley, J. Chem. Phys., 41, 60
+        (1964).
+    - system: N-O-Ti
+      state: s
+      method: Multiple cell
+      investigators: Grainer, Chatillon, and Allibert
+      year: 1982
+      ref_number: 137
+      journal_reference_as_printed: B. Grainer, C. Chatillon, and M. Allibert, J. Am. Ceram. Soc., 65,
+        465 (1982).
+  - table: '4'
+    title_as_printed: Thermodynamic Measurements of Oxide Melts Related to Metallurgical Processes by
+      Mass Spectrometry
+    published_page: 308
+    pdf_page_index: 12
+    rows:
+    - system: Al2O3-CaO
+      state: l, s
+      method: Multiple cell
+      investigators: Allibert, Chatillon, Jacob, and Lourtau
+      year: 1981
+      ref_number: 138
+      journal_reference_as_printed: M. Allibert, C. Chatillon, K. T. Jacob, and R. Lourtau, J. Amer. Cer.
+        Soc., 64, 307 (1981).
+    - system: Al2O3-CaF2-CaO
+      state: l
+      method: Multiple cell
+      investigators: Allibert and Chatillon
+      year: 1979
+      ref_number: 139
+      journal_reference_as_printed: M. Allibert and C. Chatillon, Can. Metall. Quart., 18, 349 (1979).
+    - system: Al2O3-CaF2-CaO
+      state: l
+      method: Other
+      investigators: Zaitsev, Korolyov, and Mogutnov
+      year: 1990
+      ref_number: 140
+      journal_reference_as_printed: A. I. Zaitsev, N. V. Korolyov, and B. M. Mogutnov, J. Chem. Thermodyn.,
+        22, 513 (1990).
+    - system: Al2O3-SiO2
+      state: l
+      method: Multiple cell
+      investigators: Dhima, Stafa, and Allibert
+      year: 1986
+      ref_number: 141
+      journal_reference_as_printed: A. Dhima, B. Stafa, and M. Allibert, High Temp. Sci., 21, 143 (1986).
+    - system: CaF2-CaO-SiO2
+      state: l
+      method: Other
+      investigators: Zaitsev, Litvina, and Mogutnov
+      year: 1992
+      ref_number: 142
+      journal_reference_as_printed: A. I. Zaitsev, A. D. Litvina, and B. M. Mogutnov, J. Chem. Thermodyn.,
+        24, 1039 (1992).
+    - system: CaO-FeO-SiO2
+      state: l
+      method: Multiple cell
+      investigators: Dhima, Stafa, and Allibert
+      year: 1986
+      ref_number: 141
+      journal_reference_as_printed: A. Dhima, B. Stafa, and M. Allibert, High Temp. Sci., 21, 143 (1986).
+    - system: CaO-SiO2
+      state: l
+      method: Other
+      investigators: Stolyarova, Shornikov, Ivanov, and Schultz
+      year: 1991
+      ref_number: 143
+      journal_reference_as_printed: V. L. Stolyarova, S. I. Shornikov, G. G. Ivanov, and M. M. Shultz,
+        J. Electrochem., 138, 3710 (1991).
+    - system: CaTiO3-Ti2O3-TiO2
+      state: l
+      method: Multiple cell
+      investigators: Banon, Chatillon, and Allibert
+      year: 1981
+      ref_number: 144
+      journal_reference_as_printed: S. Banon, C. Chatillon, and M. Allibert, Can. Metall. Quart., 20,
+        79 (1981).
+    - system: FeO-MgO-SiO2
+      state: l
+      method: Ratio/G-D
+      investigators: E. R. Plante, W. Hastie, and M. Kowalska
+      year: 1992
+      ref_number: 145
+      journal_reference_as_printed: E. R. Plante and J. W. Hastie, and M. Kowalska, ISIJ Inter., 32, 1276
+        (1992).
+    - system: FetO-P2O5
+      state: l
+      method: I.S.
+      investigators: Kambayashi, Awaka, and Kato
+      year: 1985
+      ref_number: 146
+      journal_reference_as_printed: S. Kambayashi, H. Awaka, and E. Kato, Tetsu-to-Hagane, 71, 1911 (1985).
+    - system: FetO-P2O5-i
+      state: l
+      method: I.S.
+      investigators: Ohara, Nunoue, and Kato
+      year: 1988
+      ref_number: 147
+      journal_reference_as_printed: N. Ohara, S. Nunoue, and E. Kato, Tetsu-to-Hagane, 73, 1337 (1987);
+        "Proc. 3rd Inter. Conf. Molten Slags and Fluxes," The Inst. Met., London, 1988, p. 70.
+      footnote: i=CaO, MgO, MnO, and SiO2
+    - system: FeO-SiO2
+      state: l
+      method: Multiple cell
+      investigators: Dhima, Stafa, and Allibert
+      year: 1986
+      ref_number: 141
+      journal_reference_as_printed: A. Dhima, B. Stafa, and M. Allibert, High Temp. Sci., 21, 143 (1986).
+    - system: MgO-SiO2
+      state: l
+      method: Ratio/G-D
+      investigators: Kambayashi and Kato
+      year: 1983
+      ref_number: 148
+      journal_reference_as_printed: S. Kambayashi and E. Kato, J. Chem. Thermodyn., 15, 701 (1983).
+    - system: MgO-SiO2
+      state: l
+      method: Ratio/G-D
+      investigators: Kambayashi and Kato
+      year: 1984
+      ref_number: 149
+      journal_reference_as_printed: S. Kambayashi and E. Kato, J. Chem. Thermodyn., 16, 241 (1984).
+    - system: Na2O-P2O5
+      state: l
+      method: Multiple cell
+      investigators: Mahlheiors, Chatillon, and Allibert
+      year: 1988
+      ref_number: 150
+      journal_reference_as_printed: L. F. Malheiros, C. Chatillon, and M. Allibert, High Temp. Press.,
+        20, 361 (1988).
+    - system: PbO-SiO2
+      state: l
+      method: Monomer-dimer
+      investigators: Kato and Ouchi
+      year: 1973
+      ref_number: 151
+      journal_reference_as_printed: E. Kato and Y. Ouchi, "Chemical Metallurgy of Iron and Steel," The
+        Iron and Steel Inst., London, 1973, p. 26.
+    - system: PbO-SiO2-j
+      state: l
+      method: Monomer-dimer
+      investigators: Ouchi and Kato
+      year: 1983
+      ref_number: 152
+      journal_reference_as_printed: Y. Ouchi and E. Kato, Can. Metall. Quart., 22, 45 (1983).
+      footnote: j=BaO, CaO, CoO, MgO, and NiO
+  - table: '5'
+    title_as_printed: Phase Diagrams of Alloys and a Metallurgical Slag System Studied by Mass Spectrometry
+    published_page: 309
+    pdf_page_index: 13
+    rows:
+    - system: Ag-Mn
+      state: ''
+      method: ''
+      investigators: Ichise, Ueshima, and Yamana
+      year: 1989
+      ref_number: 153
+      journal_reference_as_printed: E. Ichise, Y. Ueshima, and H. Yamana, Mass Spectroscopy (Japan), 37,
+        295 (1989).
+    - system: Al-Te
+      state: ''
+      method: ''
+      investigators: Said, Chastel, Bergman, and Castanet
+      year: 1981
+      ref_number: 66
+      journal_reference_as_printed: M. Hoch and R. J. Usell, Jr., Metall. Trans., 2, 2627 (1971).
+    - system: Au-Ni
+      state: ''
+      method: ''
+      investigators: Tomiska, Erdelyi, Neckel, and Nowotny
+      year: 1977
+      ref_number: 73
+      journal_reference_as_printed: J. Tomiska, L. Erdelyi, A. Neckel, and Nowotny, Z. Metallkd., 68,
+        734 (1977).
+    - system: Au-Pd
+      state: ''
+      method: ''
+      investigators: Tomiska
+      year: 1990
+      ref_number: 76
+      journal_reference_as_printed: J. Tomiska, Z. Metallkd., 81, 912 (1990).
+    - system: B-La
+      state: ''
+      method: ''
+      investigators: Storms and Mueller
+      year: 1978
+      ref_number: 80
+      journal_reference_as_printed: E. Storms and B. Mueller, J. Phys. Chem., 82, 51 (1978).
+    - system: B-Mo
+      state: ''
+      method: ''
+      investigators: Storms and Mueller
+      year: 1977
+      ref_number: 81
+      journal_reference_as_printed: E. Storms and B. Mueller, J. Phys. Chem., 81, 318 (1977).
+    - system: C-Nb
+      state: ''
+      method: ''
+      investigators: Storms, Calkin, and Yencha
+      year: 1969
+      ref_number: 89
+      journal_reference_as_printed: E. Storms, B. Calkin, and A. Yencha, High Temp. Sci., 1, 430 (1969).
+    - system: C-V
+      state: ''
+      method: ''
+      investigators: Storms, Lowe, Baca, and Griffin
+      year: 1973
+      ref_number: 90
+      journal_reference_as_printed: E. K. Storms, A. Lowe, E. Baca, and J. Griffin, High Temp. Sci., 5,
+        276 (1973).
+    - system: C-Y
+      state: ''
+      method: ''
+      investigators: Storms
+      year: 1971
+      ref_number: 91
+      journal_reference_as_printed: E. K. Storms, High Temp. Sci., 3, 99 (1971).
+    - system: C-Zr
+      state: ''
+      method: ''
+      investigators: Storms and Griffin
+      year: 1973
+      ref_number: 92
+      journal_reference_as_printed: E. K. Storms and J. Griffin, High Temp. Sci., 5, 291 (1973).
+    - system: Co-Fe
+      state: ''
+      method: ''
+      investigators: Tomiska
+      year: 1986
+      ref_number: 36
+      journal_reference_as_printed: J. Tomiska, Z. Metallkd., 77, 97 (1986).
+    - system: Co-Ni
+      state: ''
+      method: ''
+      investigators: Tomiska, Nowotny, Erdelyi, and Neckel
+      year: 1979
+      ref_number: 97
+      journal_reference_as_printed: J. Tomiska, H. Nowotny, L. Erdelyi, and A. Neckel, Ber. Bunsenges.
+        Phys. Chem., 83, 1035 (1979).
+    - system: Cr-Cu
+      state: ''
+      method: ''
+      investigators: Timberg and Toguri
+      year: 1982
+      ref_number: 99
+      journal_reference_as_printed: L. Timberg and J. M. Toguri, J. Chem. Thermodyn., 4, 193 (1982).
+    - system: Cu-Ni
+      state: ''
+      method: ''
+      investigators: Tomiska and Neckel
+      year: 1984
+      ref_number: 107
+      journal_reference_as_printed: J. Tomiska and A. Neckel, Ber. Bunsenges. Phys. Chem., 88, 551 (1984).
+    - system: Fe-Ge
+      state: ''
+      method: ''
+      investigators: Nunoue and Kato
+      year: 1989
+      ref_number: 154
+      journal_reference_as_printed: S. Nunoue and E. Kato, Metall. Trans. A, 20A, 975 (1989).
+    - system: Fe-Mo
+      state: ''
+      method: ''
+      investigators: Ueshima, Ichise, and Mori
+      year: 1983
+      ref_number: 155
+      journal_reference_as_printed: Y. Ueshima, E. Ichise, and T. Mori, Tetsu-To-Hagane, 69, 556 (1983).
+    - system: Fe-Ni
+      state: ''
+      method: ''
+      investigators: Tomiska and Neckel
+      year: 1985
+      ref_number: 41
+      journal_reference_as_printed: J. Tomiska and A. Neckel, Ber. Bunsenges. Phys. Chem., 89, 1104 (1985).
+    - system: Fe-Pd
+      state: ''
+      method: ''
+      investigators: Tomiska
+      year: 1989
+      ref_number: 33
+      journal_reference_as_printed: J. Tomiska, Z. Metallkd., 80, 888 (1989).
+    - system: Fe-Si
+      state: ''
+      method: ''
+      investigators: Zaitsev, Zemchenko, and Mogutnov
+      year: 1991
+      ref_number: 43
+      journal_reference_as_printed: A. I. Zaitsev, M. A. Zemchenko, and B. M. Mogutnov, J. Chem. Thermodyn.,
+        23, 831 (1991).
+    - system: Fe-Sn
+      state: ''
+      method: ''
+      investigators: Nunoue and Kato
+      year: 1987
+      ref_number: 23
+      journal_reference_as_printed: S. Nunoue and E. Kato, Tetsu-To-Hagane, 73, 868 (1987).
+    - system: Fe-W
+      state: ''
+      method: ''
+      investigators: Ichise, Ueshima, and Miyagawa
+      year: 1986
+      ref_number: 156
+      journal_reference_as_printed: E. Ichise, Y. Ueshima, and S. Miyagawa, Tetsu-To-Hagane, 72, 791 (1986).
+    - system: Ni-Pd
+      state: ''
+      method: ''
+      investigators: Kopecky, Belegratis, Neckel, and Tomiska
+      year: 1992
+      ref_number: 120
+      journal_reference_as_printed: K. Kopecky, M. S. Belegratis, A. Neckel, and J. Tomiska, Ber. Bunsenges.
+        Phys. Chem., 96, 1658 (1992).
+    - system: Si-V
+      state: ''
+      method: ''
+      investigators: Storms and Myers
+      year: 1985
+      ref_number: 124
+      journal_reference_as_printed: E. K. Storms and C. Myers, High Temp. Sci., 87, 20 (1985).
+    - system: Al2O3-CaF2
+      state: ''
+      method: ''
+      investigators: Zaitsev, Korolyov, and Mogutnov
+      year: 1990
+      ref_number: 140
+      journal_reference_as_printed: A. I. Zaitsev, N. V. Korolyov, and B. M. Mogutnov, J. Chem. Thermodyn.,
+        22, 513 (1990).
+  figure_inventory:
+  - figure: '1'
+    published_page: 298
+    caption: N2+ and CO+ pulse-counting peaks (Yamada and Kato ref 4); apparatus illustration
+  - figure: '2'
+    published_page: 299
+    caption: Device for measurements on multiple effusion cells (Chatillon et al. ref 5); apparatus
+  - figure: '3'
+    published_page: 300
+    caption: Fe-V integration curve (Furukawa and Kato ref 8); figure-only
+  - figure: '4'
+    published_page: 303
+    caption: Gold-target collection apparatus (Yamamoto et al. ref 48); apparatus
+  - figure: '5'
+    published_page: 304
+    caption: P, P2 from Fe-P (Yamamoto et al. ref 48); figure-only
+  - figure: '6'
+    published_page: 304
+    caption: Fe ion intensity in low-Mo (Ichise et al. ref 45); figure-only
+  - figure: '7'
+    published_page: 311
+    caption: Fe-Ge ion current ratios (Nunoue and Kato ref 154); figure-only
+  - figure: '8'
+    published_page: 311
+    caption: Fe-Ge phase equilibria (Nunoue and Kato ref 154); figure-only

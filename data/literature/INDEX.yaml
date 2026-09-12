@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 143
-  extracts: 140
+  sources: 145
+  extracts: 142
   pdfs_present_in_worktree: 44
   extracts_with_private_locators: 37
   pdfs_tracked_99_kems_langmuir: 39
   pdfs_without_extract: 3
-  extracts_without_pdf: 99
+  extracts_without_pdf: 101
   alias_groups_needing_resolution: 32
 gaps:
   pdfs_without_extract:
@@ -55,6 +55,8 @@ gaps:
   - kems-038-matchett-2006
   - kems-040-stolyarova-2015
   - kems-044-robinot-2026
+  - kems-048-turkdogan-2001-sio2-gamma
+  - kems-049-kato-1993-ms-review
   - kems-050-gorokhov-1977
   - kems-103-fraser-1983
   - kems-133-costa-2017
@@ -3929,6 +3931,122 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/kems-045-sossi-2018-pnas-cr.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: kems-048-turkdogan-2001-sio2-gamma
+  aliases: []
+  citation: Turkdogan, E. T. (2001), "Assessment of SiO2 Activity Coefficients in Molten Slags Relative
+    to the CaO-SiO2 System", ISIJ International 41(8):930-932, DOI 10.2355/isijinternational.41.930
+  doi: 10.2355/isijinternational.41.930
+  report_number: null
+  identifier: 10.2355/isijinternational.41.930
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-048-turkdogan-2001-sio2-gamma.yaml
+    review_status: draft
+    rows: 12
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-048-turkdogan-2001-sio2-gamma/kems-048-turkdogan-2001-sio2-gamma.pdf
+      present: true
+      sha256: acd3112c87a2ab23e9de83a3292a558b97ebacf57cad594bdb14351ca63af01a
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-048-turkdogan-2001-sio2-gamma/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-048-turkdogan-2001-sio2-gamma
+      exists: true
+      file_count: 27
+    tables:
+      path: tables/kems-048-turkdogan-2001-sio2-gamma
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-048-turkdogan-2001-sio2-gamma.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-048-turkdogan-2001-sio2-gamma.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: kems-049-kato-1993-ms-review
+  aliases: []
+  citation: Kato, Eiichi (1993), "Thermodynamic Studies of Metallurgical Systems by Mass Spectrometry",
+    J. Mass Spectrom. Soc. Jpn. 41(6):297-316 (REVIEW)
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-049-kato-1993-ms-review.yaml
+    review_status: draft
+    rows: 26
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-049-kato-1993-ms-review/kems-049-kato-1993-ms-review.pdf
+      present: true
+      sha256: b0bc110b0fc799afd378236b92ce7938c7fdfcdffb6e10dd5e58081021f1bf16
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-049-kato-1993-ms-review/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-049-kato-1993-ms-review
+      exists: true
+      file_count: 38
+    tables:
+      path: tables/kems-049-kato-1993-ms-review
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-049-kato-1993-ms-review.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-049-kato-1993-ms-review.yaml
       present: true
       error: null
       last_stage: decoded
