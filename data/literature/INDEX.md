@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 145
-- Extracts (`literature_extract.v1`): 142
+- Sources: 146
+- Extracts (`literature_extract.v1`): 143
 - PDFs present in this worktree: 44
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 39
 - PDFs with no extract: 3
-- Extracts with no PDF: 101
+- Extracts with no PDF: 102
 - Alias groups needing owner/controller resolution: 32
 - Extracts with private/non-public row locators: 37
 
@@ -87,6 +87,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `kems-042-plante-1979` | Plante, E. R. (1979), "Vapor pressure measurements of potassium over K2O-SiO2 solutions by a Knudsen effusion, mass spectrometric method", in Hastie, J. W. (ed.), Characterization of High Temperature Vapors and Gases, NBS Special Publication 561, Vol. 1, pp. 265-281, National Bureau of Standards, Washington, DC. | 10.6028/NBS.SP.561v1 | `docs/references/pdfs/99-kems-langmuir/kems-042-plante-1979.pdf`, `a46c2132` | `raw/kems-042-plante-1979/kems-042-plante-1979.pdf` (present, a46c2132); `text/kems-042-plante-1979/` (4 files, exists); `tables/kems-042-plante-1979/` (6 files, exists) | `data/literature/extracts/kems-042-plante-1979.yaml` (383 rows, draft) | `ledger/kems-042-plante-1979.yaml`: — (—) |
 | `kems-044-robinot-2026` | Robinot, J., Rodat, S., Abanades, S., Bêche, E., Paillet, A. & Cowley, A. (2026), "Quantification of oxygen production from solar pyrolysis of lunar regolith", Adv. Space Res., DOI 10.1016/j.asr.2026.02.003, HAL hal-05512237 | 10.1016/j.asr.2026.02.003 | ABSENT, `` | `raw/kems-044-robinot-2026/kems-044-robinot-2026.pdf` (present, 199c350a); `text/kems-044-robinot-2026/` (32 files, exists); `tables/kems-044-robinot-2026/` (0 files, ABSENT) | `data/literature/extracts/kems-044-robinot-2026.yaml` (19 rows, draft) | `ledger/kems-044-robinot-2026.yaml`: decoded (2026-09-06) |
 | `kems-045-sossi-2018-pnas-cr` |  |  | `docs/references/pdfs/99-kems-langmuir/kems-045-sossi-2018-pnas-cr.pdf`, `47384f82` | `raw/kems-045-sossi-2018-pnas-cr/kems-045-sossi-2018-pnas-cr.pdf` (present, 47384f82); `text/kems-045-sossi-2018-pnas-cr/` (49 files, exists); `tables/kems-045-sossi-2018-pnas-cr/` (0 files, ABSENT) | — | `ledger/kems-045-sossi-2018-pnas-cr.yaml`: decoded (2026-09-06) |
+| `kems-047-turkdogan-1984-isij` | Turkdogan, E. T. (1984), "Physicochemical Aspects of Reactions in Ironmaking and Steelmaking Processes", Transactions ISIJ 24:591–611 (review). Received 14 November 1983. USS Technical Center, Monroeville, PA 15146. |  | ABSENT, `` | `raw/kems-047-turkdogan-1984-isij/kems-047-turkdogan-1984-isij.pdf` (present, 206060bc); `text/kems-047-turkdogan-1984-isij/` (89 files, exists); `tables/kems-047-turkdogan-1984-isij/` (0 files, ABSENT) | `data/literature/extracts/kems-047-turkdogan-1984-isij.yaml` (6 rows, draft) | `ledger/kems-047-turkdogan-1984-isij.yaml`: decoded (2026-09-06) |
 | `kems-048-turkdogan-2001-sio2-gamma` | Turkdogan, E. T. (2001), "Assessment of SiO2 Activity Coefficients in Molten Slags Relative to the CaO-SiO2 System", ISIJ International 41(8):930-932, DOI 10.2355/isijinternational.41.930 | 10.2355/isijinternational.41.930 | ABSENT, `` | `raw/kems-048-turkdogan-2001-sio2-gamma/kems-048-turkdogan-2001-sio2-gamma.pdf` (present, acd3112c); `text/kems-048-turkdogan-2001-sio2-gamma/` (27 files, exists); `tables/kems-048-turkdogan-2001-sio2-gamma/` (0 files, ABSENT) | `data/literature/extracts/kems-048-turkdogan-2001-sio2-gamma.yaml` (12 rows, draft) | `ledger/kems-048-turkdogan-2001-sio2-gamma.yaml`: decoded (2026-09-06) |
 | `kems-049-kato-1993-ms-review` | Kato, Eiichi (1993), "Thermodynamic Studies of Metallurgical Systems by Mass Spectrometry", J. Mass Spectrom. Soc. Jpn. 41(6):297-316 (REVIEW) |  | ABSENT, `` | `raw/kems-049-kato-1993-ms-review/kems-049-kato-1993-ms-review.pdf` (present, b0bc110b); `text/kems-049-kato-1993-ms-review/` (38 files, exists); `tables/kems-049-kato-1993-ms-review/` (0 files, ABSENT) | `data/literature/extracts/kems-049-kato-1993-ms-review.yaml` (26 rows, draft) | `ledger/kems-049-kato-1993-ms-review.yaml`: decoded (2026-09-06) |
 | `kems-050-gorokhov-1977` | Gorokhov, L. N., Gusarov, A. V. et al. (1977), "Масс-спектрометрическое определение энтальпий образования молекул CrO и CrO2" (Mass-spectrometric determination of formation enthalpies of CrO and CrO2 molecules). Report, Institute for High Temperatures of the USSR Academy of Sciences (IVTAN), No. 43-77. IVTANTHERMO key [77ГОР/ГУС]. Quoted on https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html Table Cr.T3 and https://www.chem.msu.ru/rus/tsiv/Cr/allbibs.html. |  | ABSENT, `` | `raw/kems-050-gorokhov-1977/kems-050-gorokhov-1977.pdf` (ABSENT, ); `text/kems-050-gorokhov-1977/` (4 files, exists); `tables/kems-050-gorokhov-1977/` (5 files, exists) | `data/literature/extracts/kems-050-gorokhov-1977.yaml` (3 rows, draft) | `ledger/kems-050-gorokhov-1977.yaml`: — (—) |
@@ -214,6 +215,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `kems-038-matchett-2006`
 - `kems-040-stolyarova-2015`
 - `kems-044-robinot-2026`
+- `kems-047-turkdogan-1984-isij`
 - `kems-048-turkdogan-2001-sio2-gamma`
 - `kems-049-kato-1993-ms-review`
 - `kems-050-gorokhov-1977`

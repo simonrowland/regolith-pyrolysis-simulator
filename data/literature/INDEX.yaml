@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 145
-  extracts: 142
+  sources: 146
+  extracts: 143
   pdfs_present_in_worktree: 44
   extracts_with_private_locators: 37
   pdfs_tracked_99_kems_langmuir: 39
   pdfs_without_extract: 3
-  extracts_without_pdf: 101
+  extracts_without_pdf: 102
   alias_groups_needing_resolution: 32
 gaps:
   pdfs_without_extract:
@@ -55,6 +55,7 @@ gaps:
   - kems-038-matchett-2006
   - kems-040-stolyarova-2015
   - kems-044-robinot-2026
+  - kems-047-turkdogan-1984-isij
   - kems-048-turkdogan-2001-sio2-gamma
   - kems-049-kato-1993-ms-review
   - kems-050-gorokhov-1977
@@ -3931,6 +3932,65 @@ sources:
       matches_simulator: null
     ledger:
       path: ledger/kems-045-sossi-2018-pnas-cr.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: kems-047-turkdogan-1984-isij
+  aliases: []
+  citation: Turkdogan, E. T. (1984), "Physicochemical Aspects of Reactions in Ironmaking and Steelmaking
+    Processes", Transactions ISIJ 24:591–611 (review). Received 14 November 1983. USS Technical Center,
+    Monroeville, PA 15146.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-047-turkdogan-1984-isij.yaml
+    review_status: draft
+    rows: 6
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-047-turkdogan-1984-isij/kems-047-turkdogan-1984-isij.pdf
+      present: true
+      sha256: 206060bcceb541a1b9d497325ded2f97ab15e37466104816b7f14f4fbc2e31b8
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-047-turkdogan-1984-isij/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-047-turkdogan-1984-isij
+      exists: true
+      file_count: 89
+    tables:
+      path: tables/kems-047-turkdogan-1984-isij
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-047-turkdogan-1984-isij.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-047-turkdogan-1984-isij.yaml
       present: true
       error: null
       last_stage: decoded

@@ -1,0 +1,359 @@
+schema_version: literature_extract.v1
+source_id: kems-047-turkdogan-1984-isij
+source:
+  citation: Turkdogan, E. T. (1984), "Physicochemical Aspects of Reactions in Ironmaking and Steelmaking
+    Processes", Transactions ISIJ 24:591–611 (review). Received 14 November 1983. USS Technical Center,
+    Monroeville, PA 15146.
+  doi: null
+  url: null
+  year: 1984
+extraction:
+  method: '400 dpi pdftoppm render of corpus PDF page 17 (published p. 607). MinerU table HTML used only
+    as a finding aid; where decode and render disagree the render wins. Tables 1–2 are calculated equilibrium
+    vapor pressures (not KEMS measurements). Table 1: assumed local equilibrium gas-slag vs gas-coke ash
+    at 1500 C, 1 bar CO. Table 2: p(K) from reaction (53) (K2O)+C=2K(g)+CO(g); K from thermochemical data;
+    a(K2O) from Steiler (ref. 68). Figures not digitised.'
+  date: '2026-09-12'
+  worker: extract-kems-045-r2
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.SiO.observations[turkdogan_1984_table1_SiO_calculated_p].values.points[0].p_bar
+  value: 0.00026
+  locator:
+    table: '1'
+    published_page: 607
+    pdf_page_index: 17
+    note: 'Table 1 SiO row, B''=1.5 column: 2.6 x 10^-4 bar'
+- path: species.K.observations[turkdogan_1984_table2_K_calculated_p].values.points[3].p_K_bar
+  value: 0.26
+  locator:
+    table: '2'
+    published_page: 607
+    pdf_page_index: 17
+    note: Table 2 last data row 1500 C, p_K = 2.6 x 10^-1 bar
+species:
+  SiO:
+    observations:
+    - observation_id: turkdogan_1984_table1_SiO_calculated_p
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 607
+        pdf_page_index: 17
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium
+          slag/coke-ash columns. Not this work's KEMS.
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium
+      standard_state: partial pressure in bar as printed; 1500 C; 1 bar CO
+      regime: calculated_blast_furnace_vapor_equilibrium
+      units: bar as published
+      uncertainty:
+        note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium
+          at 1500 C.
+      values:
+        quantity: equilibrium_partial_pressure
+        gas_species: SiO(g)
+        method_class: model_derived
+        model_or_data_source: 'assumed local equilibrium at 1500 C for gas-slag and gas-coke ash; 1 bar
+          pressure of CO. Authors: calculations are made for assumed local equilibrium.'
+        T_C_as_printed: 1500
+        T_K: 1773.15
+        T_conversion: T_K = 1500 + 273.15
+        P_CO_bar: 1.0
+        points:
+        - column: gas-slag
+          basicity_B_prime: 1.5
+          a_SiO2: 0.05
+          S_wt_percent: 2.0
+          C_S: 0.0003
+          C_S_units: wt percent as printed (Cs)
+          p_bar: 0.00026
+        - column: gas-coke_ash
+          basicity_B_prime: 0.6
+          a_SiO2: 0.3
+          S_wt_percent: 5.0
+          C_S: 1.0e-05
+          C_S_units: wt percent as printed (Cs)
+          p_bar: 0.0015
+  SiS:
+    observations:
+    - observation_id: turkdogan_1984_table1_SiS_calculated_p
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 607
+        pdf_page_index: 17
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium
+          slag/coke-ash columns. Not this work's KEMS.
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium
+      standard_state: partial pressure in bar as printed; 1500 C; 1 bar CO
+      regime: calculated_blast_furnace_vapor_equilibrium
+      units: bar as published
+      uncertainty:
+        note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium
+          at 1500 C.
+      values:
+        quantity: equilibrium_partial_pressure
+        gas_species: SiS(g)
+        method_class: model_derived
+        model_or_data_source: 'assumed local equilibrium at 1500 C for gas-slag and gas-coke ash; 1 bar
+          pressure of CO. Authors: calculations are made for assumed local equilibrium.'
+        T_C_as_printed: 1500
+        T_K: 1773.15
+        T_conversion: T_K = 1500 + 273.15
+        P_CO_bar: 1.0
+        points:
+        - column: gas-slag
+          basicity_B_prime: 1.5
+          a_SiO2: 0.05
+          S_wt_percent: 2.0
+          C_S: 0.0003
+          C_S_units: wt percent as printed (Cs)
+          p_bar: 3.9e-05
+        - column: gas-coke_ash
+          basicity_B_prime: 0.6
+          a_SiO2: 0.3
+          S_wt_percent: 5.0
+          C_S: 1.0e-05
+          C_S_units: wt percent as printed (Cs)
+          p_bar: 0.017
+  S2:
+    observations:
+    - observation_id: turkdogan_1984_table1_S2_calculated_p
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 607
+        pdf_page_index: 17
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium
+          slag/coke-ash columns. Not this work's KEMS.
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium
+      standard_state: partial pressure in bar as printed; 1500 C; 1 bar CO
+      regime: calculated_blast_furnace_vapor_equilibrium
+      units: bar as published
+      uncertainty:
+        note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium
+          at 1500 C.
+      values:
+        quantity: equilibrium_partial_pressure
+        gas_species: S2(g)
+        method_class: model_derived
+        model_or_data_source: 'assumed local equilibrium at 1500 C for gas-slag and gas-coke ash; 1 bar
+          pressure of CO. Authors: calculations are made for assumed local equilibrium.'
+        T_C_as_printed: 1500
+        T_K: 1773.15
+        T_conversion: T_K = 1500 + 273.15
+        P_CO_bar: 1.0
+        points:
+        - column: gas-slag
+          basicity_B_prime: 1.5
+          a_SiO2: 0.05
+          S_wt_percent: 2.0
+          C_S: 0.0003
+          C_S_units: wt percent as printed (Cs)
+          p_bar: 8.6e-09
+        - column: gas-coke_ash
+          basicity_B_prime: 0.6
+          a_SiO2: 0.3
+          S_wt_percent: 5.0
+          C_S: 1.0e-05
+          C_S_units: wt percent as printed (Cs)
+          p_bar: 4.9e-05
+  CS:
+    observations:
+    - observation_id: turkdogan_1984_table1_CS_calculated_p
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 607
+        pdf_page_index: 17
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium
+          slag/coke-ash columns. Not this work's KEMS.
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium
+      standard_state: partial pressure in bar as printed; 1500 C; 1 bar CO
+      regime: calculated_blast_furnace_vapor_equilibrium
+      units: bar as published
+      uncertainty:
+        note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium
+          at 1500 C.
+      values:
+        quantity: equilibrium_partial_pressure
+        gas_species: CS(g)
+        method_class: model_derived
+        model_or_data_source: 'assumed local equilibrium at 1500 C for gas-slag and gas-coke ash; 1 bar
+          pressure of CO. Authors: calculations are made for assumed local equilibrium.'
+        T_C_as_printed: 1500
+        T_K: 1773.15
+        T_conversion: T_K = 1500 + 273.15
+        P_CO_bar: 1.0
+        points:
+        - column: gas-slag
+          basicity_B_prime: 1.5
+          a_SiO2: 0.05
+          S_wt_percent: 2.0
+          C_S: 0.0003
+          C_S_units: wt percent as printed (Cs)
+          p_bar: 5.5e-05
+        - column: gas-coke_ash
+          basicity_B_prime: 0.6
+          a_SiO2: 0.3
+          S_wt_percent: 5.0
+          C_S: 1.0e-05
+          C_S_units: wt percent as printed (Cs)
+          p_bar: 0.0043
+  COS:
+    observations:
+    - observation_id: turkdogan_1984_table1_COS_calculated_p
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 607
+        pdf_page_index: 17
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium
+          slag/coke-ash columns. Not this work's KEMS.
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: blast_furnace_gas_slag_and_gas_coke_ash_local_equilibrium
+      standard_state: partial pressure in bar as printed; 1500 C; 1 bar CO
+      regime: calculated_blast_furnace_vapor_equilibrium
+      units: bar as published
+      uncertainty:
+        note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium
+          at 1500 C.
+      values:
+        quantity: equilibrium_partial_pressure
+        gas_species: COS(g)
+        method_class: model_derived
+        model_or_data_source: 'assumed local equilibrium at 1500 C for gas-slag and gas-coke ash; 1 bar
+          pressure of CO. Authors: calculations are made for assumed local equilibrium.'
+        T_C_as_printed: 1500
+        T_K: 1773.15
+        T_conversion: T_K = 1500 + 273.15
+        P_CO_bar: 1.0
+        points:
+        - column: gas-slag
+          basicity_B_prime: 1.5
+          a_SiO2: 0.05
+          S_wt_percent: 2.0
+          C_S: 0.0003
+          C_S_units: wt percent as printed (Cs)
+          p_bar: 5.5e-06
+        - column: gas-coke_ash
+          basicity_B_prime: 0.6
+          a_SiO2: 0.3
+          S_wt_percent: 5.0
+          C_S: 1.0e-05
+          C_S_units: wt percent as printed (Cs)
+          p_bar: 0.00012
+  K:
+    observations:
+    - observation_id: turkdogan_1984_table2_K_calculated_p
+      type: psat_series
+      locator:
+        table: '2'
+        published_page: 607
+        pdf_page_index: 17
+        note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5%
+          K2O and B'=1.5. Calculated; a(K2O) from Steiler ref. 68.
+      T_range_K:
+      - 1473.15
+      - 1773.15
+      phase: blast_furnace_slag_0.5pct_K2O_Bprime_1.5
+      standard_state: p(K) bar as printed; a(K2O) relative to hypothetical solid K2O
+      regime: calculated_blast_furnace_vapor_equilibrium
+      units: p_K in bar; K in bar^3; a(K2O) dimensionless as printed
+      uncertainty:
+        note: No numerical uncertainty printed on Table 2.
+      values:
+        quantity: equilibrium_partial_pressure
+        gas_species: K(g)
+        method_class: model_derived
+        model_or_data_source: Reaction (53) (K2O)+C = 2K(g)+CO(g). K is the equilibrium constant from
+          the thermochemical data; a(K2O) is the activity of K2O in the slag, relative to the hypothetical
+          solid K2O, from the experimental data of Steiler (ref. 68).
+        reaction_as_printed: (K2O)+C = 2K(g)+CO(g)
+        reaction_number: 53
+        slag_K2O_wt_percent: 0.5
+        basicity_B_prime: 1.5
+        quoted_a_K2O_source: Steiler (ref. 68)
+        T_conversion: T_K = T_C + 273.15
+        points:
+        - T_C: 1200
+          T_K: 1473.15
+          K_bar3: 310000.0
+          a_K2O: 2.1e-12
+          p_K_bar: 0.00071
+        - T_C: 1300
+          T_K: 1573.15
+          K_bar3: 2690000.0
+          a_K2O: 5.5e-12
+          p_K_bar: 0.0034
+        - T_C: 1400
+          T_K: 1673.15
+          K_bar3: 18100000.0
+          a_K2O: 1.4e-11
+          p_K_bar: 0.014
+        - T_C: 1500
+          T_K: 1773.15
+          K_bar3: 97800000.0
+          a_K2O: 3.5e-11
+          p_K_bar: 0.26
+deepening:
+  dispatch_id: grok-resume-91959-1789251912
+  date: '2026-09-12'
+  note: Review paper. Author's own KEMS rows are absent. Tables 1–2 recorded as model_derived calculated
+    vapor pressures from printed p. 607. a(K2O) in Table 2 is quoted from Steiler; K is from thermochemical
+    data. Figures 1–14 not digitised.
+  primary_sources_cited:
+  - system: K2O activity in blast-furnace slag (Table 2 a_K2O column)
+    method: experimental activity (as cited)
+    investigator: Steiler
+    year: null
+    journal_reference_as_printed: Steiler, ref. 68 as cited on published p. 607
+    locator:
+      published_page: 607
+      pdf_page_index: 17
+      table: '2'
+  - system: KCN vaporization (quoted mass-spectrometric study)
+    method: mass spectrometry
+    investigator: Simmons et al.
+    year: null
+    journal_reference_as_printed: Simmons et al., ref. 69; p_(KCN)2 > p_KCN > p_(KCN)3
+    locator:
+      published_page: 607
+      pdf_page_index: 17
+      paragraph: According to a mass spectrometric study of vaporization of potassium cyanide by Simmons
+        et al.
+  table_inventory:
+  - table: '1'
+    published_page: 607
+    pdf_page_index: 17
+    completeness: full
+    note: Calculated SiO/SiS/S2/CS/COS equilibrium vapor pressures; two columns.
+  - table: '2'
+    published_page: 607
+    pdf_page_index: 17
+    completeness: full
+    note: Four temperature rows 1200–1500 C; K, a_K2O, p_K.
+  class_ledger:
+    model:
+    - turkdogan_1984_table1_SiO_calculated_p
+    - turkdogan_1984_table1_SiS_calculated_p
+    - turkdogan_1984_table1_S2_calculated_p
+    - turkdogan_1984_table1_CS_calculated_p
+    - turkdogan_1984_table1_COS_calculated_p
+    - turkdogan_1984_table2_K_calculated_p
