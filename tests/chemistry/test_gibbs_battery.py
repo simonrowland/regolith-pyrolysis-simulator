@@ -181,13 +181,22 @@ def test_partition_splits_own_input_from_independent() -> None:
     # magma_model_companion_workbook - a model reproduction, not an empirical
     # anchor). They are not gibbs tables: every partition count below is
     # unchanged; only the store-wide observation total moved, 2310 -> 2317.
-    assert part["observations_total"] == 2317
-    assert part["gibbs_table_total"] == 1730
-    assert part["gibbs_table_kems"] == 33
-    assert part["gibbs_table_non_kems"] == 1697
-    assert part["engine_own_input"] + part["independent_tabulation"] == 1697
+    # 2026-09-12 (extract wave, folds bd56aaa67..001f56f3e): twenty extracts
+    # landed — KEMS papers (Demaria 1973, Markova 1983/1984, Yakovlev 1984/2011,
+    # Shornikov 2010, Kato 1993 review, Turkdogan 1984/2001) plus pyrolysis and
+    # outgassing sets (Steurer 1985/1992, Schaefer-Fegley 2007, Reiss 2019,
+    # Wilkerson 2021/2023, Street 2010, Murchison x2, Cardiff 2007). They carry
+    # gibbs_table observations on the KEMS side (33 -> 273) and independently
+    # tabulated rows on the non-KEMS side (80 -> 116, e.g. Schaefer-Fegley 9).
+    # The engine-own-input partition is unchanged (1617; nasa-cea-thermo 1615):
+    # nothing landed that an evaluator consumes as coefficients.
+    assert part["observations_total"] == 3817
+    assert part["gibbs_table_total"] == 2006
+    assert part["gibbs_table_kems"] == 273
+    assert part["gibbs_table_non_kems"] == 1733
+    assert part["engine_own_input"] + part["independent_tabulation"] == 1733
     assert part["engine_own_input"] == 1617
-    assert part["independent_tabulation"] == 80
+    assert part["independent_tabulation"] == 116
     assert part["by_source"]["nasa-cea-thermo"]["n"] == 1615
     assert part["by_source"]["nasa-cea-thermo"]["provenance_class"] == (
         PROVENANCE_ENGINE_OWN_INPUT
