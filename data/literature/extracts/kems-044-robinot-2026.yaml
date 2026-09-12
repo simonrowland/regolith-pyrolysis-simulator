@@ -1,0 +1,760 @@
+schema_version: literature_extract.v1
+source_id: kems-044-robinot-2026
+source:
+  citation: Robinot, J., Rodat, S., Abanades, S., Bêche, E., Paillet, A. & Cowley, A. (2026), "Quantification
+    of oxygen production from solar pyrolysis of lunar regolith", Adv. Space Res., DOI 10.1016/j.asr.2026.02.003,
+    HAL hal-05512237
+  doi: 10.1016/j.asr.2026.02.003
+  url: https://doi.org/10.1016/j.asr.2026.02.003
+  year: 2026
+extraction:
+  method: Official HAL / article-in-press PDF from corpus raw/kems-044-robinot-2026/kems-044-robinot-2026.pdf
+    (15 pages; HAL cover is PDF page 1). pdftotext -layout and MinerU decode used only as a map. Printed
+    numbers transcribed from a 400 dpi pdftoppm render; the render wins where the decode disagrees (Eq.
+    6 coefficients; MinerU Fig. 1 numeric dump is all zeros and was rejected). Fig. 4c bar labels are
+    printed on the figure and were transcribed; Figs 1, 4a, 4b, 5 and 8 have no printed point table and
+    were not digitised. Authors' measured O2 yield and mass-balance prose kept distinct from the HSC 10
+    model yield, from Šeško 2024 EAC-1 composition quoted as feedstock, and from EDS/XRD qualitative by-product
+    text. This paper is solar vacuum pyrolysis with an O2 trace analyser, not KEMS.
+  date: '2026-09-12'
+  worker: extract-kems-033
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: O2
+  observable: rate_series
+  observation_id: robinot_2026_o2_yield_measured
+  field: oxygen_mass_mg
+  value: 35
+  locator:
+    published_page: 7
+    pdf_page_index: 8
+    section: '4.1'
+    note: A total of 35 mg of O2 (Fig. 4b) was successfully extracted
+- species: O2
+  observable: rate_series
+  observation_id: robinot_2026_o2_yield_measured
+  field: mass_yield_percent
+  value: 1.05
+  locator:
+    published_page: 7
+    pdf_page_index: 8
+    section: '4.1'
+    note: yielding 1.05 % of the total mass of the processed sample
+- species: O2
+  observable: rate_series
+  observation_id: robinot_2026_mass_balance_fig4c_bar_labels
+  field: glass_lump_g
+  value: 1.82
+  locator:
+    figure: 4c
+    published_page: 8
+    pdf_page_index: 9
+    note: Fig. 4c printed bar label Glass 1.82 g
+- species: Na
+  observable: gibbs_table
+  observation_id: robinot_2026_eac1_composition_quoted_sesko
+  field: Na2O_wt_pct
+  value: 2.95
+  locator:
+    published_page: 3
+    pdf_page_index: 4
+    paragraph: EAC-1 oxide composition
+    note: Na2O 2.95 % as printed, cited Šeško et al. 2024
+species:
+  O2:
+    observations:
+    - observation_id: robinot_2026_o2_yield_measured
+      type: rate_series
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        section: '4.1'
+        figure: 4b
+        note: Oxygen production and mass yield from the reported EAC-1 run
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_vacuum_pyrolysis
+      condensed_form:
+        state: pressed_simulant_pellet
+        metastable: false
+        basis: explicit_author
+        note: EAC-1 pellet 13 mm diameter x 10 mm height, hydraulic press 2.5 tons; mass approximately
+          3.38 g. T_range_K is 1200 C (two-phase O2 onset in the conclusion) to about 1800 C (punctual
+          pyrometer at peaking power), converted as T_K = t_C + 273.15. Authors warn the 1800 C reading
+          may be underestimated because the melt is not a blackbody.
+      standard_state: gaseous O2 quantified in an Ar carrier by a Systech trace analyser; not a Knudsen
+        partial pressure
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: as published (mg O2; percent of sample mass; percent of feedstock oxygen)
+      uncertainty:
+        analyser_precision_as_printed: ± 2 % of reading
+        analyser_range: 0.1 ppm to 1 %
+        note: Systech analyser precision ±2 % of reading (published p. 4). No uncertainty is printed on
+          the 35 mg / 1.05 % / 2.47 % yield figures. Peak T is 'around 1800 °C' and 'may be underestimated'.
+      values:
+        quantity: measured_oxygen_yield
+        method_class: measured_direct
+        gas_species: O2
+        oxygen_mass_mg: 35
+        mass_yield_percent: 1.05
+        fraction_of_feedstock_oxygen_percent: 2.47
+        specific_energy_yield_mg_O2_per_kWh: 31
+        sample_mass_g: 3.38
+        sample_mass_qualifier: approximately 3.38 g
+        heating_duration_h: 1.0
+        argon_flow_NL_per_min: 0.3
+        argon_purity_percent: 99.999
+        chamber_pressure_fill_mbar_about: 10.0
+        chamber_pressure_run_mbar_about: 13.0
+        peak_T_C_about: 1800
+        peak_T_K_converted: 2073.15
+        peak_T_conversion: 1800 C + 273.15 = 2073.15 K
+        two_phase_onset_T_C_about: 1200
+        max_flux_MW_m2: 4.8
+        feedstock: EAC-1
+        yield_definition_as_printed: gO2 = mO2 / mEAC-1 (Eq. 5)
+        note: Abstract and §4.1 print 35 mg O2, 1.05 % of processed sample mass, and 2.47 % of the simulant's
+          total oxygen. §4.1 also prints 31 mg O2/kWh. Abstract/procedure say 10 mbar; §4.1 says about
+          13 mbar with 0.3 NL/min Ar. Both pressures are retained; they are not averaged.
+      equipment:
+        cell_material:
+          value: water-cooled steel holder inside a glass-sphere vacuum chamber; refrigerated copper condenser;
+            PORAL grade 03 316 L sintered filter
+          locator:
+            published_page: 4
+            pdf_page_index: 5
+            section: '3.1'
+            paragraph: The sample was placed on a water-cooled steel holder
+        chamber_pressure:
+          value: 13.0
+          units: mbar
+          qualifier: about 13 mbar during the reported run (argon flowing)
+          locator:
+            published_page: 7
+            pdf_page_index: 8
+            section: '4.1'
+            paragraph: maintaining an internal pressure of about 13 mbar
+    - observation_id: robinot_2026_o2_prose_rate_points
+      type: rate_series
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        section: '4.1'
+        figure: 4a
+        note: Printed power / time / ppm points in §4.1 prose (not digitised from Fig. 4a)
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_vacuum_pyrolysis
+      standard_state: O2 mole fraction in Ar carrier, ppm as printed
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: W; min; ppm as published
+      uncertainty:
+        note: No sigma printed on the 3750 / 2000 / 1500 ppm figures; analyser ±2 % of reading
+      values:
+        quantity: printed_oxygen_release_timeline
+        method_class: measured_direct
+        semantics: bound_not_point_ordering
+        points_as_printed:
+        - power_W: 380
+          event: initial_regolith_melting
+          O2: no detectable oxygen
+        - power_W: 650
+          t_min_range:
+          - 10
+          - 15
+          event: brief_oxygen_peak
+          duration_as_printed: roughly five minutes
+          authors_attribution: possibly Na2O and K2O reduction at low temperature
+        - power_W: 1220
+          event: no_additional_oxygen
+        - power_W: 1200
+          t_min: 17
+          event: oxygen_generation_resumed
+          peak_XO2_ppm: 3750
+        - power_W: 1460
+          t_min: 25
+          event: shutters_fully_open
+          duration_min: 33
+          XO2_ppm_range:
+          - 2000
+          - 1500
+          note: steadily declining oxygen production from 2000 ppm to 1500 ppm
+        note: These are the numeric waypoints printed in §4.1. The full O2(t) and power(t) curves remain
+          figure-only in robinot_2026_o2_fig4ab_figure_only.
+    - observation_id: robinot_2026_o2_fig4ab_figure_only
+      type: rate_series
+      locator:
+        figure: '4'
+        published_page: 8
+        pdf_page_index: 9
+        note: Fig. 4a O2 ppm and solar power vs time; Fig. 4b cumulative O2 mg and energy Wh
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_vacuum_pyrolysis
+      standard_state: O2 concentration ppm and cumulative O2 mg vs time
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: ppm; mg; W; Wh; min as published
+      uncertainty:
+        note: curves not digitised; analyser ±2 % of reading
+      values:
+        quantity: oxygen_concentration_and_cumulative_mass_vs_time
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        panels:
+        - 4a
+        - 4b
+        axis_4a: O2 concentration (ppm) and Power (W) vs Time (min), 0-60 min
+        axis_4b: O2 produced (mg) and Energy (Wh) vs Time (min), 0-60 min
+        note: No printed point table. Numeric waypoints from the captioning prose are stored on robinot_2026_o2_prose_rate_points.
+          The 35 mg end point is stored on robinot_2026_o2_yield_measured.
+    - observation_id: robinot_2026_mass_balance_text
+      type: rate_series
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        section: '4.1'
+        figure: 4c
+        note: Mass-balance numbers printed in §4.1 prose
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_vacuum_pyrolysis_products
+      standard_state: recovered condensed mass after cooldown
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: g; percent as published
+      uncertainty:
+        note: No sigma printed. Authors attribute the unaccounted mass to incomplete cleaning of reactor
+          components.
+      values:
+        quantity: post_run_mass_balance
+        method_class: measured_direct
+        evidence_form: prose
+        semantics: competing_observation_do_not_average
+        sample_mass_g: 3.38
+        glass_lump_g: 1.82
+        vaporized_and_captured_g: 1.1
+        captured_locations:
+        - holder
+        - window
+        - condenser
+        - filter
+        unaccounted_g: 0.27
+        final_mass_recovery_percent: 92
+        competing_conclusion_vaporized_g: 1.3
+        competing_conclusion_locator: published p. 12, conclusion column
+        note: §4.1 prints 1.82 g glassy lump, 1.1 g vaporized and captured, 0.27 g unaccounted, 92 % recovery.
+          The conclusion prints 'a total mass of 1.3 g was found to be vaporized'. Fig. 4c printed bars
+          (separate observation) sum captured holder+window+condenser+filter = 1.26 g and discrepancy
+          0.265 g. Do not average the 1.1 / 1.26 / 1.3 g figures.
+    - observation_id: robinot_2026_mass_balance_fig4c_bar_labels
+      type: rate_series
+      locator:
+        figure: 4c
+        published_page: 8
+        pdf_page_index: 9
+        note: Printed bar labels on Fig. 4c; not axis-digitised
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_vacuum_pyrolysis_products
+      standard_state: recovered mass by location as labelled on Fig. 4c
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: g as printed on the bars
+      uncertainty:
+        note: bar labels have no printed sigma; 0.035 g O2 matches the 35 mg prose value
+      values:
+        quantity: post_run_mass_balance
+        method_class: measured_direct
+        admission_status: figure_labels_transcribed
+        semantics: competing_observation_do_not_average
+        glass_lump_g: 1.82
+        holder_g: 0.2
+        window_g: 0.35
+        condenser_g: 0.2
+        filter_g: 0.51
+        O2_g: 0.035
+        discrepancy_g: 0.265
+        initial_sample_g_from_caption: 3.38
+        sum_check_g: 3.38
+        sum_check: 1.82 + 0.2 + 0.35 + 0.2 + 0.51 + 0.035 + 0.265 = 3.38
+        captured_holder_window_condenser_filter_g: 1.26
+        note: Labels read from the 400 dpi render of Fig. 4c. These are printed numbers, not interpolated
+          axis readings. They compete with the §4.1 prose 1.1 g captured / 0.27 g unaccounted and the
+          conclusion 1.3 g vaporized; do not average.
+    - observation_id: robinot_2026_o2_comparable_run_1p17
+      type: rate_series
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        section: '4.1'
+        note: Comparable yield 1.17 %; figure in supplementary data not in this PDF
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_vacuum_pyrolysis
+      standard_state: mass yield of O2 as printed
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: percent of sample mass
+      uncertainty:
+        note: No sigma printed; supplementary figure is not in the 15-page HAL PDF
+      values:
+        quantity: measured_oxygen_yield
+        method_class: measured_direct
+        mass_yield_percent: 1.17
+        conditions_as_printed: similar conditions, except for the heating rate
+        supplement_status: figure_provided_in_supplementary_data_not_in_this_pdf
+        note: Only the 1.17 % figure is printed in the main text. The supplementary plot was not transcribed
+          because it is not in the corpus PDF.
+    - observation_id: robinot_2026_o2_hsc_expected_1p37_model
+      type: rate_series
+      locator:
+        published_page: 11
+        pdf_page_index: 12
+        section: '4.3'
+        paragraph: an oxygen yield of around 1.37 % was expected by thermodynamic simulation
+      T_range_K:
+      - 2073.15
+      - 2073.15
+      phase: HSC_Chemistry_10_EAC-1_equilibrium
+      standard_state: HSC 10 Gibbs-energy-minimisation O2 mass yield
+      regime: thermochemical_equilibrium_model
+      units: percent mass yield as published
+      uncertainty:
+        note: authors print 'around 1.37 %'; they then say the comparison to 1.05 % would be invalid because
+          the model is closed-system equilibrium
+      values:
+        quantity: equilibrium_molecular_oxygen_yield
+        method_class: model_derived
+        admission_status: model_output_not_measurement
+        gas_species: O2
+        mass_yield_percent_about: 1.37
+        T_C_as_printed: 1800
+        P_mbar_as_printed: 10
+        code: HSC Chemistry version 10
+        authors_caveat: Both results appeared to be close, however this comparison would be invalid as
+          the model does not accurately reflect the experiment.
+    - observation_id: robinot_2026_fig1_hsc_figure_only
+      type: rate_series
+      locator:
+        figure: '1'
+        published_page: 4
+        pdf_page_index: 5
+        note: HSC 10 O and O2 mass fraction vs T at 1e-2, 1e-7, and 3e-15 bar
+      T_range_K:
+      - 773.15
+      - 3273.15
+      phase: HSC_Chemistry_10_EAC-1_equilibrium
+      standard_state: oxygen mass fraction vs temperature from Gibbs minimisation
+      regime: thermochemical_equilibrium_model
+      units: wt% vs degC as published
+      uncertainty:
+        note: figure-only model curves; MinerU numeric dump was all zeros and was rejected
+      values:
+        quantity: model_oxygen_mass_fraction_vs_T
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        pressures_bar_as_printed:
+        - 0.01
+        - 1.0e-07
+        - 3.0e-15
+        prose_O2_mass_fraction_range_percent:
+        - 7
+        - 8
+        prose_optimal_T_C_at_1e-2_bar: 2600
+        prose_optimal_T_C_at_lunar_pressure: 950
+        prose_decade_pressure_shift_C_about: 100
+        O_atom_excluded_from_theoretical_yield: true
+        note: Printed prose numbers on p. 3 are retained. The Fig. 1 curves were not digitised. Atomic
+          O was not taken into account for theoretical oxygen yield estimation.
+    - observation_id: robinot_2026_fig8_80kg_astronaut_o2
+      type: rate_series
+      locator:
+        figure: '8'
+        published_page: 12
+        pdf_page_index: 13
+        paragraph: At the experimentally-obtained yield, a mass of 80 kg of regolith is required
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: scaleup_from_measured_yield
+      standard_state: regolith mass to supply 0.84 kg O2/day at a given mass yield
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: kg regolith; percent yield as published
+      uncertainty:
+        note: 80 kg is printed for the experimental yield; the rest of Fig. 8 is an undigitised curve
+      values:
+        quantity: regolith_mass_for_astronaut_daily_O2
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        astronaut_O2_kg_per_day: 0.84
+        experimental_yield_mass_percent: 1.05
+        regolith_mass_kg_at_experimental_yield: 80
+        note: 0.84 kg O2/day and 80 kg at the experimental yield are printed in the captioning prose.
+          The Fig. 8 curve itself was not digitised.
+  Na:
+    observations:
+    - observation_id: robinot_2026_eac1_composition_quoted_sesko
+      type: gibbs_table
+      locator:
+        published_page: 3
+        pdf_page_index: 4
+        paragraph: EAC-1 has the following oxide composition which is expressed in weight percent
+      phase: lunar_regolith_simulant_EAC-1
+      condensed_form:
+        state: granular_simulant_as_loaded
+        metastable: false
+        basis: explicit_author
+        note: Quoted from Šeško et al. 2024; not measured in this work.
+      standard_state: bulk oxide wt% of the EAC-1 feedstock
+      regime: compiled_composition
+      units: wt_percent
+      uncertainty:
+        note: no uncertainty printed on the oxide list; total of printed oxides is 100.00
+      values:
+        quantity: bulk_sample_composition
+        method_class: secondary_compilation
+        sample: EAC-1
+        composition_basis: Sesko_et_al_2024_as_cited
+        oxygen_content_wt_pct: 44.41
+        real_lunar_soil_oxygen_wt_pct_average: 44.59
+        real_lunar_soil_oxygen_wt_pct_min: 40.6
+        real_lunar_soil_oxygen_wt_pct_max: 48.1
+        major_oxide_wt_pct:
+          SiO2: 44.41
+          Al2O3: 12.8
+          Fe2O3: 12.2
+          MgO: 12.09
+          CaO: 10.98
+          Na2O: 2.95
+          TiO2: 2.44
+          K2O: 1.32
+          P2O5: 0.61
+          MnO: 0.2
+        Na2O_wt_pct: 2.95
+        note: Feedstock composition quoted from Šeško et al. 2024. Not a measurement from this solar-pyrolysis
+          run. Lunar-soil oxygen bounds are also quoted, not measured here.
+    - observation_id: robinot_2026_deposit_Na_qualitative
+      type: rate_series
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        section: '4.2'
+        figure: '5'
+        paragraph: major elements in oxides found on the sample holder were Na and Fe
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_pyrolysis_deposits
+      condensed_form:
+        state: condensate_and_glass
+        metastable: false
+        basis: explicit_author
+        note: SEM/EDS of recovered deposits; Fig. 5 is a stacked bar chart with no printed wt% labels.
+      standard_state: elemental presence by location as printed in §4.2
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: qualitative as published
+      uncertainty:
+        note: no printed wt%; Fig. 5 was not digitised
+      values:
+        quantity: deposit_eds_qualitative
+        method_class: measured_direct
+        evidence_class: measured_edx
+        semantics: bound_not_point_ordering
+        holder: Na and Fe major; lower Si; trace Mg, P, K
+        filter: moderate Na and Fe; primarily Si
+        glass: Na not listed among predominant nonvolatiles
+        note: Qualitative prose only. Absence of a number is not zero Na.
+    - observation_id: robinot_2026_fig5_eds_figure_only
+      type: rate_series
+      locator:
+        figure: '5'
+        published_page: 8
+        pdf_page_index: 9
+        note: Stacked elemental mass-fraction bars for EAC-1, Glass, Holder, Window, Condenser, Filter
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_pyrolysis_deposits
+      standard_state: atomic composition in weight percent as the Fig. 5 caption
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: mass fraction percent as published axis
+      uncertainty:
+        note: no printed bar labels; figure not digitised
+      values:
+        quantity: deposit_eds_stacked_bars
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        samples:
+        - EAC-1
+        - Glass
+        - Holder
+        - Window
+        - Condenser
+        - Filter
+        legend_elements:
+        - O
+        - Na
+        - Mg
+        - Al
+        - Si
+        - P
+        - K
+        - Ca
+        - Ti
+        - Fe
+        eac1_reference: Šeško et al. 2024
+        authors_text: no significant variation in oxygen concentration among the samples; higher-than-expected
+          oxygen in vaporized species, most likely due to metal reoxidation after recovery
+        note: Stacked bars have no printed numeric labels. A prior vacuum-pyrolysis skeleton that read
+          bar heights is not reused; those numbers were marked extraction_suspect and disagreed with the
+          Šeško oxide table.
+  K:
+    observations:
+    - observation_id: robinot_2026_deposit_K_qualitative
+      type: rate_series
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        section: '4.2'
+        paragraph: trace levels of Mg, P, and K on the sample holder
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_pyrolysis_deposits
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: qualitative as published
+      uncertainty:
+        note: no printed wt%
+      values:
+        quantity: deposit_eds_qualitative
+        method_class: measured_direct
+        evidence_class: measured_edx
+        semantics: bound_not_point_ordering
+        holder: trace K
+        filter: trace K
+        early_O2_peak_attribution: possibly Na2O and K2O reduction at low temperature
+        note: K2O listed among the most volatile oxides recovered farther from the focal point.
+  Fe:
+    observations:
+    - observation_id: robinot_2026_deposit_Fe_qualitative
+      type: rate_series
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        section: '4.2'
+        paragraph: major elements in oxides found on the sample holder were Na and Fe
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_pyrolysis_deposits
+      condensed_form:
+        state: condensate_oxide_and_metallic_Fe
+        metastable: false
+        basis: explicit_author
+        note: XRD of holder materials identified metallic alpha-Fe among five prominent crystalline phases.
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: qualitative as published
+      uncertainty:
+        note: no printed Fe wt%; Fig. 5 not digitised
+      values:
+        quantity: deposit_eds_and_xrd_qualitative
+        method_class: measured_direct
+        evidence_class: measured_edx_and_xrd
+        semantics: bound_not_point_ordering
+        holder_eds: Na and Fe major
+        window_eds: predominantly Si and Fe
+        condenser_eds: measurable Fe
+        filter_eds: moderate Fe
+        holder_xrd_phases_as_printed:
+        - magnetite Fe3O4
+        - metallic alpha-Fe
+        - quartz alpha SiO2
+        - cristobalite alpha high
+        - fayalite Fe2SiO4
+        glass_xrd: localized crystalline domains of Al, Si, and alpha-Fe in an amorphous matrix
+        window_filter_xrd: largely amorphous; only alpha-Fe discernible
+        condenser_xrd: entirely amorphous; no identifiable phases
+        note: Metallic Fe is Raman-inactive; authors use that to explain missing Raman signal on window/condenser/filter.
+  Si:
+    observations:
+    - observation_id: robinot_2026_deposit_Si_qualitative
+      type: rate_series
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        section: '4.2'
+        paragraph: The condenser contained roughly one-third Si
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_pyrolysis_deposits
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: qualitative as published; condenser 'roughly one-third' is the only numeric fraction printed
+      uncertainty:
+        note: '''roughly one-third Si'' on the condenser is the only printed fraction; no table'
+      values:
+        quantity: deposit_eds_qualitative
+        method_class: measured_direct
+        evidence_class: measured_edx
+        semantics: bound_not_point_ordering
+        glass: some Mg and Si with nonvolatiles Al, Ca, Ti
+        holder: lower amounts of Si
+        window: predominantly Si and Fe
+        condenser_Si_fraction_as_printed: roughly one-third
+        filter: primarily Si
+        note: Si was present in every sample. Fig. 5 not digitised.
+  Mg:
+    observations:
+    - observation_id: robinot_2026_deposit_Mg_qualitative
+      type: rate_series
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        section: '4.2'
+        paragraph: the glassy residue predominantly contained nonvolatile elements (Al, Ca, Ti) along
+          with some Mg and Si
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_pyrolysis_deposits
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: qualitative as published
+      uncertainty:
+        note: no printed Mg wt%
+      values:
+        quantity: deposit_eds_qualitative
+        method_class: measured_direct
+        evidence_class: measured_edx
+        semantics: bound_not_point_ordering
+        glass: some Mg
+        holder: trace Mg
+        condenser: measurable Mg
+        filter: trace Mg
+        authors_volatility: SiO2 and MgO found in both glass and condensate, indicating partial vaporization
+  Al:
+    observations:
+    - observation_id: robinot_2026_deposit_Al_qualitative
+      type: rate_series
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        section: '4.2'
+        paragraph: glassy residue predominantly contained nonvolatile elements (Al, Ca, Ti)
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_pyrolysis_glass
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: qualitative as published
+      uncertainty:
+        note: no printed Al wt%
+      values:
+        quantity: deposit_eds_qualitative
+        method_class: measured_direct
+        evidence_class: measured_edx
+        semantics: bound_not_point_ordering
+        glass: Al among predominant nonvolatiles
+        authors_volatility: Al2O3, CaO, and TiO2 only found in the regolith glass
+        note: Not reported as a major deposit species away from the focal point.
+  Ca:
+    observations:
+    - observation_id: robinot_2026_deposit_Ca_qualitative
+      type: rate_series
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        section: '4.2'
+        paragraph: glassy residue predominantly contained nonvolatile elements (Al, Ca, Ti)
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_pyrolysis_glass
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: qualitative as published
+      uncertainty:
+        note: no printed Ca wt%
+      values:
+        quantity: deposit_eds_qualitative
+        method_class: measured_direct
+        evidence_class: measured_edx
+        semantics: bound_not_point_ordering
+        glass: Ca among predominant nonvolatiles
+        authors_volatility: Al2O3, CaO, and TiO2 only found in the regolith glass
+  Ti:
+    observations:
+    - observation_id: robinot_2026_deposit_Ti_qualitative
+      type: rate_series
+      locator:
+        published_page: 7
+        pdf_page_index: 8
+        section: '4.2'
+        paragraph: glassy residue predominantly contained nonvolatile elements (Al, Ca, Ti)
+      T_range_K:
+      - 1473.15
+      - 2073.15
+      phase: EAC-1_solar_pyrolysis_glass
+      regime: solar_vacuum_pyrolysis_free_evaporation
+      units: qualitative as published
+      uncertainty:
+        note: no printed Ti wt%
+      values:
+        quantity: deposit_eds_qualitative
+        method_class: measured_direct
+        evidence_class: measured_edx
+        semantics: bound_not_point_ordering
+        glass: Ti among predominant nonvolatiles
+        holder_xrd_minor: rutile TiO2 among minor holder phases
+        authors_volatility: Al2O3, CaO, and TiO2 only found in the regolith glass
+deepening:
+  dispatch_id: extract-kems-033
+  date: '2026-09-12'
+  quote_convention: Printed text transcribed with normalized whitespace and ASCII flattening of subscripts,
+    superscripts, and plus/minus signs.
+  table_inventory:
+  - table: none numbered
+    note: The paper has no numbered data table. Fig. 6c is a crystalline-phase assignment legend (formula/symbol),
+      not a measurement table. Fig. 4c printed bar labels are the only numeric mass table on a figure.
+  - figure: 4c
+    published_page: 8
+    pdf_page_index: 9
+    completeness: full_printed_labels
+    note: Glass 1.82; Holder 0.2; Window 0.35; Condenser 0.2; Filter 0.51; O2 0.035; Discrepancy 0.265
+      g
+  class_ledger:
+    measured:
+    - robinot_2026_o2_yield_measured
+    - robinot_2026_o2_prose_rate_points
+    - robinot_2026_mass_balance_text
+    - robinot_2026_mass_balance_fig4c_bar_labels
+    - robinot_2026_o2_comparable_run_1p17
+    - robinot_2026_deposit_Na_qualitative
+    - robinot_2026_deposit_K_qualitative
+    - robinot_2026_deposit_Fe_qualitative
+    - robinot_2026_deposit_Si_qualitative
+    - robinot_2026_deposit_Mg_qualitative
+    - robinot_2026_deposit_Al_qualitative
+    - robinot_2026_deposit_Ca_qualitative
+    - robinot_2026_deposit_Ti_qualitative
+    figure_only:
+    - robinot_2026_o2_fig4ab_figure_only
+    - robinot_2026_fig5_eds_figure_only
+    - robinot_2026_fig1_hsc_figure_only
+    - robinot_2026_fig8_80kg_astronaut_o2
+    model:
+    - robinot_2026_o2_hsc_expected_1p37_model
+    - robinot_2026_fig1_hsc_figure_only
+    - robinot_2026_fig8_80kg_astronaut_o2
+    compiled:
+    - robinot_2026_eac1_composition_quoted_sesko
+  battery_limitation: Not KEMS. Measured quantity is O2 produced into an Ar carrier under ~10-13 mbar
+    solar vacuum pyrolysis of EAC-1, plus qualitative EDS/XRD of deposits. No species partial pressures
+    and no Knudsen-cell geometry.

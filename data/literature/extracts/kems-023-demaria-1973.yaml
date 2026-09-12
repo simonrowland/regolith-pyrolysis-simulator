@@ -1,0 +1,1401 @@
+schema_version: literature_extract.v1
+source_id: kems-023-demaria-1973
+source:
+  citation: De Maria, G. & Piacente, V. (1973), "Vaporization Study of Selected Lunar Samples", Lunar
+    Science IV, 175-177. ADS bibcode 1973LPI.....4..175D.
+  doi: null
+  url: https://ui.adsabs.harvard.edu/abs/1973LPI.....4..175D
+  year: 1973
+  bibcode: 1973LPI.....4..175D
+extraction:
+  method: Held ADS JBIG2 scan (raw/kems-023-demaria-1973/kems-023-demaria-1973.pdf). pdftotext -layout
+    is empty (one bibcode token per page) and is not data. Table I transcribed from a 400 dpi pdftoppm
+    render of PDF page 2 (published p. 176). Where MinerU and the render disagree, the render wins. Figs
+    1-3 listed figure-only; Clausius-Clapeyron grids were not digitised. This-work columns 10017 and 12073
+    kept distinct from 12022/12065, which the authors include for comparison with previous vaporization
+    studies of lunar basalts (ref 4, De Maria et al. 1971). Printed dashes omitted (not zeros). Approximate
+    cells marked ~ kept as approximate. Detected species without printed numbers recorded as measured_not_tabulated.
+  date: '2026-09-12'
+  worker: extract-kems-023
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.Na.observations[demaria_1973_na_psat_table1_this_work].values.points[0].p_atm
+  value: 1.30e-07
+  locator:
+    table: '1'
+    published_page: 176
+    pdf_page_index: 2
+    note: Table I Na 1400 K sample 10017 = 1.3 x 10^-7 atm
+- path: species.Fe.observations[demaria_1973_fe_psat_table1_this_work].values.points[2].p_atm
+  value: 7.80e-07
+  locator:
+    table: '1'
+    published_page: 176
+    pdf_page_index: 2
+    note: Table I Fe 1600 K sample 10017 = 7.8 x 10^-7 atm
+- path: species.SiO.observations[demaria_1973_sio_psat_table1_this_work].values.points[3].p_atm
+  value: 7.60e-06
+  locator:
+    table: '1'
+    published_page: 176
+    pdf_page_index: 2
+    note: Table I SiO 1800 K sample 12073 = 7.6 x 10^-6 atm
+- path: species.Al.observations[demaria_1973_al_psat_table1_this_work].values.points[0].p_atm
+  value: 2.30e-07
+  locator:
+    table: '1'
+    published_page: 176
+    pdf_page_index: 2
+    note: Table I Al 2100 K sample 10017 = 2.3 x 10^-7 atm
+- path: species.Na.observations[demaria_1973_na_psat_table1_quoted_demaria_1971].values.points[0].p_atm
+  value: 8.50e-09
+  locator:
+    table: '1'
+    published_page: 176
+    pdf_page_index: 2
+    note: Table I Na 1300 K sample 12022 = 8.5 x 10^-9 atm (quoted comparison column)
+species:
+  Na:
+    observations:
+    - observation_id: demaria_1973_kems_method_and_inventory
+      type: rate_series
+      locator:
+        published_page: 175
+        pdf_page_index: 1
+        section: body
+        note: Knudsen-cell mass spectrometric investigations of 10017 and 12073; method similar to De
+          Maria et al. 1971 (ref 4)
+      T_range_K:
+      - 1300.0
+      - 2200.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: silver-calibrated KEMS absolute partial pressures referred to previous paper; units
+        atm in Table I
+      regime: kems_effusion
+      units: as published
+      uncertainty:
+        note: No numeric calibration envelope printed in this abstract. Geometry and calibration are not
+          restated; authors say a method similar to ref 4.
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        samples_this_work:
+        - '10017'
+        - '12073'
+        samples_quoted_for_comparison:
+        - '12022'
+        - '12065'
+        quoted_comparison_source: De Maria, Balducci, Guido and Piacente, Proc. Second Lunar Science Conf.,
+          vol. 2, pp. 1367-1380 (ref 4)
+        heating_procedures_as_printed:
+        - progressive depletion (step-wise heating; main procedure)
+        - fixed temperature (a few cases)
+        apollo_15_and_16: experiments being carried out; no numbers printed
+        monoatomic_species_detected:
+        - Na
+        - K
+        - Fe
+        - O
+        - Cr
+        - Mn
+        - Mg
+        - Ca
+        - Al
+        molecular_species_detected:
+        - SiO
+        - SiO2
+        - O2
+        - FeO
+        - AlO
+        - Al2O
+        - TiO
+        - TiO2
+        table_I_species:
+        - Na
+        - Fe
+        - Mg
+        - SiO
+        - Ca
+        - TiO
+        - Al
+        table_I_condition_as_printed: The data are relative to measurements corresponding to the conditions
+          under which presumably no appreciable variation of the concentration of the relative components
+          in the condensed phase occurred.
+        missing_for_motzfeldt:
+        - orifice_area
+        - orifice_diameter
+        - clausing_factor
+        - sample_surface_area
+        - cell_material
+        geometry_note: Orifice, cell material, and calibration are not printed in this 3-page abstract.
+          Authors state the method is similar to the one described previously (4).
+    - observation_id: demaria_1973_na_psat_table1_this_work
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I Na rows; samples 10017 and 12073 are this work
+      T_range_K:
+      - 1400.0
+      - 1500.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of Na(g) over lunar samples; atm as printed
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: Na(g)
+        method_class: measured_direct
+        evidence_class: authors_this_work
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        omitted_cells:
+        - T_K: 1300.0
+          sample: '10017'
+          reason: printed dash; not a zero
+        - T_K: 1300.0
+          sample: '12073'
+          reason: printed dash; not a zero
+        points:
+        - T_K: 1400.0
+          p_atm: 1.30e-07
+          p_Pa: 0.01317225
+          sample: '10017'
+        - T_K: 1500.0
+          p_atm: 1.60e-06
+          p_Pa: 0.16212
+          sample: '10017'
+        - T_K: 1400.0
+          p_atm: 7.40e-08
+          p_Pa: 0.00749805
+          sample: '12073'
+        - T_K: 1500.0
+          p_atm: 1.10e-06
+          p_Pa: 0.1114575
+          sample: '12073'
+    - observation_id: demaria_1973_na_psat_table1_quoted_demaria_1971
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I Na rows; samples 12022 and 12065 printed for comparison with previous lunar-basalt
+          vaporization studies (ref 4)
+      T_range_K:
+      - 1300.0
+      - 1500.0
+      phase: lunar_samples_12022_12065
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo 12 samples 12022 and 12065 printed in Table I for comparison with previous vaporization
+          studies (ref 4, De Maria et al. 1971). Not this-work measurements.
+      standard_state: quoted partial pressure of Na(g); atm as printed; not this-work KEMS
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: Na(g)
+        method_class: quoted_prior_work
+        evidence_class: not_this_work
+        quoted_from: De Maria et al. 1971, Proc. Second Lunar Science Conf. 2, 1367-1380 (ref 4)
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        omitted_cells:
+        - T_K: 1500.0
+          sample: '12022'
+          reason: printed dash; not a zero
+        points:
+        - T_K: 1300.0
+          p_atm: 8.50e-09
+          p_Pa: 8.61e-04
+          sample: '12022'
+        - T_K: 1400.0
+          p_atm: 4.00e-07
+          p_Pa: 0.04053
+          sample: '12022'
+        - T_K: 1300.0
+          p_atm: 4.00e-09
+          p_Pa: 4.05e-04
+          sample: '12065'
+          qualifier: approximate_as_printed
+          as_printed: ~4e-09
+        - T_K: 1400.0
+          p_atm: 8.30e-09
+          p_Pa: 8.41e-04
+          sample: '12065'
+        - T_K: 1500.0
+          p_atm: 1.30e-07
+          p_Pa: 0.01317225
+          sample: '12065'
+    - observation_id: demaria_1973_na_psat_fig1_figure_only
+      type: psat_series
+      locator:
+        figure: '1'
+        published_page: 177
+        pdf_page_index: 3
+        note: Fig. 1 Temperature dependence of sodium vapor pressure; lg P_Na (Atm.) vs 1/T x 10^4 (K^-1)
+      T_range_K:
+      - 1250.0
+      - 1538.5
+      phase: lunar_samples_10017_12022_12065_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Lunar samples 10017, 12022, 12065, 12073 as plotted. 10017 and 12073 are this work; 12022
+          and 12065 are comparison overlays from prior work.
+      standard_state: lg P_Na (Atm.) as printed on Fig. 1; not digitised
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: figure-only; scatter not digitised; no numeric uncertainty printed on the figure
+      values:
+        quantity: partial_pressure
+        gas_species: Na(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_Na_atm vs 1e4_over_T_K
+        labeled_1e4_over_T:
+        - 6.5
+        - 7.0
+        - 7.5
+        - 8.0
+        T_from_labeled_ticks_K:
+        - 1538.5
+        - 1428.6
+        - 1333.3
+        - 1250.0
+        T_from_ticks_arithmetic: T_K = 1e4 / (1e4/T tick)
+        legend_symbols:
+          open_triangle: '12065'
+          filled_triangle: '12022'
+          open_circle: '10017'
+          filled_circle: '12073'
+        body_text_fig1_conflict: Body text on p. 175 attributes nearly unit Fe activity to fig.1; the
+          printed Fig. 1 caption is sodium. Fig. 3 is iron. Caption wins for this observation.
+  Fe:
+    observations:
+    - observation_id: demaria_1973_fe_psat_table1_this_work
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I Fe rows; samples 10017 and 12073 are this work
+      T_range_K:
+      - 1400.0
+      - 1600.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of Fe(g) over lunar samples; atm as printed
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: Fe(g)
+        method_class: measured_direct
+        evidence_class: authors_this_work
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        activity_note_as_printed: The activity of manganese and iron appears to be independent of the
+          nature of the sample. For the latter element the value of nearly unit activity is reproduced
+          in the new samples.
+        points:
+        - T_K: 1400.0
+          p_atm: 1.50e-08
+          p_Pa: 0.001519875
+          sample: '10017'
+        - T_K: 1500.0
+          p_atm: 1.20e-07
+          p_Pa: 0.012159
+          sample: '10017'
+        - T_K: 1600.0
+          p_atm: 7.80e-07
+          p_Pa: 0.0790335
+          sample: '10017'
+        - T_K: 1400.0
+          p_atm: 7.90e-09
+          p_Pa: 8.00e-04
+          sample: '12073'
+        - T_K: 1500.0
+          p_atm: 6.20e-08
+          p_Pa: 0.00628215
+          sample: '12073'
+        - T_K: 1600.0
+          p_atm: 3.80e-07
+          p_Pa: 0.0385035
+          sample: '12073'
+    - observation_id: demaria_1973_fe_psat_table1_quoted_demaria_1971
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I Fe rows; 12022 and 12065 quoted comparison (ref 4)
+      T_range_K:
+      - 1400.0
+      - 1600.0
+      phase: lunar_samples_12022_12065
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo 12 samples 12022 and 12065 printed in Table I for comparison with previous vaporization
+          studies (ref 4, De Maria et al. 1971). Not this-work measurements.
+      standard_state: quoted partial pressure of Fe(g); atm as printed; not this-work KEMS
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: Fe(g)
+        method_class: quoted_prior_work
+        evidence_class: not_this_work
+        quoted_from: De Maria et al. 1971 (ref 4)
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        points:
+        - T_K: 1400.0
+          p_atm: 1.30e-08
+          p_Pa: 0.001317225
+          sample: '12022'
+        - T_K: 1500.0
+          p_atm: 6.40e-07
+          p_Pa: 0.064848
+          sample: '12022'
+        - T_K: 1600.0
+          p_atm: 6.40e-07
+          p_Pa: 0.064848
+          sample: '12022'
+        - T_K: 1400.0
+          p_atm: 3.20e-09
+          p_Pa: 3.24e-04
+          sample: '12065'
+        - T_K: 1500.0
+          p_atm: 2.60e-08
+          p_Pa: 0.00263445
+          sample: '12065'
+        - T_K: 1600.0
+          p_atm: 1.60e-07
+          p_Pa: 0.016212
+          sample: '12065'
+    - observation_id: demaria_1973_fe_psat_fig3_figure_only
+      type: psat_series
+      locator:
+        figure: '3'
+        published_page: 177
+        pdf_page_index: 3
+        note: Fig. 3 Temperature dependence of the iron partial pressure; dotted line is relative to the
+          pure element
+      T_range_K:
+      - 1333.3
+      - 1818.2
+      phase: lunar_samples_10017_12022_12065_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Lunar samples 10017, 12022, 12065, 12073 as plotted. 10017 and 12073 are this work; 12022
+          and 12065 are comparison overlays from prior work.
+      standard_state: lg P_Fe (Atm.) as printed on Fig. 3; not digitised
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: figure-only; dotted pure-element overlay is not a this-work measurement; scatter not digitised
+      values:
+        quantity: partial_pressure
+        gas_species: Fe(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_Fe_atm vs 1e4_over_T_K
+        labeled_1e4_over_T:
+        - 5.5
+        - 6.0
+        - 6.5
+        - 7.0
+        - 7.5
+        T_from_labeled_ticks_K:
+        - 1818.2
+        - 1666.7
+        - 1538.5
+        - 1428.6
+        - 1333.3
+        legend_symbols:
+          open_triangle: '12065'
+          filled_triangle: '12022'
+          open_circle: '10017'
+          filled_circle: '12073'
+        dotted_line: pure_element_Fe_not_this_work
+        nearly_unit_activity_as_printed: The observation of constant unit activity for iron, the only
+          element in lunar material that exhibits this peculiarity, strongly support the working hypothesis
+          of the presence of an inner iron core in the moon.
+  Mg:
+    observations:
+    - observation_id: demaria_1973_mg_psat_table1_this_work
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I Mg rows; samples 10017 and 12073 are this work
+      T_range_K:
+      - 1700.0
+      - 1900.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of Mg(g) over lunar samples; atm as printed
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: Mg(g)
+        method_class: measured_direct
+        evidence_class: authors_this_work
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        omitted_cells:
+        - T_K: 1700.0
+          sample: '12073'
+          reason: printed dash; not a zero
+        points:
+        - T_K: 1700.0
+          p_atm: 5.60e-08
+          p_Pa: 0.0056742
+          sample: '10017'
+        - T_K: 1800.0
+          p_atm: 2.70e-07
+          p_Pa: 0.02735775
+          sample: '10017'
+        - T_K: 1900.0
+          p_atm: 1.30e-06
+          p_Pa: 0.1317225
+          sample: '10017'
+        - T_K: 1800.0
+          p_atm: 1.10e-07
+          p_Pa: 0.011145750000000001
+          sample: '12073'
+        - T_K: 1900.0
+          p_atm: 5.00e-07
+          p_Pa: 0.0506625
+          sample: '12073'
+    - observation_id: demaria_1973_mg_psat_table1_quoted_demaria_1971
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I Mg rows; 12022 and 12065 quoted comparison (ref 4)
+      T_range_K:
+      - 1700.0
+      - 1900.0
+      phase: lunar_samples_12022_12065
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo 12 samples 12022 and 12065 printed in Table I for comparison with previous vaporization
+          studies (ref 4, De Maria et al. 1971). Not this-work measurements.
+      standard_state: quoted partial pressure of Mg(g); atm as printed; not this-work KEMS
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: Mg(g)
+        method_class: quoted_prior_work
+        evidence_class: not_this_work
+        quoted_from: De Maria et al. 1971 (ref 4)
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        omitted_cells:
+        - T_K: 1700.0
+          sample: '12065'
+          reason: printed dash; not a zero
+        points:
+        - T_K: 1700.0
+          p_atm: 6.70e-08
+          p_Pa: 0.006788775
+          sample: '12022'
+        - T_K: 1800.0
+          p_atm: 3.20e-07
+          p_Pa: 0.032424
+          sample: '12022'
+        - T_K: 1900.0
+          p_atm: 1.40e-06
+          p_Pa: 0.14185499999999998
+          sample: '12022'
+        - T_K: 1800.0
+          p_atm: 3.60e-09
+          p_Pa: 3.65e-04
+          sample: '12065'
+        - T_K: 1900.0
+          p_atm: 1.70e-08
+          p_Pa: 0.001722525
+          sample: '12065'
+  SiO:
+    observations:
+    - observation_id: demaria_1973_sio_psat_table1_this_work
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I SiO rows; samples 10017 and 12073 are this work
+      T_range_K:
+      - 1800.0
+      - 2000.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of SiO(g) over lunar samples; atm as printed
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        evidence_class: authors_this_work
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        as_printed_note: 10017 SiO at 1900 K is printed 1.2e-6, below the 1800 K cell 3.5e-6; transcribed
+          as printed, not smoothed. Authors note SiO differences might be attributed to the modalities
+          of the heating procedure adopted.
+        points:
+        - T_K: 1800.0
+          p_atm: 3.50e-06
+          p_Pa: 0.3546375
+          sample: '10017'
+        - T_K: 1900.0
+          p_atm: 1.20e-06
+          p_Pa: 0.12158999999999999
+          sample: '10017'
+        - T_K: 2000.0
+          p_atm: 3.70e-05
+          p_Pa: 3.7490249999999996
+          sample: '10017'
+        - T_K: 1800.0
+          p_atm: 7.60e-06
+          p_Pa: 0.77007
+          sample: '12073'
+        - T_K: 1900.0
+          p_atm: 2.70e-06
+          p_Pa: 0.2735775
+          sample: '12073'
+        - T_K: 2000.0
+          p_atm: 7.90e-06
+          p_Pa: 0.8004675000000001
+          sample: '12073'
+    - observation_id: demaria_1973_sio_psat_table1_quoted_demaria_1971
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I SiO rows; 12022 and 12065 quoted comparison (ref 4)
+      T_range_K:
+      - 1800.0
+      - 2000.0
+      phase: lunar_samples_12022_12065
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo 12 samples 12022 and 12065 printed in Table I for comparison with previous vaporization
+          studies (ref 4, De Maria et al. 1971). Not this-work measurements.
+      standard_state: quoted partial pressure of SiO(g); atm as printed; not this-work KEMS
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: quoted_prior_work
+        evidence_class: not_this_work
+        quoted_from: De Maria et al. 1971 (ref 4)
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        points:
+        - T_K: 1800.0
+          p_atm: 7.40e-07
+          p_Pa: 0.0749805
+          sample: '12022'
+        - T_K: 1900.0
+          p_atm: 2.60e-06
+          p_Pa: 0.263445
+          sample: '12022'
+        - T_K: 2000.0
+          p_atm: 7.70e-06
+          p_Pa: 0.7802025000000001
+          sample: '12022'
+        - T_K: 1800.0
+          p_atm: 3.10e-07
+          p_Pa: 0.03141075
+          sample: '12065'
+        - T_K: 1900.0
+          p_atm: 1.20e-07
+          p_Pa: 0.012159
+          sample: '12065'
+        - T_K: 2000.0
+          p_atm: 3.50e-06
+          p_Pa: 0.3546375
+          sample: '12065'
+    - observation_id: demaria_1973_sio_psat_fig2_figure_only
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 177
+        pdf_page_index: 3
+        note: Fig. 2 Temperature dependence of SiO partial pressure; dotted line is SiO saturated pressure
+          over crystobalite (as printed)
+      T_range_K:
+      - 1666.7
+      - 2105.3
+      phase: lunar_samples_10017_12022_12065_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Lunar samples 10017, 12022, 12065, 12073 as plotted. 10017 and 12073 are this work; 12022
+          and 12065 are comparison overlays from prior work.
+      standard_state: lg P_SiO (Atm.) as printed on Fig. 2; not digitised
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: figure-only; cristobalite overlay is not a this-work measurement; scatter not digitised
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_SiO_atm vs 1e4_over_T_K
+        labeled_1e4_over_T:
+        - 4.75
+        - 5.0
+        - 5.5
+        - 6.0
+        T_from_labeled_ticks_K:
+        - 2105.3
+        - 2000.0
+        - 1818.2
+        - 1666.7
+        legend_symbols:
+          open_triangle: '12065'
+          filled_triangle: '12022'
+          open_circle: '10017'
+          filled_circle: '12073'
+        dotted_line: SiO_saturated_pressure_over_crystobalite_not_this_work
+        dotted_line_spelling_as_printed: crystobalite
+  Ca:
+    observations:
+    - observation_id: demaria_1973_ca_psat_table1_this_work
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I Ca rows; samples 10017 and 12073 are this work
+      T_range_K:
+      - 1900.0
+      - 2000.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of Ca(g) over lunar samples; atm as printed
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: Ca(g)
+        method_class: measured_direct
+        evidence_class: authors_this_work
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        points:
+        - T_K: 1900.0
+          p_atm: 6.20e-08
+          p_Pa: 0.00628215
+          sample: '10017'
+        - T_K: 2000.0
+          p_atm: 2.30e-07
+          p_Pa: 0.02330475
+          sample: '10017'
+        - T_K: 1900.0
+          p_atm: 4.00e-08
+          p_Pa: 0.004053
+          sample: '12073'
+        - T_K: 2000.0
+          p_atm: 1.50e-07
+          p_Pa: 0.015198749999999999
+          sample: '12073'
+    - observation_id: demaria_1973_ca_psat_table1_quoted_demaria_1971
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I Ca rows; 12022 and 12065 quoted comparison (ref 4)
+      T_range_K:
+      - 1900.0
+      - 2000.0
+      phase: lunar_samples_12022_12065
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo 12 samples 12022 and 12065 printed in Table I for comparison with previous vaporization
+          studies (ref 4, De Maria et al. 1971). Not this-work measurements.
+      standard_state: quoted partial pressure of Ca(g); atm as printed; not this-work KEMS
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: Ca(g)
+        method_class: quoted_prior_work
+        evidence_class: not_this_work
+        quoted_from: De Maria et al. 1971 (ref 4)
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        points:
+        - T_K: 1900.0
+          p_atm: 1.40e-07
+          p_Pa: 0.0141855
+          sample: '12022'
+        - T_K: 2000.0
+          p_atm: 5.20e-07
+          p_Pa: 0.052689
+          sample: '12022'
+        - T_K: 1900.0
+          p_atm: 3.30e-08
+          p_Pa: 0.0033437249999999996
+          sample: '12065'
+        - T_K: 2000.0
+          p_atm: 1.20e-07
+          p_Pa: 0.012159
+          sample: '12065'
+  TiO:
+    observations:
+    - observation_id: demaria_1973_tio_psat_table1_this_work
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I TiO rows; samples 10017 and 12073 are this work
+      T_range_K:
+      - 2100.0
+      - 2200.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of TiO(g) over lunar samples; atm as printed
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: TiO(g)
+        method_class: measured_direct
+        evidence_class: authors_this_work
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        points:
+        - T_K: 2100.0
+          p_atm: 1.10e-07
+          p_Pa: 0.011145750000000001
+          sample: '10017'
+        - T_K: 2200.0
+          p_atm: 5.20e-07
+          p_Pa: 0.052689
+          sample: '10017'
+        - T_K: 2100.0
+          p_atm: 7.10e-08
+          p_Pa: 0.007194075
+          sample: '12073'
+        - T_K: 2200.0
+          p_atm: 3.20e-07
+          p_Pa: 0.032424
+          sample: '12073'
+    - observation_id: demaria_1973_tio_psat_table1_quoted_demaria_1971
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I TiO rows; 12022 and 12065 quoted comparison (ref 4)
+      T_range_K:
+      - 2100.0
+      - 2200.0
+      phase: lunar_samples_12022_12065
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo 12 samples 12022 and 12065 printed in Table I for comparison with previous vaporization
+          studies (ref 4, De Maria et al. 1971). Not this-work measurements.
+      standard_state: quoted partial pressure of TiO(g); atm as printed; not this-work KEMS
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: TiO(g)
+        method_class: quoted_prior_work
+        evidence_class: not_this_work
+        quoted_from: De Maria et al. 1971 (ref 4)
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        omitted_cells:
+        - T_K: 2200.0
+          sample: '12065'
+          reason: printed dash; not a zero
+        points:
+        - T_K: 2100.0
+          p_atm: 2.00e-07
+          p_Pa: 0.020265
+          sample: '12022'
+        - T_K: 2200.0
+          p_atm: 2.00e-07
+          p_Pa: 0.020265
+          sample: '12022'
+        - T_K: 2100.0
+          p_atm: 9.00e-08
+          p_Pa: 0.00911925
+          sample: '12065'
+          qualifier: approximate_as_printed
+          as_printed: ~9e-08
+  Al:
+    observations:
+    - observation_id: demaria_1973_al_psat_table1_this_work
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I Al row; 10017 is this work; 12073 is a printed dash
+      T_range_K:
+      - 2100.0
+      - 2100.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of Al(g) over lunar samples; atm as printed
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: measured_direct
+        evidence_class: authors_this_work
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        omitted_cells:
+        - T_K: 2100.0
+          sample: '12073'
+          reason: printed dash; not a zero
+        points:
+        - T_K: 2100.0
+          p_atm: 2.30e-07
+          p_Pa: 0.02330475
+          sample: '10017'
+    - observation_id: demaria_1973_al_psat_table1_quoted_demaria_1971
+      type: psat_series
+      locator:
+        table: '1'
+        published_page: 176
+        pdf_page_index: 2
+        note: Table I Al row; 12022 and 12065 quoted comparison (ref 4)
+      T_range_K:
+      - 2100.0
+      - 2100.0
+      phase: lunar_samples_12022_12065
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo 12 samples 12022 and 12065 printed in Table I for comparison with previous vaporization
+          studies (ref 4, De Maria et al. 1971). Not this-work measurements.
+      standard_state: quoted partial pressure of Al(g); atm as printed; not this-work KEMS
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: No numeric uncertainty printed on Table I cells. Approximate cells are marked ~ as printed.
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: quoted_prior_work
+        evidence_class: not_this_work
+        quoted_from: De Maria et al. 1971 (ref 4)
+        p_Pa_arithmetic: p_Pa = p_atm x 101325
+        points:
+        - T_K: 2100.0
+          p_atm: 2.50e-07
+          p_Pa: 0.02533125
+          sample: '12022'
+        - T_K: 2100.0
+          p_atm: 2.60e-07
+          p_Pa: 0.0263445
+          sample: '12065'
+  K:
+    observations:
+    - observation_id: demaria_1973_k_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 175
+        pdf_page_index: 1
+        paragraph: In addition to the monoatomic species Na, K, Fe, O, Cr, Mn, Mg, Ca, Al the molecules
+          SiO, SiO2, O2, FeO, AlO, Al2O, TiO and TiO2 were detected and their partial pressures measured
+          at different temperatures.
+        note: K detected and said to have been measured; no Table I cell and no dedicated figure
+      T_range_K:
+      - 1300.0
+      - 2200.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of K(g); not printed as a number in this abstract
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: typed omission; no printed numeric value to transcribe
+      values:
+        quantity: partial_pressure
+        gas_species: K(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_pressures_measured_values_not_printed
+        reason: Authors state partial pressures were measured at different temperatures. Table I is only
+          a typical set of selected species. No numeric p(T) for this species is printed. Not invented
+          from Figs 1-3.
+  O:
+    observations:
+    - observation_id: demaria_1973_o_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 175
+        pdf_page_index: 1
+        paragraph: In addition to the monoatomic species Na, K, Fe, O, Cr, Mn, Mg, Ca, Al the molecules
+          SiO, SiO2, O2, FeO, AlO, Al2O, TiO and TiO2 were detected and their partial pressures measured
+          at different temperatures.
+        note: O detected and said to have been measured; no Table I cell and no dedicated figure
+      T_range_K:
+      - 1300.0
+      - 2200.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of O(g); not printed as a number in this abstract
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: typed omission; no printed numeric value to transcribe
+      values:
+        quantity: partial_pressure
+        gas_species: O(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_pressures_measured_values_not_printed
+        reason: Authors state partial pressures were measured at different temperatures. Table I is only
+          a typical set of selected species. No numeric p(T) for this species is printed. Not invented
+          from Figs 1-3.
+  Cr:
+    observations:
+    - observation_id: demaria_1973_cr_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 175
+        pdf_page_index: 1
+        paragraph: In addition to the monoatomic species Na, K, Fe, O, Cr, Mn, Mg, Ca, Al the molecules
+          SiO, SiO2, O2, FeO, AlO, Al2O, TiO and TiO2 were detected and their partial pressures measured
+          at different temperatures.
+        note: Cr detected and said to have been measured; no Table I cell and no dedicated figure
+      T_range_K:
+      - 1300.0
+      - 2200.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of Cr(g); not printed as a number in this abstract
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: typed omission; no printed numeric value to transcribe
+      values:
+        quantity: partial_pressure
+        gas_species: Cr(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_pressures_measured_values_not_printed
+        reason: Authors state partial pressures were measured at different temperatures. Table I is only
+          a typical set of selected species. No numeric p(T) for this species is printed. Not invented
+          from Figs 1-3.
+  Mn:
+    observations:
+    - observation_id: demaria_1973_mn_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 175
+        pdf_page_index: 1
+        paragraph: In addition to the monoatomic species Na, K, Fe, O, Cr, Mn, Mg, Ca, Al the molecules
+          SiO, SiO2, O2, FeO, AlO, Al2O, TiO and TiO2 were detected and their partial pressures measured
+          at different temperatures.
+        note: Mn detected and said to have been measured; no Table I cell and no dedicated figure
+      T_range_K:
+      - 1300.0
+      - 2200.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of Mn(g); not printed as a number in this abstract
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: typed omission; no printed numeric value to transcribe
+      values:
+        quantity: partial_pressure
+        gas_species: Mn(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_pressures_measured_values_not_printed
+        reason: Authors state partial pressures were measured at different temperatures. Table I is only
+          a typical set of selected species. No numeric p(T) for this species is printed. Not invented
+          from Figs 1-3.
+  SiO2:
+    observations:
+    - observation_id: demaria_1973_sio2_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 175
+        pdf_page_index: 1
+        paragraph: In addition to the monoatomic species Na, K, Fe, O, Cr, Mn, Mg, Ca, Al the molecules
+          SiO, SiO2, O2, FeO, AlO, Al2O, TiO and TiO2 were detected and their partial pressures measured
+          at different temperatures.
+        note: SiO2 detected and said to have been measured; no Table I cell and no dedicated figure
+      T_range_K:
+      - 1300.0
+      - 2200.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of SiO2(g); not printed as a number in this abstract
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: typed omission; no printed numeric value to transcribe
+      values:
+        quantity: partial_pressure
+        gas_species: SiO2(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_pressures_measured_values_not_printed
+        reason: Authors state partial pressures were measured at different temperatures. Table I is only
+          a typical set of selected species. No numeric p(T) for this species is printed. Not invented
+          from Figs 1-3.
+  O2:
+    observations:
+    - observation_id: demaria_1973_o2_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 175
+        pdf_page_index: 1
+        paragraph: In addition to the monoatomic species Na, K, Fe, O, Cr, Mn, Mg, Ca, Al the molecules
+          SiO, SiO2, O2, FeO, AlO, Al2O, TiO and TiO2 were detected and their partial pressures measured
+          at different temperatures.
+        note: O2 detected and said to have been measured; no Table I cell and no dedicated figure
+      T_range_K:
+      - 1300.0
+      - 2200.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of O2(g); not printed as a number in this abstract
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: typed omission; no printed numeric value to transcribe
+      values:
+        quantity: partial_pressure
+        gas_species: O2(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_pressures_measured_values_not_printed
+        reason: Authors state partial pressures were measured at different temperatures. Table I is only
+          a typical set of selected species. No numeric p(T) for this species is printed. Not invented
+          from Figs 1-3.
+  FeO:
+    observations:
+    - observation_id: demaria_1973_feo_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 175
+        pdf_page_index: 1
+        paragraph: In addition to the monoatomic species Na, K, Fe, O, Cr, Mn, Mg, Ca, Al the molecules
+          SiO, SiO2, O2, FeO, AlO, Al2O, TiO and TiO2 were detected and their partial pressures measured
+          at different temperatures.
+        note: FeO detected and said to have been measured; no Table I cell and no dedicated figure
+      T_range_K:
+      - 1300.0
+      - 2200.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of FeO(g); not printed as a number in this abstract
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: typed omission; no printed numeric value to transcribe
+      values:
+        quantity: partial_pressure
+        gas_species: FeO(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_pressures_measured_values_not_printed
+        reason: Authors state partial pressures were measured at different temperatures. Table I is only
+          a typical set of selected species. No numeric p(T) for this species is printed. Not invented
+          from Figs 1-3.
+  AlO:
+    observations:
+    - observation_id: demaria_1973_alo_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 175
+        pdf_page_index: 1
+        paragraph: In addition to the monoatomic species Na, K, Fe, O, Cr, Mn, Mg, Ca, Al the molecules
+          SiO, SiO2, O2, FeO, AlO, Al2O, TiO and TiO2 were detected and their partial pressures measured
+          at different temperatures.
+        note: AlO detected and said to have been measured; no Table I cell and no dedicated figure
+      T_range_K:
+      - 1300.0
+      - 2200.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of AlO(g); not printed as a number in this abstract
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: typed omission; no printed numeric value to transcribe
+      values:
+        quantity: partial_pressure
+        gas_species: AlO(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_pressures_measured_values_not_printed
+        reason: Authors state partial pressures were measured at different temperatures. Table I is only
+          a typical set of selected species. No numeric p(T) for this species is printed. Not invented
+          from Figs 1-3.
+  Al2O:
+    observations:
+    - observation_id: demaria_1973_al2o_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 175
+        pdf_page_index: 1
+        paragraph: In addition to the monoatomic species Na, K, Fe, O, Cr, Mn, Mg, Ca, Al the molecules
+          SiO, SiO2, O2, FeO, AlO, Al2O, TiO and TiO2 were detected and their partial pressures measured
+          at different temperatures.
+        note: Al2O detected and said to have been measured; no Table I cell and no dedicated figure
+      T_range_K:
+      - 1300.0
+      - 2200.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of Al2O(g); not printed as a number in this abstract
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: typed omission; no printed numeric value to transcribe
+      values:
+        quantity: partial_pressure
+        gas_species: Al2O(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_pressures_measured_values_not_printed
+        reason: Authors state partial pressures were measured at different temperatures. Table I is only
+          a typical set of selected species. No numeric p(T) for this species is printed. Not invented
+          from Figs 1-3.
+  TiO2:
+    observations:
+    - observation_id: demaria_1973_tio2_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 175
+        pdf_page_index: 1
+        paragraph: In addition to the monoatomic species Na, K, Fe, O, Cr, Mn, Mg, Ca, Al the molecules
+          SiO, SiO2, O2, FeO, AlO, Al2O, TiO and TiO2 were detected and their partial pressures measured
+          at different temperatures.
+        note: TiO2 detected and said to have been measured; no Table I cell and no dedicated figure
+      T_range_K:
+      - 1300.0
+      - 2200.0
+      phase: lunar_samples_10017_12073
+      condensed_form:
+        state: condensed_lunar_sample
+        metastable: false
+        basis: explicit_author
+        note: Apollo lunar samples 10017 and 12073; this-work Knudsen-cell mass spectrometry. Heating
+          mainly progressive depletion, a few runs fixed temperature.
+      standard_state: partial pressure of TiO2(g); not printed as a number in this abstract
+      regime: kems_effusion
+      units: atm as published (p_Pa = p_atm x 101325)
+      uncertainty:
+        note: typed omission; no printed numeric value to transcribe
+      values:
+        quantity: partial_pressure
+        gas_species: TiO2(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_pressures_measured_values_not_printed
+        reason: Authors state partial pressures were measured at different temperatures. Table I is only
+          a typical set of selected species. No numeric p(T) for this species is printed. Not invented
+          from Figs 1-3.
+deepening:
+  dispatch_id: extract-kems-023
+  date: '2026-09-12'
+  quote_convention: Printed text transcribed with normalized whitespace and ASCII flattening of subscripts,
+    superscripts, and lg/log symbols.
+  measured_rows_covered: 28
+  table_inventory:
+  - table: '1'
+    published_page: 176
+    pdf_page_index: 2
+    completeness: full
+    note: One printed table. All header cells and every numeric / dash / tilde cell transcribed. 10017
+      and 12073 = this work; 12022 and 12065 = quoted comparison.
+  class_ledger:
+    measured:
+    - demaria_1973_na_psat_table1_this_work
+    - demaria_1973_fe_psat_table1_this_work
+    - demaria_1973_mg_psat_table1_this_work
+    - demaria_1973_sio_psat_table1_this_work
+    - demaria_1973_ca_psat_table1_this_work
+    - demaria_1973_tio_psat_table1_this_work
+    - demaria_1973_al_psat_table1_this_work
+    quoted:
+    - demaria_1973_na_psat_table1_quoted_demaria_1971
+    - demaria_1973_fe_psat_table1_quoted_demaria_1971
+    - demaria_1973_mg_psat_table1_quoted_demaria_1971
+    - demaria_1973_sio_psat_table1_quoted_demaria_1971
+    - demaria_1973_ca_psat_table1_quoted_demaria_1971
+    - demaria_1973_tio_psat_table1_quoted_demaria_1971
+    - demaria_1973_al_psat_table1_quoted_demaria_1971
+    figure_only:
+    - demaria_1973_na_psat_fig1_figure_only
+    - demaria_1973_sio_psat_fig2_figure_only
+    - demaria_1973_fe_psat_fig3_figure_only
+    derived:
+    - demaria_1973_kems_method_and_inventory
+    measured_not_tabulated:
+    - demaria_1973_k_detected_not_tabulated
+    - demaria_1973_o_detected_not_tabulated
+    - demaria_1973_cr_detected_not_tabulated
+    - demaria_1973_mn_detected_not_tabulated
+    - demaria_1973_sio2_detected_not_tabulated
+    - demaria_1973_o2_detected_not_tabulated
+    - demaria_1973_feo_detected_not_tabulated
+    - demaria_1973_alo_detected_not_tabulated
+    - demaria_1973_al2o_detected_not_tabulated
+    - demaria_1973_tio2_detected_not_tabulated
+  battery_limitation: Table I this-work cells are the only printed numeric P(T) from this abstract. Figs
+    1-3 are not digitised. Quoted 12022/12065 columns must not be treated as 1973 measurements.

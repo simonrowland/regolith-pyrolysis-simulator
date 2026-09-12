@@ -1,0 +1,1288 @@
+schema_version: literature_extract.v1
+source_id: kems-025-markova-1983
+source:
+  citation: 'Markova, O. M., Yakovlev, O. I., Semenov, G. A. & Belov, A. N. (1983), "Vaporization of Lunar
+    Highland Rocks: Experimental Investigation", Lunar and Planetary Science XIV, 460-461. ADS bibcode
+    1983LPI....14..460M.'
+  doi: null
+  url: https://ui.adsabs.harvard.edu/abs/1983LPI....14..460M
+  year: 1983
+  bibcode: 1983LPI....14..460M
+extraction:
+  method: Held ADS JBIG2 scan (raw/kems-025-markova-1983/kems-025-markova-1983.pdf). pdftotext -layout
+    is empty (one bibcode token per page) and is not data. The unnumbered composition table transcribed
+    from a 400 dpi pdftoppm render of PDF page 2 (published p. 461). Where MinerU and the render disagree,
+    the render wins. Figs 1-4 (lg P_i, torr vs T deg C) listed figure-only; curves were not digitised.
+    AlO/Al2O not-higher-than-10% bound kept as a printed bound, not a series. Detected species without
+    printed numbers recorded as measured_not_tabulated. MgO identification flagged as printed MgO (?).
+  date: '2026-09-12'
+  worker: extract-kems-023
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: Al2O3
+  observable: rate_series
+  observation_id: markova_1983_initial_compositions_table
+  field: sample_1_anorthite_Al2O3_wt_pct
+  value: 36.63
+  locator:
+    table: unnumbered
+    published_page: 461
+    pdf_page_index: 2
+    note: Table col 1 anorthite Al2O3 = 36.63 wt%
+- path: species.Al2O3.observations[markova_1983_initial_compositions_table].values.sample_3_apollo16_68415_40_SiO2_wt_pct
+  value: 45.4
+  locator:
+    table: unnumbered
+    published_page: 461
+    pdf_page_index: 2
+    note: Table col 3 Apollo-16 high-alumina basalt SiO2 = 45.40 wt%
+- path: species.Al2O3.observations[markova_1983_initial_compositions_table].values.sample_4_troctolite_FeO_wt_pct
+  value: 8.84
+  locator:
+    table: unnumbered
+    published_page: 461
+    pdf_page_index: 2
+    note: Table col 4 troctolite FeO = 8.84 wt%
+- species: Al
+  observable: psat_series
+  observation_id: markova_1983_al_alo_al2o_proportion_bound
+  field: AlO_and_Al2O_upper_percent
+  value: 10.0
+  locator:
+    published_page: 460
+    pdf_page_index: 1
+    paragraph: the proportions of AlO and Al2O were not higher than 10%
+species:
+  Al2O3:
+    observations:
+    - observation_id: markova_1983_kems_method_and_inventory
+      type: rate_series
+      locator:
+        published_page: 460
+        pdf_page_index: 1
+        section: Technique
+        note: Knudsen cell; MS-1301; heating 3-7 grad/min; technique in Yakovlev et al. 1983 LPSC XIV
+          (ref 2)
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: high_Al_melts_highland_rocks
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: Knudsen-cell mass spectrometry of vapor over high-Al melts
+      regime: kems_effusion
+      units: as published
+      uncertainty:
+        note: No numeric calibration envelope or orifice geometry printed in this abstract.
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: MS-1301 mass spectrometer
+        cell: Knudsen cell
+        heating_rate_as_printed: 3-7 grad/min
+        full_vaporization: true
+        technique_reference: Yakovlev O.I., Markova O.M., Semenov G.A., Belov A.N. (1983) LPSC XIV (ref
+          2)
+        analogous_prior_work: De Maria et al., Proc. 2nd L.S.C. v.2 pp. 1367-1380 (ref 1)
+        detected_atomic_and_molecular_forms:
+        - Na
+        - K
+        - PO
+        - PO2
+        - SiO
+        - Mg
+        - Ca
+        - Al
+        - AlO
+        - Al2O
+        - TiO
+        - TiO2
+        - O
+        - O2
+        also_identified_quantities_insignificant:
+        - FeO
+        - CaO
+        - MgO
+        - Al2O2
+        MgO_identification: MgO (?) as printed; uncertain identification
+        missing_for_motzfeldt:
+        - orifice_area
+        - orifice_diameter
+        - clausing_factor
+        - sample_surface_area
+        - cell_material
+        geometry_note: Orifice, cell material, and calibration are not printed in this 2-page abstract.
+        release_sequence_as_printed: (Na,K)-Fe-SiO Mg-Ca,TiO-Al
+        release_sequence_note: Sequence of components release into vapor phase (or sequence of reaching
+          of maximum pressure) was similar in all cases and coincides in general with the row of volatilities
+          of these substances taken in pure oxide forms.
+        pressure_vs_T_shape_as_printed: With increasing temperature the pressure of any component grows
+          at first then it reaches maximum value and then drops. Maxima shift to higher T the higher the
+          initial Al2O3 content.
+    - observation_id: markova_1983_initial_compositions_table
+      type: rate_series
+      locator:
+        table: unnumbered
+        published_page: 461
+        pdf_page_index: 2
+        note: Table. The compositions of initial samples
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: initial_high_Al_samples_before_vaporization
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: bulk oxide composition of the initial condensed samples; wt% as printed
+      regime: kems_effusion
+      units: wt% as published
+      uncertainty:
+        note: No analytic uncertainty printed. MnO of sample 1 is a printed 0.00, not a missing cell.
+      values:
+        quantity: condensed_composition
+        method_class: measured_direct
+        evidence_class: authors_this_work
+        table_title_as_printed: The compositions of initial samples
+        footnote_as_printed: 1-anorthite; 2-anorthositic gabbro; 3- Apollo-16 high-alumina basalt; 4-troctolite
+        sample_3_catalog_as_printed: Apollo-16 basalt 68415,40 (figure caption p. 461)
+        samples:
+        - sample_number: 1
+          name: anorthite
+          lithology_as_printed: anorthite
+          figure: '1'
+          oxides_wt_pct:
+            SiO2: 42.86
+            TiO2: 0.05
+            Al2O3: 36.63
+            FeO: 0.55
+            MnO: 0.00
+            MgO: 0.11
+            CaO: 19.16
+            Na2O: 0.55
+            K2O: 0.06
+          sum_wt_pct: 100.05
+        - sample_number: 2
+          name: anorthositic_gabbro
+          lithology_as_printed: anorthositic gabbro
+          figure: '2'
+          oxides_wt_pct:
+            SiO2: 42.73
+            TiO2: 0.05
+            Al2O3: 26.72
+            FeO: 5.54
+            MnO: 0.09
+            MgO: 8.27
+            CaO: 14.31
+            Na2O: 1.26
+            K2O: 0.11
+          sum_wt_pct: 99.16
+        - sample_number: 3
+          name: apollo16_68415_40
+          lithology_as_printed: Apollo-16 high-alumina basalt 68415,40
+          figure: '3'
+          oxides_wt_pct:
+            SiO2: 45.4
+            TiO2: 0.32
+            Al2O3: 28.63
+            FeO: 4.25
+            MnO: 0.06
+            MgO: 4.38
+            CaO: 16.39
+            Na2O: 0.41
+            K2O: 0.06
+          sum_wt_pct: 99.96
+        - sample_number: 4
+          name: troctolite
+          lithology_as_printed: troctolite
+          figure: '4'
+          oxides_wt_pct:
+            SiO2: 44.16
+            TiO2: 0.13
+            Al2O3: 20.29
+            FeO: 8.84
+            MnO: 0.14
+            MgO: 15.58
+            CaO: 10.79
+            Na2O: 0.71
+            K2O: 0.08
+          sum_wt_pct: 100.72
+        sample_1_anorthite_SiO2_wt_pct: 42.86
+        sample_1_anorthite_TiO2_wt_pct: 0.05
+        sample_1_anorthite_Al2O3_wt_pct: 36.63
+        sample_1_anorthite_FeO_wt_pct: 0.55
+        sample_1_anorthite_MnO_wt_pct: 0.00
+        sample_1_anorthite_MgO_wt_pct: 0.11
+        sample_1_anorthite_CaO_wt_pct: 19.16
+        sample_1_anorthite_Na2O_wt_pct: 0.55
+        sample_1_anorthite_K2O_wt_pct: 0.06
+        sample_1_anorthite_sum_wt_pct: 100.05
+        sample_2_anorthositic_gabbro_SiO2_wt_pct: 42.73
+        sample_2_anorthositic_gabbro_TiO2_wt_pct: 0.05
+        sample_2_anorthositic_gabbro_Al2O3_wt_pct: 26.72
+        sample_2_anorthositic_gabbro_FeO_wt_pct: 5.54
+        sample_2_anorthositic_gabbro_MnO_wt_pct: 0.09
+        sample_2_anorthositic_gabbro_MgO_wt_pct: 8.27
+        sample_2_anorthositic_gabbro_CaO_wt_pct: 14.31
+        sample_2_anorthositic_gabbro_Na2O_wt_pct: 1.26
+        sample_2_anorthositic_gabbro_K2O_wt_pct: 0.11
+        sample_2_anorthositic_gabbro_sum_wt_pct: 99.16
+        sample_3_apollo16_68415_40_SiO2_wt_pct: 45.4
+        sample_3_apollo16_68415_40_TiO2_wt_pct: 0.32
+        sample_3_apollo16_68415_40_Al2O3_wt_pct: 28.63
+        sample_3_apollo16_68415_40_FeO_wt_pct: 4.25
+        sample_3_apollo16_68415_40_MnO_wt_pct: 0.06
+        sample_3_apollo16_68415_40_MgO_wt_pct: 4.38
+        sample_3_apollo16_68415_40_CaO_wt_pct: 16.39
+        sample_3_apollo16_68415_40_Na2O_wt_pct: 0.41
+        sample_3_apollo16_68415_40_K2O_wt_pct: 0.06
+        sample_3_apollo16_68415_40_sum_wt_pct: 99.96
+        sample_4_troctolite_SiO2_wt_pct: 44.16
+        sample_4_troctolite_TiO2_wt_pct: 0.13
+        sample_4_troctolite_Al2O3_wt_pct: 20.29
+        sample_4_troctolite_FeO_wt_pct: 8.84
+        sample_4_troctolite_MnO_wt_pct: 0.14
+        sample_4_troctolite_MgO_wt_pct: 15.58
+        sample_4_troctolite_CaO_wt_pct: 10.79
+        sample_4_troctolite_Na2O_wt_pct: 0.71
+        sample_4_troctolite_K2O_wt_pct: 0.08
+        sample_4_troctolite_sum_wt_pct: 100.72
+  Al:
+    observations:
+    - observation_id: markova_1983_al_alo_al2o_proportion_bound
+      type: psat_series
+      locator:
+        published_page: 460
+        pdf_page_index: 1
+        paragraph: Monoatomic form Al prevailed while the proportions of AlO and Al2O were not higher
+          than 10%.
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: high_Al_melts_highland_rocks
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: Al(g) vs AlO(g) and Al2O(g) over high-Al melts
+      regime: kems_effusion
+      units: percent of Al-bearing vapor as printed
+      uncertainty:
+        note: Upper bound as printed; no plus/minus term.
+      values:
+        quantity: relative_abundance
+        gas_species: Al(g)
+        method_class: measured_direct
+        admission_status: bound_not_point
+        semantics: bound_not_point_ordering
+        as_printed: Monoatomic form Al prevailed while the proportions of AlO and Al2O were not higher
+          than 10%.
+        Al_form: prevailed
+        AlO_and_Al2O_upper_percent: 10.0
+        note: Bound on AlO and Al2O together relative to Al; no per-T numeric series printed.
+    - observation_id: markova_1983_al_psat_figs_figure_only
+      type: psat_series
+      locator:
+        figure: 1,2,3,4
+        published_page: 461
+        pdf_page_index: 2
+        note: 'Figs 1, 2, 3, 4: lg P_i, torr vs T deg C for Al(g). Curves not digitised.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: residual_high_Al_melts
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: lg P(Al(g)) in torr as printed; not digitised
+      regime: kems_effusion
+      units: torr as published (lg P_i, torr)
+      uncertainty:
+        note: figure-only; scatter not digitised; no printed point coordinates
+      values:
+        quantity: partial_pressure
+        gas_species: Al(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_i_torr vs T_C
+        T_C_axis:
+        - 1000.0
+        - 2500.0
+        T_K_from_C:
+        - 1273.15
+        - 2773.15
+        T_conversion: T_K = T_C + 273.15
+        ordinate_as_printed: lg P_i, torr
+        figures_where_labeled:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        samples:
+        - figure: '1'
+          sample_number: 1
+          sample: anorthite
+          labeled: true
+        - figure: '2'
+          sample_number: 2
+          sample: anorthositic_gabbro
+          labeled: true
+        - figure: '3'
+          sample_number: 3
+          sample: apollo16_68415_40
+          labeled: true
+        - figure: '4'
+          sample_number: 4
+          sample: troctolite
+          labeled: true
+  Na:
+    observations:
+    - observation_id: markova_1983_na_psat_figs_figure_only
+      type: psat_series
+      locator:
+        figure: 1,2,3,4
+        published_page: 461
+        pdf_page_index: 2
+        note: 'Figs 1, 2, 3, 4: lg P_i, torr vs T deg C for Na(g). Curves not digitised.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: residual_high_Al_melts
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: lg P(Na(g)) in torr as printed; not digitised
+      regime: kems_effusion
+      units: torr as published (lg P_i, torr)
+      uncertainty:
+        note: figure-only; scatter not digitised; no printed point coordinates
+      values:
+        quantity: partial_pressure
+        gas_species: Na(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_i_torr vs T_C
+        T_C_axis:
+        - 1000.0
+        - 2500.0
+        T_K_from_C:
+        - 1273.15
+        - 2773.15
+        T_conversion: T_K = T_C + 273.15
+        ordinate_as_printed: lg P_i, torr
+        figures_where_labeled:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        samples:
+        - figure: '1'
+          sample_number: 1
+          sample: anorthite
+          labeled: true
+        - figure: '2'
+          sample_number: 2
+          sample: anorthositic_gabbro
+          labeled: true
+        - figure: '3'
+          sample_number: 3
+          sample: apollo16_68415_40
+          labeled: true
+        - figure: '4'
+          sample_number: 4
+          sample: troctolite
+          labeled: true
+  K:
+    observations:
+    - observation_id: markova_1983_k_psat_figs_figure_only
+      type: psat_series
+      locator:
+        figure: '4'
+        published_page: 461
+        pdf_page_index: 2
+        note: 'Figs 4: lg P_i, torr vs T deg C for K(g). Curves not digitised.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: residual_high_Al_melts
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: lg P(K(g)) in torr as printed; not digitised
+      regime: kems_effusion
+      units: torr as published (lg P_i, torr)
+      uncertainty:
+        note: figure-only; scatter not digitised; no printed point coordinates
+      values:
+        quantity: partial_pressure
+        gas_species: K(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_i_torr vs T_C
+        T_C_axis:
+        - 1000.0
+        - 2500.0
+        T_K_from_C:
+        - 1273.15
+        - 2773.15
+        T_conversion: T_K = T_C + 273.15
+        ordinate_as_printed: lg P_i, torr
+        figures_where_labeled:
+        - '4'
+        samples:
+        - figure: '1'
+          sample_number: 1
+          sample: anorthite
+          labeled: false
+        - figure: '2'
+          sample_number: 2
+          sample: anorthositic_gabbro
+          labeled: false
+        - figure: '3'
+          sample_number: 3
+          sample: apollo16_68415_40
+          labeled: false
+        - figure: '4'
+          sample_number: 4
+          sample: troctolite
+          labeled: true
+  Fe:
+    observations:
+    - observation_id: markova_1983_fe_psat_figs_figure_only
+      type: psat_series
+      locator:
+        figure: 1,2,3,4
+        published_page: 461
+        pdf_page_index: 2
+        note: 'Figs 1, 2, 3, 4: lg P_i, torr vs T deg C for Fe(g). Curves not digitised.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: residual_high_Al_melts
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: lg P(Fe(g)) in torr as printed; not digitised
+      regime: kems_effusion
+      units: torr as published (lg P_i, torr)
+      uncertainty:
+        note: figure-only; scatter not digitised; no printed point coordinates
+      values:
+        quantity: partial_pressure
+        gas_species: Fe(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_i_torr vs T_C
+        T_C_axis:
+        - 1000.0
+        - 2500.0
+        T_K_from_C:
+        - 1273.15
+        - 2773.15
+        T_conversion: T_K = T_C + 273.15
+        ordinate_as_printed: lg P_i, torr
+        figures_where_labeled:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        samples:
+        - figure: '1'
+          sample_number: 1
+          sample: anorthite
+          labeled: true
+        - figure: '2'
+          sample_number: 2
+          sample: anorthositic_gabbro
+          labeled: true
+        - figure: '3'
+          sample_number: 3
+          sample: apollo16_68415_40
+          labeled: true
+        - figure: '4'
+          sample_number: 4
+          sample: troctolite
+          labeled: true
+  SiO:
+    observations:
+    - observation_id: markova_1983_sio_psat_figs_figure_only
+      type: psat_series
+      locator:
+        figure: 1,2,3,4
+        published_page: 461
+        pdf_page_index: 2
+        note: 'Figs 1, 2, 3, 4: lg P_i, torr vs T deg C for SiO(g). Curves not digitised.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: residual_high_Al_melts
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: lg P(SiO(g)) in torr as printed; not digitised
+      regime: kems_effusion
+      units: torr as published (lg P_i, torr)
+      uncertainty:
+        note: figure-only; scatter not digitised; no printed point coordinates
+      values:
+        quantity: partial_pressure
+        gas_species: SiO(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_i_torr vs T_C
+        T_C_axis:
+        - 1000.0
+        - 2500.0
+        T_K_from_C:
+        - 1273.15
+        - 2773.15
+        T_conversion: T_K = T_C + 273.15
+        ordinate_as_printed: lg P_i, torr
+        figures_where_labeled:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        samples:
+        - figure: '1'
+          sample_number: 1
+          sample: anorthite
+          labeled: true
+        - figure: '2'
+          sample_number: 2
+          sample: anorthositic_gabbro
+          labeled: true
+        - figure: '3'
+          sample_number: 3
+          sample: apollo16_68415_40
+          labeled: true
+        - figure: '4'
+          sample_number: 4
+          sample: troctolite
+          labeled: true
+  Mg:
+    observations:
+    - observation_id: markova_1983_mg_psat_figs_figure_only
+      type: psat_series
+      locator:
+        figure: 2,3,4
+        published_page: 461
+        pdf_page_index: 2
+        note: 'Figs 2, 3, 4: lg P_i, torr vs T deg C for Mg(g). Curves not digitised.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: residual_high_Al_melts
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: lg P(Mg(g)) in torr as printed; not digitised
+      regime: kems_effusion
+      units: torr as published (lg P_i, torr)
+      uncertainty:
+        note: figure-only; scatter not digitised; no printed point coordinates
+      values:
+        quantity: partial_pressure
+        gas_species: Mg(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_i_torr vs T_C
+        T_C_axis:
+        - 1000.0
+        - 2500.0
+        T_K_from_C:
+        - 1273.15
+        - 2773.15
+        T_conversion: T_K = T_C + 273.15
+        ordinate_as_printed: lg P_i, torr
+        figures_where_labeled:
+        - '2'
+        - '3'
+        - '4'
+        samples:
+        - figure: '1'
+          sample_number: 1
+          sample: anorthite
+          labeled: false
+        - figure: '2'
+          sample_number: 2
+          sample: anorthositic_gabbro
+          labeled: true
+        - figure: '3'
+          sample_number: 3
+          sample: apollo16_68415_40
+          labeled: true
+        - figure: '4'
+          sample_number: 4
+          sample: troctolite
+          labeled: true
+  Ca:
+    observations:
+    - observation_id: markova_1983_ca_psat_figs_figure_only
+      type: psat_series
+      locator:
+        figure: 1,2,3,4
+        published_page: 461
+        pdf_page_index: 2
+        note: 'Figs 1, 2, 3, 4: lg P_i, torr vs T deg C for Ca(g). Curves not digitised.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: residual_high_Al_melts
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: lg P(Ca(g)) in torr as printed; not digitised
+      regime: kems_effusion
+      units: torr as published (lg P_i, torr)
+      uncertainty:
+        note: figure-only; scatter not digitised; no printed point coordinates
+      values:
+        quantity: partial_pressure
+        gas_species: Ca(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_i_torr vs T_C
+        T_C_axis:
+        - 1000.0
+        - 2500.0
+        T_K_from_C:
+        - 1273.15
+        - 2773.15
+        T_conversion: T_K = T_C + 273.15
+        ordinate_as_printed: lg P_i, torr
+        figures_where_labeled:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        samples:
+        - figure: '1'
+          sample_number: 1
+          sample: anorthite
+          labeled: true
+        - figure: '2'
+          sample_number: 2
+          sample: anorthositic_gabbro
+          labeled: true
+        - figure: '3'
+          sample_number: 3
+          sample: apollo16_68415_40
+          labeled: true
+        - figure: '4'
+          sample_number: 4
+          sample: troctolite
+          labeled: true
+  AlO:
+    observations:
+    - observation_id: markova_1983_alo_psat_figs_figure_only
+      type: psat_series
+      locator:
+        figure: 2,3,4
+        published_page: 461
+        pdf_page_index: 2
+        note: 'Figs 2, 3, 4: lg P_i, torr vs T deg C for AlO(g). Curves not digitised.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: residual_high_Al_melts
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: lg P(AlO(g)) in torr as printed; not digitised
+      regime: kems_effusion
+      units: torr as published (lg P_i, torr)
+      uncertainty:
+        note: figure-only; scatter not digitised; no printed point coordinates
+      values:
+        quantity: partial_pressure
+        gas_species: AlO(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_i_torr vs T_C
+        T_C_axis:
+        - 1000.0
+        - 2500.0
+        T_K_from_C:
+        - 1273.15
+        - 2773.15
+        T_conversion: T_K = T_C + 273.15
+        ordinate_as_printed: lg P_i, torr
+        figures_where_labeled:
+        - '2'
+        - '3'
+        - '4'
+        samples:
+        - figure: '1'
+          sample_number: 1
+          sample: anorthite
+          labeled: false
+        - figure: '2'
+          sample_number: 2
+          sample: anorthositic_gabbro
+          labeled: true
+        - figure: '3'
+          sample_number: 3
+          sample: apollo16_68415_40
+          labeled: true
+        - figure: '4'
+          sample_number: 4
+          sample: troctolite
+          labeled: true
+  Al2O:
+    observations:
+    - observation_id: markova_1983_al2o_psat_figs_figure_only
+      type: psat_series
+      locator:
+        figure: 1,2,3,4
+        published_page: 461
+        pdf_page_index: 2
+        note: 'Figs 1, 2, 3, 4: lg P_i, torr vs T deg C for Al2O(g). Curves not digitised.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: residual_high_Al_melts
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: lg P(Al2O(g)) in torr as printed; not digitised
+      regime: kems_effusion
+      units: torr as published (lg P_i, torr)
+      uncertainty:
+        note: figure-only; scatter not digitised; no printed point coordinates
+      values:
+        quantity: partial_pressure
+        gas_species: Al2O(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_i_torr vs T_C
+        T_C_axis:
+        - 1000.0
+        - 2500.0
+        T_K_from_C:
+        - 1273.15
+        - 2773.15
+        T_conversion: T_K = T_C + 273.15
+        ordinate_as_printed: lg P_i, torr
+        figures_where_labeled:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        samples:
+        - figure: '1'
+          sample_number: 1
+          sample: anorthite
+          labeled: true
+        - figure: '2'
+          sample_number: 2
+          sample: anorthositic_gabbro
+          labeled: true
+        - figure: '3'
+          sample_number: 3
+          sample: apollo16_68415_40
+          labeled: true
+        - figure: '4'
+          sample_number: 4
+          sample: troctolite
+          labeled: true
+  TiO:
+    observations:
+    - observation_id: markova_1983_tio_psat_figs_figure_only
+      type: psat_series
+      locator:
+        figure: 2,4
+        published_page: 461
+        pdf_page_index: 2
+        note: 'Figs 2, 4: lg P_i, torr vs T deg C for TiO(g). Curves not digitised.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: residual_high_Al_melts
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: lg P(TiO(g)) in torr as printed; not digitised
+      regime: kems_effusion
+      units: torr as published (lg P_i, torr)
+      uncertainty:
+        note: figure-only; scatter not digitised; no printed point coordinates
+      values:
+        quantity: partial_pressure
+        gas_species: TiO(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_i_torr vs T_C
+        T_C_axis:
+        - 1000.0
+        - 2500.0
+        T_K_from_C:
+        - 1273.15
+        - 2773.15
+        T_conversion: T_K = T_C + 273.15
+        ordinate_as_printed: lg P_i, torr
+        figures_where_labeled:
+        - '2'
+        - '4'
+        samples:
+        - figure: '1'
+          sample_number: 1
+          sample: anorthite
+          labeled: false
+        - figure: '2'
+          sample_number: 2
+          sample: anorthositic_gabbro
+          labeled: true
+        - figure: '3'
+          sample_number: 3
+          sample: apollo16_68415_40
+          labeled: false
+        - figure: '4'
+          sample_number: 4
+          sample: troctolite
+          labeled: true
+  FeO:
+    observations:
+    - observation_id: markova_1983_feo_psat_figs_figure_only
+      type: psat_series
+      locator:
+        figure: 3,4
+        published_page: 461
+        pdf_page_index: 2
+        note: 'Figs 3, 4: lg P_i, torr vs T deg C for FeO(g). Curves not digitised.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: residual_high_Al_melts
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: lg P(FeO(g)) in torr as printed; not digitised
+      regime: kems_effusion
+      units: torr as published (lg P_i, torr)
+      uncertainty:
+        note: figure-only; scatter not digitised; no printed point coordinates
+      values:
+        quantity: partial_pressure
+        gas_species: FeO(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_i_torr vs T_C
+        T_C_axis:
+        - 1000.0
+        - 2500.0
+        T_K_from_C:
+        - 1273.15
+        - 2773.15
+        T_conversion: T_K = T_C + 273.15
+        ordinate_as_printed: lg P_i, torr
+        figures_where_labeled:
+        - '3'
+        - '4'
+        samples:
+        - figure: '1'
+          sample_number: 1
+          sample: anorthite
+          labeled: false
+        - figure: '2'
+          sample_number: 2
+          sample: anorthositic_gabbro
+          labeled: false
+        - figure: '3'
+          sample_number: 3
+          sample: apollo16_68415_40
+          labeled: true
+        - figure: '4'
+          sample_number: 4
+          sample: troctolite
+          labeled: true
+  CaO:
+    observations:
+    - observation_id: markova_1983_cao_psat_figs_figure_only
+      type: psat_series
+      locator:
+        figure: 1,2,3,4
+        published_page: 461
+        pdf_page_index: 2
+        note: 'Figs 1, 2, 3, 4: lg P_i, torr vs T deg C for CaO(g). Curves not digitised.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: residual_high_Al_melts
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: lg P(CaO(g)) in torr as printed; not digitised
+      regime: kems_effusion
+      units: torr as published (lg P_i, torr)
+      uncertainty:
+        note: figure-only; scatter not digitised; no printed point coordinates
+      values:
+        quantity: partial_pressure
+        gas_species: CaO(g)
+        method_class: measured_direct
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        axis: lg_P_i_torr vs T_C
+        T_C_axis:
+        - 1000.0
+        - 2500.0
+        T_K_from_C:
+        - 1273.15
+        - 2773.15
+        T_conversion: T_K = T_C + 273.15
+        ordinate_as_printed: lg P_i, torr
+        figures_where_labeled:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        samples:
+        - figure: '1'
+          sample_number: 1
+          sample: anorthite
+          labeled: true
+        - figure: '2'
+          sample_number: 2
+          sample: anorthositic_gabbro
+          labeled: true
+        - figure: '3'
+          sample_number: 3
+          sample: apollo16_68415_40
+          labeled: true
+        - figure: '4'
+          sample_number: 4
+          sample: troctolite
+          labeled: true
+  PO:
+    observations:
+    - observation_id: markova_1983_po_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 460
+        pdf_page_index: 1
+        paragraph: 'The following atomic and molecular forms of the components were observed in vapor
+          phase: Na, K, PO, PO2, SiO, Mg, Ca, Al, AlO, Al2O, TiO, TiO2, O, O2. There were also identified
+          FeO, CaO, MgO (?), Al2O2, but their quantities were insignificant.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: high_Al_melts_highland_rocks
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: partial pressure of PO(g); not printed as a number
+      regime: kems_effusion
+      units: torr as published on the figures; no numeric cell for this species
+      uncertainty:
+        note: typed omission; no printed numeric p(T)
+      values:
+        quantity: partial_pressure
+        gas_species: PO(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_values_not_printed
+        reason: Observed in vapor phase; no table and no dedicated printed coordinates.
+  PO2:
+    observations:
+    - observation_id: markova_1983_po2_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 460
+        pdf_page_index: 1
+        paragraph: 'The following atomic and molecular forms of the components were observed in vapor
+          phase: Na, K, PO, PO2, SiO, Mg, Ca, Al, AlO, Al2O, TiO, TiO2, O, O2. There were also identified
+          FeO, CaO, MgO (?), Al2O2, but their quantities were insignificant.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: high_Al_melts_highland_rocks
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: partial pressure of PO2(g); not printed as a number
+      regime: kems_effusion
+      units: torr as published on the figures; no numeric cell for this species
+      uncertainty:
+        note: typed omission; no printed numeric p(T)
+      values:
+        quantity: partial_pressure
+        gas_species: PO2(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_values_not_printed
+        reason: Observed in vapor phase; no table and no dedicated printed coordinates.
+  TiO2:
+    observations:
+    - observation_id: markova_1983_tio2_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 460
+        pdf_page_index: 1
+        paragraph: 'The following atomic and molecular forms of the components were observed in vapor
+          phase: Na, K, PO, PO2, SiO, Mg, Ca, Al, AlO, Al2O, TiO, TiO2, O, O2. There were also identified
+          FeO, CaO, MgO (?), Al2O2, but their quantities were insignificant.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: high_Al_melts_highland_rocks
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: partial pressure of TiO2(g); not printed as a number
+      regime: kems_effusion
+      units: torr as published on the figures; no numeric cell for this species
+      uncertainty:
+        note: typed omission; no printed numeric p(T)
+      values:
+        quantity: partial_pressure
+        gas_species: TiO2(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_values_not_printed
+        reason: Observed in vapor phase; no table and no dedicated printed coordinates.
+  O:
+    observations:
+    - observation_id: markova_1983_o_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 460
+        pdf_page_index: 1
+        paragraph: 'The following atomic and molecular forms of the components were observed in vapor
+          phase: Na, K, PO, PO2, SiO, Mg, Ca, Al, AlO, Al2O, TiO, TiO2, O, O2. There were also identified
+          FeO, CaO, MgO (?), Al2O2, but their quantities were insignificant.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: high_Al_melts_highland_rocks
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: partial pressure of O(g); not printed as a number
+      regime: kems_effusion
+      units: torr as published on the figures; no numeric cell for this species
+      uncertainty:
+        note: typed omission; no printed numeric p(T)
+      values:
+        quantity: partial_pressure
+        gas_species: O(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_values_not_printed
+        reason: Observed in vapor phase; no table and no dedicated printed coordinates.
+  O2:
+    observations:
+    - observation_id: markova_1983_o2_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 460
+        pdf_page_index: 1
+        paragraph: 'The following atomic and molecular forms of the components were observed in vapor
+          phase: Na, K, PO, PO2, SiO, Mg, Ca, Al, AlO, Al2O, TiO, TiO2, O, O2. There were also identified
+          FeO, CaO, MgO (?), Al2O2, but their quantities were insignificant.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: high_Al_melts_highland_rocks
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: partial pressure of O2(g); not printed as a number
+      regime: kems_effusion
+      units: torr as published on the figures; no numeric cell for this species
+      uncertainty:
+        note: typed omission; no printed numeric p(T)
+      values:
+        quantity: partial_pressure
+        gas_species: O2(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_values_not_printed
+        reason: Observed in vapor phase; no table and no dedicated printed coordinates.
+  Al2O2:
+    observations:
+    - observation_id: markova_1983_al2o2_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 460
+        pdf_page_index: 1
+        paragraph: 'The following atomic and molecular forms of the components were observed in vapor
+          phase: Na, K, PO, PO2, SiO, Mg, Ca, Al, AlO, Al2O, TiO, TiO2, O, O2. There were also identified
+          FeO, CaO, MgO (?), Al2O2, but their quantities were insignificant.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: high_Al_melts_highland_rocks
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: partial pressure of Al2O2(g); not printed as a number
+      regime: kems_effusion
+      units: torr as published on the figures; no numeric cell for this species
+      uncertainty:
+        note: typed omission; no printed numeric p(T)
+      values:
+        quantity: partial_pressure
+        gas_species: Al2O2(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_values_not_printed
+        reason: Identified but quantities insignificant.
+  MgO:
+    observations:
+    - observation_id: markova_1983_mgo_detected_not_tabulated
+      type: psat_series
+      locator:
+        published_page: 460
+        pdf_page_index: 1
+        paragraph: 'The following atomic and molecular forms of the components were observed in vapor
+          phase: Na, K, PO, PO2, SiO, Mg, Ca, Al, AlO, Al2O, TiO, TiO2, O, O2. There were also identified
+          FeO, CaO, MgO (?), Al2O2, but their quantities were insignificant.'
+      T_range_K:
+      - 1273.15
+      - 2773.15
+      phase: high_Al_melts_highland_rocks
+      condensed_form:
+        state: high_Al_melt_or_highland_rock
+        metastable: false
+        basis: explicit_author
+        note: High-Al melts (or highland rocks). Full vaporization reached in all experiments. Distinctive
+          variable is Al2O3 content of the initial samples.
+      standard_state: partial pressure of MgO(g); not printed as a number
+      regime: kems_effusion
+      units: torr as published on the figures; no numeric cell for this species
+      uncertainty:
+        note: typed omission; no printed numeric p(T)
+      values:
+        quantity: partial_pressure
+        gas_species: MgO(g)
+        method_class: measured_direct
+        admission_status: measured_not_tabulated
+        semantics: bound_not_point_ordering
+        status: detected_values_not_printed
+        reason: Identified as MgO (?) ; quantities insignificant; identification flagged uncertain.
+deepening:
+  dispatch_id: extract-kems-023
+  date: '2026-09-12'
+  quote_convention: Printed text transcribed with normalized whitespace and ASCII flattening of subscripts,
+    superscripts, and lg symbols.
+  measured_rows_covered: 22
+  table_inventory:
+  - table: unnumbered
+    published_page: 461
+    pdf_page_index: 2
+    completeness: full
+    note: One printed composition table. All nine oxide rows, four sample columns, and the printed column
+      sums transcribed from the 400 dpi render.
+  class_ledger:
+    measured:
+    - markova_1983_initial_compositions_table
+    - markova_1983_al_alo_al2o_proportion_bound
+    figure_only:
+    - markova_1983_na_psat_figs_figure_only
+    - markova_1983_k_psat_figs_figure_only
+    - markova_1983_fe_psat_figs_figure_only
+    - markova_1983_sio_psat_figs_figure_only
+    - markova_1983_mg_psat_figs_figure_only
+    - markova_1983_ca_psat_figs_figure_only
+    - markova_1983_al_psat_figs_figure_only
+    - markova_1983_alo_psat_figs_figure_only
+    - markova_1983_al2o_psat_figs_figure_only
+    - markova_1983_tio_psat_figs_figure_only
+    - markova_1983_feo_psat_figs_figure_only
+    - markova_1983_cao_psat_figs_figure_only
+    derived:
+    - markova_1983_kems_method_and_inventory
+    measured_not_tabulated:
+    - markova_1983_po_detected_not_tabulated
+    - markova_1983_po2_detected_not_tabulated
+    - markova_1983_tio2_detected_not_tabulated
+    - markova_1983_o_detected_not_tabulated
+    - markova_1983_o2_detected_not_tabulated
+    - markova_1983_al2o2_detected_not_tabulated
+    - markova_1983_mgo_detected_not_tabulated
+  battery_limitation: No printed numeric P(T) series. Vapor pressures exist only as Figs 1-4 in torr and
+    were not digitised. Usable printed numbers are the initial-sample oxide table and the AlO+Al2O <=
+    10% bound.
