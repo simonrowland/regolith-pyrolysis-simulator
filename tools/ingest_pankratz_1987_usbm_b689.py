@@ -98,15 +98,29 @@ def build(corpus):
     sidecar = yaml.safe_load((pdf.parent / "sidecar.yaml").read_text())
     if sha256(pdf) != sidecar["sha256"]:
         raise ValueError("source PDF differs from acquisition checksum")
-    source_path = corpus / "text" / SOURCE_ID / "mineru/chunk-p001-p040" / f"{SOURCE_ID}-p001-p040_content_list.json"
-    content = json.loads(source_path.read_text())
-    if {item["page_idx"] for item in content} != set(range(40)):
-        raise ValueError("expected the complete first 40-page chunk")
     audits = [json.loads(line) for line in (DEST / "source/formula-audit.jsonl").read_text().splitlines()]
-    if [a["pdf_page"] for a in audits] != list(range(7, 41)):
-        raise ValueError("identity audit must cover every table page through PDF40")
+    last_page = audits[-1]["pdf_page"]
+    if last_page < 40 or [a["pdf_page"] for a in audits] != list(range(7, last_page + 1)):
+        raise ValueError("identity audit must cover every table page from PDF7 through its endpoint")
+    if any(a["printed_page"] != a["pdf_page"] - 4
+           or a["record_id"] != f"page-{a['printed_page']:04d}" for a in audits):
+        raise ValueError("identity audit page and record locators disagree")
+    source_paths = []
+    pages = []
+    for first in range(1, 433, 40):
+        last = min(first + 39, 432)
+        chunk = f"p{first:03d}-p{last:03d}"
+        source_path = corpus / "text" / SOURCE_ID / f"mineru/chunk-{chunk}" / f"{SOURCE_ID}-{chunk}_content_list.json"
+        content = json.loads(source_path.read_text())
+        # PDF432 is the blank terminal scan and has no MinerU items.
+        if {item["page_idx"] for item in content} != set(range(min(last, 431) - first + 1)):
+            raise ValueError(f"expected the complete decoded chunk {chunk}")
+        source_paths.append(source_path)
+        pages.extend({"pdf_page": pg, "items": [x for x in content if x["page_idx"] == pg - first]}
+                     for pg in range(first, min(last, last_page) + 1))
+    if last_page > len(pages):
+        raise ValueError("identity audit exceeds decoded PDF coverage")
     fixture = json.loads((DEST / "source/image-verified-fixture.json").read_text())
-    pages = [{"pdf_page": pg + 1, "items": [x for x in content if x["page_idx"] == pg]} for pg in range(40)]
     source = {"database": "U.S. Bureau of Mines Bulletin 689", "version": "1987",
               "citation": sidecar["citation"], "official_url": "https://digital.library.unt.edu/ark:/67531/metadc38801/",
               "retrieved_url": sidecar["retrieved_url"], "licence": sidecar["licence"], "access_date": "2026-09-12"}
@@ -181,15 +195,15 @@ def build(corpus):
                         "ambiguity_count": len(record["ambiguities"]), "ambiguities": record["ambiguities"],
                         "ocr_suspect_count": int(record["metadata_ocr_suspect"]) + int(record["notes"]["ocr_suspect"])
                         + sum(c["ocr_suspect"] for row in record["rows"] for c in row["cells"].values())})
-    coverage = {"status": "partial", "pdf_page_count": 432, "decoded_pdf_pages": [1, 40],
-                "ingested_printed_pages": [3, 36], "ingested_pdf_pages": [7, 40],
-                "remaining_pdf_pages": [41, 432], "remaining_printed_pages": [37, 427],
-                "remaining_note": "PDF432 is the unnumbered terminal scan; printed37–427 not transcribed. Front matter and methods PDF1–6 retained as source only.",
+    coverage = {"status": "partial", "pdf_page_count": 432, "decoded_pdf_pages": [1, 432],
+                "ingested_printed_pages": [3, last_page - 4], "ingested_pdf_pages": [7, last_page],
+                "remaining_pdf_pages": [last_page + 1, 432], "remaining_printed_pages": [last_page - 3, 427],
+                "remaining_note": f"PDF432 is the unnumbered terminal scan; printed{last_page - 3}–427 not transcribed. Front matter and methods PDF1–6 retained as source only.",
                 "records_examined": len(audits),
                 **{status: sum(a["status"] == status for a in audits) for status in ("matched", "corrected", "unverified")},
                 "complete_numeric_image_audit_pdf_pages": [7],
                 "numeric_cell_count": sum(len(r["rows"]) * 8 for r in records),
-                "numeric_cells_image_verified": 96 + len(fixture["numeric_corrections"]),
+                "numeric_cells_image_verified": sum(not c["ocr_suspect"] for r in records for row in r["rows"] for c in row["cells"].values()),
                 "per_page": [{"pdf_page": a["pdf_page"], "printed_page": a["printed_page"],
                               "record_id": a["record_id"], "identity_status": a["status"],
                               "numeric_status": "image_verified" if a["pdf_page"] == 7 else "unverified"} for a in audits]}
@@ -201,8 +215,8 @@ def build(corpus):
                 "substance_count": sum(r["record_kind"] == "substance" for r in records),
                 "feedstock_element_coverage": feedstock_coverage([{"formula": r["formula"] or ""} for r in records
                                                                  if r["record_kind"] == "substance"]),
-                "source_files": [{"path": str(source_path.relative_to(corpus)), "sha256": sha256(source_path)},
-                                 {"path": str(pdf.relative_to(corpus)), "sha256": sidecar["sha256"]}],
+                "source_files": [{"path": str(p.relative_to(corpus)), "sha256": sha256(p)} for p in source_paths]
+                                + [{"path": str(pdf.relative_to(corpus)), "sha256": sidecar["sha256"]}],
                 "corrections": [c for r in records for c in r["corrections"]], "entries": entries}
     access_path = ROOT / "data/literature/compilations/access-status.yaml"
     access = yaml.safe_load(access_path.read_text())
@@ -211,7 +225,7 @@ def build(corpus):
         **source, "access": "public_domain_us_government_work", "local_status": "partial_ingest",
         "harvested_path": str(DEST.relative_to(ROOT)), "source_pdf_sha256": sidecar["sha256"],
         "harvested_record_count": len(records), "coverage": coverage,
-        "note": "Non-oxide reference compilation; no battery scoring. Only first 40-page decode available locally."}
+        "note": "Non-oxide reference compilation; no battery scoring. All eleven decode chunks available; ingestion bounded by image-audited pages."}
     artifacts = {DEST / "manifest.yaml": yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True),
                  DEST / "source/sidecar.yaml": yaml.safe_dump(sidecar, sort_keys=False, allow_unicode=True),
                  access_path: yaml.safe_dump(access, sort_keys=False, allow_unicode=True, width=120),
