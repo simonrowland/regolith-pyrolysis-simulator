@@ -1,0 +1,205 @@
+schema_version: literature_extract.v1
+source_id: kems-033-shornikov-2010
+source:
+  citation: Shornikov, S. I. and Yakovlev, O. I. (2010), "A Study of CAI Melt Composition Changing During
+    Evaporation", 41st Lunar and Planetary Science Conference, abstract 1408
+  year: 2010
+extraction:
+  method: LPSC 2010 abstract PDF (corpus raw/kems-033-shornikov-2010), 2 pages. 400 dpi pdftoppm render
+    is the authority. No numbered data table. Printed starting compositions quoted from Paque and Stolper
+    (1984) and Markova et al. (1986) are quoted_measurement. Preset reducing p(O)/p(O2) and the calculated
+    composition-vs-q curves are model_derived; Figs 1-2 stay figure-only. References [1]-[6] are the fetch
+    list.
+  date: '2026-09-12'
+  worker: grok-resume-96459-1789251936
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: CaO
+  observable: gibbs_table
+  observation_id: shornikov_2010_cai_start_quoted_paque_stolper
+  field: CaO_mole_pct
+  value: 33.0
+  locator:
+    published_page: 1
+    pdf_page_index: 1
+    note: 'average CAI composition [5]: 33 mole % CaO'
+- species: O
+  observable: psat_series
+  observation_id: shornikov_2010_reducing_pO_pO2_model
+  field: p_O_atm
+  value: 1.0e-07
+  locator:
+    figure: '2'
+    published_page: 2
+    pdf_page_index: 2
+    note: Fig. 2b caption p(O) = 1.00 · 10^-7 atm
+species:
+  CaO:
+    observations:
+    - observation_id: shornikov_2010_cai_start_quoted_paque_stolper
+      type: gibbs_table
+      locator:
+        published_page: 1
+        pdf_page_index: 1
+        paragraph: average CAI composition [5]
+      phase: average_CAI_starting_melt
+      standard_state: mole % oxides as printed; quoted from Paque and Stolper (1984)
+      regime: quoted_compilation
+      units: mole_percent
+      uncertainty:
+        note: no sigma; Fe and Ti omitted as insignificant
+      values:
+        quantity: starting_melt_composition
+        method_class: quoted_measurement
+        cited_author_year: Paque and Stolper (1984)
+        ref_number: 5
+        CaO_mole_pct: 33.0
+        MgO_mole_pct: 16.0
+        Al2O3_mole_pct: 18.0
+        SiO2_mole_pct: 33.0
+    - observation_id: shornikov_2010_lunar_basalt_start_quoted_markova
+      type: gibbs_table
+      locator:
+        published_page: 1
+        pdf_page_index: 1
+        paragraph: Ap-16 68415,40 lunar basalt experimentally studied in detail [6]
+      phase: Ap-16_68415_40_lunar_basalt
+      standard_state: mole % oxides as printed; quoted from Markova et al. (1986)
+      regime: quoted_compilation
+      units: mole_percent
+      uncertainty:
+        note: Na+K+Ti oxides 0.8 wt% disregarded
+      values:
+        quantity: starting_melt_composition
+        method_class: quoted_measurement
+        cited_author_year: Markova et al. (1986)
+        ref_number: 6
+        CaO_mole_pct: 19.5
+        MgO_mole_pct: 7.3
+        Al2O3_mole_pct: 18.8
+        FeO_mole_pct: 4.0
+        SiO2_mole_pct: 50.5
+  O:
+    observations:
+    - observation_id: shornikov_2010_reducing_pO_pO2_model
+      type: psat_series
+      locator:
+        figure: '2'
+        published_page: 2
+        pdf_page_index: 2
+        note: Fig. 2b caption preset reducing conditions
+      T_range_K:
+      - 2300.0
+      - 2300.0
+      phase: preset_reducing_atmosphere_for_calculation
+      standard_state: p(O) and p(O2) in atm as printed; calculation inputs not measured here
+      regime: thermochemical_equilibrium_model
+      units: atm
+      uncertainty:
+        note: printed as exact 1.00e-7 and 4.13e-10; no sigma
+      values:
+        quantity: preset_reducing_partial_pressures
+        method_class: model_derived
+        p_O_atm: 1.0e-07
+        p_O2_atm: 4.13e-10
+        T_K: 2300.0
+        note: Fig. 2b 'in reducing conditions (p(O) = 1.00 · 10^-7 atm, p(O2) = 4.13 · 10^-10 atm)'
+  Al2O3:
+    observations:
+    - observation_id: shornikov_2010_fig1_cai_calc_figure_only
+      type: rate_series
+      locator:
+        figure: '1'
+        published_page: 1
+        pdf_page_index: 1
+        note: calculated oxide mole % vs q for average CAI
+      T_range_K:
+      - 1300.0
+      - 2600.0
+      phase: CAI_average_composition_melt
+      standard_state: condensed-phase oxide mole % vs weight loss
+      regime: thermochemical_equilibrium_model
+      units: mole_percent vs wt_percent_loss
+      uncertainty:
+        note: figure-only calculated curves; MinerU tables of axis ticks rejected
+      values:
+        quantity: calculated_condensed_composition_vs_weight_loss
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        model_as_printed: authors' approach based on own experimental thermodynamic data [3, 4]
+    - observation_id: shornikov_2010_fig2_lunar_calc_figure_only
+      type: rate_series
+      locator:
+        figure: '2'
+        published_page: 2
+        pdf_page_index: 2
+        note: calculated vs Markova 1986 KEMS symbols at 2300 K
+      T_range_K:
+      - 2300.0
+      - 2300.0
+      phase: Ap-16_68415_40_lunar_basalt_melt
+      standard_state: condensed-phase oxide mole % vs weight loss
+      regime: thermochemical_equilibrium_model
+      units: mole_percent vs wt_percent_loss
+      uncertainty:
+        note: figure-only; Markova symbols not digitised
+      values:
+        quantity: calculated_condensed_composition_vs_weight_loss
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        overlay_quoted_measurement: Markova et al. (1986) KEMS symbols
+        panels:
+          a: chemically neutral conditions
+          b: preset reducing conditions
+deepening:
+  dispatch_id: grok-resume-96459-1789251936
+  date: '2026-09-12'
+  primary_sources_cited:
+  - system: CAI Yefremovka evaporation
+    method: KEMS
+    investigator: Yakovlev et al.
+    year: 1984
+    journal_reference_as_printed: Yakovlev O. I. et al. (1984) LPS XV, 945-946.
+    ref_number: 1
+  - system: condensed-phase composition change at evaporation
+    method: calculation approach
+    investigator: Shornikov S. I.
+    year: 2009
+    journal_reference_as_printed: Shornikov S. I. (2009) Herald Earth Sci. Dept. RAS, 27, No. 1.
+    ref_number: 2
+  - system: authors' experimental thermodynamic data
+    method: KEMS (prior work)
+    investigator: Shornikov S. I.
+    year: 2003
+    journal_reference_as_printed: Shornikov S. I. (2003) Herald Earth Sci. Dept. RAS, 21, No. 1.
+    ref_number: 3
+  - system: authors' experimental thermodynamic data
+    method: KEMS (prior work)
+    investigator: Shornikov S. I.
+    year: 2008
+    journal_reference_as_printed: Shornikov S. I. (2008) Geochem. Int., 46, 724-729.
+    ref_number: 4
+  - system: average CAI composition
+    method: compilation
+    investigator: Paque J. M. and Stolper E.
+    year: 1984
+    journal_reference_as_printed: Paque J. M. and Stolper E. (1984) LPS XV, 631-632.
+    ref_number: 5
+  - system: Ap-16 68415,40 lunar basalt
+    method: Knudsen effusion mass spectrometry
+    investigator: Markova O. M. et al.
+    year: 1986
+    journal_reference_as_printed: Markova O. M. et al. (1986) Geokhimiya, No. 11, 1559-1569 (in Russian).
+    ref_number: 6
+  class_ledger:
+    quoted_measurement:
+    - shornikov_2010_cai_start_quoted_paque_stolper
+    - shornikov_2010_lunar_basalt_start_quoted_markova
+    model_derived:
+    - shornikov_2010_reducing_pO_pO2_model
+    - shornikov_2010_fig1_cai_calc_figure_only
+    - shornikov_2010_fig2_lunar_calc_figure_only

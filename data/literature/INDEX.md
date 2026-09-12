@@ -15,12 +15,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 146
-- Extracts (`literature_extract.v1`): 143
+- Sources: 147
+- Extracts (`literature_extract.v1`): 144
 - PDFs present in this worktree: 44
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 39
 - PDFs with no extract: 3
-- Extracts with no PDF: 102
+- Extracts with no PDF: 103
 - Alias groups needing owner/controller resolution: 32
 - Extracts with private/non-public row locators: 37
 
@@ -78,6 +78,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `kems-029-yakovlev-shornikov-2011` | Yakovlev, O.I. & Shornikov, S.I. (2011), "Experimental study of meteorites and Ca–Al-inclusions", Vestn. Otd. nauk Zemle 3, NZ6104, doi:10.2205/2011NZ000234 | 10.2205/2011NZ000234 | ABSENT, `` | `raw/kems-029-yakovlev-shornikov-2011/kems-029-yakovlev-shornikov-2011.pdf` (present, 1381e9fe); `text/kems-029-yakovlev-shornikov-2011/` (18 files, exists); `tables/kems-029-yakovlev-shornikov-2011/` (0 files, ABSENT) | `data/literature/extracts/kems-029-yakovlev-shornikov-2011.yaml` (6 rows, draft) | `ledger/kems-029-yakovlev-shornikov-2011.yaml`: decoded (2026-09-06) |
 | `kems-031-halwax-2024` | Halwax, A., Sergeev, D., Müller, M. & Schenk, J. (2024), "Enthalpy of Formation of Calcium and Magnesium Oxide Obtained by Knudsen Effusion Mass Spectrometry", Metall. Mater. Trans. B, DOI 10.1007/s11663-024-02995-6 | 10.1007/s11663-024-02995-6 | `docs/references/pdfs/99-kems-langmuir/kems-031-halwax-2024.pdf`, `9d60e03e` | `raw/kems-031-halwax-2024/kems-031-halwax-2024.pdf` (present, 9d60e03e); `text/kems-031-halwax-2024/` (89 files, exists); `tables/kems-031-halwax-2024/` (14 files, exists) | `data/literature/extracts/kems-031-halwax-2024.yaml` (22 rows, draft, private_path) | `ledger/kems-031-halwax-2024.yaml`: extracted (2026-09-06) |
 | `kems-032-copland-jacobson-2010` | Copland, E. H. & Jacobson, N. S. (2010), "Measuring Thermodynamic Properties of Metals and Alloys With Knudsen Effusion Mass Spectrometry", NASA/TP—2010-216795 | NTRS 20110001597 | `docs/references/pdfs/99-kems-langmuir/kems-032-copland-jacobson-2010.pdf`, `a72ca745` | `raw/kems-032-copland-jacobson-2010/kems-032-copland-jacobson-2010.pdf` (present, a72ca745); `text/kems-032-copland-jacobson-2010/` (135 files, exists); `tables/kems-032-copland-jacobson-2010/` (0 files, ABSENT) | `data/literature/extracts/kems-032-copland-jacobson-2010.yaml` (5 rows, draft, private_path) | `ledger/kems-032-copland-jacobson-2010.yaml`: decoded (2026-09-06) |
+| `kems-033-shornikov-2010` | Shornikov, S. I. and Yakovlev, O. I. (2010), "A Study of CAI Melt Composition Changing During Evaporation", 41st Lunar and Planetary Science Conference, abstract 1408 |  | ABSENT, `` | `raw/kems-033-shornikov-2010/kems-033-shornikov-2010.pdf` (present, 0523d324); `text/kems-033-shornikov-2010/` (18 files, exists); `tables/kems-033-shornikov-2010/` (0 files, ABSENT) | `data/literature/extracts/kems-033-shornikov-2010.yaml` (5 rows, draft) | `ledger/kems-033-shornikov-2010.yaml`: decoded (2026-09-06) |
 | `kems-035-sauerborn-2005` | Sauerborn, M. (2005), "Pyrolyse von Metalloxiden und Silikaten unter Vakuum mit konzentrierter Solarstrahlung", Dissertation, Rheinische Friedrich-Wilhelms-Universität Bonn |  | `docs/references/pdfs/99-kems-langmuir/kems-035-sauerborn-2005.pdf`, `76484556` | `raw/kems-035-sauerborn-2005/kems-035-sauerborn-2005.pdf` (present, 76484556); `text/kems-035-sauerborn-2005/` (589 files, exists); `tables/kems-035-sauerborn-2005/` (16 files, exists) | `data/literature/extracts/kems-035-sauerborn-2005.yaml` (60 rows, draft, private_path) | `ledger/kems-035-sauerborn-2005.yaml`: deepened (2026-09-06) |
 | `kems-036-sesko-2024` | Šeško, R., Lamboley, K., Cutard, T., Grill, L., Reiss, P. & Cowley, A. (2024), "Oxygen production by solar vapor-phase pyrolysis of lunar regolith simulant", Acta Astronautica 224:215–225, DOI 10.1016/j.actaastro.2024.08.009. PDF not on disk (CC BY, fetch bot-blocked; see sidecar docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md) | 10.1016/j.actaastro.2024.08.009 | ABSENT, `` | `raw/kems-036-sesko-2024/kems-036-sesko-2024.pdf` (present, 22ca3c77); `text/kems-036-sesko-2024/` (279 files, exists); `tables/kems-036-sesko-2024/` (0 files, ABSENT) | `data/literature/extracts/kems-036-sesko-2024.yaml` (8 rows, draft, private_path) | `ledger/kems-036-sesko-2024.yaml`: decoded (2026-09-06) |
 | `kems-037-richter-2002` | Richter, F. M., Davis, A. M., Ebel, D. S. & Hashimoto, A. (2002), "Elemental and isotopic fractionation of Type B calcium-, aluminum-rich inclusions: experiments, theoretical considerations, and constraints on their thermal evolution", Geochim. Cosmochim. Acta 66:521-540 |  | `docs/references/pdfs/99-kems-langmuir/kems-037-richter-2002.pdf`, `c64b38ea` | `raw/kems-037-richter-2002/kems-037-richter-2002.pdf` (present, c64b38ea); `text/kems-037-richter-2002/` (67 files, exists); `tables/kems-037-richter-2002/` (0 files, ABSENT) | `data/literature/extracts/kems-037-richter-2002.yaml` (4 rows, draft, private_path) | `ledger/kems-037-richter-2002.yaml`: decoded (2026-09-06) |
@@ -211,6 +212,7 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `kems-026-markova-1984`
 - `kems-028-yakovlev-1984`
 - `kems-029-yakovlev-shornikov-2011`
+- `kems-033-shornikov-2010`
 - `kems-036-sesko-2024`
 - `kems-038-matchett-2006`
 - `kems-040-stolyarova-2015`

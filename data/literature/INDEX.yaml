@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 146
-  extracts: 143
+  sources: 147
+  extracts: 144
   pdfs_present_in_worktree: 44
   extracts_with_private_locators: 37
   pdfs_tracked_99_kems_langmuir: 39
   pdfs_without_extract: 3
-  extracts_without_pdf: 102
+  extracts_without_pdf: 103
   alias_groups_needing_resolution: 32
 gaps:
   pdfs_without_extract:
@@ -51,6 +51,7 @@ gaps:
   - kems-026-markova-1984
   - kems-028-yakovlev-1984
   - kems-029-yakovlev-shornikov-2011
+  - kems-033-shornikov-2010
   - kems-036-sesko-2024
   - kems-038-matchett-2006
   - kems-040-stolyarova-2015
@@ -3426,6 +3427,64 @@ sources:
       matches_simulator: true
     ledger:
       path: ledger/kems-032-copland-jacobson-2010.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-06'
+    commit: 517fe861ad4e3b102d8d5e8c8c917ada806e417a
+- source_id: kems-033-shornikov-2010
+  aliases: []
+  citation: Shornikov, S. I. and Yakovlev, O. I. (2010), "A Study of CAI Melt Composition Changing During
+    Evaporation", 41st Lunar and Planetary Science Conference, abstract 1408
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-033-shornikov-2010.yaml
+    review_status: draft
+    rows: 5
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-033-shornikov-2010/kems-033-shornikov-2010.pdf
+      present: true
+      sha256: 0523d32464402d6fa6e2d3ac66f5e1233c5c359b411fe9e9099166a8a2842049
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-033-shornikov-2010/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-033-shornikov-2010
+      exists: true
+      file_count: 18
+    tables:
+      path: tables/kems-033-shornikov-2010
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-033-shornikov-2010.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-033-shornikov-2010.yaml
       present: true
       error: null
       last_stage: decoded
