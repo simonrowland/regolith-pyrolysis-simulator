@@ -3,12 +3,11 @@ source_id: pankratz-1987-usbm-b689
 source: &id001
   database: U.S. Bureau of Mines Bulletin 689
   version: '1987'
-  citation: Pankratz, L. B., Mah, A. D. and Watson, S. W., 1987, Thermodynamic Properties
-    of Sulfides, U.S. Bureau of Mines Bulletin 689, iv, 427 pp.
+  citation: Pankratz, L. B., Mah, A. D. and Watson, S. W., 1987, Thermodynamic Properties of Sulfides,
+    U.S. Bureau of Mines Bulletin 689, iv, 427 pp.
   official_url: https://digital.library.unt.edu/ark:/67531/metadc38801/
   retrieved_url: https://web.archive.org/web/20170817002429id_/https://digital.library.unt.edu/ark:/67531/metadc38801/m2/1/high_res_d/metadc38801.pdf
-  licence: United States government work (USBM bulletin). Public domain in the United
-    States.
+  licence: United States government work (USBM bulletin). Public domain in the United States.
   access_date: '2026-09-12'
 compilation_role:
   engine_reference_input: true
@@ -18,28 +17,24 @@ compilation_role:
   non_oxide_policy: warn_not_fail_closed
   intended_use: Stage 0 cleanup chemistry
 coverage:
-  status: partial
+  status: complete
   pdf_page_count: 432
   decoded_pdf_pages:
   - 1
   - 432
   ingested_printed_pages:
   - 3
-  - 44
+  - 423
   ingested_pdf_pages:
   - 7
-  - 48
-  remaining_pdf_pages:
-  - 49
-  - 432
-  remaining_printed_pages:
-  - 45
   - 427
-  remaining_note: PDF432 is the unnumbered terminal scan; printed45–427 not transcribed.
-    Front matter and methods PDF1–6 retained as source only.
-  records_examined: 42
-  matched: 27
-  corrected: 14
+  remaining_pdf_pages: []
+  remaining_printed_pages: []
+  remaining_note: PDF432 is the unnumbered terminal scan; printed45–427 not transcribed. Front matter
+    and methods PDF1–6 retained as source only.
+  records_examined: 421
+  matched: 342
+  corrected: 78
   unverified: 1
   complete_numeric_image_audit_pdf_pages:
   - 7
@@ -256,8 +251,8 @@ coverage:
     record_id: page-0044
     identity_status: matched
     numeric_status: unverified
-record_count: 42
-substance_count: 41
+record_count: 421
+substance_count: 420
 feedstock_element_coverage:
   Ag: 4
   Al: 9
@@ -562,8 +557,7 @@ corrections:
   field: substance_identity
   ocr_token:
   - '(BS) $_{2}$ (g) '
-  - 'Dimeric Boron Monosulfide (ideal gas) [Reaction: $2B(\beta) + S_{2}(g) = (BS)_{2}(g)$
-    ] '
+  - 'Dimeric Boron Monosulfide (ideal gas) [Reaction: $2B(\beta) + S_{2}(g) = (BS)_{2}(g)$ ] '
   printed_token: (BS)₂(g) / Dimeric Boron Monosulfide (ideal gas)
   image_quote: '(BS)₂(g)
 
@@ -613,8 +607,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   ocr_suspect_count: 1
 - record_id: page-0004
   record_kind: substance
@@ -664,12 +657,10 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: unparsed_transition_form
     raw: '450 K, \alpha - \beta transition point of Ag_{2}S '
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 113
 - record_id: page-0006
@@ -696,12 +687,10 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: '450 K, \alpha-\beta transition point of Ag_{2}S '
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: unparsed_transition_form
     raw: '860 K, \beta - \gamma transition point of \mathrm{Ag}_2\mathrm{S} '
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 169
 - record_id: page-0007
@@ -728,8 +717,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0008
@@ -780,8 +768,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0010
@@ -832,8 +819,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0012
@@ -884,8 +870,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0014
@@ -940,8 +925,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0016
@@ -992,8 +976,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0018
@@ -1044,8 +1027,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 105
 - record_id: page-0020
@@ -1096,8 +1078,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 145
 - record_id: page-0022
@@ -1148,12 +1129,10 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: unparsed_transition_form
     raw: '478 K, glass transition temperature of As_{2}S_{3} '
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 113
 - record_id: page-0024
@@ -1180,8 +1159,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: '478 K, glass transition of As_{2}S_{3} '
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 81
 - record_id: page-0025
@@ -1208,8 +1186,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 113
 - record_id: page-0026
@@ -1260,8 +1237,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0028
@@ -1312,8 +1288,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0030
@@ -1368,8 +1343,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0032
@@ -1420,8 +1394,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0034
@@ -1447,8 +1420,7 @@ entries:
   - kind: identity_and_reaction_merged
     raw:
     - '(BS) $_{2}$ (g) '
-    - 'Dimeric Boron Monosulfide (ideal gas) [Reaction: $2B(\beta) + S_{2}(g) = (BS)_{2}(g)$
-      ] '
+    - 'Dimeric Boron Monosulfide (ideal gas) [Reaction: $2B(\beta) + S_{2}(g) = (BS)_{2}(g)$ ] '
   - kind: post_table_note_ocr_unverified
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: numeric_cells_not_image_verified
@@ -1477,8 +1449,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0036
@@ -1529,8 +1500,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0038
@@ -1581,8 +1551,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0040
@@ -1633,8 +1602,7 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 97
 - record_id: page-0042
@@ -1685,12 +1653,10 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 368.3 K, orthorhombic - monoclinic transition point of S
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: unparsed_transition_form
     raw: 582 K, \alpha - \beta transition point of Ba
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 105
 - record_id: page-0044
@@ -1717,11 +1683,9 @@ entries:
     reason: Raw MinerU note text is retained verbatim; no image correction is asserted.
   - kind: unparsed_transition_form
     raw: 582 K, \alpha-\beta transition point of Ba
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: unparsed_transition_form
     raw: 768 K, \beta - \gamma transition point of Ba
-    reason: Event-like source prose did not match a supported structured transition
-      form.
+    reason: Event-like source prose did not match a supported structured transition form.
   - kind: numeric_cells_not_image_verified
   ocr_suspect_count: 185
