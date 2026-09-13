@@ -120,8 +120,14 @@ def _issue(path: str, reason: RefusalReason, detail: str) -> ValidationIssue:
     return ValidationIssue(path, reason, detail)
 
 
-def _check_located(path: str, located: Located[Any], issues: list[ValidationIssue]) -> None:
-    if located.state.is_value and located.locator is None:
+def _check_located(
+    path: str,
+    located: Located[Any],
+    issues: list[ValidationIssue],
+    *,
+    empirical: bool,
+) -> None:
+    if empirical and located.state.is_value and located.locator is None:
         issues.append(
             _issue(
                 path,
@@ -167,7 +173,14 @@ def _reconcile_identity_axis(
         )
 
 
-def _walk_located(obj: object, path: str, issues: list[ValidationIssue], seen: set[int] | None = None) -> None:
+def _walk_located(
+    obj: object,
+    path: str,
+    issues: list[ValidationIssue],
+    seen: set[int] | None = None,
+    *,
+    empirical: bool,
+) -> None:
     if obj is None:
         return
     if seen is None:
@@ -177,21 +190,23 @@ def _walk_located(obj: object, path: str, issues: list[ValidationIssue], seen: s
         return
     seen.add(marker)
     if isinstance(obj, Located):
-        _check_located(path, obj, issues)
+        _check_located(path, obj, issues, empirical=empirical)
         if obj.inference is not None:
-            _walk_located(obj.inference, f"{path}.inference", issues, seen)
+            _walk_located(obj.inference, f"{path}.inference", issues, seen, empirical=empirical)
         return
     if isinstance(obj, Mapping):
         for key, value in obj.items():
-            _walk_located(value, f"{path}.{key}", issues, seen)
+            _walk_located(value, f"{path}.{key}", issues, seen, empirical=empirical)
         return
     if isinstance(obj, (tuple, list)):
         for i, value in enumerate(obj):
-            _walk_located(value, f"{path}[{i}]", issues, seen)
+            _walk_located(value, f"{path}[{i}]", issues, seen, empirical=empirical)
         return
     if is_dataclass(obj) and not isinstance(obj, type):
         for field in fields(obj):
-            _walk_located(getattr(obj, field.name), f"{path}.{field.name}", issues, seen)
+            _walk_located(
+                getattr(obj, field.name), f"{path}.{field.name}", issues, seen, empirical=empirical
+            )
 
 
 def _is_printed_observation(observation: Observation) -> bool:
@@ -521,7 +536,12 @@ def validate_experiment(
                         "buffer channel requires buffer",
                     )
                 )
-    _walk_located(experiment, path, issues)
+    _walk_located(
+        experiment,
+        path,
+        issues,
+        empirical=experiment.kind is ExperimentKind.LITERATURE,
+    )
     return issues
 
 
@@ -770,9 +790,20 @@ def validate_observation(
                 "decided admission requires decided_by",
             )
         )
-    _walk_located(observation.point_conditions, f"{path}.point_conditions", issues)
+    empirical = experiment is not None and experiment.kind is ExperimentKind.LITERATURE
+    _walk_located(
+        observation.point_conditions,
+        f"{path}.point_conditions",
+        issues,
+        empirical=empirical,
+    )
     if observation.derivation is not None:
-        _walk_located(observation.derivation.parameters, f"{path}.derivation.parameters", issues)
+        _walk_located(
+            observation.derivation.parameters,
+            f"{path}.derivation.parameters",
+            issues,
+            empirical=empirical,
+        )
     if observation.value.kind is ValueKind.POINT and observation.uncertainty.kind is UncertaintyKind.NONE:
         # none uncertainty is valid; never invent a z-score
         pass

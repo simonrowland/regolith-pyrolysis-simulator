@@ -20,6 +20,7 @@ from simulator.battery.enums import (
     Engine,
     EvidenceClass,
     ExecutionState,
+    ExperimentKind,
     IdentityEqualKind,
     MethodToken,
     MetricOperation,
@@ -1535,6 +1536,34 @@ def test_r03_union_fingerprint_honours_from_to_dropped_and_fraction() -> None:
         dropped_mass_fraction=Decimal("0.02"),
     )
     assert union_notices((projected_a,), (projected_b,)) == (projected_a, projected_b)
+
+
+def test_r06_engine_evaluation_commanded_value_needs_no_locator() -> None:
+    """C(empirical value): synthetic engine commands are not literature locators."""
+
+    from dataclasses import replace
+
+    w = F.work()
+    exp = F.tabulation_experiment()
+    synthetic = replace(
+        exp,
+        experiment_id="synthetic",
+        kind=ExperimentKind.SYNTHETIC,
+        work_id=None,
+        simulated_experiment_id=exp.experiment_id,
+        method=State.of(MethodToken.ENGINE_EVALUATION),
+        locator=None,
+        conditions={"temperature_K": Located(State.of(Decimal("298.15")))},
+    )
+    report = validate_corpus([w], [exp, synthetic], [])
+    assert report.ok
+    unlocated = replace(
+        exp,
+        conditions={"temperature_K": Located(State.of(Decimal("298.15")))},
+    )
+    empirical = validate_corpus([w], [unlocated], [])
+    assert not empirical.ok
+    assert any("locator" in i.detail for i in empirical.issues)
 
 
 def test_r05_relative_series_rejects_nonfinite_values() -> None:
