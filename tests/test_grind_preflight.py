@@ -401,6 +401,25 @@ def test_strict_vapor_source_report_rejects_extrapolated_mg() -> None:
         assert_strict_vapor_source_report(report, context="stored-result")
 
 
+def test_strict_vapor_source_report_rejects_pO2_floor_inversion_even_with_authoritative_head() -> None:
+    """Hostile construction: head approved but floor-inversion suffix must fail."""
+    source = (
+        "builtin_authoritative:standard_reaction_term:"
+        "melt_dissociation_pO2_floor_inverted_through_mass_action"
+    )
+    report = {
+        "species": {"Si": source},
+        "summary": {source: {"count": 1, "percentage": 100.0}},
+        "total_species": 1,
+    }
+
+    with pytest.raises(
+        GrindSourceGateError,
+        match="melt_dissociation_pO2_floor_inverted_through_mass_action",
+    ):
+        assert_strict_vapor_source_report(report, context="stored-result")
+
+
 def test_strict_vapor_source_report_rejects_extrapolated_sio_even_with_authoritative_head() -> None:
     """Hostile construction: head approved but extrapolation suffix must fail.
 

@@ -164,6 +164,150 @@ def physical_melt_dissociation_pO2_bar(fO2_log: float) -> tuple[float, bool]:
     return raw, False
 
 
+MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON = (
+    "melt_dissociation_pO2_floor_inverted_through_mass_action"
+)
+# Catalog operating-envelope lower bound from
+# test_catalog_operating_envelope_no_nonphysical_pressure (1e-12 bar).
+# That sweep stays under CATALOG_PHYSICAL_PRESSURE_CEILING_PA; the 1e-30
+# floor is 18 dex below the band and is not a certified melt state.
+MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR = 1.0e-12
+
+
+def _pO2_is_melt_dissociation_floor(pO2_bar: float) -> bool:
+    """True when mass-action pO2 is at or below the b-148 envelope floor.
+
+    ``10**log10(MIN)`` is 9.999e-31 in float64, slightly below the 1e-30
+    literal the clamp returns for fO2 < log10(MIN). Equality to MIN would
+    miss the exact-edge case that does not set was_clamped.
+    """
+
+    try:
+        oxygen = float(pO2_bar)
+    except (TypeError, ValueError):
+        return False
+    return math.isfinite(oxygen) and oxygen > 0.0 and (
+        oxygen <= MELT_DISSOCIATION_PO2_MIN_BAR
+    )
+
+
+def melt_dissociation_pO2_floor_inversion_notice(
+    *,
+    species: str,
+    pressure_Pa: float,
+    pO2_bar_used: float,
+    pO2_exponent: float | None,
+    pressure_rail: str | None,
+    fO2_log: float | None,
+    was_clamped: bool,
+) -> dict[str, Any] | None:
+    """Typed predict-and-flag notice when the pO2 floor inverts p_M.
+
+    Premise: oxide-coupled metal pressure follows mass action
+    ``p_M ∝ a * (pO2 / pO2_ref)^n`` with n < 0 (Si n=-1, pO2_ref=1e-9 bar;
+    Na n=-0.25, pO2_ref=1 bar; Ellingham gas_fugacity
+    ``p_M ∝ (K a^{n_ox} / pO2)^{1/n_M}``, so n_eff = -1/n_M).
+    Algebra: at pO2 = MIN = 1e-30 bar, Si's pO2 term is
+    (1e-30/1e-9)^{-1} = 1e21; Na's is (1e-30)^{-0.25} = 10^{7.5} ≈ 3.16e7;
+    Mg (n_M=2) scales as (pO2)^{-0.5} so MIN vs 1e-9 is 10^{10.5} ≈ 3.16e10.
+    Unit check: pO2/pO2_ref is bar/bar dimensionless; P remains Pa.
+    Sanity: catalog envelope at 1e-12 bar keeps Si ~1e-8 Pa; the floor
+    lands Si at ~7e9 Pa (above CATALOG_PHYSICAL_PRESSURE_CEILING_PA).
+    Positive-n carriers (AlO2 n=+0.25) shrink at the floor — not inversion.
+    Transport-channel species (Fe, SiO) keep overhead pO2 and are skipped
+    when that pO2 is not the floor.
+
+    Predict-and-flag: the number stays; the notice carries the original
+    reason, authority_level, and certified pO2 band. Do not retune MIN.
+    """
+
+    if not _pO2_is_melt_dissociation_floor(pO2_bar_used):
+        return None
+    if pO2_exponent is not None:
+        try:
+            exponent = float(pO2_exponent)
+        except (TypeError, ValueError):
+            exponent = None
+        else:
+            if not math.isfinite(exponent) or exponent >= 0.0:
+                return None
+    elif str(pressure_rail or "") not in {
+        "gas_fugacity",
+        "liquid_oxide_standard_reaction",
+        "gas_rail_liquid_oxide_standard_reaction",
+    }:
+        return None
+    try:
+        pressure = float(pressure_Pa)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(pressure) or pressure <= 0.0:
+        return None
+    fO2_payload: float | None
+    try:
+        fO2_payload = float(fO2_log) if fO2_log is not None else None
+    except (TypeError, ValueError):
+        fO2_payload = None
+    if fO2_payload is not None and not math.isfinite(fO2_payload):
+        fO2_payload = None
+    return {
+        "reason": MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON,
+        "authority_level": "extrapolated",
+        "certified_band": {
+            "pO2_bar": (
+                MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR,
+                MELT_DISSOCIATION_PO2_MAX_BAR,
+            )
+        },
+        "pO2_bar_used": float(pO2_bar_used),
+        "envelope_bar": (
+            MELT_DISSOCIATION_PO2_MIN_BAR,
+            MELT_DISSOCIATION_PO2_MAX_BAR,
+        ),
+        "fO2_log": fO2_payload,
+        "was_clamped": bool(was_clamped),
+        "species": str(species),
+        "pressure_Pa": pressure,
+        "pO2_exponent": (
+            None if pO2_exponent is None else float(pO2_exponent)
+        ),
+        "pressure_rail": str(pressure_rail or "") or None,
+    }
+
+
+def _attach_pO2_floor_inversion_notices(
+    *,
+    vapor_pressures: dict[str, float],
+    vapor_pressure_sources: dict[str, str],
+    vapor_pressure_provenance: dict[str, dict[str, Any]],
+    fO2_log: float | None,
+    was_clamped: bool,
+) -> dict[str, dict[str, Any]]:
+    """Single choke: flag published metal P that used the pO2 floor."""
+
+    notices: dict[str, dict[str, Any]] = {}
+    token = MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON
+    for species, pressure_Pa in vapor_pressures.items():
+        provenance = vapor_pressure_provenance.get(species) or {}
+        notice = melt_dissociation_pO2_floor_inversion_notice(
+            species=str(species),
+            pressure_Pa=float(pressure_Pa),
+            pO2_bar_used=float(provenance.get("pO2_bar") or 0.0),
+            pO2_exponent=provenance.get("pO2_exponent"),
+            pressure_rail=provenance.get("pressure_rail"),
+            fO2_log=fO2_log,
+            was_clamped=was_clamped,
+        )
+        if notice is None:
+            continue
+        notices[str(species)] = notice
+        provenance["floor_inversion_notice"] = notice
+        source = str(vapor_pressure_sources.get(species) or "")
+        if source and token not in source.split(":"):
+            vapor_pressure_sources[species] = f"{source}:{token}"
+    return notices
+
+
 class VaporPressureComputationError(RuntimeError):
     """Raised when vapor-pressure math cannot produce an authoritative value."""
 
@@ -2506,6 +2650,29 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 if key in authority_fields
             }
 
+        floor_inversion_notices = _attach_pO2_floor_inversion_notices(
+            vapor_pressures=vapor_pressures,
+            vapor_pressure_sources=vapor_pressure_sources,
+            vapor_pressure_provenance=vapor_pressure_provenance,
+            fO2_log=(
+                float(intrinsic_fO2_log)
+                if intrinsic_fO2_log is not None
+                else None
+            ),
+            was_clamped=melt_dissociation_pO2_clamped,
+        )
+        if floor_inversion_notices:
+            flagged = ",".join(sorted(floor_inversion_notices))
+            warnings.append(
+                f"{MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON}: "
+                f"species={flagged} "
+                f"pO2_bar={MELT_DISSOCIATION_PO2_MIN_BAR:g} "
+                "authority_level=extrapolated "
+                "certified_band_pO2_bar=["
+                f"{MELT_DISSOCIATION_PO2_MASS_ACTION_CERTIFIED_MIN_BAR:g}, "
+                f"{MELT_DISSOCIATION_PO2_MAX_BAR:g}]"
+            )
+
         diagnostic = {
             "vapor_pressures_Pa": vapor_pressures,
             "vapor_pressures_source": vapor_pressure_sources,
@@ -2541,6 +2708,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             "melt_dissociation_pO2_clamped_to_physical_envelope": (
                 melt_dissociation_pO2_clamped
             ),
+            "pO2_floor_inversion_notices_by_species": floor_inversion_notices,
             "pO2_bar": transport_pO2_bar,
             "vacuum_floor_bar": vacuum_floor_bar,
             "extrapolated_beyond_valid_range_K": {
