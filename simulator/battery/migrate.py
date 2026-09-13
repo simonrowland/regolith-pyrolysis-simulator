@@ -271,6 +271,12 @@ TYPE_QUANTITY = {
     "transition_point": Quantity.TRANSITION_TEMPERATURE,
 }
 
+# Unit strings that name a closed quantity. Consulted only when values.quantity
+# is absent; never overrides an explicit quantity token.
+UNIT_DECLARED_QUANTITY = {
+    "dimensionless alpha vs t_k": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+}
+
 QUANTITY_ALIASES = {
     "pure_Psat": Quantity.P_SAT,
     "vapor_pressure": Quantity.P_SAT,
@@ -286,6 +292,8 @@ QUANTITY_ALIASES = {
     "activity_coefficient_this_work": Quantity.ACTIVITY_COEFFICIENT,
     "wagner_interaction_parameter": Quantity.INTERACTION_PARAMETER,
     "literature_vaporization_coefficient": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+    "alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+    "evaporation_coefficient_alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
     "o2_yield": Quantity.O2_YIELD,
     "mass_loss_fraction": Quantity.MASS_LOSS_FRACTION,
     "ion_current_ratio": Quantity.ION_INTENSITY_RATIO,
@@ -1379,7 +1387,9 @@ def map_phase(raw: object) -> tuple[State[Phase], str | None]:
 
 
 def map_quantity(
-    obs_type: str | None, values: Mapping[str, Any] | None
+    obs_type: str | None,
+    values: Mapping[str, Any] | None,
+    units: str | None = None,
 ) -> tuple[State[Quantity], str | None]:
     raw = None
     if isinstance(values, Mapping):
@@ -1388,7 +1398,12 @@ def map_quantity(
             return State.of(QUANTITY_ALIASES[raw]), None
         if isinstance(raw, str) and raw in {q.value for q in Quantity}:
             return State.of(Quantity(raw)), None
-    if obs_type in TYPE_QUANTITY:
+    quantity_absent = raw is None or raw == ""
+    if quantity_absent and units is not None and str(units).strip():
+        unit_mapped = UNIT_DECLARED_QUANTITY.get(str(units).strip().lower())
+        if unit_mapped is not None:
+            return State.of(unit_mapped), None
+    if quantity_absent and obs_type in TYPE_QUANTITY:
         return State.of(TYPE_QUANTITY[obs_type]), None
     if isinstance(raw, str) and raw:
         return (
@@ -1753,42 +1768,43 @@ def _series_point_value(
 ) -> tuple[Decimal | None, str, tuple[str, ...]]:
     """Pick the printed value from the declared quantity, not the first numeric key."""
 
-    unused: list[str] = []
+    unused = tuple(k for k in _ANCILLARY_SERIES_KEYS if k in raw_item)
+    if q_token is None:
+        return None, "identity", unused
     if q_token is Quantity.ACTIVITY_COEFFICIENT:
         for vk in ("gamma", "activity_coefficient"):
             if vk in raw_item:
-                val = _as_dec_or_none(raw_item.get(vk))
-                unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
-                return val, "as_published", tuple(unused)
-        unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
-        return None, "as_published", tuple(unused)
-    if q_token is Quantity.EVAPORATION_COEFFICIENT_ALPHA and "alpha" in raw_item:
-        unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
-        return _as_dec_or_none(raw_item.get("alpha")), "as_published", tuple(unused)
+                return _as_dec_or_none(raw_item.get(vk)), "as_published", unused
+        return None, "as_published", unused
+    if q_token is Quantity.EVAPORATION_COEFFICIENT_ALPHA:
+        if "alpha" in raw_item:
+            return _as_dec_or_none(raw_item.get("alpha")), "as_published", unused
+        return None, "as_published", unused
+    if q_token is Quantity.ACTIVITY:
+        if "activity" in raw_item:
+            return _as_dec_or_none(raw_item.get("activity")), "as_published", unused
+        return None, "as_published", unused
     if q_token is Quantity.DELTA_FG:
         for vk in ("delta_fG", "value"):
             if vk in raw_item:
-                unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
-                return _as_dec_or_none(raw_item.get(vk)), "as_published", tuple(unused)
-    if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL, None}:
+                return _as_dec_or_none(raw_item.get(vk)), "as_published", unused
+        return None, "as_published", unused
+    if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
         for key, unit in _PRESSURE_SERIES_KEYS:
             if key in raw_item:
                 val, trail = convert_pressure_to_pa(raw_item.get(key), unit)
-                unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
-                return val, trail or "identity", tuple(unused)
+                return val, trail or "identity", unused
         # Species-labelled pressures are p_partial only when that is the declared quantity.
         if q_token is Quantity.P_PARTIAL:
             for key in ("p_Ga_Pa", "p_In_Pa", "p_O2_calc_Pa"):
                 if key in raw_item:
                     val, trail = convert_pressure_to_pa(raw_item.get(key), "Pa")
-                    unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item and k != key]
-                    return val, trail or "identity:Pa", tuple(unused)
-    for vk in ("alpha", "gamma", "value", "delta_fG"):
-        if vk in raw_item:
-            unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
-            return _as_dec_or_none(raw_item.get(vk)), "as_published", tuple(unused)
-    unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
-    return None, "identity", tuple(unused)
+                    unused_partial = tuple(
+                        k for k in _ANCILLARY_SERIES_KEYS if k in raw_item and k != key
+                    )
+                    return val, trail or "identity:Pa", unused_partial
+        return None, "as_published", unused
+    return None, "identity", unused
 
 
 def _series_value(series: list[Any], units: str | None) -> Value:
@@ -2509,7 +2525,7 @@ class Migrator:
         species = make_species(
             species_formula, phase, polymorph=polymorph_from_extract(obs)
         )
-        quantity, q_reason = map_quantity(obs_type, values)
+        quantity, q_reason = map_quantity(obs_type, values, units=obs.get("units"))
         if q_reason:
             self.result.add_queue(
                 work.work_id,
@@ -2798,7 +2814,6 @@ class Migrator:
             if val is None and ("P" in raw_item or "p" in raw_item) and q_token in {
                 Quantity.P_SAT,
                 Quantity.P_PARTIAL,
-                None,
             }:
                 raw_p = raw_item.get("P", raw_item.get("p"))
                 val, trail_or_why = convert_pressure_to_pa(raw_p, units)

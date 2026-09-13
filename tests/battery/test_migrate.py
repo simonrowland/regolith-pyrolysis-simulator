@@ -1265,3 +1265,178 @@ def test_h02_bischof_stored_gammas_match_source() -> None:
     for val in stored_vals:
         assert val in gamma_set
         assert val not in source_pressures
+
+
+def _j01_series_fixture(quantity: str, series: list[dict]) -> dict:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["units"] = ""
+    row["values"]["quantity"] = quantity
+    row["values"]["series"] = series
+    return extract
+
+
+def test_j01_missing_declared_psat_does_not_take_gamma_or_value(tmp_path: Path) -> None:
+    extract = _j01_series_fixture(
+        "pure_Psat", [{"T_K": 1200, "gamma": 0.06, "value": 0.7}]
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.P_SAT
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    assert obs.value.point is None or obs.value.point != as_decimal("0.06")
+    assert obs.value.point != as_decimal("0.7")
+    assert any("value" in (e.axes or ()) for e in result.queue)
+
+
+def test_j01_missing_declared_activity_does_not_take_gamma(tmp_path: Path) -> None:
+    extract = _j01_series_fixture(
+        "activity", [{"T_K": 1200, "gamma": 0.06, "value": 0.7}]
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.ACTIVITY
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    assert any("value" in (e.axes or ()) for e in result.queue)
+
+
+def test_j01_missing_declared_alpha_does_not_take_gamma(tmp_path: Path) -> None:
+    extract = _j01_series_fixture(
+        "evaporation_coefficient_alpha",
+        [{"T_K": 1200, "gamma": 0.06, "value": 0.7}],
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    assert any("value" in (e.axes or ()) for e in result.queue)
+
+
+def test_j01_explicit_pressure_atm_control_still_lifts(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    result = migrate(root, write=False)
+    points = [
+        o
+        for o in result.observations.values()
+        if o.observation_id.startswith("fixture-source::na_psat")
+    ]
+    assert len(points) == 2
+    assert all(quantity_token(p.identity) is Quantity.P_SAT for p in points)
+    assert all(p.value.kind is ValueKind.POINT for p in points)
+    values = sorted(p.value.point for p in points)
+    assert values[0] == atm_to_pa("1")
+    assert values[1] == atm_to_pa("2")
+
+
+def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
+    src = REPO_ROOT / "data" / "literature" / "extracts" / "fedkin-grossman-ghiorso-2006.yaml"
+    extract = yaml.safe_load(src.read_text(encoding="utf-8"))
+    root = _write_min_tree(tmp_path, extract)
+    (root / "data" / "literature" / "extracts" / "fedkin-grossman-ghiorso-2006.yaml").write_text(
+        src.read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    (root / "data" / "literature" / "extracts" / "fixture-source.yaml").unlink()
+    result = migrate(root, write=False)
+    alpha_points = [
+        o
+        for o in result.observations.values()
+        if "per_T_alpha_series::point:" in o.observation_id
+    ]
+    assert len(alpha_points) == 12
+    for obs in alpha_points:
+        assert quantity_token(obs.identity) is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+        assert quantity_token(obs.identity) is not Quantity.MASS_LOSS_RATE
+        assert obs.value.kind is ValueKind.POINT
+    fe0 = next(
+        o
+        for o in alpha_points
+        if "fe_hashimoto_langmuir_per_T_alpha_series::point:0" in o.observation_id
+    )
+    assert fe0.value.point == as_decimal("0.23")
+    assert float(fe0.identity.temperature_K.value) == 1973.0
+
+
+def test_j01_store_census_series_numeric_matches_declared_field() -> None:
+    from decimal import Decimal
+
+    from simulator.battery.migrate import map_quantity, _series_point_value
+
+    extracts = REPO_ROOT / "data" / "literature" / "extracts"
+    extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
+    if not extracts_v2.is_dir():
+        pytest.skip("migrated store not generated yet")
+    census: dict[str, int] = {}
+    mismatches: list[str] = []
+    n_numeric = 0
+    n_unavailable = 0
+    for src_path in sorted(extracts.glob("*.yaml")):
+        source = yaml.safe_load(src_path.read_text(encoding="utf-8"))
+        if not isinstance(source, dict):
+            continue
+        store_path = extracts_v2 / src_path.name
+        if not store_path.is_file():
+            continue
+        stored = yaml.safe_load(store_path.read_text(encoding="utf-8"))
+        by_id = {
+            o["observation_id"]: o
+            for o in (stored.get("observations") or [])
+            if isinstance(o, dict)
+        }
+        source_id = str(source.get("source_id") or src_path.stem)
+        species = source.get("species") or {}
+        for body in species.values():
+            if not isinstance(body, dict):
+                continue
+            for row in body.get("observations") or []:
+                values = row.get("values") or {}
+                series = values.get("series") if isinstance(values, dict) else None
+                if not isinstance(series, list) or not series:
+                    continue
+                obs_type = row.get("type") if isinstance(row.get("type"), str) else None
+                units = str(row.get("units") or "")
+                q_state, _why = map_quantity(obs_type, values, units=units)
+                q_token = q_state.value if q_state.is_value else None
+                raw_id = str(row.get("observation_id") or "")
+                for index, item in enumerate(series):
+                    if not isinstance(item, dict):
+                        continue
+                    oid = f"{source_id}::{raw_id}::point:{index}"
+                    stored_obs = by_id.get(oid)
+                    if stored_obs is None:
+                        mismatches.append(f"missing stored point {oid}")
+                        continue
+                    stored_q = (stored_obs.get("identity") or {}).get("quantity") or {}
+                    stored_val = stored_obs.get("value") or {}
+                    expected, _trail, _unused = _series_point_value(item, q_token, units)
+                    if expected is None:
+                        n_unavailable += 1
+                        if stored_val.get("kind") == "point":
+                            mismatches.append(
+                                f"{oid} stored numeric {stored_val.get('point')} "
+                                f"but declared quantity {q_token} has no source field"
+                            )
+                        continue
+                    n_numeric += 1
+                    label = q_token.value if q_token is not None else "unknown"
+                    census[label] = census.get(label, 0) + 1
+                    if stored_q.get("value") != label:
+                        mismatches.append(
+                            f"{oid} stored quantity {stored_q.get('value')!r} != declared {label}"
+                        )
+                    if stored_val.get("kind") != "point":
+                        mismatches.append(f"{oid} declared field present but stored {stored_val.get('kind')}")
+                        continue
+                    got = Decimal(str(stored_val.get("point")))
+                    if got != expected:
+                        mismatches.append(f"{oid} stored {got} != source {expected} for {label}")
+    assert not mismatches, mismatches[:20]
+    assert n_numeric == sum(census.values())
+    # Live census after the quantity-bound fix: 128 gamma + 24 pressure + 12 alpha.
+    assert census.get("activity_coefficient") == 128
+    assert census.get("p_sat", 0) + census.get("p_partial", 0) == 24
+    assert census.get("evaporation_coefficient_alpha") == 12
+    assert census.get("mass_loss_rate", 0) == 0
+    assert n_numeric == 164, (n_numeric, census, n_unavailable)
