@@ -12,20 +12,29 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
     DEFAULT_POTS_PATH,
     QUANTITY_ACTIVITY,
+    QUANTITY_PRESSURE,
     REFUSAL_TIMEOUT,
     REFUSAL_UNAVAILABLE,
+    REFUSAL_VALUE_IS_FLOOR,
     BinaryPot,
     EngineHandle,
     EquilibrateCell,
     Po2Request,
     classify_equilibrate_outcome,
+    classify_reported_value,
+    collect_floor_refusals,
     equilibrate_cell,
     extract_reported_quantities,
     load_binary_pots,
     pairwise_residuals,
+    recompute_residuals_from_report,
     render_report_markdown,
     residual_log10,
     write_reports,
+)
+from simulator.physical_constants import (
+    CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
+    MELT_DISSOCIATION_PO2_MIN_BAR,
 )
 
 
@@ -341,4 +350,132 @@ def test_battery_engine_names_match_backends_py_surface() -> None:
         "vaporock",
         "magemin",
         "cached-real",
+    )
+
+
+def _ok_cell(
+    *,
+    engine: str,
+    gas: dict[str, float],
+    activities: dict[str, float] | None = None,
+) -> EquilibrateCell:
+    return EquilibrateCell(
+        pot_id="feo_mgo_sio2_30_20_50",
+        engine=engine,
+        temperature_K=1700.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities=dict(activities or {}),
+        gas_partial_pressures_Pa=dict(gas),
+        liquid_fraction=1.0,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname="test",
+    )
+
+
+def test_floor_value_is_typed_refusal_not_residual() -> None:
+    floor_fill = MELT_DISSOCIATION_PO2_MIN_BAR
+    floor_exploded = 4.527934710618984e20
+    physical = 7.318136019588876e-12
+
+    fill_refusal = classify_reported_value(
+        floor_fill, quantity=QUANTITY_PRESSURE, engine="thermoengine"
+    )
+    assert fill_refusal is not None
+    assert fill_refusal["reason"] == REFUSAL_VALUE_IS_FLOOR
+    assert fill_refusal["engine"] == "thermoengine"
+    assert fill_refusal["floor_value"] == floor_fill
+    assert fill_refusal["reported_value"] == floor_fill
+
+    exploded_refusal = classify_reported_value(
+        floor_exploded, quantity=QUANTITY_PRESSURE, engine="thermoengine"
+    )
+    assert exploded_refusal is not None
+    assert exploded_refusal["reason"] == REFUSAL_VALUE_IS_FLOOR
+    assert exploded_refusal["floor_value"] == MELT_DISSOCIATION_PO2_MIN_BAR
+    assert exploded_refusal["reported_value"] == floor_exploded
+    assert floor_exploded >= CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+
+    assert (
+        classify_reported_value(
+            physical, quantity=QUANTITY_PRESSURE, engine="alphamelts"
+        )
+        is None
+    )
+
+    synthetic = SimpleNamespace(
+        activity_coefficients={"SiO2": 0.75},
+        vapor_pressures_Pa={"Si": floor_fill, "SiO": 0.013},
+        vaporock_full_speciation_Pa=None,
+    )
+    activities, pressures = extract_reported_quantities(synthetic)
+    assert activities == {"SiO2": 0.75}
+    assert pressures["Si"] == floor_fill
+    assert pressures["SiO"] == pytest.approx(0.013)
+
+    floor_cell = _ok_cell(engine="thermoengine", gas={"Si": floor_fill, "SiO": 0.013})
+    partner = _ok_cell(
+        engine="alphamelts", gas={"Si": physical, "SiO": 0.0087}
+    )
+    exploded_cell = _ok_cell(
+        engine="thermoengine", gas={"Si": floor_exploded, "SiO": 0.013}
+    )
+    vaporock = _ok_cell(
+        engine="vaporock", gas={"Si": 9.540668602825991e-12, "SiO": 0.0127}
+    )
+
+    fill_rows = pairwise_residuals([floor_cell, partner])
+    assert all(row["species"] != "Si" for row in fill_rows)
+    assert any(row["species"] == "SiO" for row in fill_rows)
+
+    exploded_rows = pairwise_residuals([exploded_cell, partner, vaporock])
+    assert all(
+        "thermoengine" not in (row["engine_a"], row["engine_b"])
+        for row in exploded_rows
+        if row["species"] == "Si" and row["quantity"] == QUANTITY_PRESSURE
+    )
+    assert any(
+        row["species"] == "Si"
+        and {row["engine_a"], row["engine_b"]} == {"alphamelts", "vaporock"}
+        for row in exploded_rows
+    )
+    assert any(row["species"] == "SiO" for row in exploded_rows)
+
+    refusals = collect_floor_refusals([floor_cell, exploded_cell, partner])
+    assert {row["reason"] for row in refusals} == {REFUSAL_VALUE_IS_FLOOR}
+    assert {row["engine"] for row in refusals} == {"thermoengine"}
+    assert {row["species"] for row in refusals} == {"Si"}
+    assert {row["floor_value"] for row in refusals} == {MELT_DISSOCIATION_PO2_MIN_BAR}
+
+    rebuilt = recompute_residuals_from_report(
+        {
+            "pots": [
+                {
+                    "pot_id": "feo_mgo_sio2_30_20_50",
+                    "kato_1993_table4_system": "FeO-MgO-SiO2",
+                    "why": "fixture",
+                    "composition_wt_pct": {
+                        "FeO": 30.0,
+                        "MgO": 20.0,
+                        "SiO2": 50.0,
+                    },
+                }
+            ],
+            "cells": [
+                floor_cell.as_payload(),
+                exploded_cell.as_payload(),
+                partner.as_payload(),
+                vaporock.as_payload(),
+            ],
+        }
+    )
+    assert rebuilt["n_floor_refusals"] == 2
+    assert all(
+        "thermoengine" not in (row["engine_a"], row["engine_b"])
+        for row in rebuilt["largest_in_envelope_residuals"]
+        if row["species"] == "Si" and row["quantity"] == QUANTITY_PRESSURE
     )

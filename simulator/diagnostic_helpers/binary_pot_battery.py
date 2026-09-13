@@ -33,6 +33,10 @@ from typing import Any, Callable, Mapping, Sequence
 
 import yaml
 
+from simulator.physical_constants import (
+    CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
+    MELT_DISSOCIATION_PO2_MIN_BAR,
+)
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 
 
@@ -64,6 +68,7 @@ REFUSAL_MAJOR_SUM = "sum_below_95_wt_pct"
 REFUSAL_NO_LIQUID = "no_liquid"
 REFUSAL_TIMEOUT = "engine_timeout"
 REFUSAL_UNAVAILABLE = "unavailable"
+REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
 
 _MAJOR_SUM_TOKENS = frozenset(
     {"major_sum", "sum_below_95_wt_pct", "major oxide sum"}
@@ -369,6 +374,100 @@ def residual_log10(value_a: float, value_b: float) -> float:
     return math.log10(a / b)
 
 
+def classify_reported_value(
+    value: Any,
+    *,
+    quantity: str,
+    engine: str,
+) -> dict[str, Any] | None:
+    """Typed refusal when a reported number is a floor, sentinel, or absence.
+
+    The adapter pO2 clamp is ``max(pO2_bar, 1e-30)``
+    (``alphamelts.py:5139``, ``thermoengine.py:430``; same number as
+    ``MELT_DISSOCIATION_PO2_MIN_BAR``). For Si the Antoine fallback then
+    applies ``(pO2 / pO2_ref) ** (-1)`` with ``pO2_ref = 1e-9 bar``, so a
+    clamped 1e-30 bar becomes a ~1e21 boost and P_Si lands at ~4.5e20 Pa
+    at 1700 K — a floor scored as a vapor pressure.
+
+    Premise: a gas partial pressure at or above
+    ``CATALOG_PHYSICAL_PRESSURE_CEILING_PA`` (1e9 Pa = 10 kbar) is not a
+    vacuum-pyrolysis vapor pressure; it is that clamp inverted through a
+    negative mass-action exponent. Algebra: P_Si = a_SiO2 * P_ref *
+    (pO2 / 1e-9) ** (-1); with pO2 floored at 1e-30 bar the pO2 term is
+    1e21. Unit check: bar/bar dimensionless, P_ref in Pa. Sanity: 1e9 Pa
+    is 10 kbar, already above any vacuum-pyrolysis vapor; the 1700 K
+    exploded Si cell is ~4.5e20 Pa.
+
+    A reported value equal to the clamp itself (1e-30) is the fill
+    constant used as a Pa number.
+    """
+
+    number = _finite_float(value)
+    if number is None or number <= 0.0:
+        return None
+    if quantity != QUANTITY_PRESSURE:
+        return None
+    if number >= CATALOG_PHYSICAL_PRESSURE_CEILING_PA:
+        return {
+            "reason": REFUSAL_VALUE_IS_FLOOR,
+            "engine": str(engine),
+            "floor_value": MELT_DISSOCIATION_PO2_MIN_BAR,
+            "reported_value": number,
+        }
+    if number == MELT_DISSOCIATION_PO2_MIN_BAR:
+        return {
+            "reason": REFUSAL_VALUE_IS_FLOOR,
+            "engine": str(engine),
+            "floor_value": MELT_DISSOCIATION_PO2_MIN_BAR,
+            "reported_value": number,
+        }
+    return None
+
+
+def collect_floor_refusals(
+    cells: Sequence[EquilibrateCell] | Sequence[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    """Per-species value_is_floor records; not scored as residuals."""
+
+    rows: list[dict[str, Any]] = []
+    for cell in cells:
+        payload = cell.as_payload() if isinstance(cell, EquilibrateCell) else dict(cell)
+        if payload.get("status") != "ok":
+            continue
+        engine = str(payload.get("engine") or "")
+        po2 = payload.get("po2") or {}
+        for quantity, field_name in (
+            (QUANTITY_ACTIVITY, "melt_activities"),
+            (QUANTITY_PRESSURE, "gas_partial_pressures_Pa"),
+        ):
+            for name, raw in dict(payload.get(field_name) or {}).items():
+                refusal = classify_reported_value(
+                    raw, quantity=quantity, engine=engine
+                )
+                if refusal is None:
+                    continue
+                rows.append(
+                    {
+                        "pot_id": payload.get("pot_id"),
+                        "temperature_K": payload.get("temperature_K"),
+                        "po2_mode": po2.get("mode"),
+                        "po2_bar": po2.get("po2_bar"),
+                        "species": str(name),
+                        "quantity": quantity,
+                        **refusal,
+                    }
+                )
+    rows.sort(
+        key=lambda row: (
+            str(row.get("pot_id") or ""),
+            float(row.get("temperature_K") or 0.0),
+            str(row.get("species") or ""),
+            str(row.get("engine") or ""),
+        )
+    )
+    return rows
+
+
 def pairwise_residuals(
     cells: Sequence[EquilibrateCell] | Sequence[Mapping[str, Any]],
 ) -> list[dict[str, Any]]:
@@ -408,6 +507,12 @@ def pairwise_residuals(
                     for name in species:
                         value_a = float((left.get(field_name) or {})[name])
                         value_b = float((right.get(field_name) or {})[name])
+                        if classify_reported_value(
+                            value_a, quantity=quantity, engine=engine_a
+                        ) or classify_reported_value(
+                            value_b, quantity=quantity, engine=engine_b
+                        ):
+                            continue
                         try:
                             delta = residual_log10(value_a, value_b)
                         except BinaryPotBatteryError:
@@ -1053,6 +1158,7 @@ def build_report(
     generated_at: str | None = None,
 ) -> dict[str, Any]:
     residuals = pairwise_residuals(cells)
+    floor_refusals = collect_floor_refusals(cells)
     identities = _engine_identities_from_toml()
     engines_block: dict[str, Any] = {}
     for name in engine_names:
@@ -1123,12 +1229,47 @@ def build_report(
         "n_ok": sum(1 for cell in cells if cell.status == "ok"),
         "n_refused": sum(1 for cell in cells if cell.status == "refusal"),
         "n_matched_residuals": len(residuals),
+        "n_floor_refusals": len(floor_refusals),
+        "floor_refusals": floor_refusals,
         "cells": [cell.as_payload() for cell in cells],
         "note": (
             "divergence_label is a descriptive magnitude band only; "
-            "never an acceptance verdict."
+            "never an acceptance verdict. Floor/sentinel/absent values "
+            "are value_is_floor refusals and are excluded from residuals."
         ),
     }
+
+
+def recompute_residuals_from_report(
+    report: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Re-score an existing engine-arm JSON (no engine re-run)."""
+
+    pots = tuple(
+        BinaryPot(
+            pot_id=str(row["pot_id"]),
+            kato_1993_table4_system=row.get("kato_1993_table4_system"),
+            why=str(row.get("why") or ""),
+            composition_wt_pct=dict(row.get("composition_wt_pct") or {}),
+        )
+        for row in report.get("pots") or []
+        if isinstance(row, Mapping)
+    )
+    cells = list(report.get("cells") or [])
+    residuals = pairwise_residuals(cells)
+    floor_refusals = collect_floor_refusals(cells)
+    updated = dict(report)
+    updated["largest_in_envelope_residuals"] = residuals[:20]
+    updated["n_matched_residuals"] = len(residuals)
+    updated["per_pot_residuals"] = _per_pot_residual_tables(pots, residuals)
+    updated["n_floor_refusals"] = len(floor_refusals)
+    updated["floor_refusals"] = floor_refusals
+    updated["note"] = (
+        "divergence_label is a descriptive magnitude band only; "
+        "never an acceptance verdict. Floor/sentinel/absent values "
+        "are value_is_floor refusals and are excluded from residuals."
+    )
+    return updated
 
 
 def _fmt_dex(value: Any) -> str:
@@ -1154,6 +1295,10 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
         "- verdict: none — this report measures engine-vs-engine residuals and cannot pass or fail the model",
         "- `divergence_label` is a descriptive magnitude band only; never an acceptance verdict",
         f"- hostname: `{report.get('hostname')}`",
+        (
+            f"- floor refusals: `{report.get('n_floor_refusals', 0)}` "
+            f"(`{REFUSAL_VALUE_IS_FLOOR}`; excluded from residuals)"
+        ),
         (
             f"- wall: `{receipt.get('wall_s'):.3f} s`; "
             f"cpu: `{receipt.get('cpu_s'):.3f} s`; "
@@ -1253,7 +1398,9 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
             "## Per-pot residual tables",
             "",
             "Matched in-envelope residuals only (both engines reported a finite "
-            "positive value for the same species and quantity).",
+            "positive value for the same species and quantity). "
+            "A floor/sentinel/absent value is a `value_is_floor` refusal "
+            "and is not scored.",
             "",
         ]
     )
@@ -1334,12 +1481,40 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
             "",
             (
                 "The companion JSON contains every cell, typed refusal, and "
-                "matched residual. No result is clipped or used to change a "
-                "coefficient."
+                "matched residual. Floor/sentinel/absent values are "
+                f"`{REFUSAL_VALUE_IS_FLOOR}` (floor_value="
+                f"{MELT_DISSOCIATION_PO2_MIN_BAR:g} bar pO2 clamp, or a "
+                f"gas partial pressure ≥ {CATALOG_PHYSICAL_PRESSURE_CEILING_PA:g} Pa) "
+                "and are excluded from residuals. No result is used to change "
+                "a coefficient."
             ),
             "",
         ]
     )
+    n_floor = int(report.get("n_floor_refusals") or 0)
+    if n_floor:
+        lines.extend(
+            [
+                "Adapter exposure (not changed in this harness): the 1e-30 bar "
+                "pO2 clamp lives in `simulator/melt_backend/alphamelts.py:5139` "
+                "(`max(float(pO2_bar), 1e-30)`) and "
+                "`simulator/melt_backend/thermoengine.py:430` "
+                "(`pO2_bar=max(10.0 ** solved_fO2_log, 1e-30)`). For Si, "
+                "`_activities_times_antoine` then applies "
+                "`(pO2 / pO2_ref) ** (-1)` (`pO2_ref = 1e-9 bar`), so the "
+                "clamp inverts to ~4.5e20 Pa at 1700 K. "
+                "`EquilibriumResult.vapor_pressures_Pa` is the field. "
+                "Recipe path: `simulator/core.py` "
+                "`_refresh_vapor_pressures_from_kernel` replaces backend "
+                "pressures with the builtin kernel; builtin "
+                "`engines/builtin/vapor_pressure.py` uses the same "
+                "`MELT_DISSOCIATION_PO2_MIN_BAR = 1e-30` clamp, so an "
+                "extremely reducing recipe fO2 can still explode P_Si into "
+                "evaporation flux. Direct `equilibrate()` consumers "
+                "(this battery, engine_crosscheck) see the adapter number.",
+                "",
+            ]
+        )
     return "\n".join(lines)
 
 
