@@ -475,6 +475,7 @@ def validate_observation(
     observation: Observation,
     experiments: Mapping[str, Experiment],
     observations: Mapping[str, Observation],
+    works: Mapping[str, Work] | None = None,
     path: str = "observation",
 ) -> list[ValidationIssue]:
     issues: list[ValidationIssue] = []
@@ -513,6 +514,28 @@ def validate_observation(
                         "literature observation requires read_from",
                     )
                 )
+    work = None
+    if experiment is not None and experiment.work_id and works:
+        work = works.get(experiment.work_id)
+    asset_ids: set[str] = set()
+    if work is not None:
+        asset_ids = {f.asset_id for f in work.source_files.files}
+        if observation.read_from and observation.read_from not in asset_ids:
+            issues.append(
+                _issue(
+                    f"{path}.read_from",
+                    RefusalReason.REFERENTIAL_INTEGRITY,
+                    f"read_from {observation.read_from!r} is not a Work asset",
+                )
+            )
+        if observation.source_id and observation.source_id not in work.source_ids:
+            issues.append(
+                _issue(
+                    f"{path}.source_id",
+                    RefusalReason.REFERENTIAL_INTEGRITY,
+                    f"source_id {observation.source_id!r} is not in Work.source_ids",
+                )
+            )
     identity = observation.identity
     if not isinstance(identity, Identity):
         issues.append(
@@ -576,6 +599,16 @@ def validate_observation(
                         f"{path}.derived_from",
                         RefusalReason.REFERENTIAL_INTEGRITY,
                         f"derived_from {parent!r} does not resolve",
+                    )
+                )
+    if observation.derivation is not None:
+        for inp in observation.derivation.inputs:
+            if inp not in observations and inp not in asset_ids:
+                issues.append(
+                    _issue(
+                        f"{path}.derivation.inputs",
+                        RefusalReason.REFERENTIAL_INTEGRITY,
+                        f"derivation input {inp!r} does not resolve",
                     )
                 )
     if observation.admission.status is AdmissionStatus.SUPERSEDED and not observation.admission.superseded_by:
@@ -855,23 +888,39 @@ def validate_residual(
     return issues
 
 
+def _index_unique(
+    items: Sequence[Any] | Mapping[str, Any],
+    attr: str,
+    label: str,
+    issues: list[ValidationIssue],
+) -> dict[str, Any]:
+    if isinstance(items, Mapping):
+        return dict(items)
+    indexed: dict[str, Any] = {}
+    for item in items:
+        key = getattr(item, attr)
+        if key in indexed:
+            issues.append(
+                _issue(
+                    f"{label}[{key}]",
+                    RefusalReason.REFERENTIAL_INTEGRITY,
+                    f"duplicate {attr} {key!r}",
+                )
+            )
+        indexed[key] = item
+    return indexed
+
+
 def validate_corpus(
     works: Sequence[Work] | Mapping[str, Work],
     experiments: Sequence[Experiment] | Mapping[str, Experiment],
     observations: Sequence[Observation] | Mapping[str, Observation],
     residuals: Sequence[Residual] | Mapping[str, Residual] | None = None,
 ) -> ValidationReport:
-    work_map = works if isinstance(works, Mapping) else {w.work_id: w for w in works}
-    exp_map = (
-        experiments
-        if isinstance(experiments, Mapping)
-        else {e.experiment_id: e for e in experiments}
-    )
-    obs_map = (
-        observations
-        if isinstance(observations, Mapping)
-        else {o.observation_id: o for o in observations}
-    )
+    issues: list[ValidationIssue] = []
+    work_map = _index_unique(works, "work_id", "work", issues)
+    exp_map = _index_unique(experiments, "experiment_id", "experiment", issues)
+    obs_map = _index_unique(observations, "observation_id", "observation", issues)
     res_items: Iterable[Residual]
     if residuals is None:
         res_items = ()
@@ -879,8 +928,18 @@ def validate_corpus(
         res_items = residuals.values()
     else:
         res_items = residuals
+        seen_keys: set[str] = set()
+        for residual in res_items:
+            if residual.key in seen_keys:
+                issues.append(
+                    _issue(
+                        f"residual[{residual.key}]",
+                        RefusalReason.REFERENTIAL_INTEGRITY,
+                        f"duplicate residual key {residual.key!r}",
+                    )
+                )
+            seen_keys.add(residual.key)
 
-    issues: list[ValidationIssue] = []
     for work in work_map.values():
         issues.extend(validate_work(work, f"work[{work.work_id}]"))
     for experiment in exp_map.values():
@@ -890,7 +949,11 @@ def validate_corpus(
     for observation in obs_map.values():
         issues.extend(
             validate_observation(
-                observation, exp_map, obs_map, f"observation[{observation.observation_id}]"
+                observation,
+                exp_map,
+                obs_map,
+                work_map,
+                f"observation[{observation.observation_id}]",
             )
         )
     for cycle in _ancestry_cycles(obs_map):

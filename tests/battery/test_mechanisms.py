@@ -1226,6 +1226,62 @@ def test_physics_false_refuse_compilation_not_applicable_axes_equal() -> None:
     assert identity_equal(clean_psat, F.psat_identity("Na")).kind is IdentityEqualKind.EQUAL
 
 
+def test_referential_integrity_rejects_duplicates_and_dangling_refs() -> None:
+    from dataclasses import replace
+
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    first = F.observation("dup", exp.experiment_id, ident, Decimal("0"))
+    second = F.observation("dup", exp.experiment_id, ident, Decimal("999"))
+    dup_report = validate_corpus([w], [exp], [first, second])
+    assert not dup_report.ok
+    assert any("duplicate" in i.detail for i in dup_report.issues)
+    dangling = replace(first, observation_id="dangling", read_from="nonexistent-asset", source_id="foreign-source")
+    dangling_report = validate_corpus([w], [exp], [dangling])
+    assert not dangling_report.ok
+    assert any(i.reason is RefusalReason.REFERENTIAL_INTEGRITY for i in dangling_report.issues)
+    raw = F.observation(
+        "raw-lineage",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    derived = F.observation(
+        "derived-lineage",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derived_from=("raw-lineage",),
+        derivation=Derivation(
+            relation="ion-to-pressure",
+            inputs=("missing-input",),
+            parameters=(),
+            output_unit="Pa",
+        ),
+    )
+    derived_report = validate_corpus([w], [exp], [raw, derived])
+    assert not derived_report.ok
+    assert any("derivation input" in i.detail for i in derived_report.issues)
+    good_derived = F.observation(
+        "derived-ok",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derived_from=("raw-lineage",),
+        derivation=Derivation(
+            relation="ion-to-pressure",
+            inputs=("raw-lineage",),
+            parameters=(),
+            output_unit="Pa",
+        ),
+    )
+    assert validate_corpus([w], [exp], [raw, good_derived]).ok
+
+
 def test_closed_records_reject_invalid_payloads() -> None:
     """Closed records: invalid tokens, mixed Value branches, empty maps, missing C()."""
 
