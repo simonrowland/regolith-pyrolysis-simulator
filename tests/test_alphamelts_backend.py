@@ -2126,20 +2126,27 @@ def test_alphamelts_cleanup_reaps_launcher_after_retry_kill(monkeypatch):
     assert events[3][1] <= 0.2
 
 
-def test_alphamelts_subprocess_rejects_below_operating_floor_without_launch(
+def test_alphamelts_subprocess_below_certified_t_notices_and_still_launches(
     monkeypatch,
 ):
+    """t-894: certified T band is notice+run, not a pre-equilibrate refusal."""
     backend = AlphaMELTSBackend()
     backend._mode = 'subprocess'
     backend._binary_path = Path('/tmp/fake-alphamelts')
+    called = []
 
-    def forbidden_run(*_args, **_kwargs):
-        raise AssertionError('out-of-domain point must not launch AlphaMELTS')
+    def spy_prepared(**kwargs):
+        called.append(kwargs)
+        return EquilibriumResult(
+            temperature_C=kwargs['temperature_C'],
+            status='ok',
+            liquid_fraction=1.0,
+            phases_present=['liquid'],
+            diagnostics=dict(kwargs.get('crash_diagnostics') or {}),
+            warnings=list(kwargs.get('warnings') or []),
+        )
 
-    monkeypatch.setattr(
-        'simulator.melt_backend.alphamelts._run_alphamelts_subprocess',
-        forbidden_run,
-    )
+    monkeypatch.setattr(backend, '_equilibrate_prepared', spy_prepared)
 
     result = backend.equilibrate(
         temperature_C=75.0,
@@ -2149,11 +2156,12 @@ def test_alphamelts_subprocess_rejects_below_operating_floor_without_launch(
         subprocess_run_mode='isothermal',
     )
 
-    assert result.status == 'out_of_domain'
-    assert result.diagnostics['backend_status_reason'] == (
-        'subprocess_temperature_below_minimum'
+    assert called, 'certified-band T must still call the engine'
+    assert result.diagnostics['authority'] == 'extrapolated'
+    assert result.diagnostics['commissioning_notice']['kind'] == (
+        'engine_commissioning'
     )
-    assert result.diagnostics['backend_failure_category'] == 'out_of_domain'
+    assert 'certified_band' in result.diagnostics
     assert backend._mode == 'subprocess'
 
 
@@ -3909,7 +3917,7 @@ def test_domain_gate_rejects_non_silicate_or_non_oxide_inputs():
 
     assert result.phases_present == []
     assert result.warnings == [
-        'DomainGate rejected: SiO2 90.000 wt% outside [30, 80]; '
+        'DomainGate rejected: '
         'major oxide sum 90.000 wt% <= 95; non-oxide species present: Fe'
     ]
     assert result.status == 'out_of_domain'

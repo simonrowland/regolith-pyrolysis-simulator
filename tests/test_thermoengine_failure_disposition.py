@@ -16,6 +16,7 @@ from engines.alphamelts.thermoengine import (
 from simulator.melt_backend.liquidus import (
     liquidus_sample_error_from_exception,
 )
+from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
 
 
@@ -175,3 +176,38 @@ def test_initialize_preserves_execution_failure_and_real_absence(
         backend.initialize({})
     assert raised_absence.value.__cause__ is absence
     assert 'transport unavailable' in str(raised_absence.value)
+
+
+def test_thermoengine_commissioning_notice_does_not_retype_to_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Out of the certified T band ThermoEngine still runs (predict-and-flag)."""
+    backend = ThermoEngineBackend()
+    backend._mode = 'thermoengine'
+    backend._engine_version = 'test'
+    called: list[dict] = []
+
+    def spy(**kwargs):
+        called.append(kwargs)
+        return EquilibriumResult(
+            temperature_C=kwargs['temperature_C'],
+            status='ok',
+            liquid_fraction=1.0,
+            phases_present=['liquid'],
+            diagnostics=dict(kwargs.get('crash_diagnostics') or {}),
+            warnings=list(kwargs.get('warnings') or []),
+        )
+
+    monkeypatch.setattr(backend, '_equilibrate_prepared', spy)
+    result = backend.equilibrate(
+        temperature_C=2200.0,
+        composition_kg={'SiO2': 50.0, 'Al2O3': 15.0, 'MgO': 35.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+    assert called
+    assert result.status == 'ok'
+    assert result.diagnostics['authority'] == 'extrapolated'
+    assert result.diagnostics['commissioning_notice']['reason'] == (
+        'temperature_range'
+    )

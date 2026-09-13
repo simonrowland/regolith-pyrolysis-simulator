@@ -9,11 +9,15 @@ from engines.alphamelts.domain import (
     CONSTRAINT_OXIDE_BASIS,
     CONSTRAINT_SILICATE_NETWORK_BAND,
     DEFAULT_SILICATE_NETWORK_BAND_WT_PCT,
+    DEFAULT_SIO2_MAX_WT_PCT,
+    DEFAULT_SIO2_MIN_WT_PCT,
     MELTS_PARENT_OXIDE_NOT_ENDMEMBER,
     AlphaMELTSDomainGate,
     DomainGateAssessment,
     melts_endmember_to_parent_oxide_activity,
+    _SIO2_CRASH_FLOOR_WT_PCT,
 )
+from engines.engine_commissioning import engine_commissioning
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.chemistry.kernel.dto import (
     INTENT_RESULT_STATUSES,
@@ -34,6 +38,15 @@ def _in_band_basalt() -> dict[str, float]:
 
 def test_default_band_matches_historical_30_80() -> None:
     assert DEFAULT_SILICATE_NETWORK_BAND_WT_PCT == (30.0, 80.0)
+
+
+def test_default_band_aliases_commissioning_table() -> None:
+    """t-894: domain.py constants are aliases of data/engine_commissioning.yaml."""
+    spec = engine_commissioning('alphamelts')
+    assert DEFAULT_SIO2_MIN_WT_PCT == spec.sio2_wt_pct.certified.minimum
+    assert DEFAULT_SIO2_MAX_WT_PCT == spec.sio2_wt_pct.certified.maximum
+    assert _SIO2_CRASH_FLOOR_WT_PCT == spec.sio2_wt_pct.crash_floor
+    assert DEFAULT_SILICATE_NETWORK_BAND_WT_PCT == spec.sio2_wt_pct.certified.as_tuple()
 
 
 def test_assess_default_band_is_golden_neutral_with_validate() -> None:
