@@ -826,9 +826,23 @@ def _values_compare(name: str, left: Any, right: Any) -> IdentityEqualOutcome:
     return _mismatch(name)
 
 
+def _quantity_state(identity: Identity) -> State[Quantity]:
+    q = identity.quantity
+    if isinstance(q, State):
+        return q
+    return State.of(q)
+
+
 def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
     """Reject a supplied VALUE on an inapplicable axis; check reservoir rule."""
 
+    q_state = _quantity_state(identity)
+    if q_state.is_not_applicable:
+        return IdentityEqualOutcome(
+            IdentityEqualKind.INVALID_IDENTITY,
+            ("quantity",),
+            "quantity cannot be not_applicable",
+        )
     if quantity_token(identity) is None:
         return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
     profile = profile_for(identity)
@@ -898,6 +912,18 @@ def _reservoir_rule(identity: Identity) -> IdentityEqualOutcome | None:
 def identity_equal(left: Identity, right: Identity) -> IdentityEqualOutcome:
     """Exact equality on the quantity-class compared axes."""
 
+    left_q_state = _quantity_state(left)
+    right_q_state = _quantity_state(right)
+    if left_q_state.is_not_applicable and right_q_state.is_not_applicable:
+        return IdentityEqualOutcome(
+            IdentityEqualKind.INVALID_IDENTITY,
+            ("quantity",),
+            "quantity cannot be not_applicable",
+        )
+    if left_q_state.is_not_applicable or right_q_state.is_not_applicable:
+        if left_q_state.is_unknown or right_q_state.is_unknown:
+            return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_UNKNOWN, ("quantity",))
+        return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_MISMATCH, ("quantity",))
     left_profile = validate_quantity_profile(left)
     right_profile = validate_quantity_profile(right)
     if left_profile.kind is IdentityEqualKind.INVALID_IDENTITY:

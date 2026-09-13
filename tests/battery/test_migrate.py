@@ -418,6 +418,27 @@ def test_g01_sidecar_without_phase_is_unknown(tmp_path: Path) -> None:
     assert kems.identity.species.phase.is_unknown
 
 
+def test_h09_quantity_not_applicable_is_not_unknown() -> None:
+    from dataclasses import replace
+
+    known = F.psat_identity("Na")
+    na = replace(known, quantity=State.not_applicable("test"))
+    both_na = identity_equal(na, na)
+    assert both_na.kind is IdentityEqualKind.INVALID_IDENTITY
+    vs_known = identity_equal(known, na)
+    assert vs_known.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    unk = replace(known, quantity=State.unknown("missing quantity"))
+    assert identity_equal(unk, unk).kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert identity_equal(known, unk).kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    exp = F.tabulation_experiment()
+    report = validate_corpus(
+        [F.work()],
+        [exp],
+        [F.observation("na-qty", exp.experiment_id, na, 1)],
+    )
+    assert any(i.reason.value == "invalid_identity" for i in report.hard_issues)
+
+
 def test_g01_identity_unknown_phase_never_equals() -> None:
     from dataclasses import replace
 
