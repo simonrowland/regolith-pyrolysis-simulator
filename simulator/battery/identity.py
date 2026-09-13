@@ -273,7 +273,7 @@ class QuantityProfile:
 
 @dataclass(frozen=True)
 class Identity:
-    quantity: Quantity
+    quantity: State[Quantity] | Quantity
     species: Species
     subtype: State[str] | None = None
     per: State[PerBasis] | None = None
@@ -292,6 +292,16 @@ class Identity:
     wall: State[WallIdentity] | None = None
 
     def __post_init__(self) -> None:
+        if isinstance(self.quantity, Quantity):
+            object.__setattr__(self, "quantity", State.of(self.quantity))
+        elif not isinstance(self.quantity, State):
+            raise ValueError(
+                f"Identity.quantity must be a Quantity token or State[Quantity], not {self.quantity!r}"
+            )
+        elif self.quantity.is_value and self.quantity.value not in Quantity:
+            raise ValueError(
+                f"Identity.quantity must be a closed Quantity token, not {self.quantity.value!r}"
+            )
         if self.temperature_K is not None and self.temperature_K.is_value:
             object.__setattr__(
                 self,
@@ -341,7 +351,9 @@ def profile_for(identity: Identity) -> QuantityProfile:
     spec says so), never by whether a field happens to be filled.
     """
 
-    q = identity.quantity
+    q = quantity_token(identity)
+    if q is None:
+        return QuantityProfile(required=frozenset(), permitted_not_applicable=frozenset())
     required: set[str] = set()
     permitted_na: set[str] = set()
 
@@ -602,6 +614,17 @@ def _reaction_includes_redox(identity: Identity) -> bool:
     return any(term.species.formula == "O2" for term in reaction_state.value.terms)
 
 
+def quantity_token(identity: Identity) -> Quantity | None:
+    """Closed Quantity token when the axis is a value; None for unknown / n/a."""
+
+    q = identity.quantity
+    if isinstance(q, Quantity):
+        return q
+    if isinstance(q, State) and q.is_value:
+        return q.value
+    return None
+
+
 def _axis_state(identity: Identity, name: str) -> State[Any] | None:
     return getattr(identity, name)
 
@@ -836,7 +859,7 @@ def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
 
 
 def _reservoir_rule(identity: Identity) -> IdentityEqualOutcome | None:
-    if identity.quantity is not Quantity.P_SAT:
+    if quantity_token(identity) is not Quantity.P_SAT:
         return None
     reservoir = identity.reservoir
     if reservoir is None or not reservoir.is_value or reservoir.value is None:
@@ -879,7 +902,11 @@ def identity_equal(left: Identity, right: Identity) -> IdentityEqualOutcome:
         return left_profile
     if right_profile.kind is IdentityEqualKind.INVALID_IDENTITY:
         return right_profile
-    if left.quantity is not right.quantity:
+    left_q = quantity_token(left)
+    right_q = quantity_token(right)
+    if left_q is None or right_q is None:
+        return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_UNKNOWN, ("quantity",))
+    if left_q is not right_q:
         return IdentityEqualOutcome(
             IdentityEqualKind.IDENTITY_MISMATCH, ("quantity",)
         )

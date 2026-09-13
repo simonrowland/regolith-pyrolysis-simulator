@@ -62,6 +62,7 @@ from simulator.battery.identity import (
     Identity,
     identity_equal,
     profile_for,
+    quantity_token,
     validate_quantity_profile,
 )
 from simulator.battery.records import (
@@ -264,11 +265,12 @@ def _table_payloads(
     ident = reference.identity
     if not isinstance(ident, Identity):
         return ()
-    if ident.quantity not in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
+    ident_q = quantity_token(ident)
+    if ident_q not in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
         return ()
     if not _is_printed_observation(reference):
         return ()
-    want = Quantity.LOG10_KF if ident.quantity is Quantity.DELTA_FG else Quantity.DELTA_FG
+    want = Quantity.LOG10_KF if ident_q is Quantity.DELTA_FG else Quantity.DELTA_FG
     payloads: list[dict] = []
     for other in observations.values():
         if other.observation_id == reference.observation_id:
@@ -278,12 +280,12 @@ def _table_payloads(
         if not _is_printed_observation(other):
             continue
         other_ident = other.identity
-        if not isinstance(other_ident, Identity) or other_ident.quantity is not want:
+        if not isinstance(other_ident, Identity) or quantity_token(other_ident) is not want:
             continue
         if not _table_identity_matches(ident, other_ident):
             continue
-        delta_obs = reference if ident.quantity is Quantity.DELTA_FG else other
-        log_obs = other if ident.quantity is Quantity.DELTA_FG else reference
+        delta_obs = reference if ident_q is Quantity.DELTA_FG else other
+        log_obs = other if ident_q is Quantity.DELTA_FG else reference
         payload = _table_pair_payload(delta_obs, log_obs)
         if payload is not None:
             payloads.append(payload)
@@ -427,7 +429,7 @@ def _check_identity(path: str, identity: Identity, issues: list[ValidationIssue]
         )
     if identity.reservoir is not None and identity.reservoir.is_value and identity.reservoir.value is not None:
         _check_species(f"{path}.reservoir", identity.reservoir.value, issues)
-        if identity.quantity is Quantity.P_SAT:
+        if quantity_token(identity) is Quantity.P_SAT:
             src = identity.reservoir.value
             if src.formula != identity.species.formula:
                 issues.append(
@@ -1178,7 +1180,7 @@ def validate_residual(
                             )
             quantity = None
             if isinstance(reference.identity, Identity):
-                quantity = reference.identity.quantity
+                quantity = quantity_token(reference.identity)
             if quantity in _VAPOUR_EQUILIBRIUM:
                 blocking = _pressure_blocking_notices(
                     residual.notices,

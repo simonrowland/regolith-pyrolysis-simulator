@@ -15,10 +15,11 @@ from simulator.battery.enums import (
     IdentityEqualKind,
     MethodToken,
     Phase,
+    Quantity,
     Rail,
     StateTag,
 )
-from simulator.battery.identity import atm_to_pa, identity_equal
+from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.migrate import (
     REPO_ROOT,
     DuplicateObservationIdError,
@@ -452,6 +453,67 @@ def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
     assert exp.method.is_unknown
     assert obs.evidence.class_.is_unknown
     assert obs.evidence.class_.value is not EvidenceClass.FIGURE_ONLY
+
+
+def test_g07_unsupported_quantity_is_unknown_not_relabeled(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "mre_measurements.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": "mre_measurements.v1",
+                "measurements": {
+                    "yu_2025_hollow_anode_measurements": {
+                        "paper_citation": {"title": "MRE fixture", "doi": "10.1234/MRE"},
+                        "cases": {
+                            "one_hour": {
+                                "comparison_points": [
+                                    {
+                                        "observable_id": "mre_applied_charge_C",
+                                        "expected_value": 1800.0,
+                                        "units": "C",
+                                        "source_locator": {"section": "2.2.2"},
+                                    }
+                                ]
+                            }
+                        },
+                    }
+                },
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    (root / "data" / "literature" / "species_rail_differential_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "points": [
+                    {
+                        "key": "janaf::Mg-nbp-sanity:T=1363::vapour_rail_psat::log10_Psat_over_P0",
+                        "source_id": "janaf",
+                        "species": "Mg",
+                        "comparison_quantity": "log10_Psat_over_P0",
+                        "temperature_K": 1363,
+                        "table_kJ_mol": 0.0,
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False, validate=True)
+    charge = result.observations[
+        "yu_2025_hollow_anode_measurements:one_hour:mre_applied_charge_C"
+    ]
+    assert charge.identity.quantity.is_unknown
+    assert quantity_token(charge.identity) is not Quantity.MASS_LOSS_FRACTION
+    psat = result.observations[
+        "janaf::Mg-nbp-sanity:T=1363::vapour_rail_psat::log10_Psat_over_P0"
+    ]
+    assert psat.identity.quantity.is_unknown
+    assert quantity_token(psat.identity) is not Quantity.DELTA_FG
+    assert "log10_Psat_over_P0" in (psat.identity.quantity.reason or "")
 
 
 def test_g06_p_atm_and_unliftable_series_explode(tmp_path: Path) -> None:

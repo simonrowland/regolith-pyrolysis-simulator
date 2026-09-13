@@ -66,6 +66,7 @@ from simulator.battery.identity import (
     bar_to_pa,
     celsius_to_kelvin,
     profile_for,
+    quantity_token,
 )
 from simulator.battery.records import (
     Admission,
@@ -749,14 +750,24 @@ def map_phase(raw: object) -> tuple[State[Phase], str | None]:
     )
 
 
-def map_quantity(obs_type: str | None, values: Mapping[str, Any] | None) -> Quantity:
+def map_quantity(
+    obs_type: str | None, values: Mapping[str, Any] | None
+) -> tuple[State[Quantity], str | None]:
+    raw = None
     if isinstance(values, Mapping):
         raw = values.get("quantity")
         if isinstance(raw, str) and raw in QUANTITY_ALIASES:
-            return QUANTITY_ALIASES[raw]
+            return State.of(QUANTITY_ALIASES[raw]), None
+        if isinstance(raw, str) and raw in {q.value for q in Quantity}:
+            return State.of(Quantity(raw)), None
     if obs_type in TYPE_QUANTITY:
-        return TYPE_QUANTITY[obs_type]
-    return Quantity.DELTA_FG
+        return State.of(TYPE_QUANTITY[obs_type]), None
+    if isinstance(raw, str) and raw:
+        return (
+            State.unknown(f"unsupported quantity {raw!r}"),
+            f"unsupported quantity {raw!r}",
+        )
+    return State.unknown("source does not state a closed quantity"), "missing quantity"
 
 
 def map_method(regime: object) -> State[MethodToken]:
@@ -943,7 +954,7 @@ def polymorph_from_extract(obs: Mapping[str, Any]) -> State[str] | None:
 
 
 def fill_identity(
-    quantity: Quantity,
+    quantity: Quantity | State[Quantity],
     species: Species,
     **known: Any,
 ) -> Identity:
@@ -954,9 +965,13 @@ def fill_identity(
     ``identity.temperature_K``.
     """
 
-    if quantity is Quantity.TRANSITION_TEMPERATURE:
+    q_state = quantity if isinstance(quantity, State) else State.of(quantity)
+    token = q_state.value if q_state.is_value else None
+    if token is Quantity.TRANSITION_TEMPERATURE:
         known.pop("temperature_K", None)
-    identity = Identity(quantity=quantity, species=species, **known)
+    identity = Identity(quantity=q_state, species=species, **known)
+    if token is None:
+        return identity
     from simulator.battery.identity import _AXIS_NAMES
 
     for _ in range(4):
@@ -972,12 +987,12 @@ def fill_identity(
             state = payload.get(name)
             if state is None:
                 payload[name] = State.not_applicable(
-                    f"profile {quantity.value} does not use {name}"
+                    f"profile {token.value} does not use {name}"
                 )
                 changed = True
             elif isinstance(state, State) and state.is_value:
                 payload[name] = State.not_applicable(
-                    f"profile {quantity.value} does not use {name}"
+                    f"profile {token.value} does not use {name}"
                 )
                 changed = True
         for name in _AXIS_NAMES:
@@ -1595,17 +1610,16 @@ class Migrator:
         species = make_species(
             species_formula, phase, polymorph=polymorph_from_extract(obs)
         )
-        quantity = map_quantity(obs_type, values)
-        if values.get("quantity") and str(values.get("quantity")) not in QUANTITY_ALIASES:
-            if obs_type not in TYPE_QUANTITY:
-                self.result.add_queue(
-                    work.work_id,
-                    locator,
-                    ["quantity"],
-                    f"unmapped values.quantity {values.get('quantity')!r}",
-                    source=source_key,
-                    observation_id=obs_id,
-                )
+        quantity, q_reason = map_quantity(obs_type, values)
+        if q_reason:
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["quantity"],
+                q_reason,
+                source=source_key,
+                observation_id=obs_id,
+            )
 
         t_known: Decimal | None = None
         t_range = obs.get("T_range_K") or values.get("T_range_K")
@@ -1696,14 +1710,15 @@ class Migrator:
             measured.tabulated_lists += 1
 
         ident_kwargs: dict[str, Any] = {}
-        if t_known is not None and quantity is not Quantity.TRANSITION_TEMPERATURE:
+        q_token = quantity.value if quantity.is_value else None
+        if t_known is not None and q_token is not Quantity.TRANSITION_TEMPERATURE:
             ident_kwargs["temperature_K"] = State.of(t_known)
         if p_std is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(p_std)
-        if quantity is Quantity.TRANSITION_TEMPERATURE and isinstance(values.get("quantity"), str):
+        if q_token is Quantity.TRANSITION_TEMPERATURE and isinstance(values.get("quantity"), str):
             ident_kwargs["subtype"] = State.of(str(values["quantity"]))
         if (
-            quantity is Quantity.TRANSITION_TEMPERATURE
+            q_token is Quantity.TRANSITION_TEMPERATURE
             and t_known is not None
             and value.kind in {ValueKind.UNAVAILABLE, ValueKind.INTERVAL}
         ):
@@ -1787,7 +1802,7 @@ class Migrator:
         source_key: str,
         experiment_id: str,
         locator: Locator,
-        identity_base: tuple[Quantity, Species, dict[str, Any]],
+        identity_base: tuple[Quantity | State[Quantity], Species, dict[str, Any]],
         evidence: Evidence,
         admission: Admission,
         uncertainty: Uncertainty,
@@ -1935,7 +1950,7 @@ class Migrator:
         source_key: str,
         observation_id: str,
         locator: Locator,
-        quantity: Quantity,
+        quantity: Quantity | State[Quantity],
         species: Species,
         value: Value,
         evidence: Evidence,
@@ -2096,6 +2111,19 @@ class Migrator:
                     )
                     assert loc is not None
                     formula = str(point.get("species") or "unknown")
+                    stated_q = point.get("quantity") or point.get("observable_id")
+                    mre_quantity, q_reason = map_quantity(
+                        None, {"quantity": stated_q} if stated_q else None
+                    )
+                    if q_reason:
+                        self.result.add_queue(
+                            work.work_id,
+                            loc,
+                            ["quantity"],
+                            q_reason,
+                            source=rel,
+                            observation_id=f"{meas_id}:{case_id}:{point.get('observable_id')}",
+                        )
                     expected = point.get("expected_value")
                     value = (
                         Value.point_of(expected)
@@ -2111,9 +2139,7 @@ class Migrator:
                         source_key=rel,
                         observation_id=f"{meas_id}:{case_id}:{point.get('observable_id')}",
                         locator=loc,
-                        quantity=Quantity.O2_YIELD
-                        if "o2" in str(point.get("observable_id", "")).lower()
-                        else Quantity.MASS_LOSS_FRACTION,
+                        quantity=mre_quantity,
                         species=make_species(
                             formula, map_phase(point.get("phase"))[0]
                         ),
@@ -2324,6 +2350,19 @@ class Migrator:
                 table=str(point.get("observation_id") or ""),
             )
             formula = str(point.get("species") or "unknown")
+            stated_q = point.get("comparison_quantity") or point.get("quantity")
+            ledger_quantity, q_reason = map_quantity(
+                None, {"quantity": stated_q} if stated_q else None
+            )
+            if q_reason:
+                self.result.add_queue(
+                    work.work_id,
+                    loc,
+                    ["quantity"],
+                    q_reason,
+                    source=rel,
+                    observation_id=str(point.get("key") or point.get("observation_id")),
+                )
             t = _as_dec_or_none(point.get("temperature_K"))
             table_val = point.get("table_kJ_mol")
             if table_val is None:
@@ -2340,7 +2379,7 @@ class Migrator:
                 source_key=rel,
                 observation_id=obs_id,
                 locator=loc,
-                quantity=Quantity.DELTA_FG,
+                quantity=ledger_quantity,
                 species=make_species(formula, map_phase(point.get("phase"))[0]),
                 value=value,
                 evidence=evidence_for(point.get("method_class") or point.get("provenance_class"))[0],
@@ -2446,7 +2485,9 @@ class Migrator:
             )
         loc_raw = doc.get("source_locator")
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
-        quantity = Quantity.DELTA_FG
+        quantity: Quantity | State[Quantity] = State.unknown(
+            "compilation record does not state a closed quantity"
+        )
         value: Value
         t = None
         p_std = None
@@ -2517,14 +2558,14 @@ class Migrator:
                 )
                 if t_row is not None and g_row is not None:
                     series_points.append((t_row, g_row))
-            value = (
-                Value(ValueKind.SERIES, series=tuple(series_points))
-                if series_points
-                else Value(
+            if series_points:
+                quantity = Quantity.DELTA_FG
+                value = Value(ValueKind.SERIES, series=tuple(series_points))
+            else:
+                value = Value(
                     ValueKind.UNAVAILABLE,
                     unavailable_reason="printed rows had no T/delta_fG pair",
                 )
-            )
         else:
             value = Value(
                 ValueKind.UNAVAILABLE,

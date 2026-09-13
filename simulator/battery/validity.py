@@ -39,7 +39,7 @@ from simulator.battery.enums import (
     RefusalReason,
     StateTag,
 )
-from simulator.battery.identity import log10K_from_delta_fG_kJ_mol
+from simulator.battery.identity import log10K_from_delta_fG_kJ_mol, quantity_token
 from simulator.battery.records import (
     Experiment,
     Located,
@@ -390,7 +390,7 @@ def run_validity_gates(
 ) -> GateOutcome:
     """Run all four gates. Record every failure; first is the primary reason."""
 
-    quantity = observation.identity.quantity
+    quantity = quantity_token(observation.identity)
     checks: list[GateCheck] = []
     primary: RefusalReason | None = None
     primary_name: str | None = None
@@ -421,9 +421,10 @@ def run_validity_gates(
                 printed_log10_Kf=payload.get("printed_log10_Kf"),
             )
         )
-    absorb(underdetermined_apparatus(experiment, quantity))
-    absorb(effusion_regime_unverified(experiment, quantity))
-    absorb(background_pressure_high(experiment, quantity))
+    if quantity is not None:
+        absorb(underdetermined_apparatus(experiment, quantity))
+        absorb(effusion_regime_unverified(experiment, quantity))
+        absorb(background_pressure_high(experiment, quantity))
     if primary is not None:
         return GateOutcome(
             passed=False,

@@ -46,6 +46,7 @@ from simulator.battery.identity import (
     identity_equal,
     kcal_th_to_kJ_per_mol,
     log10K_from_delta_fG_kJ_mol,
+    quantity_token,
     rescale_energy_per_basis,
 )
 from simulator.battery.records import (
@@ -2733,8 +2734,8 @@ def test_pi_p1_1_formation_elements_na_liquid_vs_gas() -> None:
 def test_pi_p1_2_pref_is_not_psat() -> None:
     pref = F.pref_identity()
     psat = F.psat_identity("Na", T_K=Decimal("1156"))
-    assert pref.quantity is Quantity.P_REFERENCE
-    assert psat.quantity is Quantity.P_SAT
+    assert quantity_token(pref) is Quantity.P_REFERENCE
+    assert quantity_token(psat) is Quantity.P_SAT
     pref_vs_psat = identity_equal(pref, psat)
     assert pref_vs_psat.kind is IdentityEqualKind.IDENTITY_MISMATCH
     assert pref_vs_psat.fields == ("quantity",)
