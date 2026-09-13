@@ -10,7 +10,10 @@ from __future__ import annotations
 import json
 import math
 import re
+import time
+from collections import defaultdict
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -18,8 +21,10 @@ import yaml
 
 from simulator.accounting.formulas import parse_formula
 from simulator.diagnostic_helpers.binary_pot_battery import (
+    REPORT_DIR,
     BinaryPot,
     BinaryPotBatteryError,
+    EquilibrateCell,
     Po2Request,
 )
 from simulator.state import MOLAR_MASS
@@ -578,3 +583,744 @@ def engine_arm_pot_ids(path: Path | None = None) -> tuple[str, ...]:
 
     pots, _grid = load_binary_pots(path)
     return tuple(pot.pot_id for pot in pots)
+
+
+# ---------------------------------------------------------------------------
+# Measured / model_derived activity comparators
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ActivityComparator:
+    source_id: str
+    observation_id: str
+    species: str
+    observable: str
+    method_class: str
+    sample_no: int | None
+    temperature_K: float
+    measured: float
+    units: str
+    standard_state: str | None
+    uncertainty: Mapping[str, Any] | None
+    doi: str | None
+    row: Mapping[str, Any]
+
+
+def method_class_is_scored(method_class: str) -> bool:
+    token = str(method_class or "").strip().lower()
+    if not token:
+        return False
+    if token in _UNSCORED_METHOD_CLASSES or token.startswith("model_derived"):
+        return False
+    if token.startswith("quoted"):
+        return False
+    return token == "measured"
+
+
+def _gamma_field_temperature_K(field: str, obs: Mapping[str, Any]) -> float | None:
+    match = re.search(r"(\d{3,4})C$", field)
+    if match:
+        return float(match.group(1)) + 273.0
+    return _row_temperature_K({}, obs)
+
+
+def iter_activity_comparators(
+    extract_paths: Sequence[Path] | None = None,
+) -> tuple[ActivityComparator, ...]:
+    """Activity / activity-coefficient rows from the scoring extracts."""
+
+    paths = tuple(extract_paths) if extract_paths is not None else SCORING_EXTRACTS
+    found: list[ActivityComparator] = []
+    for path in paths:
+        extract = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
+        if not isinstance(extract, Mapping):
+            continue
+        source_id = str(extract.get("source_id") or "")
+        doi = None
+        source_block = extract.get("source")
+        if isinstance(source_block, Mapping):
+            doi = source_block.get("doi")
+        for species, block in (extract.get("species") or {}).items():
+            for obs in block.get("observations") or []:
+                if not isinstance(obs, Mapping):
+                    continue
+                if str(obs.get("type") or "") != "activity_coefficient":
+                    continue
+                values = obs.get("values") if isinstance(obs.get("values"), Mapping) else {}
+                method = str(values.get("method_class") or "")
+                observation_id = str(obs.get("observation_id") or "")
+                standard_state = obs.get("standard_state")
+                uncertainty = obs.get("uncertainty") if isinstance(obs.get("uncertainty"), Mapping) else None
+                rows = values.get("rows")
+                if isinstance(rows, list) and rows:
+                    for row in rows:
+                        if not isinstance(row, Mapping):
+                            continue
+                        measured = _finite_positive(row.get("a_P2O5"))
+                        observable = "activity"
+                        units = "1"
+                        if measured is None:
+                            ln_gamma = row.get("ln_gamma_P2O5")
+                            if _finite_positive(ln_gamma) is not None or (
+                                isinstance(ln_gamma, (int, float)) and math.isfinite(float(ln_gamma))
+                            ):
+                                measured = math.exp(float(ln_gamma))
+                                observable = "activity_coefficient"
+                        temperature = _row_temperature_K(row, obs)
+                        if measured is None or temperature is None:
+                            continue
+                        sample = row.get("sample_no")
+                        found.append(
+                            ActivityComparator(
+                                source_id=source_id,
+                                observation_id=observation_id,
+                                species=str(species),
+                                observable=observable,
+                                method_class=method,
+                                sample_no=None if sample is None else int(sample),
+                                temperature_K=float(temperature),
+                                measured=float(measured),
+                                units=units,
+                                standard_state=None if standard_state is None else str(standard_state),
+                                uncertainty=uncertainty,
+                                doi=None if doi is None else str(doi),
+                                row=dict(row),
+                            )
+                        )
+                    continue
+                for field_name, value in values.items():
+                    if not str(field_name).startswith("gamma_"):
+                        continue
+                    if str(field_name).endswith("_as_printed"):
+                        continue
+                    measured = _finite_positive(value)
+                    temperature = _gamma_field_temperature_K(str(field_name), obs)
+                    if measured is None or temperature is None:
+                        continue
+                    field_unc = None
+                    if isinstance(uncertainty, Mapping) and field_name in uncertainty:
+                        field_unc = {
+                            "kind": "absolute",
+                            "value": uncertainty[field_name],
+                            "as_printed": uncertainty.get("as_printed"),
+                        }
+                    found.append(
+                        ActivityComparator(
+                            source_id=source_id,
+                            observation_id=observation_id,
+                            species=str(species),
+                            observable="activity_coefficient",
+                            method_class=method,
+                            sample_no=None,
+                            temperature_K=float(temperature),
+                            measured=float(measured),
+                            units="1",
+                            standard_state=None if standard_state is None else str(standard_state),
+                            uncertainty=field_unc or uncertainty,
+                            doi=None if doi is None else str(doi),
+                            row={"field": field_name, "value": measured},
+                        )
+                    )
+    return tuple(found)
+
+
+def _engine_activity(cell: EquilibrateCell, species: str) -> float | None:
+    activities = cell.melt_activities or {}
+    for key in (species, f"{species}_Liq", species.replace("2O5", "2O5(l)")):
+        value = activities.get(key)
+        number = _finite_positive(value)
+        if number is not None and number > 0.0:
+            return number
+    return None
+
+
+def _predicted_for_comparator(
+    cell: EquilibrateCell,
+    comparator: ActivityComparator,
+    pot: ScoringPot,
+) -> tuple[float | None, str | None]:
+    """Engine quantity matching the measured observable.
+
+    KEMS Raoultian a_P2O5 is relative to P2O5(s). Engines report melt
+    activity on whatever standard state they expose. No solid/liquid
+    conversion is applied: if both numbers exist they are compared as
+    returned, with a notice. Henry gamma uses a = gamma * X, so
+    gamma_pred = a_pred / X_P2O5 when the engine returns activity.
+    Premise: X_P2O5 = n_P2O5 / sum n_oxide from the converted pot.
+    Algebra: n_i = w_i / M_i; X = n_P2O5 / sum n. Sanity: equal moles → 0.5.
+    """
+
+    activity = _engine_activity(cell, comparator.species)
+    if activity is None:
+        return None, None
+    if comparator.observable == "activity":
+        return activity, (
+            "engine melt_activity used as returned; KEMS standard state "
+            f"{comparator.standard_state or 'unspecified'}; no solid/liquid conversion"
+        )
+    moles = {
+        oxide: float(wt) / oxide_molar_mass_g_mol(oxide)
+        for oxide, wt in pot.composition_wt_pct.items()
+    }
+    total = sum(moles.values())
+    x = moles.get(comparator.species, 0.0) / total if total else 0.0
+    if x <= 0.0:
+        return None, "no mole fraction for Henry gamma conversion"
+    # a = gamma * X  (Raoult/Henry definition) → gamma = a / X
+    return activity / x, (
+        f"gamma_pred = a_engine / X_{comparator.species} with X={x:.6g}; "
+        "KEMS gamma is Henrian vs P2O5(s)"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Engine pass + envelope rows
+# ---------------------------------------------------------------------------
+
+
+def run_scoring_arm(
+    *,
+    pots_path: Path | None = None,
+    extract_paths: Sequence[Path] | None = None,
+    engine_names: Sequence[str] | None = None,
+    handles: Mapping[str, Any] | None = None,
+    pots: Sequence[ScoringPot] | None = None,
+    progress_log: Path | None = None,
+) -> dict[str, Any]:
+    """Run printed-T scoring pots on every battery engine and score envelopes."""
+
+    from scripts.calibration_battery import envelope, rail_for
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        BATTERY_ENGINE_NAMES,
+        _emit_progress,
+        _engine_identities_from_toml,
+        _hostname,
+        _refusal_matrix,
+        _utc_stamp,
+        equilibrate_cell,
+        probe_battery_engines,
+    )
+
+    names = tuple(engine_names) if engine_names is not None else BATTERY_ENGINE_NAMES
+    scoring_pots = tuple(pots) if pots is not None else load_scoring_pots(pots_path)
+    extracts = tuple(extract_paths) if extract_paths is not None else SCORING_EXTRACTS
+    comparators = iter_activity_comparators(extracts)
+    wall0 = time.perf_counter()
+    cpu0 = time.process_time()
+    hostname = _hostname()
+    resolved = dict(handles) if handles is not None else probe_battery_engines(names)
+
+    n_expected = 0
+    for pot in scoring_pots:
+        n_expected += len(pot.temperatures_K) * len(names)
+    _emit_progress(
+        progress_log,
+        f"{_utc_stamp()} START scoring-arm hostname={hostname} n_expected={n_expected}",
+    )
+
+    cells: list[EquilibrateCell] = []
+    for pot in scoring_pots:
+        binary = pot.as_binary_pot()
+        for name in names:
+            handle = resolved.get(name) or probe_battery_engines((name,))[name]
+            resolved[name] = handle
+            for temperature_K in pot.temperatures_K:
+                cell = equilibrate_cell(
+                    handle,
+                    binary,
+                    temperature_K=float(temperature_K),
+                    po2=SCORING_PO2,
+                )
+                cells.append(cell)
+                _emit_progress(
+                    progress_log,
+                    (
+                        f"{_utc_stamp()} {len(cells)}/{n_expected} "
+                        f"pot={cell.pot_id} engine={cell.engine} "
+                        f"T={cell.temperature_K:g} "
+                        f"status={cell.status} "
+                        f"reason={cell.refusal_reason or '-'} "
+                        f"n_act={len(cell.melt_activities)} "
+                        f"wall={cell.wall_s:.3f}"
+                    ),
+                )
+                if not handle.available:
+                    revived = probe_battery_engines((name,))[name]
+                    resolved[name] = revived
+                    handle = revived
+
+    envelopes = score_scoring_arm(
+        pots=scoring_pots,
+        cells=cells,
+        comparators=comparators,
+        envelope=envelope,
+        rail_for=rail_for,
+    )
+    binary_pots = [pot.as_binary_pot() for pot in scoring_pots]
+    identities = _engine_identities_from_toml()
+    engines_block: dict[str, Any] = {}
+    for name in names:
+        handle = resolved.get(name)
+        engines_block[name] = {
+            "available": bool(handle.available) if handle is not None else False,
+            "unavailable_reason": (
+                handle.unavailable_reason if handle is not None else "not_probed"
+            ),
+            "takes_fo2": bool(handle.takes_fo2) if handle is not None else False,
+            "identity": (
+                dict(handle.identity)
+                if handle is not None and handle.identity
+                else identities.get(name, {})
+            ),
+        }
+    wall = time.perf_counter() - wall0
+    cpu = time.process_time() - cpu0
+    scored = [row for row in envelopes if row.get("score_eligible")]
+    residual_summary = _residual_summary(envelopes)
+    report = {
+        "schema_version": 1,
+        "kind": "binary_pot_scoring_arm",
+        "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "authority": "diagnostic_only",
+        "certifies": False,
+        "calibrates": False,
+        "verdict": None,
+        "posture": (
+            "Measured KEMS activities vs each engine. Typed refusals are "
+            "scored rows. model_derived / quoted extract rows are not scored. "
+            "No coefficient is adjusted by this harness."
+        ),
+        "hostname": hostname,
+        "receipt": {
+            "hostname": hostname,
+            "engine_identities": identities,
+            "wall_s": wall,
+            "cpu_s": cpu,
+            "wall_cpu_ratio": (wall / cpu) if cpu > 0.0 else None,
+        },
+        "pots": [pot.as_payload() | {"pot_id": pot.pot_id} for pot in scoring_pots],
+        "engines": engines_block,
+        "refusal_matrix": _refusal_matrix(binary_pots, names, cells),
+        "n_cells": len(cells),
+        "n_ok": sum(1 for cell in cells if cell.status == "ok"),
+        "n_refused": sum(1 for cell in cells if cell.status == "refusal"),
+        "n_envelope_rows": len(envelopes),
+        "n_score_eligible": len(scored),
+        "scored_rows_per_engine": _count_scored_per_engine(envelopes),
+        "residual_summary": residual_summary,
+        "cells": [cell.as_payload() for cell in cells],
+        "envelopes": envelopes,
+    }
+    _emit_progress(
+        progress_log,
+        (
+            f"{_utc_stamp()} DONE scoring-arm hostname={hostname} "
+            f"n_cells={report['n_cells']} n_ok={report['n_ok']} "
+            f"n_refused={report['n_refused']} "
+            f"n_envelope={report['n_envelope_rows']} "
+            f"n_score_eligible={report['n_score_eligible']} "
+            f"wall={wall:.3f} cpu={cpu:.3f}"
+        ),
+    )
+    return report
+
+
+def score_scoring_arm(
+    *,
+    pots: Sequence[ScoringPot],
+    cells: Sequence[EquilibrateCell],
+    comparators: Sequence[ActivityComparator],
+    envelope,
+    rail_for,
+) -> list[dict[str, Any]]:
+    """Emit calibration_battery envelope rows for cells and comparators."""
+
+    pots_by_id = {pot.pot_id: pot for pot in pots}
+
+    rows: list[dict[str, Any]] = []
+    for cell in cells:
+        pot = pots_by_id[cell.pot_id]
+        matched = [
+            cmp for cmp in comparators
+            if cmp.source_id == pot.source_id
+            and (cmp.sample_no is None or cmp.sample_no == pot.sample_no)
+            and math.isclose(cmp.temperature_K, cell.temperature_K, abs_tol=0.6)
+        ]
+        # Henry gamma (sample_no is None) applies to every pot of that source
+        # at that T; still emit the cell refusal when nothing matches.
+        if not matched:
+            rows.append(
+                _cell_envelope(
+                    pot=pot,
+                    cell=cell,
+                    envelope=envelope,
+                    rail_for=rail_for,
+                    comparator=None,
+                )
+            )
+            continue
+        emitted_measured = False
+        for comparator in matched:
+            if comparator.sample_no is None and comparator.observable == "activity_coefficient":
+                # One Henry-gamma row per engine×T, not per pot.
+                key = (
+                    comparator.observation_id,
+                    cell.engine,
+                    comparator.temperature_K,
+                )
+                if any(
+                    row.get("raw", {}).get("henry_key") == list(key)
+                    for row in rows
+                ):
+                    continue
+            row = _comparator_envelope(
+                pot=pot,
+                cell=cell,
+                comparator=comparator,
+                envelope=envelope,
+                rail_for=rail_for,
+            )
+            if comparator.sample_no is None:
+                row.setdefault("raw", {})["henry_key"] = [
+                    comparator.observation_id,
+                    cell.engine,
+                    comparator.temperature_K,
+                ]
+            rows.append(row)
+            emitted_measured = True
+        if not emitted_measured:
+            rows.append(
+                _cell_envelope(
+                    pot=pot,
+                    cell=cell,
+                    envelope=envelope,
+                    rail_for=rail_for,
+                    comparator=None,
+                )
+            )
+    return rows
+
+
+def _cell_envelope(*, pot, cell, envelope, rail_for, comparator) -> dict[str, Any]:
+    refused = cell.status == "refusal"
+    status = (cell.refusal_reason or "refused") if refused else "ok"
+    species = "P2O5" if "P2O5" in pot.composition_wt_pct else next(iter(pot.composition_wt_pct))
+    predicted = _engine_activity(cell, species)
+    row = envelope(
+        dataset_id=pot.source_id,
+        observation_id=f"{pot.observation_id}:{pot.pot_id}@{cell.temperature_K:g}K:{cell.engine}",
+        species=species,
+        observable="activity",
+        units="1",
+        measured=None,
+        predicted=predicted,
+        status=status if refused or predicted is None else "ok",
+        conditions={
+            "temperature_K": cell.temperature_K,
+            "pot_id": pot.pot_id,
+            "composition_wt_pct": dict(pot.composition_wt_pct),
+            "po2": cell.po2.as_payload(),
+        },
+        raw={
+            "engine": cell.engine,
+            "cell": cell.as_payload(),
+            "pot": pot.as_payload(),
+        },
+        uncertainty=None,
+        rail=rail_for(species, "activity_coefficient"),
+        evidence="direct experiment",
+        source_doi=pot.doi,
+        notices=[cell.engine_reason] if cell.engine_reason else (),
+        authority="refused" if refused or predicted is None else "bridge",
+        selected=False,
+        score_allowed=False,
+        run_id=f"{pot.pot_id}:{cell.engine}",
+        execution={"hostname": cell.hostname, "wall_s": cell.wall_s, "cpu_s": cell.cpu_s},
+    )
+    return row
+
+
+def _comparator_envelope(*, pot, cell, comparator, envelope, rail_for) -> dict[str, Any]:
+    scored_method = method_class_is_scored(comparator.method_class)
+    predicted, conversion_note = _predicted_for_comparator(cell, comparator, pot)
+    refused = cell.status == "refusal" or predicted is None
+    if cell.status == "refusal":
+        status = cell.refusal_reason or "refused"
+    elif predicted is None:
+        status = "unsupported-observable"
+    else:
+        status = "ok"
+    notices = []
+    if cell.engine_reason:
+        notices.append(cell.engine_reason)
+    if conversion_note:
+        notices.append(conversion_note)
+    if not scored_method:
+        notices.append(
+            f"method_class={comparator.method_class}; model_derived/quoted rows are not scored"
+        )
+    row = envelope(
+        dataset_id=comparator.source_id,
+        observation_id=(
+            f"{comparator.observation_id}:{pot.pot_id}@"
+            f"{comparator.temperature_K:g}K:{cell.engine}"
+        ),
+        species=comparator.species,
+        observable=comparator.observable,
+        units=comparator.units,
+        measured=comparator.measured,
+        predicted=predicted,
+        status=status,
+        conditions={
+            "temperature_K": comparator.temperature_K,
+            "pot_id": pot.pot_id,
+            "sample_no": comparator.sample_no,
+            "composition_wt_pct": dict(pot.composition_wt_pct),
+            "standard_state": comparator.standard_state,
+            "method_class": comparator.method_class,
+            "po2": cell.po2.as_payload(),
+        },
+        raw={
+            "engine": cell.engine,
+            "cell": cell.as_payload(),
+            "comparator": {
+                "observation_id": comparator.observation_id,
+                "method_class": comparator.method_class,
+                "row": dict(comparator.row),
+            },
+            "pot": pot.as_payload(),
+        },
+        uncertainty=comparator.uncertainty,
+        rail=rail_for(comparator.species, "activity_coefficient"),
+        evidence="direct experiment" if scored_method else "derived measurement",
+        source_doi=comparator.doi,
+        notices=tuple(notices),
+        authority="refused" if refused else "bridge",
+        selected=scored_method,
+        score_allowed=scored_method,
+        run_id=f"{pot.pot_id}:{cell.engine}",
+        execution={"hostname": cell.hostname, "wall_s": cell.wall_s, "cpu_s": cell.cpu_s},
+    )
+    return row
+
+
+def _count_scored_per_engine(rows: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+    counts: dict[str, int] = defaultdict(int)
+    for row in rows:
+        if not row.get("score_eligible"):
+            continue
+        engine = row.get("engine") or (row.get("raw") or {}).get("engine")
+        counts[str(engine or "unknown")] += 1
+    return dict(sorted(counts.items()))
+
+
+def _residual_summary(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    by_engine: dict[str, list[float]] = defaultdict(list)
+    for row in rows:
+        if not row.get("score_eligible"):
+            continue
+        dex = (row.get("signed_residual") or {}).get("dex")
+        if isinstance(dex, (int, float)) and math.isfinite(float(dex)):
+            engine = row.get("engine") or (row.get("raw") or {}).get("engine")
+            by_engine[str(engine or "unknown")].append(float(dex))
+    summary: dict[str, Any] = {}
+    for engine, values in sorted(by_engine.items()):
+        abs_vals = [abs(v) for v in values]
+        summary[engine] = {
+            "n": len(values),
+            "median_signed_dex": sorted(values)[len(values) // 2],
+            "median_abs_dex": sorted(abs_vals)[len(abs_vals) // 2],
+            "max_abs_dex": max(abs_vals),
+            "rmse_dex": math.sqrt(sum(v * v for v in values) / len(values)),
+        }
+    return summary
+
+
+def render_scoring_report_markdown(report: Mapping[str, Any]) -> str:
+    receipt = report.get("receipt") or {}
+    lines = [
+        "# Binary-pot battery — scoring arm",
+        "",
+        f"- generated: `{report.get('generated_at')}`",
+        (
+            f"- authority: `{report.get('authority')}`; "
+            f"certifies: `{str(report.get('certifies')).lower()}`; "
+            f"calibrates: `{str(report.get('calibrates')).lower()}`"
+        ),
+        "- verdict: none — measured KEMS activities vs each engine; refusals are the finding",
+        "- model_derived / quoted extract rows are not scored",
+        f"- hostname: `{report.get('hostname')}`",
+        (
+            f"- wall: `{receipt.get('wall_s'):.3f} s`; "
+            f"cpu: `{receipt.get('cpu_s'):.3f} s`; "
+            f"wall/cpu: `{receipt.get('wall_cpu_ratio')}`"
+            if receipt.get("wall_s") is not None
+            else "- wall/cpu: unavailable"
+        ),
+        f"- cells: `{report.get('n_cells')}` ok `{report.get('n_ok')}` refused `{report.get('n_refused')}`",
+        (
+            f"- envelope rows: `{report.get('n_envelope_rows')}`; "
+            f"score_eligible: `{report.get('n_score_eligible')}`"
+        ),
+        "",
+        "## Engine identity digests (`engines.local.toml`)",
+        "",
+    ]
+    identities = receipt.get("engine_identities") or {}
+    if identities:
+        lines.extend(["| engine | version | digest |", "|---|---|---|"])
+        for key, block in sorted(identities.items()):
+            if not isinstance(block, Mapping):
+                continue
+            lines.append(
+                f"| `{key}` | `{block.get('version', '')}` | `{block.get('digest', '')}` |"
+            )
+    else:
+        lines.append("No `engines.local.toml` identities were readable on this host.")
+
+    lines.extend(
+        [
+            "",
+            "## Engine availability",
+            "",
+            "| engine | available | unavailable_reason |",
+            "|---|---|---|",
+        ]
+    )
+    for name, block in (report.get("engines") or {}).items():
+        lines.append(
+            f"| `{name}` | `{str(block.get('available')).lower()}` | "
+            f"{block.get('unavailable_reason') or '—'} |"
+        )
+
+    engine_names = list((report.get("engines") or {}).keys())
+    lines.extend(
+        [
+            "",
+            "## Refusal matrix (pot × engine)",
+            "",
+            "Each cell is the dominant typed refusal (or `ok`). Counts are cells.",
+            "",
+        ]
+    )
+    header = "| pot | " + " | ".join(f"`{name}`" for name in engine_names) + " |"
+    sep = "|---|" + "|".join("---" for _ in engine_names) + "|"
+    lines.extend([header, sep])
+    matrix = report.get("refusal_matrix") or {}
+    for pot in report.get("pots") or []:
+        pot_id = pot["pot_id"]
+        cells = []
+        for name in engine_names:
+            cell = (matrix.get(pot_id) or {}).get(name) or {}
+            reason = cell.get("dominant_reason")
+            n_ok = cell.get("n_ok", 0)
+            n_refused = cell.get("n_refused", 0)
+            if reason is None and n_ok:
+                label = f"ok ({n_ok})"
+            elif reason is None:
+                label = "—"
+            else:
+                label = f"{reason} ({n_refused}/{cell.get('n_cells', 0)})"
+            cells.append(label)
+        lines.append(f"| `{pot_id}` | " + " | ".join(cells) + " |")
+
+    lines.extend(
+        [
+            "",
+            "## Scored rows per engine",
+            "",
+            "| engine | score_eligible N |",
+            "|---|---:|",
+        ]
+    )
+    per_engine = report.get("scored_rows_per_engine") or {}
+    if not per_engine:
+        lines.append("| — | 0 |")
+    for name, count in per_engine.items():
+        lines.append(f"| `{name}` | {count} |")
+    for name in engine_names:
+        if name not in per_engine:
+            lines.append(f"| `{name}` | 0 |")
+
+    lines.extend(
+        [
+            "",
+            "## Residual summary per engine",
+            "",
+            "| engine | n | median signed dex | median |Δ| dex | max |Δ| dex | RMSE dex |",
+            "|---|---:|---:|---:|---:|---:|",
+        ]
+    )
+    summary = report.get("residual_summary") or {}
+    if not summary:
+        lines.append("| — | 0 | — | — | — | — |")
+    for name, block in summary.items():
+        lines.append(
+            f"| `{name}` | {block['n']} | {block['median_signed_dex']:+.3f} | "
+            f"{block['median_abs_dex']:.3f} | {block['max_abs_dex']:.3f} | "
+            f"{block['rmse_dex']:.3f} |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Scored rows",
+            "",
+            "| pot | engine | T K | species | observable | measured | predicted | dex | method | status | eligible |",
+            "|---|---|---:|---|---|---:|---:|---:|---|---|---|",
+        ]
+    )
+    envelopes = [
+        row for row in (report.get("envelopes") or [])
+        if row.get("score_eligible") or row.get("comparator_status") not in {None}
+    ]
+    shown = [row for row in (report.get("envelopes") or []) if row.get("score_eligible")]
+    if not shown:
+        lines.append("| — | — | — | — | — | — | — | — | — | no score_eligible rows | `false` |")
+    for row in shown[:80]:
+        conditions = row.get("conditions") or {}
+        predicted = row.get("predicted")
+        measured = row.get("measured")
+        dex = (row.get("signed_residual") or {}).get("dex")
+        lines.append(
+            "| `{pot}` | `{engine}` | {T:g} | {sp} | {obs} | {meas} | {pred} | {dex} | `{method}` | `{status}` | `{elig}` |".format(
+                pot=conditions.get("pot_id"),
+                engine=row.get("engine") or (row.get("raw") or {}).get("engine"),
+                T=float(conditions.get("temperature_K") or 0.0),
+                sp=row.get("species"),
+                obs=row.get("observable"),
+                meas="—" if measured is None else f"{measured:.4g}",
+                pred="—" if predicted is None else f"{predicted:.4g}",
+                dex="—" if dex is None else f"{float(dex):+.3f}",
+                method=(conditions.get("method_class") or "—"),
+                status=row.get("comparator_status"),
+                elig=str(bool(row.get("score_eligible"))).lower(),
+            )
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Notes",
+            "",
+            "The companion JSON contains every cell, typed refusal, and envelope row. "
+            "No result is clipped or used to change a coefficient.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def write_scoring_reports(
+    report: Mapping[str, Any],
+    output_dir: Path | None = None,
+) -> tuple[Path, Path]:
+    dest = Path(output_dir) if output_dir is not None else REPORT_DIR
+    dest.mkdir(parents=True, exist_ok=True)
+    json_path = dest / f"{SCORING_REPORT_STEM}.json"
+    md_path = dest / f"{SCORING_REPORT_STEM}.md"
+    json_path.write_text(json.dumps(report, indent=2, sort_keys=True, default=str) + "\n")
+    md_path.write_text(render_scoring_report_markdown(report))
+    return json_path, md_path
+

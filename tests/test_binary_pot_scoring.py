@@ -8,15 +8,24 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.diagnostic_helpers.binary_pot_battery import load_binary_pots
+from scripts.calibration_battery import envelope, rail_for
+from simulator.diagnostic_helpers.binary_pot_battery import (
+    EquilibrateCell,
+    Po2Request,
+    composition_kg_and_mol,
+    load_binary_pots,
+)
 from simulator.diagnostic_helpers.binary_pot_scoring import (
     DEFAULT_POTS_PATH,
     SCORING_EXTRACTS,
     build_scoring_pots_from_extracts,
     convert_printed_composition_to_wt_pct,
     feto_fe2_fe3_to_feo_fe2o3_moles,
+    iter_activity_comparators,
     load_scoring_pots,
+    method_class_is_scored,
     oxide_molar_mass_g_mol,
+    score_scoring_arm,
     sync_scoring_pots_into_catalog,
 )
 
@@ -138,3 +147,118 @@ def test_sync_does_not_rewrite_engine_arm_pots(tmp_path: Path) -> None:
     prefix = original.split("\nscoring_pots:")[0].split("\n# Scoring-arm pots")[0]
     written = clone.read_text(encoding="utf-8")
     assert written.startswith(prefix.rstrip())
+
+
+def _refusal_cell(pot, *, engine: str = "alphamelts") -> EquilibrateCell:
+    return EquilibrateCell(
+        pot_id=pot.pot_id,
+        engine=engine,
+        temperature_K=float(pot.temperatures_K[0]),
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="refusal",
+        refusal_reason="out_of_basis",
+        engine_status="out_of_domain",
+        engine_reason="SiO2 below MELTS band",
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=None,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname="test",
+    )
+
+
+def test_pbo_composition_has_formula_molar_mass() -> None:
+    kg, mol = composition_kg_and_mol({"PbO": 73.77, "P2O5": 26.23})
+    assert kg["PbO"] == pytest.approx(0.7377)
+    assert mol["PbO"] > 0.0
+    assert mol["P2O5"] > 0.0
+
+
+def test_model_derived_observation_is_not_scored() -> None:
+    pots = build_scoring_pots_from_extracts()
+    pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
+    comparators = iter_activity_comparators()
+    assert any(method_class_is_scored(c.method_class) for c in comparators)
+    assert any(c.method_class == "model_derived" for c in comparators)
+    rows = score_scoring_arm(
+        pots=(pot,),
+        cells=(_refusal_cell(pot),),
+        comparators=comparators,
+        envelope=envelope,
+        rail_for=rail_for,
+    )
+    derived = [r for r in rows if (r["conditions"] or {}).get("method_class") == "model_derived"]
+    assert derived
+    assert all(not r["score_eligible"] for r in derived)
+    canon = envelope(
+        dataset_id="x",
+        observation_id="y",
+        species="P2O5",
+        observable="activity",
+        units="1",
+        measured=1.0,
+        predicted=2.0,
+        status="ok",
+        conditions={},
+        raw={"engine": "alphamelts"},
+    )
+    assert all(set(r) == set(canon) for r in rows)
+
+
+def test_refusing_engine_yields_typed_refusal_envelope() -> None:
+    pots = build_scoring_pots_from_extracts()
+    pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
+    rows = score_scoring_arm(
+        pots=(pot,),
+        cells=(_refusal_cell(pot, engine="magemin"),),
+        comparators=iter_activity_comparators(),
+        envelope=envelope,
+        rail_for=rail_for,
+    )
+    assert rows
+    assert all(r["authority"] == "refused" for r in rows)
+    assert all(r["comparator_status"] == "out_of_basis" for r in rows)
+    assert all(r["predicted"] is None for r in rows)
+    assert all(not r["score_eligible"] for r in rows)
+    assert all(r["engine"] == "magemin" for r in rows)
+
+
+def test_measured_gamma_scores_when_engine_returns_activity() -> None:
+    pots = build_scoring_pots_from_extracts()
+    pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
+    comparators = [
+        c
+        for c in iter_activity_comparators()
+        if c.observation_id == "kambayashi_1985_gamma_p2o5_solid_std_henry"
+        and c.temperature_K == pot.temperatures_K[0]
+    ]
+    assert comparators
+    cell = EquilibrateCell(
+        pot_id=pot.pot_id,
+        engine="alphamelts",
+        temperature_K=float(pot.temperatures_K[0]),
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities={"P2O5": 1.0e-17},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=1.0,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname="test",
+    )
+    rows = score_scoring_arm(
+        pots=(pot,),
+        cells=(cell,),
+        comparators=comparators,
+        envelope=envelope,
+        rail_for=rail_for,
+    )
+    assert len(rows) == 1
+    assert rows[0]["score_eligible"] is True
+    assert rows[0]["authority"] == "bridge"
+    assert rows[0]["signed_residual"]["dex"] is not None
+    assert rows[0]["rail"] == "melt activities"
