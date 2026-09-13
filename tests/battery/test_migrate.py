@@ -321,6 +321,33 @@ def test_j03_compilation_nested_row_unknown_rail_still_raises(tmp_path: Path) ->
         migrate(root, write=False)
 
 
+def test_j04_named_source_fallthrough_includes_unmapped_token(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "points": [
+                    {
+                        "key": "named-source-fallthrough",
+                        "source_id": "janaf",
+                        "species": "Na",
+                        "comparison_quantity": "delta_fG",
+                        "temperature_K": 298.15,
+                        "table_kJ_mol": 0.0,
+                        "method_class": "independent_tabulation",
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    assert "independent_tabulation" in result.evidence_fallthrough
+    assert result.evidence_fallthrough["independent_tabulation"] >= 1
+
+
 def test_series_explosion_keeps_conversion_trail(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     result = migrate(root, write=True)

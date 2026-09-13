@@ -2592,7 +2592,7 @@ class Migrator:
         method_class = values.get("method_class")
         if method_class is None:
             measured.absent_classes += 1
-        evidence, ev_reason = evidence_for(
+        evidence, ev_reason = self._evidence_for(
             method_class,
             evaluator_family=values.get("evaluator_family"),
             attribution=obs.get("quote") if isinstance(obs.get("quote"), str) else None,
@@ -2606,16 +2606,6 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-            if (
-                ev_reason.startswith("PAGE")
-                or ev_reason.startswith("unmapped")
-                or ev_reason.startswith("fall-through")
-                or ev_reason == "absent method_class"
-            ):
-                token = str(method_class or "absent")
-                self.result.evidence_fallthrough[token] = (
-                    self.result.evidence_fallthrough.get(token, 0) + 1
-                )
 
         raw_adm = values.get("admission_status")
         if raw_adm is None and obs.get("admission_status") is None:
@@ -3022,6 +3012,20 @@ class Migrator:
             index_row=index_row,
         )
 
+    def _evidence_for(self, method_class: object, **kwargs: Any) -> tuple[Evidence, str | None]:
+        evidence, ev_reason = evidence_for(method_class, **kwargs)
+        if ev_reason and (
+            ev_reason.startswith("PAGE")
+            or ev_reason.startswith("unmapped")
+            or ev_reason.startswith("fall-through")
+            or ev_reason == "absent method_class"
+        ):
+            token = str(method_class or "absent")
+            self.result.evidence_fallthrough[token] = (
+                self.result.evidence_fallthrough.get(token, 0) + 1
+            )
+        return evidence, ev_reason
+
     def _generic_obs(
         self,
         *,
@@ -3167,7 +3171,7 @@ class Migrator:
                     quantity=Quantity.P_PARTIAL,
                     species=species,
                     value=value,
-                    evidence=evidence_for(point.get("method_class"))[0],
+                    evidence=self._evidence_for(point.get("method_class"))[0],
                     temperature_K=t,
                     method=map_method(point.get("regime") or point.get("method")),
                     uncertainty=uncertainty_for(point.get("uncertainty")),
@@ -3330,7 +3334,7 @@ class Migrator:
                 quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA,
                 species=make_species(formula, phase),
                 value=value,
-                evidence=evidence_for(meas.get("method_class"))[0],
+                evidence=self._evidence_for(meas.get("method_class"))[0],
                 temperature_K=t,
                 uncertainty=unc,
                 method=map_method(meas.get("regime") or meas.get("method")),
@@ -3386,7 +3390,7 @@ class Migrator:
                         value=Value.point_of(val) if _as_dec_or_none(val) is not None else Value(
                             ValueKind.UNAVAILABLE, unavailable_reason="missing log10_Kf"
                         ),
-                        evidence=evidence_for(payload.get("method_class"))[0],
+                        evidence=self._evidence_for(payload.get("method_class"))[0],
                         temperature_K=t,
                         standard_pressure_Pa=p_std,
                         method=map_method(payload.get("method") or payload.get("regime")),
@@ -3426,7 +3430,7 @@ class Migrator:
                     value=Value.point_of(pa) if pa is not None else Value(
                         ValueKind.UNAVAILABLE, unavailable_reason="missing pressure_atm"
                     ),
-                    evidence=evidence_for(row.get("method_class"))[0],
+                    evidence=self._evidence_for(row.get("method_class"))[0],
                     temperature_K=t,
                     method=map_method(row.get("method") or row.get("regime")),
                     derivation=derivation,
@@ -3494,7 +3498,7 @@ class Migrator:
                 quantity=ledger_quantity,
                 species=make_species(formula, map_phase(point.get("phase"))[0]),
                 value=value,
-                evidence=evidence_for(point.get("method_class") or point.get("provenance_class"))[0],
+                evidence=self._evidence_for(point.get("method_class") or point.get("provenance_class"))[0],
                 temperature_K=t if t is not None and t > 0 else None,
                 method=map_method(point.get("method") or point.get("regime")),
                 source_row_index=row_index,
