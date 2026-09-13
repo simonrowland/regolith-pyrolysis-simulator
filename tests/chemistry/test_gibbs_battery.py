@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import copy
 from pathlib import Path
 
 import pytest
 import yaml
 
+from simulator.diagnostic_helpers import gibbs_battery as gibbs_battery_mod
 from simulator.diagnostic_helpers.gibbs_battery import (
     CEA_EXTRACT_PATH,
+    ENGINE_EVALUATOR_FAMILIES,
     INDEPENDENT_AGREEMENT_BAND_KJ_MOL,
     LEDGER_PATH,
     LN10,
@@ -170,50 +173,196 @@ def test_mass_spec_battery_still_skips_non_kems_gibbs() -> None:
     assert "Pulling every priority-winner thermochemical table" in src
 
 
-def test_partition_splits_own_input_from_independent() -> None:
-    part = partition_gibbs_tables()
-    # 2026-08-26 corpus integration: the store grew (Sossi remine added Table-5
-    # thermochemical rows as kems gibbs coverage; metadata completion added
-    # observations). The own-input partition remained pinned while later
-    # extracts added seven independently tabulated rows.
-    # 2026-09-04 (VR-13/B, 3e324581): the SF04 MAGMA companion-workbook extract
-    # added seven psat_series observations (O, O2, Mg, SiO, Fe, Na, K; regime
-    # magma_model_companion_workbook - a model reproduction, not an empirical
-    # anchor). They are not gibbs tables: every partition count below is
-    # unchanged; only the store-wide observation total moved, 2310 -> 2317.
-    # 2026-09-12 (extract wave, folds bd56aaa67..001f56f3e): twenty extracts
-    # landed — KEMS papers (Demaria 1973, Markova 1983/1984, Yakovlev 1984/2011,
-    # Shornikov 2010, Kato 1993 review, Turkdogan 1984/2001) plus pyrolysis and
-    # outgassing sets (Steurer 1985/1992, Schaefer-Fegley 2007, Reiss 2019,
-    # Wilkerson 2021/2023, Street 2010, Murchison x2, Cardiff 2007). They carry
-    # gibbs_table observations on the KEMS side (33 -> 273) and independently
-    # tabulated rows on the non-KEMS side (80 -> 116, e.g. Schaefer-Fegley 9).
-    # The engine-own-input partition is unchanged (1617; nasa-cea-thermo 1615):
-    # nothing landed that an evaluator consumes as coefficients.
-    # 2026-09-12 (late fold 321de2926): Kambayashi 1985 + Ohara 1987 phosphate-slag
-    # KEMS extracts added five KEMS gibbs tables (273 -> 278) and 43 observations;
-    # the non-KEMS and engine-own-input partitions are unchanged.
-    assert part["observations_total"] == 3860
-    assert part["gibbs_table_total"] == 2011
-    assert part["gibbs_table_kems"] == 278
-    assert part["gibbs_table_non_kems"] == 1733
-    assert part["engine_own_input"] + part["independent_tabulation"] == 1733
-    assert part["engine_own_input"] == 1617
-    assert part["independent_tabulation"] == 116
-    assert part["by_source"]["nasa-cea-thermo"]["n"] == 1615
-    assert part["by_source"]["nasa-cea-thermo"]["provenance_class"] == (
-        PROVENANCE_ENGINE_OWN_INPUT
+_COEFFICIENT_PAYLOAD_FLAGS = frozenset({"cea_polynomial", "shomate_polynomial"})
+_OWN_SWAP_OBS = "ivtan_MnO_gibbs"
+_INDEP_SWAP_OBS = "Ames67_EuO_dissociation"
+
+
+def _row_expected_provenance(row: dict) -> str:
+    """Re-derive own-input vs independent from payload shape, not the stored class.
+
+    Engine-own-input is a coefficient payload (CEA/Shomate segments) that a live
+    evaluator consumes. Independent tabulation is everything else. Swapping only
+    ``provenance_class`` while leaving payload_shape intact must disagree here.
+    """
+    fam = str(row.get("evaluator_family") or "")
+    shape = tuple(row.get("payload_shape") or ())
+    has_coeff = any(flag in shape for flag in _COEFFICIENT_PAYLOAD_FLAGS)
+    if fam in ENGINE_EVALUATOR_FAMILIES and has_coeff:
+        return PROVENANCE_ENGINE_OWN_INPUT
+    return PROVENANCE_INDEPENDENT
+
+
+def _source_provenance_class(rows: list[dict], source_id: str) -> str:
+    classes = {row["provenance_class"] for row in rows if row["source_id"] == source_id}
+    if classes == {PROVENANCE_ENGINE_OWN_INPUT}:
+        return PROVENANCE_ENGINE_OWN_INPUT
+    if classes == {PROVENANCE_INDEPENDENT}:
+        return PROVENANCE_INDEPENDENT
+    return "mixed"
+
+
+def _assert_partition_semantic_gates(part: dict) -> None:
+    """Executable coverage / source-role / closed-set invariants.
+
+    Counts are derived from rows. Frozen census identity (observations_total
+    == N) is not a validity gate: a valid admitted observation must pass.
+    """
+    rows = list(part["rows"])
+    own = [row for row in rows if row["provenance_class"] == PROVENANCE_ENGINE_OWN_INPUT]
+    indep = [
+        row for row in rows if row["provenance_class"] == PROVENANCE_INDEPENDENT
+    ]
+    assert len(rows) == part["gibbs_table_non_kems"]
+    assert len(own) == part["engine_own_input"]
+    assert len(indep) == part["independent_tabulation"]
+    assert (
+        part["engine_own_input"] + part["independent_tabulation"]
+        == part["gibbs_table_non_kems"]
     )
-    assert part["by_source"]["janaf-4th"]["provenance_class"] == PROVENANCE_INDEPENDENT
-    assert part["by_source"]["ivtan-mno-coo-thermo"]["provenance_class"] == (
-        PROVENANCE_ENGINE_OWN_INPUT
+    assert (
+        part["gibbs_table_kems"] + part["gibbs_table_non_kems"]
+        == part["gibbs_table_total"]
     )
-    for row in part["rows"]:
+    type_counts = part.get("type_counts") or {}
+    if type_counts:
+        assert type_counts.get("gibbs_table") == part["gibbs_table_total"]
+        assert sum(type_counts.values()) == part["observations_total"]
+    for row in rows:
         assert row["provenance_class"] in {
             PROVENANCE_ENGINE_OWN_INPUT,
             PROVENANCE_INDEPENDENT,
         }
         assert not row["is_kems"]
+        assert _row_expected_provenance(row) == row["provenance_class"]
+    for source_id, info in part["by_source"].items():
+        derived = _source_provenance_class(rows, source_id)
+        assert info["provenance_class"] == derived
+        assert info["n"] == sum(1 for row in rows if row["source_id"] == source_id)
+    assert (
+        _source_provenance_class(rows, "nasa-cea-thermo") == PROVENANCE_ENGINE_OWN_INPUT
+    )
+    assert part["by_source"]["nasa-cea-thermo"]["provenance_class"] == (
+        PROVENANCE_ENGINE_OWN_INPUT
+    )
+    assert _source_provenance_class(rows, "janaf-4th") == PROVENANCE_INDEPENDENT
+    assert part["by_source"]["janaf-4th"]["provenance_class"] == PROVENANCE_INDEPENDENT
+    assert (
+        _source_provenance_class(rows, "ivtan-mno-coo-thermo")
+        == PROVENANCE_ENGINE_OWN_INPUT
+    )
+    assert part["by_source"]["ivtan-mno-coo-thermo"]["provenance_class"] == (
+        PROVENANCE_ENGINE_OWN_INPUT
+    )
+
+
+def test_partition_splits_own_input_from_independent() -> None:
+    """Live corpus: coverage and named source-roles, not frozen census identity."""
+    part = partition_gibbs_tables()
+    _assert_partition_semantic_gates(part)
+
+
+def test_partition_valid_growth_preserves_semantic_gates(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """CONFIRM probe: one extra valid independent Gibbs observation still partitions.
+
+    The old census pin (observations_total == 3860) failed on this growth even
+    when own+indep == non_kems held. Named source-roles must stay intact.
+    """
+    live = partition_gibbs_tables()
+    template = next(
+        row
+        for row in live["rows"]
+        if row["source_id"] == "janaf-4th"
+        and row["provenance_class"] == PROVENANCE_INDEPENDENT
+    )
+    orig_load = gibbs_battery_mod._load_yaml_mapping
+
+    def _load_with_valid_growth(path: Path) -> dict:
+        doc = orig_load(path)
+        source_id = str(doc.get("source_id") or path.stem)
+        if source_id != template["source_id"]:
+            return doc
+        grown = copy.deepcopy(doc)
+        block = grown["species"][template["species_id"]]
+        observations = list(block.get("observations") or [])
+        donor = next(
+            obs
+            for obs in observations
+            if str(obs.get("observation_id") or "") == template["observation_id"]
+        )
+        extra = copy.deepcopy(donor)
+        extra["observation_id"] = "m15_valid_growth_probe_copy"
+        observations.append(extra)
+        block["observations"] = observations
+        return grown
+
+    monkeypatch.setattr(gibbs_battery_mod, "_load_yaml_mapping", _load_with_valid_growth)
+    grown = partition_gibbs_tables()
+    _assert_partition_semantic_gates(grown)
+    assert grown["observations_total"] == live["observations_total"] + 1
+    assert grown["gibbs_table_total"] == live["gibbs_table_total"] + 1
+    assert grown["gibbs_table_non_kems"] == live["gibbs_table_non_kems"] + 1
+    assert grown["independent_tabulation"] == live["independent_tabulation"] + 1
+    assert grown["engine_own_input"] == live["engine_own_input"]
+    assert grown["by_source"]["nasa-cea-thermo"]["provenance_class"] == (
+        PROVENANCE_ENGINE_OWN_INPUT
+    )
+    assert grown["by_source"]["janaf-4th"]["provenance_class"] == PROVENANCE_INDEPENDENT
+
+
+def test_partition_count_preserving_role_swap_is_rejected() -> None:
+    """CONFIRM probe: swapping own-input and independent roles must fail.
+
+    Counts stay identical. Token-membership-only closed-set checks used to
+    accept this mutation; payload/source-role gates must not.
+    """
+    live = partition_gibbs_tables()
+    swapped = copy.deepcopy(live)
+    own_row = next(
+        row
+        for row in swapped["rows"]
+        if row["observation_id"] == _OWN_SWAP_OBS
+        and row["source_id"] == "ivtan-mno-coo-thermo"
+    )
+    indep_row = next(
+        row
+        for row in swapped["rows"]
+        if row["observation_id"] == _INDEP_SWAP_OBS
+        and row["source_id"] == "ames-walsh-white-1967"
+    )
+    assert own_row["provenance_class"] == PROVENANCE_ENGINE_OWN_INPUT
+    assert indep_row["provenance_class"] == PROVENANCE_INDEPENDENT
+    own_row["provenance_class"] = PROVENANCE_INDEPENDENT
+    indep_row["provenance_class"] = PROVENANCE_ENGINE_OWN_INPUT
+    own_n = sum(
+        1
+        for row in swapped["rows"]
+        if row["provenance_class"] == PROVENANCE_ENGINE_OWN_INPUT
+    )
+    indep_n = sum(
+        1
+        for row in swapped["rows"]
+        if row["provenance_class"] == PROVENANCE_INDEPENDENT
+    )
+    assert own_n == live["engine_own_input"]
+    assert indep_n == live["independent_tabulation"]
+    with pytest.raises(AssertionError):
+        _assert_partition_semantic_gates(swapped)
+
+
+def test_partition_named_nasa_source_role_mutation_is_rejected() -> None:
+    """Successful-value negative control: NASA CEA cannot be relabelled independent."""
+    mutated = copy.deepcopy(partition_gibbs_tables())
+    assert mutated["by_source"]["nasa-cea-thermo"]["provenance_class"] == (
+        PROVENANCE_ENGINE_OWN_INPUT
+    )
+    mutated["by_source"]["nasa-cea-thermo"]["provenance_class"] = (
+        PROVENANCE_INDEPENDENT
+    )
+    with pytest.raises(AssertionError):
+        _assert_partition_semantic_gates(mutated)
 
 
 def test_pilot_ledger_pins_every_comparable_point() -> None:
