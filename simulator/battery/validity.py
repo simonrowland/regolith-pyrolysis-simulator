@@ -12,7 +12,9 @@ Ambiguity resolutions:
   O2 identity (ΔfG=0, log10 Kf=0) passes. The gate does not score engines.
 - Effusion Kn threshold is ``FREE_MOLECULAR_KNUDSEN_MIN`` (10) from
   transport_constants. Kn is the *orifice* (cell-local) number, not chamber
-  pressure masquerading as cell pressure.
+  pressure masquerading as cell pressure. Unknown/missing chamber
+  background also fails this gate (v2.1: missing pressure already fails
+  effusion; the background-high gate does not double-count).
 - Background ≥ 1e-2 Pa fails KEMS *equilibrium* pressure/activity only.
   Millibar bench kinetic experiments are out of this gate's scope.
 - Apparatus determinants are those the actual derivation needs: effusion
@@ -263,6 +265,20 @@ def effusion_regime_unverified(
         Quantity.ACTIVITY_COEFFICIENT,
     }:
         return _pass(checks)
+    total = _located_decimal(experiment.pressure_environment.total_pressure_Pa)
+    if total is None:
+        checks.append(
+            GateCheck(
+                "background_pressure_stated",
+                False,
+                {
+                    "reason": "unknown KEMS background pressure; missing pressure fails effusion",
+                },
+            )
+        )
+        return _fail(
+            RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, "background_pressure_stated"
+        )
     regime = experiment.pressure_environment.regime
     kn_located = regime.knudsen_number_orifice
     kn = _located_decimal(kn_located)

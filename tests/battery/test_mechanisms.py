@@ -61,6 +61,7 @@ from simulator.battery.validate import validate_corpus
 from simulator.battery.validity import (
     background_pressure_high,
     effusion_regime_unverified,
+    run_validity_gates,
     table_self_consistency,
     underdetermined_apparatus,
 )
@@ -1021,6 +1022,31 @@ def test_mf_f04_f16_scoped_notices_and_explicit_apparatus_gate() -> None:
     assert effusion_regime_unverified(unknown_kn, Quantity.P_SAT).reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
     low_kn = F.kems_experiment(kn=Decimal("0.5"))
     assert effusion_regime_unverified(low_kn, Quantity.P_SAT).reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    from dataclasses import replace as _replace
+
+    from simulator.battery.records import Located as _Located
+
+    unknown_bg = _replace(
+        F.kems_experiment(),
+        pressure_environment=_replace(
+            F.kems_experiment().pressure_environment,
+            total_pressure_Pa=_Located(State.unknown("not printed"), locator=F.loc()),
+        ),
+    )
+    unknown_effusion = effusion_regime_unverified(unknown_bg, Quantity.P_SAT)
+    assert unknown_effusion.passed is False
+    assert unknown_effusion.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    ident_psat = F.psat_identity("Na")
+    obs_psat = F.observation("kems-unknown-bg", unknown_bg.experiment_id, ident_psat, Decimal("1"))
+    combined = run_validity_gates(unknown_bg, obs_psat)
+    assert combined.passed is False
+    assert combined.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    stated = F.kems_experiment(total_P=Decimal("1e-6"))
+    assert effusion_regime_unverified(stated, Quantity.P_SAT).passed
+    assert background_pressure_high(stated, Quantity.P_SAT).passed
+    assert run_validity_gates(
+        stated, F.observation("kems-stated-bg", stated.experiment_id, ident_psat, Decimal("1"))
+    ).passed
 
 
 def test_physics_false_refuse_compilation_not_applicable_axes_equal() -> None:
