@@ -1,0 +1,994 @@
+schema_version: literature_extract.v1
+source_id: kems-112-ichise-1989
+source:
+  citation: Ichise, E. and Horikawa, K. (1989), "Thermodynamic Study of Fe-Ta and Fe-Nb Alloys by Means
+    of the Knudsen Cell Mass Spectrometry", ISIJ International 29(10):843-851, DOI 10.2355/isijinternational.29.843
+  doi: 10.2355/isijinternational.29.843
+  url: https://doi.org/10.2355/isijinternational.29.843
+  year: 1989
+extraction:
+  method: 'Official J-STAGE OA PDF (corpus raw/kems-112-ichise-1989/kems-112-ichise-1989.pdf, sha256 38753dce3d1f8556f3584620ea7dfb72eb1fda0b6c54dd3e945faf05180c360b).
+    No MinerU decode. Tables 1-6 transcribed from a 400 dpi pdftoppm render of PDF pages 1-9 (published
+    pp. 843-851). pdftotext-layout is a noisy OCR layer and was not used as data. Table 1/5 a_Fe from
+    ion-intensity ratios labelled measured. Tables 4 and 6 gamma/Delta-G/a_Ta/a_Nb labelled model_derived
+    (Gibbs-Duhem). Table 2 metallography measured. Table 3 EPMA boundaries measured; Average row model_derived.
+    Figs 1-7 figure-only. Ionizing energy unstated. Sample mass unstated for KEMS (metallography samples
+    about 2 g). Chamber pressure printed: ion source ~5e-5 Pa, cell chamber ~1e-4 Pa. gamma0_Ta(l) body
+    0.31±0.07 vs conclusion 0.31±0.06 both retained.'
+  date: '2026-09-13'
+  worker: extract-alloys-b2
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.Fe.observations[ichise_1989_table4_FeTa_1873K].values.rows[2].a_Fe
+  value: 0.832
+  locator:
+    table: '4'
+    published_page: 848
+    pdf_page_index: 6
+    note: Table 4 X_Ta=0.168, a_Fe=0.832±0.04
+- path: species.Fe.observations[ichise_1989_table6_FeNb_1873K].values.rows[3].a_Fe
+  value: 0.7
+  locator:
+    table: '6'
+    published_page: 850
+    pdf_page_index: 8
+    note: Table 6 X_Nb=0.265, a_Fe=0.700±0.010
+- species: Ta
+  observable: activity_coefficient
+  observation_id: ichise_1989_infinite_dilution_gamma
+  field: gamma0_Ta_s
+  value: 0.75
+  locator:
+    published_page: 851
+    pdf_page_index: 9
+    note: 'Conclusion: gamma0_Ta(s)=0.75±0.15 at 1873 K'
+- path: species.Ta.observations[ichise_1989_table3_phase_boundaries].values.rows[8].eps_Fe_rich
+  value: 29.4
+  locator:
+    table: '3'
+    published_page: 847
+    pdf_page_index: 5
+    note: Table 3 Average eps Fe-rich 29.4 at% Ta
+- path: species.Fe.observations[ichise_1989_kems_geometry_and_calibration].values.orifice_diameter_mm
+  value: 0.4
+  locator:
+    published_page: 844
+    pdf_page_index: 2
+    note: orifice 0.4 mm; ion source 5e-5 Pa
+species:
+  Fe:
+    observations:
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-Ta_or_Fe-Nb_alloy
+      condensed_form: &id001
+        state: liquid_or_solid_alloy
+        metastable: false
+        basis: explicit_author
+        note: Fe-Ta and Fe-Nb at 1873 K; phases L, epsilon, mu, (Ta) / L, epsilon, L', zeta, (Nb)
+      regime: kems_effusion
+      equipment: &id002
+        cell_material:
+          value: 'Sintered alumina crucible 9 mm diameter, 11 mm height, lid orifice 0.4 mm. Tantalum
+            Knudsen-cell holder heated by electron bombardment from two ring filaments. W/W-26%Re thermocouples
+            at upper side and bottom center of the cell holder. Modified internal standard: a piece of
+            pure iron foil on the sample surface.'
+          locator:
+            published_page: 844
+            pdf_page_index: 2
+            section: '2.1'
+            paragraph: A sintered alumina crucible of 9 mm in diameter and 11 mm in height and a lid with
+              an orifice of 0.4 mm in diameter were used as a Knudsen cell.
+        chamber_pressure:
+          value: ion source about 5e-5 Pa; cell chamber about 1e-4 Pa
+          units: Pa
+          locator:
+            published_page: 844
+            pdf_page_index: 2
+            paragraph: Pressures in the ion source and the cell chambers were maintained respectively
+              about 5×10^{-5} and 1×10^{-4} Pa.
+      observation_id: ichise_1989_kems_geometry_and_calibration
+      type: gibbs_table
+      locator:
+        published_page: 844
+        pdf_page_index: 2
+        section: '2.1'
+      standard_state: method geometry; not a species observation
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        orifice_diameter_mm: 0.4
+        crucible_diameter_mm: 9.0
+        crucible_height_mm: 11.0
+        ion_source_pressure_Pa: 5.0e-05
+        cell_chamber_pressure_Pa: 0.0001
+        internal_standard: pure iron foil on the sample surface, melted together after foil intensities
+          were taken
+        ionizing_energy: unstated
+        kems_sample_mass: unstated
+        metallography_sample_mass_g_about: 2.0
+        arc_melt_Ar_Pa: 5–8×10^4
+        equation_as_printed: ln(I_Fe T) = A * 10^4/T + B
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+        - sample_mass
+      uncertainty:
+        note: chamber pressures printed as about 5e-5 and 1e-4 Pa; ionizing energy unstated
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-Ta_or_Fe-Nb_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1989_table1_FeTa_a_Fe
+      type: activity_coefficient
+      locator:
+        table: '1'
+        published_page: 847
+        pdf_page_index: 5
+        note: Table 1 split across pp. 846-847. a_Fe at 1873 K from I(alloy)/I(foil).
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; X_Ta mole fraction
+      values:
+        quantity: activity
+        method_class: measured
+        T_K: 1873.0
+        composition_basis: X_Ta mole fraction
+        ion_intensity_equation: ln(I_Fe T)=A 10^4/T+B; coefficients printed for phases stable at 1873
+          K
+        L_plus_eps_mean_a_Fe: 0.832
+        L_plus_eps_mean_note: 'mean of heats 25,22,27,33: 0.822, 0.852, 0.797, 0.862'
+        rows:
+        - heat: 9
+          X_Ta: 0.048
+          T_K:
+          - 1746
+          - 1921
+          phase_block: L
+          a_Fe: 0.969
+          T_rxn_K: null
+        - heat: 34
+          X_Ta: 0.054
+          T_K:
+          - 1625
+          - 1875
+          phase_block: L
+          a_Fe: 0.949
+          T_rxn_K: 1713
+        - heat: 12
+          X_Ta: 0.094
+          T_K:
+          - 1751
+          - 1927
+          phase_block: L
+          a_Fe: 0.916
+          T_rxn_K: null
+        - heat: 32
+          X_Ta: 0.152
+          T_K:
+          - 1610
+          - 1899
+          phase_block: L
+          a_Fe: 0.846
+          T_rxn_K: 1713
+        - heat: 21
+          X_Ta: 0.153
+          T_K:
+          - 1630
+          - 1942
+          phase_block: L
+          a_Fe: 0.811
+          T_rxn_K: 1715
+        - heat: 31
+          X_Ta: 0.156
+          T_K:
+          - 1650
+          - 1898
+          phase_block: L
+          a_Fe: 0.886
+          T_rxn_K: 1717
+        - heat: 25
+          X_Ta: 0.239
+          T_K:
+          - 1640
+          - 1966
+          phase_block: L+ε
+          a_Fe: 0.822
+          T_rxn_K: 1716
+        - heat: 22
+          X_Ta: 0.244
+          T_K:
+          - 1658
+          - 1980
+          phase_block: L+ε
+          a_Fe: 0.852
+          T_rxn_K: 1713
+        - heat: 27
+          X_Ta: 0.255
+          T_K:
+          - 1639
+          - 1989
+          phase_block: L+ε
+          a_Fe: 0.797
+          T_rxn_K: 1713
+        - heat: 33
+          X_Ta: 0.297
+          T_K:
+          - 1626
+          - 1904
+          phase_block: L+ε
+          a_Fe: 0.862
+          T_rxn_K: null
+        - heat: 17
+          X_Ta: 0.319
+          T_K:
+          - 1629
+          - 1868
+          phase_block: ε
+          a_Fe: 0.76
+          T_rxn_K: null
+        - heat: 50
+          X_Ta: 0.404
+          T_K:
+          - 1752
+          - 1879
+          phase_block: ε+μ
+          a_Fe: 0.412
+          T_rxn_K: null
+        - heat: 49
+          X_Ta: 0.406
+          T_K:
+          - 1736
+          - 1909
+          phase_block: ε+μ
+          a_Fe: 0.421
+          T_rxn_K: null
+        - heat: 47
+          X_Ta: 0.436
+          T_K:
+          - 1751
+          - 1859
+          phase_block: ε+μ
+          a_Fe: 0.42
+          T_rxn_K: null
+        - heat: 51
+          X_Ta: 0.444
+          T_K:
+          - 1769
+          - 1900
+          phase_block: ε+μ
+          a_Fe: 0.459
+          T_rxn_K: null
+        - heat: 48
+          X_Ta: 0.606
+          T_K:
+          - 1774
+          - 1915
+          phase_block: μ+(Ta)
+          a_Fe: 0.179
+          T_rxn_K: null
+        - heat: 53
+          X_Ta: 0.727
+          T_K:
+          - 1746
+          - 1909
+          phase_block: μ+(Ta)
+          a_Fe: 0.194
+          T_rxn_K: null
+        - heat: 55
+          X_Ta: 0.775
+          T_K:
+          - 1706
+          - 1877
+          phase_block: μ+(Ta)
+          a_Fe: 0.248
+          T_rxn_K: null
+        - heat: 54
+          X_Ta: 0.81
+          T_K:
+          - 1762
+          - 1905
+          phase_block: μ+(Ta)
+          a_Fe: 0.109
+          T_rxn_K: null
+        - heat: 56
+          X_Ta: 0.828
+          T_K:
+          - 1701
+          - 1866
+          phase_block: μ+(Ta)
+          a_Fe: 0.189
+          T_rxn_K: null
+      uncertainty:
+        note: no ± on individual Table 1 a_Fe cells; two-phase mean used in Table 4
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-Ta_or_Fe-Nb_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1989_table4_FeTa_1873K
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 848
+        pdf_page_index: 6
+      standard_state: Fe(l)=Fe(in alloy); Ta(s)=Ta(in alloy)
+      units: dimensionless a, gamma; Delta-G J/mol
+      values:
+        quantity: activity_and_partial_molar_gibbs
+        a_Fe_method_class: measured
+        a_Ta_method_class: model_derived
+        method_class: model_derived
+        model_or_data_source: a_Fe from Table 1 two-phase averages / Raoult liquid; a_Ta Gibbs-Duhem
+        T_K: 1873.0
+        composition_basis: X_Ta mole fraction
+        rows:
+        - X_Ta: 0.0
+          phase: L
+          a_Fe: 1.0
+          gamma_Fe: 1.0
+          dG_Fe_J_mol: 0
+          a_Ta: 0.0
+          gamma_Ta: 0.75
+          dG_Ta_J_mol: null
+        - X_Ta: 0.1
+          phase: L
+          a_Fe: 0.9
+          gamma_Fe: 1.0
+          dG_Fe_J_mol: -1630
+          a_Ta: 0.075
+          gamma_Ta: 0.75
+          dG_Ta_J_mol: -40200
+        - X_Ta: 0.168
+          phase: L
+          a_Fe: 0.832
+          a_Fe_as_printed: 0.832±0.04
+          gamma_Fe: 1.0
+          dG_Fe_J_mol: -2850
+          a_Ta: 0.126
+          a_Ta_as_printed: 0.126±0.025
+          gamma_Ta: 0.75
+          dG_Ta_J_mol: -32200
+        - X_Ta: 0.294
+          phase: ε
+          a_Fe: 0.832
+          a_Fe_as_printed: 0.832±0.04
+          gamma_Fe: 1.18
+          dG_Fe_J_mol: -2850
+          a_Ta: 0.126
+          a_Ta_as_printed: 0.126±0.025
+          gamma_Ta: 0.43
+          dG_Ta_J_mol: -32200
+        - X_Ta: 0.405
+          phase: ε
+          a_Fe: 0.427
+          a_Fe_as_printed: 0.427±0.03
+          gamma_Fe: 0.72
+          dG_Fe_J_mol: -13300
+          a_Ta: 0.457
+          a_Ta_as_printed: 0.457±0.029
+          gamma_Ta: 1.13
+          dG_Ta_J_mol: -12100
+        - X_Ta: 0.503
+          phase: μ
+          a_Fe: 0.427
+          a_Fe_as_printed: 0.427±0.03
+          gamma_Fe: 0.86
+          dG_Fe_J_mol: -13300
+          a_Ta: 0.457
+          a_Ta_as_printed: 0.457±0.029
+          gamma_Ta: 0.91
+          dG_Ta_J_mol: -12100
+        - X_Ta: 0.591
+          phase: μ
+          a_Fe: 0.183
+          a_Fe_as_printed: 0.183±0.07
+          gamma_Fe: 0.45
+          dG_Fe_J_mol: -26500
+          a_Ta: 0.936
+          a_Ta_as_printed: 0.936±0.006
+          gamma_Ta: 1.0
+          dG_Ta_J_mol: -1050
+        - X_Ta: 0.936
+          phase: (Ta)
+          a_Fe: 0.183
+          a_Fe_as_printed: 0.183±0.07
+          gamma_Fe: 2.84
+          dG_Fe_J_mol: -26500
+          a_Ta: 0.936
+          a_Ta_as_printed: 0.936±0.006
+          gamma_Ta: 1.0
+          dG_Ta_J_mol: -1050
+        - X_Ta: 1.0
+          phase: (Ta)
+          a_Fe: 0.0
+          gamma_Fe: 2.84
+          dG_Fe_J_mol: null
+          a_Ta: 1.0
+          gamma_Ta: 1.0
+          dG_Ta_J_mol: 0
+      uncertainty:
+        note: printed ± on two-phase a_Fe/a_Ta; em-dash Delta-G at X=0 and X=1 Fe not interpolated
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-Ta_or_Fe-Nb_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1989_table5_FeNb_a_Fe
+      type: activity_coefficient
+      locator:
+        table: '5'
+        published_page: 849
+        pdf_page_index: 7
+        note: Table 5 split across pp. 848-849. a_Fe column on p.849.
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; X_Nb mole fraction
+      values:
+        quantity: activity
+        method_class: measured
+        T_K: 1873.0
+        composition_basis: X_Nb mole fraction
+        ion_intensity_equation: ln(I_Fe T)=A 10^4/T+B
+        rows:
+        - heat: 8
+          X_Nb: 0.048
+          phase: L
+          a_Fe: 0.962
+        - heat: 4
+          X_Nb: 0.091
+          phase: L
+          a_Fe: 0.869
+        - heat: 31
+          X_Nb: 0.094
+          phase: L
+          a_Fe: 0.902
+        - heat: 59
+          X_Nb: 0.139
+          phase: L
+          a_Fe: 0.826
+        - heat: 58
+          X_Nb: 0.144
+          phase: L
+          a_Fe: 0.846
+        - heat: 11
+          X_Nb: 0.192
+          phase: L
+          a_Fe: 0.791
+        - heat: 14
+          X_Nb: 0.234
+          phase: L
+          a_Fe: 0.731
+        - heat: 12
+          X_Nb: 0.242
+          phase: L
+          a_Fe: 0.782
+        - heat: 32
+          X_Nb: 0.298
+          phase: L+ε
+          a_Fe: 0.704
+        - heat: 15
+          X_Nb: 0.32
+          phase: ε
+          a_Fe: 0.545
+        - heat: 30
+          X_Nb: 0.37
+          phase: ε+
+          a_Fe: 0.387
+        - heat: 29
+          X_Nb: 0.384
+          phase: ε+
+          a_Fe: 0.367
+        - heat: 20
+          X_Nb: 0.388
+          phase: ε+
+          a_Fe: 0.359
+        - heat: 19
+          X_Nb: 0.394
+          phase: ε+
+          a_Fe: 0.36
+        - heat: 16
+          X_Nb: 0.502
+          phase: L'
+          a_Fe: 0.34
+        - heat: 26
+          X_Nb: 0.548
+          phase: L'+ζ
+          a_Fe: 0.276
+        - heat: 23
+          X_Nb: 0.596
+          phase: ζ
+          a_Fe: 0.258
+        - heat: 24
+          X_Nb: 0.671
+          phase: ζ+(Nb)
+          a_Fe: 0.203
+        - heat: 25
+          X_Nb: 0.76
+          phase: ζ+(Nb)
+          a_Fe: 0.197
+        - heat: 27
+          X_Nb: 0.856
+          phase: ζ+(Nb)
+          a_Fe: 0.222
+      uncertainty:
+        note: no ± on individual Table 5 a_Fe cells
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-Ta_or_Fe-Nb_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1989_table6_FeNb_1873K
+      type: activity_coefficient
+      locator:
+        table: '6'
+        published_page: 850
+        pdf_page_index: 8
+      standard_state: Fe(l)=Fe(in alloy); Nb(s)=Nb(in alloy)
+      units: dimensionless a, gamma; Delta-G J/mol
+      values:
+        quantity: activity_and_partial_molar_gibbs
+        a_Fe_method_class: measured
+        a_Nb_method_class: model_derived
+        method_class: model_derived
+        model_or_data_source: a_Fe from Table 5 two-phase averages; a_Nb Gibbs-Duhem; Fe-Nb boundaries
+          from Kubaschewski
+        T_K: 1873.0
+        eq8_as_printed: ln gamma_Fe = -0.71(1-x_Fe)^2
+        rows:
+        - X_Nb: 0.0
+          phase: L
+          a_Fe: 1.0
+          gamma_Fe: 1.0
+          dG_Fe_J_mol: 0
+          a_Nb: 0.0
+          gamma_Nb: 0.435
+          dG_Nb_J_mol: null
+        - X_Nb: 0.1
+          phase: L
+          a_Fe: 0.894
+          gamma_Fe: 0.993
+          dG_Fe_J_mol: -1760
+          a_Nb: 0.05
+          gamma_Nb: 0.498
+          dG_Nb_J_mol: -46650
+        - X_Nb: 0.2
+          phase: L
+          a_Fe: 0.777
+          gamma_Fe: 0.972
+          dG_Fe_J_mol: -3930
+          a_Nb: 0.113
+          gamma_Nb: 0.565
+          dG_Nb_J_mol: -33900
+        - X_Nb: 0.265
+          phase: L
+          a_Fe: 0.7
+          a_Fe_as_printed: 0.700±0.010
+          gamma_Fe: 0.953
+          dG_Fe_J_mol: -5560
+          a_Nb: 0.16
+          a_Nb_as_printed: 0.160±0.024
+          gamma_Nb: 0.604
+          dG_Nb_J_mol: -28500
+        - X_Nb: 0.32
+          phase: ε
+          a_Fe: 0.7
+          a_Fe_as_printed: 0.700±0.010
+          gamma_Fe: 1.029
+          dG_Fe_J_mol: -5560
+          a_Nb: 0.16
+          a_Nb_as_printed: 0.160±0.024
+          gamma_Nb: 0.5
+          dG_Nb_J_mol: -28500
+        - X_Nb: 0.36
+          phase: ε
+          a_Fe: 0.369
+          a_Fe_as_printed: 0.369±0.010
+          gamma_Fe: 0.577
+          dG_Fe_J_mol: -15500
+          a_Nb: 0.585
+          a_Nb_as_printed: 0.585±0.022
+          gamma_Nb: 1.63
+          dG_Nb_J_mol: -8370
+        - X_Nb: 0.45
+          phase: L'
+          a_Fe: 0.369
+          a_Fe_as_printed: 0.369±0.010
+          gamma_Fe: 0.671
+          dG_Fe_J_mol: -15500
+          a_Nb: 0.585
+          a_Nb_as_printed: 0.585±0.022
+          gamma_Nb: 1.3
+          dG_Nb_J_mol: -8370
+        - X_Nb: 0.54
+          phase: L'
+          a_Fe: 0.278
+          a_Fe_as_printed: 0.278±0.010
+          gamma_Fe: 0.604
+          dG_Fe_J_mol: -19900
+          a_Nb: 0.785
+          a_Nb_as_printed: 0.785±0.043
+          gamma_Nb: 1.45
+          dG_Nb_J_mol: -3770
+        - X_Nb: 0.57
+          phase: ζ
+          a_Fe: 0.278
+          a_Fe_as_printed: 0.278±0.010
+          gamma_Fe: 0.647
+          dG_Fe_J_mol: -19900
+          a_Nb: 0.785
+          a_Nb_as_printed: 0.785±0.043
+          gamma_Nb: 1.38
+          dG_Nb_J_mol: -3770
+        - X_Nb: 0.64
+          phase: ζ
+          a_Fe: 0.208
+          a_Fe_as_printed: 0.208±0.011
+          gamma_Fe: 0.578
+          dG_Fe_J_mol: -24400
+          a_Nb: 0.95
+          a_Nb_as_printed: 0.95±0.011
+          gamma_Nb: 1.48
+          dG_Nb_J_mol: -790
+        - X_Nb: 0.95
+          phase: (Nb)
+          a_Fe: 0.208
+          a_Fe_as_printed: 0.208±0.011
+          gamma_Fe: 4.16
+          dG_Fe_J_mol: -24400
+          a_Nb: 0.95
+          a_Nb_as_printed: 0.95±0.011
+          gamma_Nb: 1.0
+          dG_Nb_J_mol: -790
+        - X_Nb: 1.0
+          phase: (Nb)
+          a_Fe: 0.0
+          gamma_Fe: 4.16
+          dG_Fe_J_mol: null
+          a_Nb: 1.0
+          gamma_Nb: 1.0
+          dG_Nb_J_mol: 0
+      uncertainty:
+        note: printed ± on two-phase a_Fe/a_Nb
+    - T_range_K:
+      - 1673.0
+      - 1973.0
+      phase: Fe-Ta_or_Fe-Nb_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1989_figs_ion_intensity_figure_only
+      type: rate_series
+      locator:
+        figure: '1'
+        published_page: 845
+        pdf_page_index: 3
+        note: also Figs 2 and 5
+      standard_state: ln(I_Fe T) vs 1/T
+      units: as published
+      values:
+        quantity: ion_intensity
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        figures:
+        - '1'
+        - '2'
+        - '5'
+      uncertainty:
+        note: figure-only; Table 1/5 carry the fitted A,B and a_Fe
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-Ta_or_Fe-Nb_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1989_figs_activities_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '4'
+        published_page: 847
+        pdf_page_index: 5
+        note: also Figs 6 and 7
+      standard_state: a_Fe, a_Ta / a_Nb vs composition at 1873 K
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        figures:
+        - '4'
+        - '6'
+        - '7'
+      uncertainty:
+        note: figure-only; Tables 4 and 6 carry the tabulated values
+  Ta:
+    observations:
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-Ta_or_Fe-Nb_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1989_table2_metallography
+      type: transition_point
+      locator:
+        table: '2'
+        published_page: 847
+        pdf_page_index: 5
+      standard_state: phase identification at 1873 K, at% Ta
+      units: at% Ta
+      values:
+        quantity: phase_identification
+        method_class: measured
+        T_K: 1873.0
+        composition_basis: at% Ta
+        rows:
+        - atpct_Ta: 11.1
+          microscope: L
+          EPMA: L
+          Xray: null
+        - atpct_Ta: 17.5
+          microscope: L+ε
+          EPMA: L+ε
+          Xray: null
+        - atpct_Ta: 25.2
+          microscope: L+ε
+          EPMA: L+ε
+          Xray: null
+        - atpct_Ta: 29.0
+          microscope: L+ε
+          EPMA: L+ε
+          Xray: null
+        - atpct_Ta: 34.0
+          microscope: null
+          EPMA: ε
+          Xray: null
+        - atpct_Ta: 37.5
+          microscope: null
+          EPMA: ε
+          Xray: null
+        - atpct_Ta: 40.4
+          microscope: null
+          EPMA: ε+μ
+          Xray: null
+        - atpct_Ta: 41.0
+          microscope: null
+          EPMA: ε+μ
+          Xray: null
+        - atpct_Ta: 43.0
+          microscope: null
+          EPMA: ε+μ
+          Xray: null
+        - atpct_Ta: 46.0
+          microscope: null
+          EPMA: ε+μ
+          Xray: ε+μ
+        - atpct_Ta: 51.0
+          microscope: null
+          EPMA: μ
+          Xray: μ
+        - atpct_Ta: 64.0
+          microscope: null
+          EPMA: μ+(Ta)
+          Xray: μ+(Ta)
+      uncertainty:
+        note: blank microscope/X-ray cells are structural, not interpolated
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-Ta_or_Fe-Nb_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1989_table3_phase_boundaries
+      type: transition_point
+      locator:
+        table: '3'
+        published_page: 847
+        pdf_page_index: 5
+      standard_state: EPMA phase-boundary at% Ta at 1873 K
+      units: at% Ta
+      values:
+        quantity: phase_boundary_composition
+        method_class: measured
+        average_row_method_class: model_derived
+        T_K: 1873.0
+        liquidus_atpct_Ta_from_a_Fe: 16.8
+        liquidus_note: liquidus of L+eps could not be fixed by EPMA; 16.8 at% Ta from a_Fe=0.832 intersect
+          Raoult
+        eutectic_K: 1714.0
+        eutectic_as_printed: 1714±2 K
+        rows:
+        - alloy_atpct_Ta: 17.5
+          eps_Fe_rich: 29.7
+        - alloy_atpct_Ta: 25.2
+          eps_Fe_rich: 29.9
+        - alloy_atpct_Ta: 29.0
+          eps_Fe_rich: 28.6
+        - alloy_atpct_Ta: 40.4
+          eps_Ta_rich: 38.0
+          mu_Fe_rich: 51.0
+        - alloy_atpct_Ta: 41.0
+          eps_Ta_rich: 40.8
+          mu_Fe_rich: 49.6
+        - alloy_atpct_Ta: 43.0
+          eps_Ta_rich: 42.7
+          mu_Fe_rich: 49.9
+        - alloy_atpct_Ta: 46.0
+          eps_Ta_rich: 40.4
+          mu_Fe_rich: 50.8
+        - alloy_atpct_Ta: 64.0
+          mu_Ta_rich: 59.1
+          Ta_ss: 93.6
+        - alloy_atpct_Ta: Average
+          eps_Fe_rich: 29.4
+          eps_Ta_rich: 40.5
+          mu_Fe_rich: 50.3
+          mu_Ta_rich: 59.1
+          Ta_ss: 93.6
+      uncertainty:
+        eutectic_K: 2.0
+        note: Average row is the printed mean of the EPMA columns
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-Ta_or_Fe-Nb_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1989_infinite_dilution_gamma
+      type: activity_coefficient
+      locator:
+        published_page: 851
+        pdf_page_index: 9
+        section: 5. Conclusion
+      standard_state: Raoultian gamma°; solid and liquid Ta/Nb standards as printed
+      units: dimensionless gamma°
+      values:
+        quantity: infinite_dilution_activity_coefficient
+        method_class: model_derived
+        T_K: 1873.0
+        gamma0_Ta_s: 0.75
+        gamma0_Ta_s_as_printed: 0.75±0.15
+        gamma0_Ta_l_conclusion: 0.31
+        gamma0_Ta_l_conclusion_as_printed: 0.31±0.06
+        gamma0_Ta_l_body: 0.31
+        gamma0_Ta_l_body_as_printed: 0.31±0.07
+        gamma0_Ta_l_note: body p.848 prints 0.31±0.07; conclusion p.851 prints 0.31±0.06. Both retained.
+        epsilon_Ta_Ta: 0
+        gamma0_Nb_s: 0.44
+        gamma0_Nb_s_as_printed: 0.44±0.06
+        gamma0_Nb_l: 0.26
+        gamma0_Nb_l_as_printed: 0.26±0.03
+        epsilon_Nb_Nb: 1.42
+        Ta_conversion: Delta-S_m=9.6 J/(mol K), T_m=3278 K (Hultgren)
+        Nb_conversion: Delta-S_m=9.6 J/(mol K), T_m=2740 K (Hultgren)
+      uncertainty:
+        gamma0_Ta_s: 0.15
+        gamma0_Ta_l_conclusion: 0.06
+        gamma0_Ta_l_body: 0.07
+        gamma0_Nb_s: 0.06
+        gamma0_Nb_l: 0.03
+  Nb:
+    observations:
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: Fe-Ta_or_Fe-Nb_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1989_quoted_gamma0_literature
+      type: activity_coefficient
+      locator:
+        published_page: 850
+        pdf_page_index: 8
+        section: 4. Discussion
+      standard_state: quoted gamma°_Ta(l) and gamma°_Nb(l) at 1873 K
+      units: dimensionless
+      values:
+        quantity: infinite_dilution_activity_coefficient
+        method_class: quoted_measurement
+        T_K: 1873.0
+        gamma0_Ta_l_Morita: 0.04
+        gamma0_Ta_l_Buzek: 0.025
+        gamma0_Nb_l_as_printed:
+        - 0.2
+        - 0.33
+        - 0.24
+        - 0.175
+        - 0.92
+        epsilon_Ta_Ta_as_printed:
+        - 1.8
+        - 14.9
+        - 71
+        epsilon_Nb_Nb_as_printed:
+        - 3.2
+        - 1.0
+        - -0.7
+        - -85
+      uncertainty:
+        note: quoted literature scatter; this-work values are in ichise_1989_infinite_dilution_gamma
+deepening:
+  dispatch_id: extract-alloys-b2
+  date: '2026-09-13'
+  table_inventory:
+  - table: '1'
+    published_page: 847
+    pdf_page_index: 5
+    completeness: a_Fe and identifiers full; per-phase -A,B coefficients listed in the paper on pp.846-847
+      and transcribed into the source render notes. a_Fe column is the activity payload.
+    note: 20 heats. Ion-intensity A,B fits are in the printed table; a_Fe at 1873 K recorded here.
+  - table: '2'
+    published_page: 847
+    pdf_page_index: 5
+    completeness: full
+  - table: '3'
+    published_page: 847
+    pdf_page_index: 5
+    completeness: full
+  - table: '4'
+    published_page: 848
+    pdf_page_index: 6
+    completeness: full
+  - table: '5'
+    published_page: 849
+    pdf_page_index: 7
+    completeness: a_Fe full; A,B on pp.848-849
+  - table: '6'
+    published_page: 850
+    pdf_page_index: 8
+    completeness: full
+  class_ledger:
+    measured:
+    - ichise_1989_kems_geometry_and_calibration
+    - ichise_1989_table1_FeTa_a_Fe
+    - ichise_1989_table5_FeNb_a_Fe
+    - ichise_1989_table2_metallography
+    - ichise_1989_table3_phase_boundaries
+    - ichise_1989_figs_ion_intensity_figure_only
+    - ichise_1989_figs_activities_figure_only
+    model_derived:
+    - ichise_1989_table4_FeTa_1873K
+    - ichise_1989_table6_FeNb_1873K
+    - ichise_1989_infinite_dilution_gamma
+    quoted_measurement:
+    - ichise_1989_quoted_gamma0_literature
+    figure_only:
+    - ichise_1989_figs_ion_intensity_figure_only
+    - ichise_1989_figs_activities_figure_only
+  refused:
+  - what: numeric points off Figs 1, 4, 5, 6, 7 axes
+    why: figure_only; tables carry a_Fe and thermodynamics
+  - what: KEMS sample mass and ionizing energy
+    why: unstated
+  - what: orifice area from 0.4 mm diameter
+    why: area not invented
+  - what: empty microscope/X-ray cells in Table 2
+    why: structural blanks, not interpolated
+  primary_sources_cited:
+  - ref: 5
+    as_printed: Kubaschewski Fe-Ta / Fe-Nb phase diagram (used for Fe-Nb boundaries)
+  - ref: 6
+    as_printed: Hultgren et al. melting entropy 9.6 J/(mol K); T_m(Ta)=3278 K; T_m(Nb)=2740 K
+  - ref: 9
+    as_printed: Morita et al. gamma0_Ta(l)=0.04
+  - ref: 10
+    as_printed: Buzek gamma0_Ta(l)=0.025

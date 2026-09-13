@@ -1,0 +1,886 @@
+schema_version: literature_extract.v1
+source_id: kems-118-yamamoto-1983
+source:
+  citation: Yamamoto, M., Mori, S. and Kato, E. (1983), "Mass Spectrometric Study of the Thermodynamic
+    Properties of the Liquid Fe-Sn and Fe-Sn-Cu Alloys", Trans. ISIJ 23(1):56-64, DOI 10.2355/isijinternational1966.23.56.
+    Originally published in Tetsu-to-Hagane, 67 (1981), 1952, in Japanese.
+  doi: 10.2355/isijinternational1966.23.56
+  url: https://doi.org/10.2355/isijinternational1966.23.56
+  year: 1983
+extraction:
+  method: Official J-STAGE OA PDF (corpus raw/kems-118-yamamoto-1983/kems-118-yamamoto-1983.pdf, sha256
+    128431853efacfcb1a2347221d72858c7ce4e095504a37ec10bfb4bdeedd2769). No MinerU decode. Tables 1-6 transcribed
+    from a 400 dpi pdftoppm render of PDF pages 1-9 (published pp. 56-64). pdftotext-layout is a noisy
+    OCR layer and was not used as data. Table 2/4/5 ion-current ratios labelled measured. Table 3 a/gamma/Delta-H
+    from Belton-Fruehan / Gibbs-Duhem integration labelled model_derived. Table 5 epsilon_Sn^Cu and Table
+    6 Present Authors rows model_derived. Table 6 other-worker rows quoted_measurement (Hultgren Estimation
+    quoted_unattributed). Figs 1-15 figure-only. Table 3 N_Sn=0.700 a_Sn(1550 C)=0.882 transcribed as
+    printed (inconsistent with gamma_Sn=1.174). Sample mass unstated. Chamber pressure unstated. Ionizing
+    energy unstated.
+  date: '2026-09-13'
+  worker: extract-alloys-b2
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.Sn.observations[yamamoto_1983_table2_ion_ratios].values.rows[0].ln_1600C
+  value: 1.018
+  locator:
+    table: '2'
+    published_page: 58
+    pdf_page_index: 3
+    note: Table 2 N_Sn=0.100, 1600 C, ln(I_Sn+/I_Fe+)=1.018
+- species: Sn
+  observable: activity_coefficient
+  observation_id: yamamoto_1983_gamma_inf_and_epsilon
+  field: gamma0_Sn_1600C
+  value: 2.58
+  locator:
+    published_page: 56
+    pdf_page_index: 1
+    note: 'Synopsis: gamma0_Sn=2.58, gamma0_Fe=4.86 at 1600 C'
+- path: species.Sn.observations[yamamoto_1983_table4_dilute_ion_ratios_1600C].values.rows[0].ln_ISn_over_IFe
+  value: -1.347
+  locator:
+    table: '4'
+    published_page: 59
+    pdf_page_index: 4
+    note: Table 4 N_Sn=0.010, ln(I_Sn+/I_Fe+)=-1.347
+- path: species.Sn.observations[yamamoto_1983_table5_FeSnCu].values.epsilon_Sn_Cu[1].epsilon
+  value: -6.41
+  locator:
+    table: '5'
+    published_page: 60
+    pdf_page_index: 5
+    note: Table 5 epsilon_Sn^Cu=-6.41±0.03 at 1600 C
+- path: species.Fe.observations[yamamoto_1983_table1_materials].values.iron.C_wt_percent
+  value: 0.007
+  locator:
+    table: '1'
+    published_page: 56
+    pdf_page_index: 1
+    note: Table 1 Iron C=0.007 wt%
+species:
+  Fe:
+    observations:
+    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+      condensed_form: &id001
+        state: liquid_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-Sn and Fe-Sn-Cu; no liquid miscibility gap observed 1550-1610 C
+      regime: kems_effusion
+      equipment: &id002
+        cell_material:
+          value: High-purity alumina Knudsen cell (Nippon Kagaku Togyo SSA-S), inner diameter 9 mm, orifice
+            diameter 0.3 mm (0.7 mm tested for N_Sn=0.2). Hitachi RM-6E. W25%Re-W5%Re thermocouple, calibrated
+            at melting points of pure Fe and Ni. Temperature fluctuation ±1 C.
+          locator:
+            published_page: 56
+            pdf_page_index: 1
+            section: II.1
+            paragraph: The inner diameter of the high-purity alumina crucible used for a Knudsen-cell
+              (Nippon Kagaku Togyo Co., SSA-S) was 9 mm and the diameter of the orifice was 0.3 mm.
+        chamber_pressure:
+          value: unstated
+          note: KEMS chamber pressure not printed; Fe was premelted under high vacuum then deoxidized
+            in H2
+          locator:
+            published_page: 56
+            pdf_page_index: 1
+            section: II.1
+      observation_id: yamamoto_1983_kems_geometry_and_calibration
+      type: gibbs_table
+      locator:
+        published_page: 56
+        pdf_page_index: 1
+        section: II.1
+      T_range_K:
+      - 1473.0
+      - 1883.0
+      standard_state: method geometry; not a species observation
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: Hitachi RM-6E Knudsen-cell mass spectrometer
+        orifice_diameter_mm: 0.3
+        orifice_diameter_mm_tested: 0.7
+        crucible_inner_diameter_mm: 9.0
+        Al_deoxidizer_at_percent: 0.5
+        sample_mass: unstated
+        ionizing_energy: unstated
+        chamber_pressure: unstated
+        T_fluctuation_C: 1.0
+        T_range_C: 1550~1610
+        ion_current_range_C: 1200~1610
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+        - sample_mass
+        clausing_factors_discussion: estimated 0.26 (0.3 mm) and 0.43 (0.7 mm) on p.61; orifice thickness
+          1 mm
+      uncertainty:
+        note: T fluctuation ±1 C; sample mass, ionizing energy and chamber pressure unstated
+    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamamoto_1983_table1_materials
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 56
+        pdf_page_index: 1
+      T_range_K:
+      - 1823.0
+      - 1883.0
+      standard_state: starting-metal assay
+      units: wt% as published; O and N in ppm
+      values:
+        quantity: starting_metal_assay
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        iron:
+          C_wt_percent: 0.007
+          Si: trace
+          Mn_wt_percent: 0.007
+          P_wt_percent: 0.007
+          S_wt_percent: 0.002
+          O_ppm: 16
+          N_ppm: 4
+        tin_impurities_as_printed: Pb<0.01  Cu<0.005  Fe<0.005  Sb<0.01; Bi<0.003  As<0.001
+      uncertainty:
+        note: purity as printed
+  Sn:
+    observations:
+    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamamoto_1983_table2_ion_ratios
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 58
+        pdf_page_index: 3
+        note: Table 2 caption prints 'iron current ratios' (ion).
+      T_range_K:
+      - 1823.0
+      - 1873.0
+      standard_state: ln(I_Sn+/I_Fe+); mole fraction N_Sn
+      units: dimensionless ln ratio; R d ln / d(1/T) in J/mol
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        T_C:
+        - 1550
+        - 1600
+        composition_basis: N_Sn mole fraction
+        rows:
+        - N_Sn: 0.1
+          ln_1550C: 1.182
+          ln_1600C: 1.018
+          R_dln_dinvT_J_mol: 93300
+        - N_Sn: 0.2
+          ln_1550C: 1.893
+          ln_1600C: 1.744
+          R_dln_dinvT_J_mol: 84310
+        - N_Sn: 0.3
+          ln_1550C: 2.255
+          ln_1600C: 2.126
+          R_dln_dinvT_J_mol: 73010
+        - N_Sn: 0.4
+          ln_1550C: 2.433
+          ln_1600C: 2.304
+          R_dln_dinvT_J_mol: 73470
+        - N_Sn: 0.45
+          ln_1550C: 2.472
+          ln_1600C: 2.338
+          R_dln_dinvT_J_mol: 76360
+        - N_Sn: 0.5
+          ln_1550C: 2.525
+          ln_1600C: 2.394
+          R_dln_dinvT_J_mol: 73890
+        - N_Sn: 0.55
+          ln_1550C: 2.571
+          ln_1600C: 2.428
+          R_dln_dinvT_J_mol: 80880
+        - N_Sn: 0.6
+          ln_1550C: 2.59
+          ln_1600C: 2.474
+          R_dln_dinvT_J_mol: 65520
+        - N_Sn: 0.7
+          ln_1550C: 2.715
+          ln_1600C: 2.605
+          R_dln_dinvT_J_mol: 62380
+        - N_Sn: 0.8
+          ln_1550C: 2.913
+          ln_1600C: 2.822
+          R_dln_dinvT_J_mol: 51800
+        - N_Sn: 0.9
+          ln_1550C: 3.314
+          ln_1600C: 3.285
+          R_dln_dinvT_J_mol: 16110
+        - N_Sn: 0.95
+          ln_1550C: 3.85
+          ln_1600C: 3.782
+          R_dln_dinvT_J_mol: 38410
+      uncertainty:
+        note: no ± printed on Table 2 cells
+    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamamoto_1983_table3_activities_and_heats
+      type: activity_coefficient
+      locator:
+        table: '3'
+        published_page: 58
+        pdf_page_index: 3
+      T_range_K:
+      - 1823.0
+      - 1883.0
+      standard_state: Raoultian a_i, gamma_i; pure liquid Fe and Sn. Heats kJ/mol at 1550~1610 C
+      units: dimensionless a, gamma; kJ/mol for heats
+      values:
+        quantity: activity_gamma_and_partial_molar_heats
+        method_class: model_derived
+        model_or_data_source: Belton-Fruehan / Gibbs-Duhem integration of Table 2 ion-current ratios (eqs.
+          1-3); heats from R d ln(I+)/d(1/T) integration (Fig. 4 / eqs. 2, 10)
+        T_C:
+        - 1550
+        - 1600
+        composition_basis: N_Sn mole fraction
+        printed_inconsistencies:
+        - 'N_Sn=0.700, 1550 C: a_Sn=0.882 printed but gamma_Sn=1.174 implies 0.822; transcribed as printed
+          0.882'
+        - 'N_Sn=0.600, 1600 C: a_Fe=0.663 printed but gamma_Fe=1.582 implies 0.633; transcribed as printed
+          0.663'
+        em_dash_rows: heats blank at N_Sn=0.450, 0.550, 0.950; not interpolated
+        rows:
+        - N_Sn: 0.0
+          a_Sn_1550: 0.0
+          a_Fe_1550: 1.0
+          g_Sn_1550: 2.676
+          g_Fe_1550: 1.0
+          a_Sn_1600: 0.0
+          a_Fe_1600: 1.0
+          g_Sn_1600: 2.581
+          g_Fe_1600: 1.0
+          dHbar_Sn_kJ_mol: 31.5
+          dHbar_Fe_kJ_mol: 0.0
+          dH_kJ_mol: 0.0
+        - N_Sn: 0.1
+          a_Sn_1550: 0.26
+          a_Fe_1550: 0.902
+          g_Sn_1550: 2.599
+          g_Fe_1550: 1.001
+          a_Sn_1600: 0.25
+          a_Fe_1600: 0.902
+          g_Sn_1600: 2.505
+          g_Fe_1600: 1.002
+          dHbar_Sn_kJ_mol: 23.3
+          dHbar_Fe_kJ_mol: 0.4
+          dH_kJ_mol: 2.7
+          u:
+            a_Sn_1550: 0.004
+            a_Fe_1550: 0.0
+            g_Sn_1550: 0.037
+            g_Fe_1550: 0.001
+            a_Sn_1600: 0.003
+            a_Fe_1600: 0.0
+            g_Sn_1600: 0.028
+            g_Fe_1600: 0.0
+            dHbar_Sn_kJ_mol: 2.0
+            dHbar_Fe_kJ_mol: 0.1
+            dH_kJ_mol: 0.3
+        - N_Sn: 0.2
+          a_Sn_1550: 0.478
+          a_Fe_1550: 0.815
+          g_Sn_1550: 2.391
+          g_Fe_1550: 1.018
+          a_Sn_1600: 0.469
+          a_Fe_1600: 0.811
+          g_Sn_1600: 2.348
+          g_Fe_1600: 1.013
+          dHbar_Sn_kJ_mol: 16.2
+          dHbar_Fe_kJ_mol: 1.7
+          dH_kJ_mol: 4.6
+        - N_Sn: 0.3
+          a_Sn_1550: 0.631
+          a_Fe_1550: 0.745
+          g_Sn_1550: 2.104
+          g_Fe_1550: 1.064
+          a_Sn_1600: 0.627
+          a_Fe_1600: 0.739
+          g_Sn_1600: 2.09
+          g_Fe_1600: 1.055
+          dHbar_Sn_kJ_mol: 11.7
+          dHbar_Fe_kJ_mol: 3.1
+          dH_kJ_mol: 5.7
+          u:
+            a_Sn_1550: 0.007
+            a_Fe_1550: 0.001
+            g_Sn_1550: 0.023
+            g_Fe_1550: 0.002
+            a_Sn_1600: 0.006
+            a_Fe_1600: 0.001
+            g_Sn_1600: 0.019
+            g_Fe_1600: 0.001
+            dHbar_Sn_kJ_mol: 1.3
+            dHbar_Fe_kJ_mol: 0.7
+            dH_kJ_mol: 0.5
+        - N_Sn: 0.4
+          a_Sn_1550: 0.717
+          a_Fe_1550: 0.696
+          g_Sn_1550: 1.792
+          g_Fe_1550: 1.161
+          a_Sn_1600: 0.709
+          a_Fe_1600: 0.693
+          g_Sn_1600: 1.773
+          g_Fe_1600: 1.155
+          dHbar_Sn_kJ_mol: 10.0
+          dHbar_Fe_kJ_mol: 4.1
+          dH_kJ_mol: 6.5
+        - N_Sn: 0.45
+          a_Sn_1550: 0.739
+          a_Fe_1550: 0.682
+          g_Sn_1550: 1.642
+          g_Fe_1550: 1.241
+          a_Sn_1600: 0.728
+          a_Fe_1600: 0.68
+          g_Sn_1600: 1.617
+          g_Fe_1600: 1.237
+          dHbar_Sn_kJ_mol: null
+          dHbar_Fe_kJ_mol: null
+          dH_kJ_mol: null
+        - N_Sn: 0.5
+          a_Sn_1550: 0.759
+          a_Fe_1550: 0.665
+          g_Sn_1550: 1.519
+          g_Fe_1550: 1.329
+          a_Sn_1600: 0.748
+          a_Fe_1600: 0.664
+          g_Sn_1600: 1.495
+          g_Fe_1600: 1.327
+          dHbar_Sn_kJ_mol: 8.6
+          dHbar_Fe_kJ_mol: 5.3
+          dH_kJ_mol: 6.9
+          u:
+            a_Sn_1550: 0.003
+            a_Fe_1550: 0.004
+            g_Sn_1550: 0.004
+            g_Fe_1550: 0.009
+            a_Sn_1600: 0.003
+            a_Fe_1600: 0.004
+            g_Sn_1600: 0.005
+            g_Fe_1600: 0.008
+            dHbar_Sn_kJ_mol: 1.3
+            dHbar_Fe_kJ_mol: 0.7
+            dH_kJ_mol: 0.5
+        - N_Sn: 0.55
+          a_Sn_1550: 0.775
+          a_Fe_1550: 0.647
+          g_Sn_1550: 1.41
+          g_Fe_1550: 1.438
+          a_Sn_1600: 0.764
+          a_Fe_1600: 0.65
+          g_Sn_1600: 1.389
+          g_Fe_1600: 1.444
+          dHbar_Sn_kJ_mol: null
+          dHbar_Fe_kJ_mol: null
+          dH_kJ_mol: null
+        - N_Sn: 0.6
+          a_Sn_1550: 0.784
+          a_Fe_1550: 0.637
+          g_Sn_1550: 1.308
+          g_Fe_1550: 1.59
+          a_Sn_1600: 0.779
+          a_Fe_1600: 0.663
+          g_Sn_1600: 1.298
+          g_Fe_1600: 1.582
+          dHbar_Sn_kJ_mol: 7.0
+          dHbar_Fe_kJ_mol: 7.4
+          dH_kJ_mol: 7.2
+        - N_Sn: 0.7
+          a_Sn_1550: 0.882
+          a_Fe_1550: 0.582
+          g_Sn_1550: 1.174
+          g_Fe_1550: 1.938
+          a_Sn_1600: 0.817
+          a_Fe_1600: 0.58
+          g_Sn_1600: 1.167
+          g_Fe_1600: 1.932
+          dHbar_Sn_kJ_mol: 4.3
+          dHbar_Fe_kJ_mol: 12.4
+          dH_kJ_mol: 6.7
+          u:
+            a_Sn_1550: 0.003
+            a_Fe_1550: 0.009
+            g_Sn_1550: 0.004
+            g_Fe_1550: 0.031
+            a_Sn_1600: 0.002
+            a_Fe_1600: 0.005
+            g_Sn_1600: 0.002
+            g_Fe_1600: 0.018
+            dHbar_Sn_kJ_mol: 1.1
+            dHbar_Fe_kJ_mol: 0.7
+            dH_kJ_mol: 0.8
+        - N_Sn: 0.8
+          a_Sn_1550: 0.866
+          a_Fe_1550: 0.493
+          g_Sn_1550: 1.082
+          g_Fe_1550: 2.464
+          a_Sn_1600: 0.863
+          a_Fe_1600: 0.488
+          g_Sn_1600: 1.079
+          g_Fe_1600: 2.44
+          dHbar_Sn_kJ_mol: 1.9
+          dHbar_Fe_kJ_mol: 19.3
+          dH_kJ_mol: 5.4
+        - N_Sn: 0.9
+          a_Sn_1550: 0.918
+          a_Fe_1550: 0.343
+          g_Sn_1550: 1.02
+          g_Fe_1550: 3.434
+          a_Sn_1600: 0.917
+          a_Fe_1600: 0.338
+          g_Sn_1600: 1.019
+          g_Fe_1600: 3.384
+          dHbar_Sn_kJ_mol: 0.5
+          dHbar_Fe_kJ_mol: 27.1
+          dH_kJ_mol: 3.1
+          u:
+            a_Sn_1550: 0.001
+            a_Fe_1550: 0.006
+            g_Sn_1550: 0.001
+            g_Fe_1550: 0.06
+            a_Sn_1600: 0.001
+            a_Fe_1600: 0.003
+            g_Sn_1600: 0.001
+            g_Fe_1600: 0.034
+            dHbar_Sn_kJ_mol: 0.3
+            dHbar_Fe_kJ_mol: 4.6
+            dH_kJ_mol: 0.8
+        - N_Sn: 0.95
+          a_Sn_1550: 0.955
+          a_Fe_1550: 0.207
+          g_Sn_1550: 1.005
+          g_Fe_1550: 4.133
+          a_Sn_1600: 0.954
+          a_Fe_1600: 0.203
+          g_Sn_1600: 1.005
+          g_Fe_1600: 4.041
+          dHbar_Sn_kJ_mol: null
+          dHbar_Fe_kJ_mol: null
+          dH_kJ_mol: null
+        - N_Sn: 1.0
+          a_Sn_1550: 1.0
+          a_Fe_1550: 0.0
+          g_Sn_1550: 1.0
+          g_Fe_1550: 4.996
+          a_Sn_1600: 1.0
+          a_Fe_1600: 0.0
+          g_Sn_1600: 1.0
+          g_Fe_1600: 4.864
+          dHbar_Sn_kJ_mol: 0.0
+          dHbar_Fe_kJ_mol: 36.0
+          dH_kJ_mol: 0.0
+      uncertainty:
+        note: parenthetical ± printed only under N_Sn=0.100, 0.300, 0.500, 0.700, 0.900
+    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamamoto_1983_table4_dilute_ion_ratios_1600C
+      type: rate_series
+      locator:
+        table: '4'
+        published_page: 59
+        pdf_page_index: 4
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      standard_state: ln(I_Sn+/I_Fe+) at 1600 C, N_Sn=0.01-0.10
+      units: dimensionless ln ratio
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        T_C: 1600
+        T_K: 1873.0
+        composition_basis: N_Sn mole fraction
+        rows:
+        - N_Sn: 0.01
+          ln_ISn_over_IFe: -1.347
+        - N_Sn: 0.02
+          ln_ISn_over_IFe: -0.663
+        - N_Sn: 0.03
+          ln_ISn_over_IFe: -0.243
+        - N_Sn: 0.04
+          ln_ISn_over_IFe: 0.052
+        - N_Sn: 0.05
+          ln_ISn_over_IFe: 0.289
+        - N_Sn: 0.06
+          ln_ISn_over_IFe: 0.476
+        - N_Sn: 0.07
+          ln_ISn_over_IFe: 0.634
+        - N_Sn: 0.08
+          ln_ISn_over_IFe: 0.779
+        - N_Sn: 0.089
+          ln_ISn_over_IFe: 0.885
+        - N_Sn: 0.1
+          ln_ISn_over_IFe: 1.018
+      uncertainty:
+        note: no ± printed
+    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamamoto_1983_table5_FeSnCu
+      type: activity_coefficient
+      locator:
+        table: '5'
+        published_page: 60
+        pdf_page_index: 5
+      T_range_K:
+      - 1833.0
+      - 1883.0
+      standard_state: Henrian epsilon_Sn^Cu; N_Sn held at 0.03; N_Cu=0-0.08
+      units: dimensionless ln(I_Fe+/I_Sn+) and epsilon
+      values:
+        quantity: ion_current_ratio_and_wagner_interaction_parameter
+        ln_method_class: measured
+        epsilon_method_class: model_derived
+        method_class: model_derived
+        model_or_data_source: epsilon_Sn^Cu = -(1-N_Sn)*A from linear fit of ln(I_Fe+/I_Sn+ * N_Sn/N_Fe)
+          vs N_Cu (eq. 13)
+        N_Sn: 0.03
+        T_C_columns:
+        - 1610
+        - 1600
+        - 1590
+        - 1580
+        - 1570
+        - 1560
+        ion_ratio_rows:
+        - N_Cu: 0.0
+          ln_IFe_over_ISn_1610C: 0.275
+          ln_IFe_over_ISn_1600C: 0.234
+          ln_IFe_over_ISn_1590C: 0.21
+          ln_IFe_over_ISn_1580C: 0.177
+          ln_IFe_over_ISn_1570C: 0.144
+          ln_IFe_over_ISn_1560C: 0.11
+        - N_Cu: 0.02
+          ln_IFe_over_ISn_1610C: 0.386
+          ln_IFe_over_ISn_1600C: 0.357
+          ln_IFe_over_ISn_1590C: 0.327
+          ln_IFe_over_ISn_1580C: 0.296
+          ln_IFe_over_ISn_1570C: 0.265
+          ln_IFe_over_ISn_1560C: 0.234
+        - N_Cu: 0.04
+          ln_IFe_over_ISn_1610C: 0.49
+          ln_IFe_over_ISn_1600C: 0.462
+          ln_IFe_over_ISn_1590C: 0.434
+          ln_IFe_over_ISn_1580C: 0.406
+          ln_IFe_over_ISn_1570C: 0.377
+          ln_IFe_over_ISn_1560C: null
+        - N_Cu: 0.06
+          ln_IFe_over_ISn_1610C: 0.597
+          ln_IFe_over_ISn_1600C: 0.572
+          ln_IFe_over_ISn_1590C: 0.547
+          ln_IFe_over_ISn_1580C: 0.521
+          ln_IFe_over_ISn_1570C: 0.495
+          ln_IFe_over_ISn_1560C: 0.47
+        - N_Cu: 0.08
+          ln_IFe_over_ISn_1610C: 0.707
+          ln_IFe_over_ISn_1600C: 0.685
+          ln_IFe_over_ISn_1590C: 0.662
+          ln_IFe_over_ISn_1580C: 0.64
+          ln_IFe_over_ISn_1570C: 0.616
+          ln_IFe_over_ISn_1560C: 0.593
+        epsilon_Sn_Cu:
+        - T_C: 1610
+          T_K: 1883.0
+          epsilon: -6.29
+          uncertainty_1sigma: 0.03
+        - T_C: 1600
+          T_K: 1873.0
+          epsilon: -6.41
+          uncertainty_1sigma: 0.03
+        - T_C: 1590
+          T_K: 1863.0
+          epsilon: -6.54
+          uncertainty_1sigma: 0.03
+        - T_C: 1580
+          T_K: 1853.0
+          epsilon: -6.66
+          uncertainty_1sigma: 0.04
+        - T_C: 1570
+          T_K: 1843.0
+          epsilon: -6.78
+          uncertainty_1sigma: 0.04
+        - T_C: 1560
+          T_K: 1833.0
+          epsilon: -6.91
+          uncertainty_1sigma: 0.05
+        eq14_as_printed: epsilon_Sn^Cu = -42500 * (1/T) + 16.27
+        eq14_uncertainty_as_printed: ±0.04
+        em_dash: N_Cu=0.040 at 1560 C is an em-dash; omitted, not interpolated
+      uncertainty:
+        note: epsilon errors are ±1 sigma as printed in Table 5
+    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamamoto_1983_gamma_inf_and_epsilon
+      type: activity_coefficient
+      locator:
+        published_page: 56
+        pdf_page_index: 1
+        section: Synopsis
+      T_range_K:
+      - 1823.0
+      - 1873.0
+      standard_state: Raoultian gamma°; Henrian epsilon_Sn^Sn
+      units: dimensionless
+      values:
+        quantity: infinite_dilution_activity_coefficient_and_wagner_epsilon
+        method_class: model_derived
+        gamma0_Sn_1600C: 2.58
+        gamma0_Fe_1600C: 4.86
+        gamma0_Sn_1550C: 2.68
+        gamma0_Fe_1550C: 5.0
+        epsilon_Sn_Sn_1600C: -0.29
+        epsilon_Sn_Sn_1600C_as_printed: -0.29±0.06
+        e_Sn_Sn_1600C_fig7: 0.0017
+        e_Sn_Sn_1600C_fig7_as_printed: 0.0017±0.0001
+      uncertainty:
+        epsilon_Sn_Sn_1600C: 0.06
+        e_Sn_Sn_1600C: 0.0001
+    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamamoto_1983_table6_comparison
+      type: activity_coefficient
+      locator:
+        table: '6'
+        published_page: 64
+        pdf_page_index: 9
+      T_range_K:
+      - 1810.0
+      - 1873.0
+      standard_state: gamma_i° and epsilon as printed in the comparison table
+      units: dimensionless
+      values:
+        quantity: infinite_dilution_activity_coefficient
+        method_class: quoted_measurement
+        rows:
+        - investigator: H. Schenck & W. Spieker1)
+          gamma0_Sn: 1.93
+          T_C: 1550
+          method: Pb-Fe distribution
+          method_class: quoted_measurement
+        - investigator: M. Onillon & M. Olette2)
+          gamma0_Sn: 2.8
+          gamma0_Fe_as_printed: (8.37)
+          gamma0_Fe_bracketed: true
+          epsilon_Sn_Sn: -0.33
+          T_C: 1547
+          method: Langmuir
+          method_class: quoted_measurement
+          note: gamma0_Fe 8.37 is bracketed; text says it was estimated by the present authors
+        - investigator: S. Wagner & G. R. St. Pierre3)
+          gamma0_Sn: 2.15
+          gamma0_Fe: 6.69
+          T_C: 1537
+          method: Mass spectrometry
+          method_class: quoted_measurement
+        - investigator: N. Maruyama & S. Ban-ya4)
+          gamma0_Sn: 3.488
+          gamma0_Fe: 5.687
+          T_C: 1600
+          method: Transportation
+          method_class: quoted_measurement
+        - investigator: R. Hultgren et al.16)
+          gamma0_Sn: 2.8
+          gamma0_Fe: 6.65
+          T_C: 1547
+          method: Estimation
+          method_class: quoted_unattributed
+        - investigator: Present Authors
+          gamma0_Sn: 2.58
+          gamma0_Fe: 4.86
+          epsilon_Sn_Sn: -0.29
+          epsilon_Sn_Cu: -6.41
+          T_C: 1600
+          method: Mass spectrometry
+          method_class: model_derived
+        - investigator: Present Authors
+          gamma0_Sn: 2.68
+          gamma0_Fe: 5.0
+          T_C: 1550
+          method: Mass spectrometry
+          method_class: model_derived
+      uncertainty:
+        note: no ± on Table 6 except this-work values already stored elsewhere
+    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamamoto_1983_critical_mixing_author_estimate
+      type: transition_point
+      locator:
+        published_page: 56
+        pdf_page_index: 1
+        figure: '14'
+      T_range_K:
+      - 1778.0
+      - 1778.0
+      standard_state: critical mixing of liquid Fe-Sn
+      units: C as printed
+      values:
+        quantity: consolute_temperature
+        method_class: author_estimate
+        T_C: 1505
+        T_K: 1778.0
+        N_Sn: 0.5
+        as_printed: about 1 505 C at N_Sn=0.50
+      uncertainty:
+        note: printed as about; no numeric ±
+    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamamoto_1983_figs_ion_ratios_figure_only
+      type: rate_series
+      locator:
+        figure: '1'
+        published_page: 57
+        pdf_page_index: 2
+        note: also Figs 2, 6, 8
+      T_range_K:
+      - 1473.0
+      - 1883.0
+      standard_state: ln ion-current ratios vs 1/T or N_Sn
+      units: as published
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        figures:
+        - '1'
+        - '2'
+        - '6'
+        - '8'
+      uncertainty:
+        note: figure-only; Tables 2, 4, 5 already carry tabulated ratios
+    - phase: liquid_Fe-Sn_or_Fe-Sn-Cu
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamamoto_1983_figs_activities_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '3'
+        published_page: 58
+        pdf_page_index: 3
+        note: also Figs 5, 7, 9, 10, 11, 12, 13, 14, 15
+      T_range_K:
+      - 1778.0
+      - 1883.0
+      standard_state: activities, heats, epsilon, miscibility gap as plotted
+      units: as published
+      values:
+        quantity: activity_and_related_plots
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labeled_on_figures:
+          fig3_gamma0_Sn: 2.58
+          fig3_gamma0_Fe: 4.86
+          fig4_broken_line_kJ_mol: 72
+          fig7_epsilon_Sn_Sn: -0.29
+          fig7_e_Sn_Sn: 0.0017
+          fig10_eq14: epsilon_Sn^Cu=-42500(1/T)+16.27
+          fig14_critical_C: 1505
+      uncertainty:
+        note: figure-only; labelled numbers already stored from tables/synopsis
+deepening:
+  dispatch_id: extract-alloys-b2
+  date: '2026-09-13'
+  table_inventory:
+  - table: '1'
+    published_page: 56
+    pdf_page_index: 1
+    completeness: full
+  - table: '2'
+    published_page: 58
+    pdf_page_index: 3
+    completeness: full
+  - table: '3'
+    published_page: 58
+    pdf_page_index: 3
+    completeness: full
+  - table: '4'
+    published_page: 59
+    pdf_page_index: 4
+    completeness: full
+  - table: '5'
+    published_page: 60
+    pdf_page_index: 5
+    completeness: full
+  - table: '6'
+    published_page: 64
+    pdf_page_index: 9
+    completeness: full
+  class_ledger:
+    measured:
+    - yamamoto_1983_kems_geometry_and_calibration
+    - yamamoto_1983_table1_materials
+    - yamamoto_1983_table2_ion_ratios
+    - yamamoto_1983_table4_dilute_ion_ratios_1600C
+    - yamamoto_1983_figs_ion_ratios_figure_only
+    model_derived:
+    - yamamoto_1983_table3_activities_and_heats
+    - yamamoto_1983_table5_FeSnCu
+    - yamamoto_1983_gamma_inf_and_epsilon
+    - yamamoto_1983_figs_activities_figure_only
+    quoted_measurement:
+    - yamamoto_1983_table6_comparison
+    author_estimate:
+    - yamamoto_1983_critical_mixing_author_estimate
+    figure_only:
+    - yamamoto_1983_figs_ion_ratios_figure_only
+    - yamamoto_1983_figs_activities_figure_only
+  refused:
+  - what: numeric points off Figs 1-15 axes
+    why: figure_only; tables already carry tabulated ion ratios and a/gamma
+  - what: sample mass, ionizing energy, chamber pressure
+    why: unstated
+  - what: orifice area from the printed 0.3 mm diameter
+    why: area not invented; Clausing 0.26/0.43 is a discussion estimate
+  - what: Table 5 N_Cu=0.040 at 1560 C and Table 3 heat blanks
+    why: printed em-dashes; not interpolated
+  primary_sources_cited:
+  - ref: 1
+    as_printed: 'H. Schenck and W. Spieker: Arch. Eisenhuttenw., 30 (1959), 641.'
+  - ref: 2
+    as_printed: 'M. Onillon and M. Olette: Rev. Inst. Hautes Temp. Refract., 6 (1969), 245.'
+  - ref: 3
+    as_printed: 'S. Wagner and G. R. St. Pierre: Met. Trans., 3 (1972), 2873.'
+  - ref: 4
+    as_printed: 'N. Maruyama and S. Ban-ya: J. Japan Inst. Metals, 44 (1980), 1422.'
+  - ref: 7
+    as_printed: 'T. Furukawa and E. Kato: Tetsu-to-Hagane, 61 (1975), 3050.'
+  - ref: 8
+    as_printed: 'K. Yamada and E. Kato: Tetsu-to-Hagane, 65 (1979), 264.'
+  - ref: 9
+    as_printed: 'G. R. Belton and R. J. Fruehan: J. Phys. Chem., 71 (1967), 1403.'
+  - ref: 16
+    as_printed: 'R. Hultgren, P. D. Desai, D. T. Hawkins, M. Gleisler, and K. K. Kelley: Selected Values
+      of the Thermodynamic Properties of Alloys, ASM, Ohio, (1973).'

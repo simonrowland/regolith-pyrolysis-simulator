@@ -15,13 +15,13 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 
 ## Counts
 
-- Sources: 162
-- Extracts (`literature_extract.v1`): 160
+- Sources: 167
+- Extracts (`literature_extract.v1`): 165
 - PDFs present in this worktree: 44
 - Tracked PDFs in `docs/references/pdfs/99-kems-langmuir/`: 39
 - PDFs with no extract: 2
-- Extracts with no PDF: 118
-- Alias groups needing owner/controller resolution: 32
+- Extracts with no PDF: 123
+- Alias groups needing owner/controller resolution: 33
 - Extracts with private/non-public row locators: 37
 
 ## Sources
@@ -102,7 +102,12 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 | `kems-095-ueda-1986` | Ueda, Y., Nishi, T., Oishi, T. & Ono, K. (1986), "Thermodynamic Study of the Liquid Ti-Co Alloys by Mass Spectrometry", J. Japan Inst. Metals 50(12):1081-1088, DOI 10.2320/jinstmet1952.50.12_1081 | 10.2320/jinstmet1952.50.12_1081 | ABSENT, `` | `raw/kems-095-ueda-1986/kems-095-ueda-1986.pdf` (present, 0c3d55da); `text/kems-095-ueda-1986/` (3 files, exists); `tables/kems-095-ueda-1986/` (0 files, ABSENT) | `data/literature/extracts/kems-095-ueda-1986.yaml` (18 rows, draft) | `ledger/kems-095-ueda-1986.yaml`: decoded (2026-09-13) |
 | `kems-097-ikeda-1978` | Ikeda, Y., Tamaki, M. & Matsumoto, G. (1978), "A Mass Spectrometric Study of Vaporization of Refractory Metal-Al2O3 Systems in Elevated Temperature", J. Mass Spectrom. Soc. Jpn. 26(2):159–169, DOI 10.5702/massspec1953.26.159 | 10.5702/massspec1953.26.159 | `docs/references/pdfs/99-kems-langmuir/kems-097-ikeda-1978.pdf`, `c8e22428` | `raw/kems-097-ikeda-1978/kems-097-ikeda-1978.pdf` (present, c8e22428); `text/kems-097-ikeda-1978/` (21 files, exists); `tables/kems-097-ikeda-1978/` (9 files, exists) | `data/literature/extracts/kems-097-ikeda-1978.yaml` (16 rows, draft) | `ledger/kems-097-ikeda-1978.yaml`: scored (—) |
 | `kems-103-fraser-1983` | Fraser, D. G., Rammensee, W. & Jones, R. H. (1983), "The mixing properties of melts in the system NaAlSi2O6-KAlSi2O6 determined by Knudsen Cell Mass Spectrometry", Bulletin de Minéralogie 106(1-2), 111-117. DOI 10.3406/bulmi.1983.7673. | 10.3406/bulmi.1983.7673 | ABSENT, `` | `raw/kems-103-fraser-1983/kems-103-fraser-1983.pdf` (ABSENT, ); `text/kems-103-fraser-1983/` (0 files, ABSENT); `tables/kems-103-fraser-1983/` (6 files, exists) | `data/literature/extracts/kems-103-fraser-1983.yaml` (4 rows, draft) | `ledger/kems-103-fraser-1983.yaml`: — (—) |
+| `kems-105-yamada-1983` | Yamada, K. and Kato, E. (1983), "Effect of Dilute Concentrations of Si, Al, Ti, V, Cr, Co, Ni, Nb and Mo on the Activity Coefficient of P in Liquid Iron", Trans. ISIJ 23(1):51-55, DOI 10.2355/isijinternational1966.23.51. Originally published in Tetsu-to-Hagane, 65 (1979), 273, in Japanese. | 10.2355/isijinternational1966.23.51 | ABSENT, `` | `raw/kems-105-yamada-1983/kems-105-yamada-1983.pdf` (present, 2c85d228); `text/kems-105-yamada-1983/` (3 files, exists); `tables/kems-105-yamada-1983/` (0 files, ABSENT) | `data/literature/extracts/kems-105-yamada-1983.yaml` (13 rows, draft) | `ledger/kems-105-yamada-1983.yaml`: decoded (2026-09-13) |
+| `kems-111-ichise-1982` | Ichise, E., Maruo, T., Sasho, H., Ueshima, Y. and Mori, T. (1982), "Knudsen Cell-mass Spectrometric Study of the Thermodynamic Properties of Fe-Mo Alloys", Trans. ISIJ 22(7):552-559, DOI 10.2355/isijinternational1966.22.552. Originally published in Tetsu-to-Hagane, 66 (1980), 1075, in Japanese. | 10.2355/isijinternational1966.22.552 | ABSENT, `` | `raw/kems-111-ichise-1982/kems-111-ichise-1982.pdf` (present, 3b188db3); `text/kems-111-ichise-1982/` (3 files, exists); `tables/kems-111-ichise-1982/` (0 files, ABSENT) | `data/literature/extracts/kems-111-ichise-1982.yaml` (16 rows, draft) | `ledger/kems-111-ichise-1982.yaml`: decoded (2026-09-13) |
+| `kems-112-ichise-1989` | Ichise, E. and Horikawa, K. (1989), "Thermodynamic Study of Fe-Ta and Fe-Nb Alloys by Means of the Knudsen Cell Mass Spectrometry", ISIJ International 29(10):843-851, DOI 10.2355/isijinternational.29.843 | 10.2355/isijinternational.29.843 | ABSENT, `` | `raw/kems-112-ichise-1989/kems-112-ichise-1989.pdf` (present, 38753dce); `text/kems-112-ichise-1989/` (3 files, exists); `tables/kems-112-ichise-1989/` (0 files, ABSENT) | `data/literature/extracts/kems-112-ichise-1989.yaml` (11 rows, draft) | `ledger/kems-112-ichise-1989.yaml`: decoded (2026-09-13) |
 | `kems-114-nichols-1995` | Nichols Jr., R. H., Wasserburg, G. J. & Grimley, R. T. (1995), "Evaporation of forsterite: identification of gas-phase species via Knudsen cell mass spectrometry", Lunar and Planetary Science XXVI, 1047–1048. LPI abstract 1524. ADS bibcode 1995LPI....26.1047N. |  | `docs/references/pdfs/99-kems-langmuir/kems-114-nichols-1995.pdf`, `ef3a44e7` | `raw/kems-114-nichols-1995/kems-114-nichols-1995.pdf` (present, ef3a44e7); `text/kems-114-nichols-1995/` (12 files, exists); `tables/kems-114-nichols-1995/` (5 files, exists) | `data/literature/extracts/kems-114-nichols-1995.yaml` (28 rows, draft) | `ledger/kems-114-nichols-1995.yaml`: extracted (2026-09-06) |
+| `kems-116-nunoue-1987` | Nunoue, S. and Kato, E. (1987), "Mass Spectrometric Determination of the Miscibility Gap in the Liquid Fe-Sn System and the Activities of This System at 1 550°C and 1 600°C" / 「質量分析法による Fe-Sn 系の二液相分離領域の決定および 1550°C, 1600°C での活量測定」, Tetsu-to-Hagane 73(7):868-875, DOI 10.2355/tetsutohagane1955.73.7_868 | 10.2355/tetsutohagane1955.73.7_868 | ABSENT, `` | `raw/kems-116-nunoue-1987/kems-116-nunoue-1987.pdf` (present, 23ffbdf4); `text/kems-116-nunoue-1987/` (3 files, exists); `tables/kems-116-nunoue-1987/` (0 files, ABSENT) | `data/literature/extracts/kems-116-nunoue-1987.yaml` (12 rows, draft) | `ledger/kems-116-nunoue-1987.yaml`: decoded (2026-09-13) |
+| `kems-118-yamamoto-1983` | Yamamoto, M., Mori, S. and Kato, E. (1983), "Mass Spectrometric Study of the Thermodynamic Properties of the Liquid Fe-Sn and Fe-Sn-Cu Alloys", Trans. ISIJ 23(1):56-64, DOI 10.2355/isijinternational1966.23.56. Originally published in Tetsu-to-Hagane, 67 (1981), 1952, in Japanese. | 10.2355/isijinternational1966.23.56 | ABSENT, `` | `raw/kems-118-yamamoto-1983/kems-118-yamamoto-1983.pdf` (present, 12843185); `text/kems-118-yamamoto-1983/` (3 files, exists); `tables/kems-118-yamamoto-1983/` (0 files, ABSENT) | `data/literature/extracts/kems-118-yamamoto-1983.yaml` (11 rows, draft) | `ledger/kems-118-yamamoto-1983.yaml`: decoded (2026-09-13) |
 | `kems-119-furukawa-1975` | Furukawa, T. and Kato, E. (1975), "Thermodynamic Properties of the Fe-V, Fe-V-Cr Alloys at 1600 C by Mass-Spectrometry", Tetsu-to-Hagane 61(15):3050-3059, DOI 10.2355/tetsutohagane1955.61.15_3050 | 10.2355/tetsutohagane1955.61.15_3050 | ABSENT, `` | `raw/kems-119-furukawa-1975/kems-119-furukawa-1975.pdf` (present, f2e3d5a8); `text/kems-119-furukawa-1975/` (3 files, exists); `tables/kems-119-furukawa-1975/` (0 files, ABSENT) | `data/literature/extracts/kems-119-furukawa-1975.yaml` (21 rows, draft) | `ledger/kems-119-furukawa-1975.yaml`: decoded (2026-09-13) |
 | `kems-120-ueshima-1984` | Ueshima, Y., Yamana, H., Sugiyama, T. and Ichise, E. (1984), "Knudsen Cell Mass Spectrometric Study of the Thermodynamic Properties of Fe-W Alloys", Tetsu-to-Hagane 70(6):549-556, DOI 10.2355/tetsutohagane1955.70.6_549 | 10.2355/tetsutohagane1955.70.6_549 | ABSENT, `` | `raw/kems-120-ueshima-1984/kems-120-ueshima-1984.pdf` (present, 0f99f1d9); `text/kems-120-ueshima-1984/` (3 files, exists); `tables/kems-120-ueshima-1984/` (0 files, ABSENT) | `data/literature/extracts/kems-120-ueshima-1984.yaml` (8 rows, draft) | `ledger/kems-120-ueshima-1984.yaml`: decoded (2026-09-13) |
 | `kems-127-qi-1989` | Qi, G., Hino, M. and Azakami, T. (1989), "Thermodynamic Study of Liquid Ag-In and Ag-Ga Alloys with a Knudsen Cell-Mass Spectrometer", Materials Transactions, JIM 30(8):575-582, DOI 10.2320/matertrans1989.30.575 | 10.2320/matertrans1989.30.575 | ABSENT, `` | `raw/kems-127-qi-1989/kems-127-qi-1989.pdf` (present, 8fecd04a); `text/kems-127-qi-1989/` (3 files, exists); `tables/kems-127-qi-1989/` (0 files, ABSENT) | `data/literature/extracts/kems-127-qi-1989.yaml` (11 rows, draft) | `ledger/kems-127-qi-1989.yaml`: decoded (2026-09-13) |
@@ -243,6 +248,11 @@ Canonical `source_id` is the extract filename stem. Preset ids are aliases, neve
 - `kems-088-ichise-1975`
 - `kems-095-ueda-1986`
 - `kems-103-fraser-1983`
+- `kems-105-yamada-1983`
+- `kems-111-ichise-1982`
+- `kems-112-ichise-1989`
+- `kems-116-nunoue-1987`
+- `kems-118-yamamoto-1983`
 - `kems-119-furukawa-1975`
 - `kems-120-ueshima-1984`
 - `kems-127-qi-1989`
@@ -428,6 +438,7 @@ The builder does not pick a winner.
 - source_id_alias `fedkin-2006`: `fedkin-grossman-ghiorso-2006`, `kems-005-fedkin-2006` — needs owner/controller resolution
 - source_id_alias `fray-2009`: `fray-schmitt-2009-ch4-1`, `fray-schmitt-2009-co-1`, `fray-schmitt-2009-nh3` — needs owner/controller resolution
 - source_id_alias `giauque-1939`: `giauque-powell-1939-cl2`, `giauque-ruehrwein-1939-hcn-psat` — needs owner/controller resolution
+- source_id_alias `ichise-1989`: `kems-112-ichise-1989`, `kems-198-ichise-ueshima-1989` — needs owner/controller resolution
 - source_id_alias `lamoreaux-1987`: `lamoreaux-hildenbrand-hildenbrand-1987`, `lh87-al-o-gas-species`, `lh87-cao-g`, `lh87-mgo-g`, `lh87-pbo-g` — needs owner/controller resolution
 - source_id_alias `pound-1972`: `kems-003-pound-1972`, `pound-1972-cr-langmuir-knudsen`, `pound-1972-mccabe-cr` — needs owner/controller resolution
 - source_id_alias `robinot-2026`: `kems-044-robinot-2026`, `robinot_2026`, `robinot_2026_vacuum_pyrolysis` — needs owner/controller resolution

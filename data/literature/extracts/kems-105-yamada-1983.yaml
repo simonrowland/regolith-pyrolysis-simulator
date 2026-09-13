@@ -1,0 +1,771 @@
+schema_version: literature_extract.v1
+source_id: kems-105-yamada-1983
+source:
+  citation: Yamada, K. and Kato, E. (1983), "Effect of Dilute Concentrations of Si, Al, Ti, V, Cr, Co,
+    Ni, Nb and Mo on the Activity Coefficient of P in Liquid Iron", Trans. ISIJ 23(1):51-55, DOI 10.2355/isijinternational1966.23.51.
+    Originally published in Tetsu-to-Hagane, 65 (1979), 273, in Japanese.
+  doi: 10.2355/isijinternational1966.23.51
+  url: https://doi.org/10.2355/isijinternational1966.23.51
+  year: 1983
+extraction:
+  method: Official J-STAGE OA PDF (corpus raw/kems-105-yamada-1983/kems-105-yamada-1983.pdf, sha256 2c85d228997723d880339bc4d808254677163f807de65bda16a13b0dba7caf5b).
+    No MinerU decode. Tables 1-2 and printed interaction coefficients transcribed from a 400 dpi pdftoppm
+    render of PDF pages 1-5 (published pp. 51-55). pdftotext-layout is a noisy OCR layer and was not used
+    as data. Authors' own ε_P^i / e_P^i labelled measured. Table 2 comparison rows labelled quoted_measurement.
+    ε_P^Si = 12.6±0.6 using Fruehan a_Fe labelled model_derived. Figs 1-5 listed figure-only; no numbers
+    off axes. Body p. 53 prints ε_P^Al = 4.0±0.7; synopsis, Fig. 2, Table 2 and conclusions print 4.6±0.7
+    — both retained as printed, not reconciled. Chamber pressure and sample mass unstated.
+  date: '2026-09-13'
+  worker: extract-alloys-b2
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: P
+  observable: activity_coefficient
+  observation_id: yamada_1983_epsilon_P_i_this_work_1600C
+  field: epsilon_P_Si
+  value: 11.9
+  locator:
+    table: '2'
+    published_page: 54
+    pdf_page_index: 4
+    note: 'Table 2 Present work Si row: epsilon_P^Si = 11.9±0.6, e_P^Si = 0.099'
+- path: species.P.observations[yamada_1983_epsilon_P_i_this_work_1600C].values.rows[0].e_P_i
+  value: 0.037
+  locator:
+    table: '2'
+    published_page: 54
+    pdf_page_index: 4
+    note: Table 2 Present work Al row e_P^Al = 0.037
+- path: species.P.observations[yamada_1983_table1_source_and_purity].values.rows[1].purity_wt_percent_as_printed
+  value: Si—99.99+
+  locator:
+    table: '1'
+    published_page: 51
+    pdf_page_index: 1
+    note: 'Table 1 Si row: Osaka Titanium Co., Si-99.99+'
+- path: species.P.observations[yamada_1983_kems_geometry_and_calibration].values.ln_K
+  value: 1.949
+  locator:
+    published_page: 52
+    pdf_page_index: 2
+    equation: '5'
+    note: ln K = 1.949 from Fe-P alloy with 1 wt% P and epsilon_P^P = 7.3
+- species: P
+  observable: activity_coefficient
+  observation_id: yamada_1983_epsilon_P_Al_body_4p0_printed
+  field: epsilon_P_Al
+  value: 4.0
+  locator:
+    published_page: 53
+    pdf_page_index: 3
+    section: 2. The Fe-P-Al Systems
+    note: Body text prints epsilon_P^Al = 4.0±0.7; synopsis/Table 2/Fig. 2/conclusions print 4.6±0.7
+species:
+  P:
+    observations:
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-P-i_alloy
+      condensed_form: &id001
+        state: liquid_alloy
+        metastable: false
+        basis: explicit_author
+        note: Liquid Fe-P-i alloys at 1600 C; samples contained 1 wt% P and various concentrations of
+          solute i. Alloys made in situ in the Knudsen cell from pure Fe, Fe-P (from Fe + Fe3P) and the
+          alloying element. Compositions computed from the materials charged.
+      regime: kems_effusion
+      equipment: &id002
+        cell_material:
+          value: Beryllia Knudsen cells for Fe-P-Al and Fe-P-Ti; alumina Knudsen cells for the other Fe-P-i
+            systems. Apparatus described in previous papers (Yamada and Kato, Trans. ISIJ 20 (1980) 244;
+            Int. J. Mass Spectrom. Ion Phys. 25 (1977) 461). Orifice diameter, orifice area, Clausing
+            factor and sample surface area are not restated here.
+          locator:
+            published_page: 51
+            pdf_page_index: 1
+            section: 3. Experimental Procedure
+            paragraph: Beryllia Knudsen cells were used for Fe-P-Al and Fe-P-Ti systems, and alumina cells
+              were used for other alloy systems.
+        chamber_pressure:
+          value: unstated
+          note: Chamber / ion-source vacuum quality is not printed as a number. Be deoxidation of Fe-P-Al
+            is described as melted in a beryllia Knudsen cell under high vacuum (published p. 53). Sample
+            mass unstated.
+          locator:
+            published_page: 53
+            pdf_page_index: 3
+            section: 2. The Fe-P-Al Systems
+            paragraph: it was melted in a Beryllia Knudsen cell under high vacuum.
+      observation_id: yamada_1983_kems_geometry_and_calibration
+      type: gibbs_table
+      locator:
+        published_page: 51
+        pdf_page_index: 1
+        section: II. Experimental / III. Calculations
+        note: Apparatus referred to previous papers; ions, T, cell materials and ln K / epsilon_P^P calibration
+          from pp. 51-52.
+      standard_state: Henrian activity of P (standard state of P is the nonphysical state of pure liquid
+        P); Raoultian activity of Fe. Interaction coefficient epsilon_P^i = (d ln gamma_P^i / d N_i)_N_P.
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        T_K_conversion: authors print 1 600 °C; T_K = 1600 + 273
+        sample_P_wt_percent: 1.0
+        sample_mass: unstated
+        composition_basis: computed from the materials charged; authors consider this more accurate than
+          chemical analysis of the ingot after the experiment (ref 1)
+        ions_used: 54Fe+ and 31P+ except Fe-P-Cr, which used 57Fe+ because 54Cr+ is close to 54Fe+
+        measured_ratio: I(P+)/I(Fe+)
+        ln_K: 1.949
+        ln_K_source: from a_Fe, I_P+/I_Fe+ on Fe-P with 1 wt% P and epsilon_P^P = 7.3 substituted into
+          eqs. (4) and (3')
+        epsilon_P_P: 7.3
+        epsilon_P_P_source: previous Fe-P study, Yamada and Kato, Trans. ISIJ 20 (1980) 244 (ref 1)
+        ln_gamma_Fe_P_about_1wt_percent_P: 0.1
+        ln_gamma_Fe_P_source: same previous Fe-P study (ref 1)
+        O_in_pure_iron_ppm_range:
+        - 20
+        - 30
+        Al_deoxidizer_Fe_P_Si_wt_percent: 0.2
+        Be_deoxidizer_Fe_P_Al_wt_percent: 0.01
+        Be_deoxidizer_at_percent: 0.05
+        Be_effect: no relation between added Be and ln gamma_P^Al when Be < 1 at%; Be does not affect
+          results
+        Cr_anneal: high-purity Cr annealed 85 hr in dry H at 1200 C; O reduced to 0.04~0.05 wt%
+        uncertainty_convention: 2 sigma (sigma = standard deviation) of the least-squares slope for epsilon_P^i
+        linear_range_assumed: linear ln gamma_P^i vs N_i assumed for N_i < 0.1
+        missing_for_motzfeldt:
+        - orifice_area
+        - orifice_diameter
+        - clausing_factor
+        - sample_surface_area
+        - sample_mass
+        chamber_pressure: unstated
+        instrument_note: mass spectrometric system with a newly developed ion current measuring system
+          combined with a Knudsen cell; complete description in refs 1 and 2
+      uncertainty:
+        note: Interaction-coefficient uncertainties are printed as 2 sigma of the least-squares slope.
+          For V the computed 2 sigma was ±0.3 but the authors adopt ±0.7 as for the other systems; for
+          Ni the data give 0.7±0.5 and they likewise adopt ±0.7. Chamber pressure and sample mass unstated.
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-P-i_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamada_1983_table1_source_and_purity
+      type: gibbs_table
+      locator:
+        table: '1'
+        published_page: 51
+        pdf_page_index: 1
+        note: Table 1. Source and purity of metals.
+      standard_state: starting metals as charged; not a species activity observation
+      units: wt% purity as published
+      values:
+        quantity: starting_metal_purity
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        rows:
+        - material: Fe3P
+          source: Kojundo Kagaku Co.
+          purity_wt_percent_as_printed: Fe3P—99.9
+        - material: Si
+          source: Osaka Titanium Co.
+          purity_wt_percent_as_printed: Si—99.99+
+        - material: Al
+          source: Nihon Keikinzoku Co.
+          purity_wt_percent_as_printed: Al—99.99
+        - material: Ti
+          source: Johnson-Matthey Co.
+          purity_wt_percent_as_printed: Ti—99.9
+        - material: V
+          source: Kojundo Kagaku Co.
+          purity_wt_percent_as_printed: V—99.7+
+        - material: Cr
+          source: Nihonjuka Co.
+          purity_wt_percent_as_printed: Cr—99.999
+        - material: Co
+          source: Johnson-Matthey Co.
+          purity_wt_percent_as_printed: Co—99.99
+        - material: Ni
+          source: Johnson-Matthey Co.
+          purity_wt_percent_as_printed: Ni—99.99
+        - material: Nb
+          source: Hiranoseizaemon Co.
+          purity_wt_percent_as_printed: Nb—99.9
+        - material: Mo
+          source: Johnson-Matthey Co.
+          purity_wt_percent_as_printed: Mo—99.99
+        pure_Fe_source: not listed in Table 1; text says alloys were made from pure Fe, Fe-P and the alloying
+          element
+      uncertainty:
+        note: purity as printed; no numeric uncertainty on the purity figures
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-P-i_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamada_1983_epsilon_P_i_this_work_1600C
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 54
+        pdf_page_index: 4
+        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55).
+          epsilon is the mole-fraction interaction coefficient; e is the wt% coefficient as printed.
+      standard_state: Henrian gamma_P in liquid Fe (nonphysical pure liquid P); epsilon_P^i = (d ln gamma_P^i
+        / d N_i)_N_P at 1 wt% P, 1600 C. e_P^i is the weight-percent interaction coefficient printed in
+        Table 2.
+      units: dimensionless epsilon_P^i and e_P^i as published
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: measured
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        T_K_conversion: authors print 1 600 °C; T_K = 1600 + 273
+        composition: 1 wt% P; N_i varied, linear range N_i < 0.1 except Si which remains linear over a
+          larger range in Fig. 1
+        composition_basis: mole fraction N_i for epsilon; wt% for e as printed
+        epsilon_P_Si: 11.9
+        epsilon_P_Al: 4.6
+        epsilon_P_Ti: -8.0
+        epsilon_P_V: -4.9
+        epsilon_P_Cr: -3.8
+        epsilon_P_Co: 0.9
+        epsilon_P_Ni: 0.7
+        epsilon_P_Nb: -5.4
+        epsilon_P_Mo: -0.4
+        rows:
+        - solute: Al
+          epsilon_P_i: 4.6
+          epsilon_P_i_as_printed: 4.6±0.7
+          epsilon_uncertainty: 0.7
+          e_P_i: 0.037
+          method_class: measured
+          references_as_printed: Present work
+          a_Fe_source: Belton and Fruehan, Met. Trans., 1 (1970), 781 (ref 5)
+        - solute: Si
+          epsilon_P_i: 11.9
+          epsilon_P_i_as_printed: 11.9±0.6
+          epsilon_uncertainty: 0.6
+          e_P_i: 0.099
+          method_class: measured
+          references_as_printed: Present work
+          a_Fe_source: Chipman, Fulton, Gokcen and Caskey, Acta Met., 2 (1954), 439 (ref 3)
+        - solute: Ti
+          epsilon_P_i: -8.0
+          epsilon_P_i_as_printed: -8±2
+          epsilon_uncertainty: 2.0
+          e_P_i: -0.04
+          method_class: measured
+          references_as_printed: Present work
+          a_Fe_source: Furukawa and Kato, Tetsu-to-Hagane, 61 (1975), 3050 (ref 6)
+        - solute: V
+          epsilon_P_i: -4.9
+          epsilon_P_i_as_printed: -4.9±0.7
+          epsilon_uncertainty: 0.7
+          e_P_i: -0.024
+          method_class: measured
+          references_as_printed: Present work
+          a_Fe_source: Furukawa and Kato, Trans. ISIJ, 16 (1976), 382 (ref 7)
+        - solute: Cr
+          epsilon_P_i: -3.8
+          epsilon_P_i_as_printed: -3.8±0.7
+          epsilon_uncertainty: 0.7
+          e_P_i: -0.018
+          method_class: measured
+          references_as_printed: Present work
+          a_Fe_source: Raoultian a_Fe = N_Fe (Belton and Fruehan ref 5; Gilby and St. Pierre, Trans. Met.
+            Soc. AIME, 245 (1969), 1749, ref 8)
+        - solute: Co
+          epsilon_P_i: 0.9
+          epsilon_P_i_as_printed: 0.9±0.7
+          epsilon_uncertainty: 0.7
+          e_P_i: 0.004
+          method_class: measured
+          references_as_printed: Present work
+          a_Fe_source: Hultgren et al., Selected Values of the Thermodynamic Properties of Binary Alloys,
+            ASM (1973), 656 and 874 (ref 9)
+        - solute: Ni
+          epsilon_P_i: 0.7
+          epsilon_P_i_as_printed: 0.7±0.7
+          epsilon_uncertainty: 0.7
+          e_P_i: 0.003
+          method_class: measured
+          references_as_printed: Present work
+          a_Fe_source: Hultgren et al. (ref 9)
+        - solute: Nb
+          epsilon_P_i: -5.4
+          epsilon_P_i_as_printed: -5.4±1.2
+          epsilon_uncertainty: 1.2
+          e_P_i: -0.012
+          method_class: measured
+          references_as_printed: Present work
+          a_Fe_source: a_Fe assumed to obey Raoult's law; no Fe-Nb activity investigation cited
+        - solute: Mo
+          epsilon_P_i: -0.4
+          epsilon_P_i_as_printed: -0.4±0.7
+          epsilon_uncertainty: 0.7
+          e_P_i: 0.001
+          method_class: measured
+          references_as_printed: Present work
+          a_Fe_source: Ichise, Maruo, Sasho, Ueshima and Mori, Tetsu-to-Hagane, 66 (1980), 1075 (ref 10)
+        e_column_note: Table 2 e_P^i column is printed with the epsilon values; it is the wt% interaction
+          parameter converted from epsilon, not a second independent measurement.
+        al_body_text_disagreement: Section 2 on published p. 53 prints epsilon_P^Al = 4.0±0.7 after using
+          Belton-Fruehan a_Fe. Synopsis, Fig. 2 label, Table 2 and Conclusions print 4.6±0.7. This observation
+          stores the 4.6 value; the 4.0 value is a separate observation.
+      uncertainty:
+        epsilon_P_Si: 0.6
+        epsilon_P_Al: 0.7
+        epsilon_P_Ti: 2.0
+        epsilon_P_V: 0.7
+        epsilon_P_Cr: 0.7
+        epsilon_P_Co: 0.7
+        epsilon_P_Ni: 0.7
+        epsilon_P_Nb: 1.2
+        epsilon_P_Mo: 0.7
+        as_printed: 2 sigma of the least-squares slope; V computed 2 sigma was ±0.3 and Ni data 0.7±0.5,
+          both adopted as ±0.7
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-P-i_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamada_1983_epsilon_P_Al_body_4p0_printed
+      type: activity_coefficient
+      locator:
+        published_page: 53
+        pdf_page_index: 3
+        section: 2. The Fe-P-Al Systems
+        note: Body text value that disagrees with synopsis/Table 2/Fig. 2/conclusions
+      standard_state: Henrian gamma_P; epsilon_P^Al at 1600 C, 1 wt% P
+      units: dimensionless epsilon as published
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: measured
+        epsilon_P_Al: 4.0
+        epsilon_P_Al_as_printed: 4.0±0.7
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        a_Fe_source: Belton and Fruehan, Met. Trans., 1 (1970), 781 (ref 5)
+        note: Printed in the Fe-P-Al paragraph. Competing printed value 4.6±0.7 is in yamada_1983_epsilon_P_i_this_work_1600C.
+          Not reconciled.
+      uncertainty:
+        epsilon_P_Al: 0.7
+        as_printed: 4.0±0.7
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-P-i_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamada_1983_epsilon_P_Si_fruehan_aFe_12p6
+      type: activity_coefficient
+      locator:
+        published_page: 53
+        pdf_page_index: 3
+        section: 1. The Fe-P-Si System
+        note: Same ion-ratio data recomputed with Fruehan a_Fe instead of Chipman a_Fe
+      standard_state: Henrian gamma_P; epsilon_P^Si at 1600 C using Fruehan a_Fe
+      units: dimensionless epsilon as published
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: model_derived
+        model_or_data_source: this-work I(P+)/I(Fe+) with a_Fe from Fruehan, Met. Trans., 1 (1970), 865
+          (ref 4), instead of Chipman et al. (ref 3)
+        epsilon_P_Si: 12.6
+        epsilon_P_Si_as_printed: 12.6±0.6
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        authors_comment: difference vs 11.9±0.6 is rather small because a_Fe deviates little from Raoult's
+          law at high Fe concentration
+      uncertainty:
+        epsilon_P_Si: 0.6
+        as_printed: 12.6±0.6
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-P-i_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamada_1983_table2_quoted_interaction_coefficients
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 54
+        pdf_page_index: 4
+        note: Table 2 comparison rows that are not Present work
+      standard_state: quoted epsilon_P^i / e_P^i at 1600 C except Schenck Si at 1515 C as printed
+      units: dimensionless epsilon_P^i and e_P^i as published
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: quoted_measurement
+        T_C_header_as_printed: 1600
+        rows:
+        - solute: Si
+          epsilon_P_i: 21.0
+          epsilon_P_i_as_printed: '21'
+          e_P_i: 0.18
+          quoted_from: V. Cirilli (Table 2 spelling); References print V. Girilli, Chem. e L'Ind., 50
+            (1968), 33 (ref 12)
+          T_C_as_printed: 1600
+          T_note: Table 2 header is 1600 C; this row has no separate temperature mark
+          method_class: quoted_measurement
+        - solute: Si
+          epsilon_P_i: 14.2
+          epsilon_P_i_as_printed: 14.2 (1 515 °C)
+          e_P_i: 0.118
+          quoted_from: H. Schenck, E. Steinmetz and R. Gohlke, Arch. Eisenhuttenw., 39 (1968), 109 (ref
+            13)
+          T_C_as_printed: 1515
+          T_note: temperature printed in the epsilon cell, not 1600 C
+          method_class: quoted_measurement
+        - solute: Si
+          epsilon_P_i: 11.0
+          epsilon_P_i_as_printed: '11'
+          e_P_i: 0.091
+          quoted_from: J. Chipman, JISI, 180 (1955), 97 (ref 11)
+          T_C_as_printed: 1600
+          T_note: Table 2 header is 1600 C; this row has no separate temperature mark
+          method_class: quoted_measurement
+        - solute: Cr
+          epsilon_P_i: 18.8
+          epsilon_P_i_as_printed: '18.8'
+          e_P_i: 0.083
+          quoted_from: H. Schenck, E. Steinmetz and R. Gohlke, Arch. Eisenhuttenw., 39 (1968), 109 (ref
+            13); Table 2 cites Schenck et al.13) on the Cr block
+          T_C_as_printed: 1600
+          T_note: Table 2 header is 1600 C; this row has no separate temperature mark
+          method_class: quoted_measurement
+        - solute: Cr
+          epsilon_P_i: -6.3
+          epsilon_P_i_as_printed: '-6.3'
+          e_P_i: -0.03
+          quoted_from: M. G. Frohberg, J. F. Elliott and H. G. Hadrys, Arch. Eisenhuttenw., 39 (1968),
+            587; Met. Trans., 1 (1970), 1867 (ref 15)
+          T_C_as_printed: 1600
+          T_note: Table 2 header is 1600 C; this row has no separate temperature mark
+          method_class: quoted_measurement
+        - solute: Ni
+          epsilon_P_i: 0.0
+          epsilon_P_i_as_printed: '0.0'
+          e_P_i: 0.0002
+          quoted_from: H. Schenck, E. Steinmetz and H. Gitizad, Arch. Eisenhuttenw., 40 (1969), 597 (ref
+            14)
+          T_C_as_printed: 1600
+          T_note: Table 2 header is 1600 C; this row has no separate temperature mark
+          method_class: quoted_measurement
+      uncertainty:
+        note: quoted Table 2 rows print no ± except this-work rows; none invented
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-P-i_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamada_1983_fig1_Si_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '1'
+        published_page: 52
+        pdf_page_index: 2
+        note: Effect of Si on the activity coefficient of P at 1600 C
+      standard_state: ln gamma_P^i vs N_Si; Henrian P
+      units: ln gamma_P^i dimensionless; N_Si mole fraction
+      values:
+        quantity: ln_gamma_P_vs_mole_fraction_solute
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        n_measurements_as_printed: 5
+        Al_deoxidizer_wt_percent: 0.2
+        labeled_on_figure: epsilon_P^Si = 11.9±0.6
+        axis: ln gamma_P^i vs N_Si (0 to 0.20)
+      uncertainty:
+        note: figure-only; slope labelled 11.9±0.6, same as Table 2 Present work. Points not digitised.
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-P-i_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamada_1983_fig2_Al_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '2'
+        published_page: 53
+        pdf_page_index: 3
+        note: Effect of Al on the activity coefficient of P at 1600 C
+      standard_state: ln gamma_P^i vs N_Al; Henrian P
+      units: ln gamma_P^i dimensionless; N_Al mole fraction
+      values:
+        quantity: ln_gamma_P_vs_mole_fraction_solute
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        labeled_on_figure: epsilon_P^Al = 4.6±0.7
+        Be_labels_as_printed:
+        - N_Be=0.0045
+        - N_Be=0.0078
+        - N_Be=0.0047
+        - N_Be=0.0096
+        axis: ln gamma_P^i vs N_Al (0 to 0.12)
+      uncertainty:
+        note: figure-only; labelled 4.6±0.7. Be contents are added amounts just before the run. Points
+          not digitised.
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-P-i_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamada_1983_fig3_3d_metals_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '3'
+        published_page: 53
+        pdf_page_index: 3
+        note: Effect of the 3rd-transition metals (Ti, V, Cr, Co and Ni) at 1600 C
+      standard_state: ln gamma_P^i vs N_i; Henrian P
+      units: ln gamma_P^i dimensionless; N_i mole fraction
+      values:
+        quantity: ln_gamma_P_vs_mole_fraction_solute
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        labeled_on_figure:
+          Co: epsilon_P^Co = 0.9
+          Ni: epsilon_P^Ni = 0.7
+          Cr: epsilon_P^Cr = -3.8
+          V: epsilon_P^V = -4.9
+          Ti: epsilon_P^Ti = -8
+        axis: ln gamma_P^i vs N_i (0 to 0.12)
+      uncertainty:
+        note: figure-only; labelled slopes match Table 2 Present work (without the printed ±). Points
+          not digitised.
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-P-i_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamada_1983_fig4_Nb_Mo_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '4'
+        published_page: 54
+        pdf_page_index: 4
+        note: Effect of Nb and Mo on the activity coefficient of P at 1600 C
+      standard_state: ln gamma_P^i vs N_i; Henrian P
+      units: ln gamma_P^i dimensionless; N_i mole fraction
+      values:
+        quantity: ln_gamma_P_vs_mole_fraction_solute
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        labeled_on_figure:
+          Mo: epsilon_P^Mo = -0.4±0.7
+          Nb: epsilon_P^Nb = -5.4±1.2
+        axis: ln gamma_P^i vs N_i (0 to 0.12)
+      uncertainty:
+        note: figure-only; labelled slopes match Table 2 Present work. Points not digitised.
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-P-i_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamada_1983_fig5a_epsilon_vs_atomic_number_figure_only
+      type: activity_coefficient
+      locator:
+        figure: 5(a)
+        published_page: 55
+        pdf_page_index: 5
+        note: Variation of epsilon_P^i with atomic number of 4th and 5th period elements at 1600 C
+      standard_state: epsilon_P^i vs atomic number; this-work points plus Mn? and Cu? labels
+      units: dimensionless epsilon_P^i
+      values:
+        quantity: epsilon_P_i_vs_atomic_number
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        T_C_as_printed: 1600
+        T_K: 1873.0
+        legend_as_printed: open circles 4th period; open triangles 5th period
+        axis_elements_as_printed: Ti V Cr Mn Fe Co Ni Cu / Nb Mo
+        Mn_and_Cu_labels: Mn? and Cu? printed on the figure; Fe-P-Mn and Fe-P-Cu were not successfully
+          measured (section 10)
+      uncertainty:
+        note: figure-only; no numbers off axes. Successful numerical values are in Table 2.
+    - T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-S-i_quoted
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: yamada_1983_fig5b_epsilon_S_quoted_figure_only
+      type: activity_coefficient
+      locator:
+        figure: 5(b)
+        published_page: 55
+        pdf_page_index: 5
+        note: Variation of epsilon_S^i with atomic number at 1600 C, from Sigworth and Elliott (ref 16)
+      standard_state: quoted epsilon_S^i vs atomic number at 1600 C
+      units: dimensionless epsilon_S^i
+      values:
+        quantity: epsilon_S_i_vs_atomic_number
+        method_class: quoted_measurement
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        quoted_from: G. K. Sigworth and J. F. Elliott, Metal Science, 8 (1974), 298 (ref 16)
+        T_C_as_printed: 1600
+        T_K: 1873.0
+      uncertainty:
+        note: figure-only reprint of other workers; no numbers off axes
+    - observation_id: yamada_1983_Fe_P_Cu_Mn_not_measurable
+      type: activity_coefficient
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        section: 10. The Fe-P-Cu and Fe-P-Mn Systems
+        note: Measurements tried; ion source contaminated; accurate determinations impossible
+      T_range_K:
+      - 1873.0
+      - 1873.0
+      phase: liquid_Fe-P-Cu_and_Fe-P-Mn
+      condensed_form: *id001
+      standard_state: Henrian P; no usable epsilon obtained
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: measured
+        admission_status: true_absence
+        semantics: bound_not_point_ordering
+        status: not_obtained
+        as_printed: The measurements with these systems were tried. However, the vapor pressures of Cu
+          and Mn in liquid iron alloys are high, and the inside wall of the ion source was severely contaminated
+          by these vapors and this contamination made accurate determinations impossible.
+        systems:
+        - Fe-P-Cu
+        - Fe-P-Mn
+      uncertainty:
+        note: authors report accurate determinations impossible; no epsilon printed
+      equipment: *id002
+deepening:
+  dispatch_id: extract-alloys-b2
+  date: '2026-09-13'
+  table_inventory:
+  - table: '1'
+    published_page: 51
+    pdf_page_index: 1
+    completeness: full
+    note: Source and purity of ten starting metals. Pure Fe is not a Table 1 row.
+  - table: '2'
+    published_page: 54
+    pdf_page_index: 4
+    completeness: full
+    note: Interaction coefficients for P in liquid iron at 1600 C. Present-work rows measured; Cirilli/Girilli,
+      Schenck, Chipman, Frohberg rows quoted_measurement.
+  class_ledger:
+    measured:
+    - yamada_1983_kems_geometry_and_calibration
+    - yamada_1983_table1_source_and_purity
+    - yamada_1983_epsilon_P_i_this_work_1600C
+    - yamada_1983_epsilon_P_Al_body_4p0_printed
+    - yamada_1983_fig1_Si_figure_only
+    - yamada_1983_fig2_Al_figure_only
+    - yamada_1983_fig3_3d_metals_figure_only
+    - yamada_1983_fig4_Nb_Mo_figure_only
+    - yamada_1983_fig5a_epsilon_vs_atomic_number_figure_only
+    - yamada_1983_Fe_P_Cu_Mn_not_measurable
+    quoted_measurement:
+    - yamada_1983_table2_quoted_interaction_coefficients
+    - yamada_1983_fig5b_epsilon_S_quoted_figure_only
+    model_derived:
+    - yamada_1983_epsilon_P_Si_fruehan_aFe_12p6
+    figure_only:
+    - yamada_1983_fig1_Si_figure_only
+    - yamada_1983_fig2_Al_figure_only
+    - yamada_1983_fig3_3d_metals_figure_only
+    - yamada_1983_fig4_Nb_Mo_figure_only
+    - yamada_1983_fig5a_epsilon_vs_atomic_number_figure_only
+    - yamada_1983_fig5b_epsilon_S_quoted_figure_only
+  refused:
+  - what: numeric ln gamma_P^i points off Figs 1-4 axes, and numeric epsilon off Fig. 5
+    why: figure_only; Table 2 and the synopsis already carry the tabulated interaction coefficients
+  - what: orifice area, orifice diameter, Clausing factor, melt free-surface area, sample mass
+    why: not printed in this paper; apparatus referred to refs 1 and 2. Recorded as missing_for_motzfeldt
+      / unstated, not invented.
+  - what: epsilon_P^Cu and epsilon_P^Mn
+    why: authors report ion-source contamination made accurate determinations impossible
+  - what: numeric chamber pressure
+    why: unstated (high vacuum mentioned only for the Be deoxidation step)
+  primary_sources_cited:
+  - ref: 1
+    as_printed: 'K. Yamada and E. Kato: Trans. ISIJ, 20 (1980), 244.'
+  - ref: 2
+    as_printed: 'K. Yamada and E. Kato: International J. Mass Spectrometry and Ion Physics, 25 (1977),
+      461.'
+  - ref: 3
+    as_printed: 'J. Chipman, J. V. Fulton, N. A. Gokcen and G. R. Caskey: Acta Met., 2 (1954), 439.'
+  - ref: 4
+    as_printed: 'R. J. Fruehan: Met. Trans., 1 (1970), 865.'
+  - ref: 5
+    as_printed: 'G. R. Belton and R. J. Fruehan: Met. Trans., 1 (1970), 781.'
+  - ref: 6
+    as_printed: 'T. Furukawa and E. Kato: Tetsu-to-Hagane, 61 (1975), 3050; the 4th Japan-USSR Joint Symposium
+      on Physical Chemistry of Metallurgical Processes, ISIJ, (1973), 201.'
+  - ref: 7
+    as_printed: 'T. Furukawa and E. Kato: Trans. ISIJ, 16 (1976), 382.'
+  - ref: 8
+    as_printed: 'S. W. Gilby and G. R. St. Pierre: Trans. Met. Soc. AIME, 245 (1969), 1749.'
+  - ref: 9
+    as_printed: 'R. Hultgren, P. D. Desai, D. T. Hawkins, M. Gleiser and K. K. Kelley: Selected Values
+      of the Thermodynamic Properties of Binary Alloys, ASM, Ohio, (1973), 656 and 874.'
+  - ref: 10
+    as_printed: 'E. Ichise, T. Maruo, H. Sasho, Y. Ueshima and T. Mori: Tetsu-to-Hagane, 66 (1980), 1075.'
+  - ref: 11
+    as_printed: 'J. Chipman: JISI, 180 (1955), 97.'
+  - ref: 12
+    as_printed: 'V. Girilli: Chem. e L''Ind., 50 (1968), 33.'
+    table_2_spelling: V. Cirilli12)
+  - ref: 13
+    as_printed: 'H. Schenck, E. Steinmetz and R. Gohlke: Arch. Eisenhuttenw., 39 (1968), 109.'
+  - ref: 14
+    as_printed: 'H. Schenck, E. Steinmetz and H. Gitizad: Arch. Eisenhuttenw., 40 (1969), 597.'
+  - ref: 15
+    as_printed: 'M. G. Frohberg, J. F. Elliott and H. G. Hadrys: Arch. Eisenhuttenw., 39 (1968), 587;
+      Met. Trans., 1 (1970), 1867.'
+  - ref: 16
+    as_printed: 'G. K. Sigworth and J. F. Elliott: Metal Science, 8 (1974), 298.'

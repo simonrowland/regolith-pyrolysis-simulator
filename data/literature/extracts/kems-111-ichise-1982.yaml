@@ -1,0 +1,1076 @@
+schema_version: literature_extract.v1
+source_id: kems-111-ichise-1982
+source:
+  citation: Ichise, E., Maruo, T., Sasho, H., Ueshima, Y. and Mori, T. (1982), "Knudsen Cell-mass Spectrometric
+    Study of the Thermodynamic Properties of Fe-Mo Alloys", Trans. ISIJ 22(7):552-559, DOI 10.2355/isijinternational1966.22.552.
+    Originally published in Tetsu-to-Hagane, 66 (1980), 1075, in Japanese.
+  doi: 10.2355/isijinternational1966.22.552
+  url: https://doi.org/10.2355/isijinternational1966.22.552
+  year: 1982
+extraction:
+  method: Official J-STAGE OA PDF (corpus raw/kems-111-ichise-1982/kems-111-ichise-1982.pdf, sha256 3b188db3153e3d0dcf279c294b411c0cc0cd8d48c4c92995d5ed6d5e1f446eaf).
+    No MinerU decode. Tables 1-5 transcribed from a 400 dpi pdftoppm render of PDF pages 1-8 (published
+    pp. 552-559). pdftotext-layout is a noisy OCR layer and was not used as data. Table 2 a_Fe and Table
+    1 lambda labelled measured. Table 4 a_Mo / G / gamma_Mo labelled model_derived (Gibbs-Duhem). Table
+    5 comparison rows quoted_measurement. Figs 1-6 figure-only. Chamber pressure and ionizing energy unstated.
+    Sample mass 2~3 g.
+  date: '2026-09-13'
+  worker: extract-alloys-b2
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.Fe.observations[ichise_1982_table2_a_Fe_1823K].values.rows[0].a_Fe
+  value: 0.897
+  locator:
+    table: '2'
+    published_page: 555
+    pdf_page_index: 4
+    note: 'Table 2 Fe-Mo 6: x_Mo=0.096, a_Fe=0.897'
+- path: species.Fe.observations[ichise_1982_table1_lambda].values.rows[0].lambda
+  value: 6.67
+  locator:
+    table: '1'
+    published_page: 555
+    pdf_page_index: 4
+    note: 'Table 1 Ag-Fe 1: lambda=6.67, lambda_bar=6.92'
+- species: Mo
+  observable: activity_coefficient
+  observation_id: ichise_1982_infinite_dilution_gamma
+  field: gamma0_Mo_s
+  value: 1.54
+  locator:
+    published_page: 558
+    pdf_page_index: 7
+    section: V. Conclusion
+    note: gamma0_Mo(s)=1.54 (+0.32/-0.26); Table 4 x_Mo=0 prints +0.26/-0.21 under 1.54
+- path: species.Fe.observations[ichise_1982_table5_heats].values.this_study[0].delta_H_kcal_g_atom
+  value: 93.7
+  locator:
+    table: '5'
+    published_page: 558
+    pdf_page_index: 7
+    note: This study Delta-H^s(delta)=93.7 kcal/g-atom, 1665~1809 K
+- path: species.Mo.observations[ichise_1982_table3_phase_boundaries].values.rows[0].x_Mo_liquid
+  value: 0.35
+  locator:
+    table: '3'
+    published_page: 556
+    pdf_page_index: 5
+    note: 'Table 3 Fe liquid+sigma: x_Mo(liquid)=0.35, x_Mo(sigma)=0.484'
+species:
+  Fe:
+    observations:
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: &id001
+        state: liquid_or_solid_alloy
+        metastable: false
+        basis: explicit_author
+        note: Fe-Mo over the entire composition range at 1823 K; liquid, liquid+sigma, sigma, sigma+(Mo),
+          (Mo)
+      regime: kems_effusion
+      equipment: &id002
+        cell_material:
+          value: Sintered alumina crucible 9 mm inner diameter, 11 mm height, lid with orifice 0.5 mm
+            diameter. Ta cell holder. HITACHI RM6K Knudsen cell-mass spectrometer (details referred to
+            Ichise, Kitao and Mori, Tetsu-to-Hagane 60 (1974) 2119 and Ichise, Yamauchi and Mori, Tetsu-to-Hagane
+            63 (1977) 417).
+          locator:
+            published_page: 553
+            pdf_page_index: 2
+            section: II.1 Experimental Apparatus
+            paragraph: Sintered alumina crucible of 9 mm in innerdiameter and 11 mm in height and lid
+              with orifice of 0.5 mm in diameter were used as the Knudsen cell.
+        orifice_area:
+          value: unstated
+          note: orifice diameter 0.5 mm printed; area not computed here
+          inferred: true
+          inference: diameter 0.5 mm is printed; area not invented from pi r^2
+          locator:
+            published_page: 553
+            pdf_page_index: 2
+            paragraph: lid with orifice of 0.5 mm in diameter
+        chamber_pressure:
+          value: unstated
+          note: vacuum arc furnace is sample prep, not the KEMS chamber pressure
+          locator:
+            published_page: 553
+            pdf_page_index: 2
+            section: II.2 Samples
+            note: chamber / ion-source pressure not printed as a number
+      observation_id: ichise_1982_kems_geometry_and_calibration
+      type: gibbs_table
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        section: II. Experimental
+      standard_state: method geometry; not a species observation
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: HITACHI RM6K Knudsen cell-mass spectrometer
+        T_activity_K: 1823.0
+        sample_mass_g: 2~3 g for every run
+        ag_foil_mass_mg_about: 10.0
+        orifice_diameter_mm: 0.5
+        crucible_inner_diameter_mm: 9.0
+        crucible_height_mm: 11.0
+        ionizing_energy: unstated
+        chamber_pressure: unstated
+        standard_low_Mo: solid pure iron (in-situ melt, x_Mo<0.35)
+        standard_high_Mo: Ag foil on Fe disk, then Ag-Fe-Mo run
+        T_Ag_K_AgFe_1_to_5: 1227.0
+        T_Ag_K_AgFe_6_to_16: 1234.0
+        starting_iron_as_printed: 0.002 % C, <0.005 % Si, <0.001 % Mn, 0.005 % P, 0.005 % S, 0.005 % Cu,
+          0.004 % Ni, 0.003 % Cr, 0.013 % Co, 0.003 % Ti, <0.001 % V, 0.003 % Al, 0.0042 % O and 0.0017
+          % N
+        starting_Mo_purity_percent: 99.97
+        analysis: atomic absorption JIS G1257-1975; standard deviation ±0.5 %
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+      uncertainty:
+        note: sample mass 2~3 g; analysis SD ±0.5 %; ionizing energy and chamber pressure unstated
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table1_lambda
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 555
+        pdf_page_index: 4
+        note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+      standard_state: ion-intensity ratio of pure Fe to Ag at T_Ag; dimensionless
+      units: dimensionless lambda as published
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured
+        lambda_definition: lambda = I+_Fe° / I+_Ag = constant (eq. 7)
+        T_Ag_K_rows_1_to_5: 1227.0
+        T_Ag_K_rows_6_to_16: 1234.0
+        lambda_bar_note: mean lambda printed once per group, vertically centered; assigned here to every
+          row in the group
+        rows:
+        - 'no': Ag-Fe 1
+          lambda: 6.67
+          lambda_bar: 6.92
+          used_in: Ag-Fe-Mo 1
+        - 'no': Ag-Fe 2
+          lambda: 7.16
+          lambda_bar: 6.92
+          used_in: Ag-Fe-Mo 2
+        - 'no': Ag-Fe 3
+          lambda: 9.57
+          lambda_bar: 9.72
+          used_in: Ag-Fe-Mo 3
+        - 'no': Ag-Fe 4
+          lambda: 9.62
+          lambda_bar: 9.72
+          used_in: Ag-Fe-Mo 4
+        - 'no': Ag-Fe 5
+          lambda: 9.96
+          lambda_bar: 9.72
+          used_in: null
+        - 'no': Ag-Fe 6
+          lambda: 10.3
+          lambda_bar: 10.7
+          used_in: Ag-Fe-Mo 5
+        - 'no': Ag-Fe 7
+          lambda: 9.3
+          lambda_bar: 10.7
+          used_in: Ag-Fe-Mo 6
+        - 'no': Ag-Fe 8
+          lambda: 10.1
+          lambda_bar: 10.7
+          used_in: Ag-Fe-Mo 7
+        - 'no': Ag-Fe 9
+          lambda: 12.9
+          lambda_bar: 10.7
+          used_in: null
+        - 'no': Ag-Fe 10
+          lambda: 14.6
+          lambda_bar: 14.2
+          used_in: Ag-Fe-Mo 8
+        - 'no': Ag-Fe 11
+          lambda: 14.0
+          lambda_bar: 14.2
+          used_in: Ag-Fe-Mo 9
+        - 'no': Ag-Fe 12
+          lambda: 13.2
+          lambda_bar: 14.2
+          used_in: Ag-Fe-Mo 10
+        - 'no': Ag-Fe 13
+          lambda: 14.5
+          lambda_bar: 14.2
+          used_in: Ag-Fe-Mo 11
+        - 'no': Ag-Fe 14
+          lambda: 15.1
+          lambda_bar: 14.2
+          used_in: Ag-Fe-Mo 12
+        - 'no': Ag-Fe 15
+          lambda: 14.5
+          lambda_bar: 14.2
+          used_in: Ag-Fe-Mo 13
+        - 'no': Ag-Fe 16
+          lambda: 13.3
+          lambda_bar: 14.2
+          used_in: null
+      uncertainty:
+        note: no ± printed on individual lambda; group means 6.92, 9.72, 10.7, 14.2
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table2_a_Fe_1823K
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 555
+        pdf_page_index: 4
+        note: Table 2. Result of activity measurements at 1823 K.
+      standard_state: Raoultian a_Fe; pure liquid Fe
+      units: dimensionless a_Fe; x_Mo atomic fraction
+      values:
+        quantity: activity
+        method_class: measured
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction (mole fraction)
+        low_Mo_method: a_Fe = I+_Fe(alloy) / I+_Fe°(extrapolated) (eq. 6)
+        high_Mo_method: a_Fe = I+_Fe(alloy) / (lambda I+_Ag) (eq. 10)
+        rows:
+        - 'no': Fe-Mo 6
+          x_Mo: 0.096
+          a_Fe: 0.897
+          phases: Fe liquid solution
+        - 'no': Fe-Mo 2
+          x_Mo: 0.154
+          a_Fe: 0.81
+          phases: Fe liquid solution
+        - 'no': Fe-Mo 4
+          x_Mo: 0.2
+          a_Fe: 0.8
+          phases: Fe liquid solution
+        - 'no': Fe-Mo 7
+          x_Mo: 0.201
+          a_Fe: 0.767
+          phases: Fe liquid solution
+        - 'no': Fe-Mo 1
+          x_Mo: 0.24
+          a_Fe: 0.692
+          phases: Fe liquid solution
+        - 'no': Fe-Mo 5
+          x_Mo: 0.251
+          a_Fe: 0.737
+          phases: Fe liquid solution
+        - 'no': Fe-Mo 9
+          x_Mo: 0.254
+          a_Fe: 0.741
+          phases: Fe liquid solution
+        - 'no': Fe-Mo 3
+          x_Mo: 0.3
+          a_Fe: 0.69
+          phases: Fe liquid solution
+        - 'no': Fe-Mo 8
+          x_Mo: 0.302
+          a_Fe: 0.673
+          phases: Fe liquid solution
+        - 'no': Fe-Mo 10
+          x_Mo: 0.333
+          a_Fe: 0.677
+          phases: Fe liquid solution
+        - 'no': Ag-Fe-Mo 7
+          x_Mo: 0.339
+          a_Fe: 0.652
+          phases: Fe liquid solution
+        - 'no': Ag-Fe-Mo 2
+          x_Mo: 0.348
+          a_Fe: 0.652
+          phases: Fe liquid solution
+        - 'no': Ag-Fe-Mo 10
+          x_Mo: 0.434
+          a_Fe: 0.621
+          phases: Fe liquid solution+σ
+        - 'no': Ag-Fe-Mo 11
+          x_Mo: 0.434
+          a_Fe: 0.656
+          phases: Fe liquid solution+σ
+        - 'no': Ag-Fe-Mo 13
+          x_Mo: 0.434
+          a_Fe: 0.528
+          a_Fe_as_printed: 0.528*
+          phases: Fe liquid solution+σ
+          excluded: true
+          exclusion_as_printed: not used in the following calculation of a_Fe in the Fe(l)+σ phase region,
+            because of its unreasonably low value
+        - 'no': Ag-Fe-Mo 8
+          x_Mo: 0.556
+          a_Fe: 0.585
+          phases: σ+Mo solid solution
+        - 'no': Ag-Fe-Mo 9
+          x_Mo: 0.613
+          a_Fe: 0.552
+          phases: σ+Mo solid solution
+        - 'no': Ag-Fe-Mo 12
+          x_Mo: 0.666
+          a_Fe: 0.526
+          phases: σ+Mo solid solution
+        - 'no': Ag-Fe-Mo 4
+          x_Mo: 0.778
+          a_Fe: 0.556
+          phases: σ+Mo solid solution
+        - 'no': Ag-Fe-Mo 6
+          x_Mo: 0.793
+          a_Fe: 0.538
+          phases: σ+Mo solid solution
+        - 'no': Ag-Fe-Mo 3
+          x_Mo: 0.842
+          a_Fe: 0.518
+          phases: Mo solid solution
+        - 'no': Ag-Fe-Mo 1
+          x_Mo: 0.912
+          a_Fe: 0.36
+          phases: Mo solid solution
+        - 'no': Ag-Fe-Mo 5
+          x_Mo: 0.912
+          a_Fe: 0.383
+          phases: Mo solid solution
+      uncertainty:
+        note: two-phase means a_Fe=0.645±0.009 (liquid+sigma) from Ag-Fe-Mo 2,7,10,11 plus liquid-phase
+          extrapolation; a_Fe=0.551±0.008 (sigma+(Mo)). C.V.=0.032. Ag-Fe-Mo 13 (0.528*) excluded.
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table4_partial_molar_1823K
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 557
+        pdf_page_index: 6
+        note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+      standard_state: Fe(l)=Fe (in alloy), Raoultian liquid Fe; Mo(s)=Mo (in alloy), Raoultian solid Mo
+      units: a and gamma dimensionless; G in kJ/g-atom as printed
+      values:
+        quantity: activity_and_partial_molar_gibbs
+        a_Fe_method_class: measured
+        a_Mo_method_class: model_derived
+        method_class: model_derived
+        model_or_data_source: a_Fe measured (regression eq. 11 / two-phase averages / Darken / linear
+          sigma assumption). a_Mo, gamma_Mo, G^M, G^E calculated by Gibbs-Duhem as printed in the Table
+          4 footnote.
+        T_K: 1823.0
+        composition_basis: x_Mo atomic fraction
+        conversion_footnote: 'Fe: Delta-H^m=15.1 kJ/g-atom (this study); T_m=1809 K (ref 11). Mo: Delta-H^m=7777(±1000)
+          cal/g-atom (ref 11); T_m=2890(±5) K; =32.54 kJ/g-atom'
+        rows:
+        - x_Mo: 0.0
+          phase: Fe liquid solution
+          a_Fe: 1.0
+          gamma_Fe: 1.0
+          G_M_Fe_kJ_g_atom: 0.0
+          G_E_Fe_kJ_g_atom: 0.0
+          a_Mo: 0.0
+          gamma_Mo: 1.54
+          G_M_Mo_kJ_g_atom: -∞
+          G_E_Mo_kJ_g_atom: 6.6
+          err:
+            gamma_Mo:
+              plus: 0.26
+              minus: 0.21
+            G_E_Mo_kJ_g_atom:
+              pm: 2.3
+        - x_Mo: 0.1
+          phase: Fe liquid solution
+          a_Fe: 0.887
+          gamma_Fe: 0.986
+          G_M_Fe_kJ_g_atom: -1.82
+          G_E_Fe_kJ_g_atom: -0.22
+          a_Mo: 0.209
+          gamma_Mo: 2.09
+          G_M_Mo_kJ_g_atom: -23.7
+          G_E_Mo_kJ_g_atom: 11.2
+        - x_Mo: 0.2
+          phase: Fe liquid solution
+          a_Fe: 0.774
+          gamma_Fe: 0.967
+          G_M_Fe_kJ_g_atom: -3.89
+          G_E_Fe_kJ_g_atom: -0.51
+          a_Mo: 0.472
+          gamma_Mo: 2.36
+          G_M_Mo_kJ_g_atom: -11.37
+          G_E_Mo_kJ_g_atom: 13.02
+          err:
+            a_Fe:
+              pm: 0.008
+            gamma_Fe:
+              pm: 0.009
+            G_M_Fe_kJ_g_atom:
+              pm: 0.15
+            G_E_Fe_kJ_g_atom:
+              pm: 0.15
+            a_Mo:
+              pm: 0.012
+            gamma_Mo:
+              pm: 0.06
+            G_M_Mo_kJ_g_atom:
+              plus: 0.4
+              minus: 0.35
+            G_E_Mo_kJ_g_atom:
+              plus: 0.4
+              minus: 0.35
+        - x_Mo: 0.3
+          phase: Fe liquid solution
+          a_Fe: 0.685
+          gamma_Fe: 0.979
+          G_M_Fe_kJ_g_atom: -5.73
+          G_E_Fe_kJ_g_atom: -0.33
+          a_Mo: 0.689
+          gamma_Mo: 2.296
+          G_M_Mo_kJ_g_atom: -5.65
+          G_E_Mo_kJ_g_atom: 12.59
+        - x_Mo: 0.35
+          phase: Fe liquid solution
+          a_Fe: 0.645
+          gamma_Fe: 0.993
+          G_M_Fe_kJ_g_atom: -6.64
+          G_E_Fe_kJ_g_atom: -0.11
+          a_Mo: 0.757
+          gamma_Mo: 2.163
+          G_M_Mo_kJ_g_atom: -4.22
+          G_E_Mo_kJ_g_atom: 11.69
+          err:
+            a_Fe:
+              pm: 0.009
+            gamma_Fe:
+              pm: 0.013
+            G_M_Fe_kJ_g_atom:
+              plus: 0.2
+              minus: 0.22
+            G_E_Fe_kJ_g_atom:
+              plus: 0.2
+              minus: 0.22
+            a_Mo:
+              plus: 0.016
+              minus: 0.014
+            gamma_Mo:
+              plus: 0.045
+              minus: 0.041
+            G_M_Mo_kJ_g_atom:
+              plus: 0.32
+              minus: 0.28
+            G_E_Mo_kJ_g_atom:
+              plus: 0.32
+              minus: 0.28
+        - x_Mo: 0.484
+          phase: σ
+          a_Fe: 0.645
+          gamma_Fe: 1.25
+          G_M_Fe_kJ_g_atom: -6.64
+          G_E_Fe_kJ_g_atom: 3.39
+          a_Mo: 0.757
+          gamma_Mo: 1.564
+          G_M_Mo_kJ_g_atom: -4.22
+          G_E_Mo_kJ_g_atom: 6.78
+        - x_Mo: 0.5
+          phase: σ
+          a_Fe: 0.624
+          gamma_Fe: 1.247
+          G_M_Fe_kJ_g_atom: -7.16
+          G_E_Fe_kJ_g_atom: 3.35
+          a_Mo: 0.784
+          gamma_Mo: 1.568
+          G_M_Mo_kJ_g_atom: -3.69
+          G_E_Mo_kJ_g_atom: 6.82
+        - x_Mo: 0.554
+          phase: σ
+          a_Fe: 0.551
+          gamma_Fe: 1.236
+          G_M_Fe_kJ_g_atom: -9.03
+          G_E_Fe_kJ_g_atom: 3.22
+          a_Mo: 0.875
+          gamma_Mo: 1.579
+          G_M_Mo_kJ_g_atom: -2.02
+          G_E_Mo_kJ_g_atom: 6.93
+        - x_Mo: 0.81
+          phase: Mo solid solution
+          a_Fe: 0.551
+          gamma_Fe: 2.9
+          G_M_Fe_kJ_g_atom: -9.03
+          G_E_Fe_kJ_g_atom: 16.13
+          a_Mo: 0.875
+          gamma_Mo: 1.08
+          G_M_Mo_kJ_g_atom: -2.02
+          G_E_Mo_kJ_g_atom: 1.17
+          err:
+            a_Fe:
+              pm: 0.008
+            gamma_Fe:
+              pm: 0.05
+            G_M_Fe_kJ_g_atom:
+              plus: 0.17
+              minus: 0.27
+            G_E_Fe_kJ_g_atom:
+              plus: 0.17
+              minus: 0.27
+            a_Mo:
+              plus: 0.017
+              minus: 0.014
+            gamma_Mo:
+              plus: 0.021
+              minus: 0.018
+            G_M_Mo_kJ_g_atom:
+              plus: 0.29
+              minus: 0.25
+            G_E_Mo_kJ_g_atom:
+              plus: 0.29
+              minus: 0.25
+        - x_Mo: 0.9
+          phase: Mo solid solution
+          a_Fe: 0.403
+          gamma_Fe: 4.03
+          G_M_Fe_kJ_g_atom: -13.8
+          G_E_Fe_kJ_g_atom: 21.1
+          a_Mo: 0.919
+          gamma_Mo: 1.022
+          G_M_Mo_kJ_g_atom: -1.27
+          G_E_Mo_kJ_g_atom: 0.32
+        - x_Mo: 1.0
+          phase: Mo solid solution
+          a_Fe: 0.0
+          gamma_Fe: 6.0
+          G_M_Fe_kJ_g_atom: -∞
+          G_E_Fe_kJ_g_atom: 27.3
+          a_Mo: 1.0
+          gamma_Mo: 1.0
+          G_M_Mo_kJ_g_atom: 0.0
+          G_E_Mo_kJ_g_atom: 0.0
+          err:
+            gamma_Fe:
+              pm: 1.1
+            G_E_Fe_kJ_g_atom:
+              pm: 2.7
+      uncertainty:
+        note: Printed ± sit under selected rows (x=0, 0.2, 0.35, 0.81, 1). Table 4 x=0 gamma_Mo 1.54 is
+          +0.26/-0.21; conclusion p.558 prints +0.32/-0.26. Both retained.
+    - T_range_K:
+      - 1665.0
+      - 1873.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table5_heats
+      type: gibbs_table
+      locator:
+        table: '5'
+        published_page: 558
+        pdf_page_index: 7
+        note: Table 5. Heats of sublimation and vaporization of iron.
+      standard_state: pure Fe; Delta-H^s of delta-Fe and Delta-H^v of liquid Fe
+      units: kcal/g-atom as printed in Table 5; kJ also printed in the body
+      values:
+        quantity: enthalpy_of_sublimation_and_vaporization
+        method_class: measured
+        this_study:
+        - delta_H_kcal_g_atom: 93.7
+          kind: Delta-H^s(delta)
+          T_range_K:
+          - 1665.0
+          - 1809.0
+          body_kJ_g_atom: 392.0
+          body_kJ_uncertainty: 0.8
+          body_kcal_uncertainty: 0.2
+        - delta_H_kcal_g_atom: 90.1
+          kind: Delta-H^v
+          T_range_K:
+          - 1809.0
+          - 1873.0
+          T_range_print_note: Table 5 last digit of 1873 has an ink blot; body p.555 prints 1809~1873
+            K
+          body_kJ_g_atom: 377.0
+          body_kJ_uncertainty: 1.0
+          body_kcal_uncertainty: 0.2
+        quoted_rows:
+        - investigators_as_printed: R. B. Resse et al.3)
+          ref: 3
+          ref_spelling: References print R. B. Reese, R. A. Rapp and G. R. St. Pierre
+          delta_H_kcal_g_atom: 91.3
+          uncertainty: 2.2
+          T_range_as_printed: mean 1 898 K
+          method_class: quoted_measurement
+        - investigators_as_printed: S. W. Gilby and G. R. St. Pierre16)
+          values:
+          - delta_H_kcal_g_atom: 93.3
+            T_range_as_printed: 1 667~1 809 K
+          - delta_H_kcal_g_atom: 91.4
+            T_range_as_printed: 1 809~1 953 K
+          method_class: quoted_measurement
+        - investigators_as_printed: E. Kato and T. Furukawa17)
+          delta_H_kcal_g_atom: 93.9
+          T_range_as_printed: 1 813~1 873 K
+          method_class: quoted_measurement
+        - investigators_as_printed: Selected values11)
+          values:
+          - delta_H_kcal_g_atom: 94.0
+            T_range_as_printed: 1 737 K
+          - delta_H_kcal_g_atom: 90.2
+            T_range_as_printed: 1 840 K
+          method_class: quoted_measurement
+        delta_H_m_kJ_g_atom: 15.1
+        delta_H_m_kcal_g_atom: 3.6
+        delta_H_m_uncertainty_kJ: 1.7
+        delta_H_m_T_K: 1809.0
+        delta_H_m_note: difference of heats of sublimation and vaporization (this study)
+        delta_H_s_alpha_298_kJ_g_atom: 414.0
+        delta_H_s_alpha_298_kcal_g_atom: 99.0
+        delta_H_s_alpha_method_class: model_derived
+        delta_H_s_alpha_derivation: from Delta-H^s(delta) at mean 1737 K plus Cp(Fe) from Hultgren (ref
+          11)
+      uncertainty:
+        delta_H_s_delta_kJ: 0.8
+        delta_H_v_kJ: 1.0
+        delta_H_m_kJ: 1.7
+    - T_range_K:
+      - 1665.0
+      - 1809.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_fig1_ion_intensity_A4_figure_only
+      type: rate_series
+      locator:
+        figure: '1'
+        published_page: 553
+        pdf_page_index: 2
+      standard_state: pure Fe ion intensity through A4, melting and freezing
+      units: as published
+      values:
+        quantity: ion_intensity
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labeled_on_figure:
+          delta_H_m_kJ_g_atom: 15.1
+          delta_H_A4_J_g_atom: 837
+          Fe_mass_g: 2.0
+          delta_H_m_J: 541
+          delta_H_A4_J: 30
+      uncertainty:
+        note: figure-only recorder traces; labelled 15.1 kJ/g-atom matches Table 5/body
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_fig2_low_Mo_procedure_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '2'
+        published_page: 554
+        pdf_page_index: 3
+      standard_state: log(I+_Fe T) vs 1/T; low-Mo in-situ melt
+      units: as published
+      values:
+        quantity: ion_intensity
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labeled_on_figure:
+          run: FeMo 28
+          x_Mo: 0.3
+          T_K_labels:
+          - 1823.0
+          - 1758.0
+          - 1723.0
+      uncertainty:
+        note: figure-only; points not digitised
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_fig3_Ag_standard_procedure_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '3'
+        published_page: 554
+        pdf_page_index: 3
+      standard_state: log(IT) vs 1/T; Ag foil on Fe/alloy
+      units: as published
+      values:
+        quantity: ion_intensity
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labeled_on_figure:
+          run: AgFeMo 108
+          x_Mo: 0.793
+          T_Ag_K: 1234.0
+          T_Fe_mp_K: 1809.0
+          T_K: 1823.0
+      uncertainty:
+        note: figure-only; points not digitised
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_fig4_activities_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '4'
+        published_page: 556
+        pdf_page_index: 5
+      standard_state: a_Fe and a_Mo vs x_Mo at 1823 K
+      units: dimensionless activity
+      values:
+        quantity: activity
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labeled_on_figure:
+          gamma0_Fe_l: 6.0
+          gamma0_Mo_s: 1.54
+      uncertainty:
+        note: figure-only; numerical a_Fe live in Table 2
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_fig5_ln_gamma_Fe_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '5'
+        published_page: 556
+        pdf_page_index: 5
+      standard_state: ln gamma_Fe vs x_Mo, 0 to 0.35
+      units: ln gamma_Fe
+      values:
+        quantity: activity_coefficient
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        fit_as_printed: ln gamma_Fe = -2.0_4 x_Mo^2 + 6.0 x_Mo^3 (0≤x_Mo≤0.35)
+      uncertainty:
+        note: figure-only; fit coefficients also in eq. (11) on p.555
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_fig6_error_estimate_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '6'
+        published_page: 558
+        pdf_page_index: 7
+      standard_state: X_Fe/X_Mo vs ln a_Fe error envelope
+      units: as published
+      values:
+        quantity: activity_error_envelope
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: figure-only; C.V.=0.032 is tabulated in the body
+  Mo:
+    observations:
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_table3_phase_boundaries
+      type: transition_point
+      locator:
+        table: '3'
+        published_page: 556
+        pdf_page_index: 5
+        note: Table 3. The composition of coexisting phases in the Fe-Mo system at 1823 K.
+      standard_state: x_Mo atomic fraction at 1823 K from microscopy and EPMA
+      units: atomic fraction x_Mo
+      values:
+        quantity: phase_boundary_composition
+        method_class: measured
+        T_K: 1823.0
+        method_as_printed: microscopic examination and EPMA analysis of the heat treated samples
+        rows:
+        - phases: Fe liquid solution+σ
+          x_Mo_liquid: 0.35
+          x_Mo_sigma: 0.484
+        - phases: σ+Mo solid solution
+          x_Mo_sigma: 0.554
+          x_Mo_solid_solution: 0.81
+      uncertainty:
+        note: no ± printed on Table 3 compositions
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_infinite_dilution_gamma
+      type: activity_coefficient
+      locator:
+        published_page: 558
+        pdf_page_index: 7
+        section: V. Conclusion
+      standard_state: Raoultian gamma°; Mo(s), Mo(l), Fe(l) as printed
+      units: dimensionless gamma°
+      values:
+        quantity: infinite_dilution_activity_coefficient
+        method_class: model_derived
+        model_or_data_source: Table 4 intercepts plus Mo melting conversion for gamma°_Mo(l)
+        T_K: 1823.0
+        gamma0_Mo_s: 1.54
+        gamma0_Mo_s_as_printed_conclusion: 1.54 (+0.32/-0.26)
+        gamma0_Mo_s_as_printed_table4: 1.54 (+0.26/-0.21)
+        gamma0_Mo_l: 0.7
+        gamma0_Mo_l_as_printed: 0.70 (+0.39/-0.37)
+        gamma0_Fe_l: 6.0
+        gamma0_Fe_l_as_printed: 6.0(±1.1)
+      uncertainty:
+        gamma0_Mo_s_conclusion:
+          plus: 0.32
+          minus: 0.26
+        gamma0_Mo_s_table4:
+          plus: 0.26
+          minus: 0.21
+        gamma0_Mo_l:
+          plus: 0.39
+          minus: 0.37
+        gamma0_Fe_l: 1.1
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_interaction_parameters_liquid
+      type: activity_coefficient
+      locator:
+        published_page: 559
+        pdf_page_index: 8
+        equation: 21-23
+      standard_state: epsilon from ln gamma_Mo vs x_Mo at x_Mo→0; e from wt% / Henrian 1 wt% Mo in liquid
+        Fe
+      units: dimensionless epsilon; e as printed
+      values:
+        quantity: wagner_interaction_parameter
+        method_class: model_derived
+        model_or_data_source: eq. (16) ln gamma_Mo = 0.435 + 4.0_8 x_Mo - 11.0 x_Mo^2 + 6.0 x_Mo^3 in
+          Fe liquid, 0≤x_Mo≤0.35
+        T_K: 1823.0
+        epsilon_Mo_Mo: 4.1
+        epsilon_Mo_Mo_as_printed: 4.1(±1.4)
+        epsilon_Mo_Mo2: -11.0
+        epsilon_Mo_Mo2_as_printed: -11.0(±4.1)
+        e_Mo_Mo: 0.0121
+        e_Mo_Mo_as_printed: 1.21×10^{-2}(±0.35×10^{-2})
+        e_Mo_Mo2: -0.00011
+        e_Mo_Mo2_as_printed: -1.1×10^{-4}(±0.8×10^{-4})
+      uncertainty:
+        epsilon_Mo_Mo: 1.4
+        epsilon_Mo_Mo2: 4.1
+        e_Mo_Mo: 0.0035
+        e_Mo_Mo2: 8.0e-05
+    - T_range_K:
+      - 1823.0
+      - 1823.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_deltaG_henrian_1wt_pct
+      type: gibbs_table
+      locator:
+        published_page: 559
+        pdf_page_index: 8
+        equation: '26'
+      standard_state: Mo(s) = Mo (hypothetical Henrian 1 wt% in liquid Fe)
+      units: J/g-atom as printed
+      values:
+        quantity: standard_gibbs_energy_change
+        method_class: model_derived
+        model_or_data_source: regular-solution assumption with gamma°_Mo(l); eq. (25)-(26)
+        reaction_as_printed: Mo(s)=Mo (hypothetical Henrian 1 wt% in liquid Fe)
+        delta_G_J_g_atom_as_printed: 27100 - 54.1 T (+9900/-9500)
+        delta_G_cal_g_atom_as_printed: 6500 - 12.92 T (+2400/-2300)
+        delta_G_1823K_kJ_g_atom: -71.5
+        delta_G_1823K_kcal_g_atom: -17.1
+      uncertainty:
+        delta_G_1823K_kJ_g_atom: 2.8
+        delta_G_1823K_kcal_g_atom: 0.7
+        intercept_J:
+          plus: 9900
+          minus: 9500
+    - T_range_K:
+      - 2000.0
+      - 2000.0
+      phase: Fe-Mo_alloy
+      condensed_form: *id001
+      regime: kems_effusion
+      equipment: *id002
+      observation_id: ichise_1982_quoted_Mo_psat
+      type: psat_series
+      locator:
+        published_page: 552
+        pdf_page_index: 1
+        paragraph: Mo has very low vapor pressure, about 3×10^{-10} atm even at 2000 K
+      standard_state: pure Mo vapor pressure as printed; no citation on that sentence
+      units: atm as published
+      values:
+        quantity: partial_pressure
+        method_class: quoted_unattributed
+        P_atm_as_printed: 3×10^{-10}
+        P_atm: 3.0e-10
+        T_K: 2000.0
+        as_printed: about 3×10^{-10} atm even at 2000 K
+      uncertainty:
+        note: quoted_unattributed; no citation on that sentence
+deepening:
+  dispatch_id: extract-alloys-b2
+  date: '2026-09-13'
+  table_inventory:
+  - table: '1'
+    published_page: 555
+    pdf_page_index: 4
+    completeness: full
+    note: lambda = I_Fe°/I_Ag; 16 Ag-Fe rows in four mean groups
+  - table: '2'
+    published_page: 555
+    pdf_page_index: 4
+    completeness: full
+    note: 23 a_Fe rows at 1823 K; Ag-Fe-Mo 13 starred and excluded
+  - table: '3'
+    published_page: 556
+    pdf_page_index: 5
+    completeness: full
+  - table: '4'
+    published_page: 557
+    pdf_page_index: 6
+    completeness: full
+    note: a_Fe measured; a_Mo Gibbs-Duhem. Printed decimal places uneven, transcribed as printed.
+  - table: '5'
+    published_page: 558
+    pdf_page_index: 7
+    completeness: full
+    note: this-study 90.1 kcal row T_hi has an ink blot; body prints 1873 K
+  class_ledger:
+    measured:
+    - ichise_1982_kems_geometry_and_calibration
+    - ichise_1982_table1_lambda
+    - ichise_1982_table2_a_Fe_1823K
+    - ichise_1982_table5_heats
+    - ichise_1982_table3_phase_boundaries
+    - ichise_1982_fig1_ion_intensity_A4_figure_only
+    - ichise_1982_fig2_low_Mo_procedure_figure_only
+    - ichise_1982_fig3_Ag_standard_procedure_figure_only
+    - ichise_1982_fig4_activities_figure_only
+    model_derived:
+    - ichise_1982_table4_partial_molar_1823K
+    - ichise_1982_infinite_dilution_gamma
+    - ichise_1982_interaction_parameters_liquid
+    - ichise_1982_deltaG_henrian_1wt_pct
+    - ichise_1982_fig5_ln_gamma_Fe_figure_only
+    - ichise_1982_fig6_error_estimate_figure_only
+    quoted_measurement:
+    - ichise_1982_table5_heats
+    quoted_unattributed:
+    - ichise_1982_quoted_Mo_psat
+    figure_only:
+    - ichise_1982_fig1_ion_intensity_A4_figure_only
+    - ichise_1982_fig2_low_Mo_procedure_figure_only
+    - ichise_1982_fig3_Ag_standard_procedure_figure_only
+    - ichise_1982_fig4_activities_figure_only
+    - ichise_1982_fig5_ln_gamma_Fe_figure_only
+    - ichise_1982_fig6_error_estimate_figure_only
+  refused:
+  - what: numeric a_Fe/a_Mo off Fig. 4 axes and log(IT) points off Figs 2-3
+    why: figure_only; Table 2 already carries tabulated a_Fe
+  - what: orifice area, Clausing factor, melt free-surface area
+    why: only orifice diameter 0.5 mm and crucible ID 9 mm printed; area not invented
+  - what: ionizing electron energy and chamber pressure
+    why: unstated
+  - what: a_Fe inside the sigma single-phase field
+    why: authors state no measurements were carried out; linear change assumed (eq. 14), recorded as model_derived
+      in Table 4 sigma rows
+  primary_sources_cited:
+  - ref: 1
+    as_printed: 'S. Nobori, K. Saito, Y. Iguchi and T. Fuwa: Tetsu-to-Hagane, 62 (1976), 558.'
+  - ref: 2
+    as_printed: 'E. S. Filippov and S. I. Filippov: Izv. VUZov, Cher. Met., (1967), No. 1, 9.'
+  - ref: 3
+    as_printed: 'R. B. Reese, R. A. Rapp and G. R. St. Pierre: Trans. Met. Soc. AIME, 242 (1968), 1719.'
+  - ref: 4
+    as_printed: 'R. W. Jones, F. E. Stafford and D. H. Whitemore: Met. Trans., 1 (1970), 403.'
+  - ref: 5
+    as_printed: 'J. V. Hackworth, M. Hoch and H. L. Gegel: Met. Trans., 2 (1971), 1799.'
+  - ref: 6
+    as_printed: 'J. Berkowitz and W. A. Chupka: Ann. N.Y. Acad. Sci., 79 (1960), 1073.'
+  - ref: 7
+    as_printed: 'G. R. Belton and R. J. Fruehan: J. Phys. Chem., 71 (1967), 1403.'
+  - ref: 8
+    as_printed: 'T. Saito, Y. Shiraishi and M. Ismail: Proc. 4th Int''l. Conf. Vac. Met., ISIJ, (1974),
+      39.'
+  - ref: 9
+    as_printed: 'E. Ichise, K. Kitao and T. Mori: Tetsu-to-Hagane, 60 (1974), 2119.'
+  - ref: 10
+    as_printed: 'E. Ichise, T. Yamauchi and T. Mori: Tetsu-to-Hagane, 63 (1977), 417.'
+  - ref: 11
+    as_printed: 'R. Hultgren, D. D. Desai, D. T. Hawkins, M. Gleiser, K. K. Kelley and D. D. Wagman: Selected
+      Values of the Thermodynamic Properties of the Elements, ASM, (1973), 186 & 313.'
+  - ref: 12
+    as_printed: Metals Handbook, 8th ed., ASM, 8 (1973), 303.
+  - ref: 13
+    as_printed: 'Y. Ueshima, E. Ichise and T. Mori: Tetsu-to-Hagane, 65 (1979), S684.'
+  - ref: 14
+    as_printed: 'A. N. Nesmeyanov and G. Trapp: Zhur. Fiz. Khim., 39 (1965), 356.'
+  - ref: 15
+    as_printed: 'A. Morooka and T. Mori: private communication.'
+  - ref: 16
+    as_printed: 'S. W. Gilby and G. R. St. Pierre: Trans. Met. Soc. AIME, 245 (1969), 1749.'
+  - ref: 17
+    as_printed: 'E. Kato and T. Furukawa: Trans. Casting Research Laboratory, Waseda Univ., (1973), No.
+      27, 97.'
+  - ref: 18
+    as_printed: 'C. Boulanger: Compt. Rend., 241 (1955), 1133.'
+  - ref: 19
+    as_printed: 'J. R. Pattison and P. W. Willows: JISI, 183 (1956), 390.'
+  - ref: 20
+    as_printed: 'W. A. Dench and O. Kubaschewski: JISI, 201 (1963), 140.'
+  - ref: 21
+    as_printed: 'T. H. Schofield and A. E. Bacon: J. Inst. Metals, 82 (1953), 167.'
