@@ -30,8 +30,10 @@ from simulator.diagnostic_helpers.species_rail import (
 from simulator.diagnostic_helpers.species_rail_differential import (
     AL_MELTING_K,
     CHANNEL_CEA_VS_ELLINGHAM,
+    CHANNEL_ELLINGHAM,
     CHANNEL_NASA_CEA,
     CHANNEL_VAPOUR_RAIL_PSAT,
+    LEDGER_PATH,
     FINDING_ANTOINE_EXTRAPOLATED_BEYOND_FIT,
     FINDING_CONDENSED_ROW_PAST_TRANSITION,
     JANAF_STANDARD_PRESSURE_PA,
@@ -60,6 +62,7 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     ellingham_line_product_oxide,
     ellingham_line_product_phase_kind,
     ellingham_oxide_stoichiometry_for_formula,
+    live_ellingham_ledger_disagreements,
     oxide_identity_mismatch_applies,
     engine_cea_delta_fG_kJ_mol,
     kcal_per_mol_to_kJ_per_mol,
@@ -521,6 +524,122 @@ def test_pilot_ledger_is_byte_identical_after_write(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="gibbs-battery pilot ledger"):
         write_ledger(GIBBS_PILOT_LEDGER_PATH, points=[])
     assert GIBBS_PILOT_LEDGER_PATH.read_bytes() == before_bytes
+
+
+def _fe2o3_ellingham_fixture() -> KeyedTablePoint:
+    return KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Fe-030",
+        formula="Fe2O3",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=1500.0,
+        delta_fG_kJ_mol=-438.347,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+
+
+def _feo_ellingham_fixture() -> KeyedTablePoint:
+    return KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Fe-018",
+        formula="FeO",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=1500.0,
+        delta_fG_kJ_mol=-175.415,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+
+
+def _committed_ellingham_rows(*observation_ids: str) -> list[dict]:
+    """Collect ellingham ledger mappings for named observation_ids without a full YAML load."""
+
+    wanted = set(observation_ids)
+    rows: list[dict] = []
+    current: dict[str, object] = {}
+    in_points = False
+    for raw in LEDGER_PATH.read_text(encoding="utf-8").splitlines():
+        line = raw.rstrip()
+        if line == "points:":
+            in_points = True
+            continue
+        if not in_points:
+            continue
+        if line.startswith("- key:"):
+            if (
+                current.get("engine_channel") == CHANNEL_ELLINGHAM
+                and str(current.get("observation_id") or "") in wanted
+            ):
+                rows.append(current)
+            current = {}
+            continue
+        if ": " not in line or not line.startswith("  "):
+            continue
+        key, value = line.strip().split(": ", 1)
+        if key in {
+            "observation_id",
+            "species",
+            "engine_channel",
+            "compilation_id",
+            "status",
+            "skip_reason",
+            "temperature_K",
+        }:
+            if value == "null":
+                current[key] = None
+            elif key == "temperature_K":
+                current[key] = float(value)
+            else:
+                current[key] = value.strip("'\"")
+    if (
+        current.get("engine_channel") == CHANNEL_ELLINGHAM
+        and str(current.get("observation_id") or "") in wanted
+    ):
+        rows.append(current)
+    return rows
+
+
+def test_stale_scored_fe2o3_ledger_is_detected() -> None:
+    """M16: a committed Fe2O3 Ellingham match is stale against the live refusal."""
+
+    fixture = _fe2o3_ellingham_fixture()
+    live = score_ellingham_point(fixture)
+    assert live is not None
+    assert live.status == "typed-refusal"
+    mutated = [
+        {
+            "compilation_id": "janaf",
+            "observation_id": "Fe-030",
+            "species": "Fe2O3",
+            "engine_channel": CHANNEL_ELLINGHAM,
+            "temperature_K": 1500.0,
+            "status": "match",
+            "skip_reason": None,
+            "residual_kJ_mol": 0.0,
+            "engine_kJ_mol": -100.0,
+        }
+    ]
+    disagreements = live_ellingham_ledger_disagreements(mutated, [fixture])
+    assert disagreements
+
+
+def test_committed_ledger_fe2o3_and_feo_match_live_scorer() -> None:
+    """M16 control: committed Fe2O3 refusal and FeO residual still match live."""
+
+    fe2o3 = _fe2o3_ellingham_fixture()
+    feo = _feo_ellingham_fixture()
+    live_feo = score_ellingham_point(feo)
+    assert live_feo is not None
+    assert live_feo.status in {"match", "mismatch"}
+    assert live_feo.skip_reason is None
+    rows = _committed_ellingham_rows("Fe-030", "Fe-018")
+    disagreements = live_ellingham_ledger_disagreements(rows, [fe2o3, feo])
+    assert disagreements == []
 
 
 def _major_score(

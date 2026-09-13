@@ -2156,6 +2156,60 @@ def ledger_document(points: Sequence[ScoredRailPoint]) -> dict[str, Any]:
     }
 
 
+def live_ellingham_ledger_disagreements(
+    ledger_points: Sequence[Mapping[str, Any]],
+    fixtures: Sequence[KeyedTablePoint],
+) -> list[str]:
+    """Ellingham ledger rows whose status/skip_reason disagree with the live scorer.
+
+    Premise: this ledger is owned with its scorer (M16). A committed Fe2O3
+    Ellingham row that is scored while score_ellingham_point refuses the same
+    identity is stale. Matching is by compilation, observation_id, species,
+    and ellingham channel; scored fixtures also require temperature_K.
+    Algebra: disagreement iff status differs or skip_reason differs.
+    Unit check: returns text descriptions, never a residual or a new field.
+    Sanity: live Fe2O3 refusal vs a mutated match row is a disagreement;
+    live FeO scored vs a committed scored FeO row is not.
+    """
+
+    disagreements: list[str] = []
+    for fixture in fixtures:
+        live = score_ellingham_point(fixture)
+        if live is None:
+            continue
+        compared = 0
+        for row in ledger_points:
+            if str(row.get("engine_channel") or "") != CHANNEL_ELLINGHAM:
+                continue
+            compilation = str(
+                row.get("compilation_id") or row.get("source_id") or ""
+            )
+            if compilation != fixture.compilation_id:
+                continue
+            if str(row.get("observation_id") or "") != fixture.record_id:
+                continue
+            if str(row.get("species") or "") != fixture.formula:
+                continue
+            if live.status in {"match", "mismatch"}:
+                row_T = row.get("temperature_K")
+                if row_T is None or abs(float(row_T) - fixture.T_K) > 1e-6:
+                    continue
+            compared += 1
+            row_skip = row.get("skip_reason") or None
+            if row.get("status") != live.status or row_skip != live.skip_reason:
+                disagreements.append(
+                    f"{fixture.record_id} {fixture.formula} ellingham "
+                    f"ledger status={row.get('status')!r} skip={row_skip!r} "
+                    f"live status={live.status!r} skip={live.skip_reason!r}"
+                )
+        if compared == 0:
+            disagreements.append(
+                f"missing ellingham ledger row for "
+                f"{fixture.compilation_id}::{fixture.record_id} {fixture.formula}"
+            )
+    return disagreements
+
+
 def write_ledger(
     path: Path | None = None,
     points: Sequence[ScoredRailPoint] | None = None,
