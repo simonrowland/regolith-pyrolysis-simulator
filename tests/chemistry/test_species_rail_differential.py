@@ -15,7 +15,9 @@ from simulator.diagnostic_helpers.gibbs_battery import (
     R_KJ_PER_MOL_K,
     LN10,
     RT_LN10_298_15_KJ,
+    TYPED_REFUSAL_PREFIX,
 )
+from simulator.chemistry.ellingham_thermo import ellingham_fit_range_K
 from simulator.diagnostic_helpers.species_rail import (
     MAJOR_MIN_FEEDSTOCKS,
     MINOR_MIN_FEEDSTOCKS,
@@ -25,9 +27,11 @@ from simulator.diagnostic_helpers.species_rail import (
     derive_species_rail,
 )
 from simulator.diagnostic_helpers.species_rail_differential import (
+    CHANNEL_CEA_VS_ELLINGHAM,
     CHANNEL_NASA_CEA,
     ENVELOPE_BANDS,
     PHASE_GAS,
+    PHASE_LIQUID,
     PHASE_PROSE,
     PHASE_SOLID,
     TEMPERATURE_BANDS,
@@ -42,6 +46,7 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     render_report_markdown,
     resolve_cea_species,
     score_cea_point,
+    score_channel_vs_channel,
     score_ellingham_point,
     table_self_check_residual,
     temperature_band_for,
@@ -309,3 +314,112 @@ def test_headline_residual_tables_are_per_band_envelope_first() -> None:
     )
     assert envelope_pos < plasma_pos < full_pos
     assert "| Si3 | 6000.0 |" in markdown[full_pos:]
+
+
+def test_ellingham_outside_species_fit_range_is_typed_refusal() -> None:
+    low, high = ellingham_fit_range_K("Mg")
+    assert (low, high) == (1100.0, 2600.0)
+    outside = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Mg-008",
+        formula="MgO",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=2700.0,
+        delta_fG_kJ_mol=-400.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    score = score_ellingham_point(outside)
+    assert score is not None
+    assert score.status == "typed-refusal"
+    assert score.residual_kJ_mol is None
+    assert score.skip_reason is not None
+    assert score.skip_reason.startswith(
+        f"{TYPED_REFUSAL_PREFIX}engine_channel_out_of_range:"
+    )
+    assert f"{low:g}-{high:g}K" in score.skip_reason
+    cea = score_cea_point(outside)
+    assert score_channel_vs_channel(outside, cea, score) is None
+
+    inside = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Mg-008",
+        formula="MgO",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=1100.0,
+        delta_fG_kJ_mol=-481.399,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    inside_score = score_ellingham_point(inside)
+    assert inside_score is not None
+    assert inside_score.status == "match"
+    assert inside_score.residual_kJ_mol == pytest.approx(0.0, abs=0.05)
+
+
+def test_ellingham_primary_refit_to_2600k_stays_scored() -> None:
+    """Na ellingham_fit_range_K is (1100, 2600); 2500 K is in-range."""
+
+    low, high = ellingham_fit_range_K("Na")
+    assert (low, high) == (1100.0, 2600.0)
+    hot = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Na-014",
+        formula="Na2O",
+        phase="l",
+        phase_kind=PHASE_LIQUID,
+        T_K=2500.0,
+        delta_fG_kJ_mol=-50.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    score = score_ellingham_point(hot)
+    assert score is not None
+    assert score.status in {"match", "mismatch"}
+    assert score.skip_reason is None
+
+
+def test_channel_vs_channel_headline_is_legacy_fit_window() -> None:
+    def _vs(species: str, T_K: float, residual: float) -> ScoredRailPoint:
+        return ScoredRailPoint(
+            score=GibbsPointScore(
+                key=f"janaf::{species}:T={T_K}::{CHANNEL_CEA_VS_ELLINGHAM}",
+                source_id="janaf",
+                observation_id=species,
+                species=species,
+                provenance_class="independent_tabulation",
+                comparison_quantity="delta_fG_kJ_per_mol_O2",
+                temperature_K=T_K,
+                table_kJ_mol=0.0,
+                engine_kJ_mol=-residual,
+                residual_kJ_mol=residual,
+                residual_log10K=None,
+                band_kJ_mol=PIN_BAND_KJ_MOL,
+                status="mismatch",
+                finding_class="channel_disagreement",
+                engine_channel=CHANNEL_CEA_VS_ELLINGHAM,
+                cea_key=None,
+                skip_reason=None,
+            ),
+            tier=TIER_MAJOR,
+            compilation_id="janaf",
+        )
+
+    report = build_report(
+        [
+            _vs("Na2O", 1600.0, -120.7),
+            _vs("Na2O", 2300.0, -313.4),
+            _vs("MgO", 1100.0, -5.0),
+        ]
+    )
+    headline_T = [row["temperature_K"] for row in report["channel_vs_channel"]]
+    assert headline_T == [1600.0, 1100.0]
+    species_fit_T = [
+        row["temperature_K"] for row in report["channel_vs_channel_species_fit"]
+    ]
+    assert species_fit_T == [2300.0, 1600.0, 1100.0]

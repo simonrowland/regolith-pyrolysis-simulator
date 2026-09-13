@@ -849,6 +849,11 @@ def score_ellingham_point(point: KeyedTablePoint) -> GibbsPointScore | None:
             table_kJ_mol=point.delta_fG_kJ_mol,
             note=point.note,
         )
+    # Certified band is per-species ellingham_fit_range_K, not the legacy
+    # ELLINGHAM_FIT_RANGE_K = (1100, 1700) constant. Na/Mg/Fe/Ca primary-refit
+    # segments run to 2600 K; a 2000-2600 K point is in-range for those metals
+    # and stays a residual, not a refusal. Same skip token as the CEA channel:
+    # engine_channel_out_of_range:<low>-<high>K.
     low, high = ellingham_fit_range_K(metal)
     if not (low <= point.T_K <= high):
         return _refusal_score(
@@ -1372,14 +1377,41 @@ def _refusal_breakdown(points: Sequence[ScoredRailPoint]) -> dict[str, int]:
     return dict(sorted(reasons.items(), key=lambda kv: (-kv[1], kv[0])))
 
 
+def _oxide_in_ellingham_species_range(formula: str, T_K: float | None) -> bool:
+    if T_K is None:
+        return False
+    stoich = OXIDE_TO_METAL.get(formula)
+    if stoich is None:
+        return False
+    metal = stoich[0]
+    if metal not in ELLINGHAM_FIT_SEGMENTS:
+        return False
+    low, high = ellingham_fit_range_K(metal)
+    return low <= float(T_K) <= high
+
+
+def _in_legacy_ellingham_fit_window(T_K: float | None) -> bool:
+    if T_K is None:
+        return False
+    low, high = ELLINGHAM_FIT_RANGE_K
+    return low <= float(T_K) <= high
+
+
 def _channel_vs_channel_table(
     points: Sequence[ScoredRailPoint],
+    *,
+    legacy_fit_window: bool = False,
 ) -> list[dict[str, Any]]:
     rows = []
     for point in points:
         if point.score.engine_channel != CHANNEL_CEA_VS_ELLINGHAM:
             continue
         if point.score.status not in {"match", "mismatch"}:
+            continue
+        T = point.score.temperature_K
+        if not _oxide_in_ellingham_species_range(point.score.species, T):
+            continue
+        if legacy_fit_window and not _in_legacy_ellingham_fit_window(T):
             continue
         residual = point.score.residual_kJ_mol
         log10 = point.score.residual_log10K
@@ -1431,6 +1463,7 @@ def _self_check_failures(points: Sequence[ScoredRailPoint]) -> list[dict[str, An
 
 def build_report(points: Sequence[ScoredRailPoint]) -> dict[str, Any]:
     vs = _channel_vs_channel_table(points)
+    vs_legacy = _channel_vs_channel_table(points, legacy_fit_window=True)
     return {
         "schema_version": 1,
         "generated_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -1444,8 +1477,10 @@ def build_report(points: Sequence[ScoredRailPoint]) -> dict[str, Any]:
         "top20_major_residual_by_band": _top20_major_by_band(points),
         "top20_major_residual": _top20_major(points),
         "typed_refusal_breakdown": _refusal_breakdown(points),
-        "channel_vs_channel": vs[:50],
-        "channel_vs_channel_n": len(vs),
+        "channel_vs_channel": vs_legacy[:50],
+        "channel_vs_channel_n": len(vs_legacy),
+        "channel_vs_channel_species_fit": vs[:50],
+        "channel_vs_channel_species_fit_n": len(vs),
         "table_self_check_failures": _self_check_failures(points),
         "note": (
             "divergence_label is a descriptive magnitude band only; "
@@ -1561,6 +1596,14 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
             "",
             "## Channel-vs-channel (CEA vs Ellingham, oxides)",
             "",
+            (
+                "Headline table is inside `ELLINGHAM_FIT_RANGE_K` = (1100, 1700) K. "
+                "Per-species `ellingham_fit_range_K` for Na/Mg/Fe/Ca extends to 2600 K; "
+                "those in-range points stay scored (not refusals) and are listed below."
+            ),
+            "",
+            "### Inside the (1100, 1700) K Ellingham fit window",
+            "",
             "| species | T_K | CEA kJ/mol O2 | Ellingham kJ/mol O2 | residual | label |",
             "|---|---:|---:|---:|---:|---|",
         ]
@@ -1569,6 +1612,29 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
     if not vs:
         lines.append("| — | — | — | — | — | no_matched_points |")
     for row in vs[:20]:
+        lines.append(
+            "| {species} | {T} | {cea:.4g} | {ell:.4g} | {res:.4g} | `{label}` |".format(
+                species=row["species"],
+                T=row["temperature_K"],
+                cea=float(row["cea_kJ_per_mol_O2"]),
+                ell=float(row["ellingham_kJ_per_mol_O2"]),
+                res=float(row["residual_kJ_per_mol_O2"]),
+                label=row["divergence_label"],
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "### Inside per-species `ellingham_fit_range_K` (includes 2000-2600 K primary-refit)",
+            "",
+            "| species | T_K | CEA kJ/mol O2 | Ellingham kJ/mol O2 | residual | label |",
+            "|---|---:|---:|---:|---:|---|",
+        ]
+    )
+    vs_all = report["channel_vs_channel_species_fit"]
+    if not vs_all:
+        lines.append("| — | — | — | — | — | no_matched_points |")
+    for row in vs_all[:20]:
         lines.append(
             "| {species} | {T} | {cea:.4g} | {ell:.4g} | {res:.4g} | `{label}` |".format(
                 species=row["species"],
