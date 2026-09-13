@@ -22,10 +22,11 @@ Ambiguity resolutions:
   not admitted, evidence is not measured_*, identity_equal is not
   equal, or a vapour-equilibrium residual carries a blocking pressure
   qualification (floor_inversion / fallback / pressure_provenance_unknown
-  on p_sat, p_partial, or p_reference). Diagnostic numeric residuals with
-  those notices remain valid at score_eligible=False (M02). Full scoring
-  policy (lineage independence, live clamps) is chunk 2; this is the
-  schema-level floor.
+  on p_sat, p_partial, or p_reference). Independent scoring requires
+  complete resolved observation/table lineage with no overlap; incomplete
+  or unresolvable sources imply unknown, never independence; same work
+  alone is not circular. Diagnostic numeric residuals with those notices
+  remain valid at score_eligible=False (M02). Live clamps are chunk 2.
 - Compilation pairs with legitimate ``not_applicable`` axes are valid
   records. The validator must not refuse them.
 """
@@ -37,6 +38,7 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    AssetRole,
     Authority,
     EvidenceClass,
     ExecutionState,
@@ -777,24 +779,89 @@ def validate_observation(
     return issues
 
 
-def _lineage_tokens(
-    observation: Observation,
-    experiments: Mapping[str, Experiment],
+def _table_ids(works: Mapping[str, Work] | None) -> set[str]:
+    ids: set[str] = set()
+    if works is None:
+        return ids
+    for work in works.values():
+        for asset in work.source_files.files:
+            if asset.role is AssetRole.TABLE_CSV:
+                ids.add(asset.asset_id)
+    return ids
+
+
+def _work_aliases(works: Mapping[str, Work] | None) -> set[str]:
+    aliases: set[str] = set()
+    if works is None:
+        return aliases
+    for work in works.values():
+        aliases.add(work.work_id)
+        aliases.update(work.source_ids)
+        aliases.update(asset.asset_id for asset in work.source_files.files)
+    return aliases
+
+
+def _observation_lineage(
+    observation_id: str,
+    observations: Mapping[str, Observation],
+    table_ids: set[str],
+    seen: set[str] | None = None,
+) -> set[str] | None:
+    """Observation/table ids in derived_from ancestry. None = unresolvable."""
+
+    if seen is None:
+        seen = set()
+    if observation_id in seen:
+        return set()
+    if observation_id in table_ids:
+        return {observation_id}
+    obs = observations.get(observation_id)
+    if obs is None:
+        return None
+    seen.add(observation_id)
+    ids: set[str] = {observation_id}
+    for parent in obs.derived_from or ():
+        nested = _observation_lineage(parent, observations, table_ids, seen)
+        if nested is None:
+            return None
+        ids |= nested
+    if obs.derivation is not None:
+        for inp in obs.derivation.inputs:
+            if inp in observations or inp in table_ids:
+                nested = _observation_lineage(inp, observations, table_ids, seen)
+                if nested is None:
+                    return None
+                ids |= nested
+    return ids
+
+
+def _resolve_coefficient_sources(
+    sources: Sequence[str],
+    observations: Mapping[str, Observation],
     works: Mapping[str, Work] | None,
-) -> set[str]:
-    tokens: set[str] = set()
-    if observation.source_id:
-        tokens.add(observation.source_id)
-    experiment = experiments.get(observation.experiment_id)
-    if experiment is None:
-        return tokens
-    if experiment.work_id:
-        tokens.add(experiment.work_id)
-        work = None if works is None else works.get(experiment.work_id)
-        if work is not None:
-            tokens.update(work.source_ids)
-            tokens.update(asset.asset_id for asset in work.source_files.files)
-    return tokens
+) -> set[str] | None:
+    """Resolve coefficient_sources to observation/table ids.
+
+    Work/source/file aliases are not observation/table overlap. External
+    catalog tokens with complete lineage are empty (not unknown).
+    """
+
+    table_ids = _table_ids(works)
+    aliases = _work_aliases(works)
+    resolved: set[str] = set()
+    for src in sources:
+        if src in observations:
+            nested = _observation_lineage(src, observations, table_ids)
+            if nested is None:
+                return None
+            resolved |= nested
+        elif src in table_ids:
+            resolved.add(src)
+        elif src in aliases:
+            continue
+        else:
+            continue
+    return resolved
 
 
 def validate_residual(
@@ -997,18 +1064,40 @@ def validate_residual(
                     residual.source_relation is SourceRelation.INDEPENDENT
                     and candidate.engine is not None
                 ):
-                    overlap = _lineage_tokens(reference, experiments, works) & set(
-                        candidate.engine.coefficient_sources
-                    )
-                    if overlap:
+                    engine = candidate.engine
+                    if not engine.lineage_complete:
                         issues.append(
                             _issue(
                                 f"{path}.source_relation",
-                                RefusalReason.CONDITIONAL_FIELD,
-                                "independent score_eligible requires coefficient_sources "
-                                "disjoint from the reference work/source ids (same_input)",
+                                RefusalReason.LINEAGE_UNKNOWN,
+                                "incomplete coefficient sources imply unknown, never independence",
                             )
                         )
+                    else:
+                        table_ids = _table_ids(works)
+                        ref_ids = _observation_lineage(
+                            reference.observation_id, observations, table_ids
+                        )
+                        cand_ids = _resolve_coefficient_sources(
+                            engine.coefficient_sources, observations, works
+                        )
+                        if ref_ids is None or cand_ids is None:
+                            issues.append(
+                                _issue(
+                                    f"{path}.source_relation",
+                                    RefusalReason.LINEAGE_UNKNOWN,
+                                    "unresolvable lineage source implies unknown, never independence",
+                                )
+                            )
+                        elif ref_ids & cand_ids:
+                            issues.append(
+                                _issue(
+                                    f"{path}.source_relation",
+                                    RefusalReason.CONDITIONAL_FIELD,
+                                    "independent score_eligible requires coefficient_sources "
+                                    "disjoint from the reference observation/table lineage",
+                                )
+                            )
             quantity = None
             if isinstance(reference.identity, Identity):
                 quantity = reference.identity.quantity

@@ -831,7 +831,7 @@ def test_m15_growth_is_not_a_census_gate_and_roles_are_not_counts() -> None:
     own_input_eng = replace(
         eng,
         observation_id="eng-m15-own-input",
-        engine=replace(eng.engine, coefficient_sources=("janaf-4th",)),
+        engine=replace(eng.engine, coefficient_sources=(rows[1].observation_id,)),
     )
     relabelled = F.residual(
         "m15-relabelled",
@@ -843,7 +843,7 @@ def test_m15_growth_is_not_a_census_gate_and_roles_are_not_counts() -> None:
     )
     role_swap = validate_corpus([w], [exp], rows + [own_input_eng], [relabelled])
     assert not role_swap.ok
-    assert any("coefficient_sources" in i.detail for i in role_swap.issues)
+    assert any("coefficient_sources" in i.detail or "lineage" in i.detail for i in role_swap.issues)
     labelled_same = F.residual(
         "m15-same-input-ok",
         rows[1].observation_id,
@@ -853,6 +853,104 @@ def test_m15_growth_is_not_a_census_gate_and_roles_are_not_counts() -> None:
         score_eligible=False,
     )
     assert validate_corpus([w], [exp], rows + [own_input_eng], [labelled_same]).ok
+    same_work = replace(
+        eng,
+        observation_id="eng-m15-same-work",
+        engine=replace(eng.engine, coefficient_sources=("janaf-4th",)),
+    )
+    same_work_res = F.residual(
+        "m15-same-work-ok",
+        rows[1].observation_id,
+        candidate=same_work.observation_id,
+        status=ResidualStatus.MATCH,
+        source_relation=SourceRelation.INDEPENDENT,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], rows + [same_work], [same_work_res]).ok
+
+
+def test_r02_lineage_overlap_is_observation_table_not_work_or_asset() -> None:
+    """Independence is resolved observation/table lineage, not work/source/asset sets.
+
+    Codex F02: coefficient_sources=(reference.observation_id,) and
+    lineage_complete=False cannot score; a different point in the same work can.
+    """
+
+    from dataclasses import replace
+
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ref = F.observation(
+        "r02-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r02-cand", exp.experiment_id, ident, Decimal("0"))
+    scored = F.residual(
+        "r02-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, cand], [scored]).ok
+    circular = replace(
+        cand,
+        observation_id="r02-circular",
+        engine=replace(cand.engine, coefficient_sources=(ref.observation_id,)),
+    )
+    circular_res = F.residual(
+        "r02-circular",
+        ref.observation_id,
+        candidate=circular.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    circular_report = validate_corpus([w], [exp], [ref, circular], [circular_res])
+    assert not circular_report.ok
+    incomplete = replace(
+        cand,
+        observation_id="r02-incomplete",
+        engine=replace(cand.engine, lineage_complete=False),
+    )
+    incomplete_res = F.residual(
+        "r02-incomplete",
+        ref.observation_id,
+        candidate=incomplete.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    incomplete_report = validate_corpus([w], [exp], [ref, incomplete], [incomplete_res])
+    assert not incomplete_report.ok
+    same_work = replace(
+        cand,
+        observation_id="r02-same-work",
+        engine=replace(cand.engine, coefficient_sources=(w.work_id,)),
+    )
+    same_work_res = F.residual(
+        "r02-same-work",
+        ref.observation_id,
+        candidate=same_work.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, same_work], [same_work_res]).ok
+    asset = replace(
+        cand,
+        observation_id="r02-asset",
+        engine=replace(cand.engine, coefficient_sources=("pdf-1",)),
+    )
+    asset_res = F.residual(
+        "r02-asset",
+        ref.observation_id,
+        candidate=asset.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, asset], [asset_res]).ok
 
 
 def test_m16_refused_residual_cannot_carry_a_numeric_score() -> None:
