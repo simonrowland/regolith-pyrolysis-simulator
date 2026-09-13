@@ -358,7 +358,7 @@ def test_m04_residual_notice_union_survives_endpoint_ancestry() -> None:
 
     floor = F.floor_notice("provider")
     later = Notice(
-        kind=NoticeKind.EXTRAPOLATION,
+        kind=NoticeKind.DERIVATION_USES_COMPILATION,
         affected_quantities=(Quantity.P_SAT,),
         reason="later clean timestep still carries inherited floor",
         origin="carrier:wall",
@@ -1535,6 +1535,19 @@ def test_r03_union_fingerprint_honours_from_to_dropped_and_fraction() -> None:
         dropped_mass_fraction=Decimal("0.02"),
     )
     assert union_notices((projected_a,), (projected_b,)) == (projected_a, projected_b)
+
+
+def test_r04_domain_extrapolation_projection_are_unknown_kinds() -> None:
+    """Closed policy tokens only; aliases must not bypass certification policy."""
+
+    with pytest.raises(ValueError):
+        NoticeKind("domain")
+    with pytest.raises(ValueError):
+        NoticeKind("extrapolation")
+    with pytest.raises(ValueError):
+        NoticeKind("projection")
+    assert NoticeKind.OUT_OF_CERTIFIED_BAND.value == "out_of_certified_band"
+    assert NoticeKind.COMPOSITION_PROJECTED.value == "composition_projected"
 
 
 def test_r03_wall_identity_compares_area_and_location() -> None:

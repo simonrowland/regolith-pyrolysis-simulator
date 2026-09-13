@@ -137,9 +137,6 @@ class NoticeKind(StrEnum):
     DERIVATION_USES_COMPILATION = "derivation_uses_compilation"
     COMPOSITION_PROJECTED = "composition_projected"
     PRESSURE_PROVENANCE_UNKNOWN = "pressure_provenance_unknown"
-    EXTRAPOLATION = "extrapolation"
-    DOMAIN = "domain"
-    PROJECTION = "projection"
 
 
 class ReferenceStateConvention(StrEnum):

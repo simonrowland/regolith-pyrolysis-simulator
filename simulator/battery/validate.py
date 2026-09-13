@@ -436,12 +436,12 @@ def _check_notice(path: str, notice: Notice, issues: list[ValidationIssue]) -> N
                     "fallback notice requires from/to",
                 )
             )
-    if notice.kind in {NoticeKind.DOMAIN, NoticeKind.OUT_OF_CERTIFIED_BAND, NoticeKind.OUT_OF_GAMMA_DOMAIN}:
+    if notice.kind in {NoticeKind.OUT_OF_CERTIFIED_BAND, NoticeKind.OUT_OF_GAMMA_DOMAIN}:
         if not notice.band:
             issues.append(
                 _issue(path, RefusalReason.CONDITIONAL_FIELD, "domain notice requires band")
             )
-    if notice.kind in {NoticeKind.PROJECTION, NoticeKind.COMPOSITION_PROJECTED}:
+    if notice.kind is NoticeKind.COMPOSITION_PROJECTED:
         if not notice.dropped:
             issues.append(
                 _issue(
