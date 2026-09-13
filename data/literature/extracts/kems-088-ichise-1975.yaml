@@ -1,0 +1,822 @@
+schema_version: literature_extract.v1
+source_id: kems-088-ichise-1975
+source:
+  citation: Ichise, E., Kitano, K. & Mori, T. (1975), "The Determination of Activity Coefficient of Sulfur
+    in Liquid Iron by Knudsen Cell-mass Spectrometry", Trans. ISIJ 15:115-120, DOI 10.2355/isijinternational1966.15.115
+  doi: 10.2355/isijinternational1966.15.115
+  url: https://doi.org/10.2355/isijinternational1966.15.115
+  year: 1975
+extraction:
+  method: Official J-STAGE OA PDF (raw/kems-088-ichise-1975/kems-088-ichise-1975.pdf). pdftotext -layout
+    is a noisy OCR layer and is not data. Tables 1-3 transcribed from 400 dpi pdftoppm renders of PDF
+    pages 2-4 (published pp. 116-118). Where the decode and the render disagree, the render wins. Table
+    2 ion-intensity ratios kept as measured; Table 3 epsilon/e labelled model_derived from Belton-Fruehan
+    integration of Table 2. Figs 1-10 listed figure-only.
+  date: '2026-09-13'
+  worker: extract-alloys-b1
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.S.observations[ichise_1975_ion_ratio_table2].values.points[0].ln_IFe_over_IS2_1600C
+  value: 4.485
+  locator:
+    table: '2'
+    published_page: 117
+    pdf_page_index: 3
+    note: Table 2 0.31 wt% S, ln(I_Fe+/I_S2+) at 1600 C = 4.485
+- path: species.S.observations[ichise_1975_epsilon_e_table3].values.points[1].e_S_S
+  value: -0.049
+  locator:
+    table: '3'
+    published_page: 118
+    pdf_page_index: 4
+    note: Table 3 e_S^(S) at 1600 C = -0.049
+- species: S
+  observable: activity_coefficient
+  observation_id: ichise_1975_epsilon_e_table3
+  field: e_S_S_temperature_equation
+  value: e_S^(S) = -225/T + 0.0704
+  locator:
+    published_page: 118
+    pdf_page_index: 4
+    equation: '12'
+    note: e_S^(S) = -225/T + 0.0704
+- species: S
+  observable: rate_series
+  observation_id: ichise_1975_kems_geometry_and_calibration
+  field: chamber_voltage_V
+  value: 30.0
+  locator:
+    published_page: 116
+    pdf_page_index: 2
+    note: The chamber voltage was selected as 30 V.
+species:
+  S:
+    observations:
+    - observation_id: ichise_1975_kems_geometry_and_calibration
+      type: rate_series
+      locator:
+        published_page: 116
+        pdf_page_index: 2
+        section: II
+        figure: '2'
+        note: Hitachi RM-6K; alumina cell / Ta holder; ~10 g; chamber voltage 30 V; cell chamber (4-6)e-6
+          Torr
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S_in_alumina_Knudsen_cell
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: Henrian activity coefficient of S; eq (6)
+      regime: kems_effusion
+      units: as published
+      uncertainty:
+        note: 10-15% S decrease during the run; final analyzed S used. 90% CI of e_S^(S) printed on p.
+          119.
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: Hitachi Knudsen cell-mass spectrometer RM-6K
+        chamber_voltage_V: 30.0
+        ion_source_temperature_C: 200.0
+        source_slit_mm: 0.006
+        collector_slit_mm: 0.05
+        resolution_about: 2000.0
+        ions_used:
+          Fe: 56Fe+
+          S2: 64S2+ / 32S2 as printed in procedure; Table 2 uses I+_Fe / I+_S2
+        procedure_ions_as_printed: ion intensities of 56Fe and 32S2 were measured
+        sample_mass_g_as_printed: about 10 g
+        max_T_C_as_printed: 1650.0
+        run_duration_as_printed: about two hours
+        mother_alloy: Fe-23%S
+        S_analysis: Coulomatic S
+        heating: pair of ring filaments; electron-bombardment; cell holder grounded
+        cell_chamber_pressure_Torr:
+        - 4.00e-06
+        - 6.00e-06
+        ion_source_pressure_Torr:
+        - 5.00e-07
+        - 7.00e-07
+        missing_for_motzfeldt:
+        - numeric_orifice_area
+        - clausing_factor
+        - sample_surface_area
+      equipment:
+        cell_material:
+          value: alumina Knudsen cell; tantalum cell holder (Fig. 2)
+          locator:
+            figure: '2'
+            published_page: 116
+            pdf_page_index: 2
+            note: Knudsen cell (Al2O3) and cell holder (Ta); unit mm
+        orifice_area:
+          value:
+            orifice_diameter_mm_as_printed: 0.5
+            as_printed: 0.5 phi on the alumina-cell lid drawing, units mm
+            area: not_computed
+          locator:
+            figure: '2'
+            published_page: 116
+            pdf_page_index: 2
+            note: lid callout 0.5 phi, 1.5 mm lid thickness
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 116
+            pdf_page_index: 2
+            note: Clausing factor not printed
+        sample_surface_area:
+          value: unstated
+          locator:
+            figure: '2'
+            published_page: 116
+            pdf_page_index: 2
+            note: cell inner diameters printed (10 mm height cavity, 14 phi lid); free surface not stated
+        chamber_pressure:
+          value:
+            cell_chamber_Torr:
+            - 4.00e-06
+            - 6.00e-06
+            ion_source_Torr:
+            - 5.00e-07
+            - 7.00e-07
+            as_printed: Operating pressures in the cell chamber and the ion source were (4 to 6) x 10^-6
+              Torr and (5 to 7) x 10^-7 Torr respectively.
+          locator:
+            published_page: 116
+            pdf_page_index: 2
+            section: '4'
+    - observation_id: ichise_1975_table1_pure_iron_composition
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 116
+        pdf_page_index: 2
+        note: Table 1. Chemical compositions of pure iron (%)
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: starting_iron
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: starting metal; wt% as printed
+      regime: kems_effusion
+      units: wt% as printed
+      uncertainty:
+        note: No uncertainty printed on Table 1.
+      values:
+        quantity: starting_metal_chemical_analysis
+        method_class: measured
+        composition_basis: wt_pct
+        C: 0.002
+        Si: 0.005-0.010
+        Mn: <0.01
+        Cu: 0.005-0.01
+        Ni: <0.01
+        Cr: <0.01
+        Ti: <0.005
+        V: <0.001
+        Al: <0.003
+        O: <0.005
+        N: 0.0014
+    - observation_id: ichise_1975_ion_ratio_table2
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 117
+        pdf_page_index: 3
+        note: Table 2. Ion intensity ratio obtained from the lines in Fig. 3
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: ln(I+_Fe / I+_S2) as printed; composition in wt% S
+      regime: kems_effusion
+      units: ln ion-intensity ratio dimensionless; wt% S; tangent of line x 10^3 as printed
+      uncertainty:
+        note: No per-row sigma on Table 2. Values from LS lines through Fig. 3 points.
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        ion_pair: I+(Fe)/I+(S2)
+        composition_basis: wt_pct_S
+        points:
+        - S_wt_pct: 0.31
+          ln_IFe_over_IS2_1550C: 4.029
+          ln_IFe_over_IS2_1600C: 4.485
+          ln_IFe_over_IS2_1650C: 4.917
+          tangent_of_line_times_1e3: -31.12
+        - S_wt_pct: 0.42
+          ln_IFe_over_IS2_1550C: 3.542
+          ln_IFe_over_IS2_1600C: 3.875
+          ln_IFe_over_IS2_1650C: 4.191
+          tangent_of_line_times_1e3: -22.73
+        - S_wt_pct: 0.65
+          ln_IFe_over_IS2_1550C: 2.649
+          ln_IFe_over_IS2_1600C: 2.99
+          ln_IFe_over_IS2_1650C: 3.314
+          tangent_of_line_times_1e3: -23.3
+        - S_wt_pct: 1.01
+          ln_IFe_over_IS2_1550C: 1.9
+          ln_IFe_over_IS2_1600C: 2.242
+          ln_IFe_over_IS2_1650C: 2.565
+          tangent_of_line_times_1e3: -23.33
+        - S_wt_pct: 1.59
+          ln_IFe_over_IS2_1550C: 0.944
+          ln_IFe_over_IS2_1600C: 1.332
+          ln_IFe_over_IS2_1650C: 1.701
+          tangent_of_line_times_1e3: -26.52
+        - S_wt_pct: 2.19
+          ln_IFe_over_IS2_1550C: 0.335
+          ln_IFe_over_IS2_1600C: 0.735
+          ln_IFe_over_IS2_1650C: 1.113
+          tangent_of_line_times_1e3: -27.29
+        - S_wt_pct: 3.37
+          ln_IFe_over_IS2_1550C: -0.032
+          ln_IFe_over_IS2_1600C: 0.31
+          ln_IFe_over_IS2_1650C: 0.635
+          tangent_of_line_times_1e3: -23.41
+        - S_wt_pct: 4.32
+          ln_IFe_over_IS2_1550C: -0.336
+          ln_IFe_over_IS2_1600C: -0.016
+          ln_IFe_over_IS2_1650C: 0.288
+          tangent_of_line_times_1e3: -21.87
+      equipment:
+        cell_material:
+          value: alumina Knudsen cell; tantalum cell holder (Fig. 2)
+          locator:
+            figure: '2'
+            published_page: 116
+            pdf_page_index: 2
+            note: Knudsen cell (Al2O3) and cell holder (Ta); unit mm
+        orifice_area:
+          value:
+            orifice_diameter_mm_as_printed: 0.5
+            as_printed: 0.5 phi on the alumina-cell lid drawing, units mm
+            area: not_computed
+          locator:
+            figure: '2'
+            published_page: 116
+            pdf_page_index: 2
+            note: lid callout 0.5 phi, 1.5 mm lid thickness
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 116
+            pdf_page_index: 2
+            note: Clausing factor not printed
+        sample_surface_area:
+          value: unstated
+          locator:
+            figure: '2'
+            published_page: 116
+            pdf_page_index: 2
+            note: cell inner diameters printed (10 mm height cavity, 14 phi lid); free surface not stated
+        chamber_pressure:
+          value:
+            cell_chamber_Torr:
+            - 4.00e-06
+            - 6.00e-06
+            ion_source_Torr:
+            - 5.00e-07
+            - 7.00e-07
+            as_printed: Operating pressures in the cell chamber and the ion source were (4 to 6) x 10^-6
+              Torr and (5 to 7) x 10^-7 Torr respectively.
+          locator:
+            published_page: 116
+            pdf_page_index: 2
+            section: '4'
+    - observation_id: ichise_1975_epsilon_e_table3
+      type: activity_coefficient
+      locator:
+        table: '3'
+        published_page: 118
+        pdf_page_index: 4
+        note: Table 3. Interaction parameter of sulfur in liquid iron
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: Henrian; epsilon_S^(S) mole-fraction and e_S^(S) wt% interaction parameters
+      regime: kems_effusion
+      units: dimensionless
+      uncertainty:
+        note: '90% confidence intervals of e_S^(S) on p. 119: 1550 C -0.0436 to -0.0688; 1600 C -0.0413
+          to -0.0608; 1650 C -0.0391 to -0.0588. Authors also discuss a possible 10% S-loss bias moving
+          e_S^(S)(1600 C) toward -0.044.'
+      values:
+        quantity: self_interaction_parameter
+        method_class: model_derived
+        model: Belton-Fruehan polymer-aware Gibbs-Duhem (eq 6) of Table 2; epsilon = 1/(8a) (eq 10); e
+          from eq (11)
+        points:
+        - T_C: 1550.0
+          T_K: 1823.15
+          epsilon_S_S: -6.6
+          e_S_S: -0.053
+        - T_C: 1600.0
+          T_K: 1873.15
+          epsilon_S_S: -6.1
+          e_S_S: -0.049
+        - T_C: 1650.0
+          T_K: 1923.15
+          epsilon_S_S: -5.8
+          e_S_S: -0.047
+        e_S_S_temperature_equation: e_S^(S) = -225/T + 0.0704
+        possible_S_loss_bias_e_1600C_range:
+        - -0.049
+        - -0.044
+      equipment:
+        cell_material:
+          value: alumina Knudsen cell; tantalum cell holder (Fig. 2)
+          locator:
+            figure: '2'
+            published_page: 116
+            pdf_page_index: 2
+            note: Knudsen cell (Al2O3) and cell holder (Ta); unit mm
+        orifice_area:
+          value:
+            orifice_diameter_mm_as_printed: 0.5
+            as_printed: 0.5 phi on the alumina-cell lid drawing, units mm
+            area: not_computed
+          locator:
+            figure: '2'
+            published_page: 116
+            pdf_page_index: 2
+            note: lid callout 0.5 phi, 1.5 mm lid thickness
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 116
+            pdf_page_index: 2
+            note: Clausing factor not printed
+        sample_surface_area:
+          value: unstated
+          locator:
+            figure: '2'
+            published_page: 116
+            pdf_page_index: 2
+            note: cell inner diameters printed (10 mm height cavity, 14 phi lid); free surface not stated
+        chamber_pressure:
+          value:
+            cell_chamber_Torr:
+            - 4.00e-06
+            - 6.00e-06
+            ion_source_Torr:
+            - 5.00e-07
+            - 7.00e-07
+            as_printed: Operating pressures in the cell chamber and the ion source were (4 to 6) x 10^-6
+              Torr and (5 to 7) x 10^-7 Torr respectively.
+          locator:
+            published_page: 116
+            pdf_page_index: 2
+            section: '4'
+    - observation_id: ichise_1975_ls_integrand_equations_7_to_9
+      type: activity_coefficient
+      locator:
+        published_page: 117
+        pdf_page_index: 3
+        equation: 7-9
+        note: LS fits of (1-N_S)/(2-N_S) vs ln(I_Fe+ N_S^2 / I_S2+ N_Fe)
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: Belton-Fruehan integrand for S2 vapor
+      regime: kems_effusion
+      units: dimensionless
+      uncertainty:
+        note: 'SD of slope a: 0.00242 (1550 C), 0.00226 (1600 C), 0.00250 (1650 C); ratio of residual
+          SS 0.10 to 0.08.'
+      values:
+        quantity: belton_fruehan_integrand_linear_fit
+        method_class: model_derived
+        model: least-squares lines through this-work Table 2 ion ratios
+        eq7_1550C: (1-N_S)/(2-N_S) = -0.0189 ln(I_Fe+ N_S^2 / I_S2+ N_Fe) + 0.377
+        eq8_1600C: (1-N_S)/(2-N_S) = -0.0206 ln(I_Fe+ N_S^2 / I_S2+ N_Fe) + 0.375
+        eq9_1650C: (1-N_S)/(2-N_S) = -0.0216 ln(I_Fe+ N_S^2 / I_S2+ N_Fe) + 0.376
+    - observation_id: ichise_1975_fig3_ion_ratio_vs_1_over_T_figure_only
+      type: rate_series
+      locator:
+        figure: '3'
+        published_page: 117
+        pdf_page_index: 3
+        note: Fig. 3. Experimental values of the ion current ratio for the Fe-S system
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 3. Experimental values of the ion current ratio for the Fe-S system
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 3. Experimental values of the ion current ratio for the Fe-S system
+        note: ln(I_Fe+/I_S2+) vs 1/T; %S labels 0.31 to 4.32. Numerics in Table 2.
+    - observation_id: ichise_1975_fig4_integration_1550C_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '4'
+        published_page: 117
+        pdf_page_index: 3
+        note: Fig. 4. Integration curve for the Fe-S system at 1550 C
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 4. Integration curve for the Fe-S system at 1550 C
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 4. Integration curve for the Fe-S system at 1550 C
+        note: LS line is eq (7). Not digitised.
+    - observation_id: ichise_1975_fig5_integration_1600C_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '5'
+        published_page: 117
+        pdf_page_index: 3
+        note: Fig. 5. Integration curve for the Fe-S system at 1600 C
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 5. Integration curve for the Fe-S system at 1600 C
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 5. Integration curve for the Fe-S system at 1600 C
+        note: LS line is eq (8). Not digitised.
+    - observation_id: ichise_1975_fig6_integration_1650C_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '6'
+        published_page: 117
+        pdf_page_index: 3
+        note: Fig. 6. Integration curve for the Fe-S system at 1650 C
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 6. Integration curve for the Fe-S system at 1650 C
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 6. Integration curve for the Fe-S system at 1650 C
+        note: LS line is eq (9). Not digitised.
+    - observation_id: ichise_1975_fig7_log_gamma_S_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '7'
+        published_page: 117
+        pdf_page_index: 3
+        note: Fig. 7. Activity coefficient of sulfur in liquid iron
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 7. Activity coefficient of sulfur in liquid iron
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 7. Activity coefficient of sulfur in liquid iron
+        note: log gamma_S vs %S at 1550, 1600, 1650 C. No numeric table. Not digitised.
+    - observation_id: ichise_1975_fig8_pure_iron_figure_only
+      type: psat_series
+      locator:
+        figure: '8'
+        published_page: 118
+        pdf_page_index: 4
+        note: Fig. 8. Experimental results for pure iron
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 8. Experimental results for pure iron
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 8. Experimental results for pure iron
+        note: ln(I+_Fe T) vs 1/T; mp marked. Numeric slope is 82.4 kcal/g-atom.
+    - observation_id: ichise_1975_fig9_holder_heating_figure_only
+      type: rate_series
+      locator:
+        figure: '9'
+        published_page: 118
+        pdf_page_index: 4
+        note: 'Fig. 9. Heating characteristic of the cell holder by a pair of ring filaments (Total emission
+          current: 0.68 A)'
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: 'Fig. 9. Heating characteristic of the cell holder by a pair of ring filaments (Total
+          emission current: 0.68 A)'
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: 'Fig. 9. Heating characteristic of the cell holder by a pair of ring filaments (Total
+          emission current: 0.68 A)'
+        note: T vs (lower-upper) emission current; points A, B, C.
+    - observation_id: ichise_1975_fig10_e_S_comparison_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '10'
+        published_page: 119
+        pdf_page_index: 5
+        note: Fig. 10. Interaction parameters of sulfur in liquid iron
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 10. Interaction parameters of sulfur in liquid iron
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 10. Interaction parameters of sulfur in liquid iron
+        note: This study vs Morris, Sherman, Cordier, Yoshii, Adachi, Yoshida, Banya, Fuwa, Ikada overlays.
+    - observation_id: ichise_1975_fig1_chamber_figure_only
+      type: rate_series
+      locator:
+        figure: '1'
+        published_page: 116
+        pdf_page_index: 2
+        note: Fig. 1. Knudsen cell chamber
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 1. Knudsen cell chamber
+        method_class: method_only
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 1. Knudsen cell chamber
+        note: Schematic of ionization chamber, shutter, ring filament, alumina cell.
+    - observation_id: ichise_1975_fig2_cell_figure_only
+      type: rate_series
+      locator:
+        figure: '2'
+        published_page: 116
+        pdf_page_index: 2
+        note: Fig. 2. Knudsen cell and cell holder
+      T_range_K:
+      - 1823.15
+      - 1923.15
+      phase: liquid_Fe-S
+      condensed_form:
+        state: liquid_Fe_S
+        metastable: false
+        basis: explicit_author
+        note: Fe-S alloys from Fe-23%S mother alloy + pure iron under Ar. Sulfur by Coulomatic S. Final
+          S after the run used for the interaction-parameter calculation (10-15% S decrease observed).
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 2. Knudsen cell and cell holder
+        method_class: method_only
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 2. Knudsen cell and cell holder
+        note: Ta holder and Al2O3 cell dimensions in mm; orifice 0.5 phi.
+  Fe:
+    observations:
+    - observation_id: ichise_1975_fe_heat_of_vaporization_fig8
+      type: gibbs_table
+      locator:
+        figure: '8'
+        published_page: 118
+        pdf_page_index: 4
+        note: ln(I_Fe+ T) vs 1/T for pure iron; slope gives 82.4 kcal/g-atom from 1484 to 1584 C
+      T_range_K:
+      - 1757.15
+      - 1857.15
+      phase: pure_iron
+      condensed_form:
+        state: solid_and_liquid_iron
+        metastable: false
+        basis: explicit_author
+        note: straight line fitted with no inflection at the melting point of iron
+      standard_state: heat of vaporization of iron from Clausius-Clapeyron of I+_Fe T; kcal/g-atom
+      regime: kems_effusion
+      units: kcal/g-atom as printed
+      uncertainty:
+        note: 'Authors: present result is questionable as an absolute value; may measure the apparatus
+          temperature-dependence characteristic. Quoted literature 91.3-93.9 and 64-76 kcal.'
+      values:
+        quantity: heat_of_vaporization
+        method_class: model_derived
+        model: slope of ln(I+_Fe T) vs 1/T (Fig. 8); no mp inflection
+        Delta_Hv_kcal_g_atom: 82.4
+        T_range_C:
+        - 1484.0
+        - 1584.0
+        temperature_correction_point_C_to_melt: 29.0
+        admission_status: figure_only_for_the_ln_IT_series
+        authors_caution: questionable as an absolute value
+deepening:
+  dispatch_id: extract-alloys-b1
+  date: '2026-09-13'
+  quote_convention: English text transcribed with ASCII flattening of epsilon, gamma, and subscripts.
+  measured_rows_covered: 16
+  table_inventory:
+  - table: '1'
+    published_page: 116
+    pdf_page_index: 2
+    completeness: full
+    note: Pure-iron starting analysis.
+  - table: '2'
+    published_page: 117
+    pdf_page_index: 3
+    completeness: full
+    note: Eight wt% S rows of ln(I_Fe+/I_S2+) at 1550, 1600, 1650 C plus tangent.
+  - table: '3'
+    published_page: 118
+    pdf_page_index: 4
+    completeness: full
+    note: epsilon_S^(S) and e_S^(S) at 1550, 1600, 1650 C.
+  class_ledger:
+    measured:
+    - ichise_1975_table1_pure_iron_composition
+    - ichise_1975_ion_ratio_table2
+    - ichise_1975_fig3_ion_ratio_vs_1_over_T_figure_only
+    - ichise_1975_fig8_pure_iron_figure_only
+    - ichise_1975_fig9_holder_heating_figure_only
+    model_derived:
+    - ichise_1975_epsilon_e_table3
+    - ichise_1975_ls_integrand_equations_7_to_9
+    - ichise_1975_fe_heat_of_vaporization_fig8
+    - ichise_1975_fig4_integration_1550C_figure_only
+    - ichise_1975_fig5_integration_1600C_figure_only
+    - ichise_1975_fig6_integration_1650C_figure_only
+    - ichise_1975_fig7_log_gamma_S_figure_only
+    - ichise_1975_fig10_e_S_comparison_figure_only
+    method_only:
+    - ichise_1975_kems_geometry_and_calibration
+    - ichise_1975_fig1_chamber_figure_only
+    - ichise_1975_fig2_cell_figure_only
+  primary_sources_cited:
+  - J. P. Morris and A. J. Williams, Trans. ASM 41 (1949) 1425
+  - C. W. Sherman, H. I. Elvander and J. Chipman, Trans. AIME 188 (1950) 334
+  - J. A. Cordier and J. Chipman, J. Metals 7 (1955) 905
+  - J. Adachi and Z. Morita, Tetsu-to-Hagane 44 (1958) 637
+  - K. Yoshida, S. Banya and T. Fuwa, Tetsu-to-Hagane 53 (1967) 783
+  - C. Yoshii and M. Takahashi, 19th Committee Report No. 8528 (May 1967)
+  - S. Banya and J. Chipman, Trans. Met. Soc. AIME 242 (1968) 940
+  - C. Yoshii and M. Takahashi, 19th Committee Report No. 9038 (Jan 1970)
+  - T. Fuwa and F. Ishii, 19th Committee Report No. 9095 (May 1970)
+  - Y. Matsushita and H. Sakao, Tetsu-to-Hagane 58 (1972) 1535
+  - S. Ikada, S. Hayashi and T. Uno, Tetsu-to-Hagane 59 (1973) S420
+  - F. Ishii and T. Fuwa, Tetsu-to-Hagane 59 (1973) S421
+  - E. Kato, Y. Kudo and M. Minami, 19th Committee Report No. 9409 (May 1972)
+  - G. R. Belton and R. J. Fruehan, J. Phys. Chem. 71 (1967) 1403
+  - G. R. Belton and R. J. Fruehan, Trans. Met. Soc. AIME 245 (1969) 113
+  - G. R. Belton and R. J. Fruehan, Met. Trans. 2 (1971) 291
+  - T. Saito, Y. Shiraishi and M. Ismail, 19th Committee Report No. 9484 (Sept 1972)
+  - E. Kato and T. Furukawa, 19th Committee Report No. 9571 (May 1973)
+  - R. B. Reese, R. A. Rapp and G. R. St. Pierre, Trans. Met. Soc. AIME 242 (1968) 1719
+  - S. W. Gilby and G. R. St. Pierre, Trans. Met. Soc. AIME 245 (1969) 1749
+  - J. F. Elliott and M. G. Gleiser, Thermochemistry for Steelmaking Vol. 1 (1960) 57
+  - J. Chipman and A. Corrigan, Application of Fundamental Thermodynamic Principles to Metallurgical Processes
+    (1964) 23
+  battery_limitation: Table 2 is the printed numeric ion-ratio table (from Fig. 3 LS lines). gamma_S vs
+    %S is Fig. 7 only (not digitised). Table 3 e_S^(S) is the load-bearing interaction parameter.

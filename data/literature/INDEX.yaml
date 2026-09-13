@@ -9,13 +9,13 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 157
-  extracts: 155
+  sources: 162
+  extracts: 160
   pdfs_present_in_worktree: 44
   extracts_with_private_locators: 37
   pdfs_tracked_99_kems_langmuir: 39
   pdfs_without_extract: 2
-  extracts_without_pdf: 113
+  extracts_without_pdf: 118
   alias_groups_needing_resolution: 32
 gaps:
   pdfs_without_extract:
@@ -61,6 +61,11 @@ gaps:
   - kems-050-gorokhov-1977
   - kems-057-kambayashi-1985
   - kems-058-ohara-1987
+  - kems-066-ichise-1977
+  - kems-069-furukawa-1976
+  - kems-087-yamada-kato-1980
+  - kems-088-ichise-1975
+  - kems-095-ueda-1986
   - kems-103-fraser-1983
   - kems-119-furukawa-1975
   - kems-120-ueshima-1984
@@ -4359,6 +4364,240 @@ sources:
       last_stage: decoded
       date: '2026-09-13'
     commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+- source_id: kems-066-ichise-1977
+  aliases: []
+  citation: Ichise, E., Yamauchi, T. & Mori, T. (1977), "Knudsen Cell-Mass Spectrometric Study of the
+    Thermodynamics of the Iron-Aluminum Alloys", Tetsu-to-Hagane 63(3):417-424, DOI 10.2355/tetsutohagane1955.63.3_417
+  doi: 10.2355/tetsutohagane1955.63.3_417
+  report_number: null
+  identifier: 10.2355/tetsutohagane1955.63.3_417
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-066-ichise-1977.yaml
+    review_status: draft
+    rows: 24
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-066-ichise-1977/kems-066-ichise-1977.pdf
+      present: true
+      sha256: 91e6ea13e0e2340bfb69e2dfbb8e09f1c3cf2b595e31dd8825ee3a9f9f68d6df
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-066-ichise-1977/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-066-ichise-1977
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/kems-066-ichise-1977
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-066-ichise-1977.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-066-ichise-1977.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-13'
+    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+- source_id: kems-069-furukawa-1976
+  aliases: []
+  citation: Furukawa, T. & Kato, E. (1976), "Thermodynamics of Binary Liquid Iron-Titanium Alloys by Mass
+    Spectrometry", Trans. ISIJ 16:382-387, DOI 10.2355/isijinternational1966.16.382. Originally published
+    in Tetsu-to-Hagane 61 (1975) 3060 in Japanese.
+  doi: 10.2355/isijinternational1966.16.382
+  report_number: null
+  identifier: 10.2355/isijinternational1966.16.382
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-069-furukawa-1976.yaml
+    review_status: draft
+    rows: 18
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-069-furukawa-1976/kems-069-furukawa-1976.pdf
+      present: true
+      sha256: ad7a106f3831a995d0a4f134aea2769f3119052fde07f77d19748ec6106b6e98
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-069-furukawa-1976/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-069-furukawa-1976
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/kems-069-furukawa-1976
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-069-furukawa-1976.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-069-furukawa-1976.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-13'
+    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+- source_id: kems-087-yamada-kato-1980
+  aliases: []
+  citation: Yamada, K. & Kato, E. (1980), "Mass Spectrometric Study of the Activity of Phosphorus in Iron-Phosphorus
+    Alloys", Trans. ISIJ 20:244-250, DOI 10.2355/isijinternational1966.20.244. Originally published in
+    Tetsu-to-Hagane 65 (1979) 273 in Japanese.
+  doi: 10.2355/isijinternational1966.20.244
+  report_number: null
+  identifier: 10.2355/isijinternational1966.20.244
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-087-yamada-kato-1980.yaml
+    review_status: draft
+    rows: 16
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-087-yamada-kato-1980/kems-087-yamada-kato-1980.pdf
+      present: true
+      sha256: 66ba65a90fb60f4b3cd8d9aebf31b036b8e0de3465caee7c897ccd39f836a49a
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-087-yamada-kato-1980/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-087-yamada-kato-1980
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/kems-087-yamada-kato-1980
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-087-yamada-kato-1980.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-087-yamada-kato-1980.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-13'
+    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+- source_id: kems-088-ichise-1975
+  aliases: []
+  citation: Ichise, E., Kitano, K. & Mori, T. (1975), "The Determination of Activity Coefficient of Sulfur
+    in Liquid Iron by Knudsen Cell-mass Spectrometry", Trans. ISIJ 15:115-120, DOI 10.2355/isijinternational1966.15.115
+  doi: 10.2355/isijinternational1966.15.115
+  report_number: null
+  identifier: 10.2355/isijinternational1966.15.115
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-088-ichise-1975.yaml
+    review_status: draft
+    rows: 16
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-088-ichise-1975/kems-088-ichise-1975.pdf
+      present: true
+      sha256: eced8226761bbbb799e4d2edcbe7c47116f1fd1690b23743ec4dca3b85f0ef6a
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-088-ichise-1975/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-088-ichise-1975
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/kems-088-ichise-1975
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-088-ichise-1975.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-088-ichise-1975.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-13'
+    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
 - source_id: kems-093-piacente-1975
   aliases: []
   citation: Piacente, V., Matoušek, J., Spoliti, M. & Di Paolo, V. (1975), "Mass spectrometric investigation
@@ -4410,6 +4649,64 @@ sources:
       error: null
       last_stage: extracted
       date: '2026-09-06'
+    commit: 89d752b43956b94263c0f826582fa3d747e7e91b
+- source_id: kems-095-ueda-1986
+  aliases: []
+  citation: Ueda, Y., Nishi, T., Oishi, T. & Ono, K. (1986), "Thermodynamic Study of the Liquid Ti-Co
+    Alloys by Mass Spectrometry", J. Japan Inst. Metals 50(12):1081-1088, DOI 10.2320/jinstmet1952.50.12_1081
+  doi: 10.2320/jinstmet1952.50.12_1081
+  report_number: null
+  identifier: 10.2320/jinstmet1952.50.12_1081
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts:
+  - path: data/literature/extracts/kems-095-ueda-1986.yaml
+    review_status: draft
+    rows: 18
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/kems-095-ueda-1986/kems-095-ueda-1986.pdf
+      present: true
+      sha256: 0c3d55daa42a629ccdd612921df3b144bd5e55b8d3ce789e93ca7ba9661ea25e
+      matches_simulator: null
+    sidecar:
+      path: raw/kems-095-ueda-1986/sidecar.yaml
+      present: true
+    text:
+      path: text/kems-095-ueda-1986
+      exists: true
+      file_count: 3
+    tables:
+      path: tables/kems-095-ueda-1986
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/kems-095-ueda-1986.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/kems-095-ueda-1986.yaml
+      present: true
+      error: null
+      last_stage: decoded
+      date: '2026-09-13'
     commit: 89d752b43956b94263c0f826582fa3d747e7e91b
 - source_id: kems-097-ikeda-1978
   aliases: []

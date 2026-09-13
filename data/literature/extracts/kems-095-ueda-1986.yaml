@@ -1,0 +1,1015 @@
+schema_version: literature_extract.v1
+source_id: kems-095-ueda-1986
+source:
+  citation: Ueda, Y., Nishi, T., Oishi, T. & Ono, K. (1986), "Thermodynamic Study of the Liquid Ti-Co
+    Alloys by Mass Spectrometry", J. Japan Inst. Metals 50(12):1081-1088, DOI 10.2320/jinstmet1952.50.12_1081
+  doi: 10.2320/jinstmet1952.50.12_1081
+  url: https://doi.org/10.2320/jinstmet1952.50.12_1081
+  year: 1986
+extraction:
+  method: Official J-STAGE OA PDF (raw/kems-095-ueda-1986/kems-095-ueda-1986.pdf). Japanese body with
+    English abstract, table captions, and figure captions. pdftotext -layout is a noisy OCR layer and
+    is not data. Tables 1-2 transcribed from 400 dpi pdftoppm renders of PDF pages 3 and 5 (published
+    pp. 1083, 1085). Where the decode and the render disagree, the render wins. Table 2 B (binary, ignore
+    oxygen) and T (Ti-Co-O path) columns kept as printed. Figs 1-13 listed figure-only. Japanese-only
+    prose beyond captions/numerals recorded as unseen.
+  date: '2026-09-13'
+  worker: extract-alloys-b1
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.Ti.observations[ueda_1986_gamma_ti_table2].values.points[10].gamma_binary_1873K
+  value: 0.011
+  locator:
+    table: '2'
+    published_page: 1085
+    pdf_page_index: 5
+    note: Table 2 N_Co=1.0 gamma_Ti(B)=0.011 at 1873 K (infinite-dilution Ti in Co)
+- path: species.Co.observations[ueda_1986_gamma_co_table2].values.points[0].gamma_binary_1873K
+  value: 0.014
+  locator:
+    table: '2'
+    published_page: 1085
+    pdf_page_index: 5
+    note: Table 2 N_Co=0 gamma_Co(B)=0.014 at 1873 K
+- species: Ti
+  observable: gibbs_table
+  observation_id: ueda_1986_mixing_functions
+  field: Delta_H_Ti_infinite_dilution_kJ_mol
+  value: -152.2
+  locator:
+    published_page: 1087
+    pdf_page_index: 7
+    note: Delta_H_Ti = -152.2 kJ/mol at infinite dilution
+- species: Ti
+  observable: rate_series
+  observation_id: ueda_1986_kems_geometry_and_calibration
+  field: chamber_pressure_Pa_about
+  value: 3.00e-05
+  locator:
+    published_page: 1082
+    pdf_page_index: 2
+    note: ultimate vacuum about 3 x 10^-5 Pa
+species:
+  Ti:
+    observations:
+    - observation_id: ueda_1986_kems_geometry_and_calibration
+      type: rate_series
+      locator:
+        published_page: 1082
+        pdf_page_index: 2
+        section: II
+        figure: '3'
+        note: ANELVA NAG-531 quadrupole MS; Y2O3 cell; orifice 0.5-0.8 mm; 0.9-1.2 g; 3e-5 Pa
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co_in_Y2O3_Knudsen_cell
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: Raoultian pure liquid Ti and Co (1873 K treats solid Ti as hypothetical liquid)
+      regime: kems_effusion
+      units: as published
+      uncertainty:
+        note: T control +/-0.1 K. Fig. 8 error band is 95% confidence of repeated integrations.
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: ANELVA NAG-531 quadrupole mass spectrometer
+        ions_used:
+          Ti: 48Ti (abundance 73.45%)
+          Co: 59Co (abundance 100%)
+        sample_mass_g_range:
+        - 0.9
+        - 1.2
+        cell_od_mm: 11.0
+        cell_id_mm: 9.0
+        cell_height_mm: 7.0
+        cell_depth_mm: 6.0
+        lid_diameter_mm: 11.0
+        lid_thickness_mm: 1.0
+        orifice_diameter_mm_range:
+        - 0.5
+        - 0.8
+        T_range_K_as_printed:
+        - 1840.0
+        - 2020.0
+        run_duration_ks:
+        - 10.8
+        - 14.4
+        Ti_purity_pct: 99.9
+        Co_purity_pct: 99.99
+        starting_Ti_oxygen_mass_pct: 0.11
+        starting_Ti_oxygen_mol_pct: 0.33
+        chamber_pressure_Pa_about: 3.00e-05
+        japanese_body: Japanese experimental prose beyond English captions, numerals, and the English
+          abstract is recorded as unseen; not guessed.
+        missing_for_motzfeldt:
+        - numeric_orifice_area
+        - clausing_factor
+        - sample_surface_area
+      equipment:
+        cell_material:
+          value: Y2O3 Knudsen cell (Japan Chemical Ceramics); W cell holder; Ta heater (Fig. 3)
+          locator:
+            figure: '3'
+            published_page: 1082
+            pdf_page_index: 2
+            note: Y2O3 Knudsen cell; W cell holder; Ta heater; W rod; W-Re 5/26 thermocouple
+        orifice_area:
+          value:
+            orifice_diameter_mm_range_as_printed:
+            - 0.5
+            - 0.8
+            area: not_computed
+          locator:
+            published_page: 1082
+            pdf_page_index: 2
+            note: orifice diameter 0.5-0.8 mm
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 1082
+            pdf_page_index: 2
+            note: Clausing factor not printed
+        sample_surface_area:
+          value: unstated
+          locator:
+            published_page: 1082
+            pdf_page_index: 2
+            note: crucible ID 9 mm, depth 6 mm printed; free surface not stated
+        chamber_pressure:
+          value:
+            ultimate_vacuum_Pa_as_printed: 3.00e-05
+            as_printed: about 3 x 10^-5 Pa
+          locator:
+            published_page: 1082
+            pdf_page_index: 2
+            note: ultimate vacuum during measurement about 3e-5 Pa
+    - observation_id: ueda_1986_gamma_ti_table2
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1085
+        pdf_page_index: 5
+        note: Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+      T_range_K:
+      - 1873.0
+      - 1973.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: Raoultian; B ignores dissolved oxygen; T integrates the Ti-Co-O path (eqs 5-6)
+      regime: kems_effusion
+      units: dimensionless; N_Co mole fraction; Delta = 100*(gamma_T-gamma_B)/gamma_B as printed
+      uncertainty:
+        note: Printed Delta% is the oxygen-path correction, not a statistical sigma. Fig. 8 band is 95%
+          CI of repeated integrations.
+      values:
+        quantity: activity_coefficient
+        method_class: model_derived
+        model: Belton-Fruehan integration of this-work I+(Co)/I+(Ti) (eq 1 binary; eqs 5-6 ternary with
+          oxygen)
+        gamma_Ti_o_1873K_liquid: 0.011
+        gamma_Ti_o_1973K_liquid: 0.021
+        points:
+        - N_Co: 0.0
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 1.0
+          gamma_ternary_O_1873K: 1.0
+          delta_pct_1873K: 0.0
+          gamma_binary_1973K: 1.0
+          gamma_ternary_O_1973K: 1.0
+          delta_pct_1973K: 0.0
+        - N_Co: 0.1
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.979
+          gamma_ternary_O_1873K: 0.979
+          delta_pct_1873K: 0.0
+          gamma_binary_1973K: 0.985
+          gamma_ternary_O_1973K: 0.985
+          delta_pct_1973K: 0.0
+        - N_Co: 0.2
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.908
+          gamma_ternary_O_1873K: 0.909
+          delta_pct_1873K: 0.2
+          gamma_binary_1973K: 0.934
+          gamma_ternary_O_1973K: 0.935
+          delta_pct_1973K: 0.1
+        - N_Co: 0.3
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.776
+          gamma_ternary_O_1873K: 0.779
+          delta_pct_1873K: 0.4
+          gamma_binary_1973K: 0.828
+          gamma_ternary_O_1973K: 0.83
+          delta_pct_1973K: 0.3
+        - N_Co: 0.4
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.475
+          gamma_ternary_O_1873K: 0.479
+          delta_pct_1873K: 0.8
+          gamma_binary_1973K: 0.531
+          gamma_ternary_O_1973K: 0.535
+          delta_pct_1973K: 0.7
+        - N_Co: 0.5
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.236
+          gamma_ternary_O_1873K: 0.239
+          delta_pct_1873K: 1.3
+          gamma_binary_1973K: 0.284
+          gamma_ternary_O_1973K: 0.288
+          delta_pct_1973K: 1.1
+        - N_Co: 0.6
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.119
+          gamma_ternary_O_1873K: 0.121
+          delta_pct_1873K: 1.5
+          gamma_binary_1973K: 0.161
+          gamma_ternary_O_1973K: 0.163
+          delta_pct_1973K: 1.3
+        - N_Co: 0.7
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.059
+          gamma_ternary_O_1873K: 0.06
+          delta_pct_1873K: 1.5
+          gamma_binary_1973K: 0.085
+          gamma_ternary_O_1973K: 0.086
+          delta_pct_1973K: 1.3
+        - N_Co: 0.8
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.034
+          gamma_ternary_O_1873K: 0.035
+          delta_pct_1873K: 1.5
+          gamma_binary_1973K: 0.05
+          gamma_ternary_O_1973K: 0.051
+          delta_pct_1973K: 1.3
+        - N_Co: 0.9
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.019
+          gamma_ternary_O_1873K: 0.02
+          delta_pct_1873K: 1.5
+          gamma_binary_1973K: 0.03
+          gamma_ternary_O_1973K: 0.03
+          delta_pct_1973K: 1.3
+        - N_Co: 1.0
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.011
+          gamma_ternary_O_1873K: 0.011
+          delta_pct_1873K: 1.5
+          gamma_binary_1973K: 0.021
+          gamma_ternary_O_1973K: 0.021
+          delta_pct_1973K: 1.3
+      equipment:
+        cell_material:
+          value: Y2O3 Knudsen cell (Japan Chemical Ceramics); W cell holder; Ta heater (Fig. 3)
+          locator:
+            figure: '3'
+            published_page: 1082
+            pdf_page_index: 2
+            note: Y2O3 Knudsen cell; W cell holder; Ta heater; W rod; W-Re 5/26 thermocouple
+        orifice_area:
+          value:
+            orifice_diameter_mm_range_as_printed:
+            - 0.5
+            - 0.8
+            area: not_computed
+          locator:
+            published_page: 1082
+            pdf_page_index: 2
+            note: orifice diameter 0.5-0.8 mm
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 1082
+            pdf_page_index: 2
+            note: Clausing factor not printed
+        sample_surface_area:
+          value: unstated
+          locator:
+            published_page: 1082
+            pdf_page_index: 2
+            note: crucible ID 9 mm, depth 6 mm printed; free surface not stated
+        chamber_pressure:
+          value:
+            ultimate_vacuum_Pa_as_printed: 3.00e-05
+            as_printed: about 3 x 10^-5 Pa
+          locator:
+            published_page: 1082
+            pdf_page_index: 2
+            note: ultimate vacuum during measurement about 3e-5 Pa
+    - observation_id: ueda_1986_mixing_functions
+      type: gibbs_table
+      locator:
+        published_page: 1087
+        pdf_page_index: 7
+        section: IV
+        note: conclusion mixing functions; also English abstract p. 1081
+      T_range_K:
+      - 1873.0
+      - 1973.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: integral and partial molar mixing functions; kJ/mol and J/mol K as printed
+      regime: kems_effusion
+      units: kJ/mol and J/mol K as printed
+      uncertainty:
+        note: No numeric sigma on the mixing-function minima. Fig. 11 error bars are 95% CI of the slope.
+      values:
+        quantity: mixing_functions
+        method_class: model_derived
+        model: eq (2) integration of d ln(I+_i/I+_j)/d(1/T) from this-work ion ratios
+        Delta_G_M_min_1873K_kJ_mol: -32.1
+        Delta_G_M_min_1873K_N_Co: 0.49
+        Delta_G_M_min_1973K_kJ_mol: -30.9
+        Delta_H_Ti_infinite_dilution_kJ_mol: -152.2
+        Delta_H_Co_infinite_dilution_kJ_mol: -195.7
+        Delta_H_M_min_kJ_mol: -50.5
+        Delta_H_M_min_N_Co: 0.48
+        Delta_S_M_min_J_mol_K: -9.9
+        Delta_S_M_min_N_Co: 0.48
+        section_5_Delta_S_M_printed_without_minus: 9.9
+        print_conflict: Section 5 p. 1087 prints Delta_S^M = 9.9 without a minus; abstract and conclusion
+          (4) print -9.9. Recorded as printed in each location.
+        esin_quoted_Delta_H_Ti_infinite_dilution_kJ_mol: -119.0
+        esin_quoted_method_class: quoted_measurement
+    - observation_id: ueda_1986_table1_xrd
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 1083
+        pdf_page_index: 3
+        note: Table 1 X-ray diffraction patterns of Ti-Co alloys
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: solidified_Ti-Co_after_run
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: identified phases after cooling; not an activity
+      regime: kems_effusion
+      units: phase names as printed
+      uncertainty:
+        note: Post-run XRD; three-phase samples attributed to fast cooling.
+      values:
+        quantity: post_run_xrd_phases
+        method_class: measured
+        points:
+        - N_Co: 0.1
+          experimental: Ti+Ti2Co
+          equilibrium_from_fig1: Ti+Ti2Co
+        - N_Co: 0.2
+          experimental: Ti+Ti2Co
+          equilibrium_from_fig1: Ti+Ti2Co
+        - N_Co: 0.3
+          experimental: Ti+Ti2Co
+          equilibrium_from_fig1: Ti+Ti2Co
+        - N_Co: 0.4
+          experimental: Ti+Ti2Co+TiCo
+          equilibrium_from_fig1: Ti2Co+TiCo
+        - N_Co: 0.5
+          experimental: TiCo
+          equilibrium_from_fig1: TiCo
+        - N_Co: 0.6
+          experimental: TiCo+alpha-TiCo2
+          equilibrium_from_fig1: TiCo+alpha-TiCo2
+        - N_Co: 0.7
+          experimental: alpha-TiCo2+beta-TiCo2
+          equilibrium_from_fig1: beta-TiCo2+TiCo3
+        - N_Co: 0.8
+          experimental: TiCo3
+          equilibrium_from_fig1: TiCo3
+        - N_Co: 0.9
+          experimental: Co
+          equilibrium_from_fig1: TiCo3+Co
+    - observation_id: ueda_1986_fig1_phase_diagram_figure_only
+      type: transition_point
+      locator:
+        figure: '1'
+        published_page: 1082
+        pdf_page_index: 2
+        note: Fig. 1 Ti-Co binary phase diagram.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 1 Ti-Co binary phase diagram.
+        method_class: quoted_measurement
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 1 Ti-Co binary phase diagram.
+        note: Quoted constitution diagram; not this-work KEMS.
+    - observation_id: ueda_1986_fig2_apparatus_figure_only
+      type: rate_series
+      locator:
+        figure: '2'
+        published_page: 1082
+        pdf_page_index: 2
+        note: Fig. 2 Experimental apparatus.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 2 Experimental apparatus.
+        method_class: method_only
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 2 Experimental apparatus.
+        note: Schematic of quadrupole MS, cell, shutter, W-Re 5/26 thermocouple.
+    - observation_id: ueda_1986_fig3_cell_assembly_figure_only
+      type: rate_series
+      locator:
+        figure: '3'
+        published_page: 1082
+        pdf_page_index: 2
+        note: Fig. 3 Knudsen cell assembly.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 3 Knudsen cell assembly.
+        method_class: method_only
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 3 Knudsen cell assembly.
+        note: Y2O3 cell, W holder, Ta heater, W rod, thermocouple; 5 mm scale bar.
+    - observation_id: ueda_1986_fig4_time_dependence_figure_only
+      type: rate_series
+      locator:
+        figure: '4'
+        published_page: 1083
+        pdf_page_index: 3
+        note: Fig. 4 Time dependence of the ion intensities and ion intensity ratio for the Ti-60 mol%Co
+          alloy at 2020 K.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 4 Time dependence of the ion intensities and ion intensity ratio for the Ti-60
+          mol%Co alloy at 2020 K.
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 4 Time dependence of the ion intensities and ion intensity ratio for the Ti-60 mol%Co
+          alloy at 2020 K.
+        note: ln(I+_Ti T), ln(I+_Co T), ln(I+_Ti/I+_Co) vs time. Not digitised.
+    - observation_id: ueda_1986_fig5_ion_ratio_vs_1_over_T_figure_only
+      type: rate_series
+      locator:
+        figure: '5'
+        published_page: 1083
+        pdf_page_index: 3
+        note: Fig. 5 Experimental intensity ratios for the liquid Ti-Co alloys.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 5 Experimental intensity ratios for the liquid Ti-Co alloys.
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 5 Experimental intensity ratios for the liquid Ti-Co alloys.
+        note: ln(I+_Ti/I+_Co) vs 1/T; N_Co labels 0.1 to 0.9. This is the raw KEMS series; not digitised.
+    - observation_id: ueda_1986_fig6_oxygen_vs_N_Co_figure_only
+      type: rate_series
+      locator:
+        figure: '6'
+        published_page: 1084
+        pdf_page_index: 4
+        note: Fig. 6 Oxygen concentration in the Ti-Co alloys.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 6 Oxygen concentration in the Ti-Co alloys.
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 6 Oxygen concentration in the Ti-Co alloys.
+        note: 'Oxygen mol% vs N_Co after the run. Authors: O can be neglected for N_Co <= 0.6. Not digitised.'
+    - observation_id: ueda_1986_fig7_integration_path_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '7'
+        published_page: 1084
+        pdf_page_index: 4
+        note: Fig. 7 Schematic representation of the integration path for the Ti-Co binary alloys.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 7 Schematic representation of the integration path for the Ti-Co binary alloys.
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 7 Schematic representation of the integration path for the Ti-Co binary alloys.
+        note: Binary path A->E; ternary A->C->D->E. Not numeric.
+    - observation_id: ueda_1986_fig8_binary_integration_1973K_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '8'
+        published_page: 1084
+        pdf_page_index: 4
+        note: Fig. 8 Integration curve for the activity coefficients in the Ti-Co binary system at 1973
+          K.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 8 Integration curve for the activity coefficients in the Ti-Co binary system at
+          1973 K.
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 8 Integration curve for the activity coefficients in the Ti-Co binary system at
+          1973 K.
+        note: Numerics in Table 2 B columns. Not digitised.
+    - observation_id: ueda_1986_fig9_ternary_integration_1973K_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '9'
+        published_page: 1085
+        pdf_page_index: 5
+        note: Fig. 9 Integration curves for the activity coefficients in the Ti-Co-O ternary system at
+          1973 K.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 9 Integration curves for the activity coefficients in the Ti-Co-O ternary system
+          at 1973 K.
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 9 Integration curves for the activity coefficients in the Ti-Co-O ternary system
+          at 1973 K.
+        note: Numerics in Table 2 T columns. Not digitised.
+    - observation_id: ueda_1986_fig10_activities_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '10'
+        published_page: 1086
+        pdf_page_index: 6
+        note: Fig. 10 Activities of the Ti-Co system at 1873 and 1973 K.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 10 Activities of the Ti-Co system at 1873 and 1973 K.
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 10 Activities of the Ti-Co system at 1873 and 1973 K.
+        note: Printed intercepts gamma_Co^o=0.014 and 0.028, gamma_Ti^o=0.011 and 0.021. Curves not digitised.
+    - observation_id: ueda_1986_fig11_enthalpy_integrand_figure_only
+      type: gibbs_table
+      locator:
+        figure: '11'
+        published_page: 1086
+        pdf_page_index: 6
+        note: Fig. 11 Integration curve for the partial enthalpies of mixing in the Ti-Co system.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 11 Integration curve for the partial enthalpies of mixing in the Ti-Co system.
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 11 Integration curve for the partial enthalpies of mixing in the Ti-Co system.
+        note: d ln(I+_Ti/I+_Co)/d(1/T) vs N_Co. Error bars 95% CI. Not digitised.
+    - observation_id: ueda_1986_fig12_partial_enthalpies_figure_only
+      type: gibbs_table
+      locator:
+        figure: '12'
+        published_page: 1086
+        pdf_page_index: 6
+        note: Fig. 12 Partial and integral enthalpies of mixing of the liquid Ti-Co system.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 12 Partial and integral enthalpies of mixing of the liquid Ti-Co system.
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 12 Partial and integral enthalpies of mixing of the liquid Ti-Co system.
+        note: This study vs Esin et al. dashed. Numerics in the mixing-functions observation.
+    - observation_id: ueda_1986_fig13_mixing_1873K_figure_only
+      type: gibbs_table
+      locator:
+        figure: '13'
+        published_page: 1086
+        pdf_page_index: 6
+        note: Fig. 13 Thermodynamic quantities of the Ti-Co system at 1873 K.
+      T_range_K:
+      - 1840.0
+      - 2020.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 13 Thermodynamic quantities of the Ti-Co system at 1873 K.
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 13 Thermodynamic quantities of the Ti-Co system at 1873 K.
+        note: Delta_G^M, T Delta_S^M, Delta_H^M vs N_Co. Not digitised.
+  Co:
+    observations:
+    - observation_id: ueda_1986_gamma_co_table2
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 1085
+        pdf_page_index: 5
+        note: Table 2 gamma_Co(B) vs gamma_Co(T) at 1873 and 1973 K
+      T_range_K:
+      - 1873.0
+      - 1973.0
+      phase: liquid_Ti-Co
+      condensed_form:
+        state: liquid_Ti_Co_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Ti-Co alloys melted in situ in a Y2O3 Knudsen cell. Authors also integrate a Ti-Co-O ternary
+          path because oxygen dissolves from the cell. Japanese body: numerals and English captions transcribed;
+          untranslated prose recorded as unseen.'
+      standard_state: Raoultian pure liquid Co
+      regime: kems_effusion
+      units: dimensionless; N_Co mole fraction
+      uncertainty:
+        note: 'Printed Delta% is the oxygen-path correction. Authors: Ti correction is too small and Co
+          correction too large if the neglected D-E ion-ratio term is restored.'
+      values:
+        quantity: activity_coefficient
+        method_class: model_derived
+        model: Belton-Fruehan integration of this-work ion-intensity ratios (eq 7 for Co)
+        gamma_Co_o_1873K: 0.014
+        gamma_Co_o_1973K_binary: 0.027
+        gamma_Co_o_1973K_ternary: 0.028
+        gamma_Co_o_1973K_abstract_and_conclusion: 0.028
+        points:
+        - N_Co: 0.0
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.014
+          gamma_ternary_O_1873K: 0.014
+          delta_pct_1873K: 3.8
+          gamma_binary_1973K: 0.027
+          gamma_ternary_O_1973K: 0.028
+          delta_pct_1973K: 3.1
+        - N_Co: 0.1
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.02
+          gamma_ternary_O_1873K: 0.021
+          delta_pct_1873K: 3.1
+          gamma_binary_1973K: 0.036
+          gamma_ternary_O_1973K: 0.037
+          delta_pct_1973K: 2.5
+        - N_Co: 0.2
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.031
+          gamma_ternary_O_1873K: 0.032
+          delta_pct_1873K: 2.4
+          gamma_binary_1973K: 0.048
+          gamma_ternary_O_1973K: 0.049
+          delta_pct_1973K: 2.0
+        - N_Co: 0.3
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.049
+          gamma_ternary_O_1873K: 0.05
+          delta_pct_1873K: 1.7
+          gamma_binary_1973K: 0.069
+          gamma_ternary_O_1973K: 0.07
+          delta_pct_1973K: 1.5
+        - N_Co: 0.4
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.12
+          gamma_ternary_O_1873K: 0.121
+          delta_pct_1873K: 0.9
+          gamma_binary_1973K: 0.153
+          gamma_ternary_O_1973K: 0.154
+          delta_pct_1973K: 0.7
+        - N_Co: 0.5
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.284
+          gamma_ternary_O_1873K: 0.284
+          delta_pct_1873K: 0.2
+          gamma_binary_1973K: 0.332
+          gamma_ternary_O_1973K: 0.332
+          delta_pct_1973K: 0.2
+        - N_Co: 0.6
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.497
+          gamma_ternary_O_1873K: 0.497
+          delta_pct_1873K: 0.0
+          gamma_binary_1973K: 0.529
+          gamma_ternary_O_1973K: 0.529
+          delta_pct_1973K: 0.0
+        - N_Co: 0.7
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.727
+          gamma_ternary_O_1873K: 0.727
+          delta_pct_1873K: 0.0
+          gamma_binary_1973K: 0.747
+          gamma_ternary_O_1973K: 0.747
+          delta_pct_1973K: 0.0
+        - N_Co: 0.8
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.876
+          gamma_ternary_O_1873K: 0.876
+          delta_pct_1873K: 0.0
+          gamma_binary_1973K: 0.895
+          gamma_ternary_O_1973K: 0.895
+          delta_pct_1973K: 0.0
+        - N_Co: 0.9
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 0.97
+          gamma_ternary_O_1873K: 0.97
+          delta_pct_1873K: 0.0
+          gamma_binary_1973K: 0.98
+          gamma_ternary_O_1973K: 0.98
+          delta_pct_1973K: 0.0
+        - N_Co: 1.0
+          composition_basis: mole_fraction
+          gamma_binary_1873K: 1.0
+          gamma_ternary_O_1873K: 1.0
+          delta_pct_1873K: 0.0
+          gamma_binary_1973K: 1.0
+          gamma_ternary_O_1973K: 1.0
+          delta_pct_1973K: 0.0
+      equipment:
+        cell_material:
+          value: Y2O3 Knudsen cell (Japan Chemical Ceramics); W cell holder; Ta heater (Fig. 3)
+          locator:
+            figure: '3'
+            published_page: 1082
+            pdf_page_index: 2
+            note: Y2O3 Knudsen cell; W cell holder; Ta heater; W rod; W-Re 5/26 thermocouple
+        orifice_area:
+          value:
+            orifice_diameter_mm_range_as_printed:
+            - 0.5
+            - 0.8
+            area: not_computed
+          locator:
+            published_page: 1082
+            pdf_page_index: 2
+            note: orifice diameter 0.5-0.8 mm
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 1082
+            pdf_page_index: 2
+            note: Clausing factor not printed
+        sample_surface_area:
+          value: unstated
+          locator:
+            published_page: 1082
+            pdf_page_index: 2
+            note: crucible ID 9 mm, depth 6 mm printed; free surface not stated
+        chamber_pressure:
+          value:
+            ultimate_vacuum_Pa_as_printed: 3.00e-05
+            as_printed: about 3 x 10^-5 Pa
+          locator:
+            published_page: 1082
+            pdf_page_index: 2
+            note: ultimate vacuum during measurement about 3e-5 Pa
+deepening:
+  dispatch_id: extract-alloys-b1
+  date: '2026-09-13'
+  quote_convention: English abstract, table/figure captions, and numerals transcribed with ASCII flattening
+    of gamma and Delta. Japanese body not translated.
+  measured_rows_covered: 18
+  table_inventory:
+  - table: '1'
+    published_page: 1083
+    pdf_page_index: 3
+    completeness: full
+    note: Post-run XRD phases vs Fig. 1 equilibrium; not activities.
+  - table: '2'
+    published_page: 1085
+    pdf_page_index: 5
+    completeness: full
+    note: Eleven N_Co rows of gamma_Ti and gamma_Co at 1873 and 1973 K, binary vs ternary-O.
+  class_ledger:
+    measured:
+    - ueda_1986_table1_xrd
+    - ueda_1986_fig4_time_dependence_figure_only
+    - ueda_1986_fig5_ion_ratio_vs_1_over_T_figure_only
+    - ueda_1986_fig6_oxygen_vs_N_Co_figure_only
+    - ueda_1986_fig11_enthalpy_integrand_figure_only
+    model_derived:
+    - ueda_1986_gamma_ti_table2
+    - ueda_1986_gamma_co_table2
+    - ueda_1986_mixing_functions
+    - ueda_1986_fig7_integration_path_figure_only
+    - ueda_1986_fig8_binary_integration_1973K_figure_only
+    - ueda_1986_fig9_ternary_integration_1973K_figure_only
+    - ueda_1986_fig10_activities_figure_only
+    - ueda_1986_fig12_partial_enthalpies_figure_only
+    - ueda_1986_fig13_mixing_1873K_figure_only
+    quoted_measurement:
+    - ueda_1986_fig1_phase_diagram_figure_only
+    method_only:
+    - ueda_1986_kems_geometry_and_calibration
+    - ueda_1986_fig2_apparatus_figure_only
+    - ueda_1986_fig3_cell_assembly_figure_only
+  primary_sources_cited:
+  - Yu. O. Esin et al. calorimetry of Ti-Co (ref 5) quoted on Fig. 12; Delta_H_Ti^o = -119 kJ/mol
+  - G. R. Belton and R. J. Fruehan, J. Phys. Chem. 71 (1967) 781; Met. Trans. 1 (1970) 781
+  - S. Wagner and G. R. St. Pierre, Met. Trans. 5 (1974) 887
+  - Furukawa and Kato, Tetsu-to-Hagane 61 (1975) 3060
+  battery_limitation: Raw I+(Ti)/I+(Co) vs T is Fig. 5 (not digitised). Table 2 is the printed activity-coefficient
+    table from Belton-Fruehan integration, with a binary vs oxygen-corrected pair of columns.

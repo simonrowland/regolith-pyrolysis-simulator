@@ -1,0 +1,1347 @@
+schema_version: literature_extract.v1
+source_id: kems-066-ichise-1977
+source:
+  citation: Ichise, E., Yamauchi, T. & Mori, T. (1977), "Knudsen Cell-Mass Spectrometric Study of the
+    Thermodynamics of the Iron-Aluminum Alloys", Tetsu-to-Hagane 63(3):417-424, DOI 10.2355/tetsutohagane1955.63.3_417
+  doi: 10.2355/tetsutohagane1955.63.3_417
+  url: https://doi.org/10.2355/tetsutohagane1955.63.3_417
+  year: 1977
+extraction:
+  method: Official J-STAGE OA PDF (raw/kems-066-ichise-1977/kems-066-ichise-1977.pdf). Japanese body with
+    English synopsis, table captions, and figure captions. pdftotext -layout is a noisy OCR layer and
+    is not data. Tables 1-2 and Fig. 1 geometry transcribed from 400 dpi pdftoppm renders of PDF pages
+    2, 5 and 6 (published pp. 418, 421, 422). Where the decode and the render disagree, the render wins.
+    Figs 2-12 listed figure-only; axes were not digitised. Table 1 activities kept as model_derived (Darken
+    quadratic + Belton-Fruehan integration of this-work ion-intensity ratios). Table 2 This study row
+    kept distinct from quoted investigators. Japanese-only prose beyond captions/numerals recorded as
+    unseen.
+  date: '2026-09-13'
+  worker: extract-alloys-b1
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- species: Al
+  observable: activity_coefficient
+  observation_id: ichise_1977_al_activity_table1_1400C
+  field: gamma_Al_infinite_dilution_1400C
+  value: 0.027
+  locator:
+    table: '1'
+    published_page: 421
+    pdf_page_index: 5
+    note: Table 1 N_Al=0.000 gamma_Al(l)=0.027; also body p. 420 gamma_Al^o=0.027
+- path: species.Al.observations[ichise_1977_al_activity_table1_1400C].values.points[4].a_Al_liquid_standard
+  value: 0.093
+  locator:
+    table: '1'
+    published_page: 421
+    pdf_page_index: 5
+    note: Table 1 N_Al=0.368 a_Al(l)=0.093 (solidus row)
+- path: species.Fe.observations[ichise_1977_fe_activity_table1_1400C].values.points[11].gamma_Fe_solid_standard
+  value: 0.02
+  locator:
+    table: '1'
+    published_page: 421
+    pdf_page_index: 5
+    note: Table 1 N_Al=1.000 gamma_Fe(s)=0.020
+- species: Al
+  observable: activity_coefficient
+  observation_id: ichise_1977_gamma_al_epsilon_table2_this_study_1600C
+  field: gamma_Al_infinite_dilution
+  value: 0.049
+  locator:
+    table: '2'
+    published_page: 422
+    pdf_page_index: 6
+    note: Table 2 This study gamma_Al^o=0.049 at 1600 C
+- species: Al
+  observable: rate_series
+  observation_id: ichise_1977_ion_ratio_NAl_0p5_1470C_30V
+  field: I_Al_plus
+  value: 58.0
+  locator:
+    published_page: 418
+    pdf_page_index: 2
+    section: '2.5'
+    note: 'I+_Al : I+_Al2O : I+_AlO : I+_Al2 = 58 : 23 : 1.4 : 1 at N_Al=0.5, 1470 C, 30 V'
+- path: species.Al.observations[ichise_1977_gamma_al_epsilon_table2_quoted_1600C].values.points[4].epsilon_Al_Al
+  value: 10.2
+  locator:
+    table: '2'
+    published_page: 422
+    pdf_page_index: 6
+    note: Table 2 Belton and Fruehan epsilon_Al^(Al)=+10.2
+species:
+  Al:
+    observations:
+    - observation_id: ichise_1977_kems_geometry_and_calibration
+      type: rate_series
+      locator:
+        published_page: 418
+        pdf_page_index: 2
+        section: '2'
+        figure: '1'
+        note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed
+          for numerals and English captions only.
+      T_range_K:
+      - 1673.15
+      - 1873.15
+      phase: Al-Fe_alloy_in_alumina_Knudsen_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: Raoultian pure Al and Fe; solid (s) and liquid (l) as labelled in Table 1
+      regime: kems_effusion
+      units: as published
+      uncertainty:
+        note: No numeric calibration envelope printed. Temperature of the melt is the Kato-Furukawa corrected
+          B-point reading; 50 C A-B gradient corresponds to a 61 C correction (Fig. 2).
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: Hitachi Knudsen-cell mass spectrometer RM6K
+        ionizing_electron_energy_V: 30.0
+        total_emission_current_uA: 200.0
+        ion_accelerating_voltage_V: 3200.0
+        ion_source_temperature_C: 210.0
+        exit_slit_width_mm: 0.075
+        collector_slit_width_mm: 0.115
+        sample_mass_g_as_printed: about 2 g
+        run_duration_as_printed: about 6 h per measurement
+        temperature_method: thermocouples at cell-holder points A and B (Fig. 1); melt temperature from
+          Kato and Furukawa correction of the B-point reading
+        temperature_gradient_no_deposition_C: 50.0
+        temperature_correction_at_50C_gradient_C: 61.0
+        ions_measured:
+        - 27Al
+        - 27Al2O
+        - 56Fe
+        heating_protocol_as_printed: hold ~30 C above the alloy melting point until I+(Al), I+(Al2O),
+          I+(Fe) are constant; then step 20-30 C, measure I+(Al), I+(Al2O), I+(Fe), I+(Al) in that order;
+          require first and last I+(Al) to agree; repeat to maximum T and on cooling
+        Al_purity_pct: 99.995
+        pure_Fe_impurities_wt_pct_as_printed:
+          C: 0.01
+          Si: 0.001-3
+          Mn: <0.01
+          Cu: <0.005
+          Ni: <0.01
+          Cr: <0.01
+          Al: <0.003
+          O: <0.003
+          N: 0.001
+          Ti: <0.005
+          V: 0.001
+        chamber_pressure: unstated
+        vacuum_quality: unstated
+        japanese_body: Japanese experimental prose beyond English captions, numerals, and the English
+          synopsis is recorded as unseen; not guessed.
+        missing_for_motzfeldt:
+        - numeric_orifice_area
+        - clausing_factor
+        - sample_surface_area
+        - chamber_pressure
+      equipment:
+        cell_material:
+          value: Al2O3 (alumina) Knudsen cell; tantalum cell holder (Fig. 1)
+          locator:
+            figure: '1'
+            published_page: 418
+            pdf_page_index: 2
+            note: Alumina knudsen cell / Tantalum cell holder; (mm)
+        orifice_area:
+          value:
+            orifice_diameter_mm_as_printed: 0.5
+            as_printed: 0.5 phi on the alumina-cell lid drawing, units mm
+            area: not_computed
+          locator:
+            figure: '1'
+            published_page: 418
+            pdf_page_index: 2
+            note: lid callout 0.5 phi, 1 mm lid thickness; cell 12 phi OD
+        sample_surface_area:
+          value: unstated
+          locator:
+            figure: '1'
+            published_page: 418
+            pdf_page_index: 2
+            note: inner diameters 11 phi and 9 phi printed; free surface not stated
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 418
+            pdf_page_index: 2
+            section: '2.2'
+            note: Clausing factor not printed
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 419
+            pdf_page_index: 3
+            section: '2.6'
+            note: vacuum quality / chamber pressure not printed; Fig. 3 is chamber voltage vs ion ratio
+    - observation_id: ichise_1977_al_activity_table1_1400C
+      type: activity_coefficient
+      locator:
+        table: '1'
+        published_page: 421
+        pdf_page_index: 5
+        note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: Fe-Al_alloy_1400C_solid_and_liquid
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: a(s) and a(l) referred to pure solid and pure liquid component respectively, as
+        printed. Standard-state conversion used Delta-G_Al = -1685 cal and Delta-G_Fe = 270 cal at 1400
+        C (Elliott and Gleiser, ref 14).
+      regime: kems_effusion
+      units: dimensionless activity and activity coefficient as printed; N_Al mole fraction
+      uncertainty:
+        note: No per-row sigma printed on Table 1. Two-phase ln(I+_Al/I+_Fe) taken as 2.93 from Fig. 4.
+      values:
+        quantity: activity_and_activity_coefficient
+        method_class: model_derived
+        model: Darken quadratic formalism applied to this-work Belton-Fruehan ion-intensity ratios (eqs
+          2, 10, 11)
+        evidence_class: authors_this_work_integrated_from_kems_ion_ratios
+        T_C: 1400.0
+        T_K: 1673.15
+        composition_basis: mole_fraction_N_Al
+        gamma_Al_infinite_dilution_1400C: 0.027
+        gamma_Fe_solid_infinite_dilution_1400C: 0.02
+        two_phase_ln_IAl_over_IFe_from_fig4: 2.93
+        solidus_N_Al_1400C: 0.338
+        liquidus_N_Al_1400C: 0.406
+        standard_state_conversion_cal:
+          Delta_G_Al_1400C: -1685.0
+          Delta_G_Fe_1400C: 270.0
+          quoted_from: Elliott and Gleiser, Thermochemistry for Steelmaking vol. I (1960), ref 14
+        points:
+        - N_Al: 0.0
+          composition_basis: mole_fraction
+          gamma_Al_liquid_standard: 0.027
+          a_Al_liquid_standard: 0.0
+          a_Al_solid_standard: 0.0
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.1
+          composition_basis: mole_fraction
+          gamma_Al_liquid_standard: 0.055
+          a_Al_liquid_standard: 0.005
+          a_Al_solid_standard: 0.003
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.2
+          composition_basis: mole_fraction
+          gamma_Al_liquid_standard: 0.103
+          a_Al_liquid_standard: 0.021
+          a_Al_solid_standard: 0.013
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.3
+          composition_basis: mole_fraction
+          gamma_Al_liquid_standard: 0.18
+          a_Al_liquid_standard: 0.054
+          a_Al_solid_standard: 0.033
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.368
+          composition_basis: mole_fraction
+          gamma_Al_liquid_standard: 0.252
+          a_Al_liquid_standard: 0.093
+          a_Al_solid_standard: 0.056
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.406
+          composition_basis: mole_fraction
+          gamma_Al_liquid_standard: 0.229
+          a_Al_liquid_standard: 0.093
+          a_Al_solid_standard: 0.056
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.5
+          composition_basis: mole_fraction
+          gamma_Al_liquid_standard: 0.352
+          a_Al_liquid_standard: 0.176
+          a_Al_solid_standard: 0.106
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.6
+          composition_basis: mole_fraction
+          gamma_Al_liquid_standard: 0.513
+          a_Al_liquid_standard: 0.308
+          a_Al_solid_standard: 0.185
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.7
+          composition_basis: mole_fraction
+          gamma_Al_liquid_standard: 0.687
+          a_Al_liquid_standard: 0.481
+          a_Al_solid_standard: 0.29
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.8
+          composition_basis: mole_fraction
+          gamma_Al_liquid_standard: 0.845
+          a_Al_liquid_standard: 0.676
+          a_Al_solid_standard: 0.407
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.9
+          composition_basis: mole_fraction
+          gamma_Al_liquid_standard: 0.959
+          a_Al_liquid_standard: 0.863
+          a_Al_solid_standard: 0.52
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 1.0
+          composition_basis: mole_fraction
+          gamma_Al_liquid_standard: 1.0
+          a_Al_liquid_standard: 1.0
+          a_Al_solid_standard: 0.602
+          T_C: 1400.0
+          T_K: 1673.15
+      equipment:
+        cell_material:
+          value: Al2O3 (alumina) Knudsen cell; tantalum cell holder (Fig. 1)
+          locator:
+            figure: '1'
+            published_page: 418
+            pdf_page_index: 2
+            note: Alumina knudsen cell / Tantalum cell holder; (mm)
+        orifice_area:
+          value:
+            orifice_diameter_mm_as_printed: 0.5
+            as_printed: 0.5 phi on the alumina-cell lid drawing, units mm
+            area: not_computed
+          locator:
+            figure: '1'
+            published_page: 418
+            pdf_page_index: 2
+            note: lid callout 0.5 phi, 1 mm lid thickness; cell 12 phi OD
+        sample_surface_area:
+          value: unstated
+          locator:
+            figure: '1'
+            published_page: 418
+            pdf_page_index: 2
+            note: inner diameters 11 phi and 9 phi printed; free surface not stated
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 418
+            pdf_page_index: 2
+            section: '2.2'
+            note: Clausing factor not printed
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 419
+            pdf_page_index: 3
+            section: '2.6'
+            note: vacuum quality / chamber pressure not printed; Fig. 3 is chamber voltage vs ion ratio
+    - observation_id: ichise_1977_ion_ratio_NAl_0p5_1470C_30V
+      type: rate_series
+      locator:
+        published_page: 418
+        pdf_page_index: 2
+        section: '2.5'
+        note: 'N_Al=0.5, 1470 C, ionizing voltage 30 V; I+_Al : I+_Al2O : I+_AlO : I+_Al2 = 58 : 23 :
+          1.4 : 1'
+      T_range_K:
+      - 1743.15
+      - 1743.15
+      phase: Fe-Al_alloy_NAl_0.5_in_alumina_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: ion-intensity ratio as measured; not converted to partial pressure
+      regime: kems_effusion
+      units: relative ion intensity as printed
+      uncertainty:
+        note: No uncertainty printed on this ratio.
+      values:
+        quantity: ion_intensity_ratio
+        method_class: measured
+        T_C: 1470.0
+        T_K: 1743.15
+        N_Al: 0.5
+        composition_basis: mole_fraction
+        ionizing_voltage_V: 30.0
+        I_Al_plus: 58.0
+        I_Al2O_plus: 23.0
+        I_AlO_plus: 1.4
+        I_Al2_plus: 1.0
+        ratio_as_printed: 58:23:1.4:1
+        authors_assignment: 4 Al + Al2O3(s) = 3 Al2O(g) (eq 3) with the alumina cell
+      equipment:
+        cell_material:
+          value: Al2O3 (alumina) Knudsen cell; tantalum cell holder (Fig. 1)
+          locator:
+            figure: '1'
+            published_page: 418
+            pdf_page_index: 2
+            note: Alumina knudsen cell / Tantalum cell holder; (mm)
+        orifice_area:
+          value:
+            orifice_diameter_mm_as_printed: 0.5
+            as_printed: 0.5 phi on the alumina-cell lid drawing, units mm
+            area: not_computed
+          locator:
+            figure: '1'
+            published_page: 418
+            pdf_page_index: 2
+            note: lid callout 0.5 phi, 1 mm lid thickness; cell 12 phi OD
+        sample_surface_area:
+          value: unstated
+          locator:
+            figure: '1'
+            published_page: 418
+            pdf_page_index: 2
+            note: inner diameters 11 phi and 9 phi printed; free surface not stated
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 418
+            pdf_page_index: 2
+            section: '2.2'
+            note: Clausing factor not printed
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 419
+            pdf_page_index: 3
+            section: '2.6'
+            note: vacuum quality / chamber pressure not printed; Fig. 3 is chamber voltage vs ion ratio
+    - observation_id: ichise_1977_gamma_al_epsilon_table2_this_study_1600C
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 422
+        pdf_page_index: 6
+        note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Al_alloy_infinite_dilution
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: Raoultian infinite-dilution gamma_Al^o in liquid Fe; epsilon_Al^(Al) = (d ln gamma_Al
+        / d N_Al)_NAl->0
+      regime: kems_effusion
+      units: dimensionless
+      uncertainty:
+        note: No numeric uncertainty printed on the This study row.
+      values:
+        quantity: infinite_dilution_activity_coefficient_and_self_interaction_parameter
+        method_class: model_derived
+        model: temperature equations (24)-(25) evaluated at 1600 C from this-work ion-intensity T-dependence
+        T_C: 1600.0
+        T_K: 1873.15
+        gamma_Al_infinite_dilution: 0.049
+        epsilon_Al_Al: 6.4
+        as_printed: This study  0.049  +6.4
+    - observation_id: ichise_1977_gamma_al_epsilon_table2_quoted_1600C
+      type: activity_coefficient
+      locator:
+        table: '2'
+        published_page: 422
+        pdf_page_index: 6
+        note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Al_alloy_infinite_dilution
+      condensed_form:
+        state: liquid_alloy
+        metastable: false
+        basis: explicit_author
+        note: Comparison values of other workers at 1600 C; not this-work KEMS
+      standard_state: gamma_Al^o and epsilon_Al^(Al) as tabulated by Ichise et al.; standard states of
+        the cited works not restated here
+      regime: kems_effusion
+      units: dimensionless
+      uncertainty:
+        note: Quoted compilation; no uncertainties printed in Table 2.
+      values:
+        quantity: infinite_dilution_activity_coefficient_and_self_interaction_parameter
+        method_class: quoted_measurement
+        T_C: 1600.0
+        T_K: 1873.15
+        points:
+        - investigators: Chou and Elliott
+          investigators_as_printed: CHOU and ELLIOTT
+          gamma_Al_infinite_dilution: 0.043
+          T_C: 1600.0
+          T_K: 1873.15
+          epsilon_Al_Al: printed_dash
+          omitted_reason: printed dash; not a zero
+        - investigators: Chipman and Floridis
+          investigators_as_printed: CHIPMAN and FLORIDIS
+          gamma_Al_infinite_dilution: 0.031
+          T_C: 1600.0
+          T_K: 1873.15
+          epsilon_Al_Al: 6.0
+        - investigators: Wilder and Elliott
+          investigators_as_printed: WILDER and ELLIOTT
+          gamma_Al_infinite_dilution: 0.063
+          T_C: 1600.0
+          T_K: 1873.15
+          epsilon_Al_Al: 5.3
+        - investigators: Woolley and Elliott
+          investigators_as_printed: WOOLLEY and ELLIOTT
+          gamma_Al_infinite_dilution: 0.061
+          T_C: 1600.0
+          T_K: 1873.15
+          epsilon_Al_Al: 5.6
+        - investigators: Belton and Fruehan
+          investigators_as_printed: BELTON and FRUEHAN
+          gamma_Al_infinite_dilution: 0.024
+          T_C: 1600.0
+          T_K: 1873.15
+          epsilon_Al_Al: 10.2
+    - observation_id: ichise_1977_ln_gamma_al_temperature_equations
+      type: activity_coefficient
+      locator:
+        published_page: 422
+        pdf_page_index: 6
+        equation: 24-25
+        note: eqs (24) solid N_Al <= 0.33; (25) liquid N_Al <= 0.17; also English synopsis p. 417
+      T_range_K:
+      - 1673.15
+      - 1873.15
+      phase: Fe-Al_alloy_Darken_quadratic_range
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: Raoultian pure Al; Darken quadratic in the stated N_Al windows
+      regime: kems_effusion
+      units: ln gamma_Al dimensionless; T in K as printed
+      uncertainty:
+        note: No coefficient uncertainties printed.
+      values:
+        quantity: activity_coefficient_temperature_composition_equation
+        method_class: model_derived
+        model: Darken quadratic combined with this-work d ln(I+_Al N_Fe / I+_Fe N_Al)/d(1/T)
+        solid_N_Al_le: 0.33
+        solid_as_printed: ln gamma_Al = -(2880/T + 1.95)(1-N_Al)^2 - 5770/T + 3.51
+        liquid_N_Al_le: 0.17
+        liquid_as_printed: ln gamma_Al = -(5060/T + 0.50)(1-N_Al)^2 - 3490/T + 2.05
+        epsilon_Al_Al_solid_as_printed: 5760/T + 3.9
+        epsilon_Al_Al_liquid_as_printed: 10100/T + 1.0
+        epsilon_Al_Al_liquid_from_minus_2_alpha: 10120/T + 1.0 from -2*alpha_FeAl with alpha_FeAl = -5060/T
+          - 0.50 (eq 17); synopsis prints 10100/T + 1.0
+        ln_gamma_Al_o_solid_eq22: ln gamma_Al^o = -8650/T + 1.56
+        ln_gamma_Al_o_liquid_eq23: ln gamma_Al^o = -8550/T + 1.55
+        alpha_FeAl_solid_eq15: alpha_FeAl = -2880/T - 1.95
+        alpha_FeAl_liquid_eq17: alpha_FeAl = -5060/T - 0.50
+        evaluated_1600C:
+          gamma_Al_o: 0.049
+          epsilon_Al_Al: 6.4
+    - observation_id: ichise_1977_gamma_al_from_Al2O_ratio_rejected
+      type: activity_coefficient
+      locator:
+        published_page: 423
+        pdf_page_index: 7
+        note: gamma_Al^o = 0.045 at 1400 C from I+(Al2O)/I+(Al) via eqs (34)-(37); authors reject in favour
+          of the ion-intensity-ratio (Belton-Fruehan) value
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: Fe-Al_alloy_1400C
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: Raoultian; a_Al from assumed equilibrium 4Al + Al2O3(s) = 3 Al2O(g)
+      regime: kems_effusion
+      units: dimensionless
+      uncertainty:
+        note: 'Authors: agreement with the ion-intensity-ratio gamma_Al^o is not good; orifice fibrous
+          deposits (Al2O3?) scatter I+(Al2O).'
+      values:
+        quantity: infinite_dilution_activity_coefficient
+        method_class: model_derived
+        model: Al2O/Al ion-ratio equilibrium (eqs 34-37) assuming 4Al + Al2O3(s) = 3 Al2O(g)
+        admission_status: authors_rejected_in_favour_of_ion_intensity_ratio_method
+        T_C: 1400.0
+        T_K: 1673.15
+        gamma_Al_o: 0.045
+        authors_adopted_instead: ion-intensity-ratio (Belton-Fruehan) gamma_Al^o = 0.027 at 1400 C
+    - observation_id: ichise_1977_1600C_fig4_extrapolation_rejected
+      type: activity_coefficient
+      locator:
+        published_page: 422
+        pdf_page_index: 6
+        note: extrapolating each composition ln(I+_Al/I+_Fe) vs 1/T to 1600 C then integrating eq (2)
+          gave gamma_Al^o=0.041 and gamma_Fe^o=0.021; authors did not adopt because Fig. 4 slopes scatter
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Al_alloy
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: Raoultian infinite dilution
+      regime: kems_effusion
+      units: dimensionless
+      uncertainty:
+        note: 'Authors: Fig. 4 slopes scatter; high-T extrapolation not preferred.'
+      values:
+        quantity: infinite_dilution_activity_coefficient
+        method_class: model_derived
+        model: linear extrapolation of Fig. 4 ln(I+_Al/I+_Fe) vs 1/T to 1600 C, then Belton-Fruehan integration
+        admission_status: authors_rejected
+        T_C: 1600.0
+        T_K: 1873.15
+        gamma_Al_o: 0.041
+        gamma_Fe_o: 0.021
+    - observation_id: ichise_1977_p_Al2O_p_Al_1500C_author_estimate
+      type: psat_series
+      locator:
+        published_page: 423
+        pdf_page_index: 7
+        note: 'simple assumption: at 1500 C, N_Al=0.5, P_Al2O=0.8 Torr and P_Al=0.4 Torr; total 1.2 Torr'
+      T_range_K:
+      - 1773.15
+      - 1773.15
+      phase: Fe-Al_alloy_NAl_0.5
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: partial pressure in Torr as printed; not a calibrated KEMS absolute pressure
+      regime: kems_effusion
+      units: Torr as printed
+      uncertainty:
+        note: 'Authors: calculated under a simple assumption; not a tabulated calibration.'
+      values:
+        quantity: partial_pressure
+        method_class: author_estimate
+        T_C: 1500.0
+        T_K: 1773.15
+        N_Al: 0.5
+        P_Al2O_Torr: 0.8
+        P_Al_Torr: 0.4
+        P_total_Torr: 1.2
+        authors_use: to argue the orifice flow approaches viscous and the reverse of eq (3) becomes likely,
+          biasing the Al2O-method gamma_Al high
+    - observation_id: ichise_1977_limiting_molar_heat_of_mixing_Al
+      type: gibbs_table
+      locator:
+        published_page: 422
+        pdf_page_index: 6
+        note: from d ln gamma_Al^o / d(1/T); solid Fe -17200 cal; liquid Fe -17000 cal; synopsis -17000
+          cal; conclusion 17 kcal for the liquid alloy
+      T_range_K:
+      - 1673.15
+      - 1873.15
+      phase: infinite_dilution_Al_in_Fe
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: limiting molar heat of mixing of Al at infinite dilution, cal as printed
+      regime: kems_effusion
+      units: cal as printed (conclusion 17 kcal)
+      uncertainty:
+        note: No uncertainty printed. Compared with Woolley et al. -15350 cal (quoted).
+      values:
+        quantity: limiting_molar_heat_of_mixing
+        method_class: model_derived
+        model: R * d ln gamma_Al^o / d(1/T) from eqs (20)-(21)
+        solid_Fe_cal: -17200.0
+        liquid_Fe_cal: -17000.0
+        conclusion_liquid_kcal: 17.0
+        woolley_elliott_quoted_cal: -15350.0
+        woolley_quoted_method_class: quoted_measurement
+    - observation_id: ichise_1977_eq10_11_ion_ratio_integrand_1400C
+      type: activity_coefficient
+      locator:
+        published_page: 420
+        pdf_page_index: 4
+        equation: 10-11
+        note: linear fits of ln(I+_Al/I+_Fe)-ln(N_Al/N_Fe) vs N_Al at 1400 C
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: Fe-Al_alloy_1400C
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: Belton-Fruehan integrand; I+ ion intensities this work
+      regime: kems_effusion
+      units: dimensionless ln ion-intensity ratio
+      uncertainty:
+        note: No coefficient sigma printed.
+      values:
+        quantity: belton_fruehan_integrand_linear_fit
+        method_class: model_derived
+        model: linear fit of this-work ion-intensity ratios at 1400 C to Darken quadratic form
+        T_C: 1400.0
+        solid_N_Al_range:
+        - 0.0
+        - 0.368
+        solid_eq10_as_printed: ln(I+_Al/I+_Fe)-ln(N_Al/N_Fe) = 7.344 N_Al + 0.742
+        liquid_N_Al_range:
+        - 0.406
+        - 1.0
+        liquid_eq11_as_printed: ln(I+_Al/I+_Fe)-ln(N_Al/N_Fe) = 8.362 N_Al - 0.085
+        two_phase_ln_IAl_over_IFe: 2.93
+    - observation_id: ichise_1977_fig2_temperature_correction_figure_only
+      type: rate_series
+      locator:
+        figure: '2'
+        published_page: 418
+        pdf_page_index: 2
+        note: Fig. 2. Change in the correcting value with the temperature gradient of the cell holder.
+      T_range_K:
+      - 1673.15
+      - 1873.15
+      phase: Fe-Al_alloy_in_alumina_Knudsen_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: temperature_correction_C_vs_holder_gradient_C
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 2. Change in the correcting value with the temperature gradient of the cell holder.
+        note: 'Ordinate: Temperature of melt - Temperature at point B; Abscissa: Temperature at point
+          A - Temperature at point B'
+    - observation_id: ichise_1977_fig3_chamber_voltage_ion_ratio_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '3'
+        published_page: 419
+        pdf_page_index: 3
+        note: Fig. 3. Effect of the chamber voltage on the ion ratio.
+      T_range_K:
+      - 1743.15
+      - 1743.15
+      phase: Fe-Al_alloy_in_alumina_Knudsen_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: I+_Al / I+_Fe vs chamber voltage
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 3. Effect of the chamber voltage on the ion ratio.
+        note: 'Authors: the ratio changes sharply below 20 V; 30 V chosen considering Al2O fragmentation.'
+    - observation_id: ichise_1977_fig4_ln_ion_ratio_vs_1_over_T_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '4'
+        published_page: 419
+        pdf_page_index: 3
+        note: Fig. 4. Experimental results for the Fe-Al alloys.
+      T_range_K:
+      - 1673.15
+      - 1873.15
+      phase: Fe-Al_alloy_in_alumina_Knudsen_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: ln(I+_Al/I+_Fe) vs 1/T
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 4. Experimental results for the Fe-Al alloys.
+        note: 'Open circles heating, filled cooling. Printed N_Al labels: 0.750, 0.650, 0.544, 0.460,
+          0.330, 0.281, 0.172, 0.134, 0.097, 0.067, 0.022. This is the raw KEMS ion-intensity-ratio series;
+          not digitised.'
+    - observation_id: ichise_1977_fig5_solidus_liquidus_figure_only
+      type: transition_point
+      locator:
+        figure: '5'
+        published_page: 420
+        pdf_page_index: 4
+        note: Fig. 5. Solidus and liquidus of the Fe-Al alloy.
+      T_range_K:
+      - 1473.15
+      - 1873.15
+      phase: Fe-Al_alloy_in_alumina_Knudsen_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: solidus_and_liquidus
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 5. Solidus and liquidus of the Fe-Al alloy.
+        note: This-work breaks from Fig. 4 compared with Hansen constitution diagram (ref 12). Printed
+          1400 C compositions N_Al=0.338 (solidus) and 0.406 (liquidus) are in the body, not read off
+          the figure.
+        printed_1400C_N_Al:
+          solidus: 0.338
+          liquidus: 0.406
+          note: printed in the body from Fig. 4 breaks, not read off the Fig. 5 axes
+    - observation_id: ichise_1977_fig6_integration_curve_1400C_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '6'
+        published_page: 420
+        pdf_page_index: 4
+        note: Fig. 6. Integration curve for the Fe-Al alloy at 1400 C.
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: Fe-Al_alloy_in_alumina_Knudsen_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: ln(I+_Al/I+_Fe)-ln(N_Al/N_Fe) vs N_Al
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 6. Integration curve for the Fe-Al alloy at 1400 C.
+        note: Solid and liquid Darken-linear regions; two-phase L+S marked. Not digitised.
+    - observation_id: ichise_1977_fig7_activities_1400C_figure_only
+      type: rate_series
+      locator:
+        figure: '7'
+        published_page: 420
+        pdf_page_index: 4
+        note: Fig. 7. Activities in the Fe-Al alloy at 1400 C.
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: Fe-Al_alloy_in_alumina_Knudsen_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: a_Al(s), a_Al(l), a_Fe(s), a_Fe(l) vs N_Al
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 7. Activities in the Fe-Al alloy at 1400 C.
+        note: Numeric values are Table 1. Dashed curve is a_Al from the Al2O method (authors reject).
+          Not digitised.
+    - observation_id: ichise_1977_fig8_ln_rho_and_alpha_vs_1_over_T_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '8'
+        published_page: 421
+        pdf_page_index: 5
+        note: Fig. 8. Temperature dependence of ln rho^o and alpha_FeAl.
+      T_range_K:
+      - 1673.15
+      - 1873.15
+      phase: Fe-Al_alloy_in_alumina_Knudsen_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: ln rho^o and alpha_FeAl vs 1/T
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 8. Temperature dependence of ln rho^o and alpha_FeAl.
+        note: Numeric slope/intercept values are eqs (15)-(18). Not digitised.
+    - observation_id: ichise_1977_fig9_ln_gamma_al_o_and_epsilon_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '9'
+        published_page: 422
+        pdf_page_index: 6
+        note: Fig. 9. Variation of ln gamma_Al^o and epsilon_Al^(Al) with temperature.
+      T_range_K:
+      - 1673.15
+      - 1873.15
+      phase: Fe-Al_alloy_in_alumina_Knudsen_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: ln gamma_Al^o and epsilon_Al^(Al) vs 1/T
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 9. Variation of ln gamma_Al^o and epsilon_Al^(Al) with temperature.
+        note: Overlays Chou & Elliott, Chipman & Floridis, Wilder & Elliott, Woolley & Elliott, Belton
+          & Fruehan. This-work curves from the T-equations. Not digitised.
+    - observation_id: ichise_1977_fig10_Al2O_Al_ion_ratio_vs_1_over_T_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '10'
+        published_page: 423
+        pdf_page_index: 7
+        note: Fig. 10. Ion ratio according to Equation (36).
+      T_range_K:
+      - 1673.15
+      - 1873.15
+      phase: Fe-Al_alloy_in_alumina_Knudsen_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: 3 ln(I+_Al2O/I+_Al) vs 1/T
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 10. Ion ratio according to Equation (36).
+        note: Open circles heating, filled cooling; N_Al labels 0.750, 0.330, 0.172, 0.134, 0.097, 0.067.
+          Not digitised.
+    - observation_id: ichise_1977_fig11_quadratic_Al2O_plot_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '11'
+        published_page: 423
+        pdf_page_index: 7
+        note: Fig. 11. Quadratic plots according to Equation (37).
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: Fe-Al_alloy_in_alumina_Knudsen_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: 3 ln(I+_Al2O/I+_Al) - ln N_Al vs (1-N_Al)^2 at 1400 C
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 11. Quadratic plots according to Equation (37).
+        note: Solid and liquid lines. Used for the rejected Al2O-method a_Al. Not digitised.
+    - observation_id: ichise_1977_fig12_fragmentation_R_vs_ionizing_potential_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '12'
+        published_page: 424
+        pdf_page_index: 8
+        note: Fig. 12. Evaluation of the fragmentation ionization according to Equation (43).
+      T_range_K:
+      - 1673.15
+      - 1873.15
+      phase: Fe-Al_alloy_in_alumina_Knudsen_cell
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: R vs ionizing potential V
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 12. Evaluation of the fragmentation ionization according to Equation (43).
+        note: 'Run-25 (N_Al=0.750) and Run-16 (N_Al=0.134). Authors: R agrees up to 30 V so Al2O fragmentation
+          contribution to I+_Al is negligible. Appearance potential of Al2O+ quoted 7.7 V from Porter,
+          Schissel and Inghram 1955 (ref 17), not this work.'
+  Fe:
+    observations:
+    - observation_id: ichise_1977_fe_activity_table1_1400C
+      type: activity_coefficient
+      locator:
+        table: '1'
+        published_page: 421
+        pdf_page_index: 5
+        note: Table 1. Activity coefficients and activities in Fe-Al alloy at 1400 C
+      T_range_K:
+      - 1673.15
+      - 1673.15
+      phase: Fe-Al_alloy_1400C_solid_and_liquid
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: a(s) and a(l) referred to pure solid and pure liquid Fe respectively, as printed
+      regime: kems_effusion
+      units: dimensionless activity and activity coefficient as printed; N_Al mole fraction
+      uncertainty:
+        note: No per-row sigma printed on Table 1.
+      values:
+        quantity: activity_and_activity_coefficient
+        method_class: model_derived
+        model: Darken quadratic formalism applied to this-work Belton-Fruehan ion-intensity ratios (eqs
+          2, 10, 11)
+        evidence_class: authors_this_work_integrated_from_kems_ion_ratios
+        T_C: 1400.0
+        T_K: 1673.15
+        composition_basis: mole_fraction_N_Al
+        gamma_Fe_solid_infinite_dilution_1400C: 0.02
+        points:
+        - N_Al: 0.0
+          composition_basis: mole_fraction
+          gamma_Fe_solid_standard: 1.0
+          a_Fe_solid_standard: 1.0
+          a_Fe_liquid_standard: 0.923
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.1
+          composition_basis: mole_fraction
+          gamma_Fe_solid_standard: 0.964
+          a_Fe_solid_standard: 0.868
+          a_Fe_liquid_standard: 0.801
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.2
+          composition_basis: mole_fraction
+          gamma_Fe_solid_standard: 0.861
+          a_Fe_solid_standard: 0.689
+          a_Fe_liquid_standard: 0.636
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.3
+          composition_basis: mole_fraction
+          gamma_Fe_solid_standard: 0.716
+          a_Fe_solid_standard: 0.501
+          a_Fe_liquid_standard: 0.462
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.368
+          composition_basis: mole_fraction
+          gamma_Fe_solid_standard: 0.605
+          a_Fe_solid_standard: 0.382
+          a_Fe_liquid_standard: 0.353
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.406
+          composition_basis: mole_fraction
+          gamma_Fe_solid_standard: 0.644
+          a_Fe_solid_standard: 0.382
+          a_Fe_liquid_standard: 0.353
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.5
+          composition_basis: mole_fraction
+          gamma_Fe_solid_standard: 0.451
+          a_Fe_solid_standard: 0.226
+          a_Fe_liquid_standard: 0.209
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.6
+          composition_basis: mole_fraction
+          gamma_Fe_solid_standard: 0.284
+          a_Fe_solid_standard: 0.114
+          a_Fe_liquid_standard: 0.105
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.7
+          composition_basis: mole_fraction
+          gamma_Fe_solid_standard: 0.165
+          a_Fe_solid_standard: 0.05
+          a_Fe_liquid_standard: 0.046
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.8
+          composition_basis: mole_fraction
+          gamma_Fe_solid_standard: 0.088
+          a_Fe_solid_standard: 0.018
+          a_Fe_liquid_standard: 0.017
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 0.9
+          composition_basis: mole_fraction
+          gamma_Fe_solid_standard: 0.043
+          a_Fe_solid_standard: 0.004
+          a_Fe_liquid_standard: 0.004
+          T_C: 1400.0
+          T_K: 1673.15
+        - N_Al: 1.0
+          composition_basis: mole_fraction
+          gamma_Fe_solid_standard: 0.02
+          a_Fe_solid_standard: 0.0
+          a_Fe_liquid_standard: 0.0
+          T_C: 1400.0
+          T_K: 1673.15
+      equipment:
+        cell_material:
+          value: Al2O3 (alumina) Knudsen cell; tantalum cell holder (Fig. 1)
+          locator:
+            figure: '1'
+            published_page: 418
+            pdf_page_index: 2
+            note: Alumina knudsen cell / Tantalum cell holder; (mm)
+        orifice_area:
+          value:
+            orifice_diameter_mm_as_printed: 0.5
+            as_printed: 0.5 phi on the alumina-cell lid drawing, units mm
+            area: not_computed
+          locator:
+            figure: '1'
+            published_page: 418
+            pdf_page_index: 2
+            note: lid callout 0.5 phi, 1 mm lid thickness; cell 12 phi OD
+        sample_surface_area:
+          value: unstated
+          locator:
+            figure: '1'
+            published_page: 418
+            pdf_page_index: 2
+            note: inner diameters 11 phi and 9 phi printed; free surface not stated
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 418
+            pdf_page_index: 2
+            section: '2.2'
+            note: Clausing factor not printed
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 419
+            pdf_page_index: 3
+            section: '2.6'
+            note: vacuum quality / chamber pressure not printed; Fig. 3 is chamber voltage vs ion ratio
+    - observation_id: ichise_1977_ln_gamma_fe_temperature_equations
+      type: activity_coefficient
+      locator:
+        published_page: 422
+        pdf_page_index: 6
+        equation: 31-33
+        note: eqs (31)-(33) on p. 422; conclusion p. 424 reprints ln gamma_Fe^o(l) = 444/T - 4.30; English
+          synopsis p. 417 prints 440/T - 4.30
+      T_range_K:
+      - 1673.15
+      - 1873.15
+      phase: Fe-Al_alloy
+      condensed_form:
+        state: solid_and_liquid_Fe_Al_alloy
+        metastable: false
+        basis: explicit_author
+        note: 'Al-Fe alloys in an Al2O3 Knudsen cell. Charge composition taken as sample composition:
+          weight change before/after the run was very small and ion-intensity ratios did not drift with
+          time.'
+      standard_state: Raoultian pure Fe, solid and liquid as labelled
+      regime: kems_effusion
+      units: ln gamma_Fe dimensionless; T in K as printed
+      uncertainty:
+        note: Synopsis prints ln gamma_Fe^o(l)=440/T-4.30; body eq (32) and conclusion print 444/T-4.30.
+          Both recorded; not reconciled.
+      values:
+        quantity: activity_coefficient_temperature_equation
+        method_class: model_derived
+        model: same ion-ratio T-dependence method as for Al, referred to Fe
+        ln_gamma_Fe_o_solid_eq31: ln gamma_Fe^o(s) = 3140/T - 5.79
+        ln_gamma_Fe_o_liquid_eq32_body_and_conclusion: ln gamma_Fe^o(l) = 444/T - 4.30
+        ln_gamma_Fe_o_liquid_synopsis: ln gamma_Fe^o(l) = 440/T - 4.30
+        epsilon_Fe_Fe_eq33: epsilon_Fe^(Fe) = 2280/T + 6.93
+        evaluated_1600C:
+          gamma_Fe_o_liquid: 0.017
+          epsilon_Fe_Fe: 8.2
+        print_conflict: 'English synopsis p. 417: 440/T - 4.30. Japanese body eq (32) p. 422 and conclusion
+          p. 424: 444/T - 4.30. Recorded as printed in each location.'
+deepening:
+  dispatch_id: extract-alloys-b1
+  date: '2026-09-13'
+  quote_convention: English synopsis, table/figure captions, and numerals transcribed with ASCII flattening
+    of subscripts, gamma, epsilon, and Delta. Japanese body not translated.
+  measured_rows_covered: 24
+  table_inventory:
+  - table: '1'
+    published_page: 421
+    pdf_page_index: 5
+    completeness: full
+    note: All 12 composition rows and 7 columns transcribed from the 400 dpi render. N_Al=0.368 and 0.406
+      are the two-phase (solidus/liquidus) rows; a_Al and a_Fe match across those two rows as printed.
+  - table: '2'
+    published_page: 422
+    pdf_page_index: 6
+    completeness: full
+    note: Six investigator rows. Chou and Elliott epsilon is a printed dash (omitted, not a zero). This
+      study 0.049 / +6.4 stored separately from the quoted rows.
+  class_ledger:
+    measured:
+    - ichise_1977_ion_ratio_NAl_0p5_1470C_30V
+    - ichise_1977_fig3_chamber_voltage_ion_ratio_figure_only
+    - ichise_1977_fig4_ln_ion_ratio_vs_1_over_T_figure_only
+    - ichise_1977_fig5_solidus_liquidus_figure_only
+    - ichise_1977_fig10_Al2O_Al_ion_ratio_vs_1_over_T_figure_only
+    - ichise_1977_fig12_fragmentation_R_vs_ionizing_potential_figure_only
+    - ichise_1977_fig2_temperature_correction_figure_only
+    model_derived:
+    - ichise_1977_al_activity_table1_1400C
+    - ichise_1977_fe_activity_table1_1400C
+    - ichise_1977_gamma_al_epsilon_table2_this_study_1600C
+    - ichise_1977_ln_gamma_al_temperature_equations
+    - ichise_1977_ln_gamma_fe_temperature_equations
+    - ichise_1977_gamma_al_from_Al2O_ratio_rejected
+    - ichise_1977_1600C_fig4_extrapolation_rejected
+    - ichise_1977_limiting_molar_heat_of_mixing_Al
+    - ichise_1977_eq10_11_ion_ratio_integrand_1400C
+    - ichise_1977_fig6_integration_curve_1400C_figure_only
+    - ichise_1977_fig7_activities_1400C_figure_only
+    - ichise_1977_fig8_ln_rho_and_alpha_vs_1_over_T_figure_only
+    - ichise_1977_fig9_ln_gamma_al_o_and_epsilon_figure_only
+    - ichise_1977_fig11_quadratic_Al2O_plot_figure_only
+    quoted_measurement:
+    - ichise_1977_gamma_al_epsilon_table2_quoted_1600C
+    author_estimate:
+    - ichise_1977_p_Al2O_p_Al_1500C_author_estimate
+    method_only:
+    - ichise_1977_kems_geometry_and_calibration
+  primary_sources_cited:
+  - J. Chipman and T. P. Floridis, Acta Met. 3 (1955) 456
+  - T. G. Wilder and J. F. Elliott, J. Electrochem. Soc. 107 (1960) 628
+  - R. D. Pehlke, Trans. Met. Soc. AIME 212 (1958) 486
+  - P. Gross, D. L. Levi, E. W. Dewing and G. L. Wilson, Physical Chemistry of Process Metallurgy, part
+    1 (1961) 403
+  - J. Eldridge and K. L. Komarek, Trans. Met. Soc. AIME 230 (1964) 226
+  - A. Coskun and J. F. Elliott, Trans. Met. Soc. AIME 242 (1968) 253
+  - F. Woolley and J. F. Elliott, Trans. Met. Soc. AIME 239 (1967) 1872
+  - G. R. Belton and R. J. Fruehan, Trans. Met. Soc. AIME 245 (1969) 113
+  - G. R. Belton and R. J. Fruehan, J. Phys. Chem. 71 (1967) 1403
+  - Ichise, Kitao and Mori, Tetsu-to-Hagane 60 (1974) 2119
+  - Kato and Furukawa, Waseda Casting Research Laboratory Report No. 27 (1973) 97
+  - M. Hansen, Constitution of Binary Alloys (1958)
+  - L. S. Darken, Trans. Met. Soc. AIME 239 (1967) 80
+  - J. F. Elliott and M. Gleiser, Thermochemistry for Steelmaking vol. I (1960)
+  - R. Hultgren, Supplement to Selected Values of Thermodynamic Properties of Metals and Alloys (1967,
+    1968)
+  - Y. H. Chou and J. F. Elliott, Basic Open Hearth Steelmaking, AIME (1951) 638
+  - R. F. Porter, P. Schissel and M. G. Inghram, J. Chem. Phys. 23 (1955) 339
+  - J. Drowart, G. DeMaria, R. P. Burns and M. G. Inghram, J. Chem. Phys. 32 (1960) 1366
+  battery_limitation: Raw I+(Al)/I+(Fe) vs T lives only on Fig. 4 (not digitised). Table 1 is the Darken-integrated
+    activity table at 1400 C. 1600 C gamma_Al^o=0.049 is from the T-equations, not a direct 1600 C integration
+    the authors adopted.

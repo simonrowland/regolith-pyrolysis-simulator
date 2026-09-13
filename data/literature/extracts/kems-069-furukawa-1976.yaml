@@ -1,0 +1,1146 @@
+schema_version: literature_extract.v1
+source_id: kems-069-furukawa-1976
+source:
+  citation: Furukawa, T. & Kato, E. (1976), "Thermodynamics of Binary Liquid Iron-Titanium Alloys by Mass
+    Spectrometry", Trans. ISIJ 16:382-387, DOI 10.2355/isijinternational1966.16.382. Originally published
+    in Tetsu-to-Hagane 61 (1975) 3060 in Japanese.
+  doi: 10.2355/isijinternational1966.16.382
+  url: https://doi.org/10.2355/isijinternational1966.16.382
+  year: 1976
+extraction:
+  method: Official J-STAGE OA PDF (raw/kems-069-furukawa-1976/kems-069-furukawa-1976.pdf). English Transactions
+    ISIJ version of a Japanese Tetsu-to-Hagane original. pdftotext -layout is a noisy OCR layer and is
+    not data. Tables 1-4 transcribed from 400 dpi pdftoppm renders of PDF pages 2-4 (published pp. 383-385).
+    Where the decode and the render disagree, the render wins. Figs 1-7 and Photo. 1 listed figure-only.
+    Table 2 ion-current ratios kept as measured; Table 4 activities labelled model_derived (Belton-Fruehan
+    integration of Table 2). Table 3 This work kept distinct from quoted investigators.
+  date: '2026-09-13'
+  worker: extract-alloys-b1
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.Ti.observations[furukawa_1976_ion_current_ratios_table2].values.points[0].log10_ITi_over_IFe_1600C
+  value: -2.676
+  locator:
+    table: '2'
+    published_page: 384
+    pdf_page_index: 3
+    note: Table 2 N_Ti=0.098, log(I+_Ti/I+_Fe) at 1600 C = -2.676
+- species: Ti
+  observable: activity_coefficient
+  observation_id: furukawa_1976_ti_activity_table4_1600C
+  field: gamma_Ti_infinite_dilution_liquid_ref
+  value: 0.017
+  locator:
+    table: '4'
+    published_page: 385
+    pdf_page_index: 4
+    note: Table 4 N_Ti=0.00 gamma_Ti=0.017 +/- 0.002
+- path: species.Fe.observations[furukawa_1976_fe_activity_table4_1600C].values.points[10].activity_coefficient
+  value: 0.043
+  locator:
+    table: '4'
+    published_page: 385
+    pdf_page_index: 4
+    note: Table 4 N_Ti=1.00 gamma_Fe=0.043 +/- 0.002
+- species: Ti
+  observable: rate_series
+  observation_id: furukawa_1976_kems_geometry_and_calibration
+  field: ionizing_electron_energy_V
+  value: 19.0
+  locator:
+    published_page: 383
+    pdf_page_index: 2
+    note: An electron accelerating voltage of 19 V was applied for ionization
+species:
+  Ti:
+    observations:
+    - observation_id: furukawa_1976_kems_geometry_and_calibration
+      type: rate_series
+      locator:
+        published_page: 383
+        pdf_page_index: 2
+        section: III
+        note: thoria cell; 19 V ionizing; 48Ti+ and 54Fe+; apparatus as Kato-Furukawa Fe-V except movable
+          exit slit
+      T_range_K:
+      - 1823.15
+      - 1873.15
+      phase: liquid_Fe-Ti_in_thoria_Knudsen_cell
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: Raoultian pure liquid Ti and Fe (Table 4); solid-Ti gamma_Ti^o also tabulated
+      regime: kems_effusion
+      units: as published
+      uncertainty:
+        note: Heat-shield deposits contribute ~10% to Ti ion intensity at 9.84 at% Ti and ~10% to Fe intensity
+          at 90.1 at% Ti. Empty-cell checks before/after dilute and rich runs.
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: method_only
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: magnetic deflection mass spectrometer (same as Kato and Furukawa Fe-V, ref 2)
+        ionizing_electron_energy_V: 19.0
+        ions_used:
+          Ti: 48Ti+
+          Fe: 54Fe+
+        thorium_addition: 1 at% of the solute content; maximum about 0.5 at% Th at N_Ti=0.494
+        thorium_purpose: lower oxygen partial pressure in the cell; prevent creep through the orifice
+        cell_od_upper_mm: 9.5
+        cell_od_lower_mm: 11.0
+        cell_height_mm: 11.0
+        wall_thickness_mm: 1.0
+        lid_diameter_mm: 11.0
+        lid_thickness_mm: 1.0
+        orifice_diameters_mm:
+        - 0.4
+        - 0.6
+        - 0.7
+        sample_mass: unstated
+        chamber_pressure: unstated
+        vacuum_quality: unstated
+        missing_for_motzfeldt:
+        - numeric_orifice_area
+        - clausing_factor
+        - sample_surface_area
+        - chamber_pressure
+        - sample_mass
+      equipment:
+        cell_material:
+          value: thoria (ThO2) Knudsen cell, laboratory-made; wall ~94% and bottom ~98% of theoretical
+            density
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            section: III.1
+            note: thoria cells made in our laboratory
+        orifice_area:
+          value:
+            orifice_diameters_mm_as_printed:
+            - 0.4
+            - 0.6
+            - 0.7
+            area: not_computed
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            section: III.1
+            note: orifice diameters were 0.4, 0.6 and 0.7 mm
+        multi_orifice_series:
+          value: 0.4, 0.6 and 0.7 mm orifices used according to the purpose of the experiments; 69.4 at%
+            Ti run at 0.4 and 0.7 mm in agreement
+          locator:
+            published_page: 384
+            pdf_page_index: 3
+            note: measurements of the sample containing 69.4 at% Ti were made with orifice diameters of
+              0.4 and 0.7 mm
+        sample_surface_area:
+          value: unstated
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            note: crucible OD 9.5 mm (upper) / 11 mm (lower), height 11 mm, wall 1 mm; free surface not
+              stated
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            note: Clausing factor not printed
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            note: vacuum quality / chamber pressure not printed
+    - observation_id: furukawa_1976_table1_pure_materials_ppm
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 383
+        pdf_page_index: 2
+        note: Table 1. Chemical analysis of the pure materials (ppm)
+      T_range_K:
+      - 1823.15
+      - 1873.15
+      phase: starting_metals
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: starting metal purity; ppm as printed; dashes are omitted (not zeros)
+      regime: kems_effusion
+      units: ppm as printed
+      uncertainty:
+        note: No uncertainty printed on Table 1 cells.
+      values:
+        quantity: starting_metal_chemical_analysis
+        method_class: measured
+        iron_ppm:
+          Al: 40.0
+          C: 50.0
+          S: 40.0
+          Si: 70.0
+          O: 26.0
+        iron_purity_as_printed: Fe > 99.97%
+        iron_dash_columns:
+        - Fe
+        - Ag
+        - Cu
+        - Ca
+        - Mg
+        - Mn
+        - Na
+        - Sn
+        titanium_ppm:
+          Fe: 100.0
+          Ag: 0.1
+          Cu: 0.1
+          Ca: 0.2
+          Mg: 0.1
+          Mn: 0.2
+          Na: 0.5
+          Si: 10.0
+          Sn: 50.0
+        titanium_purity_as_printed: Ti > 99.9%
+        titanium_dash_columns:
+        - Al
+        - C
+        - S
+        - O
+    - observation_id: furukawa_1976_ion_current_ratios_table2
+      type: rate_series
+      locator:
+        table: '2'
+        published_page: 384
+        pdf_page_index: 3
+        note: Table 2. Experimental values of ion current ratios for Fe-Ti alloys
+      T_range_K:
+      - 1823.15
+      - 1873.15
+      phase: liquid_Fe-Ti_alloy
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: log10(I+_Ti/I+_Fe) as printed; 48Ti+ / 54Fe+
+      regime: kems_effusion
+      units: log10 ion-current ratio dimensionless; d log / d(1/T) as printed (K)
+      uncertainty:
+        note: No per-row sigma on Table 2. Fig. 1 shows heating vs cooling and 0.4/0.6/0.7 mm orifice
+          marks.
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        ion_pair: I+(Ti-48)/I+(Fe-54)
+        log_base: 10
+        points:
+        - N_Ti: 0.098
+          composition_basis: mole_fraction
+          d_log10_ITi_over_IFe_d_1_over_T: -5080.0
+          log10_ITi_over_IFe_1600C: -2.676
+          log10_ITi_over_IFe_1550C: -2.75
+        - N_Ti: 0.201
+          composition_basis: mole_fraction
+          d_log10_ITi_over_IFe_d_1_over_T: -3910.0
+          log10_ITi_over_IFe_1600C: -1.925
+          log10_ITi_over_IFe_1550C: -1.982
+        - N_Ti: 0.271
+          composition_basis: mole_fraction
+          d_log10_ITi_over_IFe_d_1_over_T: -3340.0
+          log10_ITi_over_IFe_1600C: -1.543
+          log10_ITi_over_IFe_1550C: -1.592
+        - N_Ti: 0.333
+          composition_basis: mole_fraction
+          d_log10_ITi_over_IFe_d_1_over_T: -3770.0
+          log10_ITi_over_IFe_1600C: -1.213
+          log10_ITi_over_IFe_1550C: -1.268
+        - N_Ti: 0.401
+          composition_basis: mole_fraction
+          d_log10_ITi_over_IFe_d_1_over_T: -3500.0
+          log10_ITi_over_IFe_1600C: -0.856
+          log10_ITi_over_IFe_1550C: -0.907
+        - N_Ti: 0.494
+          composition_basis: mole_fraction
+          d_log10_ITi_over_IFe_d_1_over_T: -3710.0
+          log10_ITi_over_IFe_1600C: -0.397
+          log10_ITi_over_IFe_1550C: -0.451
+        - N_Ti: 0.603
+          composition_basis: mole_fraction
+          d_log10_ITi_over_IFe_d_1_over_T: -4020.0
+          log10_ITi_over_IFe_1600C: 0.105
+          log10_ITi_over_IFe_1550C: 0.046
+        - N_Ti: 0.694
+          composition_basis: mole_fraction
+          d_log10_ITi_over_IFe_d_1_over_T: -1120.0
+          log10_ITi_over_IFe_1600C: 0.615
+          log10_ITi_over_IFe_1550C: 0.598
+        - N_Ti: 0.795
+          composition_basis: mole_fraction
+          d_log10_ITi_over_IFe_d_1_over_T: -670.0
+          log10_ITi_over_IFe_1600C: 1.121
+          log10_ITi_over_IFe_1550C: 1.111
+        - N_Ti: 0.901
+          composition_basis: mole_fraction
+          d_log10_ITi_over_IFe_d_1_over_T: 270.0
+          log10_ITi_over_IFe_1600C: 1.738
+          log10_ITi_over_IFe_1550C: 1.742
+      equipment:
+        cell_material:
+          value: thoria (ThO2) Knudsen cell, laboratory-made; wall ~94% and bottom ~98% of theoretical
+            density
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            section: III.1
+            note: thoria cells made in our laboratory
+        orifice_area:
+          value:
+            orifice_diameters_mm_as_printed:
+            - 0.4
+            - 0.6
+            - 0.7
+            area: not_computed
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            section: III.1
+            note: orifice diameters were 0.4, 0.6 and 0.7 mm
+        multi_orifice_series:
+          value: 0.4, 0.6 and 0.7 mm orifices used according to the purpose of the experiments; 69.4 at%
+            Ti run at 0.4 and 0.7 mm in agreement
+          locator:
+            published_page: 384
+            pdf_page_index: 3
+            note: measurements of the sample containing 69.4 at% Ti were made with orifice diameters of
+              0.4 and 0.7 mm
+        sample_surface_area:
+          value: unstated
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            note: crucible OD 9.5 mm (upper) / 11 mm (lower), height 11 mm, wall 1 mm; free surface not
+              stated
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            note: Clausing factor not printed
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            note: vacuum quality / chamber pressure not printed
+    - observation_id: furukawa_1976_ti_activity_table4_1600C
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 385
+        pdf_page_index: 4
+        note: Table 4. Activities and activity coefficients for Fe-Ti alloys at 1600 C (liquid Ti and
+          liquid Fe)
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Ti_alloy
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: Raoultian pure liquid titanium
+      regime: kems_effusion
+      units: dimensionless; N_Ti mole fraction
+      uncertainty:
+        note: Selected gamma cells carry +/- from drawing several curves in the +/-3 sigma band of the
+          Fig. 2(b) integration plot. Not every row has a printed envelope.
+      values:
+        quantity: activity_and_activity_coefficient
+        method_class: model_derived
+        model: Belton-Fruehan modified Gibbs-Duhem integration (eq 4) of this-work Table 2 ion-current
+          ratios
+        T_C: 1600.0
+        T_K: 1873.15
+        gamma_Ti_infinite_dilution_liquid_ref: 0.017
+        points:
+        - N_Ti: 0.0
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.0
+          activity_coefficient: 0.017
+          activity_coefficient_uncertainty: 0.002
+          uncertainty_as_printed: +/-0.002
+        - N_Ti: 0.1
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.005
+          activity_coefficient: 0.047
+        - N_Ti: 0.2
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.021
+          activity_coefficient: 0.103
+          activity_coefficient_uncertainty: 0.002
+          uncertainty_as_printed: +/-0.002
+        - N_Ti: 0.3
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.051
+          activity_coefficient: 0.172
+        - N_Ti: 0.4
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.117
+          activity_coefficient: 0.292
+        - N_Ti: 0.5
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.217
+          activity_coefficient: 0.433
+          activity_coefficient_uncertainty: 0.004
+          uncertainty_as_printed: +/-0.004
+        - N_Ti: 0.6
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.348
+          activity_coefficient: 0.58
+        - N_Ti: 0.7
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.544
+          activity_coefficient: 0.777
+        - N_Ti: 0.8
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.723
+          activity_coefficient: 0.904
+          activity_coefficient_uncertainty: 0.002
+          uncertainty_as_printed: +/-0.002
+        - N_Ti: 0.9
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.881
+          activity_coefficient: 0.979
+        - N_Ti: 1.0
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 1.0
+          activity_coefficient: 1.0
+      equipment:
+        cell_material:
+          value: thoria (ThO2) Knudsen cell, laboratory-made; wall ~94% and bottom ~98% of theoretical
+            density
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            section: III.1
+            note: thoria cells made in our laboratory
+        orifice_area:
+          value:
+            orifice_diameters_mm_as_printed:
+            - 0.4
+            - 0.6
+            - 0.7
+            area: not_computed
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            section: III.1
+            note: orifice diameters were 0.4, 0.6 and 0.7 mm
+        multi_orifice_series:
+          value: 0.4, 0.6 and 0.7 mm orifices used according to the purpose of the experiments; 69.4 at%
+            Ti run at 0.4 and 0.7 mm in agreement
+          locator:
+            published_page: 384
+            pdf_page_index: 3
+            note: measurements of the sample containing 69.4 at% Ti were made with orifice diameters of
+              0.4 and 0.7 mm
+        sample_surface_area:
+          value: unstated
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            note: crucible OD 9.5 mm (upper) / 11 mm (lower), height 11 mm, wall 1 mm; free surface not
+              stated
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            note: Clausing factor not printed
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            note: vacuum quality / chamber pressure not printed
+    - observation_id: furukawa_1976_gamma_ti_table3_this_work_1600C
+      type: activity_coefficient
+      locator:
+        table: '3'
+        published_page: 385
+        pdf_page_index: 4
+        note: 'Table 3 This work row: 0.017** (liquid Ti) and 0.018* (solid Ti) at 1600 C'
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Ti_infinite_dilution
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: '* solid Ti; ** liquid Ti, as footnoted'
+      regime: kems_effusion
+      units: dimensionless
+      uncertainty:
+        note: No extra sigma on the Table 3 This work cells; Table 4 gives +/-0.002 on gamma_Ti at N_Ti=0.
+      values:
+        quantity: infinite_dilution_activity_coefficient
+        method_class: model_derived
+        model: Belton-Fruehan integration of this-work ion ratios; solid-Ti scale uses Elliott et al.
+          heat of fusion 3700 cal/mol and mp 1940 K (ref 11)
+        T_C: 1600.0
+        gamma_Ti_o_liquid_reference: 0.017
+        gamma_Ti_o_solid_reference: 0.018
+        solid_ref_conversion_quoted:
+          Delta_H_fusion_cal_mol: 3700.0
+          T_m_K: 1940.0
+          quoted_from: Elliott, Gleiser and Ramakrishna, Thermochemistry for Steelmaking I (1963), ref
+            11
+    - observation_id: furukawa_1976_gamma_ti_table3_quoted
+      type: activity_coefficient
+      locator:
+        table: '3'
+        published_page: 385
+        pdf_page_index: 4
+        note: Table 3 comparison of gamma_Ti^o from previous works
+      T_range_K:
+      - 1818.15
+      - 1900.15
+      phase: liquid_Fe-Ti_infinite_dilution
+      condensed_form:
+        state: liquid_alloy
+        metastable: false
+        basis: explicit_author
+        note: Quoted gamma_Ti^o of other workers; not this-work KEMS
+      standard_state: '* solid Ti; ** liquid Ti, as footnoted'
+      regime: kems_effusion
+      units: dimensionless
+      uncertainty:
+        note: Quoted compilation; no uncertainties printed in Table 3.
+      values:
+        quantity: infinite_dilution_activity_coefficient
+        method_class: quoted_measurement
+        points:
+        - investigators: Chipman
+          gamma_Ti_o: 0.011
+          reference_state: solid_Ti
+          T_C: 1627.0
+        - investigators: Chino, Nakamura, Tsunetomi and Segawa
+          gamma_Ti_o: 0.033
+          reference_state: solid_Ti
+          T_C: 1600.0
+        - investigators: Averin
+          gamma_Ti_o: 0.007
+          reference_state: solid_Ti
+          T_C: 1600.0
+        - investigators: Fruehan
+          gamma_Ti_o: 0.038
+          reference_state: solid_Ti
+          T_C: 1600.0
+        - investigators: Suzuki and Sanbongi
+          gamma_Ti_o: 0.016
+          reference_state: solid_Ti
+          T_C: 1600.0
+        - investigators: Wagner and St. Pierre
+          gamma_Ti_o: 0.068
+          reference_state: liquid_Ti
+          T_C: 1545.0
+    - observation_id: furukawa_1976_wagner_quoted_regular_solution
+      type: activity_coefficient
+      locator:
+        published_page: 383
+        pdf_page_index: 2
+        equation: 1-3
+        note: Wagner and St. Pierre 1545 C regular-solution G^E = H^M = -9700 N_Fe N_Ti cal/mol; gamma_Ti^o
+          from eq (3) is 0.068
+      T_range_K:
+      - 1818.15
+      - 1818.15
+      phase: liquid_Fe-Ti
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: liquid pure titanium as the reference state (quoted)
+      regime: kems_effusion
+      units: cal/mol as printed
+      uncertainty:
+        note: Quoted from Wagner and St. Pierre (ref 1); not this work.
+      values:
+        quantity: excess_gibbs_regular_solution
+        method_class: quoted_measurement
+        quoted_from: Wagner and St. Pierre, Met. Trans. 5 (1974) 887
+        T_C: 1545.0
+        G_E_cal_mol_as_printed: G^E = H^M = -9700 N_Fe N_Ti
+        gamma_Ti_o_from_eq3: 0.068
+    - observation_id: furukawa_1976_log_gamma_darken_equations
+      type: activity_coefficient
+      locator:
+        published_page: 386
+        pdf_page_index: 5
+        equation: 6-7
+        figure: '7'
+        note: eqs (6)-(7) and conclusion; synopsis p. 382 prints +0.58 for log gamma_Ti intercept vs +0.53
+          in the body
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Ti_narrow_composition_windows
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: Raoultian liquid; Darken-style log gamma vs (1-N_i)^2 over N_i <= 0.10
+      regime: kems_effusion
+      units: log10 gamma dimensionless
+      uncertainty:
+        note: 'Authors: applicable over narrow composition ranges; liquid Fe-Ti at 1600 C cannot be thought
+          a regular solution. Synopsis intercept +0.58 vs body/Fig. 7 +0.53 recorded as printed.'
+      values:
+        quantity: activity_coefficient_composition_equation
+        method_class: model_derived
+        model: linear log gamma_i vs (1-N_i)^2 from this-work 1600 C activities (Fig. 7)
+        T_C: 1600.0
+        log10_gamma_Ti_body_eq6: log gamma_Ti = -2.29 N_Fe^2 + 0.53  (N_Ti <= 0.10)
+        log10_gamma_Fe_eq7: log gamma_Fe = -0.89 N_Ti^2 - 0.48  (N_Fe <= 0.10)
+        log10_gamma_Ti_synopsis: log gamma_Ti = -2.29 N_Fe^2 + 0.58  (N_Ti <= 0.10)
+        print_conflict: English synopsis p. 382 intercept +0.58; body eqs (6) and Fig. 7 intercept +0.53.
+          Recorded as printed in each location.
+    - observation_id: furukawa_1976_heats_of_solution
+      type: gibbs_table
+      locator:
+        published_page: 386
+        pdf_page_index: 5
+        figure: '6'
+        note: infinite-dilution heats of solution and maximum H^M from integration of Table 2 slopes via
+          eq (5)
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Ti
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: partial molar heats of solution; kcal/mol as printed
+      regime: kems_effusion
+      units: kcal/mol as printed
+      uncertainty:
+        note: Fig. 5 integrations drawn in a +/-a band of the measured slopes; authors say errors in heats
+          are large compared with activities. Numeric +/- on the infinite-dilution heats is not printed
+          on p. 386.
+      values:
+        quantity: partial_molar_heat_of_solution
+        method_class: model_derived
+        model: eq (5) graphical integration of Table 2 d log(I+_Ti/I+_Fe)/d(1/T) slopes
+        T_C: 1600.0
+        H_Ti_infinite_dilution_kcal_mol: -16.1
+        H_Fe_infinite_dilution_kcal_mol: -15.7
+        H_M_maximum_kcal_mol: -3.7
+        H_M_maximum_composition_at_pct_Ti: 65.0
+        gamma_Fe_o_1600C: 0.043
+        gamma_Ti_o_1600C: 0.017
+    - observation_id: furukawa_1976_fig1_ion_ratio_vs_1_over_T_figure_only
+      type: rate_series
+      locator:
+        figure: '1'
+        published_page: 384
+        pdf_page_index: 3
+        note: Fig. 1. Experimental values of the ion current ratio for the Fe-Ti system
+      T_range_K:
+      - 1823.15
+      - 1873.15
+      phase: liquid_Fe-Ti_alloy
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 1. Experimental values of the ion current ratio for the Fe-Ti system
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 1. Experimental values of the ion current ratio for the Fe-Ti system
+        note: log(I+_Ti/I+_Fe) vs 1/T; orifice 0.4/0.6/0.7 mm; open heating, filled cooling. Numeric values
+          are Table 2.
+    - observation_id: furukawa_1976_fig2_integration_curve_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '2'
+        published_page: 384
+        pdf_page_index: 3
+        note: Fig. 2. (a) Ion current ratios and (b) integration curve for the Fe-Ti system at 1600 C
+      T_range_K:
+      - 1823.15
+      - 1873.15
+      phase: liquid_Fe-Ti_alloy
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 2. (a) Ion current ratios and (b) integration curve for the Fe-Ti system at 1600
+          C
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 2. (a) Ion current ratios and (b) integration curve for the Fe-Ti system at 1600
+          C
+        note: Includes Wagner and St. Pierre overlay converted to 54Fe+. Not digitised.
+    - observation_id: furukawa_1976_fig3_activities_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '3'
+        published_page: 385
+        pdf_page_index: 4
+        note: Fig. 3. Activities in the Fe-Ti alloys at 1600 C
+      T_range_K:
+      - 1823.15
+      - 1873.15
+      phase: liquid_Fe-Ti_alloy
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 3. Activities in the Fe-Ti alloys at 1600 C
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 3. Activities in the Fe-Ti alloys at 1600 C
+        note: Liquid-reference this work; dotted solid-Ti reference; Wagner overlay. Numerics in Table
+          4.
+    - observation_id: furukawa_1976_fig4_comparison_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '4'
+        published_page: 385
+        pdf_page_index: 4
+        note: Fig. 4. Comparison of the present study with previous works on the activity of titanium
+          in Fe-Ti alloys
+      T_range_K:
+      - 1823.15
+      - 1873.15
+      phase: liquid_Fe-Ti_alloy
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 4. Comparison of the present study with previous works on the activity of titanium
+          in Fe-Ti alloys
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 4. Comparison of the present study with previous works on the activity of titanium
+          in Fe-Ti alloys
+        note: Fruehan (solid ref, 1600 C), Wagner et al. (liquid ref, 1545 C), this work (liquid ref,
+          1600 C). Not digitised.
+    - observation_id: furukawa_1976_fig5_heat_integration_figure_only
+      type: rate_series
+      locator:
+        figure: '5'
+        published_page: 385
+        pdf_page_index: 4
+        note: Fig. 5. Integration curve for the heats of solution in the Fe-Ti system at 1600 C
+      T_range_K:
+      - 1823.15
+      - 1873.15
+      phase: liquid_Fe-Ti_alloy
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 5. Integration curve for the heats of solution in the Fe-Ti system at 1600 C
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 5. Integration curve for the heats of solution in the Fe-Ti system at 1600 C
+        note: R d ln(I+_Ti/I+_Fe) / d(1/T) vs composition. Not digitised.
+    - observation_id: furukawa_1976_fig6_mixing_properties_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '6'
+        published_page: 386
+        pdf_page_index: 5
+        note: Fig. 6. Thermodynamic properties on the mixing of Fe-Ti alloys at 1600 C
+      T_range_K:
+      - 1823.15
+      - 1873.15
+      phase: liquid_Fe-Ti_alloy
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 6. Thermodynamic properties on the mixing of Fe-Ti alloys at 1600 C
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 6. Thermodynamic properties on the mixing of Fe-Ti alloys at 1600 C
+        note: H_i^M, H^M, G^M, TS^M vs N_Fe. Not digitised.
+    - observation_id: furukawa_1976_fig7_log_gamma_vs_one_minus_N_sq_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '7'
+        published_page: 386
+        pdf_page_index: 5
+        note: Fig. 7. Relation between log gamma_i and (1-N_i)^2 for the Fe-Ti system at 1600 C
+      T_range_K:
+      - 1823.15
+      - 1873.15
+      phase: liquid_Fe-Ti_alloy
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Fig. 7. Relation between log gamma_i and (1-N_i)^2 for the Fe-Ti system at 1600 C
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Fig. 7. Relation between log gamma_i and (1-N_i)^2 for the Fe-Ti system at 1600 C
+        note: 'Printed labels: log gamma_Ti = -2.29 N_Fe^2 + 0.53; log gamma_Fe = -0.89 N_Ti^2 - 0.48.
+          Not digitised.'
+    - observation_id: furukawa_1976_photo1_mass_spectrum_figure_only
+      type: rate_series
+      locator:
+        figure: Photo. 1
+        published_page: 383
+        pdf_page_index: 2
+        note: Photo. 1. Typical mass spectrum for the Fe-Ti system
+      T_range_K:
+      - 1823.15
+      - 1873.15
+      phase: liquid_Fe-Ti_alloy
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: as plotted; not digitised
+      regime: kems_effusion
+      units: as published on the figure
+      uncertainty:
+        note: figure-only; scatter not digitised
+      values:
+        quantity: Photo. 1. Typical mass spectrum for the Fe-Ti system
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        caption: Photo. 1. Typical mass spectrum for the Fe-Ti system
+        note: Fe-Ti alloy 69.4 atomic %, 1592 C; 48Ti+ and 54Fe+ labelled. Not a numeric table.
+  Fe:
+    observations:
+    - observation_id: furukawa_1976_fe_activity_table4_1600C
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 385
+        pdf_page_index: 4
+        note: Table 4 Fe columns at 1600 C; liquid Fe reference
+      T_range_K:
+      - 1873.15
+      - 1873.15
+      phase: liquid_Fe-Ti_alloy
+      condensed_form:
+        state: liquid_Fe_Ti_alloy
+        metastable: false
+        basis: explicit_author
+        note: Alloys made in situ in a thoria Knudsen cell from pure Fe and Ti; 1 at% Th of the solute
+          added (max ~0.5 at% Th at N_Ti=0.494) to lower pO2 and prevent creep.
+      standard_state: Raoultian pure liquid iron
+      regime: kems_effusion
+      units: dimensionless; N_Ti mole fraction
+      uncertainty:
+        note: Selected gamma_Fe cells carry printed +/- from the +/-3 sigma integration envelope.
+      values:
+        quantity: activity_and_activity_coefficient
+        method_class: model_derived
+        model: Belton-Fruehan modified Gibbs-Duhem integration (eq 4) of this-work Table 2 ion-current
+          ratios
+        T_C: 1600.0
+        T_K: 1873.15
+        gamma_Fe_infinite_dilution_liquid_ref: 0.043
+        points:
+        - N_Ti: 0.0
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 1.0
+          activity_coefficient: 1.0
+        - N_Ti: 0.1
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.856
+          activity_coefficient: 0.951
+        - N_Ti: 0.2
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.668
+          activity_coefficient: 0.835
+          activity_coefficient_uncertainty: 0.01
+          uncertainty_as_printed: +/-0.01
+        - N_Ti: 0.3
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.493
+          activity_coefficient: 0.704
+        - N_Ti: 0.4
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.318
+          activity_coefficient: 0.531
+        - N_Ti: 0.5
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.191
+          activity_coefficient: 0.383
+          activity_coefficient_uncertainty: 0.004
+          uncertainty_as_printed: +/-0.004
+        - N_Ti: 0.6
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.108
+          activity_coefficient: 0.27
+        - N_Ti: 0.7
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.047
+          activity_coefficient: 0.156
+        - N_Ti: 0.8
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.02
+          activity_coefficient: 0.1
+          activity_coefficient_uncertainty: 0.004
+          uncertainty_as_printed: +/-0.004
+        - N_Ti: 0.9
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.006
+          activity_coefficient: 0.063
+        - N_Ti: 1.0
+          composition_basis: mole_fraction
+          T_C: 1600.0
+          T_K: 1873.15
+          activity: 0.0
+          activity_coefficient: 0.043
+          activity_coefficient_uncertainty: 0.002
+          uncertainty_as_printed: +/-0.002
+      equipment:
+        cell_material:
+          value: thoria (ThO2) Knudsen cell, laboratory-made; wall ~94% and bottom ~98% of theoretical
+            density
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            section: III.1
+            note: thoria cells made in our laboratory
+        orifice_area:
+          value:
+            orifice_diameters_mm_as_printed:
+            - 0.4
+            - 0.6
+            - 0.7
+            area: not_computed
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            section: III.1
+            note: orifice diameters were 0.4, 0.6 and 0.7 mm
+        multi_orifice_series:
+          value: 0.4, 0.6 and 0.7 mm orifices used according to the purpose of the experiments; 69.4 at%
+            Ti run at 0.4 and 0.7 mm in agreement
+          locator:
+            published_page: 384
+            pdf_page_index: 3
+            note: measurements of the sample containing 69.4 at% Ti were made with orifice diameters of
+              0.4 and 0.7 mm
+        sample_surface_area:
+          value: unstated
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            note: crucible OD 9.5 mm (upper) / 11 mm (lower), height 11 mm, wall 1 mm; free surface not
+              stated
+        clausing_factor:
+          value: unstated
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            note: Clausing factor not printed
+        chamber_pressure:
+          value: unstated
+          locator:
+            published_page: 383
+            pdf_page_index: 2
+            note: vacuum quality / chamber pressure not printed
+deepening:
+  dispatch_id: extract-alloys-b1
+  date: '2026-09-13'
+  quote_convention: English text transcribed with ASCII flattening of gamma, subscripts, and Delta.
+  measured_rows_covered: 18
+  table_inventory:
+  - table: '1'
+    published_page: 383
+    pdf_page_index: 2
+    completeness: full
+    note: Starting-metal ppm analysis. Printed dashes omitted, not zeros.
+  - table: '2'
+    published_page: 384
+    pdf_page_index: 3
+    completeness: full
+    note: Ten N_Ti rows of this-work ion-current ratios at 1550 and 1600 C plus d log/d(1/T).
+  - table: '3'
+    published_page: 385
+    pdf_page_index: 4
+    completeness: full
+    note: Quoted gamma_Ti^o plus This work 0.017** / 0.018*.
+  - table: '4'
+    published_page: 385
+    pdf_page_index: 4
+    completeness: full
+    note: Eleven N_Ti rows of a and gamma at 1600 C; printed +/- transcribed where present.
+  class_ledger:
+    measured:
+    - furukawa_1976_table1_pure_materials_ppm
+    - furukawa_1976_ion_current_ratios_table2
+    - furukawa_1976_fig1_ion_ratio_vs_1_over_T_figure_only
+    - furukawa_1976_photo1_mass_spectrum_figure_only
+    model_derived:
+    - furukawa_1976_ti_activity_table4_1600C
+    - furukawa_1976_fe_activity_table4_1600C
+    - furukawa_1976_gamma_ti_table3_this_work_1600C
+    - furukawa_1976_log_gamma_darken_equations
+    - furukawa_1976_heats_of_solution
+    - furukawa_1976_fig2_integration_curve_figure_only
+    - furukawa_1976_fig3_activities_figure_only
+    - furukawa_1976_fig5_heat_integration_figure_only
+    - furukawa_1976_fig6_mixing_properties_figure_only
+    - furukawa_1976_fig7_log_gamma_vs_one_minus_N_sq_figure_only
+    quoted_measurement:
+    - furukawa_1976_gamma_ti_table3_quoted
+    - furukawa_1976_wagner_quoted_regular_solution
+    - furukawa_1976_fig4_comparison_figure_only
+    method_only:
+    - furukawa_1976_kems_geometry_and_calibration
+  primary_sources_cited:
+  - S. Wagner and G. R. St. Pierre, Met. Trans. 5 (1974) 887
+  - E. Kato and T. Furukawa, Proc. 4th Japan-USSR Joint Symposium on Physical Chemistry of Metallurgical
+    Processes, ISIJ (1974) 201; Tetsu-to-Hagane 61 (1975) 3050
+  - J. Chipman, Trans. Met. Soc. AIME 218 (1960) 767
+  - R. L. Hadley and G. Derge, Trans. Met. Soc. AIME 203 (1955) 55
+  - H. Chino, Y. Nakamura, E. Tsunetomi and K. Segawa, Trans. ISIJ 6 (1966) 959
+  - K. Suzuki and K. Sanbongi, Tetsu-to-Hagane 58 (1972) 1594
+  - V. V. Averin, Proc. 1st Japan-USSR Joint Symposium on Physical Chemistry of Metallurgical Processes,
+    ISIJ (1967) 84
+  - R. J. Fruehan, Met. Trans. 1 (1970) 3403
+  - G. R. Belton and R. J. Fruehan, J. Phys. Chem. 71 (1967) 1403
+  - N. A. Gokcen, J. Phys. Chem. 69 (1967) 3538
+  - J. F. Elliott, M. Gleiser and V. Ramakrishna, Thermochemistry for Steelmaking I (1963)
+  - L. S. Darken, Trans. Met. Soc. AIME 239 (1967) 80
+  battery_limitation: Raw I+(Ti)/I+(Fe) vs T is Fig. 1 (not digitised); Table 2 is the printed numeric
+    ion-ratio table. Table 4 activities are integrated, not independent measurements.
