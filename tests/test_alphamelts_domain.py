@@ -45,7 +45,9 @@ def test_default_band_aliases_commissioning_table() -> None:
     spec = engine_commissioning('alphamelts')
     assert DEFAULT_SIO2_MIN_WT_PCT == spec.sio2_wt_pct.certified.minimum
     assert DEFAULT_SIO2_MAX_WT_PCT == spec.sio2_wt_pct.certified.maximum
-    assert _SIO2_CRASH_FLOOR_WT_PCT == spec.sio2_wt_pct.crash_floor
+    assert (
+        _SIO2_CRASH_FLOOR_WT_PCT == spec.sio2_wt_pct.observed_crash_floor_wt_pct
+    )
     assert DEFAULT_SILICATE_NETWORK_BAND_WT_PCT == spec.sio2_wt_pct.certified.as_tuple()
 
 

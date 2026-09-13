@@ -4,8 +4,11 @@
 # runtime numbers are unchanged by this chunk. Evidence from the t-890
 # battery lives in the notes; re-setting the bands is a later owner-gated
 # step. Out of the certified band the engine still runs (predict-and-flag:
-# notice + authority=extrapolated + certified_band). crash_floor is an
-# engine-death fact and stays a hard refusal.
+# notice + authority=extrapolated + certified_band).
+# observed_crash_floor_wt_pct is evidence metadata, not a pre-run refusal.
+# AlphaMELTS: 34 wt% (measured SIGABRT floor). ThermoEngine: not_applicable
+# (zero observed crashes). The only runtime use is annotating an actual
+# AlphaMELTS subprocess death below that observed floor.
 #
 # Derivation of the published numbers this table replaces (do not retune):
 # - SiO2 certified [30, 80] wt% <- engines/alphamelts/domain.py
@@ -13,7 +16,7 @@
 #   (DEFAULT_SILICATE_NETWORK_BAND_WT_PCT). Adapter
 #   AlphaMELTSBackend._domain_gate used the same window as a pre-equilibrate
 #   refusal.
-# - SiO2 crash_floor 34 wt% <- engines/alphamelts/domain.py
+# - SiO2 observed_crash_floor_wt_pct 34 <- engines/alphamelts/domain.py
 #   _SIO2_CRASH_FLOOR_WT_PCT = 34.0 (measured 2026-08-16 rump-hotwire:
 #   three of four basalts SIGABRT at 34.0 wt%).
 # - T certified [1073.15, 1700] K <- adapter
@@ -31,7 +34,7 @@ engines:
   alphamelts:
     sio2_wt_pct:
       certified: [30.0, 80.0]
-      crash_floor: 34.0
+      observed_crash_floor_wt_pct: 34
     temperature_K:
       certified: [1073.15, 1700.0]
     authority_outside: extrapolated
@@ -40,13 +43,16 @@ engines:
       ref: "binary-pot-engine-arm-imcc.md 2026-09-13"
       note: >
         80 wt% ceiling not evidenced (85 and 90 wt% returned at 1700 K);
-        2400-2600 K returns without residual shift vs IMCC. crash_floor 34
-        wt% is the measured SIGABRT floor, not a trust window.
+        2400-2600 K returns without residual shift vs IMCC.
+        observed_crash_floor_wt_pct 34 wt% is the measured AlphaMELTS
+        SIGABRT floor (2026-08-16 rump-hotwire); it is not a pre-run
+        refusal. Actual subprocess deaths below this floor are annotated
+        engine_reason=sio2_below_observed_crash_floor.
 
   thermoengine:
     sio2_wt_pct:
       certified: [30.0, 80.0]
-      crash_floor: 34.0
+      observed_crash_floor_wt_pct: not_applicable
     temperature_K:
       certified: [1073.15, 1700.0]
     authority_outside: extrapolated
@@ -56,9 +62,8 @@ engines:
       note: >
         80 wt% ceiling not evidenced; 2400-2600 K returns without residual
         shift vs IMCC (0.570 dex in-band vs 0.566 out-of-band). ThermoEngine
-        recorded 0 crashes in the qualification sweep; crash_floor is the
-        published MELTS-family death bound, not a ThermoEngine SIGABRT
-        measurement.
+        recorded 0 crashes in the qualification sweep;
+        observed_crash_floor_wt_pct is not_applicable.
 
   # vaporock:
   # magemin:

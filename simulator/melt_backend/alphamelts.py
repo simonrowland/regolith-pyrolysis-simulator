@@ -2087,11 +2087,13 @@ class _MELTSBackendSupport(MeltBackend):
         diagnostics: Optional[Mapping[str, object]] = None,
         warnings: Optional[List[str]] = None,
     ) -> Optional[EquilibriumResult]:
-        """Crash-floor refusal or certified-band notice. Never silent.
+        """Certified-band notice. Never silent; never a pre-run floor refusal.
 
         Out of the project-owned certified SiO2/T band the engine still
         runs: a notice with authority=extrapolated and certified_band is
-        attached. Below crash_floor the engine is not called.
+        attached. ``observed_crash_floor_wt_pct`` is metadata only; an
+        actual AlphaMELTS subprocess death below that floor is annotated
+        on the typed engine_crash already produced by the base path.
         """
         self._pending_commissioning_diagnostics = None
         assessment = assess_engine_commissioning(
@@ -2099,15 +2101,6 @@ class _MELTSBackendSupport(MeltBackend):
             sio2_wt_pct=self._canonical_sio2_wt_pct(comp_wt),
             temperature_K=float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
         )
-        if assessment.below_crash_floor:
-            return self._crash_floor_result(
-                temperature_C,
-                pressure_bar,
-                fO2_log,
-                sio2_wt_pct=assessment.sio2_wt_pct,
-                crash_floor_wt_pct=float(assessment.spec.sio2_wt_pct.crash_floor),
-                diagnostics=diagnostics,
-            )
         if assessment.notice is not None:
             notice = dict(assessment.notice)
             pending = {
@@ -2193,9 +2186,9 @@ class _MELTSBackendSupport(MeltBackend):
         # t-894: the published SiO2 [30, 80] wt% window is a commissioning
         # band (predict-and-flag), not a pre-equilibrate refusal. Was:
         #   if not 30.0 <= sio2_pct <= 80.0: refuse SILICATE_WINDOW
-        # Certified-band / crash-floor handling lives in
-        # _apply_engine_commissioning. Invalid input (forbidden species,
-        # major-oxide sum) still refuses here.
+        # Certified-band notice lives in _apply_engine_commissioning.
+        # Invalid input (forbidden species, major-oxide sum) still refuses
+        # here. There is no pre-run crash-floor refusal.
         if major_pct <= MELTS_MAJOR_OXIDE_MIN_TOTAL_WT_PCT:
             reason = reason or OutOfDomainReason.MAJOR_SUM
             reasons.append(
@@ -3155,6 +3148,17 @@ class _MELTSBackendSupport(MeltBackend):
         crash_point['stage'] = 'alphamelts_subprocess_execute'
         failure_diagnostics['out_of_domain_crash_point'] = crash_point
         failure_diagnostics['subprocess_failure'] = dict(failure)
+        if reason_code == ALPHAMELTS_REASON_SUBPROCESS_DIED:
+            floor = engine_commissioning(
+                self.backend_name
+            ).sio2_wt_pct.observed_crash_floor_wt_pct
+            sio2_wt_pct = self._canonical_sio2_wt_pct(
+                crash_point.get('composition_wt_pct') or {}
+            )
+            if floor is not None and sio2_wt_pct < float(floor):
+                failure_diagnostics['engine_reason'] = (
+                    'sio2_below_observed_crash_floor'
+                )
         return self._emit_equilibrium_result(
             temperature_C=temperature_C,
             pressure_bar=pressure_bar,

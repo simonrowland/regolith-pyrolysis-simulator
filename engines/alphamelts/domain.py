@@ -78,12 +78,13 @@ _OXIDE_ALIASES.update({
 #   DEFAULT_SIO2_MIN_WT_PCT = 30.0
 #   DEFAULT_SIO2_MAX_WT_PCT = 80.0
 _ALPHAMELTS_COMMISSIONING = engine_commissioning('alphamelts')
-if _ALPHAMELTS_COMMISSIONING.sio2_wt_pct.crash_floor is None:
+if _ALPHAMELTS_COMMISSIONING.sio2_wt_pct.observed_crash_floor_wt_pct is None:
     raise RuntimeError(
-        'alphamelts commissioning row is missing sio2_wt_pct.crash_floor'
+        'alphamelts commissioning row is missing '
+        'sio2_wt_pct.observed_crash_floor_wt_pct'
     )
 _SIO2_CRASH_FLOOR_WT_PCT = float(
-    _ALPHAMELTS_COMMISSIONING.sio2_wt_pct.crash_floor
+    _ALPHAMELTS_COMMISSIONING.sio2_wt_pct.observed_crash_floor_wt_pct
 )
 DEFAULT_SIO2_MIN_WT_PCT = float(
     _ALPHAMELTS_COMMISSIONING.sio2_wt_pct.certified.minimum

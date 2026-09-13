@@ -2,8 +2,11 @@
 
 Loaded once from ``data/engine_commissioning.yaml``. Certified SiO2 and
 temperature windows are predict-and-flag (notice + authority=extrapolated
-+ certified_band); ``crash_floor`` is an engine-death fact and stays a
-hard refusal. Adapters must not re-hardcode a second copy of these numbers.
++ certified_band). ``observed_crash_floor_wt_pct`` is evidence metadata,
+not a pre-run refusal: AlphaMELTS records the measured 34 wt% SIGABRT
+floor; ThermoEngine is ``not_applicable``. The only runtime use is
+annotating an actual AlphaMELTS subprocess death below that floor.
+Adapters must not re-hardcode a second copy of these numbers.
 
 FALLBACK (loud): the published adapter/domain constants this table replaced,
 used only if a caller asks for the documented historical values. Runtime
@@ -11,7 +14,7 @@ loads the YAML; a missing or invalid table fails loud rather than inventing
 a second band.
 
     SiO2 certified [30, 80] wt%  <- domain.py DEFAULT_SIO2_MIN/MAX_WT_PCT
-    SiO2 crash_floor 34 wt%      <- domain.py _SIO2_CRASH_FLOOR_WT_PCT
+    SiO2 observed_crash_floor_wt_pct 34  <- domain.py _SIO2_CRASH_FLOOR_WT_PCT
     T certified [1073.15, 1700] K
         <- alphamelts.py ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C = 800 C
            and melt_envelope.py T_calib_max_K = 1700 K
@@ -48,7 +51,10 @@ _TOP_KEYS: frozenset[str] = frozenset({'schema_version', 'engines'})
 _ENGINE_KEYS: frozenset[str] = frozenset(
     {'sio2_wt_pct', 'temperature_K', 'authority_outside', 'source'}
 )
-_SIO2_KEYS: frozenset[str] = frozenset({'certified', 'crash_floor'})
+_SIO2_KEYS: frozenset[str] = frozenset(
+    {'certified', 'observed_crash_floor_wt_pct'}
+)
+_NOT_APPLICABLE = 'not_applicable'
 _TEMPERATURE_KEYS: frozenset[str] = frozenset({'certified'})
 _SOURCE_KEYS: frozenset[str] = frozenset({'kind', 'ref', 'note'})
 _SOURCE_KINDS: frozenset[str] = frozenset(
@@ -81,7 +87,7 @@ class CertifiedInterval:
 @dataclass(frozen=True)
 class SiO2Commissioning:
     certified: CertifiedInterval
-    crash_floor: float | None
+    observed_crash_floor_wt_pct: float | None
 
 
 @dataclass(frozen=True)
@@ -105,15 +111,10 @@ class EngineCommissioning:
     source: CommissioningSource
 
     def certified_band(self) -> dict[str, Any]:
-        payload: dict[str, Any] = {
+        return {
             'sio2_wt_pct': list(self.sio2_wt_pct.certified.as_tuple()),
             'temperature_K': list(self.temperature_K.certified.as_tuple()),
         }
-        if self.sio2_wt_pct.crash_floor is not None:
-            payload['sio2_crash_floor_wt_pct'] = float(
-                self.sio2_wt_pct.crash_floor
-            )
-        return payload
 
 
 @dataclass(frozen=True)
@@ -207,21 +208,19 @@ def _parse_engine(name: str, payload: object) -> EngineCommissioning:
         sio2_body['certified'],
         context=f'engines.{name}.sio2_wt_pct.certified',
     )
-    crash_floor: float | None = None
-    if 'crash_floor' in sio2_body and sio2_body['crash_floor'] is not None:
-        crash_floor = _finite_float(
-            sio2_body['crash_floor'],
-            context=f'engines.{name}.sio2_wt_pct.crash_floor',
+    if 'observed_crash_floor_wt_pct' not in sio2_body:
+        raise EngineCommissioningError(
+            f'engines.{name}.sio2_wt_pct missing observed_crash_floor_wt_pct'
         )
-        # Certified band must not sit entirely below the death floor.
-        # The published default [30, 80] with crash_floor 34 is admitted
-        # (grandfathered 30-34 sliver); [20, 25] with floor 34 is not.
-        if certified_sio2.maximum < crash_floor:
-            raise EngineCommissioningError(
-                f'engines.{name} certified SiO2 band '
-                f'{certified_sio2.as_tuple()} sits outside crash floor '
-                f'{crash_floor:g} wt%'
-            )
+    raw_floor = sio2_body['observed_crash_floor_wt_pct']
+    observed_crash_floor: float | None
+    if raw_floor == _NOT_APPLICABLE:
+        observed_crash_floor = None
+    else:
+        observed_crash_floor = _finite_float(
+            raw_floor,
+            context=f'engines.{name}.sio2_wt_pct.observed_crash_floor_wt_pct',
+        )
 
     temperature_body = _closed_mapping(
         body['temperature_K'],
@@ -265,7 +264,7 @@ def _parse_engine(name: str, payload: object) -> EngineCommissioning:
         name=name,
         sio2_wt_pct=SiO2Commissioning(
             certified=certified_sio2,
-            crash_floor=crash_floor,
+            observed_crash_floor_wt_pct=observed_crash_floor,
         ),
         temperature_K=TemperatureCommissioning(certified=certified_t),
         authority_outside=authority,
@@ -361,15 +360,14 @@ def assess_engine_commissioning(
 ) -> CommissioningAssessment:
     """Classify a (SiO2, T) point against the project-owned table.
 
-    Crash floor is independent of the certified band: a point may sit
-    inside [certified_min, certified_max] and still be below the death
-    floor (the published 30-34 wt% sliver).
+    ``below_crash_floor`` is evidence metadata (observed AlphaMELTS
+    SIGABRT floor). It is not a pre-run refusal: the engine still runs.
     """
 
     spec = engine_commissioning(name, path=path)
     sio2 = _finite_float(sio2_wt_pct, context='sio2_wt_pct')
     temperature = _finite_float(temperature_K, context='temperature_K')
-    crash_floor = spec.sio2_wt_pct.crash_floor
+    crash_floor = spec.sio2_wt_pct.observed_crash_floor_wt_pct
     below_crash_floor = crash_floor is not None and sio2 < crash_floor
     failed: list[str] = []
     warnings: list[str] = []
@@ -388,7 +386,7 @@ def assess_engine_commissioning(
         )
     outside_certified = bool(failed)
     notice: dict[str, Any] | None = None
-    if outside_certified and not below_crash_floor:
+    if outside_certified:
         reason = (
             OutOfDomainReason.SILICATE_WINDOW.value
             if CONSTRAINT_SILICATE_NETWORK_BAND in failed

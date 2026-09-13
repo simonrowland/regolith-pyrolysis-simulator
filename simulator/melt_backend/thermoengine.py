@@ -299,8 +299,8 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
     ) -> EquilibriumResult:
         # t-894: certified SiO2/T band is notice+run via the shared
         # _MELTSBackendSupport commissioning gate
-        # (data/engine_commissioning.yaml, engine=thermoengine). Crash
-        # floor remains a hard refusal upstream of this method.
+        # (data/engine_commissioning.yaml, engine=thermoengine). There
+        # is no ThermoEngine pre-run crash floor.
         engine_commissioning(self.backend_name)
         return self._equilibrate_thermoengine(
             temperature_C,
