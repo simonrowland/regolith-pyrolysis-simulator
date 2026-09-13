@@ -549,11 +549,12 @@
           "footnote_markers": []
         },
         "log_k": {
-          "raw": "4.841",
-          "value": 4.841,
-          "ocr_suspect": true,
-          "ocr_check": "not_image_verified",
-          "footnote_markers": []
+          "raw": "-4.841",
+          "value": -4.841,
+          "ocr_suspect": false,
+          "ocr_check": "image_verified",
+          "footnote_markers": [],
+          "raw_ocr_token": "4.841"
         }
       }
     },
@@ -997,6 +998,24 @@
       ],
       "printed_token": "SiS(g) / Silicon Monosulfide (ideal gas)",
       "image_quote": "SiS(g)\nSilicon Monosulfide (ideal gas)",
+      "image_evidence": {
+        "source_pdf_sha256": "0b4b37822a058193e2d912214d74e0a1884d604ee3dad798d90800cadff70771",
+        "pdf_page": 352,
+        "render_dpi": 300
+      }
+    },
+    {
+      "record_id": "page-0348",
+      "printed_page": 348,
+      "pdf_page": 352,
+      "source_row_index": 8,
+      "column": "log_k",
+      "kind": "repair",
+      "ocr_token": "4.841",
+      "printed_token": "-4.841",
+      "image_quote": "SiS(g), 400 K: ΔGf° 8.861 kcal/mol; Log Kf −4.841",
+      "render_dpi": 300,
+      "ocr_class": "dropped minus (ink-blotted sign)",
       "image_evidence": {
         "source_pdf_sha256": "0b4b37822a058193e2d912214d74e0a1884d604ee3dad798d90800cadff70771",
         "pdf_page": 352,
