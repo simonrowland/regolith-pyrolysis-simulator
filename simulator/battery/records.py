@@ -199,6 +199,8 @@ class Species:
     def __post_init__(self) -> None:
         if not self.formula:
             raise ValueError("Species.formula is required")
+        if self.phase not in Phase:
+            raise ValueError(f"Species.phase must be a closed Phase token, not {self.phase!r}")
 
 
 @dataclass(frozen=True)
@@ -235,6 +237,14 @@ class Composition:
         if not self.components:
             raise ValueError("Composition.components must be a complete map")
         canonical = tuple((k, as_decimal(v)) for k, v in self.components)
+        keys = [k for k, _ in canonical]
+        if len(keys) != len(set(keys)):
+            raise ValueError("Composition.components keys must be unique")
+        for key, amount in canonical:
+            if not amount.is_finite() or amount < 0:
+                raise ValueError(
+                    f"Composition component {key!r} must be a nonnegative finite amount"
+                )
         object.__setattr__(self, "components", canonical)
 
     def as_map(self) -> dict[str, Decimal]:
@@ -305,6 +315,31 @@ class Notice:
             )
 
 
+_VALUE_PAYLOAD = {
+    ValueKind.POINT: ("point",),
+    ValueKind.SERIES: ("series",),
+    ValueKind.BOUND: ("bound_operator", "bound_value"),
+    ValueKind.INTERVAL: ("interval_low", "interval_high"),
+    ValueKind.ORDERING: ("ordering",),
+    ValueKind.CATEGORICAL: ("categorical",),
+    ValueKind.RELATIVE_SERIES: ("relative_series", "relative_normalization"),
+    ValueKind.EXPRESSION: (
+        "expression_text",
+        "expression_parameters",
+        "expression_domain",
+    ),
+    ValueKind.UNAVAILABLE: ("unavailable_reason",),
+}
+_VALUE_PAYLOAD_FIELDS = frozenset(
+    name for names in _VALUE_PAYLOAD.values() for name in names
+)
+
+
+def _require_finite(name: str, value: Decimal) -> None:
+    if not value.is_finite():
+        raise ValueError(f"{name} must be a finite decimal")
+
+
 @dataclass(frozen=True)
 class Value:
     """Tagged observable; no scalar coercion between kinds."""
@@ -327,27 +362,41 @@ class Value:
 
     def __post_init__(self) -> None:
         kind = self.kind
+        allowed = _VALUE_PAYLOAD.get(kind)
+        if allowed is None:  # pragma: no cover
+            raise ValueError(f"unknown Value.kind {kind}")
+        for field in _VALUE_PAYLOAD_FIELDS:
+            if field not in allowed and getattr(self, field) is not None:
+                raise ValueError(f"Value.{kind.value} cannot carry {field}")
         if kind is ValueKind.POINT:
             if self.point is None:
                 raise ValueError("Value.point requires point")
-            object.__setattr__(self, "point", as_decimal(self.point))
+            point = as_decimal(self.point)
+            _require_finite("Value.point", point)
+            object.__setattr__(self, "point", point)
         elif kind is ValueKind.SERIES:
             if not self.series:
                 raise ValueError("Value.series requires series points")
-            object.__setattr__(
-                self,
-                "series",
-                tuple((as_decimal(c), as_decimal(v)) for c, v in self.series),
-            )
+            series = tuple((as_decimal(c), as_decimal(v)) for c, v in self.series)
+            for coord, val in series:
+                _require_finite("Value.series coordinate", coord)
+                _require_finite("Value.series value", val)
+            object.__setattr__(self, "series", series)
         elif kind is ValueKind.BOUND:
             if self.bound_operator is None or self.bound_value is None:
                 raise ValueError("Value.bound requires operator and value")
-            object.__setattr__(self, "bound_value", as_decimal(self.bound_value))
+            bound = as_decimal(self.bound_value)
+            _require_finite("Value.bound_value", bound)
+            object.__setattr__(self, "bound_value", bound)
         elif kind is ValueKind.INTERVAL:
             if self.interval_low is None or self.interval_high is None:
                 raise ValueError("Value.interval requires low and high")
-            object.__setattr__(self, "interval_low", as_decimal(self.interval_low))
-            object.__setattr__(self, "interval_high", as_decimal(self.interval_high))
+            low = as_decimal(self.interval_low)
+            high = as_decimal(self.interval_high)
+            _require_finite("Value.interval_low", low)
+            _require_finite("Value.interval_high", high)
+            object.__setattr__(self, "interval_low", low)
+            object.__setattr__(self, "interval_high", high)
         elif kind is ValueKind.ORDERING:
             if not self.ordering:
                 raise ValueError("Value.ordering requires a list")

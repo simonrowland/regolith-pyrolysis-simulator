@@ -38,6 +38,7 @@ from simulator.battery.identity import (
 )
 from simulator.battery.records import (
     Admission,
+    AdmissionDecision,
     Apparatus,
     ApparatusGeometry,
     CandidateRequest,
@@ -297,7 +298,11 @@ def activity_identity(
     total_P: Decimal = Decimal("100000"),
 ) -> Identity:
     species = Species(formula, Phase.L)
-    endmember = Species(formula, endmember_phase)
+    endmember = Species(
+        formula,
+        endmember_phase,
+        polymorph=State.of("crystalline") if endmember_phase is Phase.CR else None,
+    )
     pot = composition or Composition(
         basis="ordered_complete_mole_inventory",
         components=(("SiO2", Decimal("0.5")), ("NaO0.5", Decimal("0.5"))),
@@ -502,6 +507,9 @@ def observation(
                 parameters=(),
                 output_unit="Pa",
             )
+    decided = None
+    if admission is not AdmissionStatus.PENDING:
+        decided = AdmissionDecision(worker="test", date="2026-09-13", evidence=loc())
     return Observation(
         observation_id=observation_id,
         experiment_id=experiment_id,
@@ -509,7 +517,7 @@ def observation(
         value=Value.point_of(value),
         uncertainty=Uncertainty(kind=UncertaintyKind.NONE),
         evidence=Evidence(class_=State.of(evidence), **ev_kwargs),
-        admission=Admission(status=admission, reason="canonical"),
+        admission=Admission(status=admission, reason="canonical", decided_by=decided),
         notices=notices,
         source_id=source_id,
         locator=loc(),

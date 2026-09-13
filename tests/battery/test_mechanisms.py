@@ -1224,3 +1224,60 @@ def test_physics_false_refuse_compilation_not_applicable_axes_equal() -> None:
     assert any(i.reason is RefusalReason.INVALID_IDENTITY for i in extra_report.issues)
     clean_psat = F.psat_identity("Na")
     assert identity_equal(clean_psat, F.psat_identity("Na")).kind is IdentityEqualKind.EQUAL
+
+
+def test_closed_records_reject_invalid_payloads() -> None:
+    """Closed records: invalid tokens, mixed Value branches, empty maps, missing C()."""
+
+    from dataclasses import replace
+
+    from simulator.battery.records import Composition, Located, Value
+    from simulator.battery.enums import AmountBasis, ValueKind
+
+    with pytest.raises(ValueError):
+        Species("O2", "not-a-phase")  # type: ignore[arg-type]
+    with pytest.raises(ValueError):
+        Value(
+            kind=ValueKind.POINT,
+            point=Decimal("NaN"),
+            bound_operator="<",
+            bound_value=Decimal("1"),
+        )
+    with pytest.raises(ValueError):
+        Composition(
+            "anything",
+            (("Na", Decimal("-1")), ("Na", Decimal("2"))),
+            AmountBasis.MOLE_FRACTION,
+        )
+    ident = F.o2_identity()
+    empty_fe = replace(ident, formation_elements=State.of(()))
+    w = F.work()
+    exp = F.tabulation_experiment()
+    empty_obs = F.observation("empty-fe", exp.experiment_id, empty_fe, Decimal("0"))
+    empty_report = validate_corpus([w], [exp], [empty_obs])
+    assert not empty_report.ok
+    assert any("formation_elements" in i.path for i in empty_report.issues)
+    pending = F.observation(
+        "pending-ok",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        admission=AdmissionStatus.PENDING,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    assert pending.admission.decided_by is None
+    assert validate_corpus([w], [exp], [pending]).ok
+    admitted = F.observation("admitted-ok", exp.experiment_id, ident, Decimal("0"))
+    assert admitted.admission.decided_by is not None
+    unlocated = replace(exp, conditions={"temperature_K": Located(State.of(Decimal("298.15")))})
+    unlocated_report = validate_corpus([w], [unlocated], [admitted])
+    assert not unlocated_report.ok
+    assert any("locator" in i.detail for i in unlocated_report.issues)
+    estimate = F.observation(
+        "estimate",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.AUTHOR_ESTIMATE,
+    )
+    assert not validate_corpus([w], [exp], [estimate]).ok

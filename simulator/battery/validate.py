@@ -32,8 +32,8 @@ Ambiguity resolutions:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Iterable, Mapping, Sequence
+from dataclasses import dataclass, fields, is_dataclass
+from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
@@ -61,6 +61,7 @@ from simulator.battery.identity import (
 )
 from simulator.battery.records import (
     Experiment,
+    Located,
     Notice,
     Observation,
     Reaction,
@@ -113,6 +114,44 @@ class ValidationReport:
 
 def _issue(path: str, reason: RefusalReason, detail: str) -> ValidationIssue:
     return ValidationIssue(path, reason, detail)
+
+
+def _check_located(path: str, located: Located[Any], issues: list[ValidationIssue]) -> None:
+    if located.state.is_value and located.locator is None:
+        issues.append(
+            _issue(
+                path,
+                RefusalReason.CONDITIONAL_FIELD,
+                "empirical Located value requires a locator",
+            )
+        )
+
+
+def _walk_located(obj: object, path: str, issues: list[ValidationIssue], seen: set[int] | None = None) -> None:
+    if obj is None:
+        return
+    if seen is None:
+        seen = set()
+    marker = id(obj)
+    if marker in seen:
+        return
+    seen.add(marker)
+    if isinstance(obj, Located):
+        _check_located(path, obj, issues)
+        if obj.inference is not None:
+            _walk_located(obj.inference, f"{path}.inference", issues, seen)
+        return
+    if isinstance(obj, Mapping):
+        for key, value in obj.items():
+            _walk_located(value, f"{path}.{key}", issues, seen)
+        return
+    if isinstance(obj, (tuple, list)):
+        for i, value in enumerate(obj):
+            _walk_located(value, f"{path}[{i}]", issues, seen)
+        return
+    if is_dataclass(obj) and not isinstance(obj, type):
+        for field in fields(obj):
+            _walk_located(getattr(obj, field.name), f"{path}.{field.name}", issues, seen)
 
 
 def _table_payload(
@@ -272,6 +311,29 @@ def _check_identity(path: str, identity: Identity, issues: list[ValidationIssue]
     ):
         for element, species in identity.formation_elements.value:
             _check_species(f"{path}.formation_elements.{element}", species, issues)
+    if (
+        identity.formation_elements is not None
+        and identity.formation_elements.is_value
+        and identity.formation_elements.value is not None
+        and not identity.formation_elements.value
+    ):
+        issues.append(
+            _issue(
+                f"{path}.formation_elements",
+                RefusalReason.INVALID_IDENTITY,
+                "formation_elements value cannot be empty",
+            )
+        )
+    if (
+        identity.reference_state is not None
+        and identity.reference_state.is_value
+        and identity.reference_state.value is not None
+    ):
+        _check_species(
+            f"{path}.reference_state.endmember",
+            identity.reference_state.value.endmember,
+            issues,
+        )
     if identity.reservoir is not None and identity.reservoir.is_value and identity.reservoir.value is not None:
         _check_species(f"{path}.reservoir", identity.reservoir.value, issues)
         if identity.quantity is Quantity.P_SAT:
@@ -381,6 +443,7 @@ def validate_experiment(
                         "buffer channel requires buffer",
                     )
                 )
+    _walk_located(experiment, path, issues)
     return issues
 
 
@@ -554,6 +617,28 @@ def validate_observation(
                 "model_derived requires model",
             )
         )
+    if ev.is_value and ev.value is EvidenceClass.AUTHOR_ESTIMATE and not observation.evidence.model:
+        issues.append(
+            _issue(
+                f"{path}.evidence.model",
+                RefusalReason.CONDITIONAL_FIELD,
+                "author_estimate requires model",
+            )
+        )
+    if (
+        observation.admission.status is not AdmissionStatus.PENDING
+        and observation.admission.decided_by is None
+    ):
+        issues.append(
+            _issue(
+                f"{path}.admission.decided_by",
+                RefusalReason.CONDITIONAL_FIELD,
+                "decided admission requires decided_by",
+            )
+        )
+    _walk_located(observation.point_conditions, f"{path}.point_conditions", issues)
+    if observation.derivation is not None:
+        _walk_located(observation.derivation.parameters, f"{path}.derivation.parameters", issues)
     if observation.value.kind is ValueKind.POINT and observation.uncertainty.kind is UncertaintyKind.NONE:
         # none uncertainty is valid; never invent a z-score
         pass
