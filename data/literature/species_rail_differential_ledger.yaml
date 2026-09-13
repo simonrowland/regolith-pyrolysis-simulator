@@ -294462,11 +294462,13 @@ points:
   residual_log10K: 2.052591354081771
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(alpha) + O2 -> 2 FeO(s); source-row tangent at 1100 K); Fe2O3 expects n_M=1.33333
+    n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 25.508
@@ -294483,12 +294485,13 @@ points:
   residual_log10K: -2.09347324111444
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(alpha) + O2 -> 2 FeO(s); source-row
+    tangent at 1100 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 25.508
@@ -294526,11 +294529,12 @@ points:
   residual_log10K: 2.042270705660461
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(gamma) + O2 -> 2 FeO(s); rows 1200-1600 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 22.303
@@ -294547,12 +294551,13 @@ points:
   residual_log10K: -2.0831580512977528
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(gamma) + O2 -> 2 FeO(s); rows 1200-1600
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 22.303
@@ -294590,11 +294595,12 @@ points:
   residual_log10K: 2.0460417944567566
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(gamma) + O2 -> 2 FeO(s); rows 1200-1600 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 19.59
@@ -294611,12 +294617,13 @@ points:
   residual_log10K: -2.086054940639442
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(gamma) + O2 -> 2 FeO(s); rows 1200-1600
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 19.59
@@ -294654,11 +294661,12 @@ points:
   residual_log10K: 2.0457172954834015
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(gamma) + O2 -> 2 FeO(s); rows 1200-1600 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 17.271
@@ -294675,12 +294683,13 @@ points:
   residual_log10K: -2.0848741447958425
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(gamma) + O2 -> 2 FeO(s); rows 1200-1600
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 17.271
@@ -294718,11 +294727,12 @@ points:
   residual_log10K: 2.042580625139849
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(gamma) + O2 -> 2 FeO(s); rows 1200-1600 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 15.265
@@ -294739,12 +294749,13 @@ points:
   residual_log10K: -2.081059649488951
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(gamma) + O2 -> 2 FeO(s); rows 1200-1600
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 15.265
@@ -294782,11 +294793,12 @@ points:
   residual_log10K: 2.0375508177089237
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(gamma) + O2 -> 2 FeO(s); rows 1200-1600 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 13.513
@@ -294803,12 +294815,13 @@ points:
   residual_log10K: -2.0755875913590547
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(gamma) + O2 -> 2 FeO(s); rows 1200-1600
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 13.513
@@ -294846,11 +294859,12 @@ points:
   residual_log10K: 2.088484486412033
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(delta) + O2 -> 2 FeO(l); rows 1700-1800 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 11.968
@@ -294867,12 +294881,13 @@ points:
   residual_log10K: -2.1264206625377953
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(delta) + O2 -> 2 FeO(l); rows 1700-1800
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 11.968
@@ -294910,11 +294925,12 @@ points:
   residual_log10K: 2.1737504658204356
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(delta) + O2 -> 2 FeO(l); rows 1700-1800 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 10.595
@@ -294931,12 +294947,13 @@ points:
   residual_log10K: -2.211920848247771
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(delta) + O2 -> 2 FeO(l); rows 1700-1800
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 10.595
@@ -294974,11 +294991,12 @@ points:
   residual_log10K: 2.2360892105417274
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 9.329
@@ -294995,12 +295013,13 @@ points:
   residual_log10K: -2.2748038204038807
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 9.329
@@ -295038,11 +295057,12 @@ points:
   residual_log10K: 2.2970493141773907
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 8.185
@@ -295059,12 +295079,13 @@ points:
   residual_log10K: -2.3366044999961524
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 8.185
@@ -295102,11 +295123,12 @@ points:
   residual_log10K: 2.352336350470285
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 7.151
@@ -295123,12 +295145,13 @@ points:
   residual_log10K: -2.3930521129323146
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 7.151
@@ -295166,11 +295189,12 @@ points:
   residual_log10K: 2.4027555762520723
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 6.209
@@ -295187,12 +295211,13 @@ points:
   residual_log10K: -2.4448791470582214
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 6.209
@@ -295230,11 +295255,12 @@ points:
   residual_log10K: 2.4488813626095665
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 5.35
@@ -295251,12 +295277,13 @@ points:
   residual_log10K: -2.49269017048743
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 5.35
@@ -295294,11 +295321,12 @@ points:
   residual_log10K: 2.4912648988097286
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 4.562
@@ -295315,12 +295343,13 @@ points:
   residual_log10K: -2.5369885213520247
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 4.562
@@ -295358,11 +295387,12 @@ points:
   residual_log10K: 2.530369183836803
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: data_integrity
+  finding_class: oxide_identity_mismatch
   engine_channel: ellingham
   cea_key: null
   skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe
+  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3 via OXIDE_TO_METAL['Fe2O3'] → Fe; Ellingham Fe
+    is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600 K); Fe2O3 expects n_M=1.33333 n_ox=0.666667
   tier: major
   compilation_id: janaf
   table_log10_Kf: 3.837
@@ -295379,12 +295409,13 @@ points:
   residual_log10K: -2.5781965831863443
   band_kJ_mol: 0.05
   status: mismatch
-  finding_class: channel_disagreement
+  finding_class: oxide_identity_mismatch
   engine_channel: nasa_cea_vs_ellingham
   cea_key: Fe2O3_cr
   skip_reason: null
   note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+    never an acceptance verdict. Ellingham Fe is n_M=2 n_ox=2 (2 Fe(l) + O2 -> 2 FeO(l); rows 1900-2600
+    K); Fe2O3 expects n_M=1.33333 n_ox=0.666667.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 3.837

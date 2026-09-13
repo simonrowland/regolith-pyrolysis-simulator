@@ -31,6 +31,8 @@ from simulator.chemistry.ellingham_thermo import (
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_range_K,
     ellingham_metal_phase_kind,
+    ellingham_segment_for_temperature,
+    ellingham_stoichiometry,
 )
 from simulator.diagnostic_helpers.gibbs_battery import (
     INDEPENDENT_AGREEMENT_BAND_KJ_MOL,
@@ -766,6 +768,59 @@ def elemental_reference_mismatch_applies(oxide: str, T_K: float) -> bool:
     return _cea_elemental_is_condensed(metal, T_K)
 
 
+def ellingham_oxide_stoichiometry_for_formula(
+    oxide: str,
+) -> tuple[float, float] | None:
+    """n_M, n_ox for n_M M + O2 → n_ox oxide from the table formula.
+
+    Premise: OXIDE_TO_METAL[oxide] = (metal, n_metal, n_O) with n_O the
+    oxygen atoms per formula unit, so one formula is
+    n_metal M + (n_O/2) O2 → 1 oxide.
+    Algebra: per mol O2, n_M = 2 n_metal / n_O and n_ox = 2 / n_O.
+    Unit check: n_M and n_ox are mole ratios per mol O2 (dimensionless).
+    Sanity: Fe2O3 → (4/3, 2/3); FeO → (2, 2); Na2O → (4, 2); Al2O3 → (4/3, 2/3).
+    """
+
+    stoich = OXIDE_TO_METAL.get(oxide)
+    if stoich is None:
+        return None
+    _metal, n_metal, n_oxygen = stoich
+    if n_oxygen <= 0:
+        return None
+    return (
+        2.0 * float(n_metal) / float(n_oxygen),
+        2.0 / float(n_oxygen),
+    )
+
+
+def oxide_identity_mismatch_applies(oxide: str) -> bool:
+    """True when the Ellingham metal key is fitted to a different oxide.
+
+    Premise: the harness maps OXIDE_TO_METAL[oxide][0] onto
+    ELLINGHAM_FIT_SEGMENTS[metal]. That metal key is one oxide's line
+    (Fe is 2 Fe + O2 → 2 FeO, n_M=2, n_ox=2), not every oxide of that
+    metal (Fe2O3 would be 4/3 Fe + O2 → 2/3 Fe2O3).
+    Algebra: mismatch iff (n_M, n_ox)_Ellingham ≠ (2 n_metal/n_O, 2/n_O).
+    Unit check: both pairs are mole ratios per mol O2.
+    Sanity: Fe2O3 vs Fe is a mismatch; FeO, Al2O3, Cr2O3, Na2O match.
+    """
+
+    stoich = OXIDE_TO_METAL.get(oxide)
+    if stoich is None:
+        return False
+    metal = stoich[0]
+    if metal not in ELLINGHAM_FIT_SEGMENTS:
+        return False
+    expected = ellingham_oxide_stoichiometry_for_formula(oxide)
+    if expected is None:
+        return False
+    actual = ellingham_stoichiometry(metal)
+    return not (
+        math.isclose(expected[0], actual[0], rel_tol=0.0, abs_tol=1e-9)
+        and math.isclose(expected[1], actual[1], rel_tol=0.0, abs_tol=1e-9)
+    )
+
+
 def ellingham_provenance(metal: str, compilation_id: str) -> str:
     segments = ELLINGHAM_FIT_SEGMENTS.get(metal)
     if not segments:
@@ -990,6 +1045,27 @@ def score_ellingham_point(point: KeyedTablePoint) -> GibbsPointScore | None:
     residual = engine - table_per_o2
     provenance = ellingham_provenance(metal, point.compilation_id)
     status = _status_for_residual(residual, provenance)
+    finding = _finding_class(provenance, status)
+    note = (
+        f"{point.note}; rescaled 2*ΔfG/n_O with n_O={n_oxygen} "
+        f"via OXIDE_TO_METAL[{point.formula!r}] → {metal}"
+    )
+    if status == "mismatch" and oxide_identity_mismatch_applies(point.formula):
+        finding = "oxide_identity_mismatch"
+        n_M, n_ox = ellingham_stoichiometry(metal)
+        expected = ellingham_oxide_stoichiometry_for_formula(point.formula)
+        expected_s = (
+            "None"
+            if expected is None
+            else f"n_M={expected[0]:g} n_ox={expected[1]:g}"
+        )
+        phase_basis = ellingham_segment_for_temperature(
+            metal, point.T_K
+        ).phase_basis
+        note = (
+            f"{note}; Ellingham {metal} is n_M={n_M:g} n_ox={n_ox:g} "
+            f"({phase_basis}); {point.formula} expects {expected_s}"
+        )
     return GibbsPointScore(
         key=_point_key(
             point.compilation_id, point.record_id, point.T_K, CHANNEL_ELLINGHAM,
@@ -1007,14 +1083,11 @@ def score_ellingham_point(point: KeyedTablePoint) -> GibbsPointScore | None:
         residual_log10K=residual_log10K_from_kJ(residual, point.T_K),
         band_kJ_mol=PIN_BAND_KJ_MOL,
         status=status,
-        finding_class=_finding_class(provenance, status),
+        finding_class=finding,
         engine_channel=CHANNEL_ELLINGHAM,
         cea_key=None,
         skip_reason=None,
-        note=(
-            f"{point.note}; rescaled 2*ΔfG/n_O with n_O={n_oxygen} "
-            f"via OXIDE_TO_METAL[{point.formula!r}] → {metal}"
-        ),
+        note=note,
     )
 
 
@@ -1042,7 +1115,24 @@ def score_channel_vs_channel(
         "channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). "
         "Descriptive magnitude band only; never an acceptance verdict."
     )
-    if status == "mismatch" and elemental_reference_mismatch_applies(
+    if status == "mismatch" and oxide_identity_mismatch_applies(point.formula):
+        finding = "oxide_identity_mismatch"
+        metal, _n_metal, _n_oxygen = OXIDE_TO_METAL[point.formula]
+        n_M, n_ox = ellingham_stoichiometry(metal)
+        expected = ellingham_oxide_stoichiometry_for_formula(point.formula)
+        expected_s = (
+            "None"
+            if expected is None
+            else f"n_M={expected[0]:g} n_ox={expected[1]:g}"
+        )
+        phase_basis = ellingham_segment_for_temperature(
+            metal, point.T_K
+        ).phase_basis
+        note = (
+            f"{note} Ellingham {metal} is n_M={n_M:g} n_ox={n_ox:g} "
+            f"({phase_basis}); {point.formula} expects {expected_s}."
+        )
+    elif status == "mismatch" and elemental_reference_mismatch_applies(
         point.formula, point.T_K
     ):
         finding = "elemental_reference_state_mismatch"

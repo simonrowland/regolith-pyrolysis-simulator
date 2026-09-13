@@ -42,6 +42,8 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     classify_phase_token,
     elemental_reference_mismatch_applies,
     elemental_reference_shift_kJ_per_mol_O2,
+    ellingham_oxide_stoichiometry_for_formula,
+    oxide_identity_mismatch_applies,
     engine_cea_delta_fG_kJ_mol,
     kcal_per_mol_to_kJ_per_mol,
     log10K_from_delta_fG_kJ_mol,
@@ -588,3 +590,65 @@ def test_na2o_reference_shift_accounts_for_the_bulk_of_the_gap() -> None:
     mgo_vs = score_channel_vs_channel(mgo, mgo_cea, mgo_ell)
     if mgo_vs is not None:
         assert mgo_vs.finding_class != "elemental_reference_state_mismatch"
+
+
+def test_fe2o3_ellingham_is_oxide_identity_mismatch_not_channel_disagreement() -> None:
+    """Fe Ellingham is 2 Fe + O2 → 2 FeO; Fe2O3 is 4/3 Fe + O2 → 2/3 Fe2O3."""
+
+    assert ellingham_oxide_stoichiometry_for_formula("Fe2O3") == (
+        pytest.approx(4.0 / 3.0),
+        pytest.approx(2.0 / 3.0),
+    )
+    assert ellingham_oxide_stoichiometry_for_formula("FeO") == (2.0, 2.0)
+    assert ellingham_oxide_stoichiometry_for_formula("Al2O3") == (
+        pytest.approx(4.0 / 3.0),
+        pytest.approx(2.0 / 3.0),
+    )
+    assert oxide_identity_mismatch_applies("Fe2O3") is True
+    assert oxide_identity_mismatch_applies("FeO") is False
+    assert oxide_identity_mismatch_applies("Al2O3") is False
+    assert oxide_identity_mismatch_applies("Cr2O3") is False
+    assert oxide_identity_mismatch_applies("Na2O") is False
+
+    T = 1500.0
+    fe2o3 = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Fe-030",
+        formula="Fe2O3",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=T,
+        delta_fG_kJ_mol=-438.347,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    cea = score_cea_point(fe2o3)
+    ell = score_ellingham_point(fe2o3)
+    assert ell is not None and ell.status == "mismatch"
+    assert ell.finding_class == "oxide_identity_mismatch"
+    # 2 * ΔfG / n_O with n_O=3: 2*(-438.347)/3 = -292.231 kJ/mol O2.
+    assert ell.table_kJ_mol == pytest.approx(-292.231, abs=0.001)
+    # Ellingham Fe at 1500 K is the FeO line, not hematite.
+    assert ell.engine_kJ_mol == pytest.approx(-350.8884, abs=0.001)
+    assert ell.residual_kJ_mol == pytest.approx(-58.657, abs=0.01)
+    vs = score_channel_vs_channel(fe2o3, cea, ell)
+    assert vs is not None
+    assert vs.finding_class == "oxide_identity_mismatch"
+    assert cea.finding_class != "oxide_identity_mismatch"
+
+    feo = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Fe-020",
+        formula="FeO",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=T,
+        delta_fG_kJ_mol=-175.415,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    feo_ell = score_ellingham_point(feo)
+    assert feo_ell is not None
+    assert feo_ell.finding_class != "oxide_identity_mismatch"
