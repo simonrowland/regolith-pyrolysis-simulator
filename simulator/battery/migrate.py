@@ -47,21 +47,29 @@ import yaml
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    AmountBasis,
     AssetRole,
     EvidenceClass,
     ExperimentKind,
+    FO2Channel,
     MethodToken,
+    NoticeKind,
     PerBasis,
     Phase,
     Quantity,
     Rail,
+    ReferenceStateConvention,
     RegimeClass,
     StateTag,
     UncertaintyKind,
     ValueKind,
 )
 from simulator.battery.identity import (
+    Exposure,
     Identity,
+    StandardState,
+    SweepIdentity,
+    WallIdentity,
     atm_to_pa,
     bar_to_pa,
     celsius_to_kelvin,
@@ -70,16 +78,22 @@ from simulator.battery.identity import (
 from simulator.battery.records import (
     Admission,
     AdmissionDecision,
+    Annotations,
     Apparatus,
     ApparatusGeometry,
+    Composition,
     Derivation,
     Evidence,
     Experiment,
     FlowRegime,
+    FO2Control,
     Located,
     Locator,
+    Notice,
     Observation,
     PressureEnvironment,
+    Reaction,
+    ReactionTerm,
     Sample,
     SourceFile,
     SourceFiles,
@@ -477,6 +491,537 @@ def dump_yaml(payload: object, path: Path) -> None:
         default_flow_style=False,
     )
     path.write_text(text, encoding="utf-8")
+
+
+_LOCATOR_FIELD_NAMES = {item.name for item in fields(Locator)}
+
+
+def _enum(enum_cls: type, value: object) -> object:
+    if value is None:
+        return None
+    if isinstance(value, enum_cls):
+        return value
+    return enum_cls(value)
+
+
+def _state_from_plain(payload: object, cast) -> State:
+    if isinstance(payload, State):
+        return payload
+    if not isinstance(payload, Mapping):
+        return State.of(cast(payload))
+    tag = StateTag(str(payload.get("tag") or "value"))
+    if tag is StateTag.VALUE:
+        return State.of(cast(payload.get("value")))
+    reason = str(payload.get("reason") or tag.value)
+    if tag is StateTag.NOT_APPLICABLE:
+        return State.not_applicable(reason)
+    return State.unknown(reason)
+
+
+def _locator_from_plain(payload: object) -> Locator | None:
+    if payload is None:
+        return None
+    if isinstance(payload, Locator):
+        return payload
+    if not isinstance(payload, Mapping):
+        return Locator(note=str(payload))
+    kwargs = {k: v for k, v in payload.items() if k in _LOCATOR_FIELD_NAMES and v is not None}
+    if not kwargs:
+        return None
+    return Locator(**kwargs)
+
+
+def _derivation_from_plain(payload: object) -> Derivation | None:
+    if not isinstance(payload, Mapping):
+        return None
+    params_raw = payload.get("parameters") or ()
+    parameters: list[tuple[str, Located[Decimal]]] = []
+    for item in params_raw:
+        if isinstance(item, (list, tuple)) and len(item) == 2:
+            parameters.append((str(item[0]), _located_from_plain(item[1], as_decimal)))
+    inputs = payload.get("inputs") or ()
+    return Derivation(
+        relation=str(payload.get("relation") or "identity"),
+        inputs=tuple(str(x) for x in inputs),
+        parameters=tuple(parameters),
+        output_unit=str(payload.get("output_unit") or "as_published"),
+    )
+
+
+def _located_from_plain(payload: object, cast) -> Located:
+    if isinstance(payload, Located):
+        return payload
+    if not isinstance(payload, Mapping) or "state" not in payload:
+        return Located(_state_from_plain(payload, cast))
+    inference = None
+    if payload.get("inference"):
+        inference = _derivation_from_plain(payload.get("inference"))
+    return Located(
+        _state_from_plain(payload.get("state"), cast),
+        locator=_locator_from_plain(payload.get("locator")),
+        inference=inference,
+    )
+
+
+def _species_from_plain(payload: object) -> Species:
+    if not isinstance(payload, Mapping):
+        raise TypeError(f"species payload must be a mapping, not {payload!r}")
+    polymorph = payload.get("polymorph")
+    return Species(
+        str(payload.get("formula") or "unknown"),
+        _state_from_plain(payload.get("phase"), lambda v: Phase(str(v))),
+        polymorph=None
+        if polymorph is None
+        else _state_from_plain(polymorph, str),
+    )
+
+
+def _composition_from_plain(payload: object) -> Composition:
+    assert isinstance(payload, Mapping)
+    components = payload.get("components") or ()
+    pairs = tuple((str(k), as_decimal(v)) for k, v in components)
+    return Composition(
+        basis=str(payload.get("basis") or "unknown"),
+        components=pairs,
+        amount_basis=_enum(AmountBasis, payload.get("amount_basis")) or AmountBasis.MOLE_FRACTION,
+    )
+
+
+def _reaction_from_plain(payload: object) -> Reaction:
+    assert isinstance(payload, Mapping)
+    terms = []
+    for item in payload.get("terms") or ():
+        if not isinstance(item, Mapping):
+            continue
+        terms.append(
+            ReactionTerm(
+                species=_species_from_plain(item["species"]),
+                coefficient=item["coefficient"],
+            )
+        )
+    return Reaction(terms=tuple(terms))
+
+
+def _standard_state_from_plain(payload: object) -> StandardState:
+    assert isinstance(payload, Mapping)
+    return StandardState(
+        convention=_enum(ReferenceStateConvention, payload["convention"]),
+        endmember=_species_from_plain(payload["endmember"]),
+        component_basis=str(payload.get("component_basis") or ""),
+        reference_pressure_bar=as_decimal(payload.get("reference_pressure_bar") or 1),
+    )
+
+
+def _identity_from_plain(payload: object) -> Identity:
+    assert isinstance(payload, Mapping)
+    kwargs: dict[str, Any] = {
+        "quantity": _state_from_plain(payload["quantity"], lambda v: Quantity(str(v))),
+        "species": _species_from_plain(payload["species"]),
+    }
+    if payload.get("subtype") is not None:
+        kwargs["subtype"] = _state_from_plain(payload["subtype"], str)
+    if payload.get("per") is not None:
+        kwargs["per"] = _state_from_plain(payload["per"], lambda v: PerBasis(str(v)))
+    if payload.get("temperature_K") is not None:
+        kwargs["temperature_K"] = _state_from_plain(payload["temperature_K"], as_decimal)
+    if payload.get("standard_pressure_Pa") is not None:
+        kwargs["standard_pressure_Pa"] = _state_from_plain(
+            payload["standard_pressure_Pa"], as_decimal
+        )
+    if payload.get("reaction") is not None:
+        kwargs["reaction"] = _state_from_plain(payload["reaction"], _reaction_from_plain)
+    if payload.get("formation_elements") is not None:
+        def _elements(raw: object) -> tuple[tuple[str, Species], ...]:
+            pairs = []
+            for item in raw or ():
+                if isinstance(item, (list, tuple)) and len(item) == 2:
+                    pairs.append((str(item[0]), _species_from_plain(item[1])))
+            return tuple(pairs)
+        kwargs["formation_elements"] = _state_from_plain(
+            payload["formation_elements"], _elements
+        )
+    if payload.get("reference_state") is not None:
+        kwargs["reference_state"] = _state_from_plain(
+            payload["reference_state"], _standard_state_from_plain
+        )
+    if payload.get("reservoir") is not None:
+        kwargs["reservoir"] = _state_from_plain(payload["reservoir"], _species_from_plain)
+    if payload.get("composition") is not None:
+        kwargs["composition"] = _state_from_plain(
+            payload["composition"], _composition_from_plain
+        )
+    if payload.get("fO2_Pa") is not None:
+        kwargs["fO2_Pa"] = _state_from_plain(payload["fO2_Pa"], as_decimal)
+    if payload.get("total_pressure_Pa") is not None:
+        kwargs["total_pressure_Pa"] = _state_from_plain(
+            payload["total_pressure_Pa"], as_decimal
+        )
+    if payload.get("sweep_gas") is not None:
+        kwargs["sweep_gas"] = _state_from_plain(
+            payload["sweep_gas"], _sweep_identity_from_plain
+        )
+    if payload.get("exposure") is not None:
+        kwargs["exposure"] = _state_from_plain(payload["exposure"], _exposure_from_plain)
+    if payload.get("sample_mass_kg") is not None:
+        kwargs["sample_mass_kg"] = _state_from_plain(payload["sample_mass_kg"], as_decimal)
+    if payload.get("wall") is not None:
+        kwargs["wall"] = _state_from_plain(payload["wall"], _wall_from_plain)
+    return Identity(**kwargs)
+
+
+def _sweep_identity_from_plain(payload: object) -> SweepIdentity:
+    assert isinstance(payload, Mapping)
+    return SweepIdentity(
+        species=str(payload.get("species") or ""),
+        flow_sccm=_state_from_plain(payload["flow_sccm"], as_decimal),
+        partial_pressure_Pa=_state_from_plain(payload["partial_pressure_Pa"], as_decimal),
+    )
+
+
+def _exposure_from_plain(payload: object) -> Exposure:
+    assert isinstance(payload, Mapping)
+    schedule = payload.get("schedule")
+    return Exposure(
+        area_m2=_state_from_plain(payload["area_m2"], as_decimal),
+        duration_s=_state_from_plain(payload["duration_s"], as_decimal),
+        schedule=None if schedule is None else _state_from_plain(schedule, str),
+    )
+
+
+def _wall_from_plain(payload: object) -> WallIdentity:
+    assert isinstance(payload, Mapping)
+    area = payload.get("area_m2")
+    location = payload.get("location")
+    return WallIdentity(
+        temperature_K=_state_from_plain(payload["temperature_K"], as_decimal),
+        material=_state_from_plain(payload["material"], str),
+        area_m2=None if area is None else _state_from_plain(area, as_decimal),
+        location=None if location is None else _state_from_plain(location, str),
+    )
+
+
+def _value_from_plain(payload: object) -> Value:
+    assert isinstance(payload, Mapping)
+    kind = ValueKind(str(payload["kind"]))
+    kwargs: dict[str, Any] = {"kind": kind}
+    if payload.get("point") is not None:
+        kwargs["point"] = as_decimal(payload["point"])
+    if payload.get("series") is not None:
+        kwargs["series"] = tuple(
+            (as_decimal(a), as_decimal(b)) for a, b in payload["series"]
+        )
+    if payload.get("bound_operator") is not None:
+        kwargs["bound_operator"] = str(payload["bound_operator"])
+    if payload.get("bound_value") is not None:
+        kwargs["bound_value"] = as_decimal(payload["bound_value"])
+    if payload.get("interval_low") is not None:
+        kwargs["interval_low"] = as_decimal(payload["interval_low"])
+    if payload.get("interval_high") is not None:
+        kwargs["interval_high"] = as_decimal(payload["interval_high"])
+    if payload.get("ordering") is not None:
+        kwargs["ordering"] = tuple(str(x) for x in payload["ordering"])
+    if payload.get("categorical") is not None:
+        kwargs["categorical"] = str(payload["categorical"])
+    if payload.get("relative_series") is not None:
+        kwargs["relative_series"] = tuple(
+            (as_decimal(a), as_decimal(b)) for a, b in payload["relative_series"]
+        )
+    if payload.get("relative_normalization") is not None:
+        kwargs["relative_normalization"] = str(payload["relative_normalization"])
+    if payload.get("expression_text") is not None:
+        kwargs["expression_text"] = str(payload["expression_text"])
+    if payload.get("expression_parameters") is not None:
+        kwargs["expression_parameters"] = tuple(
+            (str(k), as_decimal(v)) for k, v in payload["expression_parameters"]
+        )
+    if payload.get("expression_domain") is not None:
+        kwargs["expression_domain"] = str(payload["expression_domain"])
+    if payload.get("unavailable_reason") is not None:
+        kwargs["unavailable_reason"] = str(payload["unavailable_reason"])
+    return Value(**kwargs)
+
+
+def _uncertainty_from_plain(payload: object) -> Uncertainty:
+    if not isinstance(payload, Mapping):
+        return Uncertainty(kind=UncertaintyKind.NONE)
+    value = payload.get("value")
+    if isinstance(value, (list, tuple)) and len(value) == 2:
+        value = (as_decimal(value[0]), as_decimal(value[1]))
+    elif value is not None:
+        value = as_decimal(value)
+    derivation = None
+    if payload.get("derivation"):
+        derivation = _derivation_from_plain(payload["derivation"])
+    return Uncertainty(
+        kind=UncertaintyKind(str(payload.get("kind") or "none")),
+        verbatim=payload.get("verbatim"),
+        value=value,
+        basis=None if payload.get("basis") is None else str(payload["basis"]),
+        derivation=derivation,
+    )
+
+
+def _evidence_from_plain(payload: object) -> Evidence:
+    assert isinstance(payload, Mapping)
+    class_payload = payload.get("class") or payload.get("class_")
+    return Evidence(
+        class_=_state_from_plain(class_payload, lambda v: EvidenceClass(str(v))),
+        original_method_class=payload.get("original_method_class"),
+        attribution=payload.get("attribution"),
+        model=payload.get("model"),
+        correlation_group=payload.get("correlation_group"),
+    )
+
+
+def _admission_from_plain(payload: object) -> Admission:
+    assert isinstance(payload, Mapping)
+    decided = None
+    raw_decided = payload.get("decided_by")
+    if isinstance(raw_decided, Mapping):
+        decided = AdmissionDecision(
+            worker=str(raw_decided.get("worker") or ""),
+            date=str(raw_decided.get("date") or "unspecified"),
+            evidence=_locator_from_plain(raw_decided.get("evidence"))
+            or Locator(note="admission-decision"),
+        )
+    return Admission(
+        status=AdmissionStatus(str(payload.get("status") or "pending")),
+        reason=str(payload.get("reason") or "source does not state admission_status"),
+        superseded_by=payload.get("superseded_by"),
+        decided_by=decided,
+    )
+
+
+def _notice_from_plain(payload: object) -> Notice:
+    assert isinstance(payload, Mapping)
+    affected = tuple(Quantity(str(q)) for q in (payload.get("affected_quantities") or ()))
+    dropped = payload.get("dropped")
+    return Notice(
+        kind=NoticeKind(str(payload["kind"])),
+        affected_quantities=affected,
+        reason=str(payload.get("reason") or ""),
+        origin=str(payload.get("origin") or ""),
+        original=None if payload.get("original") is None else as_decimal(payload["original"]),
+        source=payload.get("source"),
+        destination=payload.get("destination"),
+        band=payload.get("band"),
+        dropped=None if dropped is None else tuple(str(x) for x in dropped),
+        dropped_mass_fraction=None
+        if payload.get("dropped_mass_fraction") is None
+        else as_decimal(payload["dropped_mass_fraction"]),
+    )
+
+
+def _source_file_from_plain(payload: object) -> SourceFile:
+    assert isinstance(payload, Mapping)
+    return SourceFile(
+        asset_id=str(payload["asset_id"]),
+        role=AssetRole(str(payload["role"])),
+        path=str(payload["path"]),
+        sha256=_state_from_plain(payload["sha256"], str),
+        provenance_asset=payload.get("provenance_asset"),
+    )
+
+
+def work_from_plain(payload: object) -> Work:
+    assert isinstance(payload, Mapping)
+    files_payload = payload.get("source_files") or {}
+    files = tuple(_source_file_from_plain(f) for f in (files_payload.get("files") or ()))
+    commit = files_payload.get("corpus_commit")
+    return Work(
+        work_id=str(payload["work_id"]),
+        citation=str(payload["citation"]),
+        source_ids=tuple(str(s) for s in payload.get("source_ids") or ()),
+        source_files=SourceFiles(
+            corpus_repo=str(files_payload.get("corpus_repo") or CORPUS_REPO_DEFAULT),
+            corpus_commit=_state_from_plain(commit, str)
+            if commit is not None
+            else State.unknown("INDEX does not give corpus commit"),
+            files=files,
+        ),
+        doi=payload.get("doi"),
+    )
+
+
+def _sample_from_plain(payload: object) -> Sample:
+    if not isinstance(payload, Mapping) or not payload:
+        return Sample()
+    mass = payload.get("mass_kg")
+    form = payload.get("form")
+    container = payload.get("container")
+    printed = payload.get("printed_composition")
+    initial = payload.get("initial_composition")
+    return Sample(
+        mass_kg=None if mass is None else _located_from_plain(mass, as_decimal),
+        form=None if form is None else _located_from_plain(form, str),
+        container=None if container is None else _located_from_plain(container, str),
+        printed_composition=None
+        if printed is None
+        else _located_from_plain(printed, lambda v: v),
+        initial_composition=None
+        if initial is None
+        else _located_from_plain(initial, _composition_from_plain),
+    )
+
+
+def _geometry_from_plain(payload: object) -> ApparatusGeometry | None:
+    if not isinstance(payload, Mapping) or not payload:
+        return None
+    kwargs = {}
+    for name in (
+        "orifice_area_m2",
+        "orifice_diameter_m",
+        "clausing_factor",
+        "orifice_to_sample_area_ratio",
+        "exposed_area_m2",
+        "chamber_length_m",
+    ):
+        if payload.get(name) is not None:
+            kwargs[name] = _located_from_plain(payload[name], as_decimal)
+    return ApparatusGeometry(**kwargs) if kwargs else None
+
+
+def _apparatus_from_plain(payload: object) -> Apparatus | None:
+    if not isinstance(payload, Mapping) or not payload:
+        return None
+    cell = payload.get("cell_material_and_liner")
+    return Apparatus(
+        cell_material_and_liner=None
+        if cell is None
+        else _located_from_plain(cell, str),
+        geometry=_geometry_from_plain(payload.get("geometry")),
+    )
+
+
+def _sweep_gas_from_plain(payload: object) -> SweepGas:
+    assert isinstance(payload, Mapping)
+    return SweepGas(
+        species=str(payload.get("species") or ""),
+        flow_sccm=_state_from_plain(payload["flow_sccm"], as_decimal),
+        partial_pressure_Pa=_state_from_plain(payload["partial_pressure_Pa"], as_decimal),
+    )
+
+
+def _pressure_env_from_plain(payload: object) -> PressureEnvironment:
+    assert isinstance(payload, Mapping)
+    regime_raw = payload.get("regime") or {}
+    return PressureEnvironment(
+        total_pressure_Pa=_located_from_plain(payload["total_pressure_Pa"], as_decimal),
+        sweep_gas=_located_from_plain(
+            payload["sweep_gas"],
+            lambda v: _sweep_gas_from_plain(v) if isinstance(v, Mapping) else v,
+        ),
+        regime=FlowRegime(
+            regime_class=_state_from_plain(
+                (regime_raw or {}).get("regime_class"),
+                lambda v: RegimeClass(str(v)),
+            )
+        ),
+    )
+
+
+def experiment_from_plain(payload: object) -> Experiment:
+    assert isinstance(payload, Mapping)
+    conditions = {}
+    for key, value in (payload.get("conditions") or {}).items():
+        conditions[str(key)] = _located_from_plain(value, as_decimal)
+    fo2 = payload.get("fO2_control")
+    fo2_control = None
+    if isinstance(fo2, Mapping):
+        fo2_control = FO2Control(
+            channel=_state_from_plain(fo2["channel"], lambda v: FO2Channel(str(v))),
+            buffer=None
+            if fo2.get("buffer") is None
+            else _located_from_plain(fo2["buffer"], str),
+        )
+    return Experiment(
+        experiment_id=str(payload["experiment_id"]),
+        kind=ExperimentKind(str(payload.get("kind") or "literature")),
+        method=_state_from_plain(payload["method"], lambda v: MethodToken(str(v))),
+        sample=_sample_from_plain(payload.get("sample")),
+        conditions=conditions,
+        pressure_environment=_pressure_env_from_plain(payload["pressure_environment"]),
+        work_id=payload.get("work_id"),
+        simulated_experiment_id=payload.get("simulated_experiment_id"),
+        locator=_locator_from_plain(payload.get("locator")),
+        apparatus=_apparatus_from_plain(payload.get("apparatus")),
+        fO2_control=fo2_control,
+    )
+
+
+def observation_from_plain(payload: object) -> Observation:
+    assert isinstance(payload, Mapping)
+    notices = tuple(_notice_from_plain(n) for n in (payload.get("notices") or ()))
+    point_conditions = None
+    raw_pc = payload.get("point_conditions")
+    if isinstance(raw_pc, Mapping):
+        point_conditions = {
+            str(k): _located_from_plain(v, as_decimal) for k, v in raw_pc.items()
+        }
+    derived_from = payload.get("derived_from")
+    annotations = None
+    if isinstance(payload.get("annotations"), Mapping):
+        annotations = Annotations(**{
+            k: payload["annotations"].get(k)
+            for k in ("crystal_system", "space_group", "transition_note")
+        })
+    return Observation(
+        observation_id=str(payload["observation_id"]),
+        experiment_id=str(payload["experiment_id"]),
+        identity=_identity_from_plain(payload["identity"]),
+        value=_value_from_plain(payload["value"]),
+        uncertainty=_uncertainty_from_plain(payload.get("uncertainty")),
+        evidence=_evidence_from_plain(payload["evidence"]),
+        admission=_admission_from_plain(payload["admission"]),
+        notices=notices,
+        source_id=payload.get("source_id"),
+        locator=_locator_from_plain(payload.get("locator")),
+        read_from=payload.get("read_from"),
+        point_conditions=point_conditions,
+        derived_from=None if derived_from is None else tuple(str(x) for x in derived_from),
+        derivation=_derivation_from_plain(payload["derivation"])
+        if payload.get("derivation")
+        else None,
+        annotations=annotations,
+        authority=payload.get("authority"),
+    )
+
+
+def load_migrated_store(
+    root: Path | None = None,
+) -> tuple[dict[str, Work], dict[str, Experiment], dict[str, Observation]]:
+    """Deserialize the persisted v2.1 YAML store into typed records."""
+
+    root = root or REPO_ROOT
+    works: dict[str, Work] = {}
+    experiments: dict[str, Experiment] = {}
+    observations: dict[str, Observation] = {}
+    works_dir = root / "data" / "literature" / "works"
+    for path in sorted(works_dir.glob("*.yaml")):
+        if path.name == "ALIASES.yaml":
+            continue
+        doc = load_yaml(path)
+        if not isinstance(doc, Mapping) or "work" not in doc:
+            continue
+        work = work_from_plain(doc["work"])
+        works[work.work_id] = work
+        for raw_exp in doc.get("experiments") or []:
+            exp = experiment_from_plain(raw_exp)
+            experiments[exp.experiment_id] = exp
+    for directory in (
+        root / "data" / "literature" / "extracts-v2",
+        root / "data" / "literature" / "observations-v2",
+    ):
+        if not directory.is_dir():
+            continue
+        for path in sorted(directory.glob("*.yaml")):
+            doc = load_yaml(path)
+            if not isinstance(doc, Mapping):
+                continue
+            for raw_obs in doc.get("observations") or []:
+                obs = observation_from_plain(raw_obs)
+                observations[obs.observation_id] = obs
+    return works, experiments, observations
 
 
 def load_yaml(path: Path) -> object:
@@ -2280,20 +2825,16 @@ class Migrator:
         else:
             emitted = Value.point_of(val)
             converted = conversion_derivation(trail, None, point_locator)
-            if converted is not None:
-                derivation = Derivation(
-                    relation=converted.relation,
-                    inputs=(read_from,) + converted.inputs,
-                    parameters=converted.parameters,
-                    output_unit=converted.output_unit,
-                )
-            else:
-                derivation = Derivation(
-                    relation=trail,
-                    inputs=(read_from,),
-                    parameters=(),
-                    output_unit="Pa" if str(trail).endswith("Pa") else (units or "as_published"),
-                )
+            derivation = Derivation(
+                relation=trail if converted is None else converted.relation,
+                inputs=(read_from,),
+                parameters=() if converted is None else converted.parameters,
+                output_unit=(
+                    converted.output_unit
+                    if converted is not None
+                    else ("Pa" if str(trail).endswith("Pa") else (units or "as_published"))
+                ),
+            )
         unc = uncertainty
         if extra_unc is not None:
             unc = Uncertainty(

@@ -33,6 +33,7 @@ from simulator.battery.migrate import (
     convert_pressure_to_pa,
     convert_temperature_to_k,
     map_phase,
+    load_migrated_store,
     migrate,
     pressure_from_equipment,
     work_id_for,
@@ -248,17 +249,24 @@ def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
     extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
     if not report_path.is_file() or not any(works_dir.glob("*.yaml")):
         pytest.skip("migrated store not generated yet")
-    from simulator.battery.migrate import Migrator
-
-    migrator = Migrator(REPO_ROOT)
-    result = migrator.run(validate=True)
-    assert result.validation is not None
-    assert result.validation.hard_issues == ()
-    report = validate_corpus(
-        result.works, result.experiments, result.observations, residuals=None
-    )
+    works, experiments, observations = load_migrated_store(REPO_ROOT)
+    assert works
+    assert observations
+    report = validate_corpus(works, experiments, observations, residuals=None)
     assert report.hard_issues == ()
     assert extracts_v2.is_dir() or obs_dir.is_dir()
+
+
+def test_h05_corrupted_extracts_v2_yaml_fails_store_load(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    migrate(root, write=True, validate=True)
+    works, experiments, observations = load_migrated_store(root)
+    report = validate_corpus(works, experiments, observations, residuals=None)
+    assert report.hard_issues == ()
+    dest = next((root / "data" / "literature" / "extracts-v2").glob("*.yaml"))
+    dest.write_text("invalid: [yaml\n", encoding="utf-8")
+    with pytest.raises(yaml.YAMLError):
+        load_migrated_store(root)
 
 
 def _phase_state(obs):
