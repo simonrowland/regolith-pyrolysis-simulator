@@ -1023,7 +1023,9 @@ def _evaluate_rail_pressure_Pa(species_id: str, T_K: float, catalog=None) -> flo
         kwargs["pO2_bar"] = float(ev.pO2_reference_bar or 1.0)
     try:
         result = ev.evaluate(float(T_K), **kwargs)
-    except CatalogCompileError:
+    except Exception:
+        # Domain/compile refusals (NasaCeaDomainError, CatalogCompileError, …)
+        # are the hole; never a silent zero and never a harness crash.
         return "rail_row_absent"
     P = float(result.pressure_pa)
     if not math.isfinite(P) or P <= 0.0:
