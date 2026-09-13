@@ -944,6 +944,51 @@ def test_python_api_hot_in_band_composition_notices(monkeypatch) -> None:
     _assert_structured_commissioning(result)
 
 
+def test_native_liquidus_notices_at_returned_temperature(monkeypatch) -> None:
+    """D02 / Codex R2: native finder classifies the returned liquidus, not the seed."""
+    backend = AlphaMELTSBackend()
+    calls = _install_alphamelts_transport_spy(
+        monkeypatch, backend, temperature_C=1600.0,
+    )
+    result = backend.find_liquidus_solidus(
+        composition_kg={'SiO2': 50.0, 'FeO': 30.0, 'MgO': 20.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=1000.0,
+        max_T_C=1800.0,
+        scan_step_C=100.0,
+        tolerance_C=2.0,
+    )
+    assert len(calls) == 1, (
+        f'native finder must be one transport call; got {len(calls)}'
+    )
+    assert result.status == 'ok'
+    assert result.liquidus_T_C == pytest.approx(1600.0)
+    assert result.liquidus_T_K == pytest.approx(1873.15)
+    _assert_structured_commissioning(result)
+
+
+def test_native_liquidus_in_band_omits_notice(monkeypatch) -> None:
+    """Returned in-band liquidus carries none of the three commissioning fields."""
+    backend = AlphaMELTSBackend()
+    calls = _install_alphamelts_transport_spy(
+        monkeypatch, backend, temperature_C=1400.0,
+    )
+    result = backend.find_liquidus_solidus(
+        composition_kg={'SiO2': 50.0, 'FeO': 30.0, 'MgO': 20.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=1000.0,
+        max_T_C=1800.0,
+        scan_step_C=100.0,
+        tolerance_C=2.0,
+    )
+    assert len(calls) == 1
+    assert result.status == 'ok'
+    assert result.liquidus_T_C == pytest.approx(1400.0)
+    _assert_no_structured_commissioning(result)
+
+
 @pytest.mark.parametrize(
     'composition_kg,temperature_C',
     [

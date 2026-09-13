@@ -1548,6 +1548,55 @@ class _MELTSBackendSupport(MeltBackend):
             liquidus_C = result.liquidus_T_C
             if liquidus_C is None and result.status == 'ok':
                 liquidus_C = result.temperature_C
+            diagnostics = dict(result.diagnostics or {})
+            for key in (
+                'commissioning_notice',
+                'authority',
+                'certified_band',
+            ):
+                diagnostics.pop(key, None)
+            warnings_out = [
+                warning
+                for warning in result.warnings
+                if 'CommissioningNotice' not in warning
+            ]
+            evaluated_T_C: list[float] = []
+            if liquidus_C is not None:
+                evaluated_T_C.append(float(liquidus_C))
+            executed_C = diagnostics.get('executed_temperature_C')
+            if executed_C is not None:
+                executed_T_C = float(executed_C)
+                if not any(
+                    math.isclose(
+                        executed_T_C, temperature_C,
+                        rel_tol=0.0, abs_tol=1.0e-9,
+                    )
+                    for temperature_C in evaluated_T_C
+                ):
+                    evaluated_T_C.append(executed_T_C)
+            noticed: Optional[dict[str, object]] = None
+            for temperature_C in evaluated_T_C:
+                extra_warnings: List[str] = []
+                fields = self._apply_engine_commissioning(
+                    comp_wt,
+                    temperature_C=temperature_C,
+                    pressure_bar=pressure_bar,
+                    fO2_log=fO2_log,
+                    warnings=extra_warnings,
+                )
+                if fields is not None and noticed is None:
+                    noticed = fields
+                    warnings_out.extend(extra_warnings)
+            if noticed is not None:
+                notice = dict(noticed['commissioning_notice'])
+                if evaluated_T_C:
+                    notice['evaluated_temperature_C'] = [
+                        min(evaluated_T_C),
+                        max(evaluated_T_C),
+                    ]
+                diagnostics['commissioning_notice'] = notice
+                diagnostics['authority'] = noticed['authority']
+                diagnostics['certified_band'] = noticed['certified_band']
             return LiquidusSolidusResult(
                 liquidus_T_C=liquidus_C,
                 liquidus_T_K=(
@@ -1555,8 +1604,8 @@ class _MELTSBackendSupport(MeltBackend):
                 ),
                 liquid_fraction=result.liquid_fraction,
                 status=result.status,
-                warnings=tuple(result.warnings),
-                diagnostics=dict(result.diagnostics or {}),
+                warnings=tuple(warnings_out),
+                diagnostics=diagnostics,
             )
 
         ptt_liquidus_C: Optional[float] = None
