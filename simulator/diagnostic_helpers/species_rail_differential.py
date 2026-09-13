@@ -69,7 +69,9 @@ from simulator.reference_data.janaf import (
 from simulator.state import OXIDE_TO_METAL
 from simulator.vapour_rail.catalog import (
     CatalogCompileError,
+    PressureObservable,
     compile_vapour_rail_catalog,
+    vapor_pressure_legacy_view,
 )
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 from simulator.vapour_rail.nasa_cea import NasaCeaDomainError
@@ -943,11 +945,22 @@ def ellingham_provenance(metal: str, compilation_id: str) -> str:
 
 
 @lru_cache(maxsize=1)
+def _vapor_pressures_payload() -> Mapping[str, Any]:
+    return yaml.safe_load(VAPOR_PRESSURES_PATH.read_text(encoding="utf-8")) or {}
+
+
+@lru_cache(maxsize=1)
 def vapour_rail_catalog():
     """Compiled schema-v2 vapour rail (evaluators only; no U0 request rules)."""
 
-    payload = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text(encoding="utf-8")) or {}
-    return compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+    return compile_vapour_rail_catalog(
+        _vapor_pressures_payload(), emit_u0_request_rules=False
+    )
+
+
+@lru_cache(maxsize=1)
+def vapour_rail_legacy_view() -> Mapping[str, Any]:
+    return vapor_pressure_legacy_view(_vapor_pressures_payload())
 
 
 def standard_pressure_Pa(compilation_id: str) -> float:
@@ -1004,28 +1017,87 @@ def resolve_rail_species_id(formula: str, catalog=None) -> str | None:
     return None
 
 
-def _evaluate_rail_pressure_Pa(species_id: str, T_K: float, catalog=None) -> float | str:
-    """Pure-component limit: a_melt = 1. Refusal reason string on failure."""
+def _legacy_species_row(species_id: str) -> Mapping[str, Any]:
+    legacy = vapour_rail_legacy_view()
+    for bucket in (
+        "metals",
+        "oxide_vapors",
+        "foulant_vapor",
+        "dormant_acquisition",
+    ):
+        block = legacy.get(bucket)
+        if isinstance(block, Mapping) and species_id in block:
+            row = block[species_id]
+            if isinstance(row, Mapping):
+                return row
+    return {}
 
+
+def _pure_component_antoine_pa(row: Mapping[str, Any], T_K: float) -> float | None:
+    """P_sat in Pa from the catalog's pure_component_antoine sidecar.
+
+    Premise: log10(P/Pa) = A − B/(T+C). Na's A already includes +5 from the
+    NIST bar equation (yaml: log10(P/bar)=2.46077−…, converted to Pa by A+5).
+    Algebra: P_Pa = 10**(A − B/(T+C)).
+    Unit check: A is log10(Pa); B and C are kelvin; T+C is kelvin.
+    Sanity: Na 1156 K → 8.461e4 Pa (log10(P/1e5)=−0.073); Mg 1363 K →
+    1.033e5 Pa (log10(P/1e5)=+0.014). Both within 0.1 dex of the 1-bar NBP.
+    """
+
+    pca = row.get("pure_component_antoine")
+    if not isinstance(pca, Mapping):
+        return None
+    try:
+        A = float(pca["A"])
+        B = float(pca["B"])
+        C = float(pca.get("C") or 0.0)
+    except (KeyError, TypeError, ValueError):
+        return None
+    denom = float(T_K) + C
+    if denom <= 0.0:
+        return None
+    log10_pa = A - B / denom
+    if not math.isfinite(log10_pa) or log10_pa > 308.0:
+        return None
+    pressure = 10.0 ** log10_pa
+    if not math.isfinite(pressure) or pressure <= 0.0:
+        return None
+    return pressure
+
+
+def _evaluate_rail_pressure_Pa(species_id: str, T_K: float, catalog=None) -> float | str:
+    """Pure-component P_sat in Pa. Melt Pref is not P_sat.
+
+    Compiled Na/Mg evaluators are EQUILIBRIUM_PARTIAL_PRESSURE (NaO0.5 ⇌
+    Na(g)+¼O2 Pref, valid 1405–1600 K / Mg Pref_GF 1366–2273 K). At a=1
+    and pO2=p_ref they return Pref: Na 0.150 Pa at 1156 K (−5.82 dex vs
+    1 bar) and Mg 5.22e-13 Pa at 1363 K (−17.28 dex). That is the wrong
+    quantity, not a Pa/bar slip on metal P_sat (the leftover 0.82 dex on
+    Na is Pref continuation 250 K below its band; Mg is Pref_GF, not a
+    denormal). The catalog ``pure_component_antoine`` sidecar is metal
+    P_sat in Pa. Use it when present; otherwise only a compiled
+    PURE_COMPONENT_SATURATION_PRESSURE evaluator; otherwise rail_row_absent.
+    """
+
+    sidecar = _pure_component_antoine_pa(_legacy_species_row(species_id), T_K)
+    if sidecar is not None:
+        return sidecar
     catalog = catalog or vapour_rail_catalog()
     compiled = catalog.species.get(species_id)
     if compiled is None or compiled.evaluator is None:
         return "rail_row_absent"
     ev = compiled.evaluator
+    if (
+        ev.pressure_observable
+        is not PressureObservable.PURE_COMPONENT_SATURATION_PRESSURE
+    ):
+        return "rail_row_absent"
     kwargs: dict[str, Any] = {}
     if abs(float(ev.activity_exponent or 0.0)) > 0.0:
         kwargs["source_activity"] = 1.0
-    needs_o2 = (
-        abs(float(ev.pO2_exponent or 0.0)) > 0.0
-        or ev.o2_channel_term is not None
-    )
-    if needs_o2:
-        kwargs["pO2_bar"] = float(ev.pO2_reference_bar or 1.0)
     try:
         result = ev.evaluate(float(T_K), **kwargs)
     except Exception:
-        # Domain/compile refusals (NasaCeaDomainError, CatalogCompileError, …)
-        # are the hole; never a silent zero and never a harness crash.
         return "rail_row_absent"
     P = float(result.pressure_pa)
     if not math.isfinite(P) or P <= 0.0:
@@ -2199,6 +2271,89 @@ def _psat_sanity_rows(
     return rows
 
 
+def _psat_nbp_hand_computation() -> dict[str, Any]:
+    """Live Na/Mg NBP arithmetic for the report. P0 = 0.1 MPa = 1e5 Pa."""
+
+    catalog = vapour_rail_catalog()
+    rows = []
+    for formula, T_K, janaf_note in (
+        (
+            "Na",
+            NA_NBP_K,
+            (
+                "JANAF has no 1156 K row. Gas is Na-005 Na(g) not Na2(g); "
+                "condensed boiling row is Na-003 Na(l) not Na-002 Na(cr) "
+                "(cr ends 1000 K). Nearest printed: Na(g) 1100 K dfG=5.865, "
+                "Na(l) 1100 K dfG=0 (elemental ref below T_b)."
+            ),
+        ),
+        (
+            "Mg",
+            MG_NBP_K,
+            (
+                "JANAF has no 1363 K row. Gas is Mg-005 Mg(g); condensed "
+                "boiling row is Mg-003 Mg(l) not Mg-002 Mg(cr). Nearest "
+                "printed: Mg(g) 1300 K dfG=6.209, Mg(l) 1300 K dfG=0."
+            ),
+        ),
+    ):
+        sidecar = _evaluate_rail_pressure_Pa(formula, T_K)
+        pref_P = None
+        pref_obs = None
+        spec = catalog.species.get(formula)
+        if spec is not None and spec.evaluator is not None:
+            ev = spec.evaluator
+            pref_obs = str(ev.pressure_observable)
+            kwargs: dict[str, Any] = {}
+            if abs(float(ev.activity_exponent or 0.0)) > 0.0:
+                kwargs["source_activity"] = 1.0
+            if abs(float(ev.pO2_exponent or 0.0)) > 0.0 or ev.o2_channel_term is not None:
+                kwargs["pO2_bar"] = float(ev.pO2_reference_bar or 1.0)
+            try:
+                pref_P = float(ev.evaluate(float(T_K), **kwargs).pressure_pa)
+            except Exception:
+                pref_P = None
+        sidecar_log = (
+            None
+            if not isinstance(sidecar, float)
+            else math.log10(sidecar) - math.log10(JANAF_STANDARD_PRESSURE_PA)
+        )
+        pref_log = (
+            None
+            if pref_P is None or pref_P <= 0.0
+            else math.log10(pref_P) - math.log10(JANAF_STANDARD_PRESSURE_PA)
+        )
+        rows.append(
+            {
+                "species": formula,
+                "T_K": T_K,
+                "sidecar_Pa": sidecar if isinstance(sidecar, float) else None,
+                "sidecar_log10_P_over_P0": sidecar_log,
+                "compiled_pref_Pa": pref_P,
+                "compiled_pref_observable": pref_obs,
+                "compiled_pref_log10_P_over_P0": pref_log,
+                "janaf_note": janaf_note,
+            }
+        )
+    return {
+        "P0_Pa": JANAF_STANDARD_PRESSURE_PA,
+        "identity": (
+            "NBP: P_sat = 1 atm = 1.01325 bar → log10(P_sat/P0) = "
+            "+0.006 vs JANAF P0 = 0.1 MPa. Pass is |residual| < 0.1 dex; "
+            "the 1 kJ band is not widened."
+        ),
+        "rows": rows,
+        "diagnosis": (
+            "Na −5.82 dex was melt Pref (0.150 Pa, EQUILIBRIUM_PARTIAL_PRESSURE, "
+            "OOR continuation of the 1405–1600 K NaO0.5 Pref Antoine), not metal "
+            "P_sat. Treating 0.150 as bar leaves −0.82 dex: Pref at 1156 K is "
+            "not the boiling curve (250 K below its band). Mg −17.28 dex was "
+            "Pref_GF (5.22e-13 Pa; yaml pin at 1366 K is 6.02e-13 Pa), not a "
+            "denormal and not Mg(cr). Engine is now pure_component_antoine in Pa."
+        ),
+    }
+
+
 def _elemental_reference_accounting() -> dict[str, Any]:
     T = 1600.0
     shift = elemental_reference_shift_kJ_per_mol_O2("Na2O", T)
@@ -2268,6 +2423,7 @@ def build_report(points: Sequence[ScoredRailPoint]) -> dict[str, Any]:
             points, n=20, envelope_only=True
         ),
         "psat_sanity": _psat_sanity_rows(points),
+        "psat_nbp_hand_computation": _psat_nbp_hand_computation(),
         "g9_cea_mno_coo": (
             "no condensed MnO or CoO record in nasa-cea-thermo.yaml "
             "under any key spelling; typed refusal cea_formula_unmapped; "
@@ -2489,11 +2645,41 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
                 label=row["divergence_label"],
             )
         )
+    lines.extend(["", "### Na/Mg boiling-point sanity", ""])
+    hand = report.get("psat_nbp_hand_computation") or {}
+    if hand:
+        lines.extend(
+            [
+                str(hand.get("diagnosis") or ""),
+                "",
+                str(hand.get("identity") or ""),
+                "",
+            ]
+        )
+        for row in hand.get("rows") or []:
+            sidecar = row.get("sidecar_Pa")
+            sidecar_s = "—" if sidecar is None else f"{float(sidecar):.6g} Pa"
+            slog = row.get("sidecar_log10_P_over_P0")
+            slog_s = "—" if slog is None else f"{float(slog):.4f}"
+            pref = row.get("compiled_pref_Pa")
+            pref_s = "—" if pref is None else f"{float(pref):.6g} Pa"
+            plog = row.get("compiled_pref_log10_P_over_P0")
+            plog_s = "—" if plog is None else f"{float(plog):.4f}"
+            lines.extend(
+                [
+                    (
+                        f"- **{row['species']} {row['T_K']} K**: "
+                        f"sidecar P_sat = {sidecar_s}, "
+                        f"log10(P_sat/P0) = {slog_s}. "
+                        f"Rejected compiled Pref ({row.get('compiled_pref_observable')}) "
+                        f"= {pref_s}, log10(Pref/P0) = {plog_s}."
+                    ),
+                    f"  {row.get('janaf_note') or ''}",
+                    "",
+                ]
+            )
     lines.extend(
         [
-            "",
-            "### Na/Mg boiling-point sanity",
-            "",
             "| species | T_K | status | residual log10 | note |",
             "|---|---:|---|---:|---|",
         ]

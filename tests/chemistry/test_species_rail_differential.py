@@ -946,19 +946,30 @@ def test_psat_pair_identity_and_nbp_sanity_rows() -> None:
     assert score.status == "match"
 
     rail = derive_species_rail()
+    na_P = _evaluate_rail_pressure_Pa("Na", NA_NBP_K)
+    mg_P = _evaluate_rail_pressure_Pa("Mg", MG_NBP_K)
+    assert isinstance(na_P, float)
+    assert isinstance(mg_P, float)
+    # Melt Pref is ~0.15 Pa (Na) / 5e-13 Pa (Mg); sidecar is ~1 bar.
+    assert na_P == pytest.approx(84612.0, rel=0.02)
+    assert mg_P == pytest.approx(103271.0, rel=0.02)
+    assert abs(math.log10(na_P / JANAF_STANDARD_PRESSURE_PA)) < 0.1
+    assert abs(math.log10(mg_P / JANAF_STANDARD_PRESSURE_PA)) < 0.1
+
     sanity = score_psat_nbp_sanity(rail)
     by_species = {p.score.species: p for p in sanity}
     assert "Na" in by_species
     assert "Mg" in by_species
     assert by_species["Na"].score.temperature_K == NA_NBP_K
     assert by_species["Mg"].score.temperature_K == MG_NBP_K
-    na = by_species["Na"].score
-    assert na.status in {"match", "mismatch", "typed-refusal"}
-    if na.status != "typed-refusal":
-        assert na.residual_log10K is not None
-        assert math.isfinite(float(na.residual_log10K))
+    for name in ("Na", "Mg"):
+        score = by_species[name].score
+        assert score.status in {"match", "mismatch"}
+        assert score.residual_log10K is not None
+        assert abs(float(score.residual_log10K)) < 0.1
 
     report = build_report(sanity)
     markdown = render_report_markdown(report)
     assert "## Vapour-rail P_sat" in markdown
     assert "Na/Mg boiling-point sanity" in markdown
+    assert "pure_component_antoine" in markdown or "sidecar P_sat" in markdown
