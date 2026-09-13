@@ -1,0 +1,65 @@
+# Project-owned MELTS-family commissioning bands (t-894).
+#
+# DEFAULT VALUES = today's published adapter/domain constants so in-band
+# runtime numbers are unchanged by this chunk. Evidence from the t-890
+# battery lives in the notes; re-setting the bands is a later owner-gated
+# step. Out of the certified band the engine still runs (predict-and-flag:
+# notice + authority=extrapolated + certified_band). crash_floor is an
+# engine-death fact and stays a hard refusal.
+#
+# Derivation of the published numbers this table replaces (do not retune):
+# - SiO2 certified [30, 80] wt% <- engines/alphamelts/domain.py
+#   DEFAULT_SIO2_MIN_WT_PCT = 30.0, DEFAULT_SIO2_MAX_WT_PCT = 80.0
+#   (DEFAULT_SILICATE_NETWORK_BAND_WT_PCT). Adapter
+#   AlphaMELTSBackend._domain_gate used the same window as a pre-equilibrate
+#   refusal.
+# - SiO2 crash_floor 34 wt% <- engines/alphamelts/domain.py
+#   _SIO2_CRASH_FLOOR_WT_PCT = 34.0 (measured 2026-08-16 rump-hotwire:
+#   three of four basalts SIGABRT at 34.0 wt%).
+# - T certified [1073.15, 1700] K <- adapter
+#   ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C = 800.0 (1073.15 K) in
+#   simulator/melt_backend/alphamelts.py and T_calib_max_K = 1700.0 in
+#   simulator/melt_backend/melt_envelope.py
+#   MELT_ENVELOPE_CONSTANTS['MELTS-v1.0'].
+#
+# Closed keys. Extra engine blocks (vaporock / magemin / imcc_sf04) may be
+# added later with the same shape; they are omitted until commissioned.
+
+schema_version: 1
+
+engines:
+  alphamelts:
+    sio2_wt_pct:
+      certified: [30.0, 80.0]
+      crash_floor: 34.0
+    temperature_K:
+      certified: [1073.15, 1700.0]
+    authority_outside: extrapolated
+    source:
+      kind: adapter_default
+      ref: "binary-pot-engine-arm-imcc.md 2026-09-13"
+      note: >
+        80 wt% ceiling not evidenced (85 and 90 wt% returned at 1700 K);
+        2400-2600 K returns without residual shift vs IMCC. crash_floor 34
+        wt% is the measured SIGABRT floor, not a trust window.
+
+  thermoengine:
+    sio2_wt_pct:
+      certified: [30.0, 80.0]
+      crash_floor: 34.0
+    temperature_K:
+      certified: [1073.15, 1700.0]
+    authority_outside: extrapolated
+    source:
+      kind: adapter_default
+      ref: "binary-pot-engine-arm-imcc.md 2026-09-13"
+      note: >
+        80 wt% ceiling not evidenced; 2400-2600 K returns without residual
+        shift vs IMCC (0.570 dex in-band vs 0.566 out-of-band). ThermoEngine
+        recorded 0 crashes in the qualification sweep; crash_floor is the
+        published MELTS-family death bound, not a ThermoEngine SIGABRT
+        measurement.
+
+  # vaporock:
+  # magemin:
+  # imcc_sf04:
