@@ -1488,9 +1488,15 @@ def refusal_closure(
                     ),
                     "status": getattr(evaluation, "status", None),
                 }
-                source_notice = state.source_reaction_activity_provenance.get(
+                provenance = state.source_reaction_activity_provenance.get(
                     rule.species_id, {}
-                ).get("extrapolation_notice")
+                )
+                source_notice = provenance.get("extrapolation_notice")
+                if source_notice is None:
+                    # Floor inversion uses the same public extra field as
+                    # temperature-range extrapolation (diagnostics.py /
+                    # runner Pareto copy extra.extrapolation_notice).
+                    source_notice = provenance.get("floor_inversion_notice")
                 if source_notice is not None:
                     # Keep the melt source's band/reason attached to its public
                     # pressure answer, through the existing extensible carrier.

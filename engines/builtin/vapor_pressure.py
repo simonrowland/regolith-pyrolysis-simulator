@@ -302,6 +302,13 @@ def _attach_pO2_floor_inversion_notices(
             continue
         notices[str(species)] = notice
         provenance["floor_inversion_notice"] = notice
+        # Public carrier extra copies provenance["extrapolation_notice"]
+        # (request.py). Dual-write so wall/Pareto see the existing
+        # reason/authority/band without a new result field. Do not replace
+        # a temperature-range notice already on that key.
+        if provenance.get("extrapolation_notice") is None:
+            provenance["extrapolation_notice"] = notice
+        vapor_pressure_provenance[str(species)] = provenance
         source = str(vapor_pressure_sources.get(species) or "")
         if source and token not in source.split(":"):
             vapor_pressure_sources[species] = f"{source}:{token}"
