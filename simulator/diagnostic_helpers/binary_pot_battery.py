@@ -2334,8 +2334,11 @@ def run_engine_arm(
         for name in engine_names:
             handle = resolved.get(name) or open_battery_engine(name)
             resolved[name] = handle
+            takes_fo2 = handle.takes_fo2 or bool(
+                (reuse_engine_blocks or {}).get(name, {}).get("takes_fo2")
+            )
             n_po2 = (
-                len(po2_requests_for_engine(grid, takes_fo2=handle.takes_fo2))
+                len(po2_requests_for_engine(grid, takes_fo2=takes_fo2))
                 if job.use_grid_po2
                 else 1
             )
@@ -2355,8 +2358,11 @@ def run_engine_arm(
         for name in engine_names:
             handle = resolved.get(name) or open_battery_engine(name)
             resolved[name] = handle
+            takes_fo2 = handle.takes_fo2 or bool(
+                (reuse_engine_blocks or {}).get(name, {}).get("takes_fo2")
+            )
             requests = (
-                po2_requests_for_engine(grid, takes_fo2=handle.takes_fo2)
+                po2_requests_for_engine(grid, takes_fo2=takes_fo2)
                 if job.use_grid_po2
                 else (Po2Request(mode=PO2_ENGINE_DEFAULT, po2_bar=None),)
             )
