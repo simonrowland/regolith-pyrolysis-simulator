@@ -250,6 +250,8 @@ def test_m07_wall_identity_and_determinants_required_for_deposit() -> None:
 
 def test_m08_out_of_gamma_domain_is_extrapolated_notice_not_certified() -> None:
     ident = F.psat_identity("Na")
+    w = F.work()
+    exp = F.tabulation_experiment()
     notice = Notice(
         kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
         affected_quantities=(Quantity.P_SAT,),
@@ -257,19 +259,36 @@ def test_m08_out_of_gamma_domain_is_extrapolated_notice_not_certified() -> None:
         origin="sf18",
         band="[1673,1673] K",
     )
-    cand = F.engine_obs(
+    certified_with_domain = F.engine_obs(
+        "cand-m08-certified",
+        exp.experiment_id,
+        ident,
+        Decimal("1"),
+        authority=Authority.CERTIFIED,
+        notices=(notice,),
+        certified_band={"temperature_K": (Decimal("1673"), Decimal("1673"))},
+    )
+    certified_report = validate_corpus([w], [exp], [certified_with_domain])
+    assert not certified_report.ok
+    assert any("extrapolated" in i.detail for i in certified_report.issues)
+    extrapolated = F.engine_obs(
         "cand-m08",
-        "exp-1",
+        exp.experiment_id,
         ident,
         Decimal("1"),
         authority=Authority.EXTRAPOLATED,
         notices=(notice,),
         certified_band={"temperature_K": (Decimal("1673"), Decimal("1673"))},
     )
-    assert cand.authority is Authority.EXTRAPOLATED
-    assert cand.authority is not Authority.CERTIFIED
-    assert cand.notices[0].kind is NoticeKind.OUT_OF_GAMMA_DOMAIN
-    assert cand.notices[0].band is not None
+    assert validate_corpus([w], [exp], [extrapolated]).ok
+    clean = F.engine_obs(
+        "cand-m08-clean",
+        exp.experiment_id,
+        ident,
+        Decimal("1"),
+        authority=Authority.CERTIFIED,
+    )
+    assert validate_corpus([w], [exp], [clean]).ok
 
 
 def test_m09_nao05_scalar_vs_na2o_component_basis_mismatch() -> None:

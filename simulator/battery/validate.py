@@ -35,6 +35,7 @@ from typing import Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
     AdmissionStatus,
+    Authority,
     EvidenceClass,
     ExecutionState,
     ExperimentKind,
@@ -88,6 +89,9 @@ _PRESSURE_BLOCKING_NOTICES = frozenset(
         NoticeKind.FALLBACK,
         NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
     }
+)
+_CERTIFICATION_DOWNGRADE_NOTICES = frozenset(
+    {NoticeKind.OUT_OF_GAMMA_DOMAIN, NoticeKind.OUT_OF_CERTIFIED_BAND}
 )
 
 
@@ -420,6 +424,16 @@ def validate_observation(
                     "prediction requires authority",
                 )
             )
+        elif observation.authority is Authority.CERTIFIED:
+            if any(n.kind in _CERTIFICATION_DOWNGRADE_NOTICES for n in observation.notices):
+                issues.append(
+                    _issue(
+                        f"{path}.authority",
+                        RefusalReason.CONDITIONAL_FIELD,
+                        "out_of_gamma_domain/out_of_certified_band forbids certified; "
+                        "authority must be extrapolated",
+                    )
+                )
     if ev.is_value and ev.value in {
         EvidenceClass.MODEL_DERIVED,
         EvidenceClass.MEASURED_REDUCED,
