@@ -190,9 +190,12 @@ def test_partition_splits_own_input_from_independent() -> None:
     # tabulated rows on the non-KEMS side (80 -> 116, e.g. Schaefer-Fegley 9).
     # The engine-own-input partition is unchanged (1617; nasa-cea-thermo 1615):
     # nothing landed that an evaluator consumes as coefficients.
-    assert part["observations_total"] == 3817
-    assert part["gibbs_table_total"] == 2006
-    assert part["gibbs_table_kems"] == 273
+    # 2026-09-12 (late fold 321de2926): Kambayashi 1985 + Ohara 1987 phosphate-slag
+    # KEMS extracts added five KEMS gibbs tables (273 -> 278) and 43 observations;
+    # the non-KEMS and engine-own-input partitions are unchanged.
+    assert part["observations_total"] == 3860
+    assert part["gibbs_table_total"] == 2011
+    assert part["gibbs_table_kems"] == 278
     assert part["gibbs_table_non_kems"] == 1733
     assert part["engine_own_input"] + part["independent_tabulation"] == 1733
     assert part["engine_own_input"] == 1617
