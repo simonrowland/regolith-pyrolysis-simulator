@@ -1,0 +1,121 @@
+{
+  "authority": "diagnostic_only",
+  "calibrates": false,
+  "certifies": false,
+  "domain": {
+    "po2_bar": {
+      "commanded": [1e-8],
+      "engine_default": true
+    },
+    "pressure_bar": 1e-06,
+    "temperature_K": [1500.0, 1600.0],
+    "temperatures_K": [1500.0, 1600.0]
+  },
+  "engines": {
+    "alphamelts": {
+      "available": true,
+      "identity": {},
+      "supports_intrinsic_fo2": false,
+      "takes_fo2": true,
+      "unavailable_reason": null
+    },
+    "internal-analytical": {
+      "available": false,
+      "identity": {},
+      "supports_intrinsic_fo2": false,
+      "takes_fo2": false,
+      "unavailable_reason": "backend unavailable"
+    }
+  },
+  "generated_at": "fixed",
+  "hostname": "test-host",
+  "kind": "binary_pot_engine_arm",
+  "largest_in_envelope_residuals": [
+    {
+      "delta_log10_a_minus_b": 1.0,
+      "divergence_label": "large_1_to_2_dex",
+      "engine_a": "alphamelts",
+      "engine_b": "thermoengine",
+      "po2_bar": null,
+      "po2_mode": "engine_default",
+      "pot_id": "sio2_al2o3_50_50",
+      "quantity": "melt_activity",
+      "species": "SiO2",
+      "temperature_K": 1500.0,
+      "value_a": 10.0,
+      "value_b": 1.0
+    }
+  ],
+  "n_cells": 2,
+  "n_matched_residuals": 1,
+  "n_ok": 1,
+  "n_refused": 1,
+  "note": "divergence_label is a descriptive magnitude band only; never an acceptance verdict.",
+  "per_pot_residuals": {
+    "sio2_al2o3_50_50": {
+      "divergence_labels": {
+        "large_1_to_2_dex": 1
+      },
+      "engine_pairs": [
+        {
+          "divergence_label": "large_1_to_2_dex",
+          "engine_a": "alphamelts",
+          "engine_b": "thermoengine",
+          "max_abs_delta_dex": 1.0,
+          "median_abs_delta_dex": 1.0,
+          "n": 1
+        }
+      ],
+      "max_abs_delta_dex": 1.0,
+      "median_abs_delta_dex": 1.0,
+      "n_matched": 1
+    }
+  },
+  "pots": [
+    {
+      "composition_wt_pct": {
+        "Al2O3": 50.0,
+        "SiO2": 50.0
+      },
+      "kato_1993_table4_system": "Al2O3-SiO2",
+      "pot_id": "sio2_al2o3_50_50",
+      "why": "fixture"
+    }
+  ],
+  "posture": "Measured engine-vs-engine residuals are signal, not a pass/fail gate.",
+  "receipt": {
+    "cpu_s": 1.0,
+    "engine_identities": {
+      "alphamelts": {
+        "digest": "sha256:fixture",
+        "name": "alphamelts",
+        "version": "fixture"
+      }
+    },
+    "hostname": "test-host",
+    "wall_cpu_ratio": 2.0,
+    "wall_s": 2.0
+  },
+  "refusal_matrix": {
+    "sio2_al2o3_50_50": {
+      "alphamelts": {
+        "dominant_reason": null,
+        "n_cells": 1,
+        "n_ok": 1,
+        "n_refused": 0,
+        "reasons": {}
+      },
+      "internal-analytical": {
+        "dominant_reason": "unavailable",
+        "n_cells": 1,
+        "n_ok": 0,
+        "n_refused": 1,
+        "reasons": {
+          "unavailable": 1
+        }
+      }
+    }
+  },
+  "schema_version": 1,
+  "verdict": null
+}
