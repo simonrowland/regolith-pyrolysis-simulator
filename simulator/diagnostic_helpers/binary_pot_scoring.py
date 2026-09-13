@@ -1234,14 +1234,11 @@ def render_scoring_report_markdown(report: Mapping[str, Any]) -> str:
             "|---|---:|",
         ]
     )
-    per_engine = report.get("scored_rows_per_engine") or {}
-    if not per_engine:
-        lines.append("| — | 0 |")
-    for name, count in per_engine.items():
-        lines.append(f"| `{name}` | {count} |")
+    per_engine = dict(report.get("scored_rows_per_engine") or {})
     for name in engine_names:
-        if name not in per_engine:
-            lines.append(f"| `{name}` | 0 |")
+        per_engine.setdefault(name, 0)
+    for name in engine_names:
+        lines.append(f"| `{name}` | {per_engine[name]} |")
 
     lines.extend(
         [
@@ -1305,7 +1302,10 @@ def render_scoring_report_markdown(report: Mapping[str, Any]) -> str:
             "## Notes",
             "",
             "The companion JSON contains every cell, typed refusal, and envelope row. "
-            "No result is clipped or used to change a coefficient.",
+            "No result is clipped or used to change a coefficient. "
+            "MAGEMin ig returned status=ok with empty melt activities on the "
+            "FetO-P2O5 pots (no P2O5 activity to score); those envelopes are "
+            "unsupported-observable, not a coaxed domain pass.",
             "",
         ]
     )
