@@ -455,6 +455,19 @@ def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
     assert obs.evidence.class_.value is not EvidenceClass.FIGURE_ONLY
 
 
+def test_g08_model_derived_keeps_table_destination(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["values"]["method_class"] = "model_derived"
+    extract["species"]["Na"]["observations"][0]["values"].pop("series", None)
+    extract["species"]["Na"]["observations"][0]["values"]["quantity"] = "pure_Psat"
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False, validate=True)
+    obs = next(iter(result.observations.values()))
+    assert obs.evidence.class_.is_unknown
+    assert "model_derived" in (obs.evidence.class_.reason or "")
+    assert result.evidence_fallthrough.get("model_derived", 0) >= 1
+
+
 def test_g07_unsupported_quantity_is_unknown_not_relabeled(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     (root / "data" / "literature" / "mre_measurements.yaml").write_text(

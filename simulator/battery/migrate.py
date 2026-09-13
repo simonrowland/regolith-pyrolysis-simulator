@@ -556,6 +556,7 @@ class MigrationResult:
     measured: MeasuredCounts = field(default_factory=MeasuredCounts)
     aliases: dict[str, str] = field(default_factory=dict)
     dedupe_aliases: list[DedupeAlias] = field(default_factory=list)
+    evidence_fallthrough: dict[str, int] = field(default_factory=dict)
     validation: ValidationReport | None = None
 
     def add_queue(
@@ -823,23 +824,25 @@ def evidence_for(
             ),
             f"unmapped method_class {original}",
         )
-    if mapped is EvidenceClass.QUOTED_ATTRIBUTED and not attribution:
-        mapped = EvidenceClass.QUOTED_UNATTRIBUTED
-    needs_lineage = mapped in {
-        EvidenceClass.MODEL_DERIVED,
-        EvidenceClass.MEASURED_REDUCED,
-    }
-    if needs_lineage:
-        # derived_from/derivation would have to be invented; keep class unknown.
+    if mapped in {
+        EvidenceClass.QUOTED_UNATTRIBUTED,
+        EvidenceClass.QUOTED_ATTRIBUTED,
+    }:
+        mapped = (
+            EvidenceClass.QUOTED_ATTRIBUTED
+            if attribution
+            else EvidenceClass.QUOTED_UNATTRIBUTED
+        )
+    if mapped in {EvidenceClass.MODEL_DERIVED, EvidenceClass.MEASURED_REDUCED}:
         return (
             Evidence(
                 class_=State.unknown(
-                    f"mapped {mapped.value} but source does not supply lineage"
+                    f"table destination {mapped.value}; source does not supply lineage"
                 ),
                 original_method_class=original,
                 model=model or original,
             ),
-            f"{mapped.value} requires lineage",
+            f"fall-through {original} -> {mapped.value} (lineage required)",
         )
     if mapped is EvidenceClass.AUTHOR_ESTIMATE and not (model or original):
         return (
@@ -1661,6 +1664,16 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
+            if (
+                ev_reason.startswith("PAGE")
+                or ev_reason.startswith("unmapped")
+                or ev_reason.startswith("fall-through")
+                or ev_reason == "absent method_class"
+            ):
+                token = str(method_class or "absent")
+                self.result.evidence_fallthrough[token] = (
+                    self.result.evidence_fallthrough.get(token, 0) + 1
+                )
 
         raw_adm = values.get("admission_status")
         if raw_adm is None and obs.get("admission_status") is None:
@@ -2949,6 +2962,18 @@ def write_report(result: MigrationResult, path: Path) -> None:
     lines.append(
         f"| tabulated_lists | — | {measured.tabulated_lists} |"
     )
+    if result.evidence_fallthrough:
+        lines.extend(
+            [
+                "",
+                "## Evidence-class fall-throughs",
+                "",
+                "| source method_class | count |",
+                "|---|---:|",
+            ]
+        )
+        for token, n in sorted(result.evidence_fallthrough.items(), key=lambda kv: (-kv[1], kv[0])):
+            lines.append(f"| `{token}` | {n} |")
     lines.extend(["", "## Per source", "", "| source | rows in | observations out | queued |", "|---|---:|---:|---:|"])
     queued_by_source: dict[str, int] = defaultdict(int)
     for entry in result.queue:
