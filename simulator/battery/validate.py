@@ -69,6 +69,7 @@ from simulator.battery.records import (
     Species,
     Work,
     as_decimal,
+    union_notices,
 )
 from simulator.battery.validity import run_validity_gates
 from simulator.reference_data.janaf import formula_composition
@@ -943,6 +944,20 @@ def validate_residual(
                             "diagnostic numeric residuals keep score_eligible=false",
                         )
                     )
+    endpoint_notices = union_notices(
+        None if reference is None else reference.notices,
+        None if candidate is None else candidate.notices,
+    )
+    residual_set = set(residual.notices)
+    missing_notices = [n for n in endpoint_notices if n not in residual_set]
+    if missing_notices:
+        issues.append(
+            _issue(
+                f"{path}.notices",
+                RefusalReason.CONDITIONAL_FIELD,
+                "residual notices must include the union of endpoint notices",
+            )
+        )
     for i, notice in enumerate(residual.notices):
         _check_notice(f"{path}.notices[{i}]", notice, issues)
     return issues

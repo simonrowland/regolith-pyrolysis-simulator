@@ -747,6 +747,12 @@ def union_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
                 notice.affected_quantities,
                 notice.reason,
                 notice.origin,
+                notice.original,
+                notice.source,
+                notice.destination,
+                notice.band,
+                notice.dropped,
+                notice.dropped_mass_fraction,
             )
             if fingerprint in seen:
                 continue

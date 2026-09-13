@@ -229,6 +229,8 @@ def test_m03_cao_liquid_vs_crystal_is_identity_mismatch() -> None:
 
 
 def test_m04_residual_notice_union_survives_endpoint_ancestry() -> None:
+    from dataclasses import replace
+
     floor = F.floor_notice("provider")
     later = Notice(
         kind=NoticeKind.EXTRAPOLATION,
@@ -238,6 +240,8 @@ def test_m04_residual_notice_union_survives_endpoint_ancestry() -> None:
     )
     combined = union_notices((floor,), (), (floor, later))
     assert combined == (floor, later)
+    distinct_original = replace(floor, original=Decimal("1e-50"), band="different-band")
+    assert union_notices((floor,), (distinct_original,)) == (floor, distinct_original)
     ident = F.psat_identity("Na")
     w = F.work()
     exp = F.tabulation_experiment()
@@ -260,6 +264,18 @@ def test_m04_residual_notice_union_survives_endpoint_ancestry() -> None:
     )
     assert any(n.kind is NoticeKind.FLOOR_INVERSION for n in res.notices)
     assert validate_corpus([w], [exp], [ref, cand], [res]).ok
+    dropped = F.residual(
+        "m04-dropped",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        notices=(),
+        score_eligible=False,
+        rail=Rail.VAPOUR,
+    )
+    dropped_report = validate_corpus([w], [exp], [ref, cand], [dropped])
+    assert not dropped_report.ok
+    assert any("endpoint notices" in i.detail for i in dropped_report.issues)
 
 
 def test_m05_tiny_physical_pressure_is_not_a_floor_by_magnitude() -> None:
