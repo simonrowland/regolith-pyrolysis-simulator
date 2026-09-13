@@ -10,6 +10,8 @@ import yaml
 
 from simulator.diagnostic_helpers.gibbs_battery import (
     LEDGER_PATH as GIBBS_PILOT_LEDGER_PATH,
+    GibbsPointScore,
+    PIN_BAND_KJ_MOL,
     R_KJ_PER_MOL_K,
     LN10,
     RT_LN10_298_15_KJ,
@@ -24,19 +26,25 @@ from simulator.diagnostic_helpers.species_rail import (
 )
 from simulator.diagnostic_helpers.species_rail_differential import (
     CHANNEL_NASA_CEA,
+    ENVELOPE_BANDS,
     PHASE_GAS,
     PHASE_PROSE,
     PHASE_SOLID,
+    TEMPERATURE_BANDS,
     THERMOCHEMICAL_CALORIE_J,
     KeyedTablePoint,
+    ScoredRailPoint,
+    build_report,
     classify_phase_token,
     engine_cea_delta_fG_kJ_mol,
     kcal_per_mol_to_kJ_per_mol,
     log10K_from_delta_fG_kJ_mol,
+    render_report_markdown,
     resolve_cea_species,
     score_cea_point,
     score_ellingham_point,
     table_self_check_residual,
+    temperature_band_for,
     write_ledger,
 )
 from simulator.reference_data.janaf import FEEDSTOCKS_PATH
@@ -202,3 +210,102 @@ def test_pilot_ledger_is_byte_identical_after_write(tmp_path: Path) -> None:
     with pytest.raises(ValueError, match="gibbs-battery pilot ledger"):
         write_ledger(GIBBS_PILOT_LEDGER_PATH, points=[])
     assert GIBBS_PILOT_LEDGER_PATH.read_bytes() == before_bytes
+
+
+def _major_score(
+    *,
+    species: str,
+    T_K: float,
+    residual_kJ_mol: float,
+    channel: str = CHANNEL_NASA_CEA,
+) -> ScoredRailPoint:
+    return ScoredRailPoint(
+        score=GibbsPointScore(
+            key=f"janaf::{species}:T={T_K}::{channel}",
+            source_id="janaf",
+            observation_id=species,
+            species=species,
+            provenance_class="independent_tabulation",
+            comparison_quantity="delta_fG_kJ_mol",
+            temperature_K=T_K,
+            table_kJ_mol=0.0,
+            engine_kJ_mol=residual_kJ_mol,
+            residual_kJ_mol=residual_kJ_mol,
+            residual_log10K=None,
+            band_kJ_mol=PIN_BAND_KJ_MOL,
+            status="mismatch",
+            finding_class="compilation_disagreement",
+            engine_channel=channel,
+            cea_key=None,
+            skip_reason=None,
+        ),
+        tier=TIER_MAJOR,
+        compilation_id="janaf",
+    )
+
+
+def test_temperature_bands_split_envelope_from_plasma() -> None:
+    assert temperature_band_for(1100.0).label == "<=1100"
+    assert temperature_band_for(1100.01).label == "1100-1700"
+    assert temperature_band_for(1700.0).label == "1100-1700"
+    assert temperature_band_for(1700.01).label == "1700-2300"
+    assert temperature_band_for(2300.0).label == "1700-2300"
+    assert temperature_band_for(2300.01).label == "2300-2600"
+    assert temperature_band_for(2600.0).label == "2300-2600"
+    assert temperature_band_for(2600.01).label == ">2600"
+    assert temperature_band_for(6000.0).label == ">2600"
+    envelope_labels = [band.label for band in ENVELOPE_BANDS]
+    assert envelope_labels == ["1100-1700", "1700-2300", "2300-2600"]
+    assert [band.label for band in TEMPERATURE_BANDS[:1]] == ["<=1100"]
+    assert TEMPERATURE_BANDS[-1].label == ">2600"
+
+
+def test_headline_residual_tables_are_per_band_envelope_first() -> None:
+    points = [
+        _major_score(species="Si3", T_K=6000.0, residual_kJ_mol=-867.5),
+        _major_score(species="Na2O", T_K=1600.0, residual_kJ_mol=-120.7),
+        _major_score(species="MgO", T_K=2000.0, residual_kJ_mol=-116.6),
+        _major_score(species="CaO", T_K=2500.0, residual_kJ_mol=-109.1),
+        _major_score(species="FeO", T_K=900.0, residual_kJ_mol=-40.0),
+    ]
+    report = build_report(points)
+    by_band = report["top20_major_residual_by_band"]
+    assert [block["band"] for block in by_band] == [
+        "1100-1700",
+        "1700-2300",
+        "2300-2600",
+        "<=1100",
+        ">2600",
+    ]
+    assert [block["envelope"] for block in by_band] == [
+        True,
+        True,
+        True,
+        False,
+        False,
+    ]
+    species_by_band = {
+        block["band"]: [row["species"] for row in block["rows"]]
+        for block in by_band
+    }
+    assert species_by_band["1100-1700"] == ["Na2O"]
+    assert species_by_band["1700-2300"] == ["MgO"]
+    assert species_by_band["2300-2600"] == ["CaO"]
+    assert species_by_band["<=1100"] == ["FeO"]
+    assert species_by_band[">2600"] == ["Si3"]
+    full_range = report["top20_major_residual"]
+    assert [row["species"] for row in full_range] == [
+        "Si3",
+        "Na2O",
+        "MgO",
+        "CaO",
+        "FeO",
+    ]
+    markdown = render_report_markdown(report)
+    envelope_pos = markdown.index("### 1100-1700 K (envelope)")
+    plasma_pos = markdown.index("### >2600 K (outside envelope)")
+    full_pos = markdown.index(
+        "## Twenty largest |residual| among MAJOR-tier points (full T range)"
+    )
+    assert envelope_pos < plasma_pos < full_pos
+    assert "| Si3 | 6000.0 |" in markdown[full_pos:]

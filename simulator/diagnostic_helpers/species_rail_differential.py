@@ -25,6 +25,7 @@ from typing import Any, Iterator, Mapping, Sequence
 import yaml
 
 from simulator.chemistry.ellingham_thermo import (
+    ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_FIT_SEGMENTS,
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_range_K,
@@ -76,6 +77,61 @@ CHANNEL_NASA_CEA = "nasa_cea_9"
 CHANNEL_ELLINGHAM = "ellingham"
 CHANNEL_CEA_VS_ELLINGHAM = "nasa_cea_vs_ellingham"
 UNAVAILABLE_CHANNELS = ("vaporock", "thermoengine", "melts")
+
+# Operating-envelope temperature bands for the headline residual tables.
+# Boundary sources (each cut is a named project constant, not a round number):
+#   1100 K — ELLINGHAM_FIT_RANGE_K[0], lower bound of the legacy linear
+#            high-T Ellingham refit (ellingham_thermo.py).
+#   1700 K — ELLINGHAM_FIT_RANGE_K[1], upper bound of that same refit.
+#            The 1100-1700 K window is the first recipe-envelope band.
+#   2300 K — vapour-rail operating-envelope high
+#            (tools/compose_vapour_rail_carriers.py::OPERATING_HIGH_K = 2300 K
+#            = 2027 °C). Sits above the CLAUDE.md millibar bake-off wall
+#            temperatures: SiO 1745 °C = 2018 K, Fe 1775 °C = 2048 K
+#            (docs-private/research/2026-08-26-wall-temperature-table).
+#   2600 K — JANAF / Ellingham primary-refit grid ceiling for the mbar-regime
+#            metals (ellingham_fit_range_K("Na"|"Mg"|"Fe"|"Ca")[1] = 2600 K).
+#
+# Membership is half-open on the left except the first band: T <= 1100,
+# 1100 < T <= 1700, 1700 < T <= 2300, 2300 < T <= 2600, T > 2600.
+# Envelope bands (recipe-relevant) are the middle three; headline tables
+# list those first. The full-range top-20 stays below. Data are not deleted.
+_T_BAND_1100_K = float(ELLINGHAM_FIT_RANGE_K[0])
+_T_BAND_1700_K = float(ELLINGHAM_FIT_RANGE_K[1])
+_T_BAND_2300_K = 2300.0
+_T_BAND_2600_K = 2600.0
+
+
+@dataclass(frozen=True)
+class TemperatureBand:
+    label: str
+    t_min_exclusive: float | None
+    t_max_inclusive: float | None
+    envelope: bool
+
+
+TEMPERATURE_BANDS: tuple[TemperatureBand, ...] = (
+    TemperatureBand("<=1100", None, _T_BAND_1100_K, False),
+    TemperatureBand("1100-1700", _T_BAND_1100_K, _T_BAND_1700_K, True),
+    TemperatureBand("1700-2300", _T_BAND_1700_K, _T_BAND_2300_K, True),
+    TemperatureBand("2300-2600", _T_BAND_2300_K, _T_BAND_2600_K, True),
+    TemperatureBand(">2600", _T_BAND_2600_K, None, False),
+)
+ENVELOPE_BANDS: tuple[TemperatureBand, ...] = tuple(
+    band for band in TEMPERATURE_BANDS if band.envelope
+)
+
+
+def temperature_band_for(T_K: float | None) -> TemperatureBand | None:
+    if T_K is None:
+        return None
+    T = float(T_K)
+    for band in TEMPERATURE_BANDS:
+        lo_ok = band.t_min_exclusive is None or T > band.t_min_exclusive
+        hi_ok = band.t_max_inclusive is None or T <= band.t_max_inclusive
+        if lo_ok and hi_ok:
+            return band
+    return None
 
 # JANAF coded states from PHASE_SUFFIX_RE. B689 uses c/g/l. Anything else is
 # prose and is refused, never guessed.
@@ -1228,7 +1284,12 @@ def _count_matrix(points: Sequence[ScoredRailPoint]) -> list[dict[str, Any]]:
     return rows
 
 
-def _top20_major(points: Sequence[ScoredRailPoint]) -> list[dict[str, Any]]:
+def _top_major_residuals(
+    points: Sequence[ScoredRailPoint],
+    *,
+    n: int = 20,
+    band: TemperatureBand | None = None,
+) -> list[dict[str, Any]]:
     candidates = [
         p
         for p in points
@@ -1237,11 +1298,18 @@ def _top20_major(points: Sequence[ScoredRailPoint]) -> list[dict[str, Any]]:
         and p.score.residual_kJ_mol is not None
         and p.score.engine_channel in {CHANNEL_NASA_CEA, CHANNEL_ELLINGHAM}
     ]
+    if band is not None:
+        candidates = [
+            p
+            for p in candidates
+            if temperature_band_for(p.score.temperature_K) is band
+        ]
     candidates.sort(key=lambda p: abs(float(p.score.residual_kJ_mol or 0.0)), reverse=True)
     rows = []
-    for point in candidates[:20]:
+    for point in candidates[:n]:
         residual = float(point.score.residual_kJ_mol or 0.0)
         log10 = point.score.residual_log10K
+        assigned = temperature_band_for(point.score.temperature_K)
         rows.append(
             {
                 "key": point.score.key,
@@ -1256,9 +1324,36 @@ def _top20_major(points: Sequence[ScoredRailPoint]) -> list[dict[str, Any]]:
                 "finding_class": point.score.finding_class,
                 "provenance_class": point.score.provenance_class,
                 "printed_page": point.printed_page,
+                "band": None if assigned is None else assigned.label,
                 "divergence_label": divergence_label(
                     abs(float(log10)) if log10 is not None else None
                 ),
+            }
+        )
+    return rows
+
+
+def _top20_major(points: Sequence[ScoredRailPoint]) -> list[dict[str, Any]]:
+    return _top_major_residuals(points, n=20)
+
+
+def _top20_major_by_band(
+    points: Sequence[ScoredRailPoint],
+) -> list[dict[str, Any]]:
+    """Envelope bands first, then the below/above-envelope bands."""
+
+    ordered = list(ENVELOPE_BANDS) + [
+        band for band in TEMPERATURE_BANDS if not band.envelope
+    ]
+    rows = []
+    for band in ordered:
+        rows.append(
+            {
+                "band": band.label,
+                "envelope": band.envelope,
+                "t_min_exclusive_K": band.t_min_exclusive,
+                "t_max_inclusive_K": band.t_max_inclusive,
+                "rows": _top_major_residuals(points, n=20, band=band),
             }
         )
     return rows
@@ -1346,6 +1441,7 @@ def build_report(points: Sequence[ScoredRailPoint]) -> dict[str, Any]:
         "doctrine": LEDGER_HEADER["doctrine"],
         "never_widen": True,
         "counts": _count_matrix(points),
+        "top20_major_residual_by_band": _top20_major_by_band(points),
         "top20_major_residual": _top20_major(points),
         "typed_refusal_breakdown": _refusal_breakdown(points),
         "channel_vs_channel": vs[:50],
@@ -1384,7 +1480,51 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
     lines.extend(
         [
             "",
-            "## Twenty largest |residual| among MAJOR-tier points",
+            "## Largest |residual| among MAJOR-tier points, by temperature band",
+            "",
+            (
+                "Envelope bands (1100-1700, 1700-2300, 2300-2600 K) first. "
+                "Cuts: 1100/1700 K = `ELLINGHAM_FIT_RANGE_K`; 2300 K = vapour-rail "
+                "`OPERATING_HIGH_K` (above the CLAUDE.md SiO/Fe millibar bake-off "
+                "wall table); 2600 K = JANAF/Ellingham primary-refit grid ceiling."
+            ),
+            "",
+        ]
+    )
+    for block in report["top20_major_residual_by_band"]:
+        kind = "envelope" if block["envelope"] else "outside envelope"
+        lines.append(f"### {block['band']} K ({kind})")
+        lines.append("")
+        band_rows = block["rows"]
+        if not band_rows:
+            lines.append("None.")
+            lines.append("")
+            continue
+        lines.extend(
+            [
+                (
+                    "| species | T_K | channel | residual kJ/mol | finding_class "
+                    "| provenance | label |"
+                ),
+                "|---|---:|---|---:|---|---|---|",
+            ]
+        )
+        for row in band_rows:
+            lines.append(
+                "| {species} | {T} | {ch} | {res:.4g} | `{finding}` | `{prov}` | `{label}` |".format(
+                    species=row["species"],
+                    T=row["temperature_K"],
+                    ch=row["engine_channel"],
+                    res=float(row["residual_kJ_mol"]),
+                    finding=row["finding_class"],
+                    prov=row["provenance_class"],
+                    label=row["divergence_label"],
+                )
+            )
+        lines.append("")
+    lines.extend(
+        [
+            "## Twenty largest |residual| among MAJOR-tier points (full T range)",
             "",
             (
                 "| species | T_K | channel | residual kJ/mol | finding_class "
