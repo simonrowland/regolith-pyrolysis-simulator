@@ -219,8 +219,33 @@ def test_inverted_band_is_rejected(tmp_path: Path) -> None:
     payload = _valid_table_payload()
     payload['engines']['alphamelts']['sio2_wt_pct']['certified'] = [80.0, 30.0]
     path = _write_table(tmp_path / 'inverted.yaml', payload)
-    with pytest.raises(EngineCommissioningError, match='inverted'):
+    with pytest.raises(EngineCommissioningError, match='inverted') as excinfo:
         parse_engine_commissioning_file(path)
+    assert 'crash floor' not in str(excinfo.value)
+
+
+@pytest.mark.parametrize('value', [float('nan'), float('inf'), 'not-a-number'])
+def test_nonfinite_bound_is_rejected(tmp_path: Path, value) -> None:
+    """C11 / G-P1-3: NaN, inf, and junk are not finite floats."""
+    payload = _valid_table_payload()
+    payload['engines']['alphamelts']['sio2_wt_pct']['certified'] = [value, 80.0]
+    path = _write_table(tmp_path / 'nonfinite.yaml', payload)
+    with pytest.raises(EngineCommissioningError, match='finite float'):
+        parse_engine_commissioning_file(path)
+
+
+def test_unknown_engine_is_rejected(tmp_path: Path) -> None:
+    payload = _valid_table_payload()
+    payload['engines']['not_an_engine'] = dict(payload['engines']['alphamelts'])
+    path = _write_table(tmp_path / 'unknown-engine.yaml', payload)
+    with pytest.raises(EngineCommissioningError, match='unknown engine'):
+        parse_engine_commissioning_file(path)
+
+
+def test_missing_table_is_typed_error(tmp_path: Path) -> None:
+    missing = tmp_path / 'no-such-commissioning.yaml'
+    with pytest.raises(EngineCommissioningError, match='not found'):
+        parse_engine_commissioning_file(missing)
 
 
 def test_in_band_pot_has_no_notice_and_calls_engine(monkeypatch) -> None:
