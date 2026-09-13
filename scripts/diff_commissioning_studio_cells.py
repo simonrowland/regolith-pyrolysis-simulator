@@ -40,9 +40,7 @@ COMPARE_FIELDS = (
     "liquid_fraction",
 )
 
-CRASH_REFUSALS = frozenset(
-    {"engine_crash", "engine_timeout", "subprocess_died"}
-)
+CRASH_REFUSALS = frozenset({"engine_crash", "subprocess_died"})
 CRASH_ANNOTATION_REASON = "sio2_below_observed_crash_floor"
 REFUSAL_STATUSES = frozenset({"refusal", "out_of_domain"})
 OK_STATUSES = frozenset({"ok"})

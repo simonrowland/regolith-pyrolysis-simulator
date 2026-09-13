@@ -1180,3 +1180,16 @@ def test_studio_diff_classifies_allowed_and_other_verdicts() -> None:
         'reclassified_refusal_to_notice',
         'crash_annotation',
     }
+
+
+def test_studio_diff_timeout_is_not_subprocess_death() -> None:
+    """E02 / Codex R2: engine_timeout is not crash evidence."""
+    diff = _load_studio_diff_module()
+    base = _studio_cell(
+        status='refusal',
+        refusal_reason='engine_timeout',
+        engine_reason='timeout',
+        liquid_fraction=None,
+    )
+    tip = dict(base, engine_reason='sio2_below_observed_crash_floor')
+    assert diff.classify_cell(base, tip) == 'OTHER'
