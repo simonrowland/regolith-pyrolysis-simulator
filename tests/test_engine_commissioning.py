@@ -654,3 +654,26 @@ def test_commissioning_notice_is_call_local(monkeypatch) -> None:
     assert second.status == 'out_of_domain'
     assert 'commissioning_notice' not in (second.diagnostics or {})
     assert (second.diagnostics or {}).get('authority') is None
+
+
+def test_thermoengine_in_band_ok_omits_crash_template_keys(monkeypatch) -> None:
+    """C08 / F8: successful in-band results must not inherit crash-template fields."""
+    backend = ThermoEngineBackend()
+    _install_thermoengine_transport_spy(monkeypatch, backend)
+    result = backend.equilibrate(
+        temperature_C=1400.0,
+        composition_kg={'SiO2': 50.0, 'FeO': 30.0, 'MgO': 20.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+    assert result.status == 'ok'
+    diagnostics = result.diagnostics or {}
+    assert 'commissioning_notice' not in diagnostics
+    for key in (
+        'backend_status',
+        'backend_failure_reason_code',
+        'backend_failure_category',
+        'backend_failure_message',
+        'out_of_domain_crash_point',
+    ):
+        assert key not in diagnostics, key

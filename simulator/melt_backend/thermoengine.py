@@ -38,6 +38,23 @@ from simulator.melt_backend.base import (
 from simulator.melt_backend.vaporock import VapoRockBackend
 from simulator.scalar_boundary import is_declared_real_scalar
 
+_COMMISSIONING_NOTICE_KEYS = (
+    'commissioning_notice',
+    'authority',
+    'certified_band',
+)
+
+
+def _commissioning_notice_fields(
+    diagnostics: Optional[Mapping[str, object]],
+) -> dict[str, object]:
+    payload = dict(diagnostics or {})
+    return {
+        key: payload[key]
+        for key in _COMMISSIONING_NOTICE_KEYS
+        if key in payload
+    }
+
 
 THERMOENGINE_MIN_PRESSURE_BAR = 1.0e-6
 
@@ -308,7 +325,9 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
             fO2_log,
             pressure_bar,
             warnings,
-            commissioning_diagnostics=crash_diagnostics,
+            commissioning_diagnostics=_commissioning_notice_fields(
+                crash_diagnostics
+            ),
         )
 
     def _equilibrate_thermoengine(
