@@ -326,6 +326,8 @@ def test_m02_floor_notice_keeps_numeric_but_not_score_eligible() -> None:
     assert diagnostic_report.ok
     assert diagnostic.numeric is not None
     assert any(n.kind is NoticeKind.FLOOR_INVERSION for n in diagnostic.notices)
+    assert diagnostic.notices[0].original == Decimal("1e-40")
+    assert Quantity.P_SAT in diagnostic.notices[0].affected_quantities
     clean_cand = F.engine_obs(
         "cand-m02-clean",
         exp.experiment_id,
@@ -428,6 +430,8 @@ def test_m05_tiny_physical_pressure_is_not_a_floor_by_magnitude() -> None:
     )
     assert validate_corpus([w], [exp], [tiny, clean_cand], [clean]).ok
     floor = F.floor_notice()
+    assert floor.original == Decimal("1e-40")
+    assert Quantity.P_SAT in floor.affected_quantities
     floor_cand = F.engine_obs(
         "floor-cand",
         exp.experiment_id,
