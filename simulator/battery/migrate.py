@@ -119,6 +119,15 @@ COMPILATIONS_DIR = LITERATURE / "compilations"
 INDEX_PATH = LITERATURE / "INDEX.yaml"
 WORKS_DIR = LITERATURE / "works"
 ALIASES_PATH = WORKS_DIR / "ALIASES.yaml"
+
+# Explicit reviewed aliases only — never title-only merging.
+# Costa 2015 olivine KEMS appears as three source_ids with slightly different
+# citation strings; they are one work. Canonical id is the kems-007 citation hash.
+REVIEWED_ALIASES: dict[str, str] = {
+    "costa-jacobson-2015": "a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab",
+    "kems-007-costa-2015": "a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab",
+    "REF-016": "a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab",
+}
 EXTRACTS_V2_DIR = LITERATURE / "extracts-v2"
 OBSERVATIONS_V2_DIR = LITERATURE / "observations-v2"
 BATTERY_DIR = REPO_ROOT / "data" / "battery"
@@ -2187,6 +2196,7 @@ class Migrator:
         self.aliases = dict(aliases) if aliases is not None else load_aliases(
             self.literature / "works" / "ALIASES.yaml"
         )
+        self.aliases.update(REVIEWED_ALIASES)
         self.result = MigrationResult(aliases=dict(self.aliases))
         self._work_citations: dict[str, str] = {}
         self._work_dois: dict[str, str | None] = {}

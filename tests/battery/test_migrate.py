@@ -136,6 +136,47 @@ def test_citation_hash_nfc_and_whitespace() -> None:
     assert citation_hash("a b") != citation_hash("ab")
 
 
+def test_h12_costa_2015_reviewed_alias_collapses_three_ids() -> None:
+    from simulator.battery.migrate import REVIEWED_ALIASES
+
+    sources = [
+        (
+            "costa-jacobson-2015",
+            "Costa, G. C. C. & Jacobson, N. S. (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry, NASA NTRS 20150002321",
+        ),
+        (
+            "kems-007-costa-2015",
+            'Costa, G. C. C. & Jacobson, N. S. (2015), "Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry", NASA NTRS 20150002321',
+        ),
+        (
+            "REF-016",
+            "Costa & Jacobson (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry, NASA NTRS 20150002321",
+        ),
+    ]
+    without = {
+        work_id_for(citation=c, doi=None, source_id=s, aliases={})[0] for s, c in sources
+    }
+    assert len(without) == 3
+    with_alias = {
+        work_id_for(citation=c, doi=None, source_id=s, aliases=REVIEWED_ALIASES)[0]
+        for s, c in sources
+    }
+    assert len(with_alias) == 1
+    steurer_85, _ = work_id_for(
+        citation="Lunar Oxygen Production by Vapor Phase Pyrolysis",
+        doi=None,
+        source_id="steurer-1985",
+        aliases=REVIEWED_ALIASES,
+    )
+    steurer_92, _ = work_id_for(
+        citation="Vapor Phase Pyrolysis",
+        doi=None,
+        source_id="steurer-1992",
+        aliases=REVIEWED_ALIASES,
+    )
+    assert steurer_85 != steurer_92
+
+
 def test_doi_canonicalisation_and_alias_registry() -> None:
     assert canonicalize_doi("https://doi.org/10.1063/1.555991") == "10.1063/1.555991"
     assert canonicalize_doi("DOI: 10.1063/1.555991") == "10.1063/1.555991"
