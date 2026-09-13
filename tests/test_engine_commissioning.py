@@ -8,6 +8,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from engines.alphamelts import AlphaMELTSProvider
 from engines.alphamelts.domain import (
     DEFAULT_SILICATE_NETWORK_BAND_WT_PCT,
     DEFAULT_SIO2_MAX_WT_PCT,
@@ -33,6 +34,8 @@ from simulator.melt_backend.alphamelts import (
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.melt_envelope import MELT_ENVELOPE_CONSTANTS
 from simulator.melt_backend.thermoengine import ThermoEngineBackend
+from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
+from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 
 
@@ -467,4 +470,56 @@ def test_alphamelts_subprocess_death_below_observed_floor_annotates_engine_reaso
     assert result.diagnostics.get('backend_failure_category') == 'engine_crash'
     assert result.diagnostics.get('engine_reason') == (
         'sio2_below_observed_crash_floor'
+    )
+
+
+def test_provider_band_only_high_silica_reaches_backend_and_notices(
+    monkeypatch,
+) -> None:
+    """C02 / F2: SiO2=85 wt% is uncertified, not a provider veto."""
+    backend = AlphaMELTSBackend()
+    backend.stage0_subprocess_required = True
+    transport_calls = _install_alphamelts_transport_spy(monkeypatch, backend)
+    original_equilibrate = backend.equilibrate
+    backend_calls: list = []
+    backend_results: list = []
+
+    def wrapped_equilibrate(*args, **kwargs):
+        result = original_equilibrate(*args, **kwargs)
+        backend_calls.append(kwargs)
+        backend_results.append(result)
+        return result
+
+    monkeypatch.setattr(backend, 'equilibrate', wrapped_equilibrate)
+    provider = AlphaMELTSProvider(backend=backend)
+    masses = {'SiO2': 0.06008, 'FeO': 0.07184, 'MgO': 0.04030}
+    wt = {'SiO2': 85.0, 'FeO': 9.0, 'MgO': 6.0}
+    composition_mol = {
+        oxide: (wt_pct / 100.0) / masses[oxide]
+        for oxide, wt_pct in wt.items()
+    }
+    result = provider.dispatch(
+        IntentRequest(
+            intent=ChemistryIntent.SILICATE_EQUILIBRIUM,
+            account_view=ProviderAccountView(
+                accounts={'process.cleaned_melt': composition_mol},
+                species_formula_registry={},
+            ),
+            temperature_C=1400.0,
+            pressure_bar=1.0,
+            fO2_log=-9.0,
+            control_inputs={},
+        )
+    )
+
+    assert backend_calls, (
+        'band-only SiO2=85 wt% must reach the backend, not veto in the provider'
+    )
+    assert transport_calls, 'backend must still launch the engine'
+    eq = backend_results[0]
+    assert eq.diagnostics.get('authority') == 'extrapolated'
+    assert eq.diagnostics['commissioning_notice']['kind'] == 'engine_commissioning'
+    assert result.status != 'out_of_domain' or (
+        (result.diagnostic or {}).get('backend_status_reason')
+        != 'silicate_window'
     )

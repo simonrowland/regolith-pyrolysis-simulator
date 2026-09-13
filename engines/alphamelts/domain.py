@@ -189,10 +189,11 @@ class AlphaMELTSDomainGate:
        ``AlphaMELTSBackend._normalize_composition_to_melts_basis`` which
        raises if FeO_total is supplied without an explicit redox policy.
     3. **Silicate-network criteria** — SiO2 inside the rail-owned
-       calibration band (default [30, 80] wt%); sum of major oxides
-       > 95 wt%. The band is a trust window the caller controls DOWN TO
-       the measured crash floor at 34.0 wt%; below that alphaMELTS
-       SIGABRTs and the band stops being a trust question.
+       calibration band (default [30, 80] wt%) is recorded as an
+       uncertified constraint, not a provider veto; sum of major oxides
+       > 95 wt% remains a malformed-composition refusal. The observed
+       crash floor at 34.0 wt% is evidence metadata used to annotate
+       an actual subprocess death, not a pre-run refusal.
     4. **Composition-only gate** — operating-point checks live at the
        transport/provider layer where temperature and pressure are available.
        This validator has no T/P inputs and must not claim to certify them.
@@ -338,7 +339,9 @@ class AlphaMELTSDomainGate:
 
         sio2_pct = canonical_wt.get('SiO2', 0.0)
         if sio2_pct < sio2_min_wt_pct or sio2_pct > sio2_max_wt_pct:
-            reason = reason or OutOfDomainReason.SILICATE_WINDOW
+            # Uncertified, not malformed. The provider must not veto:
+            # the adapter notice path (authority=extrapolated) runs the
+            # engine. Oxide-basis / major-sum refusals stay below.
             failed.append(CONSTRAINT_SILICATE_NETWORK_BAND)
             warnings.append(
                 f'AlphaMELTSDomainGate: SiO2 = {sio2_pct:.3f} wt% outside '
@@ -365,14 +368,18 @@ class AlphaMELTSDomainGate:
                 'is dominated by non-MELTS species.'
             )
 
-        if warnings and reason is None:
+        malformed = (
+            CONSTRAINT_OXIDE_BASIS in failed
+            or CONSTRAINT_MAJOR_OXIDE_SUM in failed
+        )
+        if malformed and warnings and reason is None:
             reason = OutOfDomainReason.MAJOR_SUM
             if CONSTRAINT_MAJOR_OXIDE_SUM not in failed:
                 failed.append(CONSTRAINT_MAJOR_OXIDE_SUM)
         return DomainGateAssessment(
-            valid=not warnings,
+            valid=not malformed,
             warnings=tuple(warnings),
-            reason=reason_value(reason),
+            reason=reason_value(reason) if malformed else None,
             failed_constraints=tuple(failed),
             silicate_network_band_wt_pct=band,
         )

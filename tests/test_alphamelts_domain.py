@@ -57,9 +57,9 @@ def test_assess_default_band_is_golden_neutral_with_validate() -> None:
     assessment = AlphaMELTSDomainGate.assess(composition)
 
     assert isinstance(assessment, DomainGateAssessment)
-    assert assessment.valid is valid is False
+    assert assessment.valid is valid is True
     assert list(assessment.warnings) == warnings
-    assert assessment.reason == reason == "silicate_window"
+    assert assessment.reason is reason is None
     assert assessment.failed_constraints == (CONSTRAINT_SILICATE_NETWORK_BAND,)
     assert assessment.silicate_network_band_wt_pct == (30.0, 80.0)
 
@@ -75,7 +75,7 @@ def test_widened_rail_band_admits_low_silica_that_default_refuses() -> None:
         composition, silicate_network_band=(34.0, 100.0)
     )
 
-    assert default.valid is False
+    assert default.valid is True
     assert CONSTRAINT_SILICATE_NETWORK_BAND in default.failed_constraints
     assert widened.valid is True
     assert widened.failed_constraints == ()
