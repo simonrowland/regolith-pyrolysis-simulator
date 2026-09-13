@@ -21,11 +21,15 @@ import yaml
 
 from simulator.accounting.formulas import parse_formula
 from simulator.diagnostic_helpers.binary_pot_battery import (
+    BATTERY_ENGINE_NAMES,
+    REFUSAL_COMPOSITION_PROJECTED,
     REPORT_DIR,
     BinaryPot,
     BinaryPotBatteryError,
     EquilibrateCell,
     Po2Request,
+    _refusal_matrix,
+    reclassify_projected_composition_cells,
 )
 from simulator.state import MOLAR_MASS
 
@@ -926,6 +930,68 @@ def run_scoring_arm(
     return report
 
 
+def scoring_pot_from_payload(row: Mapping[str, Any]) -> ScoringPot:
+    sample = row.get("sample_no")
+    return ScoringPot(
+        pot_id=str(row.get("pot_id") or ""),
+        source_id=str(row.get("source_id") or ""),
+        observation_id=str(row.get("observation_id") or ""),
+        sample_no=None if sample is None else int(sample),
+        temperatures_K=tuple(float(t) for t in (row.get("temperatures_K") or ())),
+        composition_basis=str(row.get("composition_basis") or ""),
+        composition_conversion=str(row.get("composition_conversion") or ""),
+        composition_as_printed=dict(row.get("composition_as_printed") or {}),
+        composition_wt_pct=dict(row.get("composition_wt_pct") or {}),
+        why=str(row.get("why") or "").strip(),
+        doi=row.get("doi"),
+    )
+
+
+def recompute_scoring_from_report(report: Mapping[str, Any]) -> dict[str, Any]:
+    """Re-score an existing scoring-arm JSON (no engine re-run)."""
+
+    from scripts.calibration_battery import envelope, rail_for
+
+    pots = tuple(
+        scoring_pot_from_payload(row)
+        for row in report.get("pots") or []
+        if isinstance(row, Mapping)
+    )
+    cells = reclassify_projected_composition_cells(
+        [
+            EquilibrateCell.from_payload(row)
+            for row in report.get("cells") or []
+            if isinstance(row, Mapping)
+        ],
+        pots,
+    )
+    extracts = SCORING_EXTRACTS
+    comparators = iter_activity_comparators(extracts)
+    envelopes = score_scoring_arm(
+        pots=pots,
+        cells=cells,
+        comparators=comparators,
+        envelope=envelope,
+        rail_for=rail_for,
+    )
+    binary_pots = [pot.as_binary_pot() for pot in pots]
+    engine_names = list((report.get("engines") or {}).keys()) or list(
+        BATTERY_ENGINE_NAMES
+    )
+    scored = [row for row in envelopes if row.get("score_eligible")]
+    updated = dict(report)
+    updated["cells"] = [cell.as_payload() for cell in cells]
+    updated["envelopes"] = envelopes
+    updated["refusal_matrix"] = _refusal_matrix(binary_pots, engine_names, cells)
+    updated["n_ok"] = sum(1 for cell in cells if cell.status == "ok")
+    updated["n_refused"] = sum(1 for cell in cells if cell.status == "refusal")
+    updated["n_envelope_rows"] = len(envelopes)
+    updated["n_score_eligible"] = len(scored)
+    updated["scored_rows_per_engine"] = _count_scored_per_engine(envelopes)
+    updated["residual_summary"] = _residual_summary(envelopes)
+    return updated
+
+
 def score_scoring_arm(
     *,
     pots: Sequence[ScoringPot],
@@ -1222,6 +1288,11 @@ def render_scoring_report_markdown(report: Mapping[str, Any]) -> str:
                 label = "—"
             else:
                 label = f"{reason} ({n_refused}/{cell.get('n_cells', 0)})"
+                note = cell.get("note")
+                if reason == REFUSAL_COMPOSITION_PROJECTED and note:
+                    label = (
+                        f"{reason} ({n_refused}/{cell.get('n_cells', 0)}; {note})"
+                    )
             cells.append(label)
         lines.append(f"| `{pot_id}` | " + " | ".join(cells) + " |")
 
@@ -1303,9 +1374,9 @@ def render_scoring_report_markdown(report: Mapping[str, Any]) -> str:
             "",
             "The companion JSON contains every cell, typed refusal, and envelope row. "
             "No result is clipped or used to change a coefficient. "
-            "MAGEMin ig returned status=ok with empty melt activities on the "
-            "FetO-P2O5 pots (no P2O5 activity to score); those envelopes are "
-            "unsupported-observable, not a coaxed domain pass.",
+            "MAGEMin ig drops P2O5 (no ig endmember) and now refuses those "
+            "FetO-P2O5 pots as `composition_projected`; a projected bulk is "
+            "not a result for the requested pot.",
             "",
         ]
     )

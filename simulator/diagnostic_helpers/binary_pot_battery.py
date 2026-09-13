@@ -26,7 +26,7 @@ import subprocess
 import threading
 import time
 from collections import Counter, defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
@@ -64,6 +64,7 @@ PO2_ENGINE_DEFAULT = "engine_default"
 PO2_COMMANDED = "commanded"
 
 REFUSAL_OUT_OF_BASIS = "out_of_basis"
+REFUSAL_COMPOSITION_PROJECTED = "composition_projected"
 REFUSAL_MAJOR_SUM = "sum_below_95_wt_pct"
 REFUSAL_NO_LIQUID = "no_liquid"
 REFUSAL_TIMEOUT = "engine_timeout"
@@ -194,6 +195,35 @@ class EquilibrateCell:
                 self.authoritative_for_requested_vapor_pressure
             ),
         }
+
+    @classmethod
+    def from_payload(cls, payload: Mapping[str, Any]) -> "EquilibrateCell":
+        po2_raw = payload.get("po2") or {}
+        po2_bar = po2_raw.get("po2_bar") if isinstance(po2_raw, Mapping) else None
+        return cls(
+            pot_id=str(payload.get("pot_id") or ""),
+            engine=str(payload.get("engine") or ""),
+            temperature_K=float(payload.get("temperature_K") or 0.0),
+            po2=Po2Request(
+                mode=str(
+                    (po2_raw.get("mode") if isinstance(po2_raw, Mapping) else None)
+                    or PO2_ENGINE_DEFAULT
+                ),
+                po2_bar=None if po2_bar is None else float(po2_bar),
+            ),
+            status=str(payload.get("status") or ""),
+            refusal_reason=payload.get("refusal_reason"),
+            engine_status=payload.get("engine_status"),
+            engine_reason=payload.get("engine_reason"),
+            melt_activities=dict(payload.get("melt_activities") or {}),
+            gas_partial_pressures_Pa=dict(
+                payload.get("gas_partial_pressures_Pa") or {}
+            ),
+            liquid_fraction=_finite_float(payload.get("liquid_fraction")),
+            wall_s=float(payload.get("wall_s") or 0.0),
+            cpu_s=float(payload.get("cpu_s") or 0.0),
+            hostname=str(payload.get("hostname") or ""),
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -752,6 +782,56 @@ def _bucket_from_text(text: str) -> str | None:
     return None
 
 
+def composition_projected_note(
+    dropped_components: Sequence[str],
+    dropped_mass_fraction: float | None,
+) -> str:
+    names = ", ".join(str(name) for name in dropped_components) or "unknown"
+    if dropped_mass_fraction is None:
+        return f"dropped {names}"
+    return (
+        f"dropped {names} "
+        f"(mass_fraction={float(dropped_mass_fraction):.6g})"
+    )
+
+
+def _composition_projected_notice(
+    diagnostics: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Return dropped-component payload when the adapter flagged a projection.
+
+    Match the structured ``composition_projected`` notice / status reason, not
+    the shared VapoRock ``input_composition_projected`` projection reason —
+    that token is present on every MAGEMin bulk, including in-basis solves.
+    """
+
+    structured = str(diagnostics.get("backend_status_reason") or "")
+    projection = diagnostics.get("input_composition_projection")
+    notice: Mapping[str, Any] | None = None
+    if isinstance(projection, Mapping):
+        raw = projection.get(REFUSAL_COMPOSITION_PROJECTED)
+        if isinstance(raw, Mapping):
+            notice = raw
+    if structured != REFUSAL_COMPOSITION_PROJECTED and notice is None:
+        return None
+    dropped: list[str] = []
+    fraction = None
+    if notice is not None:
+        dropped = [str(name) for name in (notice.get("dropped_components") or [])]
+        fraction = notice.get("dropped_mass_fraction")
+    if not dropped and isinstance(projection, Mapping):
+        dropped = [
+            str(name) for name in (projection.get("dropped_bulk_components") or [])
+        ]
+        if fraction is None:
+            fraction = projection.get("dropped_mass_fraction")
+    fraction_number = _finite_float(fraction)
+    return {
+        "dropped_components": dropped,
+        "dropped_mass_fraction": fraction_number,
+    }
+
+
 def classify_equilibrate_outcome(
     result: Any | None = None,
     *,
@@ -787,6 +867,16 @@ def classify_equilibrate_outcome(
     )
     engine_reason = structured or ("; ".join(str(w) for w in warnings) if warnings else engine_status)
     haystack = _haystack(engine_status, structured, warnings, diagnostics)
+    projected = _composition_projected_notice(diagnostics)
+    if projected is not None:
+        return (
+            "refusal",
+            REFUSAL_COMPOSITION_PROJECTED,
+            composition_projected_note(
+                projected["dropped_components"],
+                projected["dropped_mass_fraction"],
+            ),
+        )
 
     timeout_bucket = _bucket_from_text(haystack)
     if engine_status in {"ok", "non_authoritative"}:
@@ -805,6 +895,75 @@ def classify_equilibrate_outcome(
     if engine_status == "out_of_domain":
         return "refusal", REFUSAL_OUT_OF_BASIS, engine_reason or engine_status
     return "refusal", engine_status or REFUSAL_UNAVAILABLE, engine_reason or engine_status
+
+
+def reclassify_projected_composition_cells(
+    cells: Sequence[EquilibrateCell],
+    pots: Sequence[Any],
+) -> list[EquilibrateCell]:
+    """Rewrite MAGEMin ok-cells whose pot drops ig-order components.
+
+    Used when regenerating reports from JSON captured before the adapter
+    refused projected bulks. Does not call the MAGEMin binary.
+    """
+
+    compositions: dict[str, Mapping[str, float]] = {}
+    for pot in pots:
+        if isinstance(pot, Mapping):
+            pot_id = str(pot.get("pot_id") or "")
+            compositions[pot_id] = dict(pot.get("composition_wt_pct") or {})
+            continue
+        compositions[str(getattr(pot, "pot_id", ""))] = dict(
+            getattr(pot, "composition_wt_pct", {}) or {}
+        )
+
+    from simulator.melt_backend.base import MeltCompositionError
+    from simulator.melt_backend.magemin import MAGEMinBackend
+
+    backend = MAGEMinBackend()
+    rewritten: list[EquilibrateCell] = []
+    for cell in cells:
+        if (
+            cell.engine != "magemin"
+            or cell.status != "ok"
+            or cell.refusal_reason == REFUSAL_COMPOSITION_PROJECTED
+        ):
+            rewritten.append(cell)
+            continue
+        composition = compositions.get(cell.pot_id) or {}
+        try:
+            projection = backend._build_db_bulk_projection(
+                composition, database="ig"
+            )
+        except MeltCompositionError:
+            rewritten.append(cell)
+            continue
+        if not projection.dropped_components:
+            rewritten.append(cell)
+            continue
+        source_sum = float(projection.source_sum_wt_pct)
+        fraction = (
+            max(0.0, source_sum - float(projection.projected_sum_wt_pct))
+            / source_sum
+            if source_sum > 0.0
+            else 0.0
+        )
+        note = composition_projected_note(
+            projection.dropped_components,
+            fraction,
+        )
+        rewritten.append(
+            replace(
+                cell,
+                status="refusal",
+                refusal_reason=REFUSAL_COMPOSITION_PROJECTED,
+                engine_status="out_of_domain",
+                engine_reason=note,
+                melt_activities={},
+                gas_partial_pressures_Pa={},
+            )
+        )
+    return rewritten
 
 
 # ---------------------------------------------------------------------------
@@ -1222,12 +1381,23 @@ def _refusal_matrix(
                 dominant = sorted(reasons.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
             elif n_ok == 0 and n_refused == 0:
                 dominant = REFUSAL_UNAVAILABLE
+            notes = []
+            if dominant == REFUSAL_COMPOSITION_PROJECTED:
+                notes = sorted(
+                    {
+                        cell.engine_reason
+                        for cell in group
+                        if cell.refusal_reason == REFUSAL_COMPOSITION_PROJECTED
+                        and cell.engine_reason
+                    }
+                )
             matrix[pot.pot_id][engine] = {
                 "n_cells": len(group),
                 "n_ok": n_ok,
                 "n_refused": n_refused,
                 "dominant_reason": dominant,
                 "reasons": dict(sorted(reasons.items())),
+                "note": "; ".join(notes) if notes else None,
             }
     return matrix
 
@@ -1388,10 +1558,24 @@ def recompute_residuals_from_report(
         for row in report.get("pots") or []
         if isinstance(row, Mapping)
     )
-    cells = list(report.get("cells") or [])
+    raw_cells = [
+        EquilibrateCell.from_payload(row)
+        if not isinstance(row, EquilibrateCell)
+        else row
+        for row in report.get("cells") or []
+        if isinstance(row, (EquilibrateCell, Mapping))
+    ]
+    cells = reclassify_projected_composition_cells(raw_cells, pots)
     residuals = pairwise_residuals(cells)
     floor_refusals = collect_floor_refusals(cells)
+    engine_names = list((report.get("engines") or {}).keys()) or list(
+        BATTERY_ENGINE_NAMES
+    )
     updated = dict(report)
+    updated["cells"] = [cell.as_payload() for cell in cells]
+    updated["refusal_matrix"] = _refusal_matrix(pots, engine_names, cells)
+    updated["n_ok"] = sum(1 for cell in cells if cell.status == "ok")
+    updated["n_refused"] = sum(1 for cell in cells if cell.status == "refusal")
     updated["largest_in_envelope_residuals"] = residuals[:20]
     updated["n_matched_residuals"] = len(residuals)
     updated["per_pot_residuals"] = _per_pot_residual_tables(pots, residuals)
@@ -1531,6 +1715,9 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
                 label = "—"
             else:
                 label = f"{reason} ({n_refused}/{cell.get('n_cells', 0)})"
+                note = cell.get("note")
+                if reason == REFUSAL_COMPOSITION_PROJECTED and note:
+                    label = f"{reason} ({n_refused}/{cell.get('n_cells', 0)}; {note})"
             cells.append(label)
         lines.append(f"| `{pot_id}` | " + " | ".join(cells) + " |")
 

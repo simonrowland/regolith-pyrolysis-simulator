@@ -25,6 +25,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (  # noqa: E402
 from simulator.diagnostic_helpers.binary_pot_scoring import (  # noqa: E402
     DEFAULT_POTS_PATH,
     REPORT_DIR,
+    recompute_scoring_from_report,
     run_scoring_arm,
     write_scoring_reports,
 )
@@ -55,6 +56,12 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="append one line per cell (and START/DONE) for detached polling",
     )
+    parser.add_argument(
+        "--from-json",
+        type=Path,
+        default=None,
+        help="re-score an existing scoring-arm JSON (no engine re-run)",
+    )
     return parser.parse_args(argv)
 
 
@@ -74,9 +81,15 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(payload, indent=2, sort_keys=True))
         return 0
 
-    report = run_scoring_arm(
-        pots_path=args.pots, progress_log=args.progress_log
-    )
+    if args.from_json is not None:
+        source = Path(args.from_json)
+        report = recompute_scoring_from_report(
+            json.loads(source.read_text(encoding="utf-8"))
+        )
+    else:
+        report = run_scoring_arm(
+            pots_path=args.pots, progress_log=args.progress_log
+        )
     json_path, markdown_path = write_scoring_reports(report, args.output_dir)
     print(f"hostname={report['hostname']}")
     print(f"n_cells={report['n_cells']}")

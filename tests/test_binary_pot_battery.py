@@ -14,6 +14,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     FINDING_CLASS_FALLBACK_VS_SPECIATION,
     QUANTITY_ACTIVITY,
     QUANTITY_PRESSURE,
+    REFUSAL_COMPOSITION_PROJECTED,
     REFUSAL_TIMEOUT,
     REFUSAL_UNAVAILABLE,
     REFUSAL_VALUE_IS_FLOOR,
@@ -30,6 +31,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     finding_class_for_pair,
     load_binary_pots,
     pairwise_residuals,
+    reclassify_projected_composition_cells,
     recompute_residuals_from_report,
     render_report_markdown,
     residual_log10,
@@ -172,6 +174,114 @@ def test_classify_out_of_domain_and_no_liquid() -> None:
     )
     assert status == "refusal"
     assert reason == "no_liquid"
+
+
+def test_classify_composition_projected_is_typed_refusal() -> None:
+    status, reason, engine_reason = classify_equilibrate_outcome(
+        SimpleNamespace(
+            status="out_of_domain",
+            diagnostics={
+                "backend_status_reason": REFUSAL_COMPOSITION_PROJECTED,
+                "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "dropped_bulk_components": ["P2O5"],
+                    "dropped_mass_fraction": 0.0154881,
+                    "composition_projected": {
+                        "dropped_components": ["P2O5"],
+                        "dropped_mass_fraction": 0.0154881,
+                    },
+                },
+            },
+            warnings=["MAGEMin refused projected composition; dropped P2O5"],
+            activity_coefficients={},
+            vapor_pressures_Pa={},
+            liquid_fraction=None,
+        )
+    )
+    assert status == "refusal"
+    assert reason == REFUSAL_COMPOSITION_PROJECTED
+    assert "P2O5" in engine_reason
+    assert "mass_fraction=" in engine_reason
+
+    vaporock_status, vaporock_reason, _ = classify_equilibrate_outcome(
+        SimpleNamespace(
+            status="out_of_domain",
+            diagnostics={
+                "backend_status_reason": "forbidden_species",
+                "input_composition_projection": {
+                    "status": "projected",
+                    "reason": "input_composition_projected",
+                    "dropped_species": ["Fe", "FeS"],
+                },
+            },
+            warnings=["VapoRock refused projected/dropped non-basis melt input"],
+            activity_coefficients={},
+            vapor_pressures_Pa={},
+            liquid_fraction=None,
+        )
+    )
+    assert vaporock_status == "refusal"
+    assert vaporock_reason == "out_of_basis"
+
+
+def test_reclassify_magemin_p2o5_ok_cell_is_composition_projected() -> None:
+    pot = BinaryPot(
+        pot_id="kambayashi_1985_feto_p2o5_s01",
+        kato_1993_table4_system=None,
+        why="fixture",
+        composition_wt_pct={
+            "P2O5": 1.548807826,
+            "FeO": 88.19034033,
+            "Fe2O3": 10.26085184,
+        },
+    )
+    ok_cell = EquilibrateCell(
+        pot_id=pot.pot_id,
+        engine="magemin",
+        temperature_K=1643.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=0.001,
+        wall_s=0.2,
+        cpu_s=0.0,
+        hostname="test",
+    )
+    rewritten = reclassify_projected_composition_cells((ok_cell,), (pot,))
+    assert len(rewritten) == 1
+    cell = rewritten[0]
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_COMPOSITION_PROJECTED
+    assert cell.engine_status == "out_of_domain"
+    assert "P2O5" in (cell.engine_reason or "")
+    assert cell.melt_activities == {}
+
+    in_basis = BinaryPot(
+        pot_id="feo_sio2_40_60",
+        kato_1993_table4_system="FeO-SiO2",
+        why="fixture",
+        composition_wt_pct={"FeO": 40.0, "SiO2": 60.0},
+    )
+    kept = reclassify_projected_composition_cells(
+        (
+            EquilibrateCell(
+                **{
+                    **ok_cell.__dict__,
+                    "pot_id": in_basis.pot_id,
+                    "melt_activities": {"SiO2": 0.4},
+                }
+            ),
+        ),
+        (in_basis,),
+    )
+    assert kept[0].status == "ok"
+    assert kept[0].refusal_reason is None
+    assert kept[0].melt_activities == {"SiO2": 0.4}
 
 
 def test_residual_function_is_antisymmetric() -> None:

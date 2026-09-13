@@ -10,6 +10,7 @@ import yaml
 
 from scripts.calibration_battery import envelope, rail_for
 from simulator.diagnostic_helpers.binary_pot_battery import (
+    REFUSAL_COMPOSITION_PROJECTED,
     EquilibrateCell,
     Po2Request,
     composition_kg_and_mol,
@@ -25,6 +26,8 @@ from simulator.diagnostic_helpers.binary_pot_scoring import (
     load_scoring_pots,
     method_class_is_scored,
     oxide_molar_mass_g_mol,
+    recompute_scoring_from_report,
+    render_scoring_report_markdown,
     score_scoring_arm,
     sync_scoring_pots_into_catalog,
 )
@@ -222,6 +225,95 @@ def test_refusing_engine_yields_typed_refusal_envelope() -> None:
     assert all(r["predicted"] is None for r in rows)
     assert all(not r["score_eligible"] for r in rows)
     assert all(r["engine"] == "magemin" for r in rows)
+
+
+def test_composition_projected_is_typed_refusal_envelope() -> None:
+    pots = build_scoring_pots_from_extracts()
+    pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
+    cell = EquilibrateCell(
+        pot_id=pot.pot_id,
+        engine="magemin",
+        temperature_K=float(pot.temperatures_K[0]),
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="refusal",
+        refusal_reason=REFUSAL_COMPOSITION_PROJECTED,
+        engine_status="out_of_domain",
+        engine_reason="dropped P2O5 (mass_fraction=0.0154881)",
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=None,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname="test",
+    )
+    rows = score_scoring_arm(
+        pots=(pot,),
+        cells=(cell,),
+        comparators=iter_activity_comparators(),
+        envelope=envelope,
+        rail_for=rail_for,
+    )
+    assert rows
+    assert all(r["authority"] == "refused" for r in rows)
+    assert all(r["comparator_status"] == REFUSAL_COMPOSITION_PROJECTED for r in rows)
+    assert all(r["predicted"] is None for r in rows)
+    assert all(not r["score_eligible"] for r in rows)
+    assert all("P2O5" in " ".join(r.get("notices") or []) for r in rows)
+
+
+def test_recompute_scoring_reclassifies_magemin_projected_ok_cells() -> None:
+    pots = build_scoring_pots_from_extracts()
+    pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
+    original = {
+        "schema_version": 1,
+        "kind": "binary_pot_scoring_arm",
+        "generated_at": "2026-09-13T00:00:00Z",
+        "authority": "diagnostic_only",
+        "certifies": False,
+        "calibrates": False,
+        "hostname": "test",
+        "receipt": {},
+        "pots": [pot.as_payload() | {"pot_id": pot.pot_id}],
+        "engines": {"magemin": {"available": True, "unavailable_reason": None}},
+        "cells": [
+            EquilibrateCell(
+                pot_id=pot.pot_id,
+                engine="magemin",
+                temperature_K=float(pot.temperatures_K[0]),
+                po2=Po2Request(mode="engine_default", po2_bar=None),
+                status="ok",
+                refusal_reason=None,
+                engine_status="ok",
+                engine_reason=None,
+                melt_activities={},
+                gas_partial_pressures_Pa={},
+                liquid_fraction=0.001,
+                wall_s=0.2,
+                cpu_s=0.0,
+                hostname="test",
+            ).as_payload()
+        ],
+        "n_ok": 1,
+        "n_refused": 0,
+    }
+    updated = recompute_scoring_from_report(original)
+    rewritten = updated["cells"]
+    assert rewritten
+    assert all(cell["status"] == "refusal" for cell in rewritten)
+    assert all(
+        cell["refusal_reason"] == REFUSAL_COMPOSITION_PROJECTED for cell in rewritten
+    )
+    assert all("P2O5" in (cell["engine_reason"] or "") for cell in rewritten)
+    matrix_cell = updated["refusal_matrix"][pot.pot_id]["magemin"]
+    assert matrix_cell["dominant_reason"] == REFUSAL_COMPOSITION_PROJECTED
+    assert matrix_cell["n_ok"] == 0
+    assert "P2O5" in (matrix_cell.get("note") or "")
+    markdown = render_scoring_report_markdown(updated)
+    assert "composition_projected" in markdown
+    assert "dropped P2O5" in markdown
+    assert updated["n_ok"] == 0
+    assert updated["n_refused"] == 1
+    assert updated["n_score_eligible"] == 0
 
 
 def test_measured_gamma_scores_when_engine_returns_activity() -> None:
