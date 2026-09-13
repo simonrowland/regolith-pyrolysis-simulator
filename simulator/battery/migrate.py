@@ -1454,6 +1454,23 @@ def work_id_for(
     return citation_hash(citation), None
 
 
+def _locator_layer(loc_path: str) -> str | None:
+    lowered = loc_path.lower().replace("\\", "/")
+    if "tables/" in lowered or lowered.endswith(".csv"):
+        return "table"
+    if (
+        "ocr/" in lowered
+        or "/vlm/" in lowered
+        or "mineru" in lowered
+        or "ocr-artifacts" in lowered
+        or lowered.endswith(".md")
+    ):
+        return "ocr"
+    if lowered.endswith(".pdf") or "/raw/" in lowered:
+        return "pdf"
+    return None
+
+
 def choose_read_from(work: Work, locator: Locator | None) -> str:
     files = work.source_files.files
     loc_path = locator.source_path if locator is not None else None
@@ -1463,21 +1480,36 @@ def choose_read_from(work: Work, locator: Locator | None) -> str:
                 asset.path in str(loc_path) or str(loc_path) in asset.path
             ):
                 return asset.asset_id
-        lowered = str(loc_path).lower()
-        if "tables/" in lowered or lowered.endswith(".csv"):
+        layer = _locator_layer(str(loc_path))
+        if layer == "table":
             for asset in files:
                 if asset.role is AssetRole.TABLE_CSV:
                     return asset.asset_id
-        if lowered.endswith(".md"):
+            return "unknown"
+        if layer == "ocr":
             for asset in files:
-                if asset.role is AssetRole.MINERU_MD:
+                if asset.role is AssetRole.MINERU_MD and asset.path != "unknown":
                     return asset.asset_id
+            # Stated OCR/md layer with no matching INDEX asset: never PDF.
+            return "unknown"
+        if layer == "pdf":
+            for asset in files:
+                if asset.role is AssetRole.PDF and asset.path != "unknown":
+                    return asset.asset_id
+            return "unknown"
     for asset in files:
         if asset.role is AssetRole.PDF and asset.path != "unknown":
             return asset.asset_id
     if files:
         return files[0].asset_id
     return "unknown"
+
+
+def unmatched_read_from_reason(locator: Locator | None, read_from: str) -> str | None:
+    loc_path = locator.source_path if locator is not None else None
+    if loc_path and (read_from == "unknown" or str(read_from).startswith("unknown:")):
+        return f"locator source_path {loc_path!r} has no matching INDEX asset"
+    return None
 
 
 def source_files_for(
@@ -1522,6 +1554,16 @@ def source_files_for(
                 role=AssetRole.TABLE_CSV,
                 path=str(tables.get("path") or "unknown"),
                 sha256=State.unknown("INDEX does not give table sha256"),
+            )
+        )
+    ocr = corpus.get("ocr") or corpus.get("mineru") or corpus.get("vlm")
+    if isinstance(ocr, Mapping) and (ocr.get("exists") or ocr.get("path")):
+        files.append(
+            SourceFile(
+                asset_id=f"mineru_md:{source_id}",
+                role=AssetRole.MINERU_MD,
+                path=str(ocr.get("path") or "unknown"),
+                sha256=State.unknown("INDEX does not give OCR sha256"),
             )
         )
     if not files:
@@ -2049,6 +2091,16 @@ class Migrator:
             source=source_key,
         )
         read_from = choose_read_from(work, locator)
+        unmatched = unmatched_read_from_reason(locator, read_from)
+        if unmatched:
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["read_from"],
+                unmatched,
+                source=source_key,
+                observation_id=obs_id,
+            )
         if exploded and isinstance(values.get("series"), list):
             before = self._count(source_key).observations_out
             for item in exploded:
@@ -2337,6 +2389,17 @@ class Migrator:
         point_conditions = None
         if temperature_K is not None:
             point_conditions = {"temperature_K": located_value(temperature_K, locator)}
+        read_from = choose_read_from(work, locator)
+        unmatched = unmatched_read_from_reason(locator, read_from)
+        if unmatched:
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["read_from"],
+                unmatched,
+                source=source_key,
+                observation_id=observation_id,
+            )
         observation = Observation(
             observation_id=observation_id,
             experiment_id=experiment_id,
@@ -2351,7 +2414,7 @@ class Migrator:
             notices=(),
             source_id=source_id,
             locator=locator,
-            read_from=choose_read_from(work, locator),
+            read_from=read_from,
             point_conditions=point_conditions,
             derivation=derivation,
         )

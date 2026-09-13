@@ -502,6 +502,21 @@ def test_g10_kems_uncertainty_is_retained(tmp_path: Path) -> None:
     assert obs.uncertainty.verbatim is not None
 
 
+def test_h04_ocr_locator_does_not_fall_through_to_pdf(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["locator"] = {
+        "source_path": "ocr/missing.md",
+        "table": "I",
+    }
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False, validate=True)
+    obs = next(iter(result.observations.values()))
+    assert not str(obs.read_from).startswith("pdf:")
+    assert "unknown" in str(obs.read_from)
+    assert any("ocr" in (e.why or "").lower() or "source_path" in (e.why or "")
+               for e in result.queue)
+
+
 def test_g11_read_from_is_unknown_without_index_asset(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     root = _write_min_tree(tmp_path, extract)
