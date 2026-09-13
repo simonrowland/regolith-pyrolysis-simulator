@@ -31,12 +31,12 @@ standard_pressure:
   vapour_rail_psat_janaf: 100000 Pa (0.1 MPa)
   vapour_rail_psat_b689: 101325 Pa (1 atm)
 summary:
-  points_total: 23761
-  points_scored: 17992
-  points_refused: 5180
+  points_total: 23677
+  points_scored: 17903
+  points_refused: 5190
   matches: 4487
-  mismatches: 13505
-  points_before_ledger_thinning: 130053
+  mismatches: 13416
+  points_before_ledger_thinning: 130048
 points:
 - key: janaf::Al-001:T=0::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
@@ -103,8 +103,9 @@ points:
   finding_class: null
   engine_channel: vaporock
   cea_key: null
-  skip_reason: typed-refusal:engine_channel_unavailable
-  note: 'Laptop slice: channel is not importable. The hole is the result; not a silent zero.'
+  skip_reason: typed-refusal:not_probed
+  note: Channel not probed for this thermodynamic quantity (ΔfG). Unsupported quantity on this instrument;
+    not an attempted-unavailable engine.
   tier: major
   compilation_id: janaf
   n_points: 1
@@ -127,8 +128,9 @@ points:
   finding_class: null
   engine_channel: thermoengine
   cea_key: null
-  skip_reason: typed-refusal:engine_channel_unavailable
-  note: 'Laptop slice: channel is not importable. The hole is the result; not a silent zero.'
+  skip_reason: typed-refusal:not_probed
+  note: Channel not probed for this thermodynamic quantity (ΔfG). Unsupported quantity on this instrument;
+    not an attempted-unavailable engine.
   tier: major
   compilation_id: janaf
   n_points: 1
@@ -151,8 +153,9 @@ points:
   finding_class: null
   engine_channel: melts
   cea_key: null
-  skip_reason: typed-refusal:engine_channel_unavailable
-  note: 'Laptop slice: channel is not importable. The hole is the result; not a silent zero.'
+  skip_reason: typed-refusal:not_probed
+  note: Channel not probed for this thermodynamic quantity (ΔfG). Unsupported quantity on this instrument;
+    not an attempted-unavailable engine.
   tier: major
   compilation_id: janaf
   n_points: 1
@@ -30197,9 +30200,9 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 857.506
-  n_points: 15
+  n_points: 11
   T_min_K: 100.0
-  T_max_K: 3000.0
+  T_max_K: 1000.0
   first_observation_id: Al-096
 - key: janaf::Al-096:T=300::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
@@ -31201,48 +31204,32 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 21.293
-- key: janaf::Al-096:T=2500::ellingham::delta_fG_kJ_per_mol_O2
+- key: janaf::Al-096:T=2500::ellingham::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Al-096
   species: Al2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
+  provenance_class: independent_tabulation
+  comparison_quantity: delta_fG_kJ_mol
   temperature_K: 2500.0
-  table_kJ_mol: -582.43
-  engine_kJ_mol: -588.220667
-  residual_kJ_mol: -5.790667000000099
-  residual_log10K: 0.12098700013130782
+  table_kJ_mol: -873.645
+  engine_kJ_mol: null
+  residual_kJ_mol: null
+  residual_log10K: null
   band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
+  status: typed-refusal
+  finding_class: null
   engine_channel: ellingham
   cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] → Al
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Al line is Al2O3 (liquid: 4/3 Al(l) + O2 -> 2/3 Al2O3(l); rows 2400-2600
+    K); not Al2O3(cr)'
   tier: major
   compilation_id: janaf
   table_log10_Kf: 18.254
-- key: janaf::Al-096:T=2600::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Al-096
-  species: Al2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2600.0
-  table_kJ_mol: -561.1873333333333
-  engine_kJ_mol: -570.3876670000002
-  residual_kJ_mol: -9.200333666666893
-  residual_log10K: 0.18483335912922205
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] → Al
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 16.912
+  n_points: 6
+  T_min_K: 2500.0
+  T_max_K: 3000.0
+  first_observation_id: Al-096
 - key: janaf::Al-097:T=0::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Al-097
@@ -31313,9 +31300,9 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 275.579
-  n_points: 13
+  n_points: 9
   T_min_K: 298.15
-  T_max_K: 3000.0
+  T_max_K: 1000.0
   first_observation_id: Al-097
 - key: janaf::Al-097:T=300::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
@@ -32317,69 +32304,32 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 21.272
-- key: janaf::Al-097:T=2400::ellingham::delta_fG_kJ_per_mol_O2
+- key: janaf::Al-097:T=2400::ellingham::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Al-097
   species: Al2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
+  provenance_class: independent_tabulation
+  comparison_quantity: delta_fG_kJ_mol
   temperature_K: 2400.0
-  table_kJ_mol: -603.5413333333333
-  engine_kJ_mol: -606.0536670000001
-  residual_kJ_mol: -2.512333666666791
-  residual_log10K: 0.05467845098466545
+  table_kJ_mol: -905.312
+  engine_kJ_mol: null
+  residual_kJ_mol: null
+  residual_log10K: null
   band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
+  status: typed-refusal
+  finding_class: null
   engine_channel: ellingham
   cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] → Al
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Al line is Al2O3 (liquid: 4/3 Al(l) + O2 -> 2/3 Al2O3(l); rows 2400-2600
+    K); not Al2O3(cr)'
   tier: major
   compilation_id: janaf
   table_log10_Kf: 19.704
-- key: janaf::Al-097:T=2500::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Al-097
-  species: Al2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2500.0
-  table_kJ_mol: -582.7246666666666
-  engine_kJ_mol: -588.220667
-  residual_kJ_mol: -5.496000333333427
-  residual_log10K: 0.11483039743965036
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] → Al
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 18.263
-- key: janaf::Al-097:T=2600::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Al-097
-  species: Al2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2600.0
-  table_kJ_mol: -561.9686666666666
-  engine_kJ_mol: -570.3876670000002
-  residual_kJ_mol: -8.419000333333543
-  residual_log10K: 0.1691364866209063
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] → Al
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 16.935
+  n_points: 7
+  T_min_K: 2400.0
+  T_max_K: 3000.0
+  first_observation_id: Al-097
 - key: janaf::Al-098:T=0::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Al-098
@@ -32450,9 +32400,9 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 273.98
-  n_points: 13
+  n_points: 9
   T_min_K: 298.15
-  T_max_K: 3000.0
+  T_max_K: 1000.0
   first_observation_id: Al-098
 - key: janaf::Al-098:T=300::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
@@ -33454,69 +33404,32 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 21.256
-- key: janaf::Al-098:T=2400::ellingham::delta_fG_kJ_per_mol_O2
+- key: janaf::Al-098:T=2400::ellingham::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Al-098
   species: Al2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
+  provenance_class: independent_tabulation
+  comparison_quantity: delta_fG_kJ_mol
   temperature_K: 2400.0
-  table_kJ_mol: -603.4726666666667
-  engine_kJ_mol: -606.0536670000001
-  residual_kJ_mol: -2.5810003333334635
-  residual_log10K: 0.05617291289369817
+  table_kJ_mol: -905.209
+  engine_kJ_mol: null
+  residual_kJ_mol: null
+  residual_log10K: null
   band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
+  status: typed-refusal
+  finding_class: null
   engine_channel: ellingham
   cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] → Al
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Al line is Al2O3 (liquid: 4/3 Al(l) + O2 -> 2/3 Al2O3(l); rows 2400-2600
+    K); not Al2O3(cr)'
   tier: major
   compilation_id: janaf
   table_log10_Kf: 19.701
-- key: janaf::Al-098:T=2500::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Al-098
-  species: Al2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2500.0
-  table_kJ_mol: -583.0486666666667
-  engine_kJ_mol: -588.220667
-  residual_kJ_mol: -5.172000333333358
-  residual_log10K: 0.10806092027189898
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] → Al
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 18.273
-- key: janaf::Al-098:T=2600::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Al-098
-  species: Al2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2600.0
-  table_kJ_mol: -562.6913333333333
-  engine_kJ_mol: -570.3876670000002
-  residual_kJ_mol: -7.696333666666874
-  residual_log10K: 0.15461821887430738
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] → Al
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 16.957
+  n_points: 7
+  T_min_K: 2400.0
+  T_max_K: 3000.0
+  first_observation_id: Al-098
 - key: janaf::Al-099:T=0::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Al-099
@@ -33587,9 +33500,9 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 274.998
-  n_points: 13
+  n_points: 9
   T_min_K: 298.15
-  T_max_K: 3000.0
+  T_max_K: 1000.0
   first_observation_id: Al-099
 - key: janaf::Al-099:T=300::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
@@ -34591,69 +34504,32 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 21.275
-- key: janaf::Al-099:T=2400::ellingham::delta_fG_kJ_per_mol_O2
+- key: janaf::Al-099:T=2400::ellingham::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Al-099
   species: Al2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
+  provenance_class: independent_tabulation
+  comparison_quantity: delta_fG_kJ_mol
   temperature_K: 2400.0
-  table_kJ_mol: -603.7113333333333
-  engine_kJ_mol: -606.0536670000001
-  residual_kJ_mol: -2.342333666666832
-  residual_log10K: 0.050978569559391486
+  table_kJ_mol: -905.567
+  engine_kJ_mol: null
+  residual_kJ_mol: null
+  residual_log10K: null
   band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
+  status: typed-refusal
+  finding_class: null
   engine_channel: ellingham
   cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] → Al
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Al line is Al2O3 (liquid: 4/3 Al(l) + O2 -> 2/3 Al2O3(l); rows 2400-2600
+    K); not Al2O3(cr)'
   tier: major
   compilation_id: janaf
   table_log10_Kf: 19.709
-- key: janaf::Al-099:T=2500::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Al-099
-  species: Al2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2500.0
-  table_kJ_mol: -582.958
-  engine_kJ_mol: -588.220667
-  residual_kJ_mol: -5.262667000000079
-  residual_log10K: 0.10995525956164083
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] → Al
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 18.27
-- key: janaf::Al-099:T=2600::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Al-099
-  species: Al2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2600.0
-  table_kJ_mol: -562.2613333333334
-  engine_kJ_mol: -570.3876670000002
-  residual_kJ_mol: -8.126333666666824
-  residual_log10K: 0.1632568560482513
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Al2O3'] → Al
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 16.944
+  n_points: 7
+  T_min_K: 2400.0
+  T_max_K: 3000.0
+  first_observation_id: Al-099
 - key: janaf::Al-100:T=0::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Al-100
@@ -152256,10 +152132,10 @@ points:
   source_id: janaf
   observation_id: Ca-028
   species: CaO
-  provenance_class: engine_own_input
+  provenance_class: independent_tabulation
   comparison_quantity: delta_fG_kJ_mol
   temperature_K: 298.15
-  table_kJ_mol: -1065.87
+  table_kJ_mol: -532.935
   engine_kJ_mol: null
   residual_kJ_mol: null
   residual_log10K: null
@@ -152268,351 +152144,16 @@ points:
   finding_class: null
   engine_channel: ellingham
   cea_key: null
-  skip_reason: typed-refusal:engine_channel_out_of_range:1100-2600K
-  note: janaf p°=0.1 MPa; certified_band_flag fit_range_K=(1100,2600)
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Ca line is CaO (solid: 2 Ca(s) + O2 -> 2 CaO(s); source-row tangent
+    at 1100 K); not CaO(l)'
   tier: major
   compilation_id: janaf
   table_log10_Kf: 93.368
-  n_points: 27
+  n_points: 43
   T_min_K: 298.15
   T_max_K: 4500.0
   first_observation_id: Ca-028
-- key: janaf::Ca-028:T=1100::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1100.0
-  table_kJ_mol: -938.124
-  engine_kJ_mol: -1040.5940005
-  residual_kJ_mol: -102.47000049999997
-  residual_log10K: 4.865799163608833
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 22.274
-- key: janaf::Ca-028:T=1200::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1200.0
-  table_kJ_mol: -920.83
-  engine_kJ_mol: -1018.414
-  residual_kJ_mol: -97.58399999999995
-  residual_log10K: 4.247637988282602
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 20.041
-- key: janaf::Ca-028:T=1300::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1300.0
-  table_kJ_mol: -903.338
-  engine_kJ_mol: -996.1755999999999
-  residual_kJ_mol: -92.83759999999995
-  residual_log10K: 3.7301876395340807
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 18.148
-- key: janaf::Ca-028:T=1400::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1400.0
-  table_kJ_mol: -885.882
-  engine_kJ_mol: -973.9371999999998
-  residual_kJ_mol: -88.0551999999999
-  residual_log10K: 3.285315618946507
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 16.526
-- key: janaf::Ca-028:T=1500::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1500.0
-  table_kJ_mol: -868.464
-  engine_kJ_mol: -951.6987999999999
-  residual_kJ_mol: -83.23479999999984
-  residual_log10K: 2.898436616060864
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 15.121
-- key: janaf::Ca-028:T=1600::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1600.0
-  table_kJ_mol: -851.086
-  engine_kJ_mol: -929.4603999999999
-  residual_kJ_mol: -78.37439999999992
-  residual_log10K: 2.558611648032893
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 13.893
-- key: janaf::Ca-028:T=1700::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1700.0
-  table_kJ_mol: -833.748
-  engine_kJ_mol: -907.2219999997999
-  residual_kJ_mol: -73.47399999979984
-  residual_log10K: 2.257537061646262
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 12.809
-- key: janaf::Ca-028:T=1800::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1800.0
-  table_kJ_mol: -812.034
-  engine_kJ_mol: -880.2938582
-  residual_kJ_mol: -68.25985820000005
-  residual_log10K: 1.9808108348711815
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 11.782
-- key: janaf::Ca-028:T=1900::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1900.0
-  table_kJ_mol: -778.096
-  engine_kJ_mol: -841.9980011
-  residual_kJ_mol: -63.90200110000001
-  residual_log10K: 1.7567541318225386
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 10.696
-- key: janaf::Ca-028:T=2000::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2000.0
-  table_kJ_mol: -744.352
-  engine_kJ_mol: -803.7021440000001
-  residual_kJ_mol: -59.350144000000114
-  residual_log10K: 1.550036437926976
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 9.72
-- key: janaf::Ca-028:T=2100::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2100.0
-  table_kJ_mol: -710.794
-  engine_kJ_mol: -765.4062869
-  residual_kJ_mol: -54.61228690000007
-  residual_log10K: 1.3583797370964135
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 8.84
-- key: janaf::Ca-028:T=2200::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2200.0
-  table_kJ_mol: -677.434
-  engine_kJ_mol: -727.1104298
-  residual_kJ_mol: -49.67642980000005
-  residual_log10K: 1.1794453468940562
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 8.042
-- key: janaf::Ca-028:T=2300::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2300.0
-  table_kJ_mol: -644.28
-  engine_kJ_mol: -688.8145727000001
-  residual_kJ_mol: -44.534572700000126
-  residual_log10K: 1.0113921533418908
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 7.316
-- key: janaf::Ca-028:T=2400::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2400.0
-  table_kJ_mol: -611.318
-  engine_kJ_mol: -650.9363330000001
-  residual_kJ_mol: -39.61833300000012
-  residual_log10K: 0.8622537315709072
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 6.652
-- key: janaf::Ca-028:T=2500::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2500.0
-  table_kJ_mol: -578.538
-  engine_kJ_mol: -613.3153330000001
-  residual_kJ_mol: -34.77733300000011
-  residual_log10K: 0.7266184003047451
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 6.044
-- key: janaf::Ca-028:T=2600::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Ca-028
-  species: CaO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2600.0
-  table_kJ_mol: -545.93
-  engine_kJ_mol: -575.6943330000001
-  residual_kJ_mol: -29.764333000000192
-  residual_log10K: 0.597961101189481
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['CaO'] → Ca
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 5.484
 - key: janaf::Ca-028:T=3200::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Ca-028
@@ -228408,10 +227949,10 @@ points:
   source_id: janaf
   observation_id: Cr-015
   species: Cr2O3
-  provenance_class: engine_own_input
+  provenance_class: independent_tabulation
   comparison_quantity: delta_fG_kJ_mol
   temperature_K: 298.15
-  table_kJ_mol: -633.3313333333333
+  table_kJ_mol: -949.997
   engine_kJ_mol: null
   residual_kJ_mol: null
   residual_log10K: null
@@ -228420,351 +227961,16 @@ points:
   finding_class: null
   engine_channel: ellingham
   cea_key: null
-  skip_reason: typed-refusal:engine_channel_out_of_range:1100-2600K
-  note: janaf p°=0.1 MPa; certified_band_flag fit_range_K=(1100,2600)
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Cr line is Cr2O3 (solid: 4/3 Cr(s) + O2 -> 2/3 Cr2O3(s); rows 1100-2100
+    K); not Cr2O3(l)'
   tier: minor
   compilation_id: janaf
   table_log10_Kf: 166.435
-  n_points: 27
+  n_points: 43
   T_min_K: 298.15
   T_max_K: 4500.0
   first_observation_id: Cr-015
-- key: janaf::Cr-015:T=1100::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1100.0
-  table_kJ_mol: -517.0600000000001
-  engine_kJ_mol: -562.6940001
-  residual_kJ_mol: -45.63400009999998
-  residual_log10K: 2.166935478044673
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 36.83
-- key: janaf::Cr-015:T=1200::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1200.0
-  table_kJ_mol: -503.068
-  engine_kJ_mol: -545.7663092
-  residual_kJ_mol: -42.69830920000004
-  residual_log10K: 1.8585727188202654
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 32.847
-- key: janaf::Cr-015:T=1300::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1300.0
-  table_kJ_mol: -489.1066666666666
-  engine_kJ_mol: -528.8386183
-  residual_kJ_mol: -39.73195163333338
-  residual_log10K: 1.5964182063864876
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 29.479
-- key: janaf::Cr-015:T=1400::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1400.0
-  table_kJ_mol: -475.1566666666667
-  engine_kJ_mol: -511.9109274
-  residual_kJ_mol: -36.7542607333333
-  residual_log10K: 1.3712914949946433
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 26.592
-- key: janaf::Cr-015:T=1500::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1500.0
-  table_kJ_mol: -461.20133333333337
-  engine_kJ_mol: -494.9832365
-  residual_kJ_mol: -33.78190316666661
-  residual_log10K: 1.176367397993257
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 24.091
-- key: janaf::Cr-015:T=1600::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1600.0
-  table_kJ_mol: -447.2253333333333
-  engine_kJ_mol: -478.05554559999996
-  residual_kJ_mol: -30.83021226666665
-  residual_log10K: 1.006483497376949
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 21.901
-- key: janaf::Cr-015:T=1700::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1700.0
-  table_kJ_mol: -433.214
-  engine_kJ_mol: -461.1278547
-  residual_kJ_mol: -27.9138547
-  residual_log10K: 0.8576715779572417
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 19.967
-- key: janaf::Cr-015:T=1800::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1800.0
-  table_kJ_mol: -419.1553333333333
-  engine_kJ_mol: -444.2001638
-  residual_kJ_mol: -25.044830466666667
-  residual_log10K: 0.7267678670021785
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 18.245
-- key: janaf::Cr-015:T=1900::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1900.0
-  table_kJ_mol: -405.07666666666665
-  engine_kJ_mol: -427.27247289999997
-  residual_kJ_mol: -22.195806233333315
-  residual_log10K: 0.6101933216226112
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 16.705
-- key: janaf::Cr-015:T=2000::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2000.0
-  table_kJ_mol: -391.00066666666663
-  engine_kJ_mol: -410.344782
-  residual_kJ_mol: -19.344115333333377
-  residual_log10K: 0.505206585954174
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 15.318
-- key: janaf::Cr-015:T=2100::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2100.0
-  table_kJ_mol: -376.91066666666666
-  engine_kJ_mol: -393.4170911
-  residual_kJ_mol: -16.506424433333336
-  residual_log10K: 0.41056681115020516
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 14.063
-- key: janaf::Cr-015:T=2200::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2200.0
-  table_kJ_mol: -361.9186666666667
-  engine_kJ_mol: -374.97139999999996
-  residual_kJ_mol: -13.052733333333265
-  residual_log10K: 0.30990523385496693
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 12.89
-- key: janaf::Cr-015:T=2300::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2300.0
-  table_kJ_mol: -346.60133333333334
-  engine_kJ_mol: -356.4983
-  residual_kJ_mol: -9.896966666666628
-  residual_log10K: 0.22476278140090586
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 11.807
-- key: janaf::Cr-015:T=2400::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2400.0
-  table_kJ_mol: -331.344
-  engine_kJ_mol: -338.0252
-  residual_kJ_mol: -6.68119999999999
-  residual_log10K: 0.14540969281497834
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 10.817
-- key: janaf::Cr-015:T=2500::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2500.0
-  table_kJ_mol: -316.142
-  engine_kJ_mol: -319.55209999999994
-  residual_kJ_mol: -3.410099999999943
-  residual_log10K: 0.07124874719056698
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 9.908
-- key: janaf::Cr-015:T=2600::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Cr-015
-  species: Cr2O3
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2600.0
-  table_kJ_mol: -300.99399999999997
-  engine_kJ_mol: -301.07899999999995
-  residual_kJ_mol: -0.08499999999997954
-  residual_log10K: 0.0017076375808956754
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=3.0 via OXIDE_TO_METAL['Cr2O3'] → Cr
-  tier: minor
-  compilation_id: janaf
-  table_log10_Kf: 9.071
 - key: janaf::Cr-015:T=2800::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Cr-015
@@ -290644,69 +289850,32 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 5.525
-- key: janaf::Fe-018:T=1800::ellingham::delta_fG_kJ_per_mol_O2
+- key: janaf::Fe-018:T=1800::ellingham::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Fe-018
   species: FeO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
+  provenance_class: independent_tabulation
+  comparison_quantity: delta_fG_kJ_mol
   temperature_K: 1800.0
-  table_kJ_mol: -313.898
-  engine_kJ_mol: -318.32
-  residual_kJ_mol: -4.421999999999969
-  residual_log10K: 0.12832059343188462
+  table_kJ_mol: -156.949
+  engine_kJ_mol: null
+  residual_kJ_mol: null
+  residual_log10K: null
   band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
+  status: typed-refusal
+  finding_class: null
   engine_channel: ellingham
   cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['FeO'] → Fe
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Fe line is FeO (liquid: 2 Fe(delta) + O2 -> 2 FeO(l); rows 1700-1800
+    K); not FeO(cr)'
   tier: major
   compilation_id: janaf
   table_log10_Kf: 4.555
-- key: janaf::Fe-018:T=1900::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Fe-018
-  species: FeO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1900.0
-  table_kJ_mol: -300.25
-  engine_kJ_mol: -307.5631669
-  residual_kJ_mol: -7.313166899999999
-  residual_log10K: 0.2010490430210146
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['FeO'] → Fe
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 4.127
-- key: janaf::Fe-018:T=2000::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Fe-018
-  species: FeO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2000.0
-  table_kJ_mol: -286.474
-  engine_kJ_mol: -296.892905
-  residual_kJ_mol: -10.418904999999995
-  residual_log10K: 0.27210856292614083
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['FeO'] → Fe
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 3.741
+  n_points: 3
+  T_min_K: 1800.0
+  T_max_K: 2000.0
+  first_observation_id: Fe-018
 - key: janaf::Fe-019:T=0::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Fe-019
@@ -290760,10 +289929,10 @@ points:
   source_id: janaf
   observation_id: Fe-019
   species: FeO
-  provenance_class: engine_own_input
+  provenance_class: independent_tabulation
   comparison_quantity: delta_fG_kJ_mol
   temperature_K: 298.15
-  table_kJ_mol: -466.578
+  table_kJ_mol: -233.289
   engine_kJ_mol: null
   residual_kJ_mol: null
   residual_log10K: null
@@ -290772,141 +289941,16 @@ points:
   finding_class: null
   engine_channel: ellingham
   cea_key: null
-  skip_reason: typed-refusal:engine_channel_out_of_range:1100-2600K
-  note: janaf p°=0.1 MPa; certified_band_flag fit_range_K=(1100,2600)
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Fe line is FeO (solid: 2 Fe(alpha) + O2 -> 2 FeO(s); source-row tangent
+    at 1100 K); not FeO(l)'
   tier: major
   compilation_id: janaf
   table_log10_Kf: 40.871
-  n_points: 33
+  n_points: 15
   T_min_K: 298.15
-  T_max_K: 5000.0
+  T_max_K: 1600.0
   first_observation_id: Fe-019
-- key: janaf::Fe-019:T=1100::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Fe-019
-  species: FeO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1100.0
-  table_kJ_mol: -386.374
-  engine_kJ_mol: -401.3400005
-  residual_kJ_mol: -14.96600049999995
-  residual_log10K: 0.7106621680505325
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['FeO'] → Fe
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 9.174
-- key: janaf::Fe-019:T=1200::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Fe-019
-  species: FeO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1200.0
-  table_kJ_mol: -376.172
-  engine_kJ_mol: -388.50120000000004
-  residual_kJ_mol: -12.329200000000014
-  residual_log10K: 0.5366656243352799
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['FeO'] → Fe
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 8.187
-- key: janaf::Fe-019:T=1300::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Fe-019
-  species: FeO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1300.0
-  table_kJ_mol: -366.06
-  engine_kJ_mol: -375.96360000000004
-  residual_kJ_mol: -9.90360000000004
-  residual_log10K: 0.39792375402735414
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['FeO'] → Fe
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 7.354
-- key: janaf::Fe-019:T=1400::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Fe-019
-  species: FeO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1400.0
-  table_kJ_mol: -356.184
-  engine_kJ_mol: -363.42600000000004
-  residual_kJ_mol: -7.242000000000019
-  residual_log10K: 0.27019705494293006
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['FeO'] → Fe
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 6.645
-- key: janaf::Fe-019:T=1500::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Fe-019
-  species: FeO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1500.0
-  table_kJ_mol: -346.514
-  engine_kJ_mol: -350.88840000000005
-  residual_kJ_mol: -4.374400000000037
-  residual_log10K: 0.15232716523974077
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['FeO'] → Fe
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 6.033
-- key: janaf::Fe-019:T=1600::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Fe-019
-  species: FeO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1600.0
-  table_kJ_mol: -337.024
-  engine_kJ_mol: -338.35080000000005
-  residual_kJ_mol: -1.3268000000000484
-  residual_log10K: 0.043314729485778136
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['FeO'] → Fe
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 5.501
 - key: janaf::Fe-019:T=1800::ellingham::delta_fG_kJ_per_mol_O2
   source_id: janaf
   observation_id: Fe-019
@@ -291096,6 +290140,31 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 2.34
+- key: janaf::Fe-019:T=2700::ellingham::delta_fG_kJ_mol
+  source_id: janaf
+  observation_id: Fe-019
+  species: FeO
+  provenance_class: engine_own_input
+  comparison_quantity: delta_fG_kJ_mol
+  temperature_K: 2700.0
+  table_kJ_mol: -222.388
+  engine_kJ_mol: null
+  residual_kJ_mol: null
+  residual_log10K: null
+  band_kJ_mol: 0.05
+  status: typed-refusal
+  finding_class: null
+  engine_channel: ellingham
+  cea_key: null
+  skip_reason: typed-refusal:engine_channel_out_of_range:1100-2600K
+  note: janaf p°=0.1 MPa; certified_band_flag fit_range_K=(1100,2600)
+  tier: major
+  compilation_id: janaf
+  table_log10_Kf: 2.151
+  n_points: 24
+  T_min_K: 2700.0
+  T_max_K: 5000.0
+  first_observation_id: Fe-019
 - key: janaf::Fe-020:T=0::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Fe-020
@@ -341518,10 +340587,10 @@ points:
   source_id: janaf
   observation_id: Mg-009
   species: MgO
-  provenance_class: engine_own_input
+  provenance_class: independent_tabulation
   comparison_quantity: delta_fG_kJ_mol
   temperature_K: 298.15
-  table_kJ_mol: -1013.414
+  table_kJ_mol: -506.707
   engine_kJ_mol: null
   residual_kJ_mol: null
   residual_log10K: null
@@ -341530,351 +340599,16 @@ points:
   finding_class: null
   engine_channel: ellingham
   cea_key: null
-  skip_reason: typed-refusal:engine_channel_out_of_range:1100-2600K
-  note: janaf p°=0.1 MPa; certified_band_flag fit_range_K=(1100,2600)
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Mg line is MgO (solid: 2 Mg(l) + O2 -> 2 MgO(s); rows 1100-1300 K);
+    not MgO(l)'
   tier: major
   compilation_id: janaf
   table_log10_Kf: 88.773
-  n_points: 32
+  n_points: 48
   T_min_K: 298.15
   T_max_K: 5000.0
   first_observation_id: Mg-009
-- key: janaf::Mg-009:T=1100::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1100.0
-  table_kJ_mol: -872.708
-  engine_kJ_mol: -962.7973330000001
-  residual_kJ_mol: -90.08933300000012
-  residual_log10K: 4.277901815385259
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 20.721
-- key: janaf::Mg-009:T=1200::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1200.0
-  table_kJ_mol: -853.886
-  engine_kJ_mol: -939.689333
-  residual_kJ_mol: -85.80333300000007
-  residual_log10K: 3.734848917569096
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 18.584
-- key: janaf::Mg-009:T=1300::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1300.0
-  table_kJ_mol: -835.07
-  engine_kJ_mol: -916.5813330002
-  residual_kJ_mol: -81.5113330001999
-  residual_log10K: 3.2751015411782753
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 16.777
-- key: janaf::Mg-009:T=1400::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1400.0
-  table_kJ_mol: -809.924
-  engine_kJ_mol: -886.6934998
-  residual_kJ_mol: -76.76949980000006
-  residual_log10K: 2.864249206766338
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 15.109
-- key: janaf::Mg-009:T=1500::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1500.0
-  table_kJ_mol: -772.568
-  engine_kJ_mol: -845.5112855000001
-  residual_kJ_mol: -72.94328550000012
-  residual_log10K: 2.54006124348208
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 13.452
-- key: janaf::Mg-009:T=1600::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1600.0
-  table_kJ_mol: -735.404
-  engine_kJ_mol: -804.3290712
-  residual_kJ_mol: -68.92507120000005
-  residual_log10K: 2.2501287411937674
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 12.004
-- key: janaf::Mg-009:T=1700::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1700.0
-  table_kJ_mol: -698.428
-  engine_kJ_mol: -763.1468569000001
-  residual_kJ_mol: -64.7188569000001
-  residual_log10K: 1.9885295211847616
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 10.73
-- key: janaf::Mg-009:T=1800::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1800.0
-  table_kJ_mol: -661.632
-  engine_kJ_mol: -721.9646426
-  residual_kJ_mol: -60.3326426000001
-  residual_log10K: 1.750773519164602
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 9.6
-- key: janaf::Mg-009:T=1900::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1900.0
-  table_kJ_mol: -625.006
-  engine_kJ_mol: -680.7824283000001
-  residual_kJ_mol: -55.776428300000134
-  residual_log10K: 1.5333709302935865
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 8.591
-- key: janaf::Mg-009:T=2000::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2000.0
-  table_kJ_mol: -588.548
-  engine_kJ_mol: -639.673071
-  residual_kJ_mol: -51.12507100000005
-  residual_log10K: 1.3352237686500585
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 7.686
-- key: janaf::Mg-009:T=2100::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2100.0
-  table_kJ_mol: -552.248
-  engine_kJ_mol: -599.4581424
-  residual_kJ_mol: -47.210142399999995
-  residual_log10K: 1.1742650685737197
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 6.868
-- key: janaf::Mg-009:T=2200::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2200.0
-  table_kJ_mol: -516.154
-  engine_kJ_mol: -559.2432138000001
-  residual_kJ_mol: -43.08921380000015
-  residual_log10K: 1.0230480113474918
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 6.128
-- key: janaf::Mg-009:T=2300::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2300.0
-  table_kJ_mol: -480.306
-  engine_kJ_mol: -519.0282852000001
-  residual_kJ_mol: -38.72228520000016
-  residual_log10K: 0.8793935371192386
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 5.454
-- key: janaf::Mg-009:T=2400::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2400.0
-  table_kJ_mol: -444.692
-  engine_kJ_mol: -478.81335660000013
-  residual_kJ_mol: -34.12135660000013
-  residual_log10K: 0.7426174911148237
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 4.839
-- key: janaf::Mg-009:T=2500::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2500.0
-  table_kJ_mol: -409.302
-  engine_kJ_mol: -438.5984280000001
-  residual_kJ_mol: -29.296428000000105
-  residual_log10K: 0.612103396427873
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 4.276
-- key: janaf::Mg-009:T=2600::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Mg-009
-  species: MgO
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2600.0
-  table_kJ_mol: -374.124
-  engine_kJ_mol: -398.3834994000001
-  residual_kJ_mol: -24.259499400000095
-  residual_log10K: 0.4873697984607791
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['MgO'] → Mg
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 3.758
 - key: janaf::Mg-009:T=3100::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Mg-009
@@ -381092,111 +379826,32 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 7.172
-- key: janaf::Na-012:T=1600::ellingham::delta_fG_kJ_per_mol_O2
+- key: janaf::Na-012:T=1600::ellingham::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Na-012
   species: Na2O
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
+  provenance_class: independent_tabulation
+  comparison_quantity: delta_fG_kJ_mol
   temperature_K: 1600.0
-  table_kJ_mol: -273.568
-  engine_kJ_mol: -287.17240000000004
-  residual_kJ_mol: -13.604400000000055
-  residual_log10K: 0.44412941348831847
+  table_kJ_mol: -136.784
+  engine_kJ_mol: null
+  residual_kJ_mol: null
+  residual_log10K: null
   band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
+  status: typed-refusal
+  finding_class: null
   engine_channel: ellingham
   cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['Na2O'] → Na
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Na line is Na2O (liquid: 4 Na(g) + O2 -> 2 Na2O(l); rows 1500-1800
+    K); not Na2O(cr)'
   tier: major
   compilation_id: janaf
   table_log10_Kf: 4.466
-- key: janaf::Na-012:T=1700::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Na-012
-  species: Na2O
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1700.0
-  table_kJ_mol: -218.93
-  engine_kJ_mol: -239.42560000000003
-  residual_kJ_mol: -20.495600000000024
-  residual_log10K: 0.6297408144486925
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['Na2O'] → Na
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 3.363
-- key: janaf::Na-012:T=1800::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Na-012
-  species: Na2O
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1800.0
-  table_kJ_mol: -164.796
-  engine_kJ_mol: -191.50080000000003
-  residual_kJ_mol: -26.704800000000034
-  residual_log10K: 0.7749379881229809
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['Na2O'] → Na
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 2.391
-- key: janaf::Na-012:T=1900::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Na-012
-  species: Na2O
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1900.0
-  table_kJ_mol: -111.142
-  engine_kJ_mol: -145.4592
-  residual_kJ_mol: -34.317200000000014
-  residual_log10K: 0.9434271518076206
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['Na2O'] → Na
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 1.528
-- key: janaf::Na-012:T=2000::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: Na-012
-  species: Na2O
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2000.0
-  table_kJ_mol: -57.954
-  engine_kJ_mol: -99.4176
-  residual_kJ_mol: -41.46359999999999
-  residual_log10K: 1.0828969656354805
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=1.0 via OXIDE_TO_METAL['Na2O'] → Na
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 0.757
+  n_points: 5
+  T_min_K: 1600.0
+  T_max_K: 2000.0
+  first_observation_id: Na-012
 - key: janaf::Na-013:T=0::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: Na-013
@@ -407046,9 +405701,9 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 149.554
-  n_points: 13
+  n_points: 9
   T_min_K: 298.15
-  T_max_K: 3000.0
+  T_max_K: 1000.0
   first_observation_id: O-035
 - key: janaf::O-035:T=300::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
@@ -407605,49 +406260,32 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 18.749
-- key: janaf::O-035:T=1700::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-035
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1700.0
-  table_kJ_mol: -610.202
-  engine_kJ_mol: -608.5806899
-  residual_kJ_mol: 1.6213100999999597
-  residual_log10K: -0.049815821095643184
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 18.749
-- key: janaf::O-035:T=1700::nasa_cea_vs_ellingham::delta_fG_kJ_per_mol_O2
+- key: janaf::O-035:T=1700::ellingham::delta_fG_kJ_mol
   source_id: janaf
   observation_id: O-035
   species: SiO2
   provenance_class: independent_tabulation
-  comparison_quantity: delta_fG_kJ_per_mol_O2
+  comparison_quantity: delta_fG_kJ_mol
   temperature_K: 1700.0
-  table_kJ_mol: -609.7223287890351
-  engine_kJ_mol: -608.5806899
-  residual_kJ_mol: -1.1416388890351072
-  residual_log10K: 0.035077607085777826
+  table_kJ_mol: -610.202
+  engine_kJ_mol: null
+  residual_kJ_mol: null
+  residual_log10K: null
   band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: channel_disagreement
-  engine_channel: nasa_cea_vs_ellingham
-  cea_key: SiO2_b-crt
-  skip_reason: null
-  note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+  status: typed-refusal
+  finding_class: null
+  engine_channel: ellingham
+  cea_key: null
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Si line is SiO2 (liquid: Si(l) + O2 -> SiO2(l); rows 1700-2500 K);
+    not SiO2(cr)'
   tier: major
   compilation_id: janaf
   table_log10_Kf: 18.749
+  n_points: 14
+  T_min_K: 1700.0
+  T_max_K: 3000.0
+  first_observation_id: O-035
 - key: janaf::O-035:T=1800::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: O-035
@@ -407666,49 +406304,6 @@ points:
   cea_key: SiO2_b-crt
   skip_reason: null
   note: janaf p°=0.1 MPa
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 17.132
-- key: janaf::O-035:T=1800::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-035
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1800.0
-  table_kJ_mol: -590.378
-  engine_kJ_mol: -589.4529066
-  residual_kJ_mol: 0.925093400000037
-  residual_log10K: -0.026844987351407827
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 17.132
-- key: janaf::O-035:T=1800::nasa_cea_vs_ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-035
-  species: SiO2
-  provenance_class: independent_tabulation
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1800.0
-  table_kJ_mol: -589.871084913443
-  engine_kJ_mol: -589.4529066
-  residual_kJ_mol: -0.41817831344303613
-  residual_log10K: 0.012134981759691413
-  band_kJ_mol: 0.05
-  status: match
-  finding_class: channel_agreement
-  engine_channel: nasa_cea_vs_ellingham
-  cea_key: SiO2_b-crt
-  skip_reason: null
-  note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
   tier: major
   compilation_id: janaf
   table_log10_Kf: 17.132
@@ -407733,196 +406328,6 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 15.687
-- key: janaf::O-035:T=1900::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-035
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1900.0
-  table_kJ_mol: -570.605
-  engine_kJ_mol: -570.3251233000001
-  residual_kJ_mol: 0.2798766999999316
-  residual_log10K: -0.007694196436138474
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 15.687
-- key: janaf::O-035:T=1900::nasa_cea_vs_ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-035
-  species: SiO2
-  provenance_class: independent_tabulation
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1900.0
-  table_kJ_mol: -570.0741377462114
-  engine_kJ_mol: -570.3251233000001
-  residual_kJ_mol: 0.25098555378872334
-  residual_log10K: -0.006899938985574392
-  band_kJ_mol: 0.05
-  status: match
-  finding_class: channel_agreement
-  engine_channel: nasa_cea_vs_ellingham
-  cea_key: SiO2_b-crt
-  skip_reason: null
-  note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 15.687
-- key: janaf::O-035:T=2000::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-035
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2000.0
-  table_kJ_mol: -550.882
-  engine_kJ_mol: -551.1973399999999
-  residual_kJ_mol: -0.31533999999999196
-  residual_log10K: 0.008235674884561008
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 14.388
-- key: janaf::O-035:T=2100::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-035
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2100.0
-  table_kJ_mol: -531.206
-  engine_kJ_mol: -532.0695567
-  residual_kJ_mol: -0.8635567000000037
-  residual_log10K: 0.021479377438666642
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 13.213
-- key: janaf::O-035:T=2200::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-035
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2200.0
-  table_kJ_mol: -511.573
-  engine_kJ_mol: -512.9417734
-  residual_kJ_mol: -1.3687734000000091
-  residual_log10K: 0.03249817718547813
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 12.146
-- key: janaf::O-035:T=2300::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-035
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2300.0
-  table_kJ_mol: -491.985
-  engine_kJ_mol: -493.8139901
-  residual_kJ_mol: -1.8289900999999986
-  residual_log10K: 0.041536858299754016
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 11.173
-- key: janaf::O-035:T=2400::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-035
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2400.0
-  table_kJ_mol: -472.437
-  engine_kJ_mol: -474.68620680000004
-  residual_kJ_mol: -2.2492068000000245
-  residual_log10K: 0.04895175565248226
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 10.282
-- key: janaf::O-035:T=2500::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-035
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2500.0
-  table_kJ_mol: -452.927
-  engine_kJ_mol: -456.004
-  residual_kJ_mol: -3.076999999999998
-  residual_log10K: 0.06428913964557582
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 9.463
-- key: janaf::O-035:T=2600::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-035
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2600.0
-  table_kJ_mol: -433.454
-  engine_kJ_mol: -437.279
-  residual_kJ_mol: -3.8249999999999886
-  residual_log10K: 0.07684369114032366
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 8.708
 - key: janaf::O-036:T=0::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: O-036
@@ -408794,49 +407199,32 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 17.094
-- key: janaf::O-037:T=1800::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-037
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1800.0
-  table_kJ_mol: -589.059
-  engine_kJ_mol: -589.4529066
-  residual_kJ_mol: -0.39390660000003663
-  residual_log10K: 0.011430648726535745
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 17.094
-- key: janaf::O-037:T=1800::nasa_cea_vs_ellingham::delta_fG_kJ_per_mol_O2
+- key: janaf::O-037:T=1800::ellingham::delta_fG_kJ_mol
   source_id: janaf
   observation_id: O-037
   species: SiO2
   provenance_class: independent_tabulation
-  comparison_quantity: delta_fG_kJ_per_mol_O2
+  comparison_quantity: delta_fG_kJ_mol
   temperature_K: 1800.0
-  table_kJ_mol: -589.871084913443
-  engine_kJ_mol: -589.4529066
-  residual_kJ_mol: -0.41817831344303613
-  residual_log10K: 0.012134981759691413
+  table_kJ_mol: -589.059
+  engine_kJ_mol: null
+  residual_kJ_mol: null
+  residual_log10K: null
   band_kJ_mol: 0.05
-  status: match
-  finding_class: channel_agreement
-  engine_channel: nasa_cea_vs_ellingham
-  cea_key: SiO2_b-crt
-  skip_reason: null
-  note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
+  status: typed-refusal
+  finding_class: null
+  engine_channel: ellingham
+  cea_key: null
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Si line is SiO2 (liquid: Si(l) + O2 -> SiO2(l); rows 1700-2500 K);
+    not SiO2(cr)'
   tier: major
   compilation_id: janaf
   table_log10_Kf: 17.094
+  n_points: 3
+  T_min_K: 1800.0
+  T_max_K: 2000.0
+  first_observation_id: O-037
 - key: janaf::O-037:T=1900::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: O-037
@@ -408858,70 +407246,6 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 15.647
-- key: janaf::O-037:T=1900::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-037
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1900.0
-  table_kJ_mol: -569.146
-  engine_kJ_mol: -570.3251233000001
-  residual_kJ_mol: -1.1791233000001284
-  residual_log10K: 0.032415725541393915
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 15.647
-- key: janaf::O-037:T=1900::nasa_cea_vs_ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-037
-  species: SiO2
-  provenance_class: independent_tabulation
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 1900.0
-  table_kJ_mol: -570.0741377462114
-  engine_kJ_mol: -570.3251233000001
-  residual_kJ_mol: 0.25098555378872334
-  residual_log10K: -0.006899938985574392
-  band_kJ_mol: 0.05
-  status: match
-  finding_class: channel_agreement
-  engine_channel: nasa_cea_vs_ellingham
-  cea_key: SiO2_b-crt
-  skip_reason: null
-  note: channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). Descriptive magnitude band only;
-    never an acceptance verdict.
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 15.647
-- key: janaf::O-037:T=2000::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-037
-  species: SiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2000.0
-  table_kJ_mol: -549.303
-  engine_kJ_mol: -551.1973399999999
-  residual_kJ_mol: -1.8943399999999428
-  residual_log10K: 0.04947411797050557
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['SiO2'] → Si
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 14.346
 - key: janaf::O-038:T=0::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: O-038
@@ -413172,69 +411496,32 @@ points:
   tier: major
   compilation_id: janaf
   table_log10_Kf: 14.11
-- key: janaf::O-043:T=2300::ellingham::delta_fG_kJ_per_mol_O2
+- key: janaf::O-043:T=2300::ellingham::delta_fG_kJ_mol
   source_id: janaf
   observation_id: O-043
   species: TiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
+  provenance_class: independent_tabulation
+  comparison_quantity: delta_fG_kJ_mol
   temperature_K: 2300.0
   table_kJ_mol: -530.64
-  engine_kJ_mol: -536.1534999999999
-  residual_kJ_mol: -5.513499999999908
-  residual_log10K: 0.12521307153914618
+  engine_kJ_mol: null
+  residual_kJ_mol: null
+  residual_log10K: null
   band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
+  status: typed-refusal
+  finding_class: null
   engine_channel: ellingham
   cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['TiO2'] → Ti
+  skip_reason: typed-refusal:ellingham_line_is_different_oxide
+  note: 'janaf p°=0.1 MPa; Ellingham Ti line is TiO2 (liquid: Ti(l) + O2 -> TiO2(l); rows 2200-2600 K);
+    not TiO2(cr)'
   tier: major
   compilation_id: janaf
   table_log10_Kf: 12.051
-- key: janaf::O-043:T=2400::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-043
-  species: TiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2400.0
-  table_kJ_mol: -512.289
-  engine_kJ_mol: -521.18
-  residual_kJ_mol: -8.890999999999963
-  residual_log10K: 0.19350379854187405
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['TiO2'] → Ti
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 11.15
-- key: janaf::O-043:T=2500::ellingham::delta_fG_kJ_per_mol_O2
-  source_id: janaf
-  observation_id: O-043
-  species: TiO2
-  provenance_class: engine_own_input
-  comparison_quantity: delta_fG_kJ_per_mol_O2
-  temperature_K: 2500.0
-  table_kJ_mol: -493.913
-  engine_kJ_mol: -506.20649999999995
-  residual_kJ_mol: -12.293499999999938
-  residual_log10K: 0.2568536035855973
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: data_integrity
-  engine_channel: ellingham
-  cea_key: null
-  skip_reason: null
-  note: janaf p°=0.1 MPa; rescaled 2*ΔfG/n_O with n_O=2.0 via OXIDE_TO_METAL['TiO2'] → Ti
-  tier: major
-  compilation_id: janaf
-  table_log10_Kf: 10.32
+  n_points: 3
+  T_min_K: 2300.0
+  T_max_K: 2500.0
+  first_observation_id: O-043
 - key: janaf::O-044:T=0::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
   observation_id: O-044
@@ -458971,8 +457258,9 @@ points:
   finding_class: null
   engine_channel: vaporock
   cea_key: null
-  skip_reason: typed-refusal:engine_channel_unavailable
-  note: 'Laptop slice: channel is not importable. The hole is the result; not a silent zero.'
+  skip_reason: typed-refusal:not_probed
+  note: Channel not probed for this thermodynamic quantity (ΔfG). Unsupported quantity on this instrument;
+    not an attempted-unavailable engine.
   tier: major
   compilation_id: pankratz-1987-usbm-b689
   n_points: 1
@@ -458995,8 +457283,9 @@ points:
   finding_class: null
   engine_channel: thermoengine
   cea_key: null
-  skip_reason: typed-refusal:engine_channel_unavailable
-  note: 'Laptop slice: channel is not importable. The hole is the result; not a silent zero.'
+  skip_reason: typed-refusal:not_probed
+  note: Channel not probed for this thermodynamic quantity (ΔfG). Unsupported quantity on this instrument;
+    not an attempted-unavailable engine.
   tier: major
   compilation_id: pankratz-1987-usbm-b689
   n_points: 1
@@ -459019,8 +457308,9 @@ points:
   finding_class: null
   engine_channel: melts
   cea_key: null
-  skip_reason: typed-refusal:engine_channel_unavailable
-  note: 'Laptop slice: channel is not importable. The hole is the result; not a silent zero.'
+  skip_reason: typed-refusal:not_probed
+  note: Channel not probed for this thermodynamic quantity (ΔfG). Unsupported quantity on this instrument;
+    not an attempted-unavailable engine.
   tier: major
   compilation_id: pankratz-1987-usbm-b689
   n_points: 1
