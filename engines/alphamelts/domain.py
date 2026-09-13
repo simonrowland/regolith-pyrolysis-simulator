@@ -27,6 +27,7 @@ from dataclasses import dataclass
 from typing import Dict, Iterable, List, Mapping, Sequence, Tuple
 
 from engines.domain_reason import OutOfDomainReason, reason_value
+from engines.engine_commissioning import engine_commissioning
 
 # Canonical MELTS 14-oxide basis. Sourced verbatim from
 # ``simulator.melt_backend.alphamelts.MELTS_OXIDE_BASIS`` so the provider
@@ -69,9 +70,27 @@ _OXIDE_ALIASES.update({
 # most permissive (31.65): tholeiite survives slightly lower, but a floor
 # must hold for every composition the rail can present, and three of four
 # basalts die at 34.
-_SIO2_CRASH_FLOOR_WT_PCT = 34.0
-DEFAULT_SIO2_MIN_WT_PCT = 30.0
-DEFAULT_SIO2_MAX_WT_PCT = 80.0
+#
+# t-894: these names are aliases of data/engine_commissioning.yaml
+# (alphamelts.sio2_wt_pct). Do not re-hardcode a second band here.
+# FALLBACK values that used to live on these lines:
+#   _SIO2_CRASH_FLOOR_WT_PCT = 34.0
+#   DEFAULT_SIO2_MIN_WT_PCT = 30.0
+#   DEFAULT_SIO2_MAX_WT_PCT = 80.0
+_ALPHAMELTS_COMMISSIONING = engine_commissioning('alphamelts')
+if _ALPHAMELTS_COMMISSIONING.sio2_wt_pct.crash_floor is None:
+    raise RuntimeError(
+        'alphamelts commissioning row is missing sio2_wt_pct.crash_floor'
+    )
+_SIO2_CRASH_FLOOR_WT_PCT = float(
+    _ALPHAMELTS_COMMISSIONING.sio2_wt_pct.crash_floor
+)
+DEFAULT_SIO2_MIN_WT_PCT = float(
+    _ALPHAMELTS_COMMISSIONING.sio2_wt_pct.certified.minimum
+)
+DEFAULT_SIO2_MAX_WT_PCT = float(
+    _ALPHAMELTS_COMMISSIONING.sio2_wt_pct.certified.maximum
+)
 DEFAULT_SILICATE_NETWORK_BAND_WT_PCT: Tuple[float, float] = (
     DEFAULT_SIO2_MIN_WT_PCT,
     DEFAULT_SIO2_MAX_WT_PCT,

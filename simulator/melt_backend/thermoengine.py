@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import List, Mapping, Optional
 import warnings
 
+from engines.engine_commissioning import engine_commissioning
 from engines.alphamelts.thermoengine import (
     THERMOENGINE_HEALTH_TIMEOUT_S,
     THERMOENGINE_WARM_CALL_TIMEOUT_S,
@@ -293,14 +294,21 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         fO2_log: Optional[float],
         pressure_bar: float,
         warnings: List[str],
+        crash_diagnostics: Optional[Mapping[str, object]] = None,
         **_unused: object,
     ) -> EquilibriumResult:
+        # t-894: certified SiO2/T band is notice+run via the shared
+        # _MELTSBackendSupport commissioning gate
+        # (data/engine_commissioning.yaml, engine=thermoengine). Crash
+        # floor remains a hard refusal upstream of this method.
+        engine_commissioning(self.backend_name)
         return self._equilibrate_thermoengine(
             temperature_C,
             comp_wt,
             fO2_log,
             pressure_bar,
             warnings,
+            commissioning_diagnostics=crash_diagnostics,
         )
 
     def _equilibrate_thermoengine(
@@ -310,6 +318,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         fO2_log: Optional[float],
         pressure_bar: float,
         warnings: Optional[List[str]] = None,
+        commissioning_diagnostics: Optional[Mapping[str, object]] = None,
     ) -> EquilibriumResult:
         """Use ENKI ThermoEngine MELTS for equilibrium + first-class mu."""
         if self._thermoengine_transport is None:
@@ -462,6 +471,7 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
                 status=status,
                 diagnostics=self._vapor_pressure_diagnostics(
                     {
+                        **dict(commissioning_diagnostics or {}),
                         **clamp_diagnostics,
                         **vaporock_envelope_diagnostics,
                         'thermodynamic_basis': dict(

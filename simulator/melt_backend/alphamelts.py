@@ -49,6 +49,10 @@ from typing import Any, Dict, List, Mapping, Optional
 
 from engines.alphamelts.domain import canonical_melt_oxide_activity_name
 from engines.domain_reason import OutOfDomainReason, reason_value
+from engines.engine_commissioning import (
+    assess_engine_commissioning,
+    engine_commissioning,
+)
 from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
@@ -80,16 +84,26 @@ from simulator.melt_backend.liquidus import (
     liquidus_sample_error_from_exception,
 )
 from simulator.melt_backend.melt_envelope import melt_extrapolation_diagnostic
-from simulator.physical_constants import GAS_CONSTANT
+from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET, GAS_CONSTANT
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
 logger = logging.getLogger(__name__)
 
 
+# Liquidus seed is a search start, not a domain gate.
 ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C = 800.0
+# t-894: public alias of data/engine_commissioning.yaml
+# alphamelts.temperature_K.certified[0] − 273.15. Was hardcoded 800.0 C
+# (1073.15 K) and used as a pre-equilibrate refusal in
+# _equilibrate_subprocess. Certified-band T is now notice+run; this name
+# stays so importers (binary_pot_battery.melts_certified_band) keep the
+# published number. Do not restore a hard refusal on this constant.
 ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C = (
-    ALPHAMELTS_LIQUIDUS_SEED_TEMPERATURE_C
+    float(
+        engine_commissioning('alphamelts').temperature_K.certified.minimum
+    )
+    - CELSIUS_TO_KELVIN_OFFSET
 )
 ALPHAMELTS_PYTHON_MIN_PRESSURE_BAR = 1.0e-6
 ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR = 1.0
@@ -149,6 +163,7 @@ ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED = (
 ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH = (
     'subprocess_fe_free_absolute_fo2_crash'
 )
+ALPHAMELTS_REASON_SIO2_CRASH_FLOOR = 'sio2_below_crash_floor'
 # Retired name: the matching scope is still the two-component
 # Na2O/K2O-SiO2 family, but that is not the crash predicate.
 ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED = (
@@ -246,6 +261,7 @@ ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON = {
     ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED: 'out_of_domain',
     ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED: 'out_of_domain',
     ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH: 'engine_crash',
+    ALPHAMELTS_REASON_SIO2_CRASH_FLOOR: 'engine_crash',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: 'contract_error',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED: 'contract_error',
     ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING: 'parse_error',
@@ -294,6 +310,10 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
         'family that hits that trigger; the predicate is not no-Fe. A '
         'separate Fe-bearing sub-34 wt% SiO2 crash family is gated in '
         'engines/alphamelts/domain.py'
+    ),
+    ALPHAMELTS_REASON_SIO2_CRASH_FLOOR: (
+        'SiO2 is below the measured engine crash floor; refusing without '
+        'calling the engine'
     ),
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: (
         'AlphaMELTS subprocess fO2 constraint was invalid'
@@ -910,6 +930,9 @@ class _MELTSBackendSupport(MeltBackend):
         self._subprocess_vapor_pressure_provider = None
         self._vapor_transport_pO2_bar = DEFAULT_VACUUM_FLOOR_BAR
         self._pseudo_vapor_pressure_warning_seen: set[str] = set()
+        self._pending_commissioning_diagnostics: Optional[dict[str, object]] = (
+            None
+        )
 
     def initialize(self, config: dict) -> bool:
         """
@@ -1370,6 +1393,7 @@ class _MELTSBackendSupport(MeltBackend):
             if math.isfinite(float(mass_kg)) and float(mass_kg) > 0.0
         )
 
+        self._pending_commissioning_diagnostics = None
         raw_comp_wt = self._composition_kg_to_wt_pct(composition_kg)
         crash_diagnostics = self._out_of_domain_diagnostics(
             temperature_C=temperature_C,
@@ -1400,6 +1424,17 @@ class _MELTSBackendSupport(MeltBackend):
         )
         if domain_rejection is not None:
             return domain_rejection
+        commissioning_warnings: List[str] = []
+        commissioning_refusal = self._apply_engine_commissioning(
+            raw_comp_wt,
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            diagnostics=crash_diagnostics,
+            warnings=commissioning_warnings,
+        )
+        if commissioning_refusal is not None:
+            return commissioning_refusal
         comp_wt = self._normalize_composition_to_melts_basis(raw_comp_wt)
         crash_diagnostics = self._out_of_domain_diagnostics(
             temperature_C=temperature_C,
@@ -1411,7 +1446,10 @@ class _MELTSBackendSupport(MeltBackend):
             composition_mol_by_account=composition_mol_by_account,
             reason=OutOfDomainReason.NOT_CONVERGED.value,
         )
+        if self._pending_commissioning_diagnostics:
+            crash_diagnostics.update(self._pending_commissioning_diagnostics)
         warnings = list(self._last_normalization_warnings)
+        warnings.extend(commissioning_warnings)
 
         return self._equilibrate_prepared(
             temperature_C=temperature_C,
@@ -1733,6 +1771,10 @@ class _MELTSBackendSupport(MeltBackend):
         phase_masses = dict(phase_masses_kg or {})
         result_status = str(status)
         result_diagnostics = dict(diagnostics or {})
+        pending = self._pending_commissioning_diagnostics
+        if pending:
+            for key, value in pending.items():
+                result_diagnostics.setdefault(key, value)
         reported_activities = dict(activity_coefficients or {})
         result_diagnostics.update(
             self._activity_diagnostic_payload(reported_activities)
@@ -2025,6 +2067,104 @@ class _MELTSBackendSupport(MeltBackend):
             if float(value) > 0.0
         }
 
+    def _canonical_sio2_wt_pct(self, comp_wt: Mapping[str, float]) -> float:
+        sio2 = 0.0
+        for raw_name, raw_wt in comp_wt.items():
+            wt = float(raw_wt)
+            if wt <= 0.0:
+                continue
+            if self._canonical_oxide_name(raw_name) == 'SiO2':
+                sio2 += wt
+        return sio2
+
+    def _apply_engine_commissioning(
+        self,
+        comp_wt: Mapping[str, float],
+        *,
+        temperature_C: float,
+        pressure_bar: float,
+        fO2_log: Optional[float],
+        diagnostics: Optional[Mapping[str, object]] = None,
+        warnings: Optional[List[str]] = None,
+    ) -> Optional[EquilibriumResult]:
+        """Crash-floor refusal or certified-band notice. Never silent.
+
+        Out of the project-owned certified SiO2/T band the engine still
+        runs: a notice with authority=extrapolated and certified_band is
+        attached. Below crash_floor the engine is not called.
+        """
+        self._pending_commissioning_diagnostics = None
+        assessment = assess_engine_commissioning(
+            self.backend_name,
+            sio2_wt_pct=self._canonical_sio2_wt_pct(comp_wt),
+            temperature_K=float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
+        )
+        if assessment.below_crash_floor:
+            return self._crash_floor_result(
+                temperature_C,
+                pressure_bar,
+                fO2_log,
+                sio2_wt_pct=assessment.sio2_wt_pct,
+                crash_floor_wt_pct=float(assessment.spec.sio2_wt_pct.crash_floor),
+                diagnostics=diagnostics,
+            )
+        if assessment.notice is not None:
+            notice = dict(assessment.notice)
+            pending = {
+                'commissioning_notice': notice,
+                'authority': notice['authority'],
+                'certified_band': notice['certified_band'],
+            }
+            self._pending_commissioning_diagnostics = pending
+            if isinstance(diagnostics, dict):
+                for key, value in pending.items():
+                    diagnostics.setdefault(key, value)
+            if warnings is not None:
+                warnings.append(
+                    'CommissioningNotice: out of certified band; '
+                    f"authority={notice['authority']}; engine will run"
+                )
+        return None
+
+    def _crash_floor_result(
+        self,
+        temperature_C: float,
+        pressure_bar: float,
+        fO2_log: Optional[float],
+        *,
+        sio2_wt_pct: float,
+        crash_floor_wt_pct: float,
+        diagnostics: Optional[Mapping[str, object]] = None,
+    ) -> EquilibriumResult:
+        message = ALPHAMELTS_BACKEND_FAILURE_MESSAGES[
+            ALPHAMELTS_REASON_SIO2_CRASH_FLOOR
+        ]
+        detail = (
+            f'SiO2 {sio2_wt_pct:.3f} wt% < crash floor '
+            f'{crash_floor_wt_pct:g} wt%'
+        )
+        diagnostics_out = dict(diagnostics or {})
+        diagnostics_out['authoritative_for_requested_conditions'] = False
+        diagnostics_out['sio2_crash_floor_wt_pct'] = float(crash_floor_wt_pct)
+        diagnostics_out['sio2_wt_pct'] = float(sio2_wt_pct)
+        diagnostics_out['backend_status_reason'] = (
+            ALPHAMELTS_REASON_SIO2_CRASH_FLOOR
+        )
+        _annotate_alphamelts_backend_failure(
+            diagnostics_out,
+            reason_code=ALPHAMELTS_REASON_SIO2_CRASH_FLOOR,
+            backend_status='engine_crash',
+            message=f'{message}: {detail}',
+        )
+        return self._emit_equilibrium_result(
+            temperature_C=temperature_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            warnings=[f'{message}: {detail}'],
+            status='out_of_domain',
+            diagnostics=diagnostics_out,
+        )
+
     def _domain_gate(self, comp_wt: Mapping[str, float], *,
                      temperature_C: float,
                      pressure_bar: float,
@@ -2047,13 +2187,15 @@ class _MELTSBackendSupport(MeltBackend):
                 continue
             canonical_wt[oxide] = canonical_wt.get(oxide, 0.0) + wt
 
-        sio2_pct = canonical_wt.get('SiO2', 0.0)
         major_pct = sum(canonical_wt.values())
         reasons: List[str] = []
         reason: OutOfDomainReason | None = None
-        if not 30.0 <= sio2_pct <= 80.0:
-            reason = OutOfDomainReason.SILICATE_WINDOW
-            reasons.append(f'SiO2 {sio2_pct:.3f} wt% outside [30, 80]')
+        # t-894: the published SiO2 [30, 80] wt% window is a commissioning
+        # band (predict-and-flag), not a pre-equilibrate refusal. Was:
+        #   if not 30.0 <= sio2_pct <= 80.0: refuse SILICATE_WINDOW
+        # Certified-band / crash-floor handling lives in
+        # _apply_engine_commissioning. Invalid input (forbidden species,
+        # major-oxide sum) still refuses here.
         if major_pct <= MELTS_MAJOR_OXIDE_MIN_TOTAL_WT_PCT:
             reason = reason or OutOfDomainReason.MAJOR_SUM
             reasons.append(
@@ -2622,6 +2764,19 @@ class _MELTSBackendSupport(MeltBackend):
                 warnings=tuple(domain_rejection.warnings),
                 diagnostics=dict(domain_rejection.diagnostics),
             )
+        commissioning_refusal = self._apply_engine_commissioning(
+            raw_comp_wt,
+            temperature_C=min_T_C,
+            pressure_bar=pressure_bar,
+            fO2_log=fO2_log,
+            diagnostics=diagnostics,
+        )
+        if commissioning_refusal is not None:
+            return LiquidusSolidusResult(
+                status=commissioning_refusal.status,
+                warnings=tuple(commissioning_refusal.warnings),
+                diagnostics=dict(commissioning_refusal.diagnostics),
+            )
         try:
             return self._normalize_composition_to_melts_basis(raw_comp_wt)
         except ValueError as exc:
@@ -2755,19 +2910,12 @@ class _MELTSBackendSupport(MeltBackend):
                 f'requested={requested_pressure_bar:g} bar; '
                 f'minimum={ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR:g} bar',
             )
-        if requested_temperature_C < ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C:
-            return self._domain_gate_result(
-                requested_temperature_C,
-                requested_pressure_bar,
-                fO2_log,
-                [
-                    f'temperature {requested_temperature_C:g} C below '
-                    'subprocess minimum '
-                    f'{ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C:g} C'
-                ],
-                diagnostics=diagnostics,
-                reason=ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED,
-            )
+        # t-894: the published 800 C / 1073.15 K floor is a commissioning
+        # band, not a pre-equilibrate refusal. Was:
+        #   if requested_temperature_C < ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C:
+        #       return _domain_gate_result(... TEMPERATURE_UNSUPPORTED)
+        # Certified-band T is notice+run (see _apply_engine_commissioning).
+        # Crashes from the subprocess remain typed engine_crash.
         active_components = frozenset(
             str(oxide)
             for oxide, wt_pct in comp_wt.items()
@@ -4585,6 +4733,14 @@ class _MELTSBackendSupport(MeltBackend):
         )
         if domain_rejection is not None:
             return [domain_rejection]
+        commissioning_refusal = self._apply_engine_commissioning(
+            raw_comp_wt,
+            temperature_C=T_C,
+            pressure_bar=P_start_bar,
+            fO2_log=fO2_log,
+        )
+        if commissioning_refusal is not None:
+            return [commissioning_refusal]
         comp_wt = self._normalize_composition_to_melts_basis(raw_comp_wt)
         ptt = self._require_petthermotools_runtime()
         ptt_comp = self._to_petthermotools_liq_comp(comp_wt)
