@@ -588,6 +588,13 @@ def pairwise_residuals(
                             value_b, quantity=quantity, engine=engine_b
                         ):
                             continue
+                        if not _pressure_pair_is_like_for_like_speciation(
+                            left,
+                            right,
+                            species=name,
+                            quantity=quantity,
+                        ):
+                            continue
                         try:
                             delta = residual_log10(value_a, value_b)
                         except BinaryPotBatteryError:
@@ -761,6 +768,30 @@ def finding_class_for_pair(
     if kinds == {AUTHORITY_FALLBACK, AUTHORITY_SPECIATION}:
         return FINDING_CLASS_FALLBACK_VS_SPECIATION
     return None
+
+
+def _pressure_pair_is_like_for_like_speciation(
+    left: Mapping[str, Any],
+    right: Mapping[str, Any],
+    *,
+    species: str,
+    quantity: str,
+) -> bool:
+    """Admit pressure residuals only on a like-for-like authority pair.
+
+    Mixed fallback/speciation/missing maps stay on the cell payloads as
+    raw diagnostics; they do not enter the ordinary speciation ranking.
+    Two missing-flag cells remain comparable — absence is not fallback.
+    Melt activity comparisons are not gated by vapor-authority flags.
+    """
+
+    if quantity != QUANTITY_PRESSURE:
+        return True
+    kind_a = vapor_authority_kind(left, species=species, quantity=quantity)
+    kind_b = vapor_authority_kind(right, species=species, quantity=quantity)
+    if kind_a != kind_b:
+        return False
+    return kind_a != AUTHORITY_FALLBACK
 
 
 def _utc_stamp() -> str:

@@ -543,15 +543,29 @@ def test_floor_value_is_typed_refusal_not_residual() -> None:
     assert pressures["Si"] == floor_fill
     assert pressures["SiO"] == pytest.approx(0.013)
 
-    floor_cell = _ok_cell(engine="thermoengine", gas={"Si": floor_fill, "SiO": 0.013})
+    _speciation_builtin = {
+        "Si": "builtin_authoritative:standard_reaction_term",
+        "SiO": "builtin_authoritative:standard_reaction_term",
+    }
+    floor_cell = _ok_cell(
+        engine="thermoengine",
+        gas={"Si": floor_fill, "SiO": 0.013},
+        vapor_pressures_source=_speciation_builtin,
+    )
     partner = _ok_cell(
-        engine="alphamelts", gas={"Si": physical, "SiO": 0.0087}
+        engine="alphamelts",
+        gas={"Si": physical, "SiO": 0.0087},
+        vapor_pressures_source=_speciation_builtin,
     )
     exploded_cell = _ok_cell(
-        engine="thermoengine", gas={"Si": floor_exploded, "SiO": 0.013}
+        engine="thermoengine",
+        gas={"Si": floor_exploded, "SiO": 0.013},
+        vapor_pressures_source=_speciation_builtin,
     )
     vaporock = _ok_cell(
-        engine="vaporock", gas={"Si": 9.540668602825991e-12, "SiO": 0.0127}
+        engine="vaporock",
+        gas={"Si": 9.540668602825991e-12, "SiO": 0.0127},
+        vapor_pressures_source={"Si": "vaporock", "SiO": "vaporock"},
     )
 
     fill_rows = pairwise_residuals([floor_cell, partner])
@@ -733,11 +747,7 @@ def test_fallback_vs_speciation_finding_class_reads_engine_flags() -> None:
         for row in si_rows
         if "thermoengine" in (row["engine_a"], row["engine_b"])
     ]
-    assert te_pairs
-    assert all(
-        row["finding_class"] == FINDING_CLASS_FALLBACK_VS_SPECIATION
-        for row in te_pairs
-    )
+    assert te_pairs == []
     am_vr = [
         row
         for row in si_rows
@@ -745,6 +755,11 @@ def test_fallback_vs_speciation_finding_class_reads_engine_flags() -> None:
     ]
     assert am_vr
     assert all(row["finding_class"] is None for row in am_vr)
+    missing_rows = pairwise_residuals([unflagged, alphamelts])
+    assert all(
+        row["quantity"] != QUANTITY_PRESSURE
+        for row in missing_rows
+    )
 
     captured: dict[str, object] = {}
 
@@ -816,9 +831,9 @@ def test_fallback_vs_speciation_finding_class_reads_engine_flags() -> None:
             ],
         }
     )
-    assert rebuilt["n_fallback_vs_speciation"] >= 2
-    assert any(
-        row.get("finding_class") == FINDING_CLASS_FALLBACK_VS_SPECIATION
+    assert rebuilt["n_fallback_vs_speciation"] == 0
+    assert all(
+        row.get("finding_class") != FINDING_CLASS_FALLBACK_VS_SPECIATION
         for row in rebuilt["largest_in_envelope_residuals"]
     )
     fixture = json.loads(FIXTURE_REPORT.read_text(encoding="utf-8"))
@@ -826,6 +841,124 @@ def test_fallback_vs_speciation_finding_class_reads_engine_flags() -> None:
     assert "finding_class" in markdown
     assert FINDING_CLASS_FALLBACK_VS_SPECIATION in markdown or (
         "fallback vs speciation" in markdown
+    )
+
+
+def test_fallback_and_missing_authority_excluded_from_speciation_ranking() -> None:
+    """M02 confirm: 12-dex fallback and unflagged pairs must not rank."""
+
+    po2 = Po2Request(mode="commanded", po2_bar=1.0e-8)
+    fallback = _ok_cell(
+        engine="thermoengine",
+        gas={"Si": 0.005055980955421236},
+        po2=po2,
+        temperature_K=1600.0,
+        vapor_pressures_source={
+            "Si": "antoine_fallback_from_vaporock:standard_reaction_term",
+        },
+        vapor_pressure_backend_status="fallback",
+        vapor_pressure_backend_status_reason="vaporock_to_antoine_fallback",
+        authoritative_for_requested_vapor_pressure=False,
+    )
+    speciation = _ok_cell(
+        engine="alphamelts",
+        gas={"Si": 1.5412127415317158e-15},
+        po2=po2,
+        temperature_K=1600.0,
+        vapor_pressures_source={
+            "Si": "builtin_authoritative:standard_reaction_term",
+        },
+    )
+    unflagged = _ok_cell(
+        engine="thermoengine",
+        gas={"Si": 0.005055980955421236},
+        po2=po2,
+        temperature_K=1600.0,
+    )
+    below_ceiling = _ok_cell(
+        engine="thermoengine",
+        gas={"Si": 1.0},
+        po2=po2,
+        temperature_K=1600.0,
+        vapor_pressures_source={
+            "Si": "antoine_fallback_from_vaporock:standard_reaction_term",
+        },
+        vapor_pressure_backend_status="fallback",
+    )
+    below_ceiling_peer = _ok_cell(
+        engine="alphamelts",
+        gas={"Si": 1.0e-12},
+        po2=po2,
+        temperature_K=1600.0,
+        vapor_pressures_source={
+            "Si": "builtin_authoritative:standard_reaction_term",
+        },
+    )
+
+    assert (
+        finding_class_for_pair(
+            fallback.as_payload(),
+            speciation.as_payload(),
+            species="Si",
+            quantity=QUANTITY_PRESSURE,
+        )
+        == FINDING_CLASS_FALLBACK_VS_SPECIATION
+    )
+    assert (
+        finding_class_for_pair(
+            unflagged.as_payload(),
+            speciation.as_payload(),
+            species="Si",
+            quantity=QUANTITY_PRESSURE,
+        )
+        is None
+    )
+    assert vapor_authority_kind(
+        unflagged.as_payload(), species="Si", quantity=QUANTITY_PRESSURE
+    ) is None
+
+    flagged_rows = pairwise_residuals([fallback, speciation])
+    missing_rows = pairwise_residuals([unflagged, speciation])
+    dex12_rows = pairwise_residuals([below_ceiling, below_ceiling_peer])
+    assert flagged_rows == []
+    assert missing_rows == []
+    assert dex12_rows == []
+    assert fallback.gas_partial_pressures_Pa["Si"] == 0.005055980955421236
+    assert unflagged.gas_partial_pressures_Pa["Si"] == 0.005055980955421236
+
+
+def test_like_for_like_speciation_pressure_residual_still_ranks() -> None:
+    """M02 control: alphamelts vs vaporock speciation still produces a residual."""
+
+    po2 = Po2Request(mode="commanded", po2_bar=1.0e-8)
+    alphamelts = _ok_cell(
+        engine="alphamelts",
+        gas={"Si": 1.5412127415317158e-15},
+        po2=po2,
+        temperature_K=1600.0,
+        vapor_pressures_source={
+            "Si": "builtin_authoritative:standard_reaction_term",
+        },
+    )
+    vaporock = _ok_cell(
+        engine="vaporock",
+        gas={"Si": 2.6888346520180887e-15},
+        po2=po2,
+        temperature_K=1600.0,
+    )
+    rows = pairwise_residuals([alphamelts, vaporock])
+    si_rows = [
+        row
+        for row in rows
+        if row["species"] == "Si" and row["quantity"] == QUANTITY_PRESSURE
+    ]
+    assert len(si_rows) == 1
+    assert si_rows[0]["finding_class"] is None
+    assert si_rows[0]["delta_log10_a_minus_b"] == pytest.approx(
+        residual_log10(
+            alphamelts.gas_partial_pressures_Pa["Si"],
+            vaporock.gas_partial_pressures_Pa["Si"],
+        )
     )
 
 
