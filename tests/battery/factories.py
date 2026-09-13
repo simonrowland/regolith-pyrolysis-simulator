@@ -99,6 +99,12 @@ def work(work_id: str = "work-1") -> Work:
                     path="chase-1998.pdf",
                     sha256=State.of("abc"),
                 ),
+                SourceFile(
+                    asset_id="nasa-cea-thermo",
+                    role=AssetRole.TABLE_CSV,
+                    path="nasa-cea-thermo.csv",
+                    sha256=State.of("cea"),
+                ),
             ),
         ),
         doi="10.18434/T42S31",

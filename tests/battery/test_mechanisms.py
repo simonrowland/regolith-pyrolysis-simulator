@@ -16,6 +16,7 @@ import pytest
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
+    AssetRole,
     Authority,
     Engine,
     EvidenceClass,
@@ -58,6 +59,7 @@ from simulator.battery.records import (
     Notice,
     Residual,
     ResidualRefusal,
+    SourceFile,
     Species,
     StandardState,
     State,
@@ -878,7 +880,8 @@ def test_m15_growth_is_not_a_census_gate_and_roles_are_not_counts() -> None:
         source_relation=SourceRelation.INDEPENDENT,
         score_eligible=True,
     )
-    assert validate_corpus([w], [exp], rows + [same_work], [same_work_res]).ok
+    same_work_report = validate_corpus([w], [exp], rows + [same_work], [same_work_res])
+    assert not same_work_report.ok
 
 
 def test_r02_lineage_overlap_is_observation_table_not_work_or_asset() -> None:
@@ -949,7 +952,8 @@ def test_r02_lineage_overlap_is_observation_table_not_work_or_asset() -> None:
         status=ResidualStatus.MATCH,
         score_eligible=True,
     )
-    assert validate_corpus([w], [exp], [ref, same_work], [same_work_res]).ok
+    same_work_report = validate_corpus([w], [exp], [ref, same_work], [same_work_res])
+    assert not same_work_report.ok
     asset = replace(
         cand,
         observation_id="r02-asset",
@@ -962,7 +966,305 @@ def test_r02_lineage_overlap_is_observation_table_not_work_or_asset() -> None:
         status=ResidualStatus.MATCH,
         score_eligible=True,
     )
-    assert validate_corpus([w], [exp], [ref, asset], [asset_res]).ok
+    asset_report = validate_corpus([w], [exp], [ref, asset], [asset_res])
+    assert not asset_report.ok
+
+
+def _r08_scored_o2(*, observation_id: str, coefficient_sources: tuple[str, ...], T_K=None):
+    from dataclasses import replace
+
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity() if T_K is None else F.o2_identity(T_K=T_K)
+    ref = F.observation(
+        observation_id,
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r08-cand", exp.experiment_id, ident, Decimal("0"))
+    cand = replace(
+        cand,
+        observation_id=f"{observation_id}-cand",
+        engine=replace(cand.engine, coefficient_sources=coefficient_sources),
+    )
+    scored = F.residual(
+        f"{observation_id}-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    return w, exp, ref, cand, scored
+
+
+def test_r08_unresolvable_coefficient_source_is_unknown_not_independent() -> None:
+    """Codex F01: an unregistered string is incomplete → unknown, never independence."""
+
+    w, exp, ref, cand, scored = _r08_scored_o2(
+        observation_id="r08-unresolved",
+        coefficient_sources=("missing-observation-or-table",),
+    )
+    report = validate_corpus([w], [exp], [ref, cand], [scored])
+    assert not report.ok
+    assert any(i.reason is RefusalReason.LINEAGE_UNKNOWN for i in report.issues)
+    control_w, control_exp, control_ref, control_cand, control_scored = _r08_scored_o2(
+        observation_id="r08-unresolved-control",
+        coefficient_sources=("nasa-cea-thermo",),
+    )
+    assert validate_corpus(
+        [control_w], [control_exp], [control_ref, control_cand], [control_scored]
+    ).ok
+
+
+def test_r08_work_id_or_pdf_alias_is_not_resolved_independence() -> None:
+    """Work/file aliases expand to registered inputs; they are not independence."""
+
+    w, exp, ref, cand, scored = _r08_scored_o2(
+        observation_id="r08-work-alias",
+        coefficient_sources=(F.work().work_id,),
+    )
+    work_report = validate_corpus([w], [exp], [ref, cand], [scored])
+    assert not work_report.ok
+    pdf_w, pdf_exp, pdf_ref, pdf_cand, pdf_scored = _r08_scored_o2(
+        observation_id="r08-pdf-alias",
+        coefficient_sources=("pdf-1",),
+    )
+    pdf_report = validate_corpus([pdf_w], [pdf_exp], [pdf_ref, pdf_cand], [pdf_scored])
+    assert not pdf_report.ok
+    control_w, control_exp, control_ref, control_cand, control_scored = _r08_scored_o2(
+        observation_id="r08-alias-control",
+        coefficient_sources=("nasa-cea-thermo",),
+    )
+    assert validate_corpus(
+        [control_w], [control_exp], [control_ref, control_cand], [control_scored]
+    ).ok
+
+
+def test_r08_consumed_table_via_read_from_refuses_independence() -> None:
+    """Reference lineage includes the TABLE_CSV consumed through read_from."""
+
+    from dataclasses import replace
+
+    w = F.work()
+    table = SourceFile(
+        asset_id="shared-table",
+        role=AssetRole.TABLE_CSV,
+        path="shared-table.csv",
+        sha256=State.of("table"),
+    )
+    w = replace(w, source_files=replace(w.source_files, files=w.source_files.files + (table,)))
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    ref = replace(
+        F.observation(
+            "r08-shared-ref",
+            exp.experiment_id,
+            ident,
+            Decimal("0"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        read_from="shared-table",
+    )
+    cand = F.engine_obs("r08-shared-cand", exp.experiment_id, ident, Decimal("0"))
+    cand = replace(
+        cand,
+        engine=replace(cand.engine, coefficient_sources=("shared-table",)),
+    )
+    scored = F.residual(
+        "r08-shared-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    report = validate_corpus([w], [exp], [ref, cand], [scored])
+    assert not report.ok
+    disjoint = replace(
+        cand,
+        observation_id="r08-shared-control-cand",
+        engine=replace(cand.engine, coefficient_sources=("nasa-cea-thermo",)),
+    )
+    control = F.residual(
+        "r08-shared-control",
+        ref.observation_id,
+        candidate=disjoint.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, disjoint], [control]).ok
+
+
+def test_r08_nested_derived_from_parent_is_not_independent() -> None:
+    """Grok F01: overlap through a parent that is not the compared observation id."""
+
+    from dataclasses import replace
+
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    parent = F.observation(
+        "raw-parent",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    ref = F.observation(
+        "r08-nested-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        derived_from=("raw-parent",),
+    )
+    cand = F.engine_obs("r08-nested-cand", exp.experiment_id, ident, Decimal("0"))
+    cand = replace(
+        cand,
+        engine=replace(cand.engine, coefficient_sources=("raw-parent",)),
+    )
+    scored = F.residual(
+        "r08-nested-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    report = validate_corpus([w], [exp], [parent, ref, cand], [scored])
+    assert not report.ok
+    control_cand = replace(
+        cand,
+        observation_id="r08-nested-control-cand",
+        engine=replace(cand.engine, coefficient_sources=("nasa-cea-thermo",)),
+    )
+    control = F.residual(
+        "r08-nested-control",
+        ref.observation_id,
+        candidate=control_cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [parent, ref, control_cand], [control]).ok
+
+
+def test_r08_nested_derivation_input_parent_is_not_independent() -> None:
+    """Recursive derivation.inputs must be in the reference lineage on their own."""
+
+    from dataclasses import replace
+
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    parent = F.observation(
+        "raw-parent-input",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    unrelated = F.observation(
+        "unrelated-raw",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    ref = F.observation(
+        "r08-input-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_REDUCED,
+        derived_from=("unrelated-raw",),
+        derivation=Derivation(
+            relation="ion-to-pressure",
+            inputs=("raw-parent-input",),
+            parameters=(),
+            output_unit="kJ_per_declared_mol_basis",
+        ),
+    )
+    cand = F.engine_obs("r08-input-cand", exp.experiment_id, ident, Decimal("0"))
+    cand = replace(
+        cand,
+        engine=replace(cand.engine, coefficient_sources=("raw-parent-input",)),
+    )
+    scored = F.residual(
+        "r08-input-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    report = validate_corpus([w], [exp], [parent, unrelated, ref, cand], [scored])
+    assert not report.ok
+    control_cand = replace(
+        cand,
+        observation_id="r08-input-control-cand",
+        engine=replace(cand.engine, coefficient_sources=("nasa-cea-thermo",)),
+    )
+    control = F.residual(
+        "r08-input-control",
+        ref.observation_id,
+        candidate=control_cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus(
+        [w], [exp], [parent, unrelated, ref, control_cand], [control]
+    ).ok
+
+
+def test_r08_same_work_different_temperature_point_may_score() -> None:
+    """Independence is a second observation at another T, not a Work id substitution."""
+
+    from dataclasses import replace
+
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ident = F.o2_identity()
+    other_ident = F.o2_identity(T_K=Decimal("400"))
+    ref = F.observation(
+        "r08-point-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    other = F.observation(
+        "r08-point-400K",
+        exp.experiment_id,
+        other_ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r08-point-cand", exp.experiment_id, ident, Decimal("0"))
+    cand = replace(
+        cand,
+        engine=replace(cand.engine, coefficient_sources=(other.observation_id,)),
+    )
+    scored = F.residual(
+        "r08-point-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, other, cand], [scored]).ok
+    circular = replace(
+        cand,
+        observation_id="r08-point-circular",
+        engine=replace(cand.engine, coefficient_sources=(ref.observation_id,)),
+    )
+    circular_res = F.residual(
+        "r08-point-circular",
+        ref.observation_id,
+        candidate=circular.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    circular_report = validate_corpus([w], [exp], [ref, other, circular], [circular_res])
+    assert not circular_report.ok
 
 
 def _r03_vapour_pair():

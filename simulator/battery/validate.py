@@ -25,8 +25,11 @@ Ambiguity resolutions:
   on p_sat, p_partial, or p_reference). Independent scoring requires
   complete resolved observation/table lineage with no overlap; incomplete
   or unresolvable sources imply unknown, never independence; same work
-  alone is not circular. Diagnostic numeric residuals with those notices
-  remain valid at score_eligible=False (M02). Live clamps are chunk 2.
+  alone is not circular. Work/source/file aliases expand to registered
+  observation/table inputs and are not independence. Reference lineage
+  includes TABLE_CSV assets consumed through read_from. Diagnostic numeric
+  residuals with those notices remain valid at score_eligible=False (M02).
+  Live clamps are chunk 2.
 - Compilation pairs with legitimate ``not_applicable`` axes are valid
   records. The validator must not refuse them.
 """
@@ -821,15 +824,40 @@ def _table_ids(works: Mapping[str, Work] | None) -> set[str]:
     return ids
 
 
-def _work_aliases(works: Mapping[str, Work] | None) -> set[str]:
-    aliases: set[str] = set()
-    if works is None:
-        return aliases
+def _work_for_alias(src: str, works: Mapping[str, Work] | None) -> Work | None:
+    """Work owning a work id, source id, or non-table file/pdf alias."""
+
+    if not works:
+        return None
+    if src in works:
+        return works[src]
     for work in works.values():
-        aliases.add(work.work_id)
-        aliases.update(work.source_ids)
-        aliases.update(asset.asset_id for asset in work.source_files.files)
-    return aliases
+        if src in work.source_ids:
+            return work
+        for asset in work.source_files.files:
+            if asset.asset_id == src and asset.role is not AssetRole.TABLE_CSV:
+                return work
+    return None
+
+
+def _inputs_registered_under_work(
+    work: Work,
+    observations: Mapping[str, Observation],
+    experiments: Mapping[str, Experiment] | None,
+    table_ids: set[str],
+) -> set[str]:
+    ids: set[str] = set()
+    for asset in work.source_files.files:
+        if asset.role is AssetRole.TABLE_CSV:
+            ids.add(asset.asset_id)
+    if experiments:
+        for obs in observations.values():
+            experiment = experiments.get(obs.experiment_id)
+            if experiment is not None and experiment.work_id == work.work_id:
+                nested = _observation_lineage(obs.observation_id, observations, table_ids)
+                if nested:
+                    ids |= nested
+    return ids
 
 
 def _observation_lineage(
@@ -851,6 +879,8 @@ def _observation_lineage(
         return None
     seen.add(observation_id)
     ids: set[str] = {observation_id}
+    if obs.read_from and obs.read_from in table_ids:
+        ids.add(obs.read_from)
     for parent in obs.derived_from or ():
         nested = _observation_lineage(parent, observations, table_ids, seen)
         if nested is None:
@@ -870,15 +900,16 @@ def _resolve_coefficient_sources(
     sources: Sequence[str],
     observations: Mapping[str, Observation],
     works: Mapping[str, Work] | None,
+    experiments: Mapping[str, Experiment] | None = None,
 ) -> set[str] | None:
     """Resolve coefficient_sources to observation/table ids.
 
-    Work/source/file aliases are not observation/table overlap. External
-    catalog tokens with complete lineage are empty (not unknown).
+    Unregistered strings and aliases that cannot expand to observation or
+    table inputs are unknown, never independence. A work/source/file alias
+    expands to every observation/table registered under that work.
     """
 
     table_ids = _table_ids(works)
-    aliases = _work_aliases(works)
     resolved: set[str] = set()
     for src in sources:
         if src in observations:
@@ -888,10 +919,16 @@ def _resolve_coefficient_sources(
             resolved |= nested
         elif src in table_ids:
             resolved.add(src)
-        elif src in aliases:
-            continue
         else:
-            continue
+            work = _work_for_alias(src, works)
+            if work is None:
+                return None
+            expanded = _inputs_registered_under_work(
+                work, observations, experiments, table_ids
+            )
+            if not expanded:
+                return None
+            resolved |= expanded
     return resolved
 
 
@@ -1110,7 +1147,10 @@ def validate_residual(
                             reference.observation_id, observations, table_ids
                         )
                         cand_ids = _resolve_coefficient_sources(
-                            engine.coefficient_sources, observations, works
+                            engine.coefficient_sources,
+                            observations,
+                            works,
+                            experiments,
                         )
                         if ref_ids is None or cand_ids is None:
                             issues.append(
