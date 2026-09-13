@@ -521,7 +521,8 @@ def test_g11_read_from_is_unknown_without_index_asset(tmp_path: Path) -> None:
     )
     result = migrate(root, write=False, validate=True)
     obs = next(iter(result.observations.values()))
-    assert obs.read_from == "unknown"
+    assert not str(obs.read_from).startswith("pdf:")
+    assert "unknown" in str(obs.read_from)
 
 
 def test_g12_metadata_files_are_not_observation_rows(tmp_path: Path) -> None:

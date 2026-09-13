@@ -1280,6 +1280,8 @@ def choose_read_from(work: Work, locator: Locator | None) -> str:
     for asset in files:
         if asset.role is AssetRole.PDF and asset.path != "unknown":
             return asset.asset_id
+    if files:
+        return files[0].asset_id
     return "unknown"
 
 
@@ -2809,8 +2811,16 @@ class Migrator:
                     observation_id=new_id,
                 )
                 continue
+            new_obs = self.result.observations[surviving_new]
             for match_id in matches:
                 old_obs = self.result.observations[match_id]
+                decided = old_obs.admission.decided_by or new_obs.admission.decided_by
+                if decided is None and old_obs.locator is not None:
+                    decided = AdmissionDecision(
+                        worker="extract-supersedes",
+                        date="unspecified",
+                        evidence=old_obs.locator,
+                    )
                 object.__setattr__(
                     old_obs,
                     "admission",
@@ -2818,6 +2828,7 @@ class Migrator:
                         status=AdmissionStatus.SUPERSEDED,
                         reason="superseded by a later observation in the same extract",
                         superseded_by=surviving_new,
+                        decided_by=decided,
                     ),
                 )
 

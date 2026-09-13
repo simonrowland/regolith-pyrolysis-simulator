@@ -829,6 +829,8 @@ def _values_compare(name: str, left: Any, right: Any) -> IdentityEqualOutcome:
 def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
     """Reject a supplied VALUE on an inapplicable axis; check reservoir rule."""
 
+    if quantity_token(identity) is None:
+        return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
     profile = profile_for(identity)
     bad: list[str] = []
     for name in _AXIS_NAMES:
