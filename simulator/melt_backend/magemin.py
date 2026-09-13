@@ -293,6 +293,24 @@ def _dropped_account_species(
     return result
 
 
+# Notice flag / backend_status_reason. Projection payload still uses
+# VapoRock's `input_composition_projected` reason token.
+COMPOSITION_PROJECTED = 'composition_projected'
+
+
+def _magemin_dropped_mass_fraction(
+    bulk_projection: _MAGEMinBulkProjection,
+) -> float:
+    source_sum = float(bulk_projection.source_sum_wt_pct)
+    if source_sum <= 0.0:
+        return 0.0
+    dropped_wt = max(
+        0.0,
+        source_sum - float(bulk_projection.projected_sum_wt_pct),
+    )
+    return dropped_wt / source_sum
+
+
 def _magemin_bulk_projection_details(
     bulk_projection: Optional[_MAGEMinBulkProjection],
 ) -> Dict[str, Any]:
@@ -308,7 +326,13 @@ def _magemin_bulk_projection_details(
         ),
     }
     if bulk_dropped:
+        dropped_mass_fraction = _magemin_dropped_mass_fraction(bulk_projection)
         details['dropped_bulk_components'] = list(bulk_dropped)
+        details['dropped_mass_fraction'] = dropped_mass_fraction
+        details[COMPOSITION_PROJECTED] = {
+            'dropped_components': list(bulk_dropped),
+            'dropped_mass_fraction': dropped_mass_fraction,
+        }
     if bulk_merged:
         details['merged_bulk_components'] = list(bulk_merged)
     if bulk_projection.source_sum_wt_pct > 0.0:
@@ -654,6 +678,26 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 bulk_projection
             ),
         )
+        if bulk_projection.dropped_components:
+            # A result for a different (projected) bulk is not a result for
+            # this one. Do not call MAGEMin on the truncated vector.
+            diagnostics = dict(result_diagnostics)
+            diagnostics['backend_status'] = 'out_of_domain'
+            diagnostics['backend_status_reason'] = COMPOSITION_PROJECTED
+            dropped = ', '.join(bulk_projection.dropped_components)
+            return EquilibriumResult(
+                temperature_C=temperature_C,
+                pressure_bar=pressure_bar,
+                fO2_log=fO2_log,
+                status='out_of_domain',
+                warnings=[
+                    *prior_warnings,
+                    *bulk_projection.warnings,
+                    'MAGEMin refused projected composition; dropped '
+                    f'components have no documented ig endmember: {dropped}',
+                ],
+                diagnostics=diagnostics,
+            )
 
         try:
             raw = self._call_magemin(

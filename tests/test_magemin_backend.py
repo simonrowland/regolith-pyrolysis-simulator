@@ -31,6 +31,7 @@ import simulator.melt_backend.liquidus as liquidus_module
 from simulator.core import PyrolysisSimulator
 from simulator.melt_backend.base import LiquidFractionInvalidError, MeltCompositionError
 from simulator.melt_backend.magemin import (
+    COMPOSITION_PROJECTED,
     MAGEMIN_WARM_CALL_TIMEOUT_S,
     MAGEMIN_WARM_LIQUIDUS_BUDGET_S,
     MAGEMinBackend,
@@ -94,23 +95,35 @@ def _assert_magemin_bulk_drop_projected(
     *,
     min_dropped_wt_pct,
     exact_components=False,
+    min_dropped_mass_fraction=None,
 ):
+    assert result.status == "out_of_domain"
+    assert result.diagnostics["backend_status_reason"] == COMPOSITION_PROJECTED
+    assert result.diagnostics["backend_status"] == "out_of_domain"
+    assert not result.phases_present
     projection = result.diagnostics["input_composition_projection"]
     dropped = set(projection["dropped_bulk_components"])
     expected = set(expected_components)
+    notice = projection[COMPOSITION_PROJECTED]
 
     assert projection["status"] == "projected"
+    assert projection["reason"] == "input_composition_projected"
     assert projection["magemin_database"] == "ig"
     if exact_components:
         assert dropped == expected
     else:
         assert expected <= dropped
     assert projection["bulk_dropped_wt_pct"] >= min_dropped_wt_pct
+    assert notice["dropped_components"] == projection["dropped_bulk_components"]
+    assert notice["dropped_mass_fraction"] == projection["dropped_mass_fraction"]
+    assert notice["dropped_mass_fraction"] > 0.0
+    if min_dropped_mass_fraction is not None:
+        assert notice["dropped_mass_fraction"] >= min_dropped_mass_fraction
     assert "dropped_species" not in projection
-    assert "backend_status_reason" not in result.diagnostics
 
     warning_text = " ".join(result.warnings)
     assert "dropped components outside documented bulk order" in warning_text
+    assert "refused projected composition" in warning_text
     for component in expected_components:
         assert component in warning_text
 
@@ -1028,7 +1041,9 @@ def test_magemin_fake_bridge_receives_pressure_in_gpa(monkeypatch):
     assert captured["T_K"] == pytest.approx(1450.0 + 273.15)
 
 
-def test_magemin_bulk_projection_drop_warns_projects_and_runs(monkeypatch):
+def test_magemin_bulk_projection_drop_is_composition_projected_refusal(
+    monkeypatch,
+):
     calls = []
 
     def minimize(**kwargs):
@@ -1050,17 +1065,50 @@ def test_magemin_bulk_projection_drop_warns_projects_and_runs(monkeypatch):
         pressure_bar=5000.0,
     )
 
-    assert result.status == "ok"
-    assert len(calls) == 1
-    assert "MnO" not in calls[0]["composition"]
-    assert calls[0]["composition"]["SiO2"] > 0.0
-    assert result.phases_present
+    assert calls == []
     _assert_magemin_bulk_drop_projected(
         result,
         ("MnO",),
         min_dropped_wt_pct=0.9,
         exact_components=True,
     )
+
+
+def test_magemin_p2o5_bulk_is_composition_projected_refusal(monkeypatch):
+    calls = []
+
+    def minimize(**kwargs):
+        calls.append(kwargs)
+        return {"phases": {"liq": {"mass_kg": 1.0}}}
+
+    fake_module = types.SimpleNamespace(minimize=minimize)
+    _make_available_magemin(monkeypatch, fake_module)
+
+    backend = MAGEMinBackend()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UserWarning)
+        backend.initialize({})
+
+    result = backend.equilibrate(
+        1400.0,
+        composition_kg={"SiO2": 50.0, "MgO": 40.0, "P2O5": 10.0},
+        fO2_log=-8.0,
+        pressure_bar=5000.0,
+    )
+
+    assert calls == []
+    _assert_magemin_bulk_drop_projected(
+        result,
+        ("P2O5",),
+        min_dropped_wt_pct=9.9,
+        min_dropped_mass_fraction=0.099,
+        exact_components=True,
+    )
+    notice = result.diagnostics["input_composition_projection"][
+        COMPOSITION_PROJECTED
+    ]
+    assert notice["dropped_components"] == ["P2O5"]
+    assert notice["dropped_mass_fraction"] == pytest.approx(0.10)
 
 
 def test_magemin_pressure_conversion_helpers_are_exact():
@@ -1419,10 +1467,6 @@ def test_magemin_live_smoke_runs_real_binary():
         "Na2O": 2.5,
         "K2O": 0.8,
         "Cr2O3": 0.2,
-        "MnO": 0.2,
-        "P2O5": 0.3,
-        "NiO": 0.02,
-        "CoO": 0.01,
     }
 
     # 2000 bar == 0.2 GPa == 2 kbar; well inside the igneous database's
@@ -1434,14 +1478,11 @@ def test_magemin_live_smoke_runs_real_binary():
         pressure_bar=2000.0,
     )
 
-    # No library-boundary error.
+    # No library-boundary error. Oxides with no ig endmember (P2O5/MnO/NiO/CoO)
+    # are a composition_projected refusal, tested separately; this live smoke
+    # stays inside the documented ig bulk order.
     assert result.status == "ok", result.warnings
     assert not any("failed" in w for w in result.warnings), result.warnings
-    _assert_magemin_bulk_drop_projected(
-        result,
-        ("MnO", "P2O5"),
-        min_dropped_wt_pct=0.5,
-    )
     # MAGEMin reports a phase assemblage including a silicate liquid.
     assert result.phases_present
     assert any(
@@ -1529,8 +1570,6 @@ def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane():
         "Na2O": 0.4,
         "K2O": 0.10,
         "Cr2O3": 0.35,
-        "MnO": 0.20,
-        "P2O5": 0.10,
     }
 
     result = backend.find_liquidus_solidus(
@@ -1557,12 +1596,6 @@ def test_magemin_live_liquidus_finder_lunar_mare_low_ti_sane():
 
     assert phase_result.status == "ok", phase_result.warnings
     assert phase_result.phases_present
-    _assert_magemin_bulk_drop_projected(
-        phase_result,
-        ("MnO", "P2O5"),
-        min_dropped_wt_pct=0.25,
-        exact_components=True,
-    )
 
 
 # Pure-endmember melting references retained for any future calibrated engine
