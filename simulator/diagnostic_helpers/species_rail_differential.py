@@ -1474,7 +1474,9 @@ def score_psat_pair(
     table_log10 = log10_psat_over_P0_from_dfg(
         gas.delta_fG_kJ_mol, condensed.delta_fG_kJ_mol, T
     )
-    engine_log10 = math.log10(float(pressure_Pa) / P0)
+    # log10(P/P0) = log10(P) − log10(P0). Direct P/P0 underflows a
+    # denormal P (IEEE min ~5e-324) to 0.0 and then log10 domain-errors.
+    engine_log10 = math.log10(float(pressure_Pa)) - math.log10(P0)
     residual_log10 = engine_log10 - table_log10
     table_dvap = float(gas.delta_fG_kJ_mol) - float(condensed.delta_fG_kJ_mol)
     engine_dvap = -R_KJ_PER_MOL_K * T * LN10 * engine_log10
@@ -1566,7 +1568,7 @@ def score_psat_nbp_sanity(
             out.append(_wrap(_psat_refusal(point, pressure), point, rail))
             continue
         P0 = JANAF_STANDARD_PRESSURE_PA
-        engine_log10 = math.log10(float(pressure) / P0)
+        engine_log10 = math.log10(float(pressure)) - math.log10(P0)
         residual_log10 = engine_log10  # table log10(1 bar / P0) = 0
         engine_dvap = -R_KJ_PER_MOL_K * T_K * LN10 * engine_log10
         provenance = PROVENANCE_INDEPENDENT

@@ -937,6 +937,10 @@ def test_psat_pair_identity_and_nbp_sanity_rows() -> None:
     )
     score = score_psat_pair(gas, liquid, JANAF_STANDARD_PRESSURE_PA, "Na")
     assert score.comparison_quantity == QUANTITY_LOG10_PSAT
+    denormal = score_psat_pair(gas, liquid, math.nextafter(0.0, 1.0), "Na")
+    assert denormal.status in {"match", "mismatch"}
+    assert denormal.residual_log10K is not None
+    assert math.isfinite(float(denormal.residual_log10K))
     assert score.engine_channel == CHANNEL_VAPOUR_RAIL_PSAT
     assert score.residual_log10K == pytest.approx(0.0, abs=1e-12)
     assert score.status == "match"
