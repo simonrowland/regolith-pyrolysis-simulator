@@ -756,7 +756,10 @@ def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
         state = _axis_state(identity, name)
         if state is None:
             continue
-        if state.is_value and name not in profile.required and name not in profile.permitted_not_applicable:
+        # permitted_not_applicable means N/A or absent — a VALUE is invalid,
+        # not an extra equality key (v2.1: supplied inapplicable value is
+        # invalid, not an override).
+        if state.is_value and name not in profile.required:
             bad.append(name)
         if (
             state.is_not_applicable

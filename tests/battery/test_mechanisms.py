@@ -1058,7 +1058,21 @@ def test_physics_false_refuse_compilation_not_applicable_axes_equal() -> None:
     filled = Identity(**{**cp.__dict__, "composition": State.of(
         Composition("ordered_complete_mole_inventory", (("O2", Decimal("1")),), AmountBasis.MOLE_FRACTION)
     )})
-    assert identity_equal(cp, filled).kind in {
-        IdentityEqualKind.IDENTITY_MISMATCH,
-        IdentityEqualKind.INVALID_IDENTITY,
-    }
+    assert identity_equal(cp, filled).kind is IdentityEqualKind.INVALID_IDENTITY
+    from dataclasses import replace
+
+    extra_p = replace(
+        F.psat_identity("Na"),
+        standard_pressure_Pa=State.of(Decimal("100000")),
+    )
+    extra_vs_extra = identity_equal(extra_p, extra_p)
+    assert extra_vs_extra.kind is IdentityEqualKind.INVALID_IDENTITY
+    assert "standard_pressure_Pa" in extra_vs_extra.fields
+    w_psat = F.work()
+    exp_psat = F.tabulation_experiment()
+    extra_obs = F.observation("psat-extra-p", exp_psat.experiment_id, extra_p, Decimal("1"))
+    extra_report = validate_corpus([w_psat], [exp_psat], [extra_obs])
+    assert not extra_report.ok
+    assert any(i.reason is RefusalReason.INVALID_IDENTITY for i in extra_report.issues)
+    clean_psat = F.psat_identity("Na")
+    assert identity_equal(clean_psat, F.psat_identity("Na")).kind is IdentityEqualKind.EQUAL
