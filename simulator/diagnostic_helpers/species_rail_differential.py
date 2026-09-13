@@ -16,7 +16,7 @@ from __future__ import annotations
 import json
 import math
 from collections import Counter, defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
@@ -1587,6 +1587,48 @@ def score_table_self_check(point: KeyedTablePoint) -> GibbsPointScore | None:
     )
 
 
+def _admit_engine_comparison(
+    score: GibbsPointScore,
+    self_check: GibbsPointScore | None,
+) -> GibbsPointScore:
+    """Keep a table-inconsistent engine residual, but do not admit it as a comparison.
+
+    Premise: printed log10 Kf and ΔfG on one compilation row are the same
+    identity. When they disagree, comparing an engine to one field is not a
+    valid match/mismatch (M01). The residual against ΔfG stays on the row as
+    a raw diagnostic.
+    Algebra: admission iff self-check is absent or |residual_log10K| is within
+    printed-precision tolerance (status match). Otherwise status becomes
+    typed-refusal with the existing payload_not_comparable token.
+    Unit check: self-check residual is dimensionless log10 K; engine residual
+    remains kJ/mol and is not retuned.
+    Sanity: O2 ΔfG=0, log10 Kf=0 stays a CEA match; O2 ΔfG=0, log10 Kf=−59.154
+    stays a self-check mismatch and is not a CEA match.
+    """
+
+    if self_check is None or self_check.status != "mismatch":
+        return score
+    if score.status not in {"match", "mismatch"}:
+        return score
+    residual_log10 = self_check.residual_log10K
+    extra = (
+        "table log10 Kf disagrees with ΔfG; engine comparison is not admitted"
+        + (
+            ""
+            if residual_log10 is None
+            else f" (self-check residual_log10K={residual_log10})"
+        )
+    )
+    note = score.note or ""
+    return replace(
+        score,
+        status="typed-refusal",
+        skip_reason=f"{TYPED_REFUSAL_PREFIX}payload_not_comparable",
+        finding_class="compilation_table_self_check",
+        note=f"{note}; {extra}".strip("; "),
+    )
+
+
 def score_psat_pair(
     gas: KeyedTablePoint,
     condensed: KeyedTablePoint,
@@ -1890,16 +1932,17 @@ def score_rail(
             out.append(_wrap_refusal(item, rail, CHANNEL_NASA_CEA))
             continue
         table_points.append(item)
-        cea = score_cea_point(item)
+        self_check = score_table_self_check(item)
+        cea = _admit_engine_comparison(score_cea_point(item), self_check)
         out.append(_wrap(cea, item, rail))
         ell = score_ellingham_point(item)
         if ell is not None:
+            ell = _admit_engine_comparison(ell, self_check)
             wrapped_ell = _wrap(ell, item, rail)
             out.append(wrapped_ell)
             vs = score_channel_vs_channel(item, cea, ell)
             if vs is not None:
                 out.append(_wrap(vs, item, rail))
-        self_check = score_table_self_check(item)
         if self_check is not None and self_check.status == "mismatch":
             out.append(_wrap(self_check, item, rail))
         for channel in UNAVAILABLE_CHANNELS:
@@ -2088,8 +2131,6 @@ def _count_matrix(points: Sequence[ScoredRailPoint]) -> list[dict[str, Any]]:
     counts: Counter[tuple[str, str, str, str]] = Counter()
     for point in points:
         channel = str(point.score.engine_channel or "")
-        if channel == "table_self_check":
-            continue
         counts[
             (
                 point.compilation_id,

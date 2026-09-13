@@ -74,10 +74,13 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     score_psat_channel,
     score_psat_nbp_sanity,
     score_psat_pair,
+    score_rail,
+    score_table_self_check,
     table_self_check_residual,
     temperature_band_for,
     thin_points_for_ledger,
     write_ledger,
+    _count_matrix,
 )
 from simulator.reference_data.janaf import FEEDSTOCKS_PATH
 
@@ -193,8 +196,8 @@ def test_cea_mno_and_coo_remain_unmapped() -> None:
     assert co_metal.cea_key == "Co_b"
 
 
-def test_o2_identity_point_is_a_match() -> None:
-    point = KeyedTablePoint(
+def _o2_identity_point(*, log10_Kf: float, as_published: str) -> KeyedTablePoint:
+    return KeyedTablePoint(
         compilation_id="janaf",
         record_id="O-029",
         formula="O2",
@@ -202,11 +205,15 @@ def test_o2_identity_point_is_a_match() -> None:
         phase_kind="elemental_ref",
         T_K=298.15,
         delta_fG_kJ_mol=0.0,
-        log10_Kf=0.0,
-        log10_Kf_as_published="0.000",
+        log10_Kf=log10_Kf,
+        log10_Kf_as_published=as_published,
         printed_page=None,
         note="JANAF O2(ref) identity",
     )
+
+
+def test_o2_identity_point_is_a_match() -> None:
+    point = _o2_identity_point(log10_Kf=0.0, as_published="0.000")
     resolved = resolve_cea_species("O2", "elemental_ref", 298.15)
     assert resolved.cea_key == "O2"
     engine = engine_cea_delta_fG_kJ_mol("O2", 298.15)
@@ -218,6 +225,69 @@ def test_o2_identity_point_is_a_match() -> None:
     assert score.provenance_class == "independent_tabulation"
     self_check = table_self_check_residual(point)
     assert self_check == pytest.approx(0.0, abs=1e-12)
+
+
+def test_inconsistent_table_logk_does_not_admit_cea_comparison(monkeypatch) -> None:
+    """M01: ΔfG=0 with log10 Kf=−59.154 is a self-check mismatch, not a CEA match."""
+
+    point = _o2_identity_point(log10_Kf=-59.154, as_published="-59.154")
+    self_check = score_table_self_check(point)
+    assert self_check is not None
+    assert self_check.status == "mismatch"
+    assert self_check.residual_log10K == pytest.approx(-59.154)
+    assert self_check.finding_class == "compilation_table_self_check"
+    cea_raw = score_cea_point(point)
+    assert cea_raw.status == "match"
+    assert cea_raw.residual_kJ_mol == pytest.approx(0.0, abs=1e-9)
+
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.species_rail_differential.iter_source_items",
+        lambda rail: [point],
+    )
+    scored = score_rail()
+    cea = [p for p in scored if p.score.engine_channel == CHANNEL_NASA_CEA]
+    assert len(cea) == 1
+    assert cea[0].score.status == "typed-refusal"
+    assert cea[0].score.skip_reason == (
+        f"{TYPED_REFUSAL_PREFIX}payload_not_comparable"
+    )
+    assert cea[0].score.finding_class == "compilation_table_self_check"
+    assert cea[0].score.residual_kJ_mol == pytest.approx(0.0, abs=1e-9)
+    sc_rows = [
+        p for p in scored if p.score.engine_channel == "table_self_check"
+    ]
+    assert len(sc_rows) == 1
+    assert sc_rows[0].score.status == "mismatch"
+    matrix = _count_matrix(scored)
+    assert not any(
+        row["channel"] == CHANNEL_NASA_CEA and row["status"] == "match"
+        for row in matrix
+    )
+    assert any(
+        row["channel"] == "table_self_check" and row["status"] == "mismatch"
+        for row in matrix
+    )
+
+
+def test_consistent_o2_identity_still_cea_matches_through_score_rail(
+    monkeypatch,
+) -> None:
+    """M01 control: consistent O2 (ΔfG=0, log10 Kf=0) remains a CEA match."""
+
+    point = _o2_identity_point(log10_Kf=0.0, as_published="0.000")
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.species_rail_differential.iter_source_items",
+        lambda rail: [point],
+    )
+    scored = score_rail()
+    cea = [p for p in scored if p.score.engine_channel == CHANNEL_NASA_CEA]
+    assert len(cea) == 1
+    assert cea[0].score.status == "match"
+    assert cea[0].score.residual_kJ_mol == pytest.approx(0.0, abs=1e-9)
+    assert cea[0].score.skip_reason is None
+    assert not any(
+        p.score.engine_channel == "table_self_check" for p in scored
+    )
 
 
 def test_ellingham_matches_condensed_mgo_not_gas() -> None:
