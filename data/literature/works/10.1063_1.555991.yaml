@@ -1,0 +1,66 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1063/1.555991
+  citation: 'Span, R. & Wagner, W. (1996), "A New Equation of State for Carbon Dioxide Covering the Fluid Region from the
+    Triple-Point Temperature to 1100 K at Pressures up to 800 MPa", J. Phys. Chem. Ref. Data 25:1509–1596, DOI 10.1063/1.555991
+    — CO2(s/l/g) saturation from multiparameter EOS (triple point 216.592 K; solid CO2 sublimation from separate ice tables).
+    Primary solid sublimation cross-check: Giauque & Egan (1937) J. Chem. Phys. 5:45–54 (historical calorimetric triple-point
+    / vapor pressure).'
+  source_ids:
+  - span-wagner-1996-co2-psat
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:span-wagner-1996-co2-psat
+      role: pdf
+      path: raw/span-wagner-1996-co2-psat/span-wagner-1996-co2-psat.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:span-wagner-1996-co2-psat
+      role: pdftotext
+      path: text/span-wagner-1996-co2-psat
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:span-wagner-1996-co2-psat
+      role: table_csv
+      path: tables/span-wagner-1996-co2-psat
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1063/1.555991
+experiments:
+- experiment_id: 10.1063/1.555991::Span-Wagner-1996#CO2_Psat
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.555991
+  locator:
+    note: Span, R. & Wagner, W. (1996), "A New Equation of State for Carbon Dioxide Covering the Fluid Region from the Triple-Point
+      Temperature to 1100 K at Pressures up to 800 MPa", J. Phys. Chem. Ref. Data 25:1509–1596, DOI 10.1063/1.555991 — CO2(s/l/g)
+      saturation from multiparameter EOS (triple point 216.5
+    record: Span-Wagner-1996#CO2_Psat

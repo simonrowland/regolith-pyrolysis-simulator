@@ -1,0 +1,153 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/habermann-daane-1964.yaml
+observations:
+- observation_id: habermann-daane-1964::Hab64_Eu_metal_third_law
+  experiment_id: 56ca9db06aa4c3185b8ff8f2b02bbf697ccc4160f3ca6e05aad7cd406c629d54::Hab64_Eu_metal_third_law
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Eu_metal_and_EuO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: habermann-daane-1964
+  locator:
+    note: Hab64_Eu_metal_third_law
+    record: Hab64_Eu_metal_third_law
+  read_from: pdf:habermann-daane-1964
+- observation_id: habermann-daane-1964::Hab64_Yb_metal_antoine
+  experiment_id: 56ca9db06aa4c3185b8ff8f2b02bbf697ccc4160f3ca6e05aad7cd406c629d54::Hab64_Yb_metal_antoine
+  identity:
+    quantity: p_sat
+    species:
+      formula: Yb_metal_and_YbO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      mid_range_Delta_sub_H_uncertainty_kcal_mol: '0.15'
+      third_law_Delta_sub_H_298_uncertainty_kcal_mol: '0.057'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: habermann-daane-1964
+  locator:
+    note: Hab64_Yb_metal_antoine
+    record: Hab64_Yb_metal_antoine
+  read_from: pdf:habermann-daane-1964

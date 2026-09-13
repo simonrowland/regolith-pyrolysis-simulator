@@ -1,0 +1,1694 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-119-furukawa-1975.yaml
+observations:
+- observation_id: kems-119-furukawa-1975::furukawa_1975_HM_fe_infinite_dilution
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::9
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: HM error about 2 kcal mol^-1 at infinite dilution; HM max -1.9 +/- 0.4 kcal mol^-1 (N_V=0.44)
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    figure: '9'
+    note: H^M_Fe = -4.5 kcal mol^-1 at infinite dilution from Table 2 slopes via eq. (2)
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_HM_v_infinite_dilution
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  identity:
+    quantity: delta_fG
+    species:
+      formula: V
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: same ~2 kcal mol^-1 infinite-dilution envelope as H^M_Fe
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    note: H^M_V = -8.6 kcal mol^-1 at infinite dilution
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_fig10_fe_v_cr_ion_ratio_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::10
+  identity:
+    quantity: ion_intensity_ratio
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; 1600 C intercepts are Table 3
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    figure: '10'
+    note: log(I_Cr+/I_Fe+) and log(I_Cr+/I_V+) vs 1/T at N_V=0.2 and 0.3
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_fig12_ternary_activities_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::12
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; printed equations (14)-(17) are the tabulated fits
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3058
+    pdf_page_index: 9
+    figure: '12'
+    note: a_Fe and a_V in Fe-V-Cr at 1600 C vs 1-(N_V+N_Cr)
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_fig4_ion_ratio_vs_1T_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::4
+  identity:
+    quantity: ion_intensity_ratio
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; tabulated 1600 C intercepts and slopes are in Table 2
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3054
+    pdf_page_index: 5
+    figure: '4'
+    note: log(I_V+/I_Fe+) vs 1/T; 0.3 and 0.5 mm orifices; heating/cooling
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_fig6_fe_v_activities_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::6
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only activity curves; gamma fits are the printed equations (9)(10)
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3055
+    pdf_page_index: 6
+    figure: '6'
+    note: a_V and a_Fe vs N_Fe at 1600 C; liquid and solid references
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_fig7_av_comparison_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::7
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: V
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; this-work points are the Fig. 6 a_V curve
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3056
+    pdf_page_index: 7
+    figure: '7'
+    note: a_V vs N_V compared with Fruehan and Kay; VO-saturated recalculation dashed
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_gamma0_fe_1600c
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no +/- printed on gamma0_Fe
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3056
+    pdf_page_index: 7
+    note: infinite-dilution gamma_Fe = 0.38_9 at 1600 C; conclusions round to 0.39
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_gamma0_v_1600c
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: V
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Al at 1 at% of V is estimated to shift gamma_V by at most ~3% for N_V<0.2 (using epsilon_V^Al=12 from the literature);
+        authors treat the Al effect as negligible.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3056
+    pdf_page_index: 7
+    note: gamma0_V = 0.16_3 (solid standard) at 1600 C; conclusions round to 0.16
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_gamma_fe_binary_fit
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: fit to the Fig. 5(b) integral of Table 2 ion ratios; no +/- on the coefficients
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    equation: '10'
+    note: eq. (10) from Gibbs-Duhem on Table 2 / Fig. 5; also synopsis p. 3050
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        equation: '10'
+        note: eq. (10) from Gibbs-Duhem on Table 2 / Fig. 5; also synopsis p. 3050
+- observation_id: kems-119-furukawa-1975::furukawa_1975_gamma_ternary_nv02_fits
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no +/- on the ternary coefficients
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3058
+    pdf_page_index: 9
+    equation: 14-15
+    note: eqs. (14)(15) at N_V=0.2 after dropping the small N_Cr^2 term
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_gamma_ternary_nv03_fits
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no +/- on the ternary coefficients
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3058
+    pdf_page_index: 9
+    equation: 16-17
+    note: eqs. (16)(17) at N_V=0.3
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_gamma_v_fe_binary_fit
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: V
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no +/- on the fitted coefficients
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    equation: '9'
+    note: eq. (9); same coefficients in the English synopsis p. 3050
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        equation: '9'
+        note: eq. (9); same coefficients in the English synopsis p. 3050
+- observation_id: kems-119-furukawa-1975::furukawa_1975_kems_geometry_and_calibration
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::1
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Temperature hold +/-0.5 C. Surface-depletion calculation at N_V=0.796 gives Fe 1% depletion time >1e8 s; authors
+        treat depletion as negligible. 51V+ at N_V=0.093 was ~20% of empty-cell background after the run and was corrected;
+        at N_V=0.201 the correction was <5%.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3051
+    pdf_page_index: 2
+    figure: '1'
+    section: '3.1'
+    note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_liquidus_solidus_1600c
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::3
+  identity:
+    quantity: transition_temperature
+    species:
+      formula: V
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: value
+      value: liquidus_and_solidus_at_1600C
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: phase-boundary T adopted; activity values from those four Al-free runs refused
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3053
+    pdf_page_index: 4
+    figure: '3'
+    note: 1600 C liquidus 66 at% V, solidus 69 at% V from ion-ratio breaks
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_quoted_chipman_dastur_gamma0_v
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: V
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Chipman considered calculation-input errors and stated gamma0_V < 0.25
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3051
+    pdf_page_index: 2
+    section: '2'
+    note: Chipman and Dastur H2-H2O equilibrium, V<1.5 wt%, 1600 C
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_quoted_fruehan_gamma_v
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: V
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted; this work also replots Fruehan as VO-saturated (Fig. 7 dashed)
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3051
+    pdf_page_index: 2
+    section: '2'
+    note: Fruehan solid-electrolyte EMF, N_V<0.36, equilibrium oxide V2O3
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_quoted_kay_kontopoulos_gamma0_v
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: V
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted; no +/- transcribed
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3051
+    pdf_page_index: 2
+    section: '2'
+    note: Kay and Kontopoulos ZrO2(CaO) EMF, V<12 wt%, Henry's law
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table1_starting_materials
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::1
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: assay table; no +/- printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3052
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 chemical composition of Fe, V, Cr starting metals
+  read_from: pdf:kems-119-furukawa-1975
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::2
+  identity:
+    quantity: ion_intensity_ratio
+    species:
+      formula: V
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 2. N_V=0.796 and 0.900 heating/cooling loops (~4 h) reproduced the ion ratio. 0.3 vs 0.5 mm orifice
+        agreed at N_V=0.796.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3054
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3054
+        pdf_page_index: 5
+        table: '2'
+        note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+- observation_id: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios
+  experiment_id: 10.2355/tetsutohagane1955.61.15_3050::3
+  identity:
+    quantity: ion_intensity_ratio
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No +/- on Table 3. Filled symbols on Fig. 10 are heating; open symbols cooling. N_V held at 0.2 or 0.3.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-119-furukawa-1975
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    table: '3'
+    note: Table 3 ion current ratios for Fe-V-Cr at 1600 C
+  read_from: pdf:kems-119-furukawa-1975
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 3057
+        pdf_page_index: 8
+        table: '3'
+        note: Table 3 ion current ratios for Fe-V-Cr at 1600 C

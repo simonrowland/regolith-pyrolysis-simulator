@@ -1,0 +1,1405 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-011-wetzel-gail-2013.yaml
+observations:
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_alpha_extrapolation_quoted
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1000'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_class_b1
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        page: 7
+        section: '3.3'
+        equation: '8'
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 7
+    section: '3.3'
+    equation: '8'
+  read_from: pdf:kems-011-wetzel-gail-2013
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1000'
+      locator:
+        page: 7
+        section: '3.3'
+        equation: '8'
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_alpha_fit_quoted
+  experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_alpha_arrhenius
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        page: 7
+        section: '3.3'
+        equation: '8'
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 7
+    section: '3.3'
+    equation: '8'
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_alpha_arrhenius
+  experiment_id: 10.1051/0004-6361/201220803::docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Extrapolation to 1000 K may be too low per authors (L397)
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    equation: '8'
+    line_range: 317-329
+    note: growth coefficient α(T) for solid SiO condensation/growth from lab measurements
+    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_growth_class_b1
+  experiment_id: 10.1051/0004-6361/201220803::4a
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    figure: 4a
+    paragraph: SiO film growth Arrhenius α(T)
+    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_sio_ta_knudsen_geometry_partial
+  experiment_id: 10.1051/0004-6361/201220803::docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    section: 2.1. Experimental setup
+    line_range: 49-53
+    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model
+  experiment_id: 10.1051/0004-6361/201220803::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 4
+    table: '1'
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model_gibbs
+  experiment_id: 10.1051/0004-6361/201220803::1
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-011-wetzel-gail-2013::wetzel_gail_2013_table1_quoted_model
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        page: 4
+        table: '1'
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 4
+    table: '1'
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model
+  experiment_id: 10.1051/0004-6361/201220803::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 4
+    table: '2'
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model_gibbs
+  experiment_id: 10.1051/0004-6361/201220803::2
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-011-wetzel-gail-2013::wetzel_gail_2013_table2_quoted_model
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        page: 4
+        table: '2'
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 4
+    table: '2'
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table3_quoted_model
+  experiment_id: 10.1051/0004-6361/201220803::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 5
+    table: '3'
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table3_quoted_model_gibbs
+  experiment_id: 10.1051/0004-6361/201220803::3
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Each value is the right-hand term printed after ± for its paired coefficient; the paper does not state a statistical
+        convention.
+      rows:
+      - osc_no: '1'
+        values:
+          omega0_a_cm-1: '2.57'
+          omega0_b_cm-1_K-1: '0.0048'
+          omegap_a_cm-1: '10.59'
+          omegap_b_cm-1_K-1: '0.020'
+          sigma_a_cm-1: '1.29'
+          sigma_b_cm-1_K-1: '0.0024'
+        quote: 1 | 1078.2 ± 2.57 | 0.064 ± 0.0048 | 311.0 ± 10.59 | 0.103 ± 0.020 | 48.74 ± 1.29 | 0.0056 ± 0.0024
+        locator:
+          page: 5
+          table: '3'
+          row: '1'
+      - osc_no: '2'
+        values:
+          omega0_a_cm-1: '1.62'
+          omega0_b_cm-1_K-1: '0.0030'
+          omegap_a_cm-1: '11.7'
+          omegap_b_cm-1_K-1: '0.022'
+          sigma_a_cm-1: '0.81'
+          sigma_b_cm-1_K-1: '0.0015'
+        quote: 2 | 955.4 ± 1.62 | 0.084 ± 0.0030 | 696.3 ± 11.7 | 0.035 ± 0.022 | 63.35 ± 0.81 | -0.016 ± 0.0015
+        locator:
+          page: 5
+          table: '3'
+          row: '2'
+      - osc_no: '3'
+        values:
+          omega0_a_cm-1: '3.53'
+          omega0_b_cm-1_K-1: '0.0065'
+          omegap_a_cm-1: '8.32'
+          omegap_b_cm-1_K-1: '0.015'
+          sigma_a_cm-1: '0.95'
+          sigma_b_cm-1_K-1: '0.0018'
+        quote: 3 | 754.8 ± 3.53 | 0.049 ± 0.0065 | 214.7 ± 8.32 | 0.032 ± 0.015 | 48.67 ± 0.95 | -0.0015 ± 0.0018
+        locator:
+          page: 5
+          table: '3'
+          row: '3'
+      - osc_no: '4'
+        values:
+          omega0_a_cm-1: '6.96'
+          omega0_b_cm-1_K-1: '0.013'
+          omegap_a_cm-1: '20.2'
+          omegap_b_cm-1_K-1: '0.037'
+          sigma_a_cm-1: '4.19'
+          sigma_b_cm-1_K-1: '0.0078'
+        quote: 4 | 663.8 ± 6.96 | 0.0009 ± 0.013 | 252.2 ± 20.2 | 0.0037 ± 0.037 | 52.78 ± 4.19 | 0.014 ± 0.0078
+        locator:
+          page: 5
+          table: '3'
+          row: '4'
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-011-wetzel-gail-2013::wetzel_gail_2013_table3_quoted_model
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        page: 5
+        table: '3'
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 5
+    table: '3'
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table4_quoted_model
+  experiment_id: 10.1051/0004-6361/201220803::4
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 7
+    table: '4'
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table4_quoted_model_gibbs
+  experiment_id: 10.1051/0004-6361/201220803::4
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-011-wetzel-gail-2013::wetzel_gail_2013_table4_quoted_model
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        page: 7
+        table: '4'
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 7
+    table: '4'
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table5_quoted_model
+  experiment_id: 10.1051/0004-6361/201220803::5
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 8
+    table: '5'
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table5_quoted_model_gibbs
+  experiment_id: 10.1051/0004-6361/201220803::5
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-011-wetzel-gail-2013::wetzel_gail_2013_table5_quoted_model
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        page: 8
+        table: '5'
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 8
+    table: '5'
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table6_quoted_model
+  experiment_id: 10.1051/0004-6361/201220803::6
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 8
+    table: '6'
+  read_from: pdf:kems-011-wetzel-gail-2013
+- observation_id: kems-011-wetzel-gail-2013::wetzel_gail_2013_table6_quoted_model_gibbs
+  experiment_id: 10.1051/0004-6361/201220803::6
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-011-wetzel-gail-2013::wetzel_gail_2013_table6_quoted_model
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        page: 8
+        table: '6'
+  notices: []
+  source_id: kems-011-wetzel-gail-2013
+  locator:
+    page: 8
+    table: '6'
+  read_from: pdf:kems-011-wetzel-gail-2013

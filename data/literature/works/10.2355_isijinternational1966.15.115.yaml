@@ -1,0 +1,384 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational1966.15.115
+  citation: Ichise, E., Kitano, K. & Mori, T. (1975), "The Determination of Activity Coefficient of Sulfur in Liquid Iron
+    by Knudsen Cell-mass Spectrometry", Trans. ISIJ 15:115-120, DOI 10.2355/isijinternational1966.15.115
+  source_ids:
+  - kems-088-ichise-1975
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-088-ichise-1975
+      role: pdf
+      path: raw/kems-088-ichise-1975/kems-088-ichise-1975.pdf
+      sha256:
+        tag: value
+        value: eced8226761bbbb799e4d2edcbe7c47116f1fd1690b23743ec4dca3b85f0ef6a
+    - asset_id: pdftotext:kems-088-ichise-1975
+      role: pdftotext
+      path: text/kems-088-ichise-1975
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-088-ichise-1975
+      role: table_csv
+      path: tables/kems-088-ichise-1975
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2355/isijinternational1966.15.115
+experiments:
+- experiment_id: 10.2355/isijinternational1966.15.115::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.15.115
+  locator:
+    published_page: 116
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1. Chemical compositions of pure iron (%)
+- experiment_id: 10.2355/isijinternational1966.15.115::10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.15.115
+  locator:
+    published_page: 119
+    pdf_page_index: 5
+    figure: '10'
+    note: Fig. 10. Interaction parameters of sulfur in liquid iron
+- experiment_id: 10.2355/isijinternational1966.15.115::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.15.115
+  locator:
+    published_page: 116
+    pdf_page_index: 2
+    figure: '2'
+    section: II
+    note: Hitachi RM-6K; alumina cell / Ta holder; ~10 g; chamber voltage 30 V; cell chamber (4-6)e-6 Torr
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: alumina Knudsen cell; tantalum cell holder (Fig. 2)
+      locator:
+        published_page: 116
+        pdf_page_index: 2
+        figure: '2'
+        note: Knudsen cell (Al2O3) and cell holder (Ta); unit mm
+- experiment_id: 10.2355/isijinternational1966.15.115::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.15.115
+  locator:
+    published_page: 118
+    pdf_page_index: 4
+    table: '3'
+    note: Table 3. Interaction parameter of sulfur in liquid iron
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: alumina Knudsen cell; tantalum cell holder (Fig. 2)
+      locator:
+        published_page: 116
+        pdf_page_index: 2
+        figure: '2'
+        note: Knudsen cell (Al2O3) and cell holder (Ta); unit mm
+- experiment_id: 10.2355/isijinternational1966.15.115::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.15.115
+  locator:
+    published_page: 117
+    pdf_page_index: 3
+    figure: '4'
+    note: Fig. 4. Integration curve for the Fe-S system at 1550 C
+- experiment_id: 10.2355/isijinternational1966.15.115::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.15.115
+  locator:
+    published_page: 117
+    pdf_page_index: 3
+    figure: '5'
+    note: Fig. 5. Integration curve for the Fe-S system at 1600 C
+- experiment_id: 10.2355/isijinternational1966.15.115::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.15.115
+  locator:
+    published_page: 117
+    pdf_page_index: 3
+    figure: '6'
+    note: Fig. 6. Integration curve for the Fe-S system at 1650 C
+- experiment_id: 10.2355/isijinternational1966.15.115::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.15.115
+  locator:
+    published_page: 117
+    pdf_page_index: 3
+    figure: '7'
+    note: Fig. 7. Activity coefficient of sulfur in liquid iron
+- experiment_id: 10.2355/isijinternational1966.15.115::8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.15.115
+  locator:
+    published_page: 118
+    pdf_page_index: 4
+    figure: '8'
+    note: Fig. 8. Experimental results for pure iron
+- experiment_id: 10.2355/isijinternational1966.15.115::9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.15.115
+  locator:
+    published_page: 118
+    pdf_page_index: 4
+    figure: '9'
+    note: 'Fig. 9. Heating characteristic of the cell holder by a pair of ring filaments (Total emission current: 0.68 A)'
+- experiment_id: 10.2355/isijinternational1966.15.115::kems-088-ichise-1975
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.15.115
+  locator:
+    published_page: 117
+    pdf_page_index: 3
+    equation: 7-9
+    note: LS fits of (1-N_S)/(2-N_S) vs ln(I_Fe+ N_S^2 / I_S2+ N_Fe)

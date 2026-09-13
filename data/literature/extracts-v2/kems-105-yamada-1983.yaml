@@ -1,0 +1,1134 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-105-yamada-1983.yaml
+observations:
+- observation_id: kems-105-yamada-1983::yamada_1983_Fe_P_Cu_Mn_not_measurable
+  experiment_id: 10.2355/isijinternational1966.23.51::kems-105-yamada-1983
+  identity:
+    quantity: interaction_parameter
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: authors report accurate determinations impossible; no epsilon printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=true_absence is not a closed v2.1 token
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    section: 10. The Fe-P-Cu and Fe-P-Mn Systems
+    note: Measurements tried; ion source contaminated; accurate determinations impossible
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_Al_body_4p0_printed
+  experiment_id: 10.2355/isijinternational1966.23.51::kems-105-yamada-1983
+  identity:
+    quantity: interaction_parameter
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      epsilon_P_Al: '0.7'
+      as_printed: 4.0±0.7
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 53
+    pdf_page_index: 3
+    section: 2. The Fe-P-Al Systems
+    note: Body text value that disagrees with synopsis/Table 2/Fig. 2/conclusions
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 53
+        pdf_page_index: 3
+        section: 2. The Fe-P-Al Systems
+        note: Body text value that disagrees with synopsis/Table 2/Fig. 2/conclusions
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_Si_fruehan_aFe_12p6
+  experiment_id: 10.2355/isijinternational1966.23.51::kems-105-yamada-1983
+  identity:
+    quantity: interaction_parameter
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      epsilon_P_Si: '0.6'
+      as_printed: 12.6±0.6
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 53
+    pdf_page_index: 3
+    section: 1. The Fe-P-Si System
+    note: Same ion-ratio data recomputed with Fruehan a_Fe instead of Chipman a_Fe
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 53
+        pdf_page_index: 3
+        section: 1. The Fe-P-Si System
+        note: Same ion-ratio data recomputed with Fruehan a_Fe instead of Chipman a_Fe
+- observation_id: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C
+  experiment_id: 10.2355/isijinternational1966.23.51::2
+  identity:
+    quantity: interaction_parameter
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      epsilon_P_Si: '0.6'
+      epsilon_P_Al: '0.7'
+      epsilon_P_Ti: '2'
+      epsilon_P_V: '0.7'
+      epsilon_P_Cr: '0.7'
+      epsilon_P_Co: '0.7'
+      epsilon_P_Ni: '0.7'
+      epsilon_P_Nb: '1.2'
+      epsilon_P_Mo: '0.7'
+      as_printed: 2 sigma of the least-squares slope; V computed 2 sigma was ±0.3 and Ni data 0.7±0.5, both adopted as ±0.7
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the mole-fraction
+      interaction coefficient; e is the wt% coefficient as printed.
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        table: '2'
+        note: Table 2 Present work rows; same numbers in the Synopsis (p. 51) and Conclusions (pp. 54-55). epsilon is the
+          mole-fraction interaction coefficient; e is the wt% coefficient as printed.
+- observation_id: kems-105-yamada-1983::yamada_1983_fig1_Si_figure_only
+  experiment_id: 10.2355/isijinternational1966.23.51::1
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; slope labelled 11.9±0.6, same as Table 2 Present work. Points not digitised.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 52
+    pdf_page_index: 2
+    figure: '1'
+    note: Effect of Si on the activity coefficient of P at 1600 C
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 52
+        pdf_page_index: 2
+        figure: '1'
+        note: Effect of Si on the activity coefficient of P at 1600 C
+- observation_id: kems-105-yamada-1983::yamada_1983_fig2_Al_figure_only
+  experiment_id: 10.2355/isijinternational1966.23.51::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; labelled 4.6±0.7. Be contents are added amounts just before the run. Points not digitised.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 53
+    pdf_page_index: 3
+    figure: '2'
+    note: Effect of Al on the activity coefficient of P at 1600 C
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 53
+        pdf_page_index: 3
+        figure: '2'
+        note: Effect of Al on the activity coefficient of P at 1600 C
+- observation_id: kems-105-yamada-1983::yamada_1983_fig3_3d_metals_figure_only
+  experiment_id: 10.2355/isijinternational1966.23.51::3
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; labelled slopes match Table 2 Present work (without the printed ±). Points not digitised.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 53
+    pdf_page_index: 3
+    figure: '3'
+    note: Effect of the 3rd-transition metals (Ti, V, Cr, Co and Ni) at 1600 C
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 53
+        pdf_page_index: 3
+        figure: '3'
+        note: Effect of the 3rd-transition metals (Ti, V, Cr, Co and Ni) at 1600 C
+- observation_id: kems-105-yamada-1983::yamada_1983_fig4_Nb_Mo_figure_only
+  experiment_id: 10.2355/isijinternational1966.23.51::4
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; labelled slopes match Table 2 Present work. Points not digitised.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    figure: '4'
+    note: Effect of Nb and Mo on the activity coefficient of P at 1600 C
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 54
+        pdf_page_index: 4
+        figure: '4'
+        note: Effect of Nb and Mo on the activity coefficient of P at 1600 C
+- observation_id: kems-105-yamada-1983::yamada_1983_fig5a_epsilon_vs_atomic_number_figure_only
+  experiment_id: 10.2355/isijinternational1966.23.51::5(a)
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; no numbers off axes. Successful numerical values are in Table 2.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 55
+    pdf_page_index: 5
+    figure: 5(a)
+    note: Variation of epsilon_P^i with atomic number of 4th and 5th period elements at 1600 C
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 55
+        pdf_page_index: 5
+        figure: 5(a)
+        note: Variation of epsilon_P^i with atomic number of 4th and 5th period elements at 1600 C
+- observation_id: kems-105-yamada-1983::yamada_1983_fig5b_epsilon_S_quoted_figure_only
+  experiment_id: 10.2355/isijinternational1966.23.51::5(b)
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only reprint of other workers; no numbers off axes
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 55
+    pdf_page_index: 5
+    figure: 5(b)
+    note: Variation of epsilon_S^i with atomic number at 1600 C, from Sigworth and Elliott (ref 16)
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 55
+        pdf_page_index: 5
+        figure: 5(b)
+        note: Variation of epsilon_S^i with atomic number at 1600 C, from Sigworth and Elliott (ref 16)
+- observation_id: kems-105-yamada-1983::yamada_1983_kems_geometry_and_calibration
+  experiment_id: 10.2355/isijinternational1966.23.51::kems-105-yamada-1983
+  identity:
+    quantity: delta_fG
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1873'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Interaction-coefficient uncertainties are printed as 2 sigma of the least-squares slope. For V the computed 2
+        sigma was ±0.3 but the authors adopt ±0.7 as for the other systems; for Ni the data give 0.7±0.5 and they likewise
+        adopt ±0.7. Chamber pressure and sample mass unstated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 51
+    pdf_page_index: 1
+    section: II. Experimental / III. Calculations
+    note: Apparatus referred to previous papers; ions, T, cell materials and ln K / epsilon_P^P calibration from pp. 51-52.
+  read_from: pdf:kems-105-yamada-1983
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873'
+      locator:
+        published_page: 51
+        pdf_page_index: 1
+        section: II. Experimental / III. Calculations
+        note: Apparatus referred to previous papers; ions, T, cell materials and ln K / epsilon_P^P calibration from pp. 51-52.
+- observation_id: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
+  experiment_id: 10.2355/isijinternational1966.23.51::1
+  identity:
+    quantity: delta_fG
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: purity as printed; no numeric uncertainty on the purity figures
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 51
+    pdf_page_index: 1
+    table: '1'
+    note: Table 1. Source and purity of metals.
+  read_from: pdf:kems-105-yamada-1983
+- observation_id: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients
+  experiment_id: 10.2355/isijinternational1966.23.51::2
+  identity:
+    quantity: interaction_parameter
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted Table 2 rows print no ± except this-work rows; none invented
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-105-yamada-1983
+  locator:
+    published_page: 54
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2 comparison rows that are not Present work
+  read_from: pdf:kems-105-yamada-1983

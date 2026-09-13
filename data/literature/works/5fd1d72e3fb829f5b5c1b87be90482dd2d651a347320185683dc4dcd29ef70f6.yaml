@@ -1,0 +1,120 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  citation: Tsaplin, A. A., Zaitsev, A. I., Shelkova, N. E. & Mogutnov, B. M., "Thermodynamic properties and phase equilibria
+    in Na2O-SiO2 and K2O-SiO2 systems", conference preprint, 24 pp.
+  source_ids:
+  - kems-ms2000-044
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-ms2000-044
+      role: pdf
+      path: raw/kems-ms2000-044/kems-ms2000-044.pdf
+      sha256:
+        tag: value
+        value: 3d78f4e6403b3512176071c79a8ac88e263f7d87c5b1e0159e2e133fb0f4d1b1
+    - asset_id: pdftotext:kems-ms2000-044
+      role: pdftotext
+      path: text/kems-ms2000-044
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-ms2000-044
+      role: table_csv
+      path: tables/kems-ms2000-044
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'experimental_melt_activity' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: PDF p. 22
+    table: '1'
+    note: row=Na2O-SiO2 x(SiO2)=0.805 T=1473 K
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_silicate_formation_thermochemistry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: PDF p. 23
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md
+- experiment_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_silicate_thermochemistry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 5fd1d72e3fb829f5b5c1b87be90482dd2d651a347320185683dc4dcd29ef70f6
+  locator:
+    page: PDF p. 23
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/ms2000-044/tables.md

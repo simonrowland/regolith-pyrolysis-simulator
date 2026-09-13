@@ -1,0 +1,63 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: c6db381cec1065135405cbe1fd1f33becb0c0a50bbad6f8b919f427fa5e81b95
+  citation: 'Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, NH3 correlations (NASA NTRS supplementary Table 2). Alternate
+    liquid branch: NIST Chemistry WebBook SRD 69 ammonia Antoine (Stull 1947 lineage), ~164–240 K liquid — independent of
+    the 2024 QCM ice fit.'
+  source_ids:
+  - fray-schmitt-2009-nh3
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:fray-schmitt-2009-nh3
+      role: pdf
+      path: raw/fray-schmitt-2009-nh3/fray-schmitt-2009-nh3.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:fray-schmitt-2009-nh3
+      role: pdftotext
+      path: text/fray-schmitt-2009-nh3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:fray-schmitt-2009-nh3
+      role: table_csv
+      path: tables/fray-schmitt-2009-nh3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: c6db381cec1065135405cbe1fd1f33becb0c0a50bbad6f8b919f427fa5e81b95::Fray-Schmitt-2009#NH3
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: c6db381cec1065135405cbe1fd1f33becb0c0a50bbad6f8b919f427fa5e81b95
+  locator:
+    note: 'Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, NH3 correlations (NASA NTRS supplementary Table 2). Alternate
+      liquid branch: NIST Chemistry WebBook SRD 69 ammonia Antoine (Stull 1947 lineage), ~164–240 K liquid — independent of
+      the 2024 QCM ice fit.'
+    record: Fray-Schmitt-2009#NH3

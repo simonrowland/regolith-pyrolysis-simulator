@@ -1,0 +1,1542 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ts1985.yaml
+observations:
+- observation_id: ts1985::ts1985_gamma_Na_in_Pb_table1
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::1
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Authors (p.818) estimate relative error on γ°_Na as 2% from Na and Si analyses, and state the true γ°_Si (hence
+        the coupled γ°_Na) lies between 0.79 and 1.3 times the measured value.
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 3
+    published_page: 817
+    pdf_page_index: 3
+    table: '1'
+    note: Auxiliary γ°_Na in Pb-Na, required to convert alloy Na analyses into a_Na2O via eq. (4). NOT melt γ_Na2O. Column
+      header 「γ°_Na in Pb」 / 「鉛-ナトリウム合金中のナトリウムの無限希釈での活量係数」.
+  read_from: pdf:ts1985
+- observation_id: ts1985::ts1985_na2o_prose_1200C_range
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::ts1985
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Order-of-magnitude synopsis endpoints, not Table 2 coefficients. 60 mol% value has no Table 2 row.
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 1
+    published_page: 815
+    pdf_page_index: 1
+    paragraph: English Synopsis + Japanese 結言 (2)
+    note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55). 5e-5
+      at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 1
+        published_page: 815
+        pdf_page_index: 1
+        paragraph: English Synopsis + Japanese 結言 (2)
+        note: Synopsis and conclusions state the 1200 °C span; 60 mol% endpoint is not in Table 2 (Table 2 stops at X=0.55).
+          5e-5 at 60 mol% is the authors' Fig. 4 reading, retained as prose, not re-digitized.
+- observation_id: ts1985::ts1985_na2o_table2_X0p40_T1100C
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.00000002497541'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 2 ± on A and B as printed. Experimental envelope on log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at
+        1200 °C, ±0.14 at 1300 °C.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 X_Na2O=0.4 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained A,
+      B by reading Fig. 4/7 (p. 820).
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 X_Na2O=0.4 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+          A, B by reading Fig. 4/7 (p. 820).
+- observation_id: ts1985::ts1985_na2o_table2_X0p40_T1200C
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.0000001316026'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 2 ± on A and B as printed. Experimental envelope on log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at
+        1200 °C, ±0.14 at 1300 °C.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 X_Na2O=0.4 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained A,
+      B by reading Fig. 4/7 (p. 820).
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 X_Na2O=0.4 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+          A, B by reading Fig. 4/7 (p. 820).
+- observation_id: ts1985::ts1985_na2o_table2_X0p40_T1300C
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.0000005613808'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 2 ± on A and B as printed. Experimental envelope on log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at
+        1200 °C, ±0.14 at 1300 °C.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 X_Na2O=0.4 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained A,
+      B by reading Fig. 4/7 (p. 820).
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 X_Na2O=0.4 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+          A, B by reading Fig. 4/7 (p. 820).
+- observation_id: ts1985::ts1985_na2o_table2_X0p45_T1100C
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.0000001572606'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 2 ± on A and B as printed. Experimental envelope on log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at
+        1200 °C, ±0.14 at 1300 °C.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 X_Na2O=0.45 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained A,
+      B by reading Fig. 4/7 (p. 820).
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 X_Na2O=0.45 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+          A, B by reading Fig. 4/7 (p. 820).
+- observation_id: ts1985::ts1985_na2o_table2_X0p45_T1200C
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.0000006024951'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 2 ± on A and B as printed. Experimental envelope on log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at
+        1200 °C, ±0.14 at 1300 °C.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 X_Na2O=0.45 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained A,
+      B by reading Fig. 4/7 (p. 820).
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 X_Na2O=0.45 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+          A, B by reading Fig. 4/7 (p. 820).
+- observation_id: ts1985::ts1985_na2o_table2_X0p45_T1300C
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.000001945924'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 2 ± on A and B as printed. Experimental envelope on log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at
+        1200 °C, ±0.14 at 1300 °C.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 X_Na2O=0.45 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained A,
+      B by reading Fig. 4/7 (p. 820).
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 X_Na2O=0.45 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+          A, B by reading Fig. 4/7 (p. 820).
+- observation_id: ts1985::ts1985_na2o_table2_X0p50_T1100C
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.0000007818527'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 2 ± on A and B as printed. Experimental envelope on log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at
+        1200 °C, ±0.14 at 1300 °C.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 X_Na2O=0.5 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained A,
+      B by reading Fig. 4/7 (p. 820).
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 X_Na2O=0.5 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+          A, B by reading Fig. 4/7 (p. 820).
+- observation_id: ts1985::ts1985_na2o_table2_X0p50_T1200C
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.00000238555'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 2 ± on A and B as printed. Experimental envelope on log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at
+        1200 °C, ±0.14 at 1300 °C.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 X_Na2O=0.5 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained A,
+      B by reading Fig. 4/7 (p. 820).
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 X_Na2O=0.5 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+          A, B by reading Fig. 4/7 (p. 820).
+- observation_id: ts1985::ts1985_na2o_table2_X0p50_T1300C
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.000006316268'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 2 ± on A and B as printed. Experimental envelope on log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at
+        1200 °C, ±0.14 at 1300 °C.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 X_Na2O=0.5 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained A,
+      B by reading Fig. 4/7 (p. 820).
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 X_Na2O=0.5 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+          A, B by reading Fig. 4/7 (p. 820).
+- observation_id: ts1985::ts1985_na2o_table2_X0p55_T1100C
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1373.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.00000468739'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 2 ± on A and B as printed. Experimental envelope on log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at
+        1200 °C, ±0.14 at 1300 °C.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 X_Na2O=0.55 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained A,
+      B by reading Fig. 4/7 (p. 820).
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1373.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 X_Na2O=0.55 evaluated at 1100 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+          A, B by reading Fig. 4/7 (p. 820).
+- observation_id: ts1985::ts1985_na2o_table2_X0p55_T1200C
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.00001088305'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 2 ± on A and B as printed. Experimental envelope on log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at
+        1200 °C, ±0.14 at 1300 °C.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 X_Na2O=0.55 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained A,
+      B by reading Fig. 4/7 (p. 820).
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 X_Na2O=0.55 evaluated at 1200 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+          A, B by reading Fig. 4/7 (p. 820).
+- observation_id: ts1985::ts1985_na2o_table2_X0p55_T1300C
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1573.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.00002270189'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 2 ± on A and B as printed. Experimental envelope on log a_Na2O from p. 819: ±0.16 at 1100 °C, ±0.15 at
+        1200 °C, ±0.14 at 1300 °C.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 X_Na2O=0.55 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained A,
+      B by reading Fig. 4/7 (p. 820).
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1573.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        table: '2'
+        equation: log a_Na2O = A/T + B
+        note: Table 2 X_Na2O=0.55 evaluated at 1300 °C. A, B as printed; a = 10**(A/T+B) with T in kelvin. Authors obtained
+          A, B by reading Fig. 4/7 (p. 820).
+- observation_id: ts1985::ts1985_na2o_table2_log10_a_AT_B
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Per-row ± on A and B as printed in Table 2. Separate experimental envelope on log a_Na2O from p.819 (PDF p.5):
+        ±0.16 at 1100 °C, ±0.15 at 1200 °C, ±0.14 at 1300 °C, dominated by ΔG° of eq. (2) (stated 1 kcal/mol) rather than
+        Na analysis.'
+      log10_a_envelope:
+        1100_C: '0.16'
+        1200_C: '0.15'
+        1300_C: '0.14'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    table: '2'
+    figure: '4'
+    equation: log a_Na2O = A/T + B
+    note: Table 2 coefficients. Authors state (p.820) that A, B were obtained by reading Fig. 4 at X_Na2O = 0.40, 0.45, 0.50,
+      0.55 (「Fig.4の結果から読みとつた」). Evaluated a and γ below use the printed A, B; they are not independent figure reads.
+  read_from: pdf:ts1985
+- observation_id: ts1985::ts1985_sio2_gibbs_duhem_1200C_X0500
+  experiment_id: 10.2355/tetsutohagane1955.71.7_815::8
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: point
+    point: '0.00601'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Authors estimate ±0.15 in log a_SiO2, inherited from a_Na2O error.
+      log10_a_SiO2: '0.15'
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: derived_gibbs_duhem
+    model: derived_gibbs_duhem
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ts1985
+  locator:
+    page: 7
+    published_page: 821
+    pdf_page_index: 7
+    figure: '8'
+    paragraph: Gibbs-Duhem integration of Fig. 4 a_Na2O
+  read_from: pdf:ts1985
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        page: 7
+        published_page: 821
+        pdf_page_index: 7
+        figure: '8'
+        paragraph: Gibbs-Duhem integration of Fig. 4 a_Na2O

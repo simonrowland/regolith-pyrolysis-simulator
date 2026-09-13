@@ -1,0 +1,156 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1002/rcm.9744
+  citation: 'Jacobson, N. S., Colle, J.-Y., Stolyarova, V., Markus, T. & Nuta, I. (2024), "Knudsen effusion mass spectrometry:
+    Current and future approaches", Rapid Commun. Mass Spectrom. 38(14):e9744, DOI 10.1002/rcm.9744. HAL hal-04602114.'
+  source_ids:
+  - kems-139-jacobson-2024
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-139-jacobson-2024
+      role: pdf
+      path: raw/kems-139-jacobson-2024/kems-139-jacobson-2024.pdf
+      sha256:
+        tag: value
+        value: 3896c027a2c5add755999981b3232bae6735844113f2560a95d11c4324190218
+    - asset_id: pdftotext:kems-139-jacobson-2024
+      role: pdftotext
+      path: text/kems-139-jacobson-2024
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-139-jacobson-2024
+      role: table_csv
+      path: tables/kems-139-jacobson-2024
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1002/rcm.9744
+experiments:
+- experiment_id: 10.1002/rcm.9744::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'review_compilation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1002/rcm.9744
+  locator:
+    page: 18
+    published_page: 18
+    pdf_page_index: 19
+    table: '1'
+    note: Chemical analysis (Snyder et al. 117) of lunar basalt sample 12022
+- experiment_id: 10.1002/rcm.9744::16
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_second_law_fit' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1002/rcm.9744
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 24
+    figure: '16'
+    note: van't Hoff plot for enthalpy of vaporization of Au
+- experiment_id: 10.1002/rcm.9744::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_third_law_thermochemistry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1002/rcm.9744
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 24
+    table: '2'
+    note: Third law thermodynamic calculations for 1/2 Hf(s) + 1/2 HfO2(s) = HfO(g)
+- experiment_id: 10.1002/rcm.9744::kems-139-jacobson-2024
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_second_law_fit' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1002/rcm.9744
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 24
+    paragraph: A second law plot of ln(IT) versus 1/T

@@ -1,0 +1,64 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1021/ja01265a030
+  citation: Giauque, W.F. & Ruehrwein, R.A. (1939), "The Entropy of Hydrogen Cyanide. Heat Capacity, Heat of Vaporization
+    and Vapor Pressure of Hydrogen Cyanide. The Structure of the Hydrogen Cyanide Molecule", J. Am. Chem. Soc. 61:2626–2633,
+    DOI 10.1021/ja01265a030 — classical vapor-pressure / calorimetry primary.
+  source_ids:
+  - giauque-ruehrwein-1939-hcn-psat
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:giauque-ruehrwein-1939-hcn-psat
+      role: pdf
+      path: raw/giauque-ruehrwein-1939-hcn-psat/giauque-ruehrwein-1939-hcn-psat.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:giauque-ruehrwein-1939-hcn-psat
+      role: pdftotext
+      path: text/giauque-ruehrwein-1939-hcn-psat
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:giauque-ruehrwein-1939-hcn-psat
+      role: table_csv
+      path: tables/giauque-ruehrwein-1939-hcn-psat
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1021/ja01265a030
+experiments:
+- experiment_id: 10.1021/ja01265a030::Giauque-Ruehrwein-1939#HCN_Psat
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1021/ja01265a030
+  locator:
+    note: Giauque, W.F. & Ruehrwein, R.A. (1939), "The Entropy of Hydrogen Cyanide. Heat Capacity, Heat of Vaporization and
+      Vapor Pressure of Hydrogen Cyanide. The Structure of the Hydrogen Cyanide Molecule", J. Am. Chem. Soc. 61:2626–2633,
+      DOI 10.1021/ja01265a030 — classical vapor-pressure / calorimetry prim
+    record: Giauque-Ruehrwein-1939#HCN_Psat

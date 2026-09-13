@@ -1,0 +1,1162 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml
+observations:
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig1_tgms_vacuum_vitrification_figure_only
+  experiment_id: 10.1016/j.icarus.2023.115577::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: extract-pyro-simulant
+      date: '2026-09-12'
+      evidence:
+        pdf_page_index: 12
+        figure: '1'
+        note: Icarus journal pre-proof; no printed pagination.
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 12
+    figure: '1'
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig2_tgms_vacuum_he_arh2_figure_only
+  experiment_id: 10.1016/j.icarus.2023.115577::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: extract-pyro-simulant
+      date: '2026-09-12'
+      evidence:
+        pdf_page_index: 13
+        figure: '2'
+        note: Icarus journal pre-proof; no printed pagination.
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 13
+    figure: '2'
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_fig4_idealized_ht_tg_figure_only
+  experiment_id: 10.1016/j.icarus.2023.115577::4
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: extract-pyro-simulant
+      date: '2026-09-12'
+      evidence:
+        pdf_page_index: 17
+        figure: '4'
+        note: Icarus journal pre-proof; no printed pagination.
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 17
+    figure: '4'
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_h2_reduction_extra_water_windows
+  experiment_id: 10.1016/j.icarus.2023.115577::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: H2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 13
+    figure: '2'
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_idealized_heat_treatment_0p50_wt_pct
+  experiment_id: 10.1016/j.icarus.2023.115577::4
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 17
+    figure: '4'
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_printed_gas_release_windows
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 12
+    section: 3.1 Thermogravimetric Analysis
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_quoted_loi_mckay_1994
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_from_other_workers
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 6
+    paragraph: LOI of 0.71
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table1_mossbauer_metallic_fe_arh2
+  experiment_id: 10.1016/j.icarus.2023.115577::1
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: parenthetical last-digit form, e.g. 11.34(6)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 8
+    table: '1'
+    section: Table 1 Mössbauer
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_carbon_sulfur
+  experiment_id: 10.1016/j.icarus.2023.115577::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: C
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: parenthetical last-digit form, e.g. 0.0253 (22); triplicate sampling stated in methods
+      n: triplicate
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 14
+    table: '2'
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table2_sulfur_pointer
+  experiment_id: 10.1016/j.icarus.2023.115577::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 14
+    table: '2'
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_table3_psd_bet_density
+  experiment_id: 10.1016/j.icarus.2023.115577::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: Surface Area 1.007 (7) untreated and 0.262 (12) heat treated; parenthetical digits as printed. D-values
+        and density printed without plus-minus.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 20
+    table: '3'
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_1050C_total_mass_loss_vacuum_vs_he
+  experiment_id: 10.1016/j.icarus.2023.115577::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: ~0.05 wt. % difference
+      note: Difference given as approximately 0.05 wt. %. Individual totals printed as 0.40 and 0.35 without plus-minus.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 13
+    figure: '2'
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_tga_apparatus_and_thermal_program
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 6
+    section: 2.1 Thermal Analysis and Mass Spectroscopy
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_vacuum_ms_apparatus
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 7
+    section: 2.1-2.2 vacuum MS and chemical analysis
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing
+- observation_id: wilkerson-2023-jsc1a-outgassing::wilkerson_2023_xrd_primary_phases_printed
+  experiment_id: 10.1016/j.icarus.2023.115577::wilkerson-2023-jsc1a-outgassing
+  identity:
+    quantity: delta_fG
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2023-jsc1a-outgassing
+  locator:
+    pdf_page_index: 17
+    section: 3.4 X-ray Diffraction and Phase Analysis
+    note: Icarus journal pre-proof; no printed pagination.
+  read_from: pdf:wilkerson-2023-jsc1a-outgassing

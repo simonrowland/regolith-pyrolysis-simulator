@@ -1,0 +1,628 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-036-sesko-2024.yaml
+observations:
+- observation_id: kems-036-sesko-2024::sesko_2024_crucible_deposit_edx
+  experiment_id: 10.1016/j.actaastro.2024.08.009::docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: K 5–8 wt% and Si 7–20 wt% are printed ranges; Na is approx. 30 wt%; 31.3 μm is the printed optical label
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-036-sesko-2024
+  locator:
+    page: 221
+    paragraph: experimental_results_deposit_edx
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+  read_from: pdf:kems-036-sesko-2024
+- observation_id: kems-036-sesko-2024::sesko_2024_deposit_Fe_edx_qualitative
+  experiment_id: 10.1016/j.actaastro.2024.08.009::15
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: qualitative EDX only; no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-036-sesko-2024
+  locator:
+    page: 221
+    figure: '15'
+    paragraph: bottom brown layer has a higher concentration of iron
+    source_path: docs-private/research/2026-09-06-data-pilot/rh50/tables.md
+  read_from: pdf:kems-036-sesko-2024
+- observation_id: kems-036-sesko-2024::sesko_2024_deposit_K_edx_range
+  experiment_id: 10.1016/j.actaastro.2024.08.009::docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed range 5–8 wt%; no single-point EDX table
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-036-sesko-2024
+  locator:
+    page: 221
+    paragraph: both deposit regions showed K concentrations ranging from 5 to 8 wt%
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+  read_from: pdf:kems-036-sesko-2024
+- observation_id: kems-036-sesko-2024::sesko_2024_deposit_Si_edx_range
+  experiment_id: 10.1016/j.actaastro.2024.08.009::docs-private/research/2026-09-06-data-pilot/rh50/tables.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Si
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed range 7–20 wt%; no single-point EDX table
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-036-sesko-2024
+  locator:
+    page: 221
+    paragraph: Si ranging from 7 to 20 wt%
+    source_path: docs-private/research/2026-09-06-data-pilot/rh50/tables.md
+  read_from: pdf:kems-036-sesko-2024
+- observation_id: kems-036-sesko-2024::sesko_2024_fig6_16_figure_only_blocked
+  experiment_id: 10.1016/j.actaastro.2024.08.009::6
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; no tabulated points
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
+    decided_by:
+      worker: tail-close
+      date: '2026-08-27'
+      evidence:
+        page: 219
+        figure: '6'
+        note: also Fig. 16 p. 223; MinerU ~ dumps rejected
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+  notices: []
+  source_id: kems-036-sesko-2024
+  locator:
+    page: 219
+    figure: '6'
+    note: also Fig. 16 p. 223; MinerU ~ dumps rejected
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+  read_from: pdf:kems-036-sesko-2024
+- observation_id: kems-036-sesko-2024::sesko_2024_table1_eac1_simulant_composition
+  experiment_id: 10.1016/j.actaastro.2024.08.009::1
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no uncertainty printed on Table 1; totals 100.00
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-036-sesko-2024
+  locator:
+    page: 216
+    table: '1'
+    paragraph: Regolith and regolith simulant geochemical compositions in % by weight
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+  read_from: pdf:kems-036-sesko-2024
+- observation_id: kems-036-sesko-2024::sesko_2024_table1_literature_feedstock_compositions
+  experiment_id: 10.1016/j.actaastro.2024.08.009::1
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: as printed; 24999 total 99.99 and 70051 total 100.01 are printed
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-036-sesko-2024
+  locator:
+    page: 216
+    table: '1'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+  read_from: pdf:kems-036-sesko-2024
+- observation_id: kems-036-sesko-2024::sesko_2024_table2_factsage_and_literature_o2_yield
+  experiment_id: 10.1016/j.actaastro.2024.08.009::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: yields published as ranges; no experimental O2 mass collected
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-036-sesko-2024
+  locator:
+    page: 221
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+  read_from: pdf:kems-036-sesko-2024

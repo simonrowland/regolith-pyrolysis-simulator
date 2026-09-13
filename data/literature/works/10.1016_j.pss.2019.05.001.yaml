@@ -1,0 +1,351 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.pss.2019.05.001
+  citation: 'Reiss, P., Grill, L. & Barber, S.J. (2019), "Thermal extraction of volatiles from the lunar regolith simulant
+    NU-LHT-2M: Preparations for in-situ analyses on the Moon", Planetary and Space Science, DOI 10.1016/j.pss.2019.05.001,
+    accepted manuscript PII S0032-0633(18)30382-9, PSS 4666'
+  source_ids:
+  - reiss-2019-thermal-extraction-nulht2m
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:reiss-2019-thermal-extraction-nulht2m
+      role: pdf
+      path: raw/reiss-2019-thermal-extraction-nulht2m/reiss-2019-thermal-extraction-nulht2m.pdf
+      sha256:
+        tag: value
+        value: 599403d1255a4705546de3f8c9e329b9b3b00b01989998c7fe67e9bac570b143
+    - asset_id: pdftotext:reiss-2019-thermal-extraction-nulht2m
+      role: pdftotext
+      path: text/reiss-2019-thermal-extraction-nulht2m
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:reiss-2019-thermal-extraction-nulht2m
+      role: table_csv
+      path: tables/reiss-2019-thermal-extraction-nulht2m
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1016/j.pss.2019.05.001
+experiments:
+- experiment_id: 10.1016/j.pss.2019.05.001::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'pumped_high_vacuum_EGA' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.1016/j.pss.2019.05.001
+  locator:
+    page: 10
+    pdf_page_index: 10
+    table: '1'
+    note: Table 1 Test parameters for the volatiles extraction; 350 dpi pdftoppm of PDF page 10
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: modified stainless steel blind fitting; Macor ceramic heater mount; Kanthal A1 heating wire
+      locator:
+        pdf_page_index: 5
+        figure: '4'
+        paragraph: 72-81
+        note: sample holder and heater; 350 dpi render of PDF pages 5-6
+- experiment_id: 10.1016/j.pss.2019.05.001::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'quoted_composition' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.pss.2019.05.001
+  locator:
+    page: 18
+    pdf_page_index: 18
+    table: '2'
+    note: Table 2 Major mineral phase abundances in NU-LHT-2M according to Rickman and Lowers (2012)
+- experiment_id: 10.1016/j.pss.2019.05.001::2-4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'pumped_high_vacuum_EGA' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.1016/j.pss.2019.05.001
+  locator:
+    page: 5
+    pdf_page_index: 5
+    figure: 2-4
+    section: '2.2'
+    note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: stainless steel sample holder; Macor heater mount
+      locator:
+        pdf_page_index: 5
+        figure: '4'
+        paragraph: 72-78
+- experiment_id: 10.1016/j.pss.2019.05.001::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'glovebox_hydration' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.pss.2019.05.001
+  locator:
+    page: 10
+    pdf_page_index: 10
+    figure: '5'
+    note: Type I and Type II coefficients printed on Fig. 5 plate; curve itself not digitised
+- experiment_id: 10.1016/j.pss.2019.05.001::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'pumped_high_vacuum_EGA' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.pss.2019.05.001
+  locator:
+    page: 12
+    pdf_page_index: 12
+    figure: '6'
+    paragraph: 201-207
+    note: Printed peak-band temperatures in prose, not read off Fig. 6
+- experiment_id: 10.1016/j.pss.2019.05.001::6,10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'pumped_high_vacuum_EGA' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.pss.2019.05.001
+  locator:
+    pdf_page_index: 18
+    figure: 6,10
+    paragraph: conclusions 447-448
+    note: printed attribution calcite >650 °C; curve figure-only
+- experiment_id: 10.1016/j.pss.2019.05.001::6-11
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'pumped_high_vacuum_EGA' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.pss.2019.05.001
+  locator:
+    figure: 6-11
+    note: RGA partial-pressure and total-pressure vs set-point T; not digitised; pdf_page_index=12-20
+- experiment_id: 10.1016/j.pss.2019.05.001::6-7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'pumped_high_vacuum_EGA' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.pss.2019.05.001
+  locator:
+    pdf_page_index: 12
+    figure: 6-7
+    paragraph: 206-207
+- experiment_id: 10.1016/j.pss.2019.05.001::9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'pumped_high_vacuum_EGA' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.pss.2019.05.001
+  locator:
+    pdf_page_index: 18
+    figure: '9'
+    paragraph: 336-337
+- experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'pumped_high_vacuum_EGA' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.pss.2019.05.001
+  locator:
+    page: 17
+    pdf_page_index: 17
+    paragraph: 297-318
+    note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement

@@ -1,0 +1,1146 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-005-fedkin-2006.yaml
+observations:
+- observation_id: kems-005-fedkin-2006::fedkin_2006_fe_class_b1
+  experiment_id: 10.1016/j.gca.2005.08.014::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.24'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    table: '3'
+    line_range: 186-197
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_fe_hashimoto_langmuir_table3
+  experiment_id: 10.1016/j.gca.2005.08.014::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.24'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: ±0.02 on α_Fe from visual fit envelope (authors)
+      alpha_range:
+      - '0.21'
+      - '0.27'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    table: '3'
+    line_range: 186-197
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_k_class_b1
+  experiment_id: 10.1016/j.gca.2005.08.014::4
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.13'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: α_K=0.13±0.02
+      alpha_range:
+      - '0.11'
+      - '0.15'
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    figure: '4'
+    line_range: 241-243
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_k_yu_langmuir
+  experiment_id: 10.1016/j.gca.2005.08.014::4
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.13'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: α_K=0.13±0.02 (authors)
+      alpha_range:
+      - '0.11'
+      - '0.15'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    figure: '4'
+    line_range: 241-243
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_mg_class_b1
+  experiment_id: 10.1016/j.gca.2005.08.014::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.24'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    table: '3'
+    line_range: 186-197
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_mg_hashimoto_langmuir_table3
+  experiment_id: 10.1016/j.gca.2005.08.014::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.24'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: ±0.01 on each α_Mg value as printed in Table 3
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    page: 212
+    table: '3'
+    paragraph: Evaporation coefficients, Hashimoto 1983 vacuum experiments; this-work columns
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-005-fedkin-2006/tables.md
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_na_class_b1
+  experiment_id: 10.1016/j.gca.2005.08.014::4
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.26'
+  uncertainty:
+    kind: printed
+    verbatim:
+      alpha_range:
+      - '0.21'
+      - '0.31'
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    figure: '4'
+    line_range: 241-243
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_na_yu_langmuir
+  experiment_id: 10.1016/j.gca.2005.08.014::4
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.26'
+  uncertainty:
+    kind: printed
+    verbatim:
+      alpha_range:
+      - '0.21'
+      - '0.31'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    figure: '4'
+    line_range: 241-243
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_langmuir_table3
+  experiment_id: 10.1016/j.gca.2005.08.014::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    table: '3'
+    line_range: 186-197
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_sio_hashimoto_table3_complete_b1
+  experiment_id: 10.1016/j.gca.2005.08.014::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.17'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: ±0.01 authors visual fit envelope
+      alpha_range:
+      - '0.11'
+      - '0.22'
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    table: '3'
+    line_range: 186-197
+    note: Table 3 SiO this-work column complete
+    source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_mg_alexander_2001_inverse
+  experiment_id: 10.1016/j.gca.2005.08.014::4
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+      note: Alexander (2001) did not present error bars for these estimates.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived_inverse_fit
+    model: model_derived_inverse_fit
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: DEEP-kems-005-fedkin-2006
+      date: '2026-09-06'
+      evidence:
+        page: 219
+        table: '4'
+        note: row=Mg; Alexander (2001)
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    page: 219
+    table: '4'
+    note: row=Mg; Alexander (2001)
+    source_path: tables/kems-005-fedkin-2006/t4.csv
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_mg_this_work_inverse
+  experiment_id: 10.1016/j.gca.2005.08.014::4
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      per_temperature:
+      - T_K: '2073'
+        alpha_sigma: '0.01'
+      - T_K: '2273'
+        alpha_sigma: '0.01'
+      note: ±0.01 is printed for both this-work Mg coefficients.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived_inverse_fit
+    model: model_derived_inverse_fit
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: DEEP-kems-005-fedkin-2006
+      date: '2026-09-06'
+      evidence:
+        page: 219
+        table: '4'
+        note: row=Mg; This work
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    page: 219
+    table: '4'
+    note: row=Mg; This work
+    source_path: tables/kems-005-fedkin-2006/t4.csv
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_alexander_2001_inverse
+  experiment_id: 10.1016/j.gca.2005.08.014::4
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+      note: Alexander (2001) did not present error bars for these estimates.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived_inverse_fit
+    model: model_derived_inverse_fit
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: DEEP-kems-005-fedkin-2006
+      date: '2026-09-06'
+      evidence:
+        page: 219
+        table: '4'
+        note: row=SiO; Alexander (2001)
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    page: 219
+    table: '4'
+    note: row=SiO; Alexander (2001)
+    source_path: tables/kems-005-fedkin-2006/t4.csv
+  read_from: pdf:kems-005-fedkin-2006
+- observation_id: kems-005-fedkin-2006::fedkin_2006_t4_sio_this_work_inverse
+  experiment_id: 10.1016/j.gca.2005.08.014::4
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      per_temperature:
+      - T_K: '2073'
+        alpha_sigma: '0.01'
+      - T_K: '2273'
+        alpha_sigma: '0.01'
+      note: ±0.01 is printed for both this-work SiO coefficients.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived_inverse_fit
+    model: model_derived_inverse_fit
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: DEEP-kems-005-fedkin-2006
+      date: '2026-09-06'
+      evidence:
+        page: 219
+        table: '4'
+        note: row=SiO; This work
+        source_path: tables/kems-005-fedkin-2006/t4.csv
+  notices: []
+  source_id: kems-005-fedkin-2006
+  locator:
+    page: 219
+    table: '4'
+    note: row=SiO; This work
+    source_path: tables/kems-005-fedkin-2006/t4.csv
+  read_from: pdf:kems-005-fedkin-2006

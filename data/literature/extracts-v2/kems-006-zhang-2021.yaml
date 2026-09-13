@@ -1,0 +1,314 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-006-zhang-2021.yaml
+observations:
+- observation_id: kems-006-zhang-2021::zhang_2021_table1_residue_compositions
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: isotope 95% c.i. printed in Table 1; EPMA oxides have no printed sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 71
+    table: '1'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: pdf:kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table3_diffusion_limitation
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 1200 °C D and L are inequalities as printed
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 73
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: pdf:kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table4_K_evaporation_coefficients
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::4
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 4 ±0.1 at 1400 °C is printed (large); prose 0.132 is a distinct printed value
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 74
+    table: '4'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: pdf:kems-006-zhang-2021
+- observation_id: kems-006-zhang-2021::zhang_2021_table4_this_study_evaporation_coefficients
+  experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::4
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      alpha_range_1400_C:
+      - '0.11'
+      - '0.17'
+      alpha_range_1200_C:
+      - '0.06'
+      - '0.1'
+      note: ± as printed in Table 4
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-006-zhang-2021
+  locator:
+    page: 74
+    table: '4'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+  read_from: pdf:kems-006-zhang-2021

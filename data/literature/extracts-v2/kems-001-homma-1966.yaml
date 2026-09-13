@@ -1,0 +1,2767 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-001-homma-1966.yaml
+observations:
+- observation_id: kems-001-homma-1966::homma_1966_crucible_area_numeric_b1
+  experiment_id: 10.2320/jinstmet1952.30.6_515::docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    paragraph: alumina crucible CP-2 ID 38 mm
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_fitted_constants_quoted_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::5
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Cu
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-001-homma-1966::homma_1966_cu_specific_evaporation_constant
+    decided_by:
+      worker: langmuir-ingest-gr-t544
+      date: '2026-08-07'
+      evidence:
+        page: '519'
+        table: '5'
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '5'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_11_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Cu
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 148.5; l(g) 145.3
+
+      t(min) 10; l0(g) 152.4; l(g) 143.7
+
+      t(min) 15; l0(g) 149.1; l(g) 142.7
+
+      t(min) 20; l0(g) 149.5; l(g) 139.8'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-11
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_12_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Cu
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 151.1; l(g) 147.5
+
+      t(min) 10; l0(g) 152.8; l(g) 148.4
+
+      t(min) 15; l0(g) 151.2; l(g) 144.3
+
+      t(min) 20; l0(g) 150.8; l(g) 141.1'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-12
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_16_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Cu
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 151.3; l(g) 147.1
+
+      t(min) 10; l0(g) 150.8; l(g) 144.8
+
+      t(min) 15; l0(g) 150.4; l(g) 143.1
+
+      t(min) 20; l0(g) 149.8; l(g) 142.1'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-16
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_masses_6503_28_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Cu
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 149.0; l(g) 144.5
+
+      t(min) 10; l0(g) 150.7; l(g) 144.8
+
+      t(min) 15; l0(g) 151.0; l(g) 142.6
+
+      t(min) 20; l0(g) 149.6; l(g) 139.6'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    note: Melt 6503-28
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_olette_alpha_exp_table2
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Cu
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '51'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: PDF pp. 3-4 / printed pp. 517-518
+    table: '2'
+    line_range: 166-168
+    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_olette_class_fence_b1
+  experiment_id: 10.2320/jinstmet1952.30.6_515::docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Cu
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '51'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    paragraph: Olette relative evaporation coefficient
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_olette_class_fence_quoted_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Cu
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '51'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical alpha uncertainty printed in table.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: alpha_Cu(exp.) 51
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-001-homma-1966::homma_1966_cu_olette_class_fence_b1
+    decided_by:
+      worker: langmuir-ingest-gr-t544
+      date: '2026-08-07'
+      evidence:
+        page: 517–518
+        table: '2'
+        source_path: tables/kems-001-homma-1966/table-2.csv
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_olette_experimental_quoted_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Cu
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '51'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical alpha uncertainty printed in table.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 'printed_row,6503-12,6503-12,6503-12,6503-12,6503-11,6503-11,6503-11,6503-11,6503-16,6503-16,6503-16,6503-16,6503-28,6503-28,6503-28,6503-28
+
+      mother_alloy_%Cu,1.04,,,,1.74,,,,2.65,,,,4.57,,,
+
+      t(min),5,10,15,20,5,10,15,20,5,10,15,20,5,10,15,20
+
+      %Cu,0.42,0.27,0.078,0.054,0.81,0.23,0.11,0.073,1.26,0.71,0.44,0.30,2.48,1.82,0.87,0.51
+
+      l0(g),151.1,152.8,151.2,150.8,148.5,152.4,149.1,149.5,151.3,150.8,150.4,149.8,149.0,150.7,151.0,149.6
+
+      l(g),147.5,148.4,144.3,141.1,145.3,143.7,142.7,139.8,147.1,144.8,143.1,142.1,144.5,144.8,142.6,139.6
+
+      alpha_Cu(exp.),51,60,73,53,68,47,101,65,55,59,67,73,70,70,32,83
+
+      alpha_Cu(theo.),143,,,,,,,,143,,,,,,,
+
+      lambda_Cu,67,,,,70,,,,44,,,,36,,,
+
+      k_Cu(exp.),0.025,0.020,0.018,0.022,0.029,0.028,0.016,0.021,0.036,0.034,0.026,0.026,0.047,0.041,0.059,0.031
+
+      k_Cu(theo.),0.016,0.015,0.014,0.014,0.022,0.019,0.019,0.018,0.028,0.025,0.024,0.023,0.043,0.040,0.035,0.034
+
+      omega_Cu,0.022,0.021,0.021,0.020,0.028,0.025,0.024,0.024,0.039,0.036,0.035,0.034,0.058,0.056,0.051,0.049
+
+      '
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-001-homma-1966::homma_1966_cu_olette_alpha_exp_table2
+    decided_by:
+      worker: langmuir-ingest-gr-t544
+      date: '2026-08-07'
+      evidence:
+        page: 517–518
+        table: '2'
+        source_path: tables/kems-001-homma-1966/table-2.csv
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_olette_theoretical_quoted_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Cu
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for theoretical coefficient.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: 517–518
+    table: '2'
+    source_path: tables/kems-001-homma-1966/table-2.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_cu_specific_evaporation_constant
+  experiment_id: 10.2320/jinstmet1952.30.6_515::5
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Cu
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    table: '5'
+    line_range: 216-218
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_fitted_constants_quoted_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::4, 5
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-001-homma-1966::homma_1966_mn_specific_evaporation_constant
+    decided_by:
+      worker: langmuir-ingest-gr-t544
+      date: '2026-08-07'
+      evidence:
+        page: '519'
+        table: 4, 5
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: 4, 5
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6412_14_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.4; l(g) 144.2
+
+      t(min) 10; l0(g) 150.2; l(g) 141.1
+
+      t(min) 15; l0(g) 150.3; l(g) 137.3'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '517'
+    table: '1'
+    note: Melt 6412-14
+    source_path: tables/kems-001-homma-1966/table-1.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_1_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 149.6; l(g) 146.5
+
+      t(min) 10; l0(g) 151.0; l(g) 144.6
+
+      t(min) 15; l0(g) 150.6; l(g) 142.1'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '517'
+    table: '1'
+    note: Melt 6502-1
+    source_path: tables/kems-001-homma-1966/table-1.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_masses_6502_2_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.1; l(g) 146.1
+
+      t(min) 10; l0(g) 149.6; l(g) 143.3
+
+      t(min) 15; l0(g) 149.6; l(g) 142.6'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '517'
+    table: '1'
+    note: Melt 6502-2
+    source_path: tables/kems-001-homma-1966/table-1.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_olette_alpha_exp_table1
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '115'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Per-run experimental scatter large (79–233); theoretical Olette value 1095 ≫ experimental — authors attribute
+        to surface depletion (Ward Cs/Cm)
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    table: '1'
+    line_range: 162-164
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_olette_class_fence_b1
+  experiment_id: 10.2320/jinstmet1952.30.6_515::docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '115'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    paragraph: Olette relative evaporation coefficient
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_olette_class_fence_quoted_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '115'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical alpha uncertainty printed in table.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: alpha_Mn(exp.) 115
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-001-homma-1966::homma_1966_mn_olette_class_fence_b1
+    decided_by:
+      worker: langmuir-ingest-gr-t544
+      date: '2026-08-07'
+      evidence:
+        page: '517'
+        table: '1'
+        source_path: tables/kems-001-homma-1966/table-1.csv
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '517'
+    table: '1'
+    source_path: tables/kems-001-homma-1966/table-1.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_olette_experimental_quoted_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '115'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical alpha uncertainty printed in table.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 'printed_row,6502-1,6502-1,6502-1,6502-2,6502-2,6502-2,6412-14,6412-14,6412-14
+
+      mother_alloy_%Mn,1.05,,,1.74,,,2.89,,
+
+      t(min),5,10,15,5,10,15,5,10,15
+
+      %Mn,0.22,0.046,0.013,0.37,0.083,0.035,0.40,0.053,0.013
+
+      l0(g),149.6,151.0,150.6,150.1,149.6,149.6,150.4,150.2,150.3
+
+      l(g),146.5,144.6,142.1,146.1,143.3,142.6,144.2,141.1,137.3
+
+      alpha_Mn(exp.),115,99,91,113,122,119,233,115,79
+
+      alpha_Mn(theo.),1095,,,,,,,,
+
+      lambda_Mn,124,,,115,,,150,,
+
+      k_Mn(exp.),0.013,0.014,0.013,0.016,0.013,0.012,0.021,0.015,0.017
+
+      k_Mn(theo.),0.0074,0.0066,0.0064,0.012,0.010,0.010,0.017,0.015,0.015
+
+      omega_Mn,0.015,0.014,0.014,0.019,0.019,0.018,0.023,0.021,0.021
+
+      '
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-001-homma-1966::homma_1966_mn_olette_alpha_exp_table1
+    decided_by:
+      worker: langmuir-ingest-gr-t544
+      date: '2026-08-07'
+      evidence:
+        page: '517'
+        table: '1'
+        source_path: tables/kems-001-homma-1966/table-1.csv
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '517'
+    table: '1'
+    source_path: tables/kems-001-homma-1966/table-1.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_olette_theoretical_quoted_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for theoretical coefficient.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '517'
+    table: '1'
+    source_path: tables/kems-001-homma-1966/table-1.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_mn_specific_evaporation_constant
+  experiment_id: 10.2320/jinstmet1952.30.6_515::4
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 4 per-melt values; abstract quotes ranges over initial 10–15 min first-order window
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    table: '4'
+    paragraph: English abstract specific evaporation constants
+    line_range: 5-7
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_fitted_constants_quoted_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::5
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Sn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No fitted-constant uncertainty printed in tables.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-001-homma-1966::homma_1966_sn_specific_evaporation_constant
+    decided_by:
+      worker: langmuir-ingest-gr-t544
+      date: '2026-08-07'
+      evidence:
+        page: '519'
+        table: '5'
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '519'
+    table: '5'
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_14_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Sn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.3; l(g) 147.7
+
+      t(min) 10; l0(g) 150.1; l(g) 146.3
+
+      t(min) 15; l0(g) 148.1; l(g) 143.0
+
+      t(min) 20; l0(g) 148.5; l(g) 142.4'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    note: Melt 6503-14
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6503_15_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Sn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 151.5; l(g) 149.4
+
+      t(min) 10; l0(g) 150.7; l(g) 147.3
+
+      t(min) 15; l0(g) 151.8; l(g) 146.7
+
+      t(min) 20; l0(g) 151.1; l(g) 146.0'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    note: Melt 6503-15
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_masses_6504_1_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Sn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical mass uncertainty printed.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 't(min) 5; l0(g) 150.1; l(g) 144.7
+
+      t(min) 10; l0(g) 150.1; l(g) 145.5
+
+      t(min) 15; l0(g) 150.0; l(g) 144.1
+
+      t(min) 20; l0(g) 149.8; l(g) 144.3'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    note: Melt 6504-1
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_olette_alpha_exp_table3
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Sn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '19'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: PDF p. 4 / printed p. 518
+    table: '3'
+    line_range: 174-176
+    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_olette_class_fence_b1
+  experiment_id: 10.2320/jinstmet1952.30.6_515::docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Sn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '19'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    paragraph: Olette relative evaporation coefficient
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_olette_class_fence_quoted_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Sn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '19'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical alpha uncertainty printed in table.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: alpha_Sn(exp.) 19
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-001-homma-1966::homma_1966_sn_olette_class_fence_b1
+    decided_by:
+      worker: langmuir-ingest-gr-t544
+      date: '2026-08-07'
+      evidence:
+        page: '518'
+        table: '3'
+        source_path: tables/kems-001-homma-1966/table-3.csv
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_olette_experimental_quoted_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Sn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '19'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical alpha uncertainty printed in table.
+      temperature_C: 20
+      locator:
+        page: '515'
+        section: II
+      quote: つぎに真空に排気し1600°C±20°Cに5minないし20min保持し
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 'printed_row,6503-15,6503-15,6503-15,6503-15,6503-14,6503-14,6503-14,6503-14,6504-1,6504-1,6504-1,6504-1
+
+      mother_alloy_%Sn,0.98,,,,1.84,,,,3.13,,,
+
+      t(min),5,10,15,20,5,10,15,20,5,10,15,20
+
+      %Sn,0.77,0.65,0.43,0.45,1.57,1.14,1.06,0.88,2.24,1.98,1.54,1.70
+
+      l0(g),151.5,150.7,151.8,151.1,150.3,150.1,148.1,148.5,150.1,150.1,150.0,149.8
+
+      l(g),149.4,147.3,146.7,146.0,147.7,146.3,143.0,142.4,144.7,145.5,144.1,144.3
+
+      alpha_Sn(exp.),19,24,31,27,23,28,22,24,13,23,33,28
+
+      alpha_Sn(theo.),20,,,,,,,,,,,
+
+      lambda_Sn,19,,,,15,,,,18,,,
+
+      k_Sn(exp.),0.055,0.053,0.040,0.043,0.092,0.050,0.059,0.053,0.099,0.066,0.052,0.057
+
+      k_Sn(theo.),0.058,0.057,0.057,0.057,0.066,0.064,0.064,0.063,0.076,0.074,0.072,0.073
+
+      omega_Sn,0.061,0.060,0.059,0.059,0.084,0.082,0.082,0.081,0.081,0.080,0.077,0.078
+
+      '
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-001-homma-1966::homma_1966_sn_olette_alpha_exp_table3
+    decided_by:
+      worker: langmuir-ingest-gr-t544
+      date: '2026-08-07'
+      evidence:
+        page: '518'
+        table: '3'
+        source_path: tables/kems-001-homma-1966/table-3.csv
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_olette_theoretical_quoted_deep
+  experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Sn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed for theoretical coefficient.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    page: '518'
+    table: '3'
+    source_path: tables/kems-001-homma-1966/table-3.csv
+  read_from: pdf:kems-001-homma-1966
+- observation_id: kems-001-homma-1966::homma_1966_sn_specific_evaporation_constant
+  experiment_id: 10.2320/jinstmet1952.30.6_515::5
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Sn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-001-homma-1966
+  locator:
+    table: '5'
+    line_range: 216-218
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  read_from: pdf:kems-001-homma-1966

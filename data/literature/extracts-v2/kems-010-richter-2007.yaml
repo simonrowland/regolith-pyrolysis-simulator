@@ -1,0 +1,1734 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-010-richter-2007.yaml
+observations:
+- observation_id: kems-010-richter-2007::richter_2007_al_non_loss_until_mg_exhausted
+  experiment_id: 10.1016/j.gca.2007.09.005::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Al
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    figure: '2'
+    paragraph: Calcium and aluminum show no significant evaporation loss until virtually all magnesium has evaporated
+    section: 4.1 Evaporation rates of silicon and magnesium
+    line_range: '146'
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_al_quoted_non_loss_bound
+  experiment_id: 10.1016/j.gca.2007.09.005::docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Al
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: Calcium and aluminum are sufficiently refractory that they do not experience any significant loss by evaporation
+      until virtually all of the magnesium has evaporated.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-010-richter-2007::richter_2007_al_non_loss_until_mg_exhausted
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        published_page: 5551
+        section: 4.1. Evaporation kinetics
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    published_page: 5551
+    section: 4.1. Evaporation kinetics
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_ca_non_loss_until_mg_exhausted
+  experiment_id: 10.1016/j.gca.2007.09.005::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ca
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    figure: '2'
+    paragraph: Calcium and aluminum show no significant evaporation loss until virtually all magnesium has evaporated
+    section: 4.1 Evaporation rates of silicon and magnesium
+    line_range: '146'
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_ca_quoted_non_loss_bound
+  experiment_id: 10.1016/j.gca.2007.09.005::docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ca
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+    attribution: Calcium and aluminum are sufficiently refractory that they do not experience any significant loss by evaporation
+      until virtually all of the magnesium has evaporated.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-010-richter-2007::richter_2007_ca_non_loss_until_mg_exhausted
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        published_page: 5551
+        section: 4.1. Evaporation kinetics
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    published_page: 5551
+    section: 4.1. Evaporation kinetics
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_mg_cai_langmuir_alpha_arrhenius
+  experiment_id: 10.1016/j.gca.2007.09.005::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      E_uncertainty_J_per_mol: '53000'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    figure: '3'
+    line_range: 447-448
+    note: vacuum free evaporation; γ_Mg = γo exp(-E/RT)
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_mg_quoted_fits
+  experiment_id: 10.1016/j.gca.2007.09.005::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      alpha_E_kJ_per_mol: '53'
+      flux_E_kJ_per_mol: '63'
+      convention: 2σ
+      quote: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0 = 25.3,
+        E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes are 2σ
+      flux_quote: The fits to the data correspond to J = J0e−E/RT with J0 = 3.81 × 10⁶ mol cm−2 s−1, E = 551 ± 63 kJ mol−1
+        for magnesium; J0 = 4.17 × 10⁷ mol cm−2 s−1, E = 576 ± 36 kJ mol−1 for silicon. All uncertainties and error envelopes
+        are 2σ
+      alpha_locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5553
+        figure: '3'
+      flux_locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5552
+        figure: '2'
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-010-richter-2007::richter_2007_mg_cai_langmuir_alpha_arrhenius
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        published_page: 5553
+        figure: '3'
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    published_page: 5553
+    figure: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_mg_rate_series_geometry
+  experiment_id: 10.1016/j.gca.2007.09.005::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    figure: '2'
+    line_range: 183-191
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_mg_table1_numeric_areas_b1
+  experiment_id: 10.1016/j.gca.2007.09.005::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    table: '1'
+    paragraph: Init/Final area mm2 columns
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_mg_table1_quoted_series
+  experiment_id: 10.1016/j.gca.2007.09.005::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger uncertainty,
+        evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by ~10%, mostly because
+        of uncertainty in surface areas.
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5550
+        table: '1'
+        paragraph: footnote a
+      quote: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger uncertainty,
+        evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by ~10%, mostly because
+        of uncertainty in surface areas.
+      flux_relative_percent: '10'
+      delta25Mg_permil_by_sample:
+      - sample: R3-10
+        delta25Mg_permil: '0.007'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-10
+        quote: 8.135 ± 0.007
+      - sample: R3-11
+        delta25Mg_permil: '0.02'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-11
+        quote: 25.810 ± 0.020
+      - sample: R3-15
+        delta25Mg_permil: '0.023'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-15
+        quote: 47.733 ± 0.023
+      - sample: R3-9
+        delta25Mg_permil: '0.017'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-9
+        quote: 43.265 ± 0.017
+      - sample: R-6
+        delta25Mg_permil: '0.025'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-6
+        quote: 0.130 ± 0.025
+      - sample: R-3
+        delta25Mg_permil: '0.009'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-3
+        quote: 1.723 ± 0.009
+      - sample: R-2
+        delta25Mg_permil: '0.044'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-2
+        quote: 5.494 ± 0.044
+      - sample: R-18
+        delta25Mg_permil: '0.032'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-18
+        quote: 17.059 ± 0.032
+      - sample: R-4
+        delta25Mg_permil: '0.042'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-4
+        quote: 18.681 ± 0.042
+      - sample: R3-14
+        delta25Mg_permil: '0.031'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R3-14
+        quote: 25.372 ± 0.031
+      - sample: R2-1
+        delta25Mg_permil: '0.063'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-1
+        quote: 69.148 ± 0.063
+      - sample: R-7
+        delta25Mg_permil: '0.044'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-7
+        quote: 10.574 ± 0.044
+      - sample: R-8
+        delta25Mg_permil: '0.029'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-8
+        quote: 0.935 ± 0.029
+      - sample: R-9
+        delta25Mg_permil: '0.027'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-9
+        quote: 3.547 ± 0.027
+      - sample: R-11
+        delta25Mg_permil: '0.028'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R-11
+        quote: 7.689 ± 0.028
+      - sample: R2-4
+        delta25Mg_permil: '0.083'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-4
+        quote: 18.867 ± 0.083
+      - sample: R2-21
+        delta25Mg_permil: '0.044'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-21
+        quote: 0.209 ± 0.044
+      - sample: R2-20
+        delta25Mg_permil: '0.044'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-20
+        quote: 20.574 ± 0.044
+      - sample: R2-18
+        delta25Mg_permil: '0.097'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-18
+        quote: 15.661 ± 0.097
+      - sample: R2-10
+        delta25Mg_permil: '0.091'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-10
+        quote: 6.246 ± 0.091
+      - sample: R2-16
+        delta25Mg_permil: '0.051'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-16
+        quote: 41.201 ± 0.051
+      - sample: R2-11
+        delta25Mg_permil: '0.05'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-11
+        quote: 16.401 ± 0.050
+      - sample: R2-12
+        delta25Mg_permil: '0.116'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5549
+          table: '1'
+          paragraph: R2-12
+        quote: 34.976 ± 0.116
+      - sample: R3-2
+        delta25Mg_permil: '0.014'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-2
+        quote: –0.105 ± 0.014
+      - sample: R3-1
+        delta25Mg_permil: '0.006'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-1
+        quote: 6.188 ± 0.006
+      - sample: R3-20
+        delta25Mg_permil: '0.053'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-20
+        quote: 12.337 ± 0.053
+      - sample: R3-4
+        delta25Mg_permil: '0.023'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-4
+        quote: 19.861 ± 0.023
+      - sample: R3-19
+        delta25Mg_permil: '0.042'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-19
+        quote: 11.887 ± 0.042
+      - sample: R3-18
+        delta25Mg_permil: '0.023'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-18
+        quote: 17.946 ± 0.023
+      - sample: R3-8
+        delta25Mg_permil: '0.016'
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5550
+          table: '1'
+          paragraph: R3-8
+        quote: 32.359 ± 0.016
+      isotope_convention:
+        value: 2σ
+        locator:
+          source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+          published_page: 5555
+          figure: '5'
+        quote: 2σ uncertainties are plotted, but they are smaller than the symbols for most of the new data reported in this
+          work.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Experimental conditions of vacuum evaporation experiments, elemental and isotopic composition of the evaporation
+      residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-010-richter-2007::richter_2007_mg_rate_series_geometry
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        published_page: 5549
+        table: '1'
+        note: Continued on printed page 5550; per-point locators
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    published_page: 5549
+    table: '1'
+    note: Continued on printed page 5550; per-point locators
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
+  experiment_id: 10.1016/j.gca.2007.09.005::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      E_uncertainty_J_per_mol: '37000'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    figure: '3'
+    line_range: 447-448
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_sio_quoted_fits
+  experiment_id: 10.1016/j.gca.2007.09.005::3
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      alpha_E_kJ_per_mol: '37'
+      flux_E_kJ_per_mol: '36'
+      convention: 2σ
+      quote: The combined vacuum and finite hydrogen pressure data are fit by the functional form γ = γ0e−E/RT with γ0 = 25.3,
+        E = 92 ± 37 kJ mol−1 for γSi; γ0 = 143, E = 121 ± 53 kJ mol−1 for γMg. All uncertainties and error envelopes are 2σ
+      flux_quote: The fits to the data correspond to J = J0e−E/RT with J0 = 3.81 × 10⁶ mol cm−2 s−1, E = 551 ± 63 kJ mol−1
+        for magnesium; J0 = 4.17 × 10⁷ mol cm−2 s−1, E = 576 ± 36 kJ mol−1 for silicon. All uncertainties and error envelopes
+        are 2σ
+      alpha_locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5553
+        figure: '3'
+      flux_locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5552
+        figure: '2'
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-010-richter-2007::richter_2007_sio_cai_langmuir_alpha_arrhenius
+    decided_by:
+      worker: ocr-phase2b-gk
+      date: '2026-08-03'
+      evidence:
+        published_page: 5553
+        figure: '3'
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    published_page: 5553
+    figure: '3'
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_sio_table1_quoted_series
+  experiment_id: 10.1016/j.gca.2007.09.005::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger uncertainty,
+        evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by ~10%, mostly because
+        of uncertainty in surface areas.
+      locator:
+        source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+        published_page: 5550
+        table: '1'
+        paragraph: footnote a
+      quote: Estimated uncertainties are 20% for 1 mm diameter samples and 10% for larger samples. Because of the larger uncertainty,
+        evaporation rates are not reported for 1 mm samples; the rates for larger samples are uncertain by ~10%, mostly because
+        of uncertainty in surface areas.
+      flux_relative_percent: '10'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Experimental conditions of vacuum evaporation experiments, elemental and isotopic composition of the evaporation
+      residues, and calculated evaporation rates of magnesium and silicon from a Type B CAI-like melt
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    published_page: 5549
+    table: '1'
+    note: Continued on printed page 5550; per-point locators
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_table2_3537_1
+  experiment_id: 10.1016/j.gca.2007.09.005::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    published_page: 5559
+    table: '2'
+    paragraph: 3537-1
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_table2_e107
+  experiment_id: 10.1016/j.gca.2007.09.005::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    published_page: 5559
+    table: '2'
+    paragraph: E107
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_table2_f2_ts65
+  experiment_id: 10.1016/j.gca.2007.09.005::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    published_page: 5559
+    table: '2'
+    paragraph: F2 (TS65)
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_table2_golfball
+  experiment_id: 10.1016/j.gca.2007.09.005::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    published_page: 5559
+    table: '2'
+    paragraph: Golfball
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_table2_ts33
+  experiment_id: 10.1016/j.gca.2007.09.005::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    published_page: 5559
+    table: '2'
+    paragraph: TS33
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  read_from: pdf:kems-010-richter-2007
+- observation_id: kems-010-richter-2007::richter_2007_table2_ts34
+  experiment_id: 10.1016/j.gca.2007.09.005::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-010-richter-2007
+  locator:
+    published_page: 5559
+    table: '2'
+    paragraph: TS34
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  read_from: pdf:kems-010-richter-2007

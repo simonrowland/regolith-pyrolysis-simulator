@@ -1,0 +1,373 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2343/geochemj.17.111
+  citation: Hashimoto, A. (1983), "Evaporation metamorphism in the early solar nebula — evaporation experiments on the melt
+    FeO-MgO-SiO2-CaO-Al2O3 and chemical fractionations of primitive materials", Geochem. J. 17:111-145
+  source_ids:
+  - kems-015-hashimoto-1983
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-015-hashimoto-1983
+      role: pdf
+      path: raw/kems-015-hashimoto-1983/kems-015-hashimoto-1983.pdf
+      sha256:
+        tag: value
+        value: d0948c1e8d6d843e9e30d8d85c6c25c9a0e5e7c9b97f6d55d6429132107d7af7
+    - asset_id: pdftotext:kems-015-hashimoto-1983
+      role: pdftotext
+      path: text/kems-015-hashimoto-1983
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-015-hashimoto-1983
+      role: table_csv
+      path: tables/kems-015-hashimoto-1983
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2343/geochemj.17.111
+experiments:
+- experiment_id: 10.2343/geochemj.17.111::1
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.01333223684210526315789473684'
+      locator:
+        paragraph: Vacuum was kept by diffusion pump; vacuum level about 10^-4 Torr during experiments
+        line_range: 80-160
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state flow regime
+  work_id: 10.2343/geochemj.17.111
+  locator:
+    figure: '1'
+    section: EXPERIMENTS
+    line_range: 33-90
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        figure: '1'
+        paragraph: Graphite crucible; high purity graphite block
+        line_range: 70-74
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+- experiment_id: 10.2343/geochemj.17.111::10
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2343/geochemj.17.111
+  locator:
+    published_page: 123
+    pdf_page_index: 13
+    figure: '10'
+    paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+    note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+- experiment_id: 10.2343/geochemj.17.111::2
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2343/geochemj.17.111
+  locator:
+    published_page: 114
+    pdf_page_index: 4
+    table: '2'
+    note: Heating conditions and run notations
+- experiment_id: 10.2343/geochemj.17.111::3
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.01333223684210526315789473684'
+      locator:
+        published_page: 118
+        pdf_page_index: 8
+        paragraph: The vacuum level in the chamber was about 10^-4 Torr during the experiments
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state flow regime
+  work_id: 10.2343/geochemj.17.111
+  locator:
+    published_page: 116
+    pdf_page_index: 6
+    table: '3'
+    note: Summary of experimental results; residue bulk composition vs VF, T, t
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade block)
+      locator:
+        published_page: 113
+        pdf_page_index: 3
+        figure: '1'
+        paragraph: crucible made of a high purity graphite block commonly used in atomic piles
+- experiment_id: 10.2343/geochemj.17.111::4
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2343/geochemj.17.111
+  locator:
+    published_page: 118
+    pdf_page_index: 8
+    table: '4'
+    note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+- experiment_id: 10.2343/geochemj.17.111::5
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2343/geochemj.17.111
+  locator:
+    published_page: 122
+    pdf_page_index: 12
+    table: '5'
+    note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+- experiment_id: 10.2343/geochemj.17.111::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermodynamic_tabulation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2343/geochemj.17.111
+  locator:
+    published_page: 124
+    pdf_page_index: 14
+    table: '6'
+    note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+- experiment_id: 10.2343/geochemj.17.111::9
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2343/geochemj.17.111
+  locator:
+    published_page: 123
+    pdf_page_index: 13
+    figure: '9'
+    paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+    note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+- experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0013'
+      locator:
+        paragraph: Prior to evaporation, the pressure in the chamber was 1.3e-8 bar
+        source_path: docs-private/research/ocr-artifacts/kems-005-fedkin-2006/spool/out/kems-005-fedkin-2006/vlm/kems-005-fedkin-2006.md
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state flow regime
+  work_id: 10.2343/geochemj.17.111
+  locator:
+    paragraph: molten spherule free evaporation graphite crucible
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity graphite crucible (atomic-pile grade)
+      locator:
+        paragraph: graphite crucible
+        source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+- experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2343/geochemj.17.111
+  locator:
+    published_page: 128
+    pdf_page_index: 18
+    equation: '14'
+    note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed in eqn
+      (16); the assumed-unity sentences continue on later Stage II/III/IV pages.

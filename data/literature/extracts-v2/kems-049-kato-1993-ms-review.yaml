@@ -1,0 +1,2033 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-049-kato-1993-ms-review.yaml
+observations:
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_fig3_fe_v_integration_figure_only
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::3
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: V
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only reprint
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 300
+    pdf_page_index: 4
+    figure: '3'
+    note: Belton-Fruehan integration curve Fe-V at 1600 C (Furukawa and Kato)
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_fig5_fe_p_p_p2_figure_only
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::5
+  identity:
+    quantity: p_partial
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only reprint; error bars visible, not digitised
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 304
+    pdf_page_index: 8
+    figure: '5'
+    note: Vapor pressures of P, P2 from Fe-P alloys (Yamamoto et al.)
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_fig6_fe_mo_ion_intensity_figure_only
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::6
+  identity:
+    quantity: p_sat
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only reprint
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 304
+    pdf_page_index: 8
+    figure: '6'
+    note: log I_Fe T vs 1/T for Fe in low Mo (Ichise et al.)
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_fig7_fe_ge_ion_ratio_figure_only
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::7
+  identity:
+    quantity: ion_intensity_ratio
+    species:
+      formula: Ge
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only reprint; N_Ge labels are axis annotations, not extracted as a numeric series
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 311
+    pdf_page_index: 15
+    figure: '7'
+    note: ln(I_Fe+/I_Ge+) vs 10^4/T for Fe-Ge (Nunoue and Kato)
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_fig8_fe_ge_phase_diagram_figure_only
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::8
+  identity:
+    quantity: transition_temperature
+    species:
+      formula: Ge
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: value
+      value: phase_boundary
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only reprint
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 311
+    pdf_page_index: 15
+    figure: '8'
+    note: Fe-Ge phase equilibria summary (Nunoue and Kato) with overlays
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_p300_al2o3_cell_a_al_model_derived
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Al
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: computed illustration; no numeric +/- printed
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 300
+    pdf_page_index: 4
+    section: 2.3 Compatibility of cell material with samples
+    note: calculated a_Al in Fe in equilibrium with Al2O3 at the Fe-V example pO2
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_al_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Al
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Al vapor pressure at 1873 K = 1.8 × 10^{2} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_au_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Au
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Au vapor pressure at 1873 K = 8.1 Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_co_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Co
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Co vapor pressure at 1873 K = 3.7 Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_cr_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Cr vapor pressure at 1873 K = 2.5 × 10^{1} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_cu_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Cu
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Cu vapor pressure at 1873 K = 1.2 × 10^{2} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_fe_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Fe vapor pressure at 1873 K = 8.0 Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ge_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Ge
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Ge vapor pressure at 1873 K = 4.6 × 10^{1} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_mn_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Mn vapor pressure at 1873 K = 5.2 × 10^{3} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_mo_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Mo
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Mo vapor pressure at 1873 K = 2.1 × 10^{-6} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_nb_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Nb
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Nb vapor pressure at 1873 K = 1.0 × 10^{-7} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ni_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Ni
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Ni vapor pressure at 1873 K = 3.8 Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_p_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 P vapor pressure at 1873 K = 1.4 × 10^{-4} Pa (1 mass%)
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_pd_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Pd
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Pd vapor pressure at 1873 K = 7.3 Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_s_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 S vapor pressure at 1873 K = 1.7 Pa (1 mass%)
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_si_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Si
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Si vapor pressure at 1873 K = 8.8 × 10^{-1} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_sn_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Sn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Sn vapor pressure at 1873 K = 1.2 × 10^{2} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ta_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Ta
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Ta vapor pressure at 1873 K = 4.3 × 10^{-10} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_ti_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: Ti
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Ti vapor pressure at 1873 K = 1.5 × 10^{-1} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_v_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: V
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 V vapor pressure at 1873 K = 2.0 × 10^{-2} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review
+- observation_id: kems-049-kato-1993-ms-review::kato_1993_table1_w_psat_1873k
+  experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: W
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on the Psat column
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_unattributed
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-049-kato-1993-ms-review
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 W vapor pressure at 1873 K = 6.7 × 10^{-11} Pa
+  read_from: pdf:kems-049-kato-1993-ms-review

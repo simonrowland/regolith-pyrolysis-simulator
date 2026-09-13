@@ -1,0 +1,268 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2320/jinstmet1952.30.6_515
+  citation: Homma, M., Ohno, R. & Ishida, T. (1966), "Evaporation of Manganese, Copper and Tin from Molten Iron under Vacuum",
+    J. Japan Inst. Metals 30:515–520, DOI 10.2320/jinstmet1952.30.6_515
+  source_ids:
+  - kems-001-homma-1966
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-001-homma-1966
+      role: pdf
+      path: raw/kems-001-homma-1966/kems-001-homma-1966.pdf
+      sha256:
+        tag: value
+        value: 697fe8c64d73886a86ae4b171613cf0aead21df80405d81f3458d3c446c21d14
+    - asset_id: pdftotext:kems-001-homma-1966
+      role: pdftotext
+      path: text/kems-001-homma-1966
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-001-homma-1966
+      role: table_csv
+      path: tables/kems-001-homma-1966
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2320/jinstmet1952.30.6_515
+experiments:
+- experiment_id: 10.2320/jinstmet1952.30.6_515::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'olette_relative_evaporation_coefficient' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    table: '1'
+    line_range: 162-164
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+- experiment_id: 10.2320/jinstmet1952.30.6_515::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'olette_relative_evaporation_coefficient' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: PDF pp. 3-4 / printed pp. 517-518
+    table: '2'
+    line_range: 166-168
+    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+- experiment_id: 10.2320/jinstmet1952.30.6_515::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'olette_relative_evaporation_coefficient' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: PDF p. 4 / printed p. 518
+    table: '3'
+    line_range: 174-176
+    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-001-homma-1966/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+- experiment_id: 10.2320/jinstmet1952.30.6_515::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_induction_free_evaporation_steel_melt' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '1.333223684210526315789473684'
+      locator:
+        paragraph: 溶解中の真空度は 10^{-2} ~ 10^{-3} mmHg
+        line_range: '29'
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state flow regime
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    table: '4'
+    paragraph: English abstract specific evaporation constants
+    line_range: 5-7
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 120 mm)
+      locator:
+        paragraph: 市販アルミナるつぼ (CP-2)
+        line_range: '27'
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+- experiment_id: 10.2320/jinstmet1952.30.6_515::4, 5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_induction_free_evaporation_steel_melt' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    page: '519'
+    table: 4, 5
+- experiment_id: 10.2320/jinstmet1952.30.6_515::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_induction_free_evaporation_steel_melt' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    table: '5'
+    line_range: 216-218
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+- experiment_id: 10.2320/jinstmet1952.30.6_515::docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'vacuum_induction_free_evaporation_steel_melt' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.30.6_515
+  locator:
+    paragraph: alumina crucible CP-2 ID 38 mm
+    source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 120 mm)
+      locator:
+        paragraph: crucible CP-2
+        source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value: '0.0011341149'
+        locator:
+          paragraph: commercial alumina crucible CP-2 ID 38 mm
+          source_path: docs-private/research/ocr-artifacts/kems-001-homma-1966/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md

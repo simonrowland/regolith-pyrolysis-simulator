@@ -1,0 +1,539 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-047-turkdogan-1984-isij.yaml
+observations:
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_COS_calculated_p
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: COS
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium at 1500 C.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '1'
+    note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+      columns. Not this work's KEMS.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '1'
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+          columns. Not this work's KEMS.
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_CS_calculated_p
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: CS
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium at 1500 C.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '1'
+    note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+      columns. Not this work's KEMS.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '1'
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+          columns. Not this work's KEMS.
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_S2_calculated_p
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: S2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium at 1500 C.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '1'
+    note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+      columns. Not this work's KEMS.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '1'
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+          columns. Not this work's KEMS.
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_SiO_calculated_p
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium at 1500 C.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '1'
+    note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+      columns. Not this work's KEMS.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '1'
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+          columns. Not this work's KEMS.
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table1_SiS_calculated_p
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::1
+  identity:
+    quantity: p_sat
+    species:
+      formula: SiS
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1773.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed. Authors state calculations for assumed local equilibrium at 1500 C.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '1'
+    note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+      columns. Not this work's KEMS.
+  read_from: pdf:kems-047-turkdogan-1984-isij
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1773.15'
+      locator:
+        published_page: 607
+        pdf_page_index: 17
+        table: '1'
+        note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+          columns. Not this work's KEMS.
+- observation_id: kems-047-turkdogan-1984-isij::turkdogan_1984_table2_K_calculated_p
+  experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::2
+  identity:
+    quantity: p_sat
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numerical uncertainty printed on Table 2.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-047-turkdogan-1984-isij
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '2'
+    note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5. Calculated;
+      a(K2O) from Steiler ref. 68.
+  read_from: pdf:kems-047-turkdogan-1984-isij

@@ -1,0 +1,154 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.32.1276
+  citation: Plante, E. R., Hastie, J. W. & Kowalska, M. (1992), "Activity of FeO in the FeO-MgO-SiO2 System Determined by
+    High Temperature Mass Spectrometry", ISIJ International 32(12):1276-1279, DOI 10.2355/isijinternational.32.1276
+  source_ids:
+  - kems-021-plante-1992-feo
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-021-plante-1992-feo
+      role: pdf
+      path: raw/kems-021-plante-1992-feo/kems-021-plante-1992-feo.pdf
+      sha256:
+        tag: value
+        value: ddcc0510faac28f82343525d74d6be142115a3c0aa1c71826d74e28f3ddae7f1
+    - asset_id: pdftotext:kems-021-plante-1992-feo
+      role: pdftotext
+      path: text/kems-021-plante-1992-feo
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-021-plante-1992-feo
+      role: table_csv
+      path: tables/kems-021-plante-1992-feo
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2355/isijinternational.32.1276
+experiments:
+- experiment_id: 10.2355/isijinternational.32.1276::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational.32.1276
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: tungsten outer cell with iridium inner cup
+      locator:
+        page: 1277
+        paragraph: iridium inner cup
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.0000001963495'
+        locator:
+          page: 1277
+          paragraph: The diameter of the effusion orifice was 0.5 mm
+- experiment_id: 10.2355/isijinternational.32.1276::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational.32.1276
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: tungsten outer cell with iridium inner cup
+      locator:
+        page: 1277
+        paragraph: evaporation from a tungsten cell in which the sample was in contact with an iridium inner cup
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.0000001963495'
+        locator:
+          page: 1277
+          paragraph: The diameter of the effusion orifice was 0.5 mm
+- experiment_id: 10.2355/isijinternational.32.1276::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'mixed_this_work_and_foreign_overlays' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational.32.1276
+  locator:
+    page: 1278
+    figure: '4'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md

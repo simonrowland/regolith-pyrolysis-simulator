@@ -1,0 +1,59 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: a5c796b924a40b5e0cb7067965c0b62fdad98b4ee073b4e4caa34abeb8135c34
+  citation: LH87 GeO(g); JANAF GeO(g); classical GeO sublimation measurements
+  source_ids:
+  - lh87-geo-g
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:lh87-geo-g
+      role: pdf
+      path: raw/lh87-geo-g/lh87-geo-g.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:lh87-geo-g
+      role: pdftotext
+      path: text/lh87-geo-g
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:lh87-geo-g
+      role: table_csv
+      path: tables/lh87-geo-g
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: a5c796b924a40b5e0cb7067965c0b62fdad98b4ee073b4e4caa34abeb8135c34::LH87#GeO_g
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: a5c796b924a40b5e0cb7067965c0b62fdad98b4ee073b4e4caa34abeb8135c34
+  locator:
+    note: LH87 GeO(g); JANAF GeO(g); classical GeO sublimation measurements
+    record: LH87#GeO_g

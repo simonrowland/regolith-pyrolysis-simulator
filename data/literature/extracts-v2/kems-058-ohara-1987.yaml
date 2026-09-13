@@ -1,0 +1,1507 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-058-ohara-1987.yaml
+observations:
+- observation_id: kems-058-ohara-1987::ohara_1987_cao_epsilon_p2o5
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  identity:
+    quantity: interaction_parameter
+    species:
+      formula: CaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: -23 +/- 3 (95% confidence)
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1337
+    pdf_page_index: 1
+    note: epsilon_P2O5^CaO = -23 +/- 3
+  read_from: pdf:kems-058-ohara-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643'
+      locator:
+        published_page: 1337
+        pdf_page_index: 1
+        note: epsilon_P2O5^CaO = -23 +/- 3
+- observation_id: kems-058-ohara-1987::ohara_1987_feto_t_and_pO2_gate
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: FeO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: authors state a_FetO cannot be obtained from this experiment
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1341
+    pdf_page_index: 5
+    equation: '17'
+    note: FetO t=0.95 used to estimate pO2 for L_P; a_FetO taken from Kambayashi binary, not measured here
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_fig1_a_p2o5_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: P2O5
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; scatter attributed to premelt composition variation; not digitised
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    figure: '1'
+    note: a_P2O5 vs X_P2O5 at 1370 C with CaO, MgO, MnO, SiO2 additions
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_fig2_ln_gamma_vs_Ni_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: P2O5
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only; not digitised
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1340
+    pdf_page_index: 4
+    figure: '2'
+    note: ln gamma_P2O5 vs N_i for CaO, MgO, MnO, SiO2
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_fig3_Lp_figure_only
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::3
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: P2O5
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: figure-only calculated L_P; not digitised
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1341
+    pdf_page_index: 5
+    figure: '3'
+    note: L_P vs mol% P2O5 at 1370 C
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_interaction_parameters_1643k
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  identity:
+    quantity: interaction_parameter
+    species:
+      formula: P2O5
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      epsilon_P2O5_CaO: 3
+      epsilon_P2O5_MgO: 2
+      epsilon_P2O5_MnO: 1
+      epsilon_P2O5_SiO2: 1
+      as_printed: errors are 95% confidence limits
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1337
+    pdf_page_index: 1
+    equation: '10'
+    note: Least-squares interaction parameters; also printed on pp. 1340 and 1341
+  read_from: pdf:kems-058-ohara-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643'
+      locator:
+        published_page: 1337
+        pdf_page_index: 1
+        equation: '10'
+        note: Least-squares interaction parameters; also printed on pp. 1340 and 1341
+- observation_id: kems-058-ohara-1987::ohara_1987_iwasaki_quoted_Lp
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted comparison; Iwasaki slag is much more CaO/SiO2-rich than this work
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1341
+    pdf_page_index: 5
+    note: Iwasaki et al. L_P about 5.5 x 10^2 at 1370 C vs this work samples 18-19
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_kems_geometry_and_calibration
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  identity:
+    quantity: delta_fG
+    species:
+      formula: P2O5
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1643'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Apparatus constant c about +/-15% cancelled by Fe internal standard. Geometry referred to Kambayashi 1985; orifice
+        diameter not restated here.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1338
+    pdf_page_index: 2
+    section: '2.1'
+    note: 'Method as Kambayashi et al. (ref 6): alumina Knudsen cell, Fe inner crucible, Fe(g) internal standard, 1370 C'
+  read_from: pdf:kems-058-ohara-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643'
+      locator:
+        published_page: 1338
+        pdf_page_index: 2
+        section: '2.1'
+        note: 'Method as Kambayashi et al. (ref 6): alumina Knudsen cell, Fe inner crucible, Fe(g) internal standard, 1370
+          C'
+- observation_id: kems-058-ohara-1987::ohara_1987_mgo_epsilon_p2o5
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  identity:
+    quantity: interaction_parameter
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: -20 +/- 2 (95% confidence)
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1337
+    pdf_page_index: 1
+    note: epsilon_P2O5^MgO = -20 +/- 2
+  read_from: pdf:kems-058-ohara-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643'
+      locator:
+        published_page: 1337
+        pdf_page_index: 1
+        note: epsilon_P2O5^MgO = -20 +/- 2
+- observation_id: kems-058-ohara-1987::ohara_1987_mno_epsilon_p2o5
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  identity:
+    quantity: interaction_parameter
+    species:
+      formula: MnO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: -13 +/- 1 (95% confidence)
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1337
+    pdf_page_index: 1
+    note: epsilon_P2O5^MnO = -13 +/- 1
+  read_from: pdf:kems-058-ohara-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643'
+      locator:
+        published_page: 1337
+        pdf_page_index: 1
+        note: epsilon_P2O5^MnO = -13 +/- 1
+- observation_id: kems-058-ohara-1987::ohara_1987_p2_table1_partial_pressure
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
+  identity:
+    quantity: p_partial
+    species:
+      formula: P2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no per-cell +/- on Table 1 pressures
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 ion current ratios and partial pressures at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_p4o10_sat_janaf_1643k
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  identity:
+    quantity: p_sat
+    species:
+      formula: P4O10
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: value
+      value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: JANAF extrapolation past 1500 K; no numeric +/- printed
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1338
+    pdf_page_index: 2
+    section: '2.3'
+    note: P_P4O10_sat = 700 atm (1643 K)
+  read_from: pdf:kems-058-ohara-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643'
+      locator:
+        published_page: 1338
+        pdf_page_index: 2
+        section: '2.3'
+        note: P_P4O10_sat = 700 atm (1643 K)
+- observation_id: kems-058-ohara-1987::ohara_1987_po2_table1_partial_pressure
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
+  identity:
+    quantity: p_partial
+    species:
+      formula: PO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no per-cell +/- on Table 1 pressures
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 ion current ratios and partial pressures at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_sio2_epsilon_p2o5
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  identity:
+    quantity: interaction_parameter
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile interaction_parameter does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: -4 +/- 1 (95% confidence)
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1337
+    pdf_page_index: 1
+    note: epsilon_P2O5^SiO2 = -4 +/- 1
+  read_from: pdf:kems-058-ohara-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643'
+      locator:
+        published_page: 1337
+        pdf_page_index: 1
+        note: epsilon_P2O5^SiO2 = -4 +/- 1
+- observation_id: kems-058-ohara-1987::ohara_1987_table1_ion_current_ratios_1643k
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
+  identity:
+    quantity: ion_intensity_ratio
+    species:
+      formula: P2O5
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use per
+    temperature_K:
+      tag: value
+      value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile ion_intensity_ratio does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no per-cell +/- on Table 1 ion ratios
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 ion current ratios and partial pressures at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643'
+      locator:
+        published_page: 1339
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 ion current ratios and partial pressures at 1643 K
+- observation_id: kems-058-ohara-1987::ohara_1987_table1_partial_pressures_1643k
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::1
+  identity:
+    quantity: p_partial
+    species:
+      formula: PO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1643'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no per-cell +/- on Table 1 pressures
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 ion current ratios and partial pressures at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1643'
+      locator:
+        published_page: 1339
+        pdf_page_index: 3
+        table: '1'
+        note: Table 1 ion current ratios and partial pressures at 1643 K
+- observation_id: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: P2O5
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no per-cell +/- on Table 2. Absolute a scale set by JANAF-extrapolated P_P4O10_sat = 700 atm at 1643 K.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1339
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 mol% compositions, Raoultian a_P2O5, ln gamma_P2O5, L_P at 1643 K
+  read_from: pdf:kems-058-ohara-1987
+- observation_id: kems-058-ohara-1987::ohara_1987_turkdogan_quoted_ln_gamma_eq11
+  experiment_id: 10.2355/tetsutohagane1955.73.10_1337::kems-058-ohara-1987
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: P2O5
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: quoted formula; no numeric +/- printed here
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-058-ohara-1987
+  locator:
+    published_page: 1340
+    pdf_page_index: 4
+    equation: '11'
+    note: Turkdogan formula converted to P2O5(s) standard state
+  read_from: pdf:kems-058-ohara-1987

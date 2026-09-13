@@ -1,0 +1,46 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: b5a6e1f3384a9a5fc4bd907d541ac56fc7f399cbf3fd083d586107948b5dfe00
+  citation: kelley-king-1961-usbm-b592
+  source_ids:
+  - kelley-king-1961-usbm-b592
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: pdf:kelley-king-1961-usbm-b592
+      role: pdf
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+experiments:
+- experiment_id: b5a6e1f3384a9a5fc4bd907d541ac56fc7f399cbf3fd083d586107948b5dfe00::kelley-king-1961-usbm-b592
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: b5a6e1f3384a9a5fc4bd907d541ac56fc7f399cbf3fd083d586107948b5dfe00
+  locator:
+    note: table-001-0001

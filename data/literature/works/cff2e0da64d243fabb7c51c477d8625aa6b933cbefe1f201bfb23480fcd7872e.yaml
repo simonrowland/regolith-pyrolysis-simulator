@@ -1,0 +1,93 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e
+  citation: Wilkerson, Ryan P., Voecks, Gerald, Shulman, Holly S., Rickman, Doug L. and Effinger, Mike R. (2021), Characterizing
+    the effects of thermal profile and gas environment on the heat treatment of JSC-1A lunar simulant using combined thermogravimetry
+    and mass spectroscopy. Prepared for the Lunar Surface Science Workshop, Fundamental and Applied Lunar Surface Research
+    in Physical Sciences, 19 August 2021. NTRS 20210020017.
+  source_ids:
+  - wilkerson-2021-jsc1a-tga-ms-poster
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+      role: pdf
+      path: raw/wilkerson-2021-jsc1a-tga-ms-poster/wilkerson-2021-jsc1a-tga-ms-poster.pdf
+      sha256:
+        tag: value
+        value: 752ac5e8705cbbee04729d55379cc6bf203ac027011f5e00c9f460676456a967
+    - asset_id: pdftotext:wilkerson-2021-jsc1a-tga-ms-poster
+      role: pdftotext
+      path: text/wilkerson-2021-jsc1a-tga-ms-poster
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:wilkerson-2021-jsc1a-tga-ms-poster
+      role: table_csv
+      path: tables/wilkerson-2021-jsc1a-tga-ms-poster
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::conclusions_total_gas_evolutions
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'tga_ms_heat_treatment_unspecified_on_table' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e
+  locator:
+    pdf_page_index: 11
+    table: conclusions_total_gas_evolutions
+    note: 'Conclusions slide table headed Species | Total Loss (wt. %). Caption: Total gas evolutions of non-lunar mineral
+      decomposition in JSC-1A. Workshop poster; no printed page numbers.'
+- experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'tga_ms_he_and_stated_equivalent_in_vacuum' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e
+  locator:
+    pdf_page_index: 4
+    section: Integrated Mass Spectroscopy
+    note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'

@@ -1,0 +1,59 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 9d325ab768d14241d47a22b33e1dff75ffdaa129bf095a8891b3095cd76c6c22
+  citation: Measured P4O6 vaporization (recover primary); SF18-T5 carrier role is review-only. JANAF if tables exist for P4O6(g).
+  source_ids:
+  - pending-p4o6-vp
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:pending-p4o6-vp
+      role: pdf
+      path: raw/pending-p4o6-vp/pending-p4o6-vp.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:pending-p4o6-vp
+      role: pdftotext
+      path: text/pending-p4o6-vp
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pending-p4o6-vp
+      role: table_csv
+      path: tables/pending-p4o6-vp
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 9d325ab768d14241d47a22b33e1dff75ffdaa129bf095a8891b3095cd76c6c22::PENDING#P4O6_VP
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 9d325ab768d14241d47a22b33e1dff75ffdaa129bf095a8891b3095cd76c6c22
+  locator:
+    note: Measured P4O6 vaporization (recover primary); SF18-T5 carrier role is review-only. JANAF if tables exist for P4O6(g).
+    record: PENDING#P4O6_VP

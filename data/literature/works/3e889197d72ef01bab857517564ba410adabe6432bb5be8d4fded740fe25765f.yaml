@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 3e889197d72ef01bab857517564ba410adabe6432bb5be8d4fded740fe25765f
+  citation: Second lab series for Re2O7 (search post-1952 effusion); or JANAF Re2O7 thermochemistry if not used in fit. Smith
+    et al. 1952 is likely the fit source — need non-Smith primary for validated flip.
+  source_ids:
+  - pending-re2o7-second-series
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:pending-re2o7-second-series
+      role: pdf
+      path: raw/pending-re2o7-second-series/pending-re2o7-second-series.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:pending-re2o7-second-series
+      role: pdftotext
+      path: text/pending-re2o7-second-series
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pending-re2o7-second-series
+      role: table_csv
+      path: tables/pending-re2o7-second-series
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 3e889197d72ef01bab857517564ba410adabe6432bb5be8d4fded740fe25765f::PENDING#Re2O7_second_series
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 3e889197d72ef01bab857517564ba410adabe6432bb5be8d4fded740fe25765f
+  locator:
+    note: Second lab series for Re2O7 (search post-1952 effusion); or JANAF Re2O7 thermochemistry if not used in fit. Smith
+      et al. 1952 is likely the fit source — need non-Smith primary for validated flip.
+    record: PENDING#Re2O7_second_series

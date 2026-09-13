@@ -1,0 +1,1178 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-026-markova-1984.yaml
+observations:
+- observation_id: kems-026-markova-1984::markova_1984_Fe_more_volatile_than_silica
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Qualitative ranking from the experiments; no numeric p(Fe) in this abstract.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    paragraph: As the experiments show, iron is more volatile than silica, but we haven't any signs of its depletion
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_K_dissipation_1500C_reduced_lunar_mass_model
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Model percentage as printed; curve in Fig. 2 not digitised.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    paragraph: dissipation for SiO-2%, K-3%, Na-14%
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_Mg_completely_in_melt_at_1500C
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
+  identity:
+    quantity: p_partial
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Qualitative split only; not a tabulated P(T) point.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source admission_status=qualitative_not_numeric is not a closed v2.1 token
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    paragraph: silica is partially in vapor as Mg is completely in melt
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_SiO_dissipation_1500C_reduced_lunar_mass_model
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Model percentage as printed; curve in Fig. 2 not digitised.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    paragraph: dissipation for SiO-2%, K-3%, Na-14%
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_dissipation_1500C_recent_moon_model
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Authors print ~2% and ~1%; no numeric uncertainty.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    paragraph: Only for Na the level of dissipation reaches ~2%, for the others it is significantly less than ~1%
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_dissipation_1500C_reduced_lunar_mass_model
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Model percentages as printed; no numeric uncertainty. Fig. 2 is the curve form of the same calculation and was
+        not digitised.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    paragraph: dissipation for SiO-2%, K-3%, Na-14%
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_fig1_ternary_residual_tracks_figure_only
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Figure-only; tracks not digitised.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    figure: '1'
+    note: THE TRENDS OF THE COMPOSITIONAL EVOLUTION DURING THE VAPORIZATION IN COMPARISON WITH THE COMPOSITION OF LUNAR HIGHLAND
+      ROCKS
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_fig2_dissipation_curves_figure_only
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Figure-only model curves; not digitised. 1500 C intercepts are printed in the text (Na 14%, K 3%, SiO 2%).
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    figure: '2'
+    note: CURVES OF THE DISSIPATION LEVELS OF THE VOLATILE PETROGENIC COMPONENTS IN DEPENDENCE ON TEMPERATURE FOR THE LUNAR
+      MASS 3.53e25 g AND ESCAPE VELOCITY 1.88 km/sek
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_kems_method_stepwise_heating
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty printed for the temperature step or duration.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    paragraph: The experiments were carried out in the step-wise heating regime till the complete vaporization of the sample
+      under study
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_residual_enrichment_Ca_Ti_Al
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Al2O3
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Qualitative ranking in the text; numeric Al2O3 wt% is in Table 2.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    paragraph: the residual melts are depleted in Na, K, Fe and Si and are enriched in Ca, Ti and Al
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_silica_partially_in_vapor_at_1500C
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
+  identity:
+    quantity: p_partial
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Qualitative split only; not a tabulated P(T) point.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source admission_status=qualitative_not_numeric is not a closed v2.1 token
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    paragraph: If the temperature of the lunar surface (magmatic ocean) and vapor ~1500 C silica is partially in vapor as
+      Mg is completely in melt
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_table1_initial_sample_compositions
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Column totals are printed under the table (100.05, 99.9, 99.25, 96.30, 100.10,
+        95.9, 97.17) and are not recomputed here.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '1'
+    note: CHEMICAL COMPOSITIONS OF THE INITIAL SAMPLES TABLE 1; 400 dpi pdftoppm of corpus PDF page 2
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_VI_lherzolite
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_table2_residual_melt_V_alumina_basalt
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No per-cell uncertainty printed. Damaged-glyph corrections are in the correction ledger.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; right panel = composition V (alumina basalt)
+  read_from: pdf:kems-026-markova-1984
+- observation_id: kems-026-markova-1984::markova_1984_text_basalt_ANT_window
+  experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Window as printed; not a tabulated point series.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-026-markova-1984
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    paragraph: During the vaporization of the basalt at T= 1600 -1700 C (mass losses 15-35%) the residual compositions crosses
+      the ANT field
+  read_from: pdf:kems-026-markova-1984

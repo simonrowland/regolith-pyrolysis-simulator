@@ -1,0 +1,1346 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml
+observations:
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_co2_release_window_500_750_C
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: CO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 4
+    section: Integrated Mass Spectroscopy
+    note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_co2_total_loss_wt_pct
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::conclusions_total_gas_evolutions
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: CO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: 0.120 +/- 0.013
+      total_loss_wt_pct: '0.013'
+      note: Plus-minus printed in the conclusions table. The table does not print the thermal program or atmosphere for these
+        totals.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 11
+    table: conclusions_total_gas_evolutions
+    note: 'Conclusions slide table headed Species | Total Loss (wt. %). Caption: Total gas evolutions of non-lunar mineral
+      decomposition in JSC-1A. Workshop poster; no printed page numbers.'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_h2o_release_window_50_200_C
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: H2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 4
+    section: Integrated Mass Spectroscopy
+    note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_h2o_total_loss_wt_pct
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::conclusions_total_gas_evolutions
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: H2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: 0.160 +/- 0.014
+      total_loss_wt_pct: '0.014'
+      note: Plus-minus printed in the conclusions table. The table does not print the thermal program or atmosphere for these
+        totals.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 11
+    table: conclusions_total_gas_evolutions
+    note: 'Conclusions slide table headed Species | Total Loss (wt. %). Caption: Total gas evolutions of non-lunar mineral
+      decomposition in JSC-1A. Workshop poster; no printed page numbers.'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_he_tga_ms_co2_page4_figure_only
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: CO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: extract-pyro-simulant
+      date: '2026-09-12'
+      evidence:
+        pdf_page_index: 4
+        section: Integrated Mass Spectroscopy
+        note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 4
+    section: Integrated Mass Spectroscopy
+    note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_he_tga_ms_h2o_page4_figure_only
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: H2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: extract-pyro-simulant
+      date: '2026-09-12'
+      evidence:
+        pdf_page_index: 4
+        section: Integrated Mass Spectroscopy
+        note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 4
+    section: Integrated Mass Spectroscopy
+    note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_he_tga_ms_so2_page4_figure_only
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: extract-pyro-simulant
+      date: '2026-09-12'
+      evidence:
+        pdf_page_index: 4
+        section: Integrated Mass Spectroscopy
+        note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 4
+    section: Integrated Mass Spectroscopy
+    note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_idealized_ht_tg_page8_figure_only
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: extract-pyro-simulant
+      date: '2026-09-12'
+      evidence:
+        pdf_page_index: 8
+        section: Idealized Heat Treatment for Non-Lunar Species Removal
+        note: Printed bullets plus TG/dTG figure (figure-only curve)
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 8
+    section: Idealized Heat Treatment for Non-Lunar Species Removal
+    note: Printed bullets plus TG/dTG figure (figure-only curve)
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_arh2_750C_2hr_hold_mass_loss
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1023.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: 0.45 - 0.50 %
+      note: Printed as a range, not a plus-minus. The accompanying TG curve is figure-only and was not digitised.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 8
+    section: Idealized Heat Treatment for Non-Lunar Species Removal
+    note: Printed bullets plus TG/dTG figure (figure-only curve)
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1023.15'
+      locator:
+        pdf_page_index: 8
+        section: Idealized Heat Treatment for Non-Lunar Species Removal
+        note: Printed bullets plus TG/dTG figure (figure-only curve)
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_arh2_thermal_program
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 6
+    section: Hydrogen Reduction of JSC-1A
+    note: 'Ar/5H2 TGA-MS slide; caption under plots: Ar/5H2, 2.5 C/min, 1050 C hold, +MS'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_he_thermal_program
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 4
+    section: Integrated Mass Spectroscopy
+    note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_jsc1a_vacuum_thermal_program
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 5
+    section: Integrated Mass Spectroscopy
+    note: 'Vacuum MS slide; caption under plots: vacuum, 2.5 C/min, 1200 C hold, +MS*'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_so2_release_window_1000_C_plus
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 4
+    section: Integrated Mass Spectroscopy
+    note: 'He TGA-MS slide; caption under plots: He, 2.5 C/min, 1050 C hold, +MS'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_so2_total_loss_wt_pct
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::conclusions_total_gas_evolutions
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: 0.079 +/- 0.011
+      total_loss_wt_pct: '0.011'
+      note: Plus-minus printed in the conclusions table. The table does not print the thermal program or atmosphere for these
+        totals.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 11
+    table: conclusions_total_gas_evolutions
+    note: 'Conclusions slide table headed Species | Total Loss (wt. %). Caption: Total gas evolutions of non-lunar mineral
+      decomposition in JSC-1A. Workshop poster; no printed page numbers.'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_suspected_reactions_hypothesis
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_hypothesis
+    model: authors_hypothesis
+  admission:
+    status: pending
+    reason: source admission_status=hypothesis_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 7
+    section: Suspected Reactions in These Environments
+    note: Authors label the reactions suspected; compounds listed are not necessarily all species
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_vacuum_bubbling_above_1100_C_qualitative
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: transition_temperature
+    species:
+      formula: JSC-1A
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: value
+      value: vacuum_bubbling_onset_qualitative
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: author_estimate
+    original_method_class: authors_estimate
+    model: authors_estimate
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 11
+    section: Conclusions
+    note: Qualitative conclusion; not a tabulated yield
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster
+- observation_id: wilkerson-2021-jsc1a-tga-ms-poster::wilkerson_2021_vacuum_ms_h2o_page5_figure_only
+  experiment_id: cff2e0da64d243fabb7c51c477d8625aa6b933cbefe1f201bfb23480fcd7872e::wilkerson-2021-jsc1a-tga-ms-poster
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: H2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: extract-pyro-simulant
+      date: '2026-09-12'
+      evidence:
+        pdf_page_index: 5
+        section: Integrated Mass Spectroscopy
+        note: 'Vacuum MS slide; caption under plots: vacuum, 2.5 C/min, 1200 C hold, +MS*'
+  notices: []
+  source_id: wilkerson-2021-jsc1a-tga-ms-poster
+  locator:
+    pdf_page_index: 5
+    section: Integrated Mass Spectroscopy
+    note: 'Vacuum MS slide; caption under plots: vacuum, 2.5 C/min, 1200 C hold, +MS*'
+  read_from: pdf:wilkerson-2021-jsc1a-tga-ms-poster

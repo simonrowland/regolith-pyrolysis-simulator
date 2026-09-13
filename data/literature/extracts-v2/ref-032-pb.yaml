@@ -1,0 +1,78 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ref-032-pb.yaml
+observations:
+- observation_id: ref-032-pb::anchor_Pb_pure_Psat
+  experiment_id: 650568f93c1d8e3ebf5cc8c7ffb49bcb6bf3234dbb5ad9975000aed26c904b02::REF-032#Pb
+  identity:
+    quantity: p_sat
+    species:
+      formula: Pb
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '800'
+    interval_high: '1800'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ref-032-pb
+  locator:
+    note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.
+    record: REF-032#Pb
+  read_from: pdf:ref-032-pb

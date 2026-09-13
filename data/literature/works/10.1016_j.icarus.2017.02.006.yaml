@@ -1,0 +1,294 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.icarus.2017.02.006
+  citation: Costa, G. C. C., Jacobson, N. S. & Fegley Jr., B. (2017), "Vaporization and thermodynamics of forsterite-rich
+    olivine and some implications for silicate atmospheres of hot rocky exoplanets", Icarus 289:42–55, DOI 10.1016/j.icarus.2017.02.006
+  source_ids:
+  - kems-133-costa-2017
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-133-costa-2017
+      role: pdf
+      path: raw/kems-133-costa-2017/kems-133-costa-2017.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:kems-133-costa-2017
+      role: pdftotext
+      path: text/kems-133-costa-2017
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-133-costa-2017
+      role: table_csv
+      path: tables/kems-133-costa-2017
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1016/j.icarus.2017.02.006
+experiments:
+- experiment_id: 10.1016/j.icarus.2017.02.006::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'analytical_composition' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2017.02.006
+  locator:
+    page: 33
+    table: '1'
+    note: 'AM HTML caption: "Table 1. Chemical composition of the olivine powder samples before and after KEMS." Icarus 289:42-55
+      pagination not recovered without PDF'
+- experiment_id: 10.1016/j.icarus.2017.02.006::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_appearance_potential' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2017.02.006
+  locator:
+    page: 33
+    table: '2'
+    section: 3.2. Vapor Composition
+    note: 'AM HTML caption: "Table 2. Vapor species of the olivine sample detected by KEMS and their appearance potentials
+      (eV)."'
+- experiment_id: 10.1016/j.icarus.2017.02.006::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2017.02.006
+  locator:
+    page: 34
+    table: '3'
+    figure: '7'
+    note: slope of Fig. 7 activity vs inverse T
+- experiment_id: 10.1016/j.icarus.2017.02.006::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2017.02.006
+  locator:
+    page: 34
+    table: '4'
+- experiment_id: 10.1016/j.icarus.2017.02.006::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2017.02.006
+  locator:
+    page: 35
+    table: '5'
+    note: 'AM HTML caption: "Table 5. (Fe/Mg) Atomic ratio in silicate vapor atmospheres of HRE"'
+- experiment_id: 10.1016/j.icarus.2017.02.006::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2017.02.006
+  locator:
+    page: 43
+    figure: '6'
+    note: AM HTML caption only; no numeric table
+- experiment_id: 10.1016/j.icarus.2017.02.006::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2017.02.006
+  locator:
+    page: 44
+    figure: '7'
+- experiment_id: 10.1016/j.icarus.2017.02.006::8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2017.02.006
+  locator:
+    page: 45
+    figure: '8'
+- experiment_id: 10.1016/j.icarus.2017.02.006::kems-133-costa-2017
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2017.02.006
+  locator:
+    page: 3
+    paragraph: abstract

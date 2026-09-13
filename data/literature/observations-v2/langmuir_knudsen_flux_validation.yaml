@@ -1,0 +1,244 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/langmuir_knudsen_flux_validation.yaml
+observations:
+- observation_id: chromium_solid_langmuir_knudsen
+  experiment_id: 10.1063/1.3253096::chromium_solid_langmuir_knudsen
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Cr
+      phase: cr
+      polymorph:
+        tag: unknown
+        reason: source does not state polymorph
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.9'
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.9'
+      uncertainty_absolute: '0.1'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: REF-040
+  locator:
+    note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1, 135-146, Table 1
+    record: chromium_solid_langmuir_knudsen
+  read_from: pdf:REF-040
+- observation_id: iron_olivine_kems
+  experiment_id: 647af0c806fe2d0259c956350123147b47d19b1ce29a2d2cba48f9599a06b752::iron_olivine_kems
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: interval
+    interval_low: '0.011'
+    interval_high: '0.02'
+  uncertainty:
+    kind: printed
+    verbatim:
+      range:
+      - '0.011'
+      - '0.02'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: REF-016
+  locator:
+    note: Costa & Jacobson (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry, NASA NTRS 20150002321
+    record: iron_olivine_kems
+  read_from: pdf:REF-016
+- observation_id: potassium_silicate_vacuum
+  experiment_id: 10.1016/j.gca.2005.08.014::potassium_silicate_vacuum
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: K
+      phase: l
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1723.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.13'
+  uncertainty:
+    kind: printed
+    verbatim:
+      value: '0.13'
+      uncertainty_absolute: '0.02'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: REF-014
+  locator:
+    note: Fedkin et al. (2006), Geochim. Cosmochim. Acta 70, 206-223; value tabulated with uncertainty by Richter et al. (2011),
+      Meteorit. Planet. Sci. 46
+    record: potassium_silicate_vacuum
+  read_from: pdf:REF-014
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1723.15'
+      locator:
+        note: Fedkin et al. (2006), Geochim. Cosmochim. Acta 70, 206-223; value tabulated with uncertainty by Richter et al.
+          (2011), Meteorit. Planet. Sci. 46
+        record: potassium_silicate_vacuum

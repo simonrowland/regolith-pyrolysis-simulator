@@ -1,0 +1,87 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 56ca9db06aa4c3185b8ff8f2b02bbf697ccc4160f3ca6e05aad7cd406c629d54
+  citation: Habermann & Daane, J. Chem. Phys. 41 (1964) 2818–2827
+  source_ids:
+  - habermann-daane-1964
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:habermann-daane-1964
+      role: pdf
+      path: raw/habermann-daane-1964/habermann-daane-1964.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:habermann-daane-1964
+      role: pdftotext
+      path: text/habermann-daane-1964
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:habermann-daane-1964
+      role: table_csv
+      path: tables/habermann-daane-1964
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 56ca9db06aa4c3185b8ff8f2b02bbf697ccc4160f3ca6e05aad7cd406c629d54::Hab64_Eu_metal_third_law
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 56ca9db06aa4c3185b8ff8f2b02bbf697ccc4160f3ca6e05aad7cd406c629d54
+  locator:
+    note: Hab64_Eu_metal_third_law
+    record: Hab64_Eu_metal_third_law
+- experiment_id: 56ca9db06aa4c3185b8ff8f2b02bbf697ccc4160f3ca6e05aad7cd406c629d54::Hab64_Yb_metal_antoine
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 56ca9db06aa4c3185b8ff8f2b02bbf697ccc4160f3ca6e05aad7cd406c629d54
+  locator:
+    note: Hab64_Yb_metal_antoine
+    record: Hab64_Yb_metal_antoine

@@ -1,0 +1,200 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  citation: Stolyarova, V., Shornikov, S., Ivanov, G. & Shultz, M. (1992), "High temperature mass spectrometric study of multicomponent
+    silicate systems", Institute of Silicate Chemistry RAS
+  source_ids:
+  - kems-016-stolyarova-1992
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-016-stolyarova-1992
+      role: pdf
+      path: raw/kems-016-stolyarova-1992/kems-016-stolyarova-1992.pdf
+      sha256:
+        tag: value
+        value: d8cb86b6f118de8d78fd007b413e4c2ae8c38cc1f3f5de06c18ed3ac51967372
+    - asset_id: pdftotext:kems-016-stolyarova-1992
+      role: pdftotext
+      path: text/kems-016-stolyarova-1992
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-016-stolyarova-1992
+      role: table_csv
+      path: tables/kems-016-stolyarova-1992
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  locator:
+    page: PDF p. 2 / printed p. 186
+    table: '1'
+    paragraph: Gibbs energies of multicomponent systems by HTMS (1), Kohler (2), Wilson (3)
+    line_range: 27-45
+    note: repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-016-stolyarova-1992/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Pt, Mo, W (system-dependent)
+      locator:
+        line_range: '17'
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+- experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermodynamic_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  locator:
+    table: '2'
+    line_range: 47-59
+    note: Binary Wilson parameters used to calculate Gibbs energies of multicomponent systems
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+- experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  locator:
+    table: '3'
+    paragraph: Gibbs energy of Na2O-K2O-SiO2 melts HTMS [6] vs Wilson
+    line_range: 61-70
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+- experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  locator:
+    table: '4'
+    paragraph: Chemical potentials of Na2O in Na2O-B2O3-SiO2 at 1273 K
+    line_range: 65-75
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+- experiment_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22::docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 06c720d1285e5a806cd601ac9215db37759ffe8fae2ecbff6dafef380bdd4d22
+  locator:
+    section: 2. Experimental procedures
+    line_range: 15-19
+    source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Pt, Mo, and W effusion cells (selection system-dependent)
+      locator:
+        paragraph: Vaporization from platinum, molybdenum and tungsten effusion cells
+        line_range: '17'
+        source_path: docs-private/research/ocr-artifacts/kems-016-stolyarova-1992/spool/out/kems-016-stolyarova-1992/vlm/kems-016-stolyarova-1992.md

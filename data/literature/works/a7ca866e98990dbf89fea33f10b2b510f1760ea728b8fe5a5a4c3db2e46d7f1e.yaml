@@ -1,0 +1,121 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e
+  citation: Shornikov, S. I. and Yakovlev, O. I. (2010), "A Study of CAI Melt Composition Changing During Evaporation", 41st
+    Lunar and Planetary Science Conference, abstract 1408
+  source_ids:
+  - kems-033-shornikov-2010
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-033-shornikov-2010
+      role: pdf
+      path: raw/kems-033-shornikov-2010/kems-033-shornikov-2010.pdf
+      sha256:
+        tag: value
+        value: 0523d32464402d6fa6e2d3ac66f5e1233c5c359b411fe9e9099166a8a2842049
+    - asset_id: pdftotext:kems-033-shornikov-2010
+      role: pdftotext
+      path: text/kems-033-shornikov-2010
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-033-shornikov-2010
+      role: table_csv
+      path: tables/kems-033-shornikov-2010
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e
+  locator:
+    published_page: 1
+    pdf_page_index: 1
+    figure: '1'
+    note: calculated oxide mole % vs q for average CAI
+- experiment_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    figure: '2'
+    note: Fig. 2b caption preset reducing conditions
+- experiment_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e::kems-033-shornikov-2010
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'quoted_compilation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: a7ca866e98990dbf89fea33f10b2b510f1760ea728b8fe5a5a4c3db2e46d7f1e
+  locator:
+    published_page: 1
+    pdf_page_index: 1
+    paragraph: average CAI composition [5]

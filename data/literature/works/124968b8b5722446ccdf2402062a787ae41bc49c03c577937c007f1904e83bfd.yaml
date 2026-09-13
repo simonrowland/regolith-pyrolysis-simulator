@@ -1,0 +1,89 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd
+  citation: IVTAN Thermodynamic Database electronic tables; per-species electronic-page identities retained below.
+  source_ids:
+  - ivtan-mno-coo-thermo
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:ivtan-mno-coo-thermo
+      role: pdf
+      path: raw/ivtan-mno-coo-thermo/ivtan-mno-coo-thermo.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:ivtan-mno-coo-thermo
+      role: pdftotext
+      path: text/ivtan-mno-coo-thermo
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ivtan-mno-coo-thermo
+      role: table_csv
+      path: tables/ivtan-mno-coo-thermo
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd::1335
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd
+  locator:
+    table: 1335
+    note: candidate_row=CoO(g); url=https://www.chem.msu.ru/rus/tsiv/Co/print-CoO.html; authors=E. A. Shenyavskaya; A. V.
+      Gusarov; page_date=2007-01-18
+- experiment_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd::1436
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd
+  locator:
+    table: 1436
+    note: candidate_row=MnO(g); url=https://www.chem.msu.ru/rus/tsiv/Mn/print-MnO.html; authors=A. V. Gusarov; A. N. Kulikov;
+      page_date=2008-12-17

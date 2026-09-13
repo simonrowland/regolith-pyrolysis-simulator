@@ -1,0 +1,156 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-009-safarian-2013.yaml
+observations:
+- observation_id: kems-009-safarian-2013::safarian_2013_si_pure_langmuir_theory
+  experiment_id: 86b58c54293da87d96fa9a5c5bce3a23f3793d880fe71d44d6e088fd66bd0c69::docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Si
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: theoretical coefficients; pure-metal literature scatter on flux ratios
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-009-safarian-2013
+  locator:
+    page: '747'
+    section: Hertz-Knudsen / Schrage / vapor velocity / flux (theory review)
+    line_range: 112-245
+    note: Primary theory block; S_cr and p_eff at line 229; flux-ratio figure context 245; repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-009-safarian-2013/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+  read_from: pdf:kems-009-safarian-2013
+- observation_id: kems-009-safarian-2013::safarian_2013_si_pure_liquid_alpha_b1
+  experiment_id: 86b58c54293da87d96fa9a5c5bce3a23f3793d880fe71d44d6e088fd66bd0c69::docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Si
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '1'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-009-safarian-2013
+  locator:
+    paragraph: liquid metal evaporation; 0.844 n_Max intensive vacuum limit
+    source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+  read_from: pdf:kems-009-safarian-2013

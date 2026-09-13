@@ -1,0 +1,208 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2174/1874396x01307010057
+  citation: Stolyarova, V.L. (2013), review/compilation on high-temperature mass spectrometry of oxide systems and ternary
+    silicate melts (CAS, CTS, MAS, BTS families) — vapour composition map Table 1
+  source_ids:
+  - kems-017-stolyarova-2013
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-017-stolyarova-2013
+      role: pdf
+      path: raw/kems-017-stolyarova-2013/kems-017-stolyarova-2013.pdf
+      sha256:
+        tag: value
+        value: dd4c37200290a118557bfda5395d9553a2c52f7e7f2a694fd166e82679f63869
+    - asset_id: pdftotext:kems-017-stolyarova-2013
+      role: pdftotext
+      path: text/kems-017-stolyarova-2013
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-017-stolyarova-2013
+      role: table_csv
+      path: tables/kems-017-stolyarova-2013
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2174/1874396x01307010057
+experiments:
+- experiment_id: 10.2174/1874396x01307010057::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2174/1874396x01307010057
+  locator:
+    table: '1'
+    paragraph: Composition of Vapour Over the Ternary Silicate Systems Studied
+    line_range: 104-126
+    source_path: docs-private/research/ocr-artifacts/kems-017-stolyarova-2013/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
+- experiment_id: 10.2174/1874396x01307010057::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion_compiled_experiment' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2174/1874396x01307010057
+  locator:
+    published_page: '62'
+    figure: '2'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-06.png
+- experiment_id: 10.2174/1874396x01307010057::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion_compiled_experiment' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2174/1874396x01307010057
+  locator:
+    published_page: '63'
+    figure: '3'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+- experiment_id: 10.2174/1874396x01307010057::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion_compiled_experiment' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2174/1874396x01307010057
+  locator:
+    published_page: '63'
+    figure: '4'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+- experiment_id: 10.2174/1874396x01307010057::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion_compiled_experiment' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2174/1874396x01307010057
+  locator:
+    published_page: '64'
+    figure: '5'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-08.png
+- experiment_id: 10.2174/1874396x01307010057::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermodynamic_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2174/1874396x01307010057
+  locator:
+    published_page: '65'
+    figure: '6'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-09.png

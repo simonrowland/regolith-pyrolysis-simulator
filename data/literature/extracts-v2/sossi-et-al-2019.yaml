@@ -1,0 +1,80 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/sossi-et-al-2019.yaml
+observations:
+- observation_id: sossi-et-al-2019::sossi_2019_na_open_furnace_apparent
+  experiment_id: 10.1016/j.gca.2019.06.021::sossi_2019_na_open_furnace_apparent
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '1'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: The source gives no 0.9-1.0 interval. The author-adopted unity value is retained only as a status-bearing physical
+        ceiling, not an intrinsic-vacuum measurement.
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: sossi-et-al-2019
+  locator:
+    note: Sossi, P. A. et al. (2019), Geochim. Cosmochim. Acta 260:204-231, DOI 10.1016/j.gca.2019.06.021
+    record: sossi_2019_na_open_furnace_apparent
+  read_from: pdf:sossi-et-al-2019

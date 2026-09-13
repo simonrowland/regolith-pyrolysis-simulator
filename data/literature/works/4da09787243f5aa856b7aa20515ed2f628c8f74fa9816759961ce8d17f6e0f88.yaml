@@ -1,0 +1,201 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88
+  citation: NIST Chemistry WebBook, SRD 69 (species thermochemistry pages)
+  source_ids:
+  - nist-webbook
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:nist-webbook
+      role: pdf
+      path: raw/nist-webbook/nist-webbook.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:nist-webbook
+      role: pdftotext
+      path: text/nist-webbook
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:nist-webbook
+      role: table_csv
+      path: tables/nist-webbook
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::NIST_Stull47_As2O3_highT
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88
+  locator:
+    note: NIST Antoine table row 485.7–730.4 K
+    record: NIST_Stull47_As2O3_highT
+- experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::NIST_Stull_Se_total_P
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88
+  locator:
+    note: NIST_Stull_Se_total_P
+    record: NIST_Stull_Se_total_P
+- experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::Rau74_critical_constants
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88
+  locator:
+    note: NIST-WB Selenium critical constants citing Rau 1974
+    record: Rau74_critical_constants
+- experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::melting_point
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88
+  locator:
+    note: '{''primary'': ''Honig & Kramer (1969) via NIST-WB SRD 69 Potassium'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440097&Units=SI&Mask=4''}'
+    record: melting_point
+- experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::normal_boiling_point
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88
+  locator:
+    note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69 Potassium: Tboil=1037 K;
+      TRC u=1 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440097&Units=SI&Mask=4''}'
+    record: normal_boiling_point
+- experiment_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88::triple_point_temperature
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 4da09787243f5aa856b7aa20515ed2f628c8f74fa9816759961ce8d17f6e0f88
+  locator:
+    note: '{''primary'': ''Honig & Kramer (1969) RCA Rev. 30, 285'', ''webbook'': ''NIST-WB SRD 69 Potassium (CAS 7440-09-7):
+      Ttriple=336.35 K; TRC u=0.1 K'', ''url'': ''https://webbook.nist.gov/cgi/cbook.cgi?ID=C7440097&Units=SI&Mask=4''}'
+    record: triple_point_temperature

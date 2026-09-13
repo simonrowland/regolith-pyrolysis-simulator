@@ -1,0 +1,78 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/pending-p4o6-vp.yaml
+observations:
+- observation_id: pending-p4o6-vp::anchor_P4O6_pure_Psat
+  experiment_id: 9d325ab768d14241d47a22b33e1dff75ffdaa129bf095a8891b3095cd76c6c22::PENDING#P4O6_VP
+  identity:
+    quantity: p_sat
+    species:
+      formula: P4O6
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '298'
+    interval_high: '1000'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: pending-p4o6-vp
+  locator:
+    note: Measured P4O6 vaporization (recover primary); SF18-T5 carrier role is review-only. JANAF if tables exist for P4O6(g).
+    record: PENDING#P4O6_VP
+  read_from: pdf:pending-p4o6-vp

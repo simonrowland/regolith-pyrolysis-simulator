@@ -1,0 +1,59 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: c16250ca10856aaeabc54fae7e64af35a1fb0970e4b9b4c42ed481252d9e9cf7
+  citation: Independent molten MgCl2 vapor-pressure / KEMS series (not JANAF)
+  source_ids:
+  - pending-mgcl2-measured-vp
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:pending-mgcl2-measured-vp
+      role: pdf
+      path: raw/pending-mgcl2-measured-vp/pending-mgcl2-measured-vp.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:pending-mgcl2-measured-vp
+      role: pdftotext
+      path: text/pending-mgcl2-measured-vp
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pending-mgcl2-measured-vp
+      role: table_csv
+      path: tables/pending-mgcl2-measured-vp
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: c16250ca10856aaeabc54fae7e64af35a1fb0970e4b9b4c42ed481252d9e9cf7::PENDING#MgCl2_measured_VP
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: c16250ca10856aaeabc54fae7e64af35a1fb0970e4b9b4c42ed481252d9e9cf7
+  locator:
+    note: Independent molten MgCl2 vapor-pressure / KEMS series (not JANAF)
+    record: PENDING#MgCl2_measured_VP

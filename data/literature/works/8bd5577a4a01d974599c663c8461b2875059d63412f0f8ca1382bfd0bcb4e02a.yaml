@@ -1,0 +1,94 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a
+  citation: Turkdogan, E. T. (1984), "Physicochemical Aspects of Reactions in Ironmaking and Steelmaking Processes", Transactions
+    ISIJ 24:591–611 (review). Received 14 November 1983. USS Technical Center, Monroeville, PA 15146.
+  source_ids:
+  - kems-047-turkdogan-1984-isij
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-047-turkdogan-1984-isij
+      role: pdf
+      path: raw/kems-047-turkdogan-1984-isij/kems-047-turkdogan-1984-isij.pdf
+      sha256:
+        tag: value
+        value: 206060bcceb541a1b9d497325ded2f97ab15e37466104816b7f14f4fbc2e31b8
+    - asset_id: pdftotext:kems-047-turkdogan-1984-isij
+      role: pdftotext
+      path: text/kems-047-turkdogan-1984-isij
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-047-turkdogan-1984-isij
+      role: table_csv
+      path: tables/kems-047-turkdogan-1984-isij
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'calculated_blast_furnace_vapor_equilibrium' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '1'
+    note: Table 1 calculated equilibrium vapor pressures at 1500 C and 1 bar CO; two assumed local-equilibrium slag/coke-ash
+      columns. Not this work's KEMS.
+- experiment_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'calculated_blast_furnace_vapor_equilibrium' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 8bd5577a4a01d974599c663c8461b2875059d63412f0f8ca1382bfd0bcb4e02a
+  locator:
+    published_page: 607
+    pdf_page_index: 17
+    table: '2'
+    note: Table 2 equilibrium vapor pressure of potassium for reaction (53) with slag having 0.5% K2O and B'=1.5. Calculated;
+      a(K2O) from Steiler ref. 68.

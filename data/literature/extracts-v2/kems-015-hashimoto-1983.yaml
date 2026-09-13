@@ -1,0 +1,3306 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-015-hashimoto-1983.yaml
+observations:
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_alpha_hertz_knudsen_assumed_unity_ratio
+  experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived_assumption
+    model: model_derived_assumption
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 128
+    pdf_page_index: 18
+    equation: '14'
+    note: Hertz-Knudsen definition of alpha_i on eqn (14), published p. 128 / PDF p. 18. alpha_i/alpha_j = 1 assumed in eqn
+      (16); the assumed-unity sentences continue on later Stage II/III/IV pages.
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_alpha_hertz_knudsen_assumed_unity_ratio_quoted
+  experiment_id: 10.2343/geochemj.17.111::kems-015-hashimoto-1983
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-015-hashimoto-1983::hashimoto_1983_alpha_hertz_knudsen_assumed_unity_ratio
+    decided_by:
+      worker: wave-WB-2
+      date: '2026-09-06'
+      evidence:
+        published_page: 133
+        equation: '16'
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 133
+    equation: '16'
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_cao_al2o3_residue_enrichment
+  experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ca
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    section: RESULTS AND DISCUSSION
+    line_range: 883-927
+    note: CaO and Al2O3 become enriched in residues as more volatile components are lost
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_feo_activation_energy
+  experiment_id: 10.2343/geochemj.17.111::10
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 123
+    pdf_page_index: 13
+    figure: '10'
+    paragraph: The activation energy of FeO vaporization lies in the range 93.7-107.9 kcal/mol
+    note: Derived Arrhenius slope; Fig. 10 itself is figure-only this round
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_feo_activation_energy_quoted
+  experiment_id: 10.2343/geochemj.17.111::10
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-015-hashimoto-1983::hashimoto_1983_derived_feo_activation_energy
+    decided_by:
+      worker: wave-WB-2
+      date: '2026-09-06'
+      evidence:
+        published_page: 123
+        figure: '10'
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 123
+    figure: '10'
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_feo_reaction_order_endpoints
+  experiment_id: 10.2343/geochemj.17.111::9
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 123
+    pdf_page_index: 13
+    figure: '9'
+    paragraph: from 1.204 at 1,700 C to 0.798 at 2,000 C
+    note: Derived reaction order nu_i; Fig. 9 itself is figure-only this round
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_mgo_activation_energy
+  experiment_id: 10.2343/geochemj.17.111::10
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 123
+    pdf_page_index: 13
+    figure: '10'
+    paragraph: For SiO2 and MgO, the values 131.6 and 123.6 kcal/mol are derived, respectively
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_mgo_activation_energy_quoted
+  experiment_id: 10.2343/geochemj.17.111::10
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-015-hashimoto-1983::hashimoto_1983_derived_mgo_activation_energy
+    decided_by:
+      worker: wave-WB-2
+      date: '2026-09-06'
+      evidence:
+        published_page: 123
+        figure: '10'
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 123
+    figure: '10'
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_sio2_activation_energy
+  experiment_id: 10.2343/geochemj.17.111::10
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 123
+    pdf_page_index: 13
+    figure: '10'
+    paragraph: For SiO2 and MgO, the values 131.6 and 123.6 kcal/mol are derived, respectively
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_derived_sio2_activation_energy_quoted
+  experiment_id: 10.2343/geochemj.17.111::10
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-015-hashimoto-1983::hashimoto_1983_derived_sio2_activation_energy
+    decided_by:
+      worker: wave-WB-2
+      date: '2026-09-06'
+      evidence:
+        published_page: 123
+        figure: '10'
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 123
+    figure: '10'
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_fcmas_qualitative_volatility_order
+  experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    section: ABSTRACT
+    line_range: '11'
+    note: Author-reported gross order of Fe, Mg, Si, Ca, and Al evaporation from FCMAS melt
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_fe_fcmas_free_evap_geometry
+  experiment_id: 10.2343/geochemj.17.111::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    figure: '1'
+    section: EXPERIMENTS
+    line_range: 33-90
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_fe_geometry_class_b1
+  experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    paragraph: molten spherule free evaporation graphite crucible
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_mg_fcmas_free_evap_geometry
+  experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    section: EXPERIMENTS
+    line_range: 33-90
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_mg_geometry_class_b1
+  experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    paragraph: molten spherule free evaporation graphite crucible
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_sio_fcmas_free_evap_geometry
+  experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    section: EXPERIMENTS
+    line_range: 33-90
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_sio_geometry_class_b1
+  experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    paragraph: molten spherule free evaporation graphite crucible
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_stage_iv_cao_relative_volatility
+  experiment_id: 10.2343/geochemj.17.111::docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ca
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct_qualitative_with_thermodynamic_crosscheck
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    section: RESULTS AND DISCUSSION
+    line_range: 927-937
+    note: Stage-IV CaO volatility reported as about one third of SiO2; thermodynamic estimate 0.36
+    source_path: docs-private/research/ocr-artifacts/kems-015-hashimoto-1983/spool/out/kems-015-hashimoto-1983/vlm/kems-015-hashimoto-1983.md
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table1_starting_composition
+  experiment_id: 10.2343/geochemj.17.111::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 113
+    pdf_page_index: 3
+    table: '1'
+    note: Chemical composition of the starting material (wt %, 100% normalized)
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table2_run_conditions
+  experiment_id: 10.2343/geochemj.17.111::2
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 114
+    pdf_page_index: 4
+    table: '2'
+    note: Heating conditions and run notations
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table3_al2o3_residue_series
+  experiment_id: 10.2343/geochemj.17.111::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Al2O3
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 116
+    pdf_page_index: 6
+    table: '3'
+    note: Al2O3 wt % column of Table 3 (measured rows only)
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table3_al2o3_residue_series_quoted
+  experiment_id: 10.2343/geochemj.17.111::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Al2O3
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      weighing_accuracy_mg: '0.1'
+      locator:
+        published_page: 114
+        section: Analytical procedures
+      quote: They were weighed by a microbalance with an accuracy of ±0.1 mg in order to determine the vaporized mass
+      note: Instrument accuracy as printed; no invented per-cell composition error.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 'sample_as_printed,VF_wt_pct,splash,SiO2_wt_pct,Al2O3_wt_pct,FeO_wt_pct,MgO_wt_pct,CaO_wt_pct,n_analyses,texture,minerals,composition_status
+
+      17C1,8.2,no,,,,,,,B,MP+OL+G,n.d.
+
+      C3 (1),17.0,yes,,,,,,,B,MD+OL+G,n.d.
+
+      C3 (2),10.8,no,39.09,3.57,27.92,26.32,3.09,14,,,measured
+
+      C5 (1),18.6,no,41.74,4.11,22.74,27.88,3.52,30,B,MD+OL+G,measured
+
+      C5 (2),18.4,no,,,,,,,B,MD+OL+G,n.d.
+
+      C5 (3),19.7,no,41.74,3.83,21.81,29.09,3.53,16,,,measured
+
+      C7,27.2,no,45.24,4.49,15.53,30.97,3.78,30,B,OL+G,measured
+
+      C9 (2),35.5,no,48.04,4.92,8.56,34.34,4.14,20,C,OL+G,measured
+
+      D2,43.3,no,49.03,5.48,2.88,37.81,4.80,20,C&B,OL+G,measured
+
+      18B6 (1),11.2,no,,,,,,,B,MP+OL+G,n.d.
+
+      B6 (2),12.3,no,38.73,3.55,28.40,26.26,3.07,14,,,measured
+
+      B8 (1),17.2,no,40.41,3.80,23.82,28.56,3.40,30,B,MP+OL+G,measured
+
+      B8 (2),15.8,no,39.55,3.88,25.78,27.26,3.53,24,,,measured
+
+      B8 (3),20.2,yes,,,,,,,,,valence_only
+
+      C1 (1),31.3,yes,44.22,4.87,14.39,32.49,4.05,30,B&C,OL+G,measured
+
+      C1 (2),25.0,no,42.84,4.05,19.10,30.41,3.59,16,,,measured
+
+      C1 (3),,no,,,,,,,,,valence_only_VF_absent
+
+      C3 (1),41.1,yes,45.60,4.61,11.84,33.89,4.06,20,B,OL+G,measured
+
+      C3 (2),33.1,no,45.30,4.33,12.87,33.57,3.93,16,,,measured
+
+      C3 (3),42.3,yes,46.12,4.99,9.95,34.38,4.55,20,B&C,OL+G,measured
+
+      C3 (4),41.8,yes,,,,,,,,,valence_only
+
+      C5 (1),45.0,no,47.35,5.33,4.18,38.43,4.70,20,C,OL+(G),measured
+
+      C5 (2),49.4,yes,47.05,5.14,3.85,39.14,4.82,20,C,OL+(G),measured
+
+      19B2,12.2,no,37.94,3.55,29.14,26.09,3.29,20,,,measured
+
+      B4,17.2,no,39.64,3.74,25.60,27.76,3.27,14,,,measured
+
+      B6,26.3,no,41.09,4.02,20.59,30.74,3.56,30,B,MD+OL+G,measured
+
+      B8,38.7,no,44.23,5.03,11.49,34.77,4.48,20,B&C,OL+G,measured
+
+      C1,49.3,no,45.56,5.88,4.55,38.94,5.07,20,C,OL+(G),measured
+
+      20B2,27.0,no,40.87,4.14,20.46,30.81,3.72,16,,,measured
+
+      B4,40.5,no,43.00,5.40,12.27,34.56,4.76,20,B,OL+G,measured
+
+      B6,52.5,no,43.74,6.24,3.15,41.10,5.77,20,C,OL+(G),measured'
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-015-hashimoto-1983::hashimoto_1983_table3_al2o3_residue_series
+    decided_by:
+      worker: wave-WB-2
+      date: '2026-09-06'
+      evidence:
+        published_page: 116
+        table: '3'
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 116
+    table: '3'
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table3_cao_residue_series
+  experiment_id: 10.2343/geochemj.17.111::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ca
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 116
+    pdf_page_index: 6
+    table: '3'
+    note: CaO wt % column of Table 3 (measured rows only)
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table3_cao_residue_series_quoted
+  experiment_id: 10.2343/geochemj.17.111::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ca
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      weighing_accuracy_mg: '0.1'
+      locator:
+        published_page: 114
+        section: Analytical procedures
+      quote: They were weighed by a microbalance with an accuracy of ±0.1 mg in order to determine the vaporized mass
+      note: Instrument accuracy as printed; no invented per-cell composition error.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 'sample_as_printed,VF_wt_pct,splash,SiO2_wt_pct,Al2O3_wt_pct,FeO_wt_pct,MgO_wt_pct,CaO_wt_pct,n_analyses,texture,minerals,composition_status
+
+      17C1,8.2,no,,,,,,,B,MP+OL+G,n.d.
+
+      C3 (1),17.0,yes,,,,,,,B,MD+OL+G,n.d.
+
+      C3 (2),10.8,no,39.09,3.57,27.92,26.32,3.09,14,,,measured
+
+      C5 (1),18.6,no,41.74,4.11,22.74,27.88,3.52,30,B,MD+OL+G,measured
+
+      C5 (2),18.4,no,,,,,,,B,MD+OL+G,n.d.
+
+      C5 (3),19.7,no,41.74,3.83,21.81,29.09,3.53,16,,,measured
+
+      C7,27.2,no,45.24,4.49,15.53,30.97,3.78,30,B,OL+G,measured
+
+      C9 (2),35.5,no,48.04,4.92,8.56,34.34,4.14,20,C,OL+G,measured
+
+      D2,43.3,no,49.03,5.48,2.88,37.81,4.80,20,C&B,OL+G,measured
+
+      18B6 (1),11.2,no,,,,,,,B,MP+OL+G,n.d.
+
+      B6 (2),12.3,no,38.73,3.55,28.40,26.26,3.07,14,,,measured
+
+      B8 (1),17.2,no,40.41,3.80,23.82,28.56,3.40,30,B,MP+OL+G,measured
+
+      B8 (2),15.8,no,39.55,3.88,25.78,27.26,3.53,24,,,measured
+
+      B8 (3),20.2,yes,,,,,,,,,valence_only
+
+      C1 (1),31.3,yes,44.22,4.87,14.39,32.49,4.05,30,B&C,OL+G,measured
+
+      C1 (2),25.0,no,42.84,4.05,19.10,30.41,3.59,16,,,measured
+
+      C1 (3),,no,,,,,,,,,valence_only_VF_absent
+
+      C3 (1),41.1,yes,45.60,4.61,11.84,33.89,4.06,20,B,OL+G,measured
+
+      C3 (2),33.1,no,45.30,4.33,12.87,33.57,3.93,16,,,measured
+
+      C3 (3),42.3,yes,46.12,4.99,9.95,34.38,4.55,20,B&C,OL+G,measured
+
+      C3 (4),41.8,yes,,,,,,,,,valence_only
+
+      C5 (1),45.0,no,47.35,5.33,4.18,38.43,4.70,20,C,OL+(G),measured
+
+      C5 (2),49.4,yes,47.05,5.14,3.85,39.14,4.82,20,C,OL+(G),measured
+
+      19B2,12.2,no,37.94,3.55,29.14,26.09,3.29,20,,,measured
+
+      B4,17.2,no,39.64,3.74,25.60,27.76,3.27,14,,,measured
+
+      B6,26.3,no,41.09,4.02,20.59,30.74,3.56,30,B,MD+OL+G,measured
+
+      B8,38.7,no,44.23,5.03,11.49,34.77,4.48,20,B&C,OL+G,measured
+
+      C1,49.3,no,45.56,5.88,4.55,38.94,5.07,20,C,OL+(G),measured
+
+      20B2,27.0,no,40.87,4.14,20.46,30.81,3.72,16,,,measured
+
+      B4,40.5,no,43.00,5.40,12.27,34.56,4.76,20,B,OL+G,measured
+
+      B6,52.5,no,43.74,6.24,3.15,41.10,5.77,20,C,OL+(G),measured'
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-015-hashimoto-1983::hashimoto_1983_table3_cao_residue_series
+    decided_by:
+      worker: wave-WB-2
+      date: '2026-09-06'
+      evidence:
+        published_page: 116
+        table: '3'
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 116
+    table: '3'
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table3_mgo_residue_series
+  experiment_id: 10.2343/geochemj.17.111::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 116
+    pdf_page_index: 6
+    table: '3'
+    note: MgO wt % column of Table 3 (measured rows only)
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table3_mgo_residue_series_quoted
+  experiment_id: 10.2343/geochemj.17.111::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      weighing_accuracy_mg: '0.1'
+      locator:
+        published_page: 114
+        section: Analytical procedures
+      quote: They were weighed by a microbalance with an accuracy of ±0.1 mg in order to determine the vaporized mass
+      note: Instrument accuracy as printed; no invented per-cell composition error.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 'sample_as_printed,VF_wt_pct,splash,SiO2_wt_pct,Al2O3_wt_pct,FeO_wt_pct,MgO_wt_pct,CaO_wt_pct,n_analyses,texture,minerals,composition_status
+
+      17C1,8.2,no,,,,,,,B,MP+OL+G,n.d.
+
+      C3 (1),17.0,yes,,,,,,,B,MD+OL+G,n.d.
+
+      C3 (2),10.8,no,39.09,3.57,27.92,26.32,3.09,14,,,measured
+
+      C5 (1),18.6,no,41.74,4.11,22.74,27.88,3.52,30,B,MD+OL+G,measured
+
+      C5 (2),18.4,no,,,,,,,B,MD+OL+G,n.d.
+
+      C5 (3),19.7,no,41.74,3.83,21.81,29.09,3.53,16,,,measured
+
+      C7,27.2,no,45.24,4.49,15.53,30.97,3.78,30,B,OL+G,measured
+
+      C9 (2),35.5,no,48.04,4.92,8.56,34.34,4.14,20,C,OL+G,measured
+
+      D2,43.3,no,49.03,5.48,2.88,37.81,4.80,20,C&B,OL+G,measured
+
+      18B6 (1),11.2,no,,,,,,,B,MP+OL+G,n.d.
+
+      B6 (2),12.3,no,38.73,3.55,28.40,26.26,3.07,14,,,measured
+
+      B8 (1),17.2,no,40.41,3.80,23.82,28.56,3.40,30,B,MP+OL+G,measured
+
+      B8 (2),15.8,no,39.55,3.88,25.78,27.26,3.53,24,,,measured
+
+      B8 (3),20.2,yes,,,,,,,,,valence_only
+
+      C1 (1),31.3,yes,44.22,4.87,14.39,32.49,4.05,30,B&C,OL+G,measured
+
+      C1 (2),25.0,no,42.84,4.05,19.10,30.41,3.59,16,,,measured
+
+      C1 (3),,no,,,,,,,,,valence_only_VF_absent
+
+      C3 (1),41.1,yes,45.60,4.61,11.84,33.89,4.06,20,B,OL+G,measured
+
+      C3 (2),33.1,no,45.30,4.33,12.87,33.57,3.93,16,,,measured
+
+      C3 (3),42.3,yes,46.12,4.99,9.95,34.38,4.55,20,B&C,OL+G,measured
+
+      C3 (4),41.8,yes,,,,,,,,,valence_only
+
+      C5 (1),45.0,no,47.35,5.33,4.18,38.43,4.70,20,C,OL+(G),measured
+
+      C5 (2),49.4,yes,47.05,5.14,3.85,39.14,4.82,20,C,OL+(G),measured
+
+      19B2,12.2,no,37.94,3.55,29.14,26.09,3.29,20,,,measured
+
+      B4,17.2,no,39.64,3.74,25.60,27.76,3.27,14,,,measured
+
+      B6,26.3,no,41.09,4.02,20.59,30.74,3.56,30,B,MD+OL+G,measured
+
+      B8,38.7,no,44.23,5.03,11.49,34.77,4.48,20,B&C,OL+G,measured
+
+      C1,49.3,no,45.56,5.88,4.55,38.94,5.07,20,C,OL+(G),measured
+
+      20B2,27.0,no,40.87,4.14,20.46,30.81,3.72,16,,,measured
+
+      B4,40.5,no,43.00,5.40,12.27,34.56,4.76,20,B,OL+G,measured
+
+      B6,52.5,no,43.74,6.24,3.15,41.10,5.77,20,C,OL+(G),measured'
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-015-hashimoto-1983::hashimoto_1983_table3_mgo_residue_series
+    decided_by:
+      worker: wave-WB-2
+      date: '2026-09-06'
+      evidence:
+        published_page: 116
+        table: '3'
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 116
+    table: '3'
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table3_residue_composition_series
+  experiment_id: 10.2343/geochemj.17.111::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 116
+    pdf_page_index: 6
+    table: '3'
+    note: Summary of experimental results; residue bulk composition vs VF, T, t
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table3_residue_composition_series_quoted
+  experiment_id: 10.2343/geochemj.17.111::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      weighing_accuracy_mg: '0.1'
+      locator:
+        published_page: 114
+        section: Analytical procedures
+      quote: They were weighed by a microbalance with an accuracy of ±0.1 mg in order to determine the vaporized mass
+      note: Instrument accuracy as printed; no invented per-cell composition error.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 'sample_as_printed,VF_wt_pct,splash,SiO2_wt_pct,Al2O3_wt_pct,FeO_wt_pct,MgO_wt_pct,CaO_wt_pct,n_analyses,texture,minerals,composition_status
+
+      17C1,8.2,no,,,,,,,B,MP+OL+G,n.d.
+
+      C3 (1),17.0,yes,,,,,,,B,MD+OL+G,n.d.
+
+      C3 (2),10.8,no,39.09,3.57,27.92,26.32,3.09,14,,,measured
+
+      C5 (1),18.6,no,41.74,4.11,22.74,27.88,3.52,30,B,MD+OL+G,measured
+
+      C5 (2),18.4,no,,,,,,,B,MD+OL+G,n.d.
+
+      C5 (3),19.7,no,41.74,3.83,21.81,29.09,3.53,16,,,measured
+
+      C7,27.2,no,45.24,4.49,15.53,30.97,3.78,30,B,OL+G,measured
+
+      C9 (2),35.5,no,48.04,4.92,8.56,34.34,4.14,20,C,OL+G,measured
+
+      D2,43.3,no,49.03,5.48,2.88,37.81,4.80,20,C&B,OL+G,measured
+
+      18B6 (1),11.2,no,,,,,,,B,MP+OL+G,n.d.
+
+      B6 (2),12.3,no,38.73,3.55,28.40,26.26,3.07,14,,,measured
+
+      B8 (1),17.2,no,40.41,3.80,23.82,28.56,3.40,30,B,MP+OL+G,measured
+
+      B8 (2),15.8,no,39.55,3.88,25.78,27.26,3.53,24,,,measured
+
+      B8 (3),20.2,yes,,,,,,,,,valence_only
+
+      C1 (1),31.3,yes,44.22,4.87,14.39,32.49,4.05,30,B&C,OL+G,measured
+
+      C1 (2),25.0,no,42.84,4.05,19.10,30.41,3.59,16,,,measured
+
+      C1 (3),,no,,,,,,,,,valence_only_VF_absent
+
+      C3 (1),41.1,yes,45.60,4.61,11.84,33.89,4.06,20,B,OL+G,measured
+
+      C3 (2),33.1,no,45.30,4.33,12.87,33.57,3.93,16,,,measured
+
+      C3 (3),42.3,yes,46.12,4.99,9.95,34.38,4.55,20,B&C,OL+G,measured
+
+      C3 (4),41.8,yes,,,,,,,,,valence_only
+
+      C5 (1),45.0,no,47.35,5.33,4.18,38.43,4.70,20,C,OL+(G),measured
+
+      C5 (2),49.4,yes,47.05,5.14,3.85,39.14,4.82,20,C,OL+(G),measured
+
+      19B2,12.2,no,37.94,3.55,29.14,26.09,3.29,20,,,measured
+
+      B4,17.2,no,39.64,3.74,25.60,27.76,3.27,14,,,measured
+
+      B6,26.3,no,41.09,4.02,20.59,30.74,3.56,30,B,MD+OL+G,measured
+
+      B8,38.7,no,44.23,5.03,11.49,34.77,4.48,20,B&C,OL+G,measured
+
+      C1,49.3,no,45.56,5.88,4.55,38.94,5.07,20,C,OL+(G),measured
+
+      20B2,27.0,no,40.87,4.14,20.46,30.81,3.72,16,,,measured
+
+      B4,40.5,no,43.00,5.40,12.27,34.56,4.76,20,B,OL+G,measured
+
+      B6,52.5,no,43.74,6.24,3.15,41.10,5.77,20,C,OL+(G),measured'
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-015-hashimoto-1983::hashimoto_1983_table3_residue_composition_series
+    decided_by:
+      worker: wave-WB-2
+      date: '2026-09-06'
+      evidence:
+        published_page: 116
+        table: '3'
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 116
+    table: '3'
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table3_sio2_residue_series
+  experiment_id: 10.2343/geochemj.17.111::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 116
+    pdf_page_index: 6
+    table: '3'
+    note: SiO2 wt % column of Table 3 (measured rows only)
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table3_sio2_residue_series_quoted
+  experiment_id: 10.2343/geochemj.17.111::3
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      weighing_accuracy_mg: '0.1'
+      locator:
+        published_page: 114
+        section: Analytical procedures
+      quote: They were weighed by a microbalance with an accuracy of ±0.1 mg in order to determine the vaporized mass
+      note: Instrument accuracy as printed; no invented per-cell composition error.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 'sample_as_printed,VF_wt_pct,splash,SiO2_wt_pct,Al2O3_wt_pct,FeO_wt_pct,MgO_wt_pct,CaO_wt_pct,n_analyses,texture,minerals,composition_status
+
+      17C1,8.2,no,,,,,,,B,MP+OL+G,n.d.
+
+      C3 (1),17.0,yes,,,,,,,B,MD+OL+G,n.d.
+
+      C3 (2),10.8,no,39.09,3.57,27.92,26.32,3.09,14,,,measured
+
+      C5 (1),18.6,no,41.74,4.11,22.74,27.88,3.52,30,B,MD+OL+G,measured
+
+      C5 (2),18.4,no,,,,,,,B,MD+OL+G,n.d.
+
+      C5 (3),19.7,no,41.74,3.83,21.81,29.09,3.53,16,,,measured
+
+      C7,27.2,no,45.24,4.49,15.53,30.97,3.78,30,B,OL+G,measured
+
+      C9 (2),35.5,no,48.04,4.92,8.56,34.34,4.14,20,C,OL+G,measured
+
+      D2,43.3,no,49.03,5.48,2.88,37.81,4.80,20,C&B,OL+G,measured
+
+      18B6 (1),11.2,no,,,,,,,B,MP+OL+G,n.d.
+
+      B6 (2),12.3,no,38.73,3.55,28.40,26.26,3.07,14,,,measured
+
+      B8 (1),17.2,no,40.41,3.80,23.82,28.56,3.40,30,B,MP+OL+G,measured
+
+      B8 (2),15.8,no,39.55,3.88,25.78,27.26,3.53,24,,,measured
+
+      B8 (3),20.2,yes,,,,,,,,,valence_only
+
+      C1 (1),31.3,yes,44.22,4.87,14.39,32.49,4.05,30,B&C,OL+G,measured
+
+      C1 (2),25.0,no,42.84,4.05,19.10,30.41,3.59,16,,,measured
+
+      C1 (3),,no,,,,,,,,,valence_only_VF_absent
+
+      C3 (1),41.1,yes,45.60,4.61,11.84,33.89,4.06,20,B,OL+G,measured
+
+      C3 (2),33.1,no,45.30,4.33,12.87,33.57,3.93,16,,,measured
+
+      C3 (3),42.3,yes,46.12,4.99,9.95,34.38,4.55,20,B&C,OL+G,measured
+
+      C3 (4),41.8,yes,,,,,,,,,valence_only
+
+      C5 (1),45.0,no,47.35,5.33,4.18,38.43,4.70,20,C,OL+(G),measured
+
+      C5 (2),49.4,yes,47.05,5.14,3.85,39.14,4.82,20,C,OL+(G),measured
+
+      19B2,12.2,no,37.94,3.55,29.14,26.09,3.29,20,,,measured
+
+      B4,17.2,no,39.64,3.74,25.60,27.76,3.27,14,,,measured
+
+      B6,26.3,no,41.09,4.02,20.59,30.74,3.56,30,B,MD+OL+G,measured
+
+      B8,38.7,no,44.23,5.03,11.49,34.77,4.48,20,B&C,OL+G,measured
+
+      C1,49.3,no,45.56,5.88,4.55,38.94,5.07,20,C,OL+(G),measured
+
+      20B2,27.0,no,40.87,4.14,20.46,30.81,3.72,16,,,measured
+
+      B4,40.5,no,43.00,5.40,12.27,34.56,4.76,20,B,OL+G,measured
+
+      B6,52.5,no,43.74,6.24,3.15,41.10,5.77,20,C,OL+(G),measured'
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-015-hashimoto-1983::hashimoto_1983_table3_sio2_residue_series
+    decided_by:
+      worker: wave-WB-2
+      date: '2026-09-06'
+      evidence:
+        published_page: 116
+        table: '3'
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 116
+    table: '3'
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table4_phase_compositions
+  experiment_id: 10.2343/geochemj.17.111::4
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 118
+    pdf_page_index: 8
+    table: '4'
+    note: EPMA averages of magnetite, olivine and glass in 18B6(1) and 17C1
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table5_initial_vaporization_rate_F
+  experiment_id: 10.2343/geochemj.17.111::5
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived_from_figure_8_linear_portion'
+    original_method_class: derived_from_figure_8_linear_portion
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 122
+    pdf_page_index: 12
+    table: '5'
+    note: F = experimental vaporization rate at the initial stage (maximum rate), mol/s
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table6_feo_vaporization_enthalpies
+  experiment_id: 10.2343/geochemj.17.111::6
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 124
+    pdf_page_index: 14
+    table: '6'
+    note: JANAF 1971 enthalpies of vaporization at 2000 K for Fe-bearing reactions 1-12
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table6_feo_vaporization_enthalpies_quoted
+  experiment_id: 10.2343/geochemj.17.111::6
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-015-hashimoto-1983::hashimoto_1983_table6_feo_vaporization_enthalpies
+    decided_by:
+      worker: wave-WB-2
+      date: '2026-09-06'
+      evidence:
+        published_page: 124
+        table: '6'
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 124
+    table: '6'
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table6_mgo_vaporization_enthalpies
+  experiment_id: 10.2343/geochemj.17.111::6
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 124
+    pdf_page_index: 14
+    table: '6'
+    note: JANAF 1971 enthalpies for MgO reactions 18-20
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table6_mgo_vaporization_enthalpies_quoted
+  experiment_id: 10.2343/geochemj.17.111::6
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-015-hashimoto-1983::hashimoto_1983_table6_mgo_vaporization_enthalpies
+    decided_by:
+      worker: wave-WB-2
+      date: '2026-09-06'
+      evidence:
+        published_page: 124
+        table: '6'
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 124
+    table: '6'
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table6_sio2_vaporization_enthalpies
+  experiment_id: 10.2343/geochemj.17.111::6
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 124
+    pdf_page_index: 14
+    table: '6'
+    note: JANAF 1971 enthalpies for SiO2 reactions 13-17
+  read_from: pdf:kems-015-hashimoto-1983
+- observation_id: kems-015-hashimoto-1983::hashimoto_1983_table6_sio2_vaporization_enthalpies_quoted
+  experiment_id: 10.2343/geochemj.17.111::6
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-015-hashimoto-1983::hashimoto_1983_table6_sio2_vaporization_enthalpies
+    decided_by:
+      worker: wave-WB-2
+      date: '2026-09-06'
+      evidence:
+        published_page: 124
+        table: '6'
+  notices: []
+  source_id: kems-015-hashimoto-1983
+  locator:
+    published_page: 124
+    table: '6'
+  read_from: pdf:kems-015-hashimoto-1983

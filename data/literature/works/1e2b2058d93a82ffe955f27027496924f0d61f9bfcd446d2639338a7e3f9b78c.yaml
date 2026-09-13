@@ -1,0 +1,59 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 1e2b2058d93a82ffe955f27027496924f0d61f9bfcd446d2639338a7e3f9b78c
+  citation: Oxide vaporization KEMS for Bi–O (Kazenas; search Bi4O6/BiO)
+  source_ids:
+  - pending-bi2o3-kems
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:pending-bi2o3-kems
+      role: pdf
+      path: raw/pending-bi2o3-kems/pending-bi2o3-kems.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:pending-bi2o3-kems
+      role: pdftotext
+      path: text/pending-bi2o3-kems
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pending-bi2o3-kems
+      role: table_csv
+      path: tables/pending-bi2o3-kems
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 1e2b2058d93a82ffe955f27027496924f0d61f9bfcd446d2639338a7e3f9b78c::PENDING#Bi2O3_KEMS
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 1e2b2058d93a82ffe955f27027496924f0d61f9bfcd446d2639338a7e3f9b78c
+  locator:
+    note: Oxide vaporization KEMS for Bi–O (Kazenas; search Bi4O6/BiO)
+    record: PENDING#Bi2O3_KEMS

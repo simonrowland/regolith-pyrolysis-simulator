@@ -1,0 +1,161 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/costa-jacobson-2015.yaml
+observations:
+- observation_id: costa-jacobson-2015::costa_jacobson_2015_fe_olivine_kems
+  experiment_id: 21e11ade7220e0bdbe00ac8f1b23e00c31b56972aba53ded96d41ef2bcf60069::costa_jacobson_2015_fe_olivine_kems
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.02'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: high-side of measured D(Fe+) band adopted as conservative pin
+      alpha_range:
+      - '0.011'
+      - '0.02'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: costa-jacobson-2015
+  locator:
+    note: Costa, G. C. C. & Jacobson, N. S. (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry,
+      NASA NTRS 20150002321
+    record: costa_jacobson_2015_fe_olivine_kems
+  read_from: pdf:costa-jacobson-2015
+- observation_id: costa-jacobson-2015::costa_jacobson_2015_sio_olivine_kems
+  experiment_id: 21e11ade7220e0bdbe00ac8f1b23e00c31b56972aba53ded96d41ef2bcf60069::costa_jacobson_2015_sio_olivine_kems
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Range from figure band / prior extract; not a single pin
+      alpha_range:
+      - '0.003'
+      - '0.036'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: costa-jacobson-2015
+  locator:
+    note: Costa & Jacobson (2015) NASA NTRS 20150002321; D(SiO+) plot band ~0.01-0.04 class (prior runtime cross-check REF-016)
+    record: costa_jacobson_2015_sio_olivine_kems
+  read_from: pdf:costa-jacobson-2015

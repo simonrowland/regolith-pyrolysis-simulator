@@ -1,0 +1,1534 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/lamoreaux-hildenbrand-1984.yaml
+observations:
+- observation_id: lamoreaux-hildenbrand-1984::LH84_Cs2O_g_GEF_segments
+  experiment_id: 10.1063/1.555706::LH84_Cs2O_g_GEF_segments
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cs2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    note: pp. 154–156 region of JPCRD 13(1)
+    record: LH84_Cs2O_g_GEF_segments
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_Cs2O_g_formation
+  experiment_id: '10.1063/1.555706::Table 4, p. 157–158 — Cs2O(g): ΔfH°298/R = −19.10 ± 3.00 kK; S°298/R = 38.23 ± 1.00; (H°298−H°0)/R
+    = 1.66 kK'
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cs2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      Delta_f_H_298_over_R_uncertainty_kK: '3'
+      S_298_over_R_uncertainty: '1'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    table: 'Table 4, p. 157–158 — Cs2O(g): ΔfH°298/R = −19.10 ± 3.00 kK; S°298/R = 38.23 ± 1.00; (H°298−H°0)/R = 1.66 kK'
+    note: 'Table 4, p. 157–158 — Cs2O(g): ΔfH°298/R = −19.10 ± 3.00 kK; S°298/R = 38.23 ± 1.00; (H°298−H°0)/R = 1.66 kK'
+    record: LH84_Cs2O_g_formation
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_Li2O_g_formation
+  experiment_id: '10.1063/1.555706::Table 4, p. 157 — Li2O(g) row: ΔfH°298/R = −20.78 ± 0.45 kK; S°298/R = 27.56 ± 0.75; (H°298−H°0)/R
+    = 1.50 kK'
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Li2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      Delta_f_H_298_over_R_uncertainty_kK: '0.45'
+      S_298_over_R_uncertainty: '0.75'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    table: 'Table 4, p. 157 — Li2O(g) row: ΔfH°298/R = −20.78 ± 0.45 kK; S°298/R = 27.56 ± 0.75; (H°298−H°0)/R = 1.50 kK'
+    note: 'Table 4, p. 157 — Li2O(g) row: ΔfH°298/R = −20.78 ± 0.45 kK; S°298/R = 27.56 ± 0.75; (H°298−H°0)/R = 1.50 kK'
+    record: LH84_Li2O_g_formation
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_Li2O_s_formation
+  experiment_id: 10.1063/1.555706::LH84_Li2O_s_formation
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Li2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      Delta_f_H_298_over_R_uncertainty_kK: '0.04'
+      S_298_over_R_uncertainty: '0.02'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    note: ΔfH°298/R = −71.91 ± 0.04 kK; S°298/R = 4.56 ± 0.02
+    record: LH84_Li2O_s_formation
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_Na2O_fusion
+  experiment_id: 10.1063/1.555706::Table 1
+  identity:
+    quantity: transition_temperature
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      T_m_uncertainty_K: '100'
+      Delta_fus_H_over_R_uncertainty_kK: '0.5'
+      note: 'Table 1 footnote c: uncertainty estimated (this work)'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    page: 153
+    published_page: 153
+    table: Table 1
+    note: Na2O Tm = 1405 ± 100 K; ΔfusH/R = 5.7 ± 0.5 kK; footnote c = uncertainty estimated (this work)
+    source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
+    record: LH84_Na2O_fusion
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_Na2O_l_GEF_segments
+  experiment_id: 10.1063/1.555706::Table 2
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: expression
+    expression_text: evaluator_segments_as_published
+    expression_domain: segments
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    page: 154
+    published_page: 154
+    table: Table 2
+    note: Na2O(l) single GEF segment 1405-3000 K
+    source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
+    record: LH84_Na2O_l_GEF_segments
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_Na2O_s_GEF_segments
+  experiment_id: 10.1063/1.555706::Table 2
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: expression
+    expression_text: evaluator_segments_as_published
+    expression_domain: segments
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    page: 154
+    published_page: 154
+    table: Table 2
+    note: Na2O(s) GEF polynomial segments; dual visual+MinerU; C(1300-1405)=-0.764 by segment continuity
+    source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
+    record: LH84_Na2O_s_GEF_segments
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_Na2O_s_formation
+  experiment_id: 10.1063/1.555706::Table 4
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Na2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      Delta_f_H_298_over_R_uncertainty_kK: '0.5'
+      S_298_over_R_uncertainty: '0.02'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    page: 157
+    published_page: 157
+    table: Table 4
+    note: Na2O(s) ΔfH°298/R = −50.17 ± 0.50 kK; S°298/R = 9.03 ± 0.02; (H°298−H°0)/R = 1.49 kK
+    source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
+    record: LH84_Na2O_s_formation
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_Na_g_GEF_segments
+  experiment_id: 10.1063/1.555706::Table 2
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: expression
+    expression_text: evaluator_segments_as_published
+    expression_domain: segments
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    page: 154
+    published_page: 154
+    table: Table 2
+    note: Na(g) GEF segments 298-800 and 800-3000 K
+    source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
+    record: LH84_Na_g_GEF_segments
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_Na_g_formation
+  experiment_id: 10.1063/1.555706::Table 4
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      Delta_f_H_298_over_R_uncertainty_kK: '0.05'
+      S_298_over_R_uncertainty: '0'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    page: 157
+    published_page: 157
+    table: Table 4
+    note: Na(g) ΔfH°298/R = 12.88 ± 0.05 kK; S°298/R = 18.47 ± 0.00; (H°298−H°0)/R = 0.75 kK
+    source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
+    record: LH84_Na_g_formation
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_O2_g_GEF_segments
+  experiment_id: 10.1063/1.555706::Table 2
+  identity:
+    quantity: delta_fG
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: expression
+    expression_text: evaluator_segments_as_published
+    expression_domain: segments
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    page: 154
+    published_page: 154
+    table: Table 2
+    note: O2(g) GEF segments (same rows as t141 K verified-data)
+    source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
+    record: LH84_O2_g_GEF_segments
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_O2_g_formation
+  experiment_id: 10.1063/1.555706::Table 4
+  identity:
+    quantity: delta_fG
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      S_298_over_R_uncertainty: '0.01'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    page: 157
+    published_page: 157
+    table: Table 4
+    note: O2(g) ΔfH°298/R = 0; S°298/R = 24.66 ± 0.01; (H°298−H°0)/R = 1.04 kK
+    source_path: docs-private/research/ocr-artifacts/lamoreaux-hildenbrand-1984-t383/mineru-out/tables-p4-8/hybrid_ocr/tables-p4-8.md
+    record: LH84_O2_g_formation
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_Rb2O_g_formation
+  experiment_id: '10.1063/1.555706::Table 4, p. 157 — Rb2O(g): ΔfH°298/R = −8.05 ± 2.50 kK; S°298/R = 36.31 ± 0.75; (H°298−H°0)/R
+    = 1.66 kK'
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Rb2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      Delta_f_H_298_over_R_uncertainty_kK: '2.5'
+      S_298_over_R_uncertainty: '0.75'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    table: 'Table 4, p. 157 — Rb2O(g): ΔfH°298/R = −8.05 ± 2.50 kK; S°298/R = 36.31 ± 0.75; (H°298−H°0)/R = 1.66 kK'
+    note: 'Table 4, p. 157 — Rb2O(g): ΔfH°298/R = −8.05 ± 2.50 kK; S°298/R = 36.31 ± 0.75; (H°298−H°0)/R = 1.66 kK'
+    record: LH84_Rb2O_g_formation
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::LH84_Rb2O_s_formation
+  experiment_id: 10.1063/1.555706::LH84_Rb2O_s_formation
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Rb2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      Delta_f_H_298_over_R_uncertainty_kK: '1.56'
+      S_298_over_R_uncertainty: '0.75'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    note: LH84_Rb2O_s_formation
+    record: LH84_Rb2O_s_formation
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::NEA05_Se2_g
+  experiment_id: 10.1063/1.555706::NEA05_Se2_g
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Se_n_ladder
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    note: selected ΔfH°298(Se2,g) = (141.1 ± 3.0) kJ·mol⁻¹; ΔfG°298 = (92.4 ± 3.0); S°298 = (247.38 ± 0.40) J·K⁻¹·mol⁻¹; pp.
+      98–99 of content
+    record: NEA05_Se2_g
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::NEA05_Se5_g
+  experiment_id: 10.1063/1.555706::NEA05_Se5_g
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Se_n_ladder
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    note: selected ΔfH°298 = (144.4 ± 4.3) kJ·mol⁻¹; ΔfG°298 = (88.4 ± 5.3); S°298 = (398.3 ± 10.0) J·K⁻¹·mol⁻¹
+    record: NEA05_Se5_g
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::NEA05_Se6_g
+  experiment_id: 10.1063/1.555706::NEA05_Se6_g
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Se_n_ladder
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    note: selected ΔfH°298 = (136.1 ± 3.8) kJ·mol⁻¹; ΔfG°298 = (83.6 ± 4.9); S°298 = (428.5 ± 10.0) J·K⁻¹·mol⁻¹
+    record: NEA05_Se6_g
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::illustrative_dissociation_reaction
+  experiment_id: 10.1063/1.555706::illustrative_dissociation_reaction
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Ga2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    note: illustrative_dissociation_reaction
+    record: illustrative_dissociation_reaction
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::sublimation_BaO_s_to_BaO_g
+  experiment_id: 10.1063/1.555706::sublimation_BaO_s_to_BaO_g
+  identity:
+    quantity: delta_fG
+    species:
+      formula: BaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    note: sublimation_BaO_s_to_BaO_g
+    record: sublimation_BaO_s_to_BaO_g
+  read_from: pdf:lamoreaux-hildenbrand-1984
+- observation_id: lamoreaux-hildenbrand-1984::sublimation_SrO_s_to_SrO_g
+  experiment_id: 10.1063/1.555706::sublimation_SrO_s_to_SrO_g
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SrO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: lamoreaux-hildenbrand-1984
+  locator:
+    note: sublimation_SrO_s_to_SrO_g
+    record: sublimation_SrO_s_to_SrO_g
+  read_from: pdf:lamoreaux-hildenbrand-1984

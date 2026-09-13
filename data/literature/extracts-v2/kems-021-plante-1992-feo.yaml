@@ -1,0 +1,335 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-021-plante-1992-feo.yaml
+observations:
+- observation_id: kems-021-plante-1992-feo::plante_1992_fig1_IT_vs_T_figure_only_blocked
+  experiment_id: 10.2355/isijinternational.32.1276::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
+    decided_by:
+      worker: orphans-close
+      date: '2026-08-27'
+      evidence:
+        page: 1277
+        figure: '1'
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1277
+    figure: '1'
+  read_from: pdf:kems-021-plante-1992-feo
+- observation_id: kems-021-plante-1992-feo::plante_1992_fig4_activity_figure_only_blocked
+  experiment_id: 10.2355/isijinternational.32.1276::4
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: FeO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; no tabulated foreign points copied from the figure
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class mixed'
+    original_method_class: mixed
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
+    decided_by:
+      worker: orphans-close
+      date: '2026-08-27'
+      evidence:
+        page: 1278
+        figure: '4'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    figure: '4'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: pdf:kems-021-plante-1992-feo
+- observation_id: kems-021-plante-1992-feo::plante_1992_table1_ion_intensity_ratios_1973k
+  experiment_id: 10.2355/isijinternational.32.1276::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1973'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 prints no sigma.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '1'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: pdf:kems-021-plante-1992-feo
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1973'
+      locator:
+        page: 1278
+        pdf_page_index: 3
+        table: '1'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+- observation_id: kems-021-plante-1992-feo::plante_1992_table2_feo_activity_coefficient_1973k
+  experiment_id: 10.2355/isijinternational.32.1276::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: FeO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 2 prints no sigma on f(FeO).
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-021-plante-1992-feo
+  locator:
+    page: 1278
+    pdf_page_index: 3
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-021-plante-1992-feo/tables.md
+  read_from: pdf:kems-021-plante-1992-feo

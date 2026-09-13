@@ -1,0 +1,165 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2205/2011nz000234
+  citation: Yakovlev, O.I. & Shornikov, S.I. (2011), "Experimental study of meteorites and Ca–Al-inclusions", Vestn. Otd.
+    nauk Zemle 3, NZ6104, doi:10.2205/2011NZ000234
+  source_ids:
+  - kems-029-yakovlev-shornikov-2011
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-029-yakovlev-shornikov-2011
+      role: pdf
+      path: raw/kems-029-yakovlev-shornikov-2011/kems-029-yakovlev-shornikov-2011.pdf
+      sha256:
+        tag: value
+        value: 1381e9fe2ccac98428b467283d3661fc7408e86af9a2bdb3ead327da3e9b2484
+    - asset_id: pdftotext:kems-029-yakovlev-shornikov-2011
+      role: pdftotext
+      path: text/kems-029-yakovlev-shornikov-2011
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-029-yakovlev-shornikov-2011
+      role: table_csv
+      path: tables/kems-029-yakovlev-shornikov-2011
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2205/2011nz000234
+experiments:
+- experiment_id: 10.2205/2011nz000234::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2205/2011nz000234
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    figure: '1'
+    note: Partial pressures dependences on temperature for Murchison chondrite vaporization
+- experiment_id: 10.2205/2011nz000234::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2205/2011nz000234
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    figure: '2'
+    note: Partial pressures dependences on temperature for Ca-Al-inclusion vaporization
+- experiment_id: 10.2205/2011nz000234::O2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2205/2011nz000234
+  locator:
+    published_page: 2
+    pdf_page_index: 2
+    table: O2
+    note: Table. O2 pressure about meteorite and CAI melts. Pressure, bar.
+- experiment_id: 10.2205/2011nz000234::kems-029-yakovlev-shornikov-2011
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2205/2011nz000234
+  locator:
+    published_page: 1
+    pdf_page_index: 1
+    paragraph: The Knudsen effusion method was used in combination with the mass spectrometric analysis of the vapor phase
+      (MS-1301 mass spectrometer)
+    note: Vestnik NZ6104 3-page PDF, page 1
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: tungsten effusion cell; 15 mg sample in a rhenium boat on the cell bottom
+      locator:
+        published_page: 1
+        pdf_page_index: 1
+        paragraph: Evaporation was conducted in a tungsten effusion cell. In order to minimize the interaction of tungsten
+          with melt, a 15 mg sample was loaded into a rhenium boat
+        note: Vestnik NZ6104 3-page PDF, page 1

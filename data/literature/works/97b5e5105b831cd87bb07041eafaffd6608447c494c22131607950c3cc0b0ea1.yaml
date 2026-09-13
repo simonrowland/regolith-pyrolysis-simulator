@@ -1,0 +1,59 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 97b5e5105b831cd87bb07041eafaffd6608447c494c22131607950c3cc0b0ea1
+  citation: Chromia oxidizing vaporization CrO3(g) KEMS under high fO2
+  source_ids:
+  - pending-kems-cro3
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:pending-kems-cro3
+      role: pdf
+      path: raw/pending-kems-cro3/pending-kems-cro3.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:pending-kems-cro3
+      role: pdftotext
+      path: text/pending-kems-cro3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pending-kems-cro3
+      role: table_csv
+      path: tables/pending-kems-cro3
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 97b5e5105b831cd87bb07041eafaffd6608447c494c22131607950c3cc0b0ea1::PENDING-KEMS#CrO3
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 97b5e5105b831cd87bb07041eafaffd6608447c494c22131607950c3cc0b0ea1
+  locator:
+    note: Chromia oxidizing vaporization CrO3(g) KEMS under high fO2
+    record: PENDING-KEMS#CrO3

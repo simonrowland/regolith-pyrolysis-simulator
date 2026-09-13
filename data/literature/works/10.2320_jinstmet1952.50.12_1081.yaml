@@ -1,0 +1,474 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  citation: Ueda, Y., Nishi, T., Oishi, T. & Ono, K. (1986), "Thermodynamic Study of the Liquid Ti-Co Alloys by Mass Spectrometry",
+    J. Japan Inst. Metals 50(12):1081-1088, DOI 10.2320/jinstmet1952.50.12_1081
+  source_ids:
+  - kems-095-ueda-1986
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-095-ueda-1986
+      role: pdf
+      path: raw/kems-095-ueda-1986/kems-095-ueda-1986.pdf
+      sha256:
+        tag: value
+        value: 0c3d55daa42a629ccdd612921df3b144bd5e55b8d3ce789e93ca7ba9661ea25e
+    - asset_id: pdftotext:kems-095-ueda-1986
+      role: pdftotext
+      path: text/kems-095-ueda-1986
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-095-ueda-1986
+      role: table_csv
+      path: tables/kems-095-ueda-1986
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2320/jinstmet1952.50.12_1081
+experiments:
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1083
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 X-ray diffraction patterns of Ti-Co alloys
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1086
+    pdf_page_index: 6
+    figure: '10'
+    note: Fig. 10 Activities of the Ti-Co system at 1873 and 1973 K.
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::11
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1086
+    pdf_page_index: 6
+    figure: '11'
+    note: Fig. 11 Integration curve for the partial enthalpies of mixing in the Ti-Co system.
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::12
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1086
+    pdf_page_index: 6
+    figure: '12'
+    note: Fig. 12 Partial and integral enthalpies of mixing of the liquid Ti-Co system.
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::13
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1086
+    pdf_page_index: 6
+    figure: '13'
+    note: Fig. 13 Thermodynamic quantities of the Ti-Co system at 1873 K.
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 gamma_Ti(B) binary vs gamma_Ti(T) Ti-Co-O ternary at 1873 and 1973 K
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Y2O3 Knudsen cell (Japan Chemical Ceramics); W cell holder; Ta heater (Fig. 3)
+      locator:
+        published_page: 1082
+        pdf_page_index: 2
+        figure: '3'
+        note: Y2O3 Knudsen cell; W cell holder; Ta heater; W rod; W-Re 5/26 thermocouple
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1082
+    pdf_page_index: 2
+    figure: '3'
+    section: II
+    note: ANELVA NAG-531 quadrupole MS; Y2O3 cell; orifice 0.5-0.8 mm; 0.9-1.2 g; 3e-5 Pa
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Y2O3 Knudsen cell (Japan Chemical Ceramics); W cell holder; Ta heater (Fig. 3)
+      locator:
+        published_page: 1082
+        pdf_page_index: 2
+        figure: '3'
+        note: Y2O3 Knudsen cell; W cell holder; Ta heater; W rod; W-Re 5/26 thermocouple
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1083
+    pdf_page_index: 3
+    figure: '4'
+    note: Fig. 4 Time dependence of the ion intensities and ion intensity ratio for the Ti-60 mol%Co alloy at 2020 K.
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1083
+    pdf_page_index: 3
+    figure: '5'
+    note: Fig. 5 Experimental intensity ratios for the liquid Ti-Co alloys.
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1084
+    pdf_page_index: 4
+    figure: '6'
+    note: Fig. 6 Oxygen concentration in the Ti-Co alloys.
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1084
+    pdf_page_index: 4
+    figure: '7'
+    note: Fig. 7 Schematic representation of the integration path for the Ti-Co binary alloys.
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1084
+    pdf_page_index: 4
+    figure: '8'
+    note: Fig. 8 Integration curve for the activity coefficients in the Ti-Co binary system at 1973 K.
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1085
+    pdf_page_index: 5
+    figure: '9'
+    note: Fig. 9 Integration curves for the activity coefficients in the Ti-Co-O ternary system at 1973 K.
+- experiment_id: 10.2320/jinstmet1952.50.12_1081::kems-095-ueda-1986
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2320/jinstmet1952.50.12_1081
+  locator:
+    published_page: 1087
+    pdf_page_index: 7
+    section: IV
+    note: conclusion mixing functions; also English abstract p. 1081

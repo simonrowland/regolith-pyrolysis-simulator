@@ -1,0 +1,1959 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-031-halwax-2024.yaml
+observations:
+- observation_id: kems-031-halwax-2024::halwax_2024_cao_kems_geometry_package
+  experiment_id: 10.1007/s11663-024-02995-6::docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: CaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    section: III. EXPERIMENTAL
+    line_range: 220-230
+    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_cao_third_law_formation_enthalpy
+  experiment_id: 10.1007/s11663-024-02995-6::IV
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_f_H_kJ_mol: '3.5'
+      basis: author_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class third_law_kems'
+    original_method_class: third_law_kems
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    table: IV
+    line_range: 595-607
+    note: Third-law standard formation enthalpy for pure solid CaO
+    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_b1
+  experiment_id: 10.1007/s11663-024-02995-6::docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+  identity:
+    quantity: p_sat
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    paragraph: Ir Knudsen cell geometry; explicitly not HKL α
+    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_quoted
+  experiment_id: 10.1007/s11663-024-02995-6::kems-031-halwax-2024
+  identity:
+    quantity: p_sat
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      temperature_systematic_K: '5'
+      quote: a systematic error of ± 5 K is estimated
+      locator:
+        page: 825
+        paragraph: experimental
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-031-halwax-2024::halwax_2024_geometry_not_alpha_b1
+    decided_by:
+      worker: DEEP-kems-031-halwax-2024
+      date: '2026-09-06'
+      evidence:
+        page: 825
+        published_page: 825
+        pdf_page_index: 5
+        paragraph: experimental
+        note: quote=To prevent reactions between the Knudsen cell and the sample, an iridium cell was used. The orifice in
+          the lid of the cell had a diameter of 0.3 mm.
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 825
+    published_page: 825
+    pdf_page_index: 5
+    paragraph: experimental
+    note: quote=To prevent reactions between the Knudsen cell and the sample, an iridium cell was used. The orifice in the
+      lid of the cell had a diameter of 0.3 mm.
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_mgo_kems_geometry_psat_package
+  experiment_id: 10.1007/s11663-024-02995-6::docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: temperature systematic ±5 K estimated by authors; ΔfH product is primary result (not α)
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    section: III. EXPERIMENTAL
+    line_range: 220-230
+    note: Pure MgO vaporization in Ir Knudsen cell; lid orifice 0.3 mm
+    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_mgo_third_law_formation_enthalpy
+  experiment_id: 10.1007/s11663-024-02995-6::IV
+  identity:
+    quantity: delta_fG
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_f_H_kJ_mol: '10'
+      basis: author_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class third_law_kems'
+    original_method_class: third_law_kems
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    table: IV
+    line_range: 595-607
+    note: Third-law standard formation enthalpy for pure solid MgO
+    source_path: docs-private/research/ocr-artifacts/kems-031-halwax-2024/spool/out/kems-031-halwax-2024/vlm/kems-031-halwax-2024.md
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_i_cao_sample_masses
+  experiment_id: 10.1007/s11663-024-02995-6::I
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: CaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no printed uncertainty on Table I mass cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+    attribution: '1st measurement | 53.93 | 45.06
+
+      2nd measurement | 49.51 | 45.72'
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-031-halwax-2024::halwax_2024_cao_kems_geometry_package
+    decided_by:
+      worker: DEEP-kems-031-halwax-2024
+      date: '2026-09-06'
+      evidence:
+        page: 825
+        published_page: 825
+        pdf_page_index: 5
+        table: I
+        source_path: tables/kems-031-halwax-2024/t1.csv
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 825
+    published_page: 825
+    pdf_page_index: 5
+    table: I
+    source_path: tables/kems-031-halwax-2024/t1.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_i_mgo_sample_masses
+  experiment_id: 10.1007/s11663-024-02995-6::I
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no printed uncertainty on Table I mass cells
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+    attribution: '1st measurement | 53.67 | 49.25
+
+      2nd measurement | 51.58 | 48.28'
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-031-halwax-2024::halwax_2024_mgo_kems_geometry_psat_package
+    decided_by:
+      worker: DEEP-kems-031-halwax-2024
+      date: '2026-09-06'
+      evidence:
+        page: 825
+        published_page: 825
+        pdf_page_index: 5
+        table: I
+        source_path: tables/kems-031-halwax-2024/t1.csv
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 825
+    published_page: 825
+    pdf_page_index: 5
+    table: I
+    source_path: tables/kems-031-halwax-2024/t1.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_ii_ni_sublimation_literature
+  experiment_id: 10.1007/s11663-024-02995-6::II
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Ni
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      cells:
+      - source: NIST-JANAF Tables[1]
+        delta_H_sub_kJ_mol: '8.4'
+        quote: 418 ± 8.4
+      - source: Alcock et al.[48]
+        delta_H_sub_kJ_mol: '5'
+        quote: 421 ± 5
+      locator:
+        page: 826
+        table: II
+      note: FactSageTM has no printed ±
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: 'NIST-JANAF Tables[1] | 418 ± 8.4
+
+      Alcock et al.[48] | 421 ± 5
+
+      FactSageTM | 417'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 826
+    published_page: 826
+    pdf_page_index: 6
+    table: II
+    source_path: tables/kems-031-halwax-2024/t2.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_ii_ni_sublimation_this_study
+  experiment_id: 10.1007/s11663-024-02995-6::II
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Ni
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_H_sub_kJ_mol: '4'
+      quote: 422 ± 4
+      locator:
+        page: 826
+        table: II
+      basis: author_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class second_law_kems'
+    original_method_class: second_law_kems
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 826
+    published_page: 826
+    pdf_page_index: 6
+    table: II
+    note: row=This Study
+    source_path: tables/kems-031-halwax-2024/t2.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_iii_ionization_cross_sections
+  experiment_id: 10.1007/s11663-024-02995-6::III
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no printed uncertainty on Table III cells
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: 'Species/Isotope | σi [10^-16 cm2] | ni
+
+      40Ca | 9.0534 | 0.96941
+
+      16O | 1.2677 | 0.99757
+
+      16O2 | 1.9016 | 0.99515
+
+      24Mg | 4.6574 | 0.78990'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 826
+    published_page: 826
+    pdf_page_index: 6
+    table: III
+    source_path: tables/kems-031-halwax-2024/t3.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_1st_measurement
+  experiment_id: 10.1007/s11663-024-02995-6::IV
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_f_H_kJ_mol: '3'
+      quote: −624 ± 3
+      locator:
+        page: 830
+        table: IV
+      basis: author_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class third_law_kems'
+    original_method_class: third_law_kems
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 830
+    published_page: 830
+    pdf_page_index: 10
+    table: IV
+    note: row=1st measurement
+    source_path: tables/kems-031-halwax-2024/t4.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_2nd_measurement
+  experiment_id: 10.1007/s11663-024-02995-6::IV
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_f_H_kJ_mol: '3'
+      quote: −625 ± 3
+      locator:
+        page: 830
+        table: IV
+      basis: author_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class third_law_kems'
+    original_method_class: third_law_kems
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 830
+    published_page: 830
+    pdf_page_index: 10
+    table: IV
+    note: row=2nd measurement
+    source_path: tables/kems-031-halwax-2024/t4.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_literature_and_factps
+  experiment_id: 10.1007/s11663-024-02995-6::IV
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      cells:
+      - source: '9'
+        delta_f_H_kJ_mol: '3'
+        quote: −602 ± 3 | 9
+      - source: '3'
+        delta_f_H_kJ_mol: '4'
+        quote: −610 ± 4 | 3
+      - source: '4'
+        delta_f_H_kJ_mol: '1.5'
+        quote: −634 ± 1.5 | 4
+      - source: '1'
+        delta_f_H_kJ_mol: '1'
+        quote: −635 ± 1 | 1
+      - source: '11'
+        delta_f_H_kJ_mol: '1'
+        quote: −635 ± 1 | 11
+      locator:
+        page: 830
+        table: IV
+      note: FactPS and source 12 have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: '−602 ± 3 | 9
+
+      −610 ± 4 | 3
+
+      −634 ± 1.5 | 4
+
+      −635 ± 1 | 1
+
+      −635 ± 1 | 11
+
+      −636 | 12
+
+      −635 | FactPS'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 830
+    published_page: 830
+    pdf_page_index: 10
+    table: IV
+    source_path: tables/kems-031-halwax-2024/t4.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_iv_cao_mean
+  experiment_id: 10.1007/s11663-024-02995-6::IV
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_f_H_kJ_mol: '3.5'
+      quote: −624.5 ± 3.5
+      locator:
+        page: 830
+        table: IV
+      basis: author_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class third_law_kems'
+    original_method_class: third_law_kems
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-031-halwax-2024::halwax_2024_cao_third_law_formation_enthalpy
+    decided_by:
+      worker: DEEP-kems-031-halwax-2024
+      date: '2026-09-06'
+      evidence:
+        page: 830
+        published_page: 830
+        pdf_page_index: 10
+        table: IV
+        note: row=mean
+        source_path: tables/kems-031-halwax-2024/t4.csv
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 830
+    published_page: 830
+    pdf_page_index: 10
+    table: IV
+    note: row=mean
+    source_path: tables/kems-031-halwax-2024/t4.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_1st_measurement
+  experiment_id: 10.1007/s11663-024-02995-6::IV
+  identity:
+    quantity: delta_fG
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_f_H_kJ_mol: '4'
+      quote: −604 ± 4
+      locator:
+        page: 830
+        table: IV
+      basis: author_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class third_law_kems'
+    original_method_class: third_law_kems
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 830
+    published_page: 830
+    pdf_page_index: 10
+    table: IV
+    note: row=1st measurement
+    source_path: tables/kems-031-halwax-2024/t4.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_2nd_measurement
+  experiment_id: 10.1007/s11663-024-02995-6::IV
+  identity:
+    quantity: delta_fG
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_f_H_kJ_mol: '4'
+      quote: −592 ± 4
+      locator:
+        page: 830
+        table: IV
+      basis: author_reported
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class third_law_kems'
+    original_method_class: third_law_kems
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 830
+    published_page: 830
+    pdf_page_index: 10
+    table: IV
+    note: row=2nd measurement
+    source_path: tables/kems-031-halwax-2024/t4.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_literature_and_factps
+  experiment_id: 10.1007/s11663-024-02995-6::IV
+  identity:
+    quantity: delta_fG
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      cells:
+      - source: '9'
+        delta_f_H_kJ_mol: '10'
+        quote: −635 ± 10 | 9
+      - source: '15'
+        delta_f_H_kJ_mol: '15'
+        quote: −589 ± 15 | 15
+      - source: '1'
+        delta_f_H_kJ_mol: '1'
+        quote: −601 ± 1 | 1
+      - source: '13'
+        delta_f_H_kJ_mol: '0.5'
+        quote: −601 ± 0.5 | 13
+      - source: '14'
+        delta_f_H_kJ_mol: '0.2'
+        quote: −602 ± 0.2 | 14
+      locator:
+        page: 830
+        table: IV
+      note: FactPS and source 4 have no printed ±
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: '−635 ± 10 | 9
+
+      −589 ± 15 | 15
+
+      −601 ± 1 | 1
+
+      −601 ± 0.5 | 13
+
+      −602 ± 0.2 | 14
+
+      −602 | 4
+
+      −601 | FactPS'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 830
+    published_page: 830
+    pdf_page_index: 10
+    table: IV
+    source_path: tables/kems-031-halwax-2024/t4.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_iv_mgo_mean
+  experiment_id: 10.1007/s11663-024-02995-6::IV
+  identity:
+    quantity: delta_fG
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_f_H_kJ_mol: '10'
+      quote: −598 ± 10
+      locator:
+        page: 830
+        table: IV
+      basis: author_reported
+      text_quote: Standard deviations of the determined values for Df H298 are obtained considering the statistical deviation
+        of the experimental data.
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class third_law_kems'
+    original_method_class: third_law_kems
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-031-halwax-2024::halwax_2024_mgo_third_law_formation_enthalpy
+    decided_by:
+      worker: DEEP-kems-031-halwax-2024
+      date: '2026-09-06'
+      evidence:
+        page: 830
+        published_page: 830
+        pdf_page_index: 10
+        table: IV
+        note: row=mean
+        source_path: tables/kems-031-halwax-2024/t4.csv
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 830
+    published_page: 830
+    pdf_page_index: 10
+    table: IV
+    note: row=mean
+    source_path: tables/kems-031-halwax-2024/t4.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_v_huber_holley_ca_composition
+  experiment_id: 10.1007/s11663-024-02995-6::V
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no printed ± on Table V cells
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: 'Table V. Composition of the Ca Sample and Heats of Combustion of the Different Species Taken from Ref. [11]
+
+      CaC2 | 0.029 | 26970
+
+      CaH2 | 0.52 | 18880
+
+      CaO | 0.07 | —
+
+      Mg | 0.01 | 24670
+
+      Ca | 99.37 | ?'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 830
+    published_page: 830
+    pdf_page_index: 10
+    table: V
+    source_path: tables/kems-031-halwax-2024/t5.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_vi_liang_cao_solution_reactions
+  experiment_id: 10.1007/s11663-024-02995-6::VI
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: no printed ± on Table VI cells
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: 'Table VI. Reactions with Corresponding Reaction Enthalpies Taken from Ref. [4]
+
+      1 | Ca(s) + 2HCl(aq) = CaCl2(aq) + H2(g) | −542.77
+
+      2 | CaO(s) + 2HCl(aq) = CaCl2(aq) + H2O(l) | −197.50
+
+      3 | H2(g) + 0.5O2(g) = H2O(l) | −285.83
+
+      4 | Ca(s) + 0.5O2(g) = CaO(s) | −631.10'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 831
+    published_page: 831
+    pdf_page_index: 11
+    table: VI
+    source_path: tables/kems-031-halwax-2024/t6.csv
+  read_from: pdf:kems-031-halwax-2024
+- observation_id: kems-031-halwax-2024::halwax_2024_table_vii_shomate_huffman_reactions
+  experiment_id: 10.1007/s11663-024-02995-6::VII
+  identity:
+    quantity: delta_fG
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: printed ± retained per cell
+      quote: −465.77 ± 0.17; −149.78 ± 0.09; −285.84 ± 0.04; −601.83 ± 0.21
+      locator:
+        page: 833
+        table: VII
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: secondary_compilation
+    attribution: 'Table VII. Reactions with Corresponding Reaction Enthalpies Taken from Ref. [14]
+
+      1 | Mg(s) + 2HCl(aq) = MgCl2(aq) + H2(g) | −465.77 ± 0.17
+
+      2 | CaO(s) + 2HCl(aq) = MgCl2(aq) + H2O(l) | −149.78 ± 0.09
+
+      3 | H2(g) + 0.5O2(g) = H2O(l) | −285.84 ± 0.04
+
+      4 | Mg(s) + 0.5O2(g) = MgO(s) | −601.83 ± 0.21'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-031-halwax-2024
+  locator:
+    page: 833
+    published_page: 833
+    pdf_page_index: 13
+    table: VII
+    source_path: tables/kems-031-halwax-2024/t7.csv
+  read_from: pdf:kems-031-halwax-2024

@@ -1,0 +1,76 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.actaastro.2025.06.028
+  citation: Improving Molten Regolith Electrolysis with Zirconia-Based Hollow Anode Technology
+  source_ids:
+  - yu_2025_hollow_anode_measurements
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: pdf:yu_2025_hollow_anode_measurements
+      role: pdf
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+  doi: 10.1016/j.actaastro.2025.06.028
+experiments:
+- experiment_id: 10.1016/j.actaastro.2025.06.028::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: mre method not a closed token
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.actaastro.2025.06.028
+  locator:
+    table: 2
+    note: row=1 h; column=O2 Produced
+- experiment_id: 10.1016/j.actaastro.2025.06.028::yu_2025_hollow_anode_measurements
+  kind: literature
+  method:
+    tag: unknown
+    reason: mre method not a closed token
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.actaastro.2025.06.028
+  locator:
+    section: 2.2.2
+    note: derivation=0.5 A times 3600 s

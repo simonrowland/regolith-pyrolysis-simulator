@@ -1,0 +1,59 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: eb65a543482a415e4c10004f575f8839cd6f5050018fa5891629c3ebfed89ec3
+  citation: Behrens & Rosenblatt, J. Chem. Thermodyn. 4 (1972) 175–190
+  source_ids:
+  - behrens-rosenblatt-1972
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:behrens-rosenblatt-1972
+      role: pdf
+      path: raw/behrens-rosenblatt-1972/behrens-rosenblatt-1972.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:behrens-rosenblatt-1972
+      role: pdftotext
+      path: text/behrens-rosenblatt-1972
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:behrens-rosenblatt-1972
+      role: table_csv
+      path: tables/behrens-rosenblatt-1972
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: eb65a543482a415e4c10004f575f8839cd6f5050018fa5891629c3ebfed89ec3::NIST_BR72_arsenolite_As4O6
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: eb65a543482a415e4c10004f575f8839cd6f5050018fa5891629c3ebfed89ec3
+  locator:
+    note: NIST Antoine table for diarsenic trioxide, row 369.29–421.69 K, citing Behrens and Rosenblatt 1972
+    record: NIST_BR72_arsenolite_As4O6

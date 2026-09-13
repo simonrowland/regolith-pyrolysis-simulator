@@ -1,0 +1,242 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b
+  citation: Kato, Eiichi (1993), "Thermodynamic Studies of Metallurgical Systems by Mass Spectrometry", J. Mass Spectrom.
+    Soc. Jpn. 41(6):297-316 (REVIEW)
+  source_ids:
+  - kems-049-kato-1993-ms-review
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-049-kato-1993-ms-review
+      role: pdf
+      path: raw/kems-049-kato-1993-ms-review/kems-049-kato-1993-ms-review.pdf
+      sha256:
+        tag: value
+        value: b0bc110b0fc799afd378236b92ce7938c7fdfcdffb6e10dd5e58081021f1bf16
+    - asset_id: pdftotext:kems-049-kato-1993-ms-review
+      role: pdftotext
+      path: text/kems-049-kato-1993-ms-review
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-049-kato-1993-ms-review
+      role: table_csv
+      path: tables/kems-049-kato-1993-ms-review
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'quoted_compilation_ranking' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b
+  locator:
+    published_page: 302
+    pdf_page_index: 6
+    table: '1'
+    note: Table 1 Fe vapor pressure at 1873 K = 8.0 Pa
+- experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b
+  locator:
+    published_page: 300
+    pdf_page_index: 4
+    figure: '3'
+    note: Belton-Fruehan integration curve Fe-V at 1600 C (Furukawa and Kato)
+- experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b
+  locator:
+    published_page: 304
+    pdf_page_index: 8
+    figure: '5'
+    note: Vapor pressures of P, P2 from Fe-P alloys (Yamamoto et al.)
+- experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b
+  locator:
+    published_page: 304
+    pdf_page_index: 8
+    figure: '6'
+    note: log I_Fe T vs 1/T for Fe in low Mo (Ichise et al.)
+- experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b
+  locator:
+    published_page: 311
+    pdf_page_index: 15
+    figure: '7'
+    note: ln(I_Fe+/I_Ge+) vs 10^4/T for Fe-Ge (Nunoue and Kato)
+- experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b
+  locator:
+    published_page: 311
+    pdf_page_index: 15
+    figure: '8'
+    note: Fe-Ge phase equilibria summary (Nunoue and Kato) with overlays
+- experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'free_energy_function_assessment' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b
+  locator:
+    published_page: 300
+    pdf_page_index: 4
+    section: 2.3 Compatibility of cell material with samples
+    note: calculated a_Al in Fe in equilibrium with Al2O3 at the Fe-V example pO2

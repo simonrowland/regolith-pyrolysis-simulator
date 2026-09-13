@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4
+  citation: Stebbins, J. F., Carmichael, I. S. E. & Weill, D. E. (1983), "The high temperature liquid and glass heat contents
+    and the heats of fusion of diopside, albite, sanidine and nepheline", American Mineralogist 68, 717-730.
+  source_ids:
+  - stebbins-carmichael-weill-1983
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:stebbins-carmichael-weill-1983
+      role: pdf
+      path: raw/stebbins-carmichael-weill-1983/stebbins-carmichael-weill-1983.pdf
+      sha256:
+        tag: value
+        value: 5246cf5b6bfd79f16961aac8264757af04da1d308e5d6b860aac747a44b2d8d6
+    - asset_id: pdftotext:stebbins-carmichael-weill-1983
+      role: pdftotext
+      path: text/stebbins-carmichael-weill-1983
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:stebbins-carmichael-weill-1983
+      role: table_csv
+      path: tables/stebbins-carmichael-weill-1983
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4::docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'inverse_drop_calorimetry_DSC_and_compiled_calorimetry' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: e21c26d90a0f5d14149da4616a8ffbd34a7e66901db372ac4ba5ceb16a1ecda4
+  locator:
+    note: tables=['1', '2', '3', '4', '6', '7']; pages=PDF pp. 4-7 / printed pp. 720-723
+    source_path: docs-private/research/2026-08-27-ocr-repair/stebbins-carmichael-weill-1983/tables.md

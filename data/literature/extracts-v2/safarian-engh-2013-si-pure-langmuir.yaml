@@ -1,0 +1,81 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/safarian-engh-2013-si-pure-langmuir.yaml
+observations:
+- observation_id: safarian-engh-2013-si-pure-langmuir::safarian_engh_2013_si_pure_langmuir
+  experiment_id: 10.1007/s11661-012-1464-2::safarian_engh_2013_si_pure_langmuir
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Si
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '1'
+  uncertainty:
+    kind: printed
+    verbatim:
+      alpha_range:
+      - '0.84'
+      - '1'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: safarian-engh-2013-si-pure-langmuir
+  locator:
+    note: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2
+    record: safarian_engh_2013_si_pure_langmuir
+  read_from: pdf:safarian-engh-2013-si-pure-langmuir

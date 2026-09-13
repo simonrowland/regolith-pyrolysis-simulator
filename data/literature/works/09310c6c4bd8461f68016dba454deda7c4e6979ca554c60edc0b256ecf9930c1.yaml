@@ -1,0 +1,59 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 09310c6c4bd8461f68016dba454deda7c4e6979ca554c60edc0b256ecf9930c1
+  citation: LH87 BeO(g); JANAF BeO(g) — use one as fit, one as anchor at numeric land
+  source_ids:
+  - lh87-beo-g
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:lh87-beo-g
+      role: pdf
+      path: raw/lh87-beo-g/lh87-beo-g.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:lh87-beo-g
+      role: pdftotext
+      path: text/lh87-beo-g
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:lh87-beo-g
+      role: table_csv
+      path: tables/lh87-beo-g
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 09310c6c4bd8461f68016dba454deda7c4e6979ca554c60edc0b256ecf9930c1::LH87#BeO_g
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 09310c6c4bd8461f68016dba454deda7c4e6979ca554c60edc0b256ecf9930c1
+  locator:
+    note: LH87 BeO(g); JANAF BeO(g) — use one as fit, one as anchor at numeric land
+    record: LH87#BeO_g

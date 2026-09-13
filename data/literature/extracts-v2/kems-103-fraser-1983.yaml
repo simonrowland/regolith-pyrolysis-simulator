@@ -1,0 +1,324 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-103-fraser-1983.yaml
+observations:
+- observation_id: kems-103-fraser-1983::fraser_1983_appendix1_ln_INa_IK
+  experiment_id: 10.3406/bulmi.1983.7673::appendix1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: NaAlSi2O6
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Appendix 1 % Error includes the standard deviations of the original peak fits to the mass spectrometer data and
+        an error of 1% added for fluctuations in temperature control and non-linearities in the amplifier gain (p.117 explanatory
+        notes).
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-103-fraser-1983
+  locator:
+    published_page: 116
+    table: appendix1
+    note: Appendix 1 list of runs and experimental data, continues p.117
+  read_from: pdf:kems-103-fraser-1983
+- observation_id: kems-103-fraser-1983::fraser_1983_kems_mo_cell_geometry
+  experiment_id: 10.3406/bulmi.1983.7673::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: NaAlSi2O6
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: method apparatus paper; mixing data in Table I, Table II, Appendix 1
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-103-fraser-1983
+  locator:
+    published_page: 113
+    figure: '1'
+    paragraph: experimental
+    note: Mo Knudsen cells, effusion orifice, ionization voltage, sample mass
+  read_from: pdf:kems-103-fraser-1983
+- observation_id: kems-103-fraser-1983::fraser_1983_table1_ln_INa_IK_regression
+  experiment_id: 10.3406/bulmi.1983.7673::1
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: NaAlSi2O6
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table I "Standard Deviation of I_Na/I_K values" is the printed residual scatter of ln I_Na/I_K about the regression,
+        not a slope sigma. Appendix 1 % error is a separate per-point envelope.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: derived_least_squares
+    model: derived_least_squares
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-103-fraser-1983
+  locator:
+    published_page: 114
+    table: '1'
+    figure: '2'
+    note: Table I regression coefficients of ln I_Na/I_K vs 1/T
+  read_from: pdf:kems-103-fraser-1983
+- observation_id: kems-103-fraser-1983::fraser_1983_table2_gamma_NaAlSi2O6
+  experiment_id: 10.3406/bulmi.1983.7673::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: NaAlSi2O6
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Authors (p.114): errors estimated by integrating alternative curves through max/min error bars on Fig. 3 and
+        counting squares. Range from zero at X_NaAlSi2O6=1.0 up to around ±4% in the worst case at X_NaAlSi2O6=0.4. Table
+        II prints parenthetical ± only on the X_Na=0.4 row, on X_Na=0.75 at 1600 °C (±~0.02), and on X_Na=1.0 at 1600 °C (±
+        0). Do not invent ± for other cells.'
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: derived_gibbs_duhem_integration
+    model: derived_gibbs_duhem_integration
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-103-fraser-1983
+  locator:
+    published_page: 114
+    table: '2'
+    figure: '3'
+    equation: '[13]'
+    note: Table II activity coefficients of NaAlSi2O6 in NaAlSi2O6-KAlSi2O6 melts
+  read_from: pdf:kems-103-fraser-1983

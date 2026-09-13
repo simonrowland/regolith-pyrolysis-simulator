@@ -1,0 +1,242 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5
+  citation: 'Markova, O. M., Yakovlev, O. I., Semenov, G. A. & Belov, A. N. (1983), "Vaporization of Lunar Highland Rocks:
+    Experimental Investigation", Lunar and Planetary Science XIV, 460-461. ADS bibcode 1983LPI....14..460M.'
+  source_ids:
+  - kems-025-markova-1983
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-025-markova-1983
+      role: pdf
+      path: raw/kems-025-markova-1983/kems-025-markova-1983.pdf
+      sha256:
+        tag: value
+        value: 8885d193b6e5e9500c6d06f983ebc79b7ec814a8d7c159ca5fdfab128fdb6cb1
+    - asset_id: pdftotext:kems-025-markova-1983
+      role: pdftotext
+      path: text/kems-025-markova-1983
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-025-markova-1983
+      role: table_csv
+      path: tables/kems-025-markova-1983
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::1,2,3,4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5
+  locator:
+    published_page: 461
+    pdf_page_index: 2
+    figure: 1,2,3,4
+    note: 'Figs 1, 2, 3, 4: lg P_i, torr vs T deg C for Al(g). Curves not digitised.'
+- experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::2,3,4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5
+  locator:
+    published_page: 461
+    pdf_page_index: 2
+    figure: 2,3,4
+    note: 'Figs 2, 3, 4: lg P_i, torr vs T deg C for Mg(g). Curves not digitised.'
+- experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::2,4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5
+  locator:
+    published_page: 461
+    pdf_page_index: 2
+    figure: 2,4
+    note: 'Figs 2, 4: lg P_i, torr vs T deg C for TiO(g). Curves not digitised.'
+- experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::3,4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5
+  locator:
+    published_page: 461
+    pdf_page_index: 2
+    figure: 3,4
+    note: 'Figs 3, 4: lg P_i, torr vs T deg C for FeO(g). Curves not digitised.'
+- experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5
+  locator:
+    published_page: 461
+    pdf_page_index: 2
+    figure: '4'
+    note: 'Figs 4: lg P_i, torr vs T deg C for K(g). Curves not digitised.'
+- experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::kems-025-markova-1983
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5
+  locator:
+    published_page: 460
+    pdf_page_index: 1
+    section: Technique
+    note: Knudsen cell; MS-1301; heating 3-7 grad/min; technique in Yakovlev et al. 1983 LPSC XIV (ref 2)
+- experiment_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5::unnumbered
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 0198c57b493a9754e97dd1c93d773e982d98037a4efcd65588c1ae0905c42aa5
+  locator:
+    published_page: 461
+    pdf_page_index: 2
+    table: unnumbered
+    note: Table. The compositions of initial samples

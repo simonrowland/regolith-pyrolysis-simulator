@@ -1,0 +1,80 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/fray-schmitt-2009-nh3.yaml
+observations:
+- observation_id: fray-schmitt-2009-nh3::anchor_NH3_pure_Psat
+  experiment_id: c6db381cec1065135405cbe1fd1f33becb0c0a50bbad6f8b919f427fa5e81b95::Fray-Schmitt-2009#NH3
+  identity:
+    quantity: p_sat
+    species:
+      formula: NH3
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '164'
+    interval_high: '240'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: fray-schmitt-2009-nh3
+  locator:
+    note: 'Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, NH3 correlations (NASA NTRS supplementary Table 2). Alternate
+      liquid branch: NIST Chemistry WebBook SRD 69 ammonia Antoine (Stull 1947 lineage), ~164–240 K liquid — independent of
+      the 2024 QCM ice fit.'
+    record: Fray-Schmitt-2009#NH3
+  read_from: pdf:fray-schmitt-2009-nh3

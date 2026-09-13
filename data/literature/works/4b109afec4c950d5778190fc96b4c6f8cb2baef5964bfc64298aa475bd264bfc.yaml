@@ -1,0 +1,59 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 4b109afec4c950d5778190fc96b4c6f8cb2baef5964bfc64298aa475bd264bfc
+  citation: MgCl2 dimerization equilibrium literature (not JANAF-only if JANAF is fit)
+  source_ids:
+  - pending-mg2cl4
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:pending-mg2cl4
+      role: pdf
+      path: raw/pending-mg2cl4/pending-mg2cl4.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:pending-mg2cl4
+      role: pdftotext
+      path: text/pending-mg2cl4
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pending-mg2cl4
+      role: table_csv
+      path: tables/pending-mg2cl4
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 4b109afec4c950d5778190fc96b4c6f8cb2baef5964bfc64298aa475bd264bfc::PENDING#Mg2Cl4
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 4b109afec4c950d5778190fc96b4c6f8cb2baef5964bfc64298aa475bd264bfc
+  locator:
+    note: MgCl2 dimerization equilibrium literature (not JANAF-only if JANAF is fit)
+    record: PENDING#Mg2Cl4

@@ -1,0 +1,80 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ref-032-mn-if-not-in-fit.yaml
+observations:
+- observation_id: ref-032-mn-if-not-in-fit::anchor_Mn_pure_Psat
+  experiment_id: e8448366ffc1340e9b41f10919c80e1c3ae8f0e9fbf190d553fcb7dc4ef5ec78::REF-032#Mn_if_not_in_fit
+  identity:
+    quantity: p_sat
+    species:
+      formula: Mn
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '1228'
+    interval_high: '2335'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ref-032-mn-if-not-in-fit
+  locator:
+    note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations
+      (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure series cited therein. Do not use Chase
+      1998 as independent if it entered the fit residual.
+    record: REF-032#Mn_if_not_in_fit
+  read_from: pdf:ref-032-mn-if-not-in-fit

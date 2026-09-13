@@ -1,0 +1,47 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.17038/cse/2440256
+  citation: atct-anl-1.222
+  source_ids:
+  - atct-anl-1.222
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: pdf:atct-anl-1.222
+      role: pdf
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+  doi: 10.17038/cse/2440256
+experiments:
+- experiment_id: 10.17038/cse/2440256::atct-anl-1.222
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.17038/cse/2440256
+  locator:
+    note: path=source/atct-anl-1.222.html; html_row_id=s1n2c0 i1 CAS1333-74-0; species_row=1; byte_start=1403195; byte_end=1403966

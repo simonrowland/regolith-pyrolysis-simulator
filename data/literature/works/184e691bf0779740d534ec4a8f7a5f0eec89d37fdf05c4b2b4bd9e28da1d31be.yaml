@@ -1,0 +1,127 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be
+  citation: 'Nichols Jr., R. H., Wasserburg, G. J. & Grimley, R. T. (1995), "Evaporation of forsterite: identification of
+    gas-phase species via Knudsen cell mass spectrometry", Lunar and Planetary Science XXVI, 1047–1048. LPI abstract 1524.
+    ADS bibcode 1995LPI....26.1047N.'
+  source_ids:
+  - kems-114-nichols-1995
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-114-nichols-1995
+      role: pdf
+      path: raw/kems-114-nichols-1995/kems-114-nichols-1995.pdf
+      sha256:
+        tag: value
+        value: ef3a44e75a503a36b43e8d4f17772b7bf23da8940118478528a08361469dfe8e
+    - asset_id: pdftotext:kems-114-nichols-1995
+      role: pdftotext
+      path: text/kems-114-nichols-1995
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-114-nichols-1995
+      role: table_csv
+      path: tables/kems-114-nichols-1995
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be
+  locator:
+    page: 2
+    published_page: 1048
+    pdf_page_index: 2
+    figure: '1'
+    note: Figure 1 van't Hoff plot of log(I+T) vs 1e4/T; Mg series
+- experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be
+  locator:
+    page: 2
+    published_page: 1048
+    pdf_page_index: 2
+    figure: '2'
+    note: Figure 2 I+(Mg)/(I+(Mg)+I+(Fe)) vs T(C)
+- experiment_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be::kems-114-nichols-1995
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 184e691bf0779740d534ec4a8f7a5f0eec89d37fdf05c4b2b4bd9e28da1d31be
+  locator:
+    page: 1
+    published_page: 1047
+    pdf_page_index: 1
+    paragraph: results
+    note: Results paragraph, printed p.1047. Mg, Fe, and SiO dominant 1675-1875 K. Absolute pressures not determined; P proportional
+      to I+T (sentence continues onto p.1048).

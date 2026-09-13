@@ -1,0 +1,2036 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml
+observations:
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_CrO2_stability_quoted_janaf
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CrO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Stability statement only. SI Fig. S2 (the equilibrium figure) is unseen. No numeric P(CrO2) table in the main
+        text.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10922
+    pdf_page_index: 3
+    paragraph: Gas-phase equilibria among the four Cr oxide species (ref. 27 and SI Appendix, Fig. S2) show that CrO2(g) is
+      stable for all fO2 > IW
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_bhvo2_measured
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: -0.104 +/- 0.03 permil; n = 4
+      two_sd_permil: '0.03'
+      n: 4
+      pooled_2sp_permil: '0.03'
+      pooled_2sp_k: 35
+      note: 2sp of the sample dataset +/-0.03 permil (k = 35) is identical to the 2SD of BHVO-2.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10924
+    pdf_page_index: 5
+    paragraph: The resulting 2sp of +/-0.03 permil (k = 35) is identical to the 2SD of repeated analyses of the US Geological
+      Survey geological reference material BHVO-2 (-0.104 +/- 0.03 permil; n = 4)
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_bonnand_2016_quoted
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: -0.22 +/- 0.10 permil
+      two_sd_permil: '0.1'
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10921
+    pdf_page_index: 2
+    paragraph: A previous study found overlapping Cr isotope compositions in low- and high-Ti basalts, with an average of
+      -0.22 +/- 0.10 permil (31)
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_bse_filtered_mean_model
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed_n42: -0.11 +/- 0.11 permil
+      as_printed_n36: -0.11 +/- 0.06 permil
+      two_se_permil_n36: '0.02'
+      note: 2SE of +/-0.02 permil on the n=36 Grubbs-filtered set. SI Table S9 not in corpus.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10922
+    pdf_page_index: 3
+    paragraph: The remaining 42 samples with mean d53Cr = -0.11 +/- 0.11 permil were then filtered for statistical outliers
+      at the 95% confidence level using Grubbs' test, leaving 36 samples with d53Cr = -0.11 +/- 0.06 permil
+    note: SI Appendix Table S9 holds the filtered list and is unseen
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_chromite_opx_fractionation_model
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1473.15'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty printed on +0.16 permil or +0.10 permil. Prefactor +0.35 x 10^6/T^2 is from Moynier et
+        al. 2011 (ref. 39).
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10921
+    pdf_page_index: 2
+    paragraph: The Cr isotopic fractionation between Cr3+-bearing chromite and a lunar silicate melt (assuming it is equivalent
+      to Cr2+-bearing forsterite) with Cr2+/Sigma Cr = 0.91 is +0.35 x 10^6/T^2 (39), or Delta53Crchromite-melt = +0.16 permil
+      at 1,200 C
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1473.15'
+      locator:
+        published_page: 10921
+        pdf_page_index: 2
+        paragraph: The Cr isotopic fractionation between Cr3+-bearing chromite and a lunar silicate melt (assuming it is equivalent
+          to Cr2+-bearing forsterite) with Cr2+/Sigma Cr = 0.91 is +0.35 x 10^6/T^2 (39), or Delta53Crchromite-melt = +0.16
+          permil at 1,200 C
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_costa2017_kems_T_quoted
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: p_sat
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the T window is printed in this paper. No partial pressures from Costa et al. 2017 are tabulated here.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source admission_status=quoted_T_window_no_P_table is not a closed v2.1 token
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10922
+    pdf_page_index: 3
+    paragraph: The relatively oxidizing vapor, near the FMQ buffer, evolved upon evaporation of silicate material, be it at
+      high temperature (1,827-1,970 K, olivine; ref. 47) or low temperature (1,396-1,499 K, lunar mare basalt 12002; ref.
+      48) is evidenced by experimental Knudsen effusion mass spectrometry studies
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_cr2plus_fraction_quoted_berry
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1673.15'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: logK(1) printed as ~1.9. No numeric uncertainty on 0.32 or 0.91.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10921
+    pdf_page_index: 2
+    paragraph: Under these conditions with logK(1) ~ 1.9 at 1,400 C, Cr2+/Sigma Cr is 0.32 and 0.91 for terrestrial and lunar
+      magmatic liquids, respectively (34)
+    equation: '1'
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 10921
+        pdf_page_index: 2
+        paragraph: Under these conditions with logK(1) ~ 1.9 at 1,400 C, Cr2+/Sigma Cr is 0.32 and 0.91 for terrestrial and
+          lunar magmatic liquids, respectively (34)
+        equation: '1'
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_cr_abundance_moon_earth_model
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      moon_Cr_ppm: 110
+      earth_Cr_ppm: 250
+      depletion_percent: 10
+      as_printed: 2,125 +/- 110 ppm Cr in the Moon; Earth's mantle 2,520 +/- 250 ppm; depleted by 16 +/- 10%
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10922
+    pdf_page_index: 3
+    paragraph: An average of these estimates gives 2,125 +/- 110 ppm Cr in the Moon, which is therefore depleted with respect
+      to the Earth's mantle (2,520 +/- 250 ppm) by 16 +/- 10%
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_delta53Cr_moon_earth_model
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: -0.10 +/- 0.04 permil
+      earth_2se_permil: '0.02'
+      moon_2se_permil: '0.03'
+      t_statistic: '13.36'
+      t_critical: '2'
+      note: Two-tailed Student's t test; t statistic 13.36 vs critical value 2.00.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10922
+    pdf_page_index: 3
+    paragraph: the d53Cr of the Earth (-0.11 +/- 0.02 permil, 2SE, n = 36) and Moon (-0.21 +/- 0.03 permil, 2SE, n = 17) are
+      clearly statistically resolvable at Delta53CrMoon-Earth = -0.10 +/- 0.04 permil
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_demaria1971_kems_T_quoted
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: p_sat
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Only the T window is printed in this paper. No partial pressures from De Maria et al. 1971 are tabulated here.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source admission_status=quoted_T_window_no_P_table is not a closed v2.1 token
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10922
+    pdf_page_index: 3
+    paragraph: or low temperature (1,396-1,499 K, lunar mare basalt 12002; ref. 48)
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_eq3_fractionation_model
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      prefactor_1e6_over_T2: '0.16'
+      as_printed: -0.31 +/- 0.16 x 10^6/T^2 (permil)
+      force_constant_agreement_percent: 50
+      note: 'Authors: this approach yields force constants that agree with spectroscopic or experimental determinations to
+        within 50% (x 10^6/T^2). Full 10^3 ln beta table is SI Table S12, unseen.'
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10923
+    pdf_page_index: 4
+    equation: '3'
+    note: Delta53Cr CrO(l)-CrO2(g) = -0.31 +/- 0.16 x 10^6/T^2 (permil)
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_fig1_figure_only
+  experiment_id: 10.1073/pnas.1809060115::1
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Figure-only; this-work points are the Table 1 cells. Scatter not digitised from axes.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10922
+    pdf_page_index: 3
+    figure: '1'
+    note: d53Cr vs Cr ppm (A) and vs MgO wt% (B); this-work points are Table 1; smaller circles are Bonnand et al. 2016
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_fig2_figure_only
+  experiment_id: 10.1073/pnas.1809060115::2
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Figure-only model curves. Permitted-zone bounds are the sample-data field; curves not digitised.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10923
+    pdf_page_index: 4
+    figure: '2'
+    note: fCr vs Delta53Cr Moon-Earth; model curves at 1500-1800 K and DeltaFMQ-1/0/+1
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_fig3_caption_model
+  experiment_id: 10.1073/pnas.1809060115::3
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Schematic. Printed caption numbers recorded; drawing not digitised.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10924
+    pdf_page_index: 5
+    figure: '3'
+    note: Fig. 3 schematic; printed numbers are from the caption, not axis digitisation
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_gamma_CrO_quoted_berry
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: CrO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Printed as ~3. No numeric uncertainty. Cited Berry et al. 2006 (ref. 34).
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10922
+    pdf_page_index: 3
+    paragraph: assuming a CrO activity coefficient in silicate melts of ~3 (34)
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_lnbeta_CrO2_g_model
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CrO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      force_constant_agreement_percent: 50
+      note: Full table is SI Table S12, unseen.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10923
+    pdf_page_index: 4
+    paragraph: giving 10^3 ln beta 53/52 Cr of 0.28, 0.57, and 0.89 x 10^6/T^2, respectively
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_lnbeta_CrO3_g_model
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CrO3
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      force_constant_agreement_percent: 50
+      note: Full table is SI Table S12, unseen.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10923
+    pdf_page_index: 4
+    paragraph: giving 10^3 ln beta 53/52 Cr of 0.28, 0.57, and 0.89 x 10^6/T^2, respectively
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_lnbeta_CrO_g_model
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CrO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      force_constant_agreement_percent: 50
+      note: Full table is SI Table S12, unseen. Frequency 864 cm^-1 from ref. 50.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10923
+    pdf_page_index: 4
+    paragraph: giving 10^3 ln beta 53/52 Cr of 0.28, 0.57, and 0.89 x 10^6/T^2, respectively (SI Appendix, Fig. S3 and Table
+      S12)
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_mcicpms_method
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Intermediate precision 2sp +/-0.03 permil (k = 35). Chromatographic Cr recovery 60-90%; mass bias corrected by
+        double spike.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10924
+    pdf_page_index: 5
+    section: Materials and Methods
+    note: Double-spike MC-ICP-MS method; not Knudsen-cell geometry
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_moon_filtered_mean_model
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: -0.21 +/- 0.06 permil
+      two_se_permil: '0.03'
+      n_measurements: 17
+      n_samples: 15
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10922
+    pdf_page_index: 3
+    paragraph: This exercise left 17 measurements of 15 lunar samples from ref. 31 and this study, with average d53Cr = -0.21
+      +/- 0.06 permil and 2SE of +/-0.03 permil (SI Appendix, Table S11; no outliers were found)
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_schoenberg_bse_quoted
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: -0.13 +/- 0.10 permil
+      two_sd_permil: '0.1'
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10921
+    pdf_page_index: 2
+    paragraph: identical to the average of samples used to define bulk silicate Earth (BSE), -0.13 +/- 0.10 permil (30)
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_table1_delta53Cr_measured
+  experiment_id: 10.1073/pnas.1809060115::1
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 column 2xSD is the 2SD of n MC-ICP-MS replicates on that sample. n denotes the number of replicates. No
+        uncertainty is printed on Cr ppm or MgO wt%.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10921
+    pdf_page_index: 2
+    table: '1'
+    note: Table 1. Chromium isotopic composition, chromium content, and MgO content of samples
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_terrestrial_20sample_average_measured
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      as_printed: -0.11 +/- 0.05 permil
+      two_sd_permil: '0.05'
+      note: Authors' 2SD on the 20-sample terrestrial average. End-members in the same sentence are prose-rounded Table 1
+        cells.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10921
+    pdf_page_index: 2
+    paragraph: Twenty terrestrial ultramafic samples have d53Cr between -0.17 +/- 0.06 permil (sample 422/95) and -0.07 +/-
+      0.04 permil (sample 49J), with an average of -0.11 +/- 0.05 permil (Table 1)
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_vapor_delta_and_T_window_model
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_53Cr_vapor_permil: '0.33'
+      delta_53Cr_vapor_asymmetric_as_printed: (+2.00/-0.45) permil
+      T_from_eq3_as_printed: ~700 (+1,100/-300) K
+      note: The ~700 K inversion of Eq. 3 alone is reported and then set aside; the adopted window is the 1600-1800 K / FMQ-to-FMQ+1
+        overlap with the thermodynamic fCr constraint (Fig. 2).
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10923
+    pdf_page_index: 4
+    paragraph: yielding d53Crvapor = +0.41 +/- 0.33 permil or (+2.00/-0.45) permil, considering uncertainty in the Cr depletion
+      in the lunar mantle. Solving Eq. 3 for temperature and propagating uncertainties yields ~700 (+1,100/-300) K. Importantly,
+      both thermodynamic and isotopic constraints converge at temperatures between 1,600 and 1,800 K and fO2 between FMQ and
+      FMQ+1 (Fig. 2)
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+- observation_id: kems-045-sossi-2018-pnas-cr::sossi_2018_pnas_visscher_fegley_fO2_quoted
+  experiment_id: 10.1073/pnas.1809060115::kems-045-sossi-2018-pnas-cr
+  identity:
+    quantity: delta_fG
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1800'
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: No numeric uncertainty printed on IW+2.5.
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_measurement
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-045-sossi-2018-pnas-cr
+  locator:
+    published_page: 10922
+    pdf_page_index: 3
+    paragraph: Vaporization of silicate material of a bulk lunar composition gives rise to fO2 of IW+2.5 at 1,800 K (13)
+  read_from: pdf:kems-045-sossi-2018-pnas-cr
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1800'
+      locator:
+        published_page: 10922
+        pdf_page_index: 3
+        paragraph: Vaporization of silicate material of a bulk lunar composition gives rise to fO2 of IW+2.5 at 1,800 K (13)

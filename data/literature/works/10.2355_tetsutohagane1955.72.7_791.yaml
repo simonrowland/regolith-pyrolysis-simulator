@@ -1,0 +1,193 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/tetsutohagane1955.72.7_791
+  citation: Ichise, E., Ueshima, Y. & Miyagawa, S. (1986), "Reexamination of the High Temperature Region of Fe-W Binary Alloy
+    Phase Diagram", Tetsu-to-Hagane 72(7):791-798, DOI 10.2355/tetsutohagane1955.72.7_791
+  source_ids:
+  - kems-201-ichise-1986
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-201-ichise-1986
+      role: pdf
+      path: raw/kems-201-ichise-1986/kems-201-ichise-1986.pdf
+      sha256:
+        tag: value
+        value: 5fc1999b8677a23be3fc81b16e58b7c75337a924ebf67c4aea8946245dbf6669
+    - asset_id: pdftotext:kems-201-ichise-1986
+      role: pdftotext
+      path: text/kems-201-ichise-1986
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-201-ichise-1986
+      role: table_csv
+      path: tables/kems-201-ichise-1986
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2355/tetsutohagane1955.72.7_791
+experiments:
+- experiment_id: 10.2355/tetsutohagane1955.72.7_791::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'starting_materials' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.72.7_791
+  locator:
+    published_page: 793
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1. Chemical composition of pure iron and tungsten powder
+- experiment_id: 10.2355/tetsutohagane1955.72.7_791::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_ion_intensity_thermal_analysis' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.72.7_791
+  locator:
+    published_page: 794
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Results of Knudsen cell ion intensity thermal analysis
+- experiment_id: 10.2355/tetsutohagane1955.72.7_791::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_ion_intensity_thermal_analysis' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.72.7_791
+  locator:
+    published_page: 793
+    pdf_page_index: 3
+    figure: '3'
+    note: Fig. 3 is figure-only; the numeric q=0 and q-max compositions in the prose are recorded here
+- experiment_id: 10.2355/tetsutohagane1955.72.7_791::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_from_this_work_and_literature' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.72.7_791
+  locator:
+    published_page: 796
+    pdf_page_index: 6
+    figure: '5'
+    note: Phase diagram of Fe-W alloy. Symbols distinguish microscopy vs KEMS thermal analysis vs Metals Handbook vs Schneider
+      et al.
+- experiment_id: 10.2355/tetsutohagane1955.72.7_791::kems-201-ichise-1986
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_ion_intensity_thermal_analysis' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/tetsutohagane1955.72.7_791
+  locator:
+    published_page: 791
+    pdf_page_index: 1
+    section: '2.1'
+    note: KEMS ion-intensity thermal analysis method; apparatus details omitted, referred to Ueshima et al. 1982 (ref 1)
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: unstated in this paper (referred to Ueshima et al. 1982)
+      locator:
+        published_page: 792
+        pdf_page_index: 2
+        paragraph: 装置および実験方法の詳細はすでに報告した1)ので省略する

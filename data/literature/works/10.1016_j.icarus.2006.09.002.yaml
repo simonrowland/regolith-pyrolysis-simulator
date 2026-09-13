@@ -1,0 +1,186 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.icarus.2006.09.002
+  citation: Schaefer, L. & Fegley, B., Jr. (2007), "Outgassing of ordinary chondritic material and some of its implications
+    for the chemistry of asteroids, planets, and satellites", Icarus 186:462–483, DOI 10.1016/j.icarus.2006.09.002
+  source_ids:
+  - schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+      role: pdf
+      path: raw/schaefer-and-fegley-2007-icarus-outgassing-of-oc/schaefer-and-fegley-2007-icarus-outgassing-of-oc.pdf
+      sha256:
+        tag: value
+        value: 737b5dee983f302e8db95c116cd9175c2c14faf8480600773c13529856eefc75
+    - asset_id: pdftotext:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+      role: pdftotext
+      path: text/schaefer-and-fegley-2007-icarus-outgassing-of-oc
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:schaefer-and-fegley-2007-icarus-outgassing-of-oc
+      role: table_csv
+      path: tables/schaefer-and-fegley-2007-icarus-outgassing-of-oc
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1016/j.icarus.2006.09.002
+experiments:
+- experiment_id: 10.1016/j.icarus.2006.09.002::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_composition' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2006.09.002
+  locator:
+    page: 464
+    published_page: 464
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1 Composition of average ordinary chondrite falls; 350 dpi pdftoppm of PDF page 3
+- experiment_id: 10.1016/j.icarus.2006.09.002::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_composition_and_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2006.09.002
+  locator:
+    page: 472
+    published_page: 472
+    pdf_page_index: 11
+    table: '2'
+    note: Table 2 Solid solution compositions, H chondrites block; 350 dpi pdftoppm of PDF page 11
+- experiment_id: 10.1016/j.icarus.2006.09.002::2–17
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'equilibrium_closed_system_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2006.09.002
+  locator:
+    published_page: 466–479
+    figure: 2–17
+    note: All calculated gas-chemistry / mineralogy / fO2 plots; not digitised; pdf_page_index=5–18
+- experiment_id: 10.1016/j.icarus.2006.09.002::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_composition_and_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2006.09.002
+  locator:
+    page: 473
+    published_page: 473
+    pdf_page_index: 12
+    table: '3'
+    note: Table 3 Normative mineralogy vs calculated Hebe 3.7 Ma; 350 dpi pdftoppm of PDF page 12
+- experiment_id: 10.1016/j.icarus.2006.09.002::schaefer-and-fegley-2007-icarus-outgassing-of-oc
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'quoted_solid_electrolyte_or_equivalent' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2006.09.002
+  locator:
+    page: 472
+    published_page: 472
+    pdf_page_index: 11
+    paragraph: '3.1'
+    note: Quoted Brett and Sato (1984) measured log fO2; not this work

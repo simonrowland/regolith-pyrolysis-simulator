@@ -1,0 +1,46 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: f74d8abfaf53e69557e605eace116b615f16e60422feb654aa7005928fa3b108
+  citation: sgte-unary-5.0
+  source_ids:
+  - sgte-unary-5.0
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: pdf:sgte-unary-5.0
+      role: pdf
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+experiments:
+- experiment_id: f74d8abfaf53e69557e605eace116b615f16e60422feb654aa7005928fa3b108::sgte-unary-5.0
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: f74d8abfaf53e69557e605eace116b615f16e60422feb654aa7005928fa3b108
+  locator:
+    note: AG-BCC_A2

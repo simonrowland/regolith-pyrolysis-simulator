@@ -1,0 +1,332 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational1966.22.552
+  citation: Ichise, E., Maruo, T., Sasho, H., Ueshima, Y. and Mori, T. (1982), "Knudsen Cell-mass Spectrometric Study of the
+    Thermodynamic Properties of Fe-Mo Alloys", Trans. ISIJ 22(7):552-559, DOI 10.2355/isijinternational1966.22.552. Originally
+    published in Tetsu-to-Hagane, 66 (1980), 1075, in Japanese.
+  source_ids:
+  - kems-111-ichise-1982
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-111-ichise-1982
+      role: pdf
+      path: raw/kems-111-ichise-1982/kems-111-ichise-1982.pdf
+      sha256:
+        tag: value
+        value: 3b188db3153e3d0dcf279c294b411c0cc0cd8d48c4c92995d5ed6d5e1f446eaf
+    - asset_id: pdftotext:kems-111-ichise-1982
+      role: pdftotext
+      path: text/kems-111-ichise-1982
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-111-ichise-1982
+      role: table_csv
+      path: tables/kems-111-ichise-1982
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2355/isijinternational1966.22.552
+experiments:
+- experiment_id: 10.2355/isijinternational1966.22.552::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.22.552
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '1'
+    note: Table 1. Values of lambda in Eq. (7). lambda = I_Fe° / I_Ag
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Sintered alumina crucible 9 mm inner diameter, 11 mm height, lid with orifice 0.5 mm diameter. Ta cell holder.
+          HITACHI RM6K Knudsen cell-mass spectrometer (details referred to Ichise, Kitao and Mori, Tetsu-to-Hagane 60 (1974)
+          2119 and Ichise, Yamauchi and Mori, Tetsu-to-Hagane 63 (1977) 417).
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        paragraph: Sintered alumina crucible of 9 mm in innerdiameter and 11 mm in height and lid with orifice of 0.5 mm in
+          diameter were used as the Knudsen cell.
+        section: II.1 Experimental Apparatus
+- experiment_id: 10.2355/isijinternational1966.22.552::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.22.552
+  locator:
+    published_page: 555
+    pdf_page_index: 4
+    table: '2'
+    note: Table 2. Result of activity measurements at 1823 K.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Sintered alumina crucible 9 mm inner diameter, 11 mm height, lid with orifice 0.5 mm diameter. Ta cell holder.
+          HITACHI RM6K Knudsen cell-mass spectrometer (details referred to Ichise, Kitao and Mori, Tetsu-to-Hagane 60 (1974)
+          2119 and Ichise, Yamauchi and Mori, Tetsu-to-Hagane 63 (1977) 417).
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        paragraph: Sintered alumina crucible of 9 mm in innerdiameter and 11 mm in height and lid with orifice of 0.5 mm in
+          diameter were used as the Knudsen cell.
+        section: II.1 Experimental Apparatus
+- experiment_id: 10.2355/isijinternational1966.22.552::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.22.552
+  locator:
+    published_page: 554
+    pdf_page_index: 3
+    figure: '3'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Sintered alumina crucible 9 mm inner diameter, 11 mm height, lid with orifice 0.5 mm diameter. Ta cell holder.
+          HITACHI RM6K Knudsen cell-mass spectrometer (details referred to Ichise, Kitao and Mori, Tetsu-to-Hagane 60 (1974)
+          2119 and Ichise, Yamauchi and Mori, Tetsu-to-Hagane 63 (1977) 417).
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        paragraph: Sintered alumina crucible of 9 mm in innerdiameter and 11 mm in height and lid with orifice of 0.5 mm in
+          diameter were used as the Knudsen cell.
+        section: II.1 Experimental Apparatus
+- experiment_id: 10.2355/isijinternational1966.22.552::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.22.552
+  locator:
+    published_page: 557
+    pdf_page_index: 6
+    table: '4'
+    note: Table 4. Partial molar quantities of Fe-Mo alloys at 1823 K.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Sintered alumina crucible 9 mm inner diameter, 11 mm height, lid with orifice 0.5 mm diameter. Ta cell holder.
+          HITACHI RM6K Knudsen cell-mass spectrometer (details referred to Ichise, Kitao and Mori, Tetsu-to-Hagane 60 (1974)
+          2119 and Ichise, Yamauchi and Mori, Tetsu-to-Hagane 63 (1977) 417).
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        paragraph: Sintered alumina crucible of 9 mm in innerdiameter and 11 mm in height and lid with orifice of 0.5 mm in
+          diameter were used as the Knudsen cell.
+        section: II.1 Experimental Apparatus
+- experiment_id: 10.2355/isijinternational1966.22.552::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.22.552
+  locator:
+    published_page: 558
+    pdf_page_index: 7
+    table: '5'
+    note: Table 5. Heats of sublimation and vaporization of iron.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Sintered alumina crucible 9 mm inner diameter, 11 mm height, lid with orifice 0.5 mm diameter. Ta cell holder.
+          HITACHI RM6K Knudsen cell-mass spectrometer (details referred to Ichise, Kitao and Mori, Tetsu-to-Hagane 60 (1974)
+          2119 and Ichise, Yamauchi and Mori, Tetsu-to-Hagane 63 (1977) 417).
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        paragraph: Sintered alumina crucible of 9 mm in innerdiameter and 11 mm in height and lid with orifice of 0.5 mm in
+          diameter were used as the Knudsen cell.
+        section: II.1 Experimental Apparatus
+- experiment_id: 10.2355/isijinternational1966.22.552::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.22.552
+  locator:
+    published_page: 558
+    pdf_page_index: 7
+    figure: '6'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Sintered alumina crucible 9 mm inner diameter, 11 mm height, lid with orifice 0.5 mm diameter. Ta cell holder.
+          HITACHI RM6K Knudsen cell-mass spectrometer (details referred to Ichise, Kitao and Mori, Tetsu-to-Hagane 60 (1974)
+          2119 and Ichise, Yamauchi and Mori, Tetsu-to-Hagane 63 (1977) 417).
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        paragraph: Sintered alumina crucible of 9 mm in innerdiameter and 11 mm in height and lid with orifice of 0.5 mm in
+          diameter were used as the Knudsen cell.
+        section: II.1 Experimental Apparatus
+- experiment_id: 10.2355/isijinternational1966.22.552::kems-111-ichise-1982
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.22.552
+  locator:
+    published_page: 553
+    pdf_page_index: 2
+    section: II. Experimental
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Sintered alumina crucible 9 mm inner diameter, 11 mm height, lid with orifice 0.5 mm diameter. Ta cell holder.
+          HITACHI RM6K Knudsen cell-mass spectrometer (details referred to Ichise, Kitao and Mori, Tetsu-to-Hagane 60 (1974)
+          2119 and Ichise, Yamauchi and Mori, Tetsu-to-Hagane 63 (1977) 417).
+      locator:
+        published_page: 553
+        pdf_page_index: 2
+        paragraph: Sintered alumina crucible of 9 mm in innerdiameter and 11 mm in height and lid with orifice of 0.5 mm in
+          diameter were used as the Knudsen cell.
+        section: II.1 Experimental Apparatus

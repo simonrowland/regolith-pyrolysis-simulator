@@ -1,0 +1,1481 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml
+observations:
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq10_logLs
+  experiment_id: 10.2355/isijinternational.33.36::10
+  identity:
+    quantity: delta_fG
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Eq. (10); aAl2O3 read from literature iso-activity curves (not tabulated here)
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 41
+    published_page: 41
+    pdf_page_index: 6
+    figure: '10'
+    equation: '10'
+    note: estimated sulphur distribution ratio Ls = (mass%S)/[mass%S]
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq4_logK3
+  experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
+  identity:
+    quantity: delta_fG
+    species:
+      formula: O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Eq. (4); compiled from ref. 17
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 40
+    published_page: 40
+    pdf_page_index: 5
+    equation: '4'
+    note: log K3 for 1/2 O2(g) = O in liquid iron, cited Steelmaking Data Sourcebook 17)
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq6_logK5
+  experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
+  identity:
+    quantity: delta_fG
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Eq. (6); compiled from ref. 17
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 40
+    published_page: 40
+    pdf_page_index: 5
+    equation: '6'
+    note: log K5 for 1/2 S2(g) = S in liquid iron, cited Steelmaking Data Sourcebook 17)
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq7_log_S_over_aS
+  experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
+  identity:
+    quantity: delta_fG
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Eq. (7); derived in this paper from cited log K and Eq. (2)
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 40
+    published_page: 40
+    pdf_page_index: 5
+    equation: '7'
+    note: obtained from Eqs. (2), (4) and (6)
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_eq9_logK8
+  experiment_id: 10.2355/isijinternational.33.36::slag-003-hino-kitagawa-banya-1993
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Al2O3
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed on Eq. (9); compiled from ref. 17
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=model_output_not_measurement is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 40
+    published_page: 40
+    pdf_page_index: 5
+    equation: '9'
+    note: log K8 for 2Al + 3O = (Al2O3), cited Steelmaking Data Sourcebook 17)
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig10_figure_only
+  experiment_id: 10.2355/isijinternational.33.36::10
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; figure not digitised
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 41
+    published_page: 41
+    pdf_page_index: 6
+    figure: '10'
+    note: Fig. 10. Comparison of the change of sulphur distribution ratio between CaO–Al2O3 slag and liquid iron by addition
+      of MgO or SiO2 to the slag at 1873 K.
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig1_figure_only
+  experiment_id: 10.2355/isijinternational.33.36::1
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; figure not digitised
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 36
+    published_page: 36
+    pdf_page_index: 1
+    figure: '1'
+    note: Fig. 1. Schematic diagram of experimental apparatus.
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig2_figure_only
+  experiment_id: 10.2355/isijinternational.33.36::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; figure not digitised
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 37
+    published_page: 37
+    pdf_page_index: 2
+    figure: '2'
+    note: Fig. 2. Sulphide capacities of CaO–Al2O3 slag.
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig3_figure_only
+  experiment_id: 10.2355/isijinternational.33.36::3
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; figure not digitised
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 38
+    published_page: 38
+    pdf_page_index: 3
+    figure: '3'
+    note: Fig. 3. Sulphide capacities of CaO–Al2O3–MgO slag.
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig4_figure_only
+  experiment_id: 10.2355/isijinternational.33.36::4
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; figure not digitised
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 39
+    published_page: 39
+    pdf_page_index: 4
+    figure: '4'
+    note: 'Fig. 4. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1823 K. ●: experimental composition. Numerical values
+      show −log Cs.'
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig5_figure_only
+  experiment_id: 10.2355/isijinternational.33.36::5
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; figure not digitised
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 39
+    published_page: 39
+    pdf_page_index: 4
+    figure: '5'
+    note: 'Fig. 5. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1873 K. ●: experimental composition. Numerical values
+      show −log Cs.'
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig6_figure_only
+  experiment_id: 10.2355/isijinternational.33.36::6
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; figure not digitised
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 39
+    published_page: 39
+    pdf_page_index: 4
+    figure: '6'
+    note: 'Fig. 6. Iso-sulphide capacity curves in CaO–Al2O3–MgO slag at 1923 K. ●: experimental composition. Numerical values
+      show −log Cs.'
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig7_figure_only
+  experiment_id: 10.2355/isijinternational.33.36::7
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; figure not digitised
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 39
+    published_page: 39
+    pdf_page_index: 4
+    figure: '7'
+    note: Fig. 7. Sulphide capacity of CaO–Al2O3–SiO2 slag at 1873 K.
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig8_figure_only
+  experiment_id: 10.2355/isijinternational.33.36::8
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; figure not digitised
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 40
+    published_page: 40
+    pdf_page_index: 5
+    figure: '8'
+    note: 'Fig. 8. Iso-sulphide capacity curves in CaO–Al2O3–SiO2 slag at 1873 K. ●: experimental composition. Numerical values
+      show −log Cs.'
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_fig9_figure_only
+  experiment_id: 10.2355/isijinternational.33.36::9
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; figure not digitised
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 40
+    published_page: 40
+    pdf_page_index: 5
+    figure: '9'
+    note: Fig. 9. Comparison of the change of sulphide capacity in CaO–Al2O3 slag by addition of MgO or SiO2 at 1873 K.
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_table1_cao_al2o3_cs
+  experiment_id: 10.2355/isijinternational.33.36::1
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: The experimental errors of Cs caused by chemical analysis of sulphur are shown (Fig. 2 error bars; not tabulated).
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 1. Experimental result in CaO–Al2O3 system. Heat No. Temp.(K) P_CO P_CO2 P_SO2 P_Ar CaO Al2O3 MgO S
+      −log Cs. 55-C1* * 1823 0.250 0.249 0.010 0.489 58.17 39.93 0.14 0.526 2.238; 55-1 1822 0.248 0.247 0.010 0.485 54.16
+      41.86 0.04 0.365 2.399; 55-2 1822 0.248 0.247 0.010 0.483 48.90 48.50 0.03 0.155 2.769; 55-3 1822 0.248 0.247 0.010
+      0.485 43.79 53.63 0.04 0.072 3.105; 55-4 1823 0.167 0.166 0.013 0.652 38.56 58.21 0.04 0.019 3.748; 60-C1* * 1867 0.251
+      0.250 0.010 0.490 59.48 39.65 0.02 0.426 2.050; 60-1 1866 0.250 0.249 0.010 0.488 53.98 44.70 0.03 0.239 2.302; 60-2
+      1867 0.249 0.248 0.010 0.485 48.38 50.39 0.03 0.107 2.648; 60-3 1867 0.251 0.250 0.010 0.488 44.91 54.82 0.03 0.059
+      2.907; 60-4 1867 0.166 0.166 0.013 0.652 36.84 61.18 0.02 0.019 3.479; 65-C1* * 1928 0.168 0.167 0.013 0.658 57.61 37.03
+      — 0.326 1.869; 65-1 1923 0.249 0.248 0.010 0.487 53.41 41.38 0.40 0.167 2.093; 65-2 1922 0.249 0.248 0.010 0.488 48.65
+      46.13 0.05 0.076 2.444; 65-3 1922 0.250 0.249 0.010 0.490 41.71 54.71 1.49 0.033 2.808. * CaO crucible was used. The
+      other samples were melted in Pt crucibles. ** PCO + PCO2 + PSO2 + PAr = PT (Atmospheric pressure).
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 37
+    published_page: 37
+    pdf_page_index: 2
+    table: '1'
+    note: Experimental result in CaO–Al2O3 system
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_table2_cao_al2o3_mgo_cs
+  experiment_id: 10.2355/isijinternational.33.36::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: experimental errors of Cs are revealed in Fig. 3 (error bars; not tabulated)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 2. Experimental result in CaO–Al2O3–MgO system. Heat No. Temp.(K) P_CO P_CO2 P_SO2 P_Ar CaO Al2O3 MgO
+      S −log Cs. 55-C2* * 1823 0.250 0.249 0.010 0.489 54.71 37.66 4.13 0.560 2.211; 55-5 1822 0.248 0.247 0.010 0.483 50.17
+      44.06 3.88 0.025 2.567; 55-6 1822 0.249 0.248 0.010 0.487 44.06 47.90 3.48 0.120 2.885; 55-7 1822 0.248 0.247 0.010
+      0.483 41.35 53.89 3.10 0.042 3.335; 55-8 1823 0.167 0.166 0.013 0.652 35.55 57.69 2.80 0.022 3.693; 55-9 1822 0.248
+      0.247 0.010 0.485 45.96 44.14 7.97 0.203 2.653; 55-10 1822 0.249 0.248 0.010 0.487 41.36 48.06 7.26 0.110 2.921; 55-11
+      1822 0.249 0.248 0.010 0.487 37.69 53.84 6.41 0.044 3.318; 60-C2* * 1873 0.165 0.164 0.013 0.642 56.48 39.30 3.92 0.560
+      2.007; 60-5 1867 0.251 0.250 0.010 0.490 50.93 45.77 4.28 0.217 2.344; 60-6 1868 0.249 0.248 0.010 0.478 45.53 51.19
+      3.44 0.105 2.642; 60-7 1867 0.251 0.250 0.010 0.490 39.91 55.49 3.19 0.042 3.044; 60-8 1867 0.166 0.166 0.013 0.652
+      33.53 61.72 2.76 0.027 3.340; 60-C3* * 1868 0.251 0.250 0.010 0.490 53.73 34.63 8.56 0.425 2.038; 60-9 1868 0.250 0.249
+      0.010 0.485 45.66 45.01 9.20 0.189 2.405; 60-10 1867 0.249 0.248 0.010 0.485 39.61 53.08 9.56 0.093 2.706; 60-11 1868
+      0.249 0.248 0.010 0.487 35.38 56.26 7.18 0.046 3.004; 65-C2* * 1928 0.168 0.167 0.013 0.658 53.87 32.09 3.65 0.400 1.780;
+      65-5 1923 0.251 0.250 0.010 0.489 49.33 45.06 3.91 0.141 2.169; 65-6 1924 0.249 0.248 0.010 0.486 43.42 45.83 3.55 0.065
+      2.497; 65-7 1922 0.249 0.248 0.010 0.488 39.80 52.10 3.17 0.025 2.918; 65-C3* * 1923 0.164 0.164 0.013 0.643 53.57 36.66
+      8.97 0.492 1.713; 65-9 1924 0.250 0.249 0.010 0.488 42.77 44.23 7.13 0.108 2.264; 65-10 1924 0.249 0.248 0.010 0.486
+      40.87 47.15 7.05 0.060 2.533; 65-11 1924 0.249 0.248 0.010 0.486 35.96 52.08 6.22 0.028 2.857. * CaO crucible was used.
+      The other samples were melted in Pt crucibles. ** PCO + PCO2 + PSO2 + PAr = PT (Atmospheric pressure).
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 38
+    published_page: 38
+    pdf_page_index: 3
+    table: '2'
+    note: Experimental result in CaO–Al2O3–MgO system
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993
+- observation_id: slag-003-hino-kitagawa-banya-1993::hino_kitagawa_banya_1993_table3_cao_al2o3_sio2_cs
+  experiment_id: 10.2355/isijinternational.33.36::3
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: experimental errors of Cs are revealed in Fig. 7 (error bars; not tabulated)
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: Table 3. Experimental result in CaO–Al2O3–SiO2 system at 1873 K. Heat No. Temp.(K) P_CO P_CO2 P_SO2 P_Ar
+      CaO Al2O3 SiO2 S −log Cs. 6-CS2* * 1873 0.247 0.246 0.010 0.483 56.12 30.04 6.92 0.467 1.962; 6-1 1872 0.166 0.165 0.013
+      0.651 52.68 36.07 6.64 0.274 2.293; 6-2 1872 0.166 0.165 0.013 0.647 48.81 42.46 6.00 0.127 2.624; 6-3 1872 0.165 0.164
+      0.013 0.646 42.31 46.22 5.39 0.053 3.002; 6-4 1872 0.165 0.164 0.013 0.646 38.85 52.18 4.83 0.018 3.472; 6-CS3* * 1873
+      0.167 0.166 0.013 0.654 59.59 24.22 10.70 0.482 2.040; 6-CSS* * 1873 0.167 0.166 0.013 0.654 55.90 27.09 7.79 0.163
+      2.510; 6-5 1872 0.166 0.165 0.013 0.647 46.76 35.13 13.22 0.090 2.774; 6-6 1872 0.165 0.164 0.013 0.646 43.31 40.60
+      11.95 0.042 3.101; 6-7 1872 0.166 0.165 0.013 0.647 38.15 46.80 10.75 0.020 3.440. * CaO crucible was used. The other
+      samples were melted in Pt crucibles. ** PCO + PCO2 + PSO2 + PAr = PT (Atmospheric pressure).
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: slag-003-hino-kitagawa-banya-1993
+  locator:
+    page: 39
+    published_page: 39
+    pdf_page_index: 4
+    table: '3'
+    note: Experimental result in CaO–Al2O3–SiO2 system at 1873 K
+  read_from: pdf:slag-003-hino-kitagawa-banya-1993

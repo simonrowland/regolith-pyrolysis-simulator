@@ -1,0 +1,47 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: f99427c7ed9c8349cc34b37e0c5f220acf62b39d910f511750102920e0ea5f6f
+  citation: McBride, B. J., Zehe, M. J. and Gordon, S., NASA Glenn Coefficients for Calculating Thermodynamic Properties of
+    Individual Species, NASA/TP-2002-211556; NASA CEA thermo.inp.
+  source_ids:
+  - nasa-glenn
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: pdf:nasa-glenn
+      role: pdf
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+experiments:
+- experiment_id: f99427c7ed9c8349cc34b37e0c5f220acf62b39d910f511750102920e0ea5f6f::nasa-glenn
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: f99427c7ed9c8349cc34b37e0c5f220acf62b39d910f511750102920e0ea5f6f
+  locator:
+    note: path=data/literature/compilations/nasa-glenn/source/thermo.inp; name_line=65; header_line=66; end_line=75

@@ -1,0 +1,263 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.5702/massspec1953.26.159
+  citation: Ikeda, Y., Tamaki, M. & Matsumoto, G. (1978), "A Mass Spectrometric Study of Vaporization of Refractory Metal-Al2O3
+    Systems in Elevated Temperature", J. Mass Spectrom. Soc. Jpn. 26(2):159–169, DOI 10.5702/massspec1953.26.159
+  source_ids:
+  - kems-097-ikeda-1978
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-097-ikeda-1978
+      role: pdf
+      path: raw/kems-097-ikeda-1978/kems-097-ikeda-1978.pdf
+      sha256:
+        tag: value
+        value: c8e224284e6075c7dbf2df29c2cba1c6de81696d76df0d967e4dc36d6a8fe6c1
+    - asset_id: pdftotext:kems-097-ikeda-1978
+      role: pdftotext
+      path: text/kems-097-ikeda-1978
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-097-ikeda-1978
+      role: table_csv
+      path: tables/kems-097-ikeda-1978
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.5702/massspec1953.26.159
+experiments:
+- experiment_id: 10.5702/massspec1953.26.159::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_third_law_thermochemistry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.5702/massspec1953.26.159
+  locator:
+    published_page: 167
+    pdf_page_index: 9
+    table: '1'
+    note: Third-law reaction enthalpy for reaction (1)
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: tungsten inner Knudsen cell (sintered W rod, NIPPON TUNGSTEN Co.); outer cell supporter tungsten block
+      locator:
+        published_page: 160
+        pdf_page_index: 2
+        paragraph: sintered tungsten rod used as Knudsen cell material; outer cell supporter machined from tungsten block
+- experiment_id: 10.5702/massspec1953.26.159::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.5702/massspec1953.26.159
+  locator:
+    published_page: 162
+    pdf_page_index: 4
+    figure: '3'
+    note: Partial pressures (atm) vs 1/T in the W-Al2O3 system
+- experiment_id: 10.5702/massspec1953.26.159::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.5702/massspec1953.26.159
+  locator:
+    published_page: 163
+    pdf_page_index: 5
+    figure: '4'
+    note: Partial pressures (atm) vs 1/T in the Mo-Al2O3 system
+- experiment_id: 10.5702/massspec1953.26.159::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.5702/massspec1953.26.159
+  locator:
+    published_page: 164
+    pdf_page_index: 6
+    figure: '5'
+    note: Partial pressures (atm) vs 1/T in the Ta-Al2O3 system; reaction region marked
+- experiment_id: 10.5702/massspec1953.26.159::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.5702/massspec1953.26.159
+  locator:
+    published_page: 165
+    pdf_page_index: 7
+    figure: '6'
+    note: Partial pressures (atm) vs 1/T in the Nb-Al2O3 system; reaction region marked
+- experiment_id: 10.5702/massspec1953.26.159::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.5702/massspec1953.26.159
+  locator:
+    published_page: 168
+    pdf_page_index: 10
+    figure: '7'
+    note: P(Al) at 1920 K versus free energy of formation of presumed cell-metal oxides
+- experiment_id: 10.5702/massspec1953.26.159::kems-097-ikeda-1978
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.5702/massspec1953.26.159
+  locator:
+    published_page: 160
+    pdf_page_index: 2
+    section: 2. Experimental
+    note: apparatus and calibration from §2 (p. 160–161); T_range_K from Table 1 printed T cells 2248 (last data row) and
+      2433 (third data row) on published p. 167. 1850 K is not printed.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: inner effusion cell of W, Mo, Ta or Nb; outer supporter tungsten
+      locator:
+        published_page: 160
+        pdf_page_index: 2
+        paragraph: inner effusion cell fabricated from various refractory metals and outer cell supporter machined from tungsten
+          block

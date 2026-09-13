@@ -1,0 +1,445 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  citation: Ichise, E., Yamauchi, T. & Mori, T. (1977), "Knudsen Cell-Mass Spectrometric Study of the Thermodynamics of the
+    Iron-Aluminum Alloys", Tetsu-to-Hagane 63(3):417-424, DOI 10.2355/tetsutohagane1955.63.3_417
+  source_ids:
+  - kems-066-ichise-1977
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-066-ichise-1977
+      role: pdf
+      path: raw/kems-066-ichise-1977/kems-066-ichise-1977.pdf
+      sha256:
+        tag: value
+        value: 91e6ea13e0e2340bfb69e2dfbb8e09f1c3cf2b595e31dd8825ee3a9f9f68d6df
+    - asset_id: pdftotext:kems-066-ichise-1977
+      role: pdftotext
+      path: text/kems-066-ichise-1977
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-066-ichise-1977
+      role: table_csv
+      path: tables/kems-066-ichise-1977
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2355/tetsutohagane1955.63.3_417
+experiments:
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 418
+    pdf_page_index: 2
+    figure: '1'
+    section: '2'
+    note: Hitachi RM6K; alumina cell / Ta holder; sample ~2 g; ionizing 30 V. Japanese body transcribed for numerals and English
+      captions only.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Al2O3 (alumina) Knudsen cell; tantalum cell holder (Fig. 1)
+      locator:
+        published_page: 418
+        pdf_page_index: 2
+        figure: '1'
+        note: Alumina knudsen cell / Tantalum cell holder; (mm)
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 423
+    pdf_page_index: 7
+    figure: '10'
+    note: Fig. 10. Ion ratio according to Equation (36).
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::11
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 423
+    pdf_page_index: 7
+    figure: '11'
+    note: Fig. 11. Quadratic plots according to Equation (37).
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::12
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 424
+    pdf_page_index: 8
+    figure: '12'
+    note: Fig. 12. Evaluation of the fragmentation ionization according to Equation (43).
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 422
+    pdf_page_index: 6
+    table: '2'
+    note: Table 2. Values for gamma_Al^o and epsilon_Al^(Al) at 1600 C
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 419
+    pdf_page_index: 3
+    figure: '3'
+    note: Fig. 3. Effect of the chamber voltage on the ion ratio.
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 419
+    pdf_page_index: 3
+    figure: '4'
+    note: Fig. 4. Experimental results for the Fe-Al alloys.
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 420
+    pdf_page_index: 4
+    figure: '5'
+    note: Fig. 5. Solidus and liquidus of the Fe-Al alloy.
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 420
+    pdf_page_index: 4
+    figure: '6'
+    note: Fig. 6. Integration curve for the Fe-Al alloy at 1400 C.
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 420
+    pdf_page_index: 4
+    figure: '7'
+    note: Fig. 7. Activities in the Fe-Al alloy at 1400 C.
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 421
+    pdf_page_index: 5
+    figure: '8'
+    note: Fig. 8. Temperature dependence of ln rho^o and alpha_FeAl.
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 422
+    pdf_page_index: 6
+    figure: '9'
+    note: Fig. 9. Variation of ln gamma_Al^o and epsilon_Al^(Al) with temperature.
+- experiment_id: 10.2355/tetsutohagane1955.63.3_417::kems-066-ichise-1977
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/tetsutohagane1955.63.3_417
+  locator:
+    published_page: 418
+    pdf_page_index: 2
+    section: '2.5'
+    note: 'N_Al=0.5, 1470 C, ionizing voltage 30 V; I+_Al : I+_Al2O : I+_AlO : I+_Al2 = 58 : 23 : 1.4 : 1'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Al2O3 (alumina) Knudsen cell; tantalum cell holder (Fig. 1)
+      locator:
+        published_page: 418
+        pdf_page_index: 2
+        figure: '1'
+        note: Alumina knudsen cell / Tantalum cell holder; (mm)

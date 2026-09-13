@@ -1,0 +1,235 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.actaastro.2024.08.009
+  citation: Šeško, R., Lamboley, K., Cutard, T., Grill, L., Reiss, P. & Cowley, A. (2024), "Oxygen production by solar vapor-phase
+    pyrolysis of lunar regolith simulant", Acta Astronautica 224:215–225, DOI 10.1016/j.actaastro.2024.08.009. PDF not on
+    disk (CC BY, fetch bot-blocked; see sidecar docs/references/pdfs/99-kems-langmuir/kems-036-sesko-2024.md)
+  source_ids:
+  - kems-036-sesko-2024
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-036-sesko-2024
+      role: pdf
+      path: raw/kems-036-sesko-2024/kems-036-sesko-2024.pdf
+      sha256:
+        tag: value
+        value: 22ca3c77e3e84f398b8b9ced101a3d1e927f6d70ca0c42962cbecd692937075c
+    - asset_id: pdftotext:kems-036-sesko-2024
+      role: pdftotext
+      path: text/kems-036-sesko-2024
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-036-sesko-2024
+      role: table_csv
+      path: tables/kems-036-sesko-2024
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1016/j.actaastro.2024.08.009
+experiments:
+- experiment_id: 10.1016/j.actaastro.2024.08.009::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'analytical_composition' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.actaastro.2024.08.009
+  locator:
+    page: 216
+    table: '1'
+    paragraph: Regolith and regolith simulant geochemical compositions in % by weight
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+- experiment_id: 10.1016/j.actaastro.2024.08.009::15
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solar_vacuum_pyrolysis_free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.1016/j.actaastro.2024.08.009
+  locator:
+    page: 221
+    figure: '15'
+    paragraph: bottom brown layer has a higher concentration of iron
+    source_path: docs-private/research/2026-09-06-data-pilot/rh50/tables.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: alumina ceramic crucible
+      locator:
+        page: 217
+        paragraph: experimental_procedure
+- experiment_id: 10.1016/j.actaastro.2024.08.009::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.actaastro.2024.08.009
+  locator:
+    page: 221
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+- experiment_id: 10.1016/j.actaastro.2024.08.009::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.actaastro.2024.08.009
+  locator:
+    page: 219
+    figure: '6'
+    note: also Fig. 16 p. 223; MinerU ~ dumps rejected
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+- experiment_id: 10.1016/j.actaastro.2024.08.009::docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solar_vacuum_pyrolysis_free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.1016/j.actaastro.2024.08.009
+  locator:
+    page: 221
+    paragraph: experimental_results_deposit_edx
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-036-sesko-2024/tables.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: alumina ceramic crucible
+      locator:
+        page: 217
+        paragraph: experimental_procedure
+- experiment_id: 10.1016/j.actaastro.2024.08.009::docs-private/research/2026-09-06-data-pilot/rh50/tables.md
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solar_vacuum_pyrolysis_free_evaporation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.1016/j.actaastro.2024.08.009
+  locator:
+    page: 221
+    paragraph: Si ranging from 7 to 20 wt%
+    source_path: docs-private/research/2026-09-06-data-pilot/rh50/tables.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: alumina ceramic crucible
+      locator:
+        page: 217
+        paragraph: experimental_procedure

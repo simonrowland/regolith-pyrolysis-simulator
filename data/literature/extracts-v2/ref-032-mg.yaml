@@ -1,0 +1,79 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ref-032-mg.yaml
+observations:
+- observation_id: ref-032-mg::anchor_Mg_pure_Psat
+  experiment_id: 1bb95d2ec4c2ee923788ed803d29dd08a52a2a3d5fc54721f5b94eeb7e58fc29::REF-032#Mg
+  identity:
+    quantity: p_sat
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '701'
+    interval_high: '1361'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ref-032-mg
+  locator:
+    note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)
+      free-energy path as secondary.
+    record: REF-032#Mg
+  read_from: pdf:ref-032-mg

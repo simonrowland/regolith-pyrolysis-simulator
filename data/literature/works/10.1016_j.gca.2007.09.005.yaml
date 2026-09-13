@@ -1,0 +1,251 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.gca.2007.09.005
+  citation: Richter, F. M., Janney, P. E., Mendybaev, R. A., Davis, A. M. & Wadhwa, M. (2007), "Elemental and isotopic fractionation
+    of Type B CAI-like liquids by evaporation", Geochim. Cosmochim. Acta 71:5544-5564, DOI 10.1016/j.gca.2007.09.005
+  source_ids:
+  - kems-010-richter-2007
+  - richter-et-al-2007
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-010-richter-2007
+      role: pdf
+      path: raw/kems-010-richter-2007/kems-010-richter-2007.pdf
+      sha256:
+        tag: value
+        value: b4155d8af4d8ab48ae6a90d954596d9d9daa5e3c5bb35d13b54480721ccb19a9
+    - asset_id: pdftotext:kems-010-richter-2007
+      role: pdftotext
+      path: text/kems-010-richter-2007
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-010-richter-2007
+      role: table_csv
+      path: tables/kems-010-richter-2007
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: pdf:richter-et-al-2007
+      role: pdf
+      path: raw/richter-et-al-2007/richter-et-al-2007.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:richter-et-al-2007
+      role: pdftotext
+      path: text/richter-et-al-2007
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:richter-et-al-2007
+      role: table_csv
+      path: tables/richter-et-al-2007
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1016/j.gca.2007.09.005
+experiments:
+- experiment_id: 10.1016/j.gca.2007.09.005::1
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    table: '1'
+    paragraph: Init/Final area mm2 columns
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+      locator:
+        paragraph: iridium loops
+        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+    geometry:
+      exposed_area_m2:
+        state:
+          tag: value
+          value: '0.0000224'
+        locator:
+          table: '1'
+          paragraph: R3-12 Init area 22.4 mm2
+          source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+- experiment_id: 10.1016/j.gca.2007.09.005::2
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    figure: '2'
+    line_range: 183-191
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+- experiment_id: 10.1016/j.gca.2007.09.005::3
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    figure: '3'
+    line_range: 447-448
+    note: vacuum free evaporation; γ_Mg = γo exp(-E/RT)
+    source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+      locator:
+        paragraph: iridium loop; Hashimoto high-temperature vacuum furnace
+        line_range: 105-107
+        source_path: docs-private/research/ocr-artifacts/kems-010-richter-2007/spool/out/kems-010-richter-2007/vlm/kems-010-richter-2007.md
+- experiment_id: 10.1016/j.gca.2007.09.005::docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    published_page: 5551
+    section: 4.1. Evaporation kinetics
+    source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
+- experiment_id: 10.1016/j.gca.2007.09.005::richter_2007_mg_cai_arrhenius_langmuir
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    note: Richter, F. M. et al. (2007), Geochim. Cosmochim. Acta 71:5544-5564, abstract and Fig. 3 pp. 5551-5553, DOI 10.1016/j.gca.2007.09.005
+    record: richter_2007_mg_cai_arrhenius_langmuir
+- experiment_id: 10.1016/j.gca.2007.09.005::richter_2007_si_cai_arrhenius_langmuir
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.gca.2007.09.005
+  locator:
+    note: Richter et al. (2007) GCA 71:5544-5564 abstract; cSi form
+    record: richter_2007_si_cai_arrhenius_langmuir

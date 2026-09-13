@@ -1,0 +1,103 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf
+  citation: 'Gorokhov, L. N., Gusarov, A. V. et al. (1977), "Масс-спектрометрическое определение энтальпий образования молекул
+    CrO и CrO2" (Mass-spectrometric determination of formation enthalpies of CrO and CrO2 molecules). Report, Institute for
+    High Temperatures of the USSR Academy of Sciences (IVTAN), No. 43-77. IVTANTHERMO key [77ГОР/ГУС]. Quoted on https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+    Table Cr.T3 and https://www.chem.msu.ru/rus/tsiv/Cr/allbibs.html.
+
+    '
+  source_ids:
+  - kems-050-gorokhov-1977
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-050-gorokhov-1977
+      role: pdf
+      path: raw/kems-050-gorokhov-1977/kems-050-gorokhov-1977.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:kems-050-gorokhov-1977
+      role: pdftotext
+      path: text/kems-050-gorokhov-1977
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-050-gorokhov-1977
+      role: table_csv
+      path: tables/kems-050-gorokhov-1977
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf::Cr.T3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_second_law' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf
+  locator:
+    table: Cr.T3
+    note: 'Second-law ΔrH°0 for AlO + Cr = Al + CrO from Table Cr.T3 (computed 3.12.2009). Compilation reprocessing of Gorokhov
+      1977 KEMS; not a measured ion-current series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+    record: '[77ГОР/ГУС]'
+- experiment_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf::Cr.T4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_isomolecular' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf
+  locator:
+    table: Cr.T4
+    paragraph: thermochemical_quantities
+    note: 'print-CrO2.html cites [77ГОР/ГУС] for Cr(g)+CrO2(g)=2CrO(g) and points to table Cr.T4. That table is not on the
+      OA HTML (true absence). Report-internal CrO2 tables unseen. No T grid for this reaction is printed on the OA pages.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: '[77ГОР/ГУС]'

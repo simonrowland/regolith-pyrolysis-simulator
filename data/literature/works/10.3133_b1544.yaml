@@ -1,0 +1,49 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.3133/b1544
+  citation: 'Hemingway, B. S., Haas, J. L., Jr. and Robinson, G. R., Jr., 1982, Thermodynamic properties of selected minerals
+    in the system Al2O3-CaO-SiO2-H2O at 298.15 K and 1 bar (10^5 pascals) pressure and at higher temperatures (Supplement
+    to Bulletin 1452): U.S. Geological Survey Bulletin 1544, 70 p.'
+  source_ids:
+  - hemingway-haas-robinson-1982-usgs-b1544
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: pdf:hemingway-haas-robinson-1982-usgs-b1544
+      role: pdf
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+  doi: 10.3133/b1544
+experiments:
+- experiment_id: 10.3133/b1544::hemingway-haas-robinson-1982-usgs-b1544
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1544
+  locator:
+    note: pdf=source/hemingway-haas-robinson-1982-usgs-b1544.pdf; pdf_pages=[29, 30]; printed_pages=[23, 24]

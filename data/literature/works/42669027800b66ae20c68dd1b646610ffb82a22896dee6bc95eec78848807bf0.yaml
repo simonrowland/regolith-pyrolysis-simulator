@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 42669027800b66ae20c68dd1b646610ffb82a22896dee6bc95eec78848807bf0
+  citation: Banchornheavakul, Matsui & Naito, J. Nucl. Sci. Technol. 23 (1986) 602–611
+  source_ids:
+  - banchor-matsui-naito-1986
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:banchor-matsui-naito-1986
+      role: pdf
+      path: raw/banchor-matsui-naito-1986/banchor-matsui-naito-1986.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:banchor-matsui-naito-1986
+      role: pdftotext
+      path: text/banchor-matsui-naito-1986
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:banchor-matsui-naito-1986
+      role: table_csv
+      path: tables/banchor-matsui-naito-1986
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 42669027800b66ae20c68dd1b646610ffb82a22896dee6bc95eec78848807bf0::Table 1 (equations); Figs. 1–4; comparison
+    to Berkowitz points
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 42669027800b66ae20c68dd1b646610ffb82a22896dee6bc95eec78848807bf0
+  locator:
+    table: Table 1 (equations); Figs. 1–4; comparison to Berkowitz points
+    note: Table 1 (equations); Figs. 1–4; comparison to Berkowitz points
+    record: Ban86_equations

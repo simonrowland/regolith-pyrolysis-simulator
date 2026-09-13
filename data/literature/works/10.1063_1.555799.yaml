@@ -1,0 +1,349 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1063/1.555799
+  citation: Lamoreaux, R. H., Hildenbrand, D. L. & Brewer, L., High-Temperature Vaporization Behavior of Oxides II. Oxides
+    of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and Hg, J. Phys. Chem. Ref. Data 16 (1987) 419–443
+  source_ids:
+  - lamoreaux-hildenbrand-hildenbrand-1987
+  - lh87-al-o-gas-species
+  - lh87-cao-g
+  - lh87-mgo-g
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:lamoreaux-hildenbrand-hildenbrand-1987
+      role: pdf
+      path: raw/lamoreaux-hildenbrand-hildenbrand-1987/lamoreaux-hildenbrand-hildenbrand-1987.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:lamoreaux-hildenbrand-hildenbrand-1987
+      role: pdftotext
+      path: text/lamoreaux-hildenbrand-hildenbrand-1987
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:lamoreaux-hildenbrand-hildenbrand-1987
+      role: table_csv
+      path: tables/lamoreaux-hildenbrand-hildenbrand-1987
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: pdf:lh87-al-o-gas-species
+      role: pdf
+      path: raw/lh87-al-o-gas-species/lh87-al-o-gas-species.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:lh87-al-o-gas-species
+      role: pdftotext
+      path: text/lh87-al-o-gas-species
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:lh87-al-o-gas-species
+      role: table_csv
+      path: tables/lh87-al-o-gas-species
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: pdf:lh87-cao-g
+      role: pdf
+      path: raw/lh87-cao-g/lh87-cao-g.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:lh87-cao-g
+      role: pdftotext
+      path: text/lh87-cao-g
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:lh87-cao-g
+      role: table_csv
+      path: tables/lh87-cao-g
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: pdf:lh87-mgo-g
+      role: pdf
+      path: raw/lh87-mgo-g/lh87-mgo-g.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:lh87-mgo-g
+      role: pdftotext
+      path: text/lh87-mgo-g
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:lh87-mgo-g
+      role: table_csv
+      path: tables/lh87-mgo-g
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1063/1.555799
+experiments:
+- experiment_id: 10.1063/1.555799::LH87#Al_O_gas_species
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.555799
+  locator:
+    note: Lamoreaux, Hildenbrand & Brewer (1987) JPCRD 16:419–443, DOI 10.1063/1.555799, Al–O gas species tables (AlO, Al2O,
+      Al2O2 — note Al2O3(g) is often NOT the dominant vapor; confirm molecular identity before flip). JANAF AlO(g)/Al2O(g)/Al2O2(g)
+      Chase 1998.
+    record: LH87#Al_O_gas_species
+- experiment_id: 10.1063/1.555799::LH87#CaO_g
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.555799
+  locator:
+    note: Lamoreaux, Hildenbrand & Brewer (1987) J. Phys. Chem. Ref. Data 16:419–443, DOI 10.1063/1.555799, Table 3 CaO(g);
+      + JANAF CaO(g) Chase 1998 (REF-020).
+    record: LH87#CaO_g
+- experiment_id: 10.1063/1.555799::LH87#MgO_g
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.555799
+  locator:
+    note: Lamoreaux, R.H., Hildenbrand, D.L. & Brewer, L. (1987), "High-Temperature Vaporization Behavior of Oxides. II. Oxides
+      of Be, Mg, Ca, Sr, Ba, B, Al, Ga, In, Tl, Si, Ge, Sn, Pb, Zn, Cd, and Hg", J. Phys. Chem. Ref. Data 16:419–443, DOI
+      10.1063/1.555799 (LH87 Table 3 — MgO(g) thermochemistry). Cross-ch
+    record: LH87#MgO_g
+- experiment_id: 10.1063/1.555799::LH87_BaO_g_formation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.555799
+  locator:
+    note: ΔfH°298/R = −15.4 ± 1 kK; S°298/R = 28.306 ± 0.05; system §2.2.e p. 430; Figs. 17–20
+    record: LH87_BaO_g_formation
+- experiment_id: 10.1063/1.555799::LH87_BaO_s_formation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.555799
+  locator:
+    note: LH87_BaO_s_formation
+    record: LH87_BaO_s_formation
+- experiment_id: 10.1063/1.555799::LH87_Ga2O3_s_formation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.555799
+  locator:
+    note: ΔfH°298/R = −131.2 ± 0.5 kK
+    record: LH87_Ga2O3_s_formation
+- experiment_id: 10.1063/1.555799::LH87_SrO_g_formation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.555799
+  locator:
+    note: ΔfH°298/R = 0.2 ± 3 kK; S°298/R = 27.656 ± 0.002; system §2.2.d pp. 428–429; Figs. 13–16
+    record: LH87_SrO_g_formation
+- experiment_id: 10.1063/1.555799::LH87_SrO_s_formation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.555799
+  locator:
+    note: LH87_SrO_s_formation
+    record: LH87_SrO_s_formation
+- experiment_id: '10.1063/1.555799::Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R
+    = 1.4712 kK'
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.555799
+  locator:
+    table: 'Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R = 1.4712 kK'
+    note: 'Table 3, p. 424 — Ga2O(g): ΔfH°298/R = −11.46 ± 1 kK; S°298/R = 34.21 ± 0.4; (H°298−H°0)/R = 1.4712 kK'
+    record: LH87_Ga2O_g_formation

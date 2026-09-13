@@ -1,0 +1,240 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1351/pac200577040683
+  citation: 'Drowart, J., Chatillon, C., Hastie, J. & Bonnell, D. (2005), "High-temperature mass spectrometry: instrumental
+    techniques, ionization cross-sections, pressure measurements, and thermodynamic data" (IUPAC Technical Report), Pure Appl.
+    Chem. 77:683–737, DOI 10.1351/pac200577040683. PDF not on disk (De Gruyter WAF / IUPAC Cloudflare; see sidecar docs/references/pdfs/99-kems-langmuir/kems-014-drowart-2005.md)'
+  source_ids:
+  - kems-014-drowart-2005
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-014-drowart-2005
+      role: pdf
+      path: raw/kems-014-drowart-2005/kems-014-drowart-2005.pdf
+      sha256:
+        tag: value
+        value: c3bc9b4054dac3769158c1527adb1a983c35cb26c6bfae2f1758fb4f4b52d5ba
+    - asset_id: pdftotext:kems-014-drowart-2005
+      role: pdftotext
+      path: text/kems-014-drowart-2005
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-014-drowart-2005
+      role: table_csv
+      path: tables/kems-014-drowart-2005
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1351/pac200577040683
+experiments:
+- experiment_id: 10.1351/pac200577040683::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'ionization_cross_section_compilation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1351/pac200577040683
+  locator:
+    page: 702
+    table: '1'
+    note: remainder of coefficient grid unseen without PDF bytes
+    source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+- experiment_id: 10.1351/pac200577040683::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'ionization_cross_section_compilation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1351/pac200577040683
+  locator:
+    page: 705
+    table: '2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-014-drowart-2005/tables.md
+- experiment_id: 10.1351/pac200577040683::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'ionization_cross_section_compilation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1351/pac200577040683
+  locator:
+    page: 708
+    table: '3'
+    source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+- experiment_id: 10.1351/pac200577040683::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'ionization_cross_section_compilation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1351/pac200577040683
+  locator:
+    page: 714
+    table: '4'
+    source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+- experiment_id: 10.1351/pac200577040683::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'ionization_cross_section_compilation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1351/pac200577040683
+  locator:
+    page: 715
+    table: '5'
+    note: caption and header only from official PDF URL text
+    source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/tables.md
+- experiment_id: 10.1351/pac200577040683::docs-private/research/2026-08-27-ocr-repair/kems-014-drowart-2005/tables.md
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1351/pac200577040683
+  locator:
+    page: 685
+    section: 2. PRINCIPLES OF THE METHOD
+    note: also §4.3a p. 687–688 and §9 p. 728
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-014-drowart-2005/tables.md
+- experiment_id: 10.1351/pac200577040683::docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/completeness-ledger.md
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1351/pac200577040683
+  locator:
+    page: 683
+    note: full paper 683–737; Tables 1–5 and Figs 1–2 from official PDF text
+    source_path: docs-private/research/2026-09-06-hunts/RH-46/kems-014-drowart-2005/completeness-ledger.md

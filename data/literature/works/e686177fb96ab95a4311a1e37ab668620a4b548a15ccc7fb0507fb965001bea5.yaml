@@ -1,0 +1,87 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: e686177fb96ab95a4311a1e37ab668620a4b548a15ccc7fb0507fb965001bea5
+  citation: Ames, Walsh & White, J. Phys. Chem. 71 (1967) 2707–2718
+  source_ids:
+  - ames-walsh-white-1967
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:ames-walsh-white-1967
+      role: pdf
+      path: raw/ames-walsh-white-1967/ames-walsh-white-1967.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:ames-walsh-white-1967
+      role: pdftotext
+      path: text/ames-walsh-white-1967
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ames-walsh-white-1967
+      role: table_csv
+      path: tables/ames-walsh-white-1967
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: e686177fb96ab95a4311a1e37ab668620a4b548a15ccc7fb0507fb965001bea5::Ames67_EuO_dissociation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: e686177fb96ab95a4311a1e37ab668620a4b548a15ccc7fb0507fb965001bea5
+  locator:
+    note: Ames67_EuO_dissociation
+    record: Ames67_EuO_dissociation
+- experiment_id: e686177fb96ab95a4311a1e37ab668620a4b548a15ccc7fb0507fb965001bea5::Ames67_YbO_dissociation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: e686177fb96ab95a4311a1e37ab668620a4b548a15ccc7fb0507fb965001bea5
+  locator:
+    note: Ames67_YbO_dissociation
+    record: Ames67_YbO_dissociation

@@ -1,0 +1,64 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1179/cmq.1984.23.3.309
+  citation: 'Alcock, C.B., Itkin, V.P. & Horrigan, M.K. (1984), "Vapour Pressure Equations for the Metallic Elements: 298–2500
+    K", Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid equations
+    (log10 P form as tabulated).'
+  source_ids:
+  - ref-032-fe-liquid-equation
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:ref-032-fe-liquid-equation
+      role: pdf
+      path: raw/ref-032-fe-liquid-equation/ref-032-fe-liquid-equation.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:ref-032-fe-liquid-equation
+      role: pdftotext
+      path: text/ref-032-fe-liquid-equation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ref-032-fe-liquid-equation
+      role: table_csv
+      path: tables/ref-032-fe-liquid-equation
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1179/cmq.1984.23.3.309
+experiments:
+- experiment_id: 10.1179/cmq.1984.23.3.309::REF-032#Fe_liquid_equation
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1179/cmq.1984.23.3.309
+  locator:
+    note: 'Alcock, C.B., Itkin, V.P. & Horrigan, M.K. (1984), "Vapour Pressure Equations for the Metallic Elements: 298–2500
+      K", Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid
+      equations (log10 P form as tabulated).'
+    record: REF-032#Fe_liquid_equation

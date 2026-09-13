@@ -1,0 +1,358 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-007-costa-2015.yaml
+observations:
+- observation_id: kems-007-costa-2015::costa_2015_fe_olivine_class_and_motzfeldt_absence_b1
+  experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::vaporization coefficients Fe+ / SiO+
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: high-side of measured D(Fe+) band; figure scatter ~0.011–0.020
+      inadmissible_figure_alpha_range:
+      - '0.011'
+      - '0.02'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
+    decided_by:
+      worker: ocr-phase2-gk
+      date: '2026-08-03'
+      evidence:
+        figure: vaporization coefficients Fe+ / SiO+
+        line_range: '386'
+        note: 'B1 harvest: class axis + Motzfeldt geometry typed absence; does not rewrite placeholder multi-orifice row'
+        source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+  notices: []
+  source_id: kems-007-costa-2015
+  locator:
+    figure: vaporization coefficients Fe+ / SiO+
+    line_range: '386'
+    note: 'B1 harvest: class axis + Motzfeldt geometry typed absence; does not rewrite placeholder multi-orifice row'
+    source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+  read_from: pdf:kems-007-costa-2015
+- observation_id: kems-007-costa-2015::costa_2015_fe_olivine_kems_alpha_multicell
+  experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::vaporization coefficients Fe+ / SiO+
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: high-side of measured D(Fe+) band adopted as conservative pin; figure scatter ~0.011–0.020
+      inadmissible_figure_alpha_range:
+      - '0.011'
+      - '0.02'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
+    decided_by:
+      worker: ocr-phase2-gk
+      date: '2026-08-03'
+      evidence:
+        figure: vaporization coefficients Fe+ / SiO+
+        line_range: '386'
+        note: Measured vaporization coefficients of Fe+ and SiO+ using three Mo Knudsen cells with different orifice sizes;
+          image docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/images/142292b86695fb9b3d3098881d5279bbb57f83f1b18d4ecac847962321570fd5.jpg
+        source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+  notices: []
+  source_id: kems-007-costa-2015
+  locator:
+    figure: vaporization coefficients Fe+ / SiO+
+    line_range: '386'
+    note: Measured vaporization coefficients of Fe+ and SiO+ using three Mo Knudsen cells with different orifice sizes; image
+      docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/images/142292b86695fb9b3d3098881d5279bbb57f83f1b18d4ecac847962321570fd5.jpg
+    source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+  read_from: pdf:kems-007-costa-2015
+- observation_id: kems-007-costa-2015::costa_2015_sio_olivine_class_and_motzfeldt_absence_b1
+  experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::vaporization coefficients Fe+ / SiO+
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Range from figure band; not a single pin
+      inadmissible_figure_alpha_range:
+      - '0.003'
+      - '0.036'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
+    decided_by:
+      worker: ocr-phase2-gk
+      date: '2026-08-03'
+      evidence:
+        figure: vaporization coefficients Fe+ / SiO+
+        line_range: '386'
+        source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+  notices: []
+  source_id: kems-007-costa-2015
+  locator:
+    figure: vaporization coefficients Fe+ / SiO+
+    line_range: '386'
+    source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+  read_from: pdf:kems-007-costa-2015
+- observation_id: kems-007-costa-2015::costa_2015_sio_olivine_kems_alpha_multicell
+  experiment_id: a0a717aca2ebe8d209b17f883521efc828bd737ee63ca1fb99e23743c79ddeab::vaporization coefficients Fe+ / SiO+
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Range from figure band; not a single pin
+      inadmissible_figure_alpha_range:
+      - '0.003'
+      - '0.036'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
+    decided_by:
+      worker: ocr-phase2-gk
+      date: '2026-08-03'
+      evidence:
+        figure: vaporization coefficients Fe+ / SiO+
+        line_range: '386'
+        note: SiO+ panel of same multi-cell Mo figure; image docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/images/142292b86695fb9b3d3098881d5279bbb57f83f1b18d4ecac847962321570fd5.jpg
+        source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+  notices: []
+  source_id: kems-007-costa-2015
+  locator:
+    figure: vaporization coefficients Fe+ / SiO+
+    line_range: '386'
+    note: SiO+ panel of same multi-cell Mo figure; image docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/images/142292b86695fb9b3d3098881d5279bbb57f83f1b18d4ecac847962321570fd5.jpg
+    source_path: docs-private/research/ocr-artifacts/kems-007-costa-2015/spool/out/kems-007-costa-2015/vlm/kems-007-costa-2015.md
+  read_from: pdf:kems-007-costa-2015

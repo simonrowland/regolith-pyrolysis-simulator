@@ -1,0 +1,172 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ivtan-mno-coo-thermo.yaml
+observations:
+- observation_id: ivtan-mno-coo-thermo::ivtan_CoO_gibbs
+  experiment_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd::1335
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CoO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: expression
+    expression_text: evaluator_segments_as_published
+    expression_domain: shomate
+  uncertainty:
+    kind: printed
+    verbatim:
+      authority: Sorensen 2020 retention of Pedley-Marshall dissociation-energy width
+      sigma_G_J_per_mol: '12543.093176'
+      d0_width_eV: '0.13'
+      sigma_log10_K_at_1500_2000_2500_K:
+      - '0.436780776'
+      - '0.327585582'
+      - '0.262068466'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    model: shomate
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ivtan-mno-coo-thermo
+  locator:
+    table: 1335
+    note: candidate_row=CoO(g); url=https://www.chem.msu.ru/rus/tsiv/Co/print-CoO.html; authors=E. A. Shenyavskaya; A. V.
+      Gusarov; page_date=2007-01-18
+  read_from: pdf:ivtan-mno-coo-thermo
+- observation_id: ivtan-mno-coo-thermo::ivtan_MnO_gibbs
+  experiment_id: 124968b8b5722446ccdf2402062a787ae41bc49c03c577937c007f1904e83bfd::1436
+  identity:
+    quantity: delta_fG
+    species:
+      formula: MnO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: value
+      value: '100000'
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: expression
+    expression_text: evaluator_segments_as_published
+    expression_domain: shomate
+  uncertainty:
+    kind: printed
+    verbatim:
+      authority: Smoes-Drowart dissociation-energy width
+      sigma_G_J_per_mol: '7531.2'
+      d0_width_kcal_per_mol: '1.8'
+      sigma_log10_K_at_1500_2000_2500_K:
+      - '0.26225456'
+      - '0.19669092'
+      - '0.157352736'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    model: shomate
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ivtan-mno-coo-thermo
+  locator:
+    table: 1436
+    note: candidate_row=MnO(g); url=https://www.chem.msu.ru/rus/tsiv/Mn/print-MnO.html; authors=A. V. Gusarov; A. N. Kulikov;
+      page_date=2008-12-17
+  read_from: pdf:ivtan-mno-coo-thermo

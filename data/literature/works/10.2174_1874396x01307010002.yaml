@@ -1,0 +1,65 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2174/1874396x01307010002
+  citation: 'Miller, M. and Armatys, K. (2013), "Twenty Years of Knudsen Effusion Mass Spectrometry: Studies Performed in
+    the Period 1990-2010", The Open Thermodynamics Journal 7:2-9, DOI 10.2174/1874396X01307010002 (open access; CC BY-NC 3.0
+    as printed)'
+  source_ids:
+  - kems-019-miller-armatys-2013
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-019-miller-armatys-2013
+      role: pdf
+      path: raw/kems-019-miller-armatys-2013/kems-019-miller-armatys-2013.pdf
+      sha256:
+        tag: value
+        value: 0b30fe164d5144ff845faf06afe4ffa55b3278babe2451080198ab94529922e4
+    - asset_id: pdftotext:kems-019-miller-armatys-2013
+      role: pdftotext
+      path: text/kems-019-miller-armatys-2013
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-019-miller-armatys-2013
+      role: table_csv
+      path: tables/kems-019-miller-armatys-2013
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2174/1874396x01307010002
+experiments:
+- experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2174/1874396x01307010002
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    paragraph: aluminate systems / Al2O3-containing systems
+    section: 4. OXIDES

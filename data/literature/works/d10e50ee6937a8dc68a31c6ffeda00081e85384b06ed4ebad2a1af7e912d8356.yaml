@@ -1,0 +1,541 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  citation: Sauerborn, M. (2005), "Pyrolyse von Metalloxiden und Silikaten unter Vakuum mit konzentrierter Solarstrahlung",
+    Dissertation, Rheinische Friedrich-Wilhelms-Universität Bonn
+  source_ids:
+  - kems-035-sauerborn-2005
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-035-sauerborn-2005
+      role: pdf
+      path: raw/kems-035-sauerborn-2005/kems-035-sauerborn-2005.pdf
+      sha256:
+        tag: value
+        value: 764845565460a247ae6dc68a66673d1ad4dc95521d748b3b25ce1d813f11a027
+    - asset_id: pdftotext:kems-035-sauerborn-2005
+      role: pdftotext
+      path: text/kems-035-sauerborn-2005
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-035-sauerborn-2005
+      role: table_csv
+      path: tables/kems-035-sauerborn-2005
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::2.1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_composition' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 15
+    table: '2.1'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::2.2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_composition' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 16
+    table: '2.2'
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::3.2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'qms_chamber' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 44
+    table: '3.2'
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::4.1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solar_vacuum_pyrolysis' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 51
+    table: '4.1'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: plasmagespritzte Aluminiumoxidkeramik (Schale or Tiegel) for powder JSC-1; Tantal Drahttraeger for pellets
+      locator:
+        page: 51
+        table: '4.1'
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'qms_chamber' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 69
+    figure: '5.1'
+    note: Abb. 5.1–5.3 and MS QMS/IR time series
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solar_vacuum_pyrolysis_condensation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 73
+    table: '5.2'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.23
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'post_run_microprobe' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 83
+    figure: '5.23'
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solar_vacuum_pyrolysis' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 79
+    table: '5.3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: plasmagespritzte Aluminiumoxidkeramik (Schale or Tiegel)
+      locator:
+        page: 51
+        table: '4.1'
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.32
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'post_run_xrf_after_1000C_flux_oxidation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 88
+    figure: '5.32'
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solar_vacuum_pyrolysis_condensation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 85
+    table: '5.4'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solar_vacuum_pyrolysis_condensation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 91
+    table: '5.5'
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.55
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'qms_chamber_baseline_normalised' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 105
+    figure: '5.55'
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.56
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'qms_chamber_baseline_normalised' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 107
+    figure: '5.56'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: plasmagespritzte Aluminiumoxidkeramik
+      locator:
+        page: 51
+        table: '4.1'
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'post_run_microprobe' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 103
+    table: '5.6'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'author_qualitative_ranking' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 104
+    table: '5.7'
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::5.8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solar_vacuum_pyrolysis' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 104
+    table: '5.8'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-035-sauerborn-2005/tables.md
+- experiment_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356::kems-035-sauerborn-2005
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solar_vacuum_pyrolysis' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d10e50ee6937a8dc68a31c6ffeda00081e85384b06ed4ebad2a1af7e912d8356
+  locator:
+    page: 67
+    paragraph: Kapitel 5 Ergebnisse und Diskussion
+    note: full-paper audit of tables 2.1-2.3, 3.1-3.3, 4.1, 5.1-5.8, 7.1-7.3 and figures 1.1-7.21

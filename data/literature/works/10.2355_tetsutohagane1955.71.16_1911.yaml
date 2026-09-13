@@ -1,0 +1,346 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  citation: Kambayashi, S., Awaka, H. and Kato, E. (1985), "Mass Spectrometric Determination of Activities of P2O5 in PbO-P2O5
+    and FetO-P2O5 Systems", Tetsu-to-Hagane 71(16):1911-1918, DOI 10.2355/tetsutohagane1955.71.16_1911
+  source_ids:
+  - kems-057-kambayashi-1985
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-057-kambayashi-1985
+      role: pdf
+      path: raw/kems-057-kambayashi-1985/kems-057-kambayashi-1985.pdf
+      sha256:
+        tag: value
+        value: 6051eea158c439e144926afffa3f51f5e21254907f186cdfac12029a343355f8
+    - asset_id: pdftotext:kems-057-kambayashi-1985
+      role: pdftotext
+      path: text/kems-057-kambayashi-1985
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-057-kambayashi-1985
+      role: table_csv
+      path: tables/kems-057-kambayashi-1985
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2355/tetsutohagane1955.71.16_1911
+experiments:
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1912
+    pdf_page_index: 2
+    figure: '1'
+    section: '2.1'
+    note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). PbO-P2O5: inner diameter 9 mm, orifice diameter
+          about 0.4 mm, Pd inner crucible. FetO-P2O5: inner diameter 15 mm, orifice diameter about 0.5 mm (0.3 mm for Table
+          5 asterisk rows No. 4 and No. 7), electrolytic-iron inner crucible. Ta susceptor; W-26%Re/W-5%Re thermocouple calibrated
+          at the melting point of pure Ni. Hitachi RM-6E Knudsen-cell mass spectrometer.'
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+        note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1913
+    pdf_page_index: 3
+    figure: '2'
+    note: Ion current ratios vs X_PbO for PbO-P2O5 at 1300 C; dashed Gibbs-Duhem
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1913
+    pdf_page_index: 3
+    table: '3'
+    note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). PbO-P2O5: inner diameter 9 mm, orifice diameter
+          about 0.4 mm, Pd inner crucible. FetO-P2O5: inner diameter 15 mm, orifice diameter about 0.5 mm (0.3 mm for Table
+          5 asterisk rows No. 4 and No. 7), electrolytic-iron inner crucible. Ta susceptor; W-26%Re/W-5%Re thermocouple calibrated
+          at the melting point of pure Ni. Hitachi RM-6E Knudsen-cell mass spectrometer.'
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+        note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1914
+    pdf_page_index: 4
+    table: '4'
+    note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1915
+    pdf_page_index: 5
+    table: '5'
+    note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: 'High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). PbO-P2O5: inner diameter 9 mm, orifice diameter
+          about 0.4 mm, Pd inner crucible. FetO-P2O5: inner diameter 15 mm, orifice diameter about 0.5 mm (0.3 mm for Table
+          5 asterisk rows No. 4 and No. 7), electrolytic-iron inner crucible. Ta susceptor; W-26%Re/W-5%Re thermocouple calibrated
+          at the melting point of pure Ni. Hitachi RM-6E Knudsen-cell mass spectrometer.'
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+        note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1915
+    pdf_page_index: 5
+    figure: '6'
+    note: Henrian activity of P2O5 for FetO-P2O5 from Table 5 and eq. (3')
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1917
+    pdf_page_index: 7
+    table: '7'
+    note: Table 7 Raoultian a_P2O5 x 10^17; standard state P2O5(s)
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1916
+    pdf_page_index: 6
+    figure: '8'
+    equation: '9'
+    note: Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C
+- experiment_id: 10.2355/tetsutohagane1955.71.16_1911::kems-057-kambayashi-1985
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.71.16_1911
+  locator:
+    published_page: 1911
+    pdf_page_index: 1
+    note: Synopsis and p. 1917/1918 conclusion; Henry region 0 < X_P2O5 < 0.08; standard state P2O5(s)

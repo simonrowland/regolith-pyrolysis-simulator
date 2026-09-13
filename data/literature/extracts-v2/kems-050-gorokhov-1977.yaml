@@ -1,0 +1,276 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-050-gorokhov-1977.yaml
+observations:
+- observation_id: kems-050-gorokhov-1977::gorokhov_1977_cro2_isomolecular_cited_t4_absent
+  experiment_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf::Cr.T4
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CrO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'No Gorokhov CrO2 enthalpy, n_points, or T grid is printed on print-CrO2.html. Compilation adopted DfH°(CrO2,g,298.15
+        K)=-99.2±15 from [61GRI/BUR2] and [77ГОР/ГУС] jointly; that selected value is already stored on source ivtan-cro2-g
+        and is not re-attributed here.
+
+        '
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-050-gorokhov-1977
+  locator:
+    table: Cr.T4
+    paragraph: thermochemical_quantities
+    note: 'print-CrO2.html cites [77ГОР/ГУС] for Cr(g)+CrO2(g)=2CrO(g) and points to table Cr.T4. That table is not on the
+      OA HTML (true absence). Report-internal CrO2 tables unseen. No T grid for this reaction is printed on the OA pages.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: '[77ГОР/ГУС]'
+  read_from: pdf:kems-050-gorokhov-1977
+- observation_id: kems-050-gorokhov-1977::gorokhov_1977_t3_cro_alo_exchange_second_law
+  experiment_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf::Cr.T3
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CrO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_rH0_II_law_kJ_mol: '38'
+      as_printed: 88.7 ± 38
+      note: 'Printed full error on the II-law cell. Compilation text states table errors include reproducibility, temperature
+        trend of the reaction enthalpy, thermodynamic-function error, and RTln(1.5) ionization cross-section error for mass-spectrometric
+        works.
+
+        '
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-050-gorokhov-1977
+  locator:
+    table: Cr.T3
+    note: 'Second-law ΔrH°0 for AlO + Cr = Al + CrO from Table Cr.T3 (computed 3.12.2009). Compilation reprocessing of Gorokhov
+      1977 KEMS; not a measured ion-current series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+    record: '[77ГОР/ГУС]'
+  read_from: pdf:kems-050-gorokhov-1977
+- observation_id: kems-050-gorokhov-1977::gorokhov_1977_t3_cro_alo_exchange_third_law_d0
+  experiment_id: d3013bc9d0cb776b380c86753700462ec01829d40fc4b312d14edee7597b74cf::Cr.T3
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CrO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      delta_rH0_III_law_kJ_mol: '8.6'
+      D0_CrO_kJ_mol: '10'
+      as_printed_III_law: 50.690 ± 8.6
+      as_printed_D0: 456.3 ± 10
+      envelope_components_kJ_mol:
+        reproducibility: '2.6'
+        ionization_cross_section: '8.2'
+        D0_AlO: '5'
+        thermodynamic_functions: '1'
+      envelope_quote: 'Погрешность принятого значения включает следующие составляющие (кДж×моль-1): 2.6 (погрешность воспроизводимости),
+        8.2 (неточность сечений ионизации), 5.0 (неточность в D°0(AlO) и 1.0 (неточность термодинамических функций).
+
+        '
+      note: 'Envelope components are the compilation''s analysis of the Gorokhov D0, not a second printed sigma on the table
+        cell. Auxiliary D°0(AlO)=507 ± 5 kJ mol-1 is from [82ГУР/ВЕЙ], not this report.
+
+        '
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-050-gorokhov-1977
+  locator:
+    table: Cr.T3
+    paragraph: thermochemical_quantities
+    note: 'Table Cr.T3 III-law ΔrH°0 and D0°(CrO) for AlO + Cr = Al + CrO, plus prose "В работе [77ГОР/ГУС] значение D°0(CrO)
+      = 456.3 ± 10 кДж×моль-1".
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
+    record: '[77ГОР/ГУС]'
+  read_from: pdf:kems-050-gorokhov-1977

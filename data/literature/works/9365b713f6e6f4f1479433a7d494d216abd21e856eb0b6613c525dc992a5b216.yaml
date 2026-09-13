@@ -1,0 +1,59 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 9365b713f6e6f4f1479433a7d494d216abd21e856eb0b6613c525dc992a5b216
+  citation: Primary TeO2 vapor-pressure / effusion papers (recover pages)
+  source_ids:
+  - pending-teo2-vp
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:pending-teo2-vp
+      role: pdf
+      path: raw/pending-teo2-vp/pending-teo2-vp.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:pending-teo2-vp
+      role: pdftotext
+      path: text/pending-teo2-vp
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pending-teo2-vp
+      role: table_csv
+      path: tables/pending-teo2-vp
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 9365b713f6e6f4f1479433a7d494d216abd21e856eb0b6613c525dc992a5b216::PENDING#TeO2_VP
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 9365b713f6e6f4f1479433a7d494d216abd21e856eb0b6613c525dc992a5b216
+  locator:
+    note: Primary TeO2 vapor-pressure / effusion papers (recover pages)
+    record: PENDING#TeO2_VP

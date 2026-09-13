@@ -1,0 +1,117 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: a0fc271919e535803ef9cd01322b3273deaeb047128a3de435bbb05f7dc5d64f
+  citation: Copland, E. H. & Jacobson, N. S. (2010), "Measuring Thermodynamic Properties of Metals and Alloys With Knudsen
+    Effusion Mass Spectrometry", NASA/TP—2010-216795
+  source_ids:
+  - kems-032-copland-jacobson-2010
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-032-copland-jacobson-2010
+      role: pdf
+      path: raw/kems-032-copland-jacobson-2010/kems-032-copland-jacobson-2010.pdf
+      sha256:
+        tag: value
+        value: a72ca745e22531dc42dc7b4d59813ac8a38f255af86023e56f1d1098637dff92
+    - asset_id: pdftotext:kems-032-copland-jacobson-2010
+      role: pdftotext
+      path: text/kems-032-copland-jacobson-2010
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-032-copland-jacobson-2010
+      role: table_csv
+      path: tables/kems-032-copland-jacobson-2010
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: a0fc271919e535803ef9cd01322b3273deaeb047128a3de435bbb05f7dc5d64f::I
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: a0fc271919e535803ef9cd01322b3273deaeb047128a3de435bbb05f7dc5d64f
+  locator:
+    table: I
+    line_range: 292-294
+    source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+- experiment_id: a0fc271919e535803ef9cd01322b3273deaeb047128a3de435bbb05f7dc5d64f::docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: a0fc271919e535803ef9cd01322b3273deaeb047128a3de435bbb05f7dc5d64f
+  locator:
+    paragraph: Whitman-Motzfeld design example; cavity 10×7.6 mm; orifice 1.5×4.0 mm
+    line_range: 304-315
+    source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: system-dependent (Table II examples include W, Ta, graphite, Y2O3, Al2O3, Si3N4; SiO2 studied in Ta with ZrO2
+          liners)
+      locator:
+        table: II
+        line_range: '319'
+        source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.000001767146'
+        locator:
+          paragraph: typical orifice diameter 1.5 mm and length 4.0 mm
+          line_range: '315'
+          source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md
+      exposed_area_m2:
+        state:
+          tag: value
+          value: '0.00007853982'
+        locator:
+          paragraph: cavity diameter 10 mm and height 7.6 mm
+          line_range: '315'
+          source_path: docs-private/research/ocr-artifacts/kems-032-copland-jacobson-2010/spool/out/kems-032-copland-jacobson-2010/vlm/kems-032-copland-jacobson-2010.md

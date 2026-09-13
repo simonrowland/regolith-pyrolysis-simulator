@@ -1,0 +1,78 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/pending-mgcl2-measured-vp.yaml
+observations:
+- observation_id: pending-mgcl2-measured-vp::anchor_MgCl2_pure_Psat
+  experiment_id: c16250ca10856aaeabc54fae7e64af35a1fb0970e4b9b4c42ed481252d9e9cf7::PENDING#MgCl2_measured_VP
+  identity:
+    quantity: p_sat
+    species:
+      formula: MgCl2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '1100'
+    interval_high: '1700'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: pending-mgcl2-measured-vp
+  locator:
+    note: Independent molten MgCl2 vapor-pressure / KEMS series (not JANAF)
+    record: PENDING#MgCl2_measured_VP
+  read_from: pdf:pending-mgcl2-measured-vp

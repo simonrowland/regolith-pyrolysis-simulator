@@ -1,0 +1,59 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 650568f93c1d8e3ebf5cc8c7ffb49bcb6bf3234dbb5ad9975000aed26c904b02
+  citation: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.
+  source_ids:
+  - ref-032-pb
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:ref-032-pb
+      role: pdf
+      path: raw/ref-032-pb/ref-032-pb.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:ref-032-pb
+      role: pdftotext
+      path: text/ref-032-pb
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ref-032-pb
+      role: table_csv
+      path: tables/ref-032-pb
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 650568f93c1d8e3ebf5cc8c7ffb49bcb6bf3234dbb5ad9975000aed26c904b02::REF-032#Pb
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 650568f93c1d8e3ebf5cc8c7ffb49bcb6bf3234dbb5ad9975000aed26c904b02
+  locator:
+    note: Alcock et al. (1984) REF-032 Pb equations; JANAF Pb(g) Chase 1998; classic Hultgren selected values for Pb.
+    record: REF-032#Pb

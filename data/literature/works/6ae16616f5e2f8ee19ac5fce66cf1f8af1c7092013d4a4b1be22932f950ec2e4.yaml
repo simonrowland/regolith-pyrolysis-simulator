@@ -1,0 +1,119 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  citation: Zhang et al. (2021), vacuum evaporation of Na, K and Rb from a basaltic silicate melt; diffusion-limited alkali
+    loss. PDF in docs/references/pdfs/99-kems-langmuir/kems-006-zhang-2021.pdf
+  source_ids:
+  - kems-006-zhang-2021
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-006-zhang-2021
+      role: pdf
+      path: raw/kems-006-zhang-2021/kems-006-zhang-2021.pdf
+      sha256:
+        tag: value
+        value: c25927f3cebace1ff65afd7d20ad17bbbf1b9d0ecf37a6ce916449688b4f251e
+    - asset_id: pdftotext:kems-006-zhang-2021
+      role: pdftotext
+      path: text/kems-006-zhang-2021
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-006-zhang-2021
+      role: table_csv
+      path: tables/kems-006-zhang-2021
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::1
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    page: 71
+    table: '1'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::3
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    page: 73
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md
+- experiment_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4::4
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 6ae16616f5e2f8ee19ac5fce66cf1f8af1c7092013d4a4b1be22932f950ec2e4
+  locator:
+    page: 74
+    table: '4'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-006-zhang-2021/tables.md

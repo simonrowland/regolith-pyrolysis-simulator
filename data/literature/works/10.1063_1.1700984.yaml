@@ -1,0 +1,109 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1063/1.1700984
+  citation: Datz, Smith & Taylor (1961) J. Chem. Phys. 34:558–564 DOI 10.1063/1.1700984 Na2Cl2 dimer over NaCl(l); JANAF Na2Cl2(g)
+  source_ids:
+  - datz-1961-na2cl2
+  - datz-smith-taylor-1961-nacl-vapor
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:datz-1961-na2cl2
+      role: pdf
+      path: raw/datz-1961-na2cl2/datz-1961-na2cl2.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:datz-1961-na2cl2
+      role: pdftotext
+      path: text/datz-1961-na2cl2
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:datz-1961-na2cl2
+      role: table_csv
+      path: tables/datz-1961-na2cl2
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: pdf:datz-smith-taylor-1961-nacl-vapor
+      role: pdf
+      path: raw/datz-smith-taylor-1961-nacl-vapor/datz-smith-taylor-1961-nacl-vapor.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:datz-smith-taylor-1961-nacl-vapor
+      role: pdftotext
+      path: text/datz-smith-taylor-1961-nacl-vapor
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:datz-smith-taylor-1961-nacl-vapor
+      role: table_csv
+      path: tables/datz-smith-taylor-1961-nacl-vapor
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1063/1.1700984
+experiments:
+- experiment_id: 10.1063/1.1700984::Datz-1961#Na2Cl2
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.1700984
+  locator:
+    note: Datz, Smith & Taylor (1961) J. Chem. Phys. 34:558–564 DOI 10.1063/1.1700984 Na2Cl2 dimer over NaCl(l); JANAF Na2Cl2(g)
+    record: Datz-1961#Na2Cl2
+- experiment_id: 10.1063/1.1700984::Datz-Smith-Taylor-1961#NaCl_vapor
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.1700984
+  locator:
+    note: 'Zimmermann, K. / later KEMS salt reviews; preferred primary: Barton, J.L. & Bloom, H. (1956–), molten alkali-halide
+      vapor pressures (transpirations), and Datz, S., Smith, W.T. & Taylor, E.H. (1961), "The Molecular Composition of Sodium
+      Chloride Vapor", J. Chem. Phys. 34:558–564, DOI 10.1063/1.170098'
+    record: Datz-Smith-Taylor-1961#NaCl_vapor

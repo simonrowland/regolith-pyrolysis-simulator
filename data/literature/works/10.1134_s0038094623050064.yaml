@@ -1,0 +1,219 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1134/s0038094623050064
+  citation: 'Voropaev, S. A., Dushenko, N. V., Fedulov, V. S. and Korochantsev, A. V. (2023), Osobennosti degazatsii uglistogo
+    khondrita Murchison (CM2) v intervale temperatur 200-800 C, Astronomicheskii Vestnik 57(6) 571-582. English translation:
+    Features of Degassing of the Murchison (CM2) Carbonaceous Chondrite in the Temperature Interval of 200-800 C, Solar System
+    Research. Russian original DOI 10.31857/S0320930X23050067; English DOI 10.1134/S0038094623050064.'
+  source_ids:
+  - murchison-degassing-2023-springer
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:murchison-degassing-2023-springer
+      role: pdf
+      path: raw/murchison-degassing-2023-springer/murchison-degassing-2023-springer.pdf
+      sha256:
+        tag: value
+        value: 906d6c2120a501201e3118c901e4fa62789d8cd96028839e4bba47a2ea542c7f
+    - asset_id: pdftotext:murchison-degassing-2023-springer
+      role: pdftotext
+      path: text/murchison-degassing-2023-springer
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:murchison-degassing-2023-springer
+      role: table_csv
+      path: tables/murchison-degassing-2023-springer
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1134/s0038094623050064
+experiments:
+- experiment_id: 10.1134/s0038094623050064::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'isothermal_degassing_helium_headspace_GC' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: unmapped pressure unit 'bar as printed (helium, approximately atmospheric)'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: unmapped pressure unit 'bar as printed (helium, approximately atmospheric)'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: unmapped pressure unit 'bar as printed (helium, approximately atmospheric)'
+  work_id: 10.1134/s0038094623050064
+  locator:
+    published_page: 576
+    pdf_page_index: 6
+    table: '1'
+    note: Soderzhanie gazov pri izotermicheskom otzhige Murchison (posle 15 min)
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: quartz-glass reactor (80 mL) with quartz boat (3 mL) holding the sample; induction heater; rubber vacuum stopper
+          for syringe sampling
+      locator:
+        published_page: 573
+        pdf_page_index: 3
+        figure: '2'
+        paragraph: tselnyi reaktor iz kvartsevogo stekla; kvartsevaya lodochka obemom 3 ml; reaktor obemom 80 ml
+- experiment_id: 10.1134/s0038094623050064::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'stepwise_degassing_helium_headspace_GC_no_accumulation' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: unmapped pressure unit 'bar as printed (helium, approximately atmospheric)'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: unmapped pressure unit 'bar as printed (helium, approximately atmospheric)'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: unmapped pressure unit 'bar as printed (helium, approximately atmospheric)'
+  work_id: 10.1134/s0038094623050064
+  locator:
+    published_page: 576
+    pdf_page_index: 6
+    table: '2'
+    note: Soderzhanie gazov pri stupenchatom nagreve Murchison (posle 30 min)
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: quartz-glass reactor (80 mL) with quartz boat (3 mL) holding the sample; induction heater; rubber vacuum stopper
+          for syringe sampling
+      locator:
+        published_page: 573
+        pdf_page_index: 3
+        figure: '2'
+        paragraph: tselnyi reaktor iz kvartsevogo stekla; kvartsevaya lodochka obemom 3 ml; reaktor obemom 80 ml
+- experiment_id: 10.1134/s0038094623050064::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'FTIR_ATR_residue' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1134/s0038094623050064
+  locator:
+    published_page: 577
+    pdf_page_index: 7
+    figure: '3'
+    note: Normalized IR transmittance of Murchison after annealing at 200, 500, 800 C
+- experiment_id: 10.1134/s0038094623050064::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'isothermal_degassing_helium_headspace_GC' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1134/s0038094623050064
+  locator:
+    published_page: 580
+    pdf_page_index: 10
+    table: '4'
+    note: Izotermicheskaya degazatsiya meteoritov Murchison i Chelyabinsk (800 C, posle 15 min)
+- experiment_id: 10.1134/s0038094623050064::murchison-degassing-2023-springer
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'isothermal_and_stepwise_degassing_helium' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: unmapped pressure unit 'bar as printed (helium, approximately atmospheric)'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: unmapped pressure unit 'bar as printed (helium, approximately atmospheric)'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: unmapped pressure unit 'bar as printed (helium, approximately atmospheric)'
+  work_id: 10.1134/s0038094623050064
+  locator:
+    published_page: 573
+    pdf_page_index: 3
+    section: Eksperimentalnye issledovaniya degazatsii
+    note: apparatus pp. 573-575; feedstock Murchison CM2; no aliquot mass printed
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: quartz-glass reactor (80 mL) with quartz boat (3 mL) holding the sample; induction heater; rubber vacuum stopper
+          for syringe sampling
+      locator:
+        published_page: 573
+        pdf_page_index: 3
+        figure: '2'
+        paragraph: tselnyi reaktor iz kvartsevogo stekla; kvartsevaya lodochka obemom 3 ml; reaktor obemom 80 ml

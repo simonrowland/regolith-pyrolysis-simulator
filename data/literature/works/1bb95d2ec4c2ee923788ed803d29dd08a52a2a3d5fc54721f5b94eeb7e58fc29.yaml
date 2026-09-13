@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 1bb95d2ec4c2ee923788ed803d29dd08a52a2a3d5fc54721f5b94eeb7e58fc29
+  citation: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)
+    free-energy path as secondary.
+  source_ids:
+  - ref-032-mg
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:ref-032-mg
+      role: pdf
+      path: raw/ref-032-mg/ref-032-mg.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:ref-032-mg
+      role: pdftotext
+      path: text/ref-032-mg
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ref-032-mg
+      role: table_csv
+      path: tables/ref-032-mg
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 1bb95d2ec4c2ee923788ed803d29dd08a52a2a3d5fc54721f5b94eeb7e58fc29::REF-032#Mg
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 1bb95d2ec4c2ee923788ed803d29dd08a52a2a3d5fc54721f5b94eeb7e58fc29
+  locator:
+    note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) Mg equations; JANAF Mg(g) Chase 1998 (REF-020)
+      free-energy path as secondary.
+    record: REF-032#Mg

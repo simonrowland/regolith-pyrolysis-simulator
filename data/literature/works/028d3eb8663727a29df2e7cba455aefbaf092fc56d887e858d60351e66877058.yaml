@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 028d3eb8663727a29df2e7cba455aefbaf092fc56d887e858d60351e66877058
+  citation: Stolyarova, V. (2012), "Thermodynamic properties and vaporization processes of the ionic silicate melts" — review;
+    Table 1 vapour composition over ternary ionic silicate systems
+  source_ids:
+  - kems-018-stolyarova-2012
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-018-stolyarova-2012
+      role: pdf
+      path: raw/kems-018-stolyarova-2012/kems-018-stolyarova-2012.pdf
+      sha256:
+        tag: value
+        value: 7a9c05dd81d50994911b82a891f0bc82f80994e4a30535b2c593ffeb441b4d2f
+    - asset_id: pdftotext:kems-018-stolyarova-2012
+      role: pdftotext
+      path: text/kems-018-stolyarova-2012
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-018-stolyarova-2012
+      role: table_csv
+      path: tables/kems-018-stolyarova-2012
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 028d3eb8663727a29df2e7cba455aefbaf092fc56d887e858d60351e66877058::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 028d3eb8663727a29df2e7cba455aefbaf092fc56d887e858d60351e66877058
+  locator:
+    table: '1'
+    paragraph: Composition of vapour over ternary ionic silicate systems studied
+    source_path: docs-private/research/ocr-artifacts/kems-018-stolyarova-2012/spool/out/kems-018-stolyarova-2012/vlm/kems-018-stolyarova-2012.md

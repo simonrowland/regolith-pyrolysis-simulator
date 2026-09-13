@@ -1,0 +1,63 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: e8448366ffc1340e9b41f10919c80e1c3ae8f0e9fbf190d553fcb7dc4ef5ec78
+  citation: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations
+    (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure series cited therein. Do not use Chase
+    1998 as independent if it entered the fit residual.
+  source_ids:
+  - ref-032-mn-if-not-in-fit
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:ref-032-mn-if-not-in-fit
+      role: pdf
+      path: raw/ref-032-mn-if-not-in-fit/ref-032-mn-if-not-in-fit.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:ref-032-mn-if-not-in-fit
+      role: pdftotext
+      path: text/ref-032-mn-if-not-in-fit
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ref-032-mn-if-not-in-fit
+      role: table_csv
+      path: tables/ref-032-mn-if-not-in-fit
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: e8448366ffc1340e9b41f10919c80e1c3ae8f0e9fbf190d553fcb7dc4ef5ec78::REF-032#Mn_if_not_in_fit
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: e8448366ffc1340e9b41f10919c80e1c3ae8f0e9fbf190d553fcb7dc4ef5ec78
+  locator:
+    note: If JANAF evaluation is part of the fit, pure independent measurement is Alcock et al. (1984) REF-032 Mn equations
+      (use Alcock alone as anchor) or Nesmeyanov-class experimental Mn vapor-pressure series cited therein. Do not use Chase
+      1998 as independent if it entered the fit residual.
+    record: REF-032#Mn_if_not_in_fit

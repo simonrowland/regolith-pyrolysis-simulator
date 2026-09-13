@@ -1,0 +1,520 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/kems_measurements.yaml
+observations:
+- observation_id: cao_p_ca_isothermal
+  experiment_id: 10.1007/s11663-024-02995-6::7
+  identity:
+    quantity: p_partial
+    species:
+      formula: Ca
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2077'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: absent_not_digitized_source_figure_only
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: absent_not_digitized_source_figure_only
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: halwax_sergeev_mueller_schenk_2024
+  locator:
+    published_page: 826
+    pdf_page_index: 5
+    figure: 7
+    note: polythermal_figure=8; polythermal_published_page=827
+  read_from: pdf:halwax_sergeev_mueller_schenk_2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2077'
+      locator:
+        published_page: 826
+        pdf_page_index: 5
+        figure: 7
+        note: polythermal_figure=8; polythermal_published_page=827
+- observation_id: cao_p_o2_isothermal
+  experiment_id: 10.1007/s11663-024-02995-6::7
+  identity:
+    quantity: p_partial
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2077'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: absent_not_digitized_source_figure_only
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: absent_not_digitized_source_figure_only
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: halwax_sergeev_mueller_schenk_2024
+  locator:
+    published_page: 826
+    pdf_page_index: 5
+    figure: 7
+    note: polythermal_figure=10; polythermal_published_page=827
+  read_from: pdf:halwax_sergeev_mueller_schenk_2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2077'
+      locator:
+        published_page: 826
+        pdf_page_index: 5
+        figure: 7
+        note: polythermal_figure=10; polythermal_published_page=827
+- observation_id: cao_p_o_isothermal
+  experiment_id: 10.1007/s11663-024-02995-6::7
+  identity:
+    quantity: p_partial
+    species:
+      formula: O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '2077'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: absent_not_digitized_source_figure_only
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: absent_not_digitized_source_figure_only
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: halwax_sergeev_mueller_schenk_2024
+  locator:
+    published_page: 826
+    pdf_page_index: 5
+    figure: 7
+    note: polythermal_figure=9; polythermal_published_page=827
+  read_from: pdf:halwax_sergeev_mueller_schenk_2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2077'
+      locator:
+        published_page: 826
+        pdf_page_index: 5
+        figure: 7
+        note: polythermal_figure=9; polythermal_published_page=827
+- observation_id: mgo_p_mg_isothermal
+  experiment_id: 10.1007/s11663-024-02995-6::7
+  identity:
+    quantity: p_partial
+    species:
+      formula: Mg
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1926'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: absent_not_digitized_source_figure_only
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: absent_not_digitized_source_figure_only
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: halwax_sergeev_mueller_schenk_2024
+  locator:
+    published_page: 826
+    pdf_page_index: 5
+    figure: 7
+    note: polythermal_figure=11; polythermal_published_page=827
+  read_from: pdf:halwax_sergeev_mueller_schenk_2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1926'
+      locator:
+        published_page: 826
+        pdf_page_index: 5
+        figure: 7
+        note: polythermal_figure=11; polythermal_published_page=827
+- observation_id: mgo_p_o2_isothermal
+  experiment_id: 10.1007/s11663-024-02995-6::7
+  identity:
+    quantity: p_partial
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1926'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: absent_not_digitized_source_figure_only
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: absent_not_digitized_source_figure_only
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: halwax_sergeev_mueller_schenk_2024
+  locator:
+    published_page: 826
+    pdf_page_index: 5
+    figure: 7
+    note: polythermal_figure=13; polythermal_published_page=828
+  read_from: pdf:halwax_sergeev_mueller_schenk_2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1926'
+      locator:
+        published_page: 826
+        pdf_page_index: 5
+        figure: 7
+        note: polythermal_figure=13; polythermal_published_page=828
+- observation_id: mgo_p_o_isothermal
+  experiment_id: 10.1007/s11663-024-02995-6::7
+  identity:
+    quantity: p_partial
+    species:
+      formula: O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: value
+      value: '1926'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: absent_not_digitized_source_figure_only
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: absent_not_digitized_source_figure_only
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: halwax_sergeev_mueller_schenk_2024
+  locator:
+    published_page: 826
+    pdf_page_index: 5
+    figure: 7
+    note: polythermal_figure=12; polythermal_published_page=827
+  read_from: pdf:halwax_sergeev_mueller_schenk_2024
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1926'
+      locator:
+        published_page: 826
+        pdf_page_index: 5
+        figure: 7
+        note: polythermal_figure=12; polythermal_published_page=827

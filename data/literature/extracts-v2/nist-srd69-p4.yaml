@@ -1,0 +1,154 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/nist-srd69-p4.yaml
+observations:
+- observation_id: nist-srd69-p4::anchor_P4_pure_Psat
+  experiment_id: 1b63586b3a68d2cde603a23d8351ed93b26f6f93ce615aa1730db3be509d878e::NIST-SRD69#P4
+  identity:
+    quantity: p_sat
+    species:
+      formula: P4
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '298'
+    interval_high: '600'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-srd69-p4
+  locator:
+    note: NIST SRD 69 white phosphorus; JANAF P4(g)
+    record: NIST-SRD69#P4
+  read_from: pdf:nist-srd69-p4
+- observation_id: nist-srd69-p4::anchor_P_pure_Psat
+  experiment_id: 1b63586b3a68d2cde603a23d8351ed93b26f6f93ce615aa1730db3be509d878e::NIST-SRD69#P4
+  identity:
+    quantity: p_sat
+    species:
+      formula: P
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '298'
+    interval_high: '600'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: nist-srd69-p4
+  locator:
+    note: 'Elemental white phosphorus: NIST Chemistry WebBook SRD 69 P4 vapor pressure (Stull 1947 lineage) — independent
+      of oxide-carrier path. Plant carriers (preferred promotion targets): (1) PO/PO2 — JANAF PO(g)/PO2(g) Chase 1998 free
+      energies (REF-020); (2) P4O10(s) sublimation — Muenow et al. / Hashimoto'
+    record: NIST-SRD69#P4
+  read_from: pdf:nist-srd69-p4

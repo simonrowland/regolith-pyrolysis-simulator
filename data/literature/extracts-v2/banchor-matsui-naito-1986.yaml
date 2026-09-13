@@ -1,0 +1,79 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/banchor-matsui-naito-1986.yaml
+observations:
+- observation_id: banchor-matsui-naito-1986::Ban86_equations
+  experiment_id: 42669027800b66ae20c68dd1b646610ffb82a22896dee6bc95eec78848807bf0::Table 1 (equations); Figs. 1–4; comparison
+    to Berkowitz points
+  identity:
+    quantity: delta_fG
+    species:
+      formula: VO_VO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: banchor-matsui-naito-1986
+  locator:
+    table: Table 1 (equations); Figs. 1–4; comparison to Berkowitz points
+    note: Table 1 (equations); Figs. 1–4; comparison to Berkowitz points
+    record: Ban86_equations
+  read_from: pdf:banchor-matsui-naito-1986

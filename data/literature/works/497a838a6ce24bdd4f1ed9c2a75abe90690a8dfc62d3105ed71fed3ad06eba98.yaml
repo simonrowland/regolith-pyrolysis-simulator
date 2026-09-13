@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 497a838a6ce24bdd4f1ed9c2a75abe90690a8dfc62d3105ed71fed3ad06eba98
+  citation: Second arsenolite vapor-pressure primary distinct from Behrens & Rosenblatt 1972 (e.g. earlier static-method series
+    cited by BR72 itself — use BR72's cited experimental sources, not BR72 coefficients). JANAF As4O6 if tabulated.
+  source_ids:
+  - pending-as2o3-second-primary
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:pending-as2o3-second-primary
+      role: pdf
+      path: raw/pending-as2o3-second-primary/pending-as2o3-second-primary.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:pending-as2o3-second-primary
+      role: pdftotext
+      path: text/pending-as2o3-second-primary
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pending-as2o3-second-primary
+      role: table_csv
+      path: tables/pending-as2o3-second-primary
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 497a838a6ce24bdd4f1ed9c2a75abe90690a8dfc62d3105ed71fed3ad06eba98::PENDING#As2O3_second_primary
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 497a838a6ce24bdd4f1ed9c2a75abe90690a8dfc62d3105ed71fed3ad06eba98
+  locator:
+    note: Second arsenolite vapor-pressure primary distinct from Behrens & Rosenblatt 1972 (e.g. earlier static-method series
+      cited by BR72 itself — use BR72's cited experimental sources, not BR72 coefficients). JANAF As4O6 if tabulated.
+    record: PENDING#As2O3_second_primary

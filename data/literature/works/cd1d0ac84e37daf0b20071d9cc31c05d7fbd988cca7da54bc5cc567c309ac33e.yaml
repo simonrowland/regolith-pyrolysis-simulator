@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: cd1d0ac84e37daf0b20071d9cc31c05d7fbd988cca7da54bc5cc567c309ac33e
+  citation: MoO3 vaporization (Ackermann & Rauh; Blackburn) — this family is explicitly a cross-check surface; use a primary
+    MoO3 series distinct from whatever coefficients sit on the row.
+  source_ids:
+  - pending-pages-moo3-vp
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:pending-pages-moo3-vp
+      role: pdf
+      path: raw/pending-pages-moo3-vp/pending-pages-moo3-vp.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:pending-pages-moo3-vp
+      role: pdftotext
+      path: text/pending-pages-moo3-vp
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pending-pages-moo3-vp
+      role: table_csv
+      path: tables/pending-pages-moo3-vp
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: cd1d0ac84e37daf0b20071d9cc31c05d7fbd988cca7da54bc5cc567c309ac33e::PENDING-pages#MoO3_VP
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: cd1d0ac84e37daf0b20071d9cc31c05d7fbd988cca7da54bc5cc567c309ac33e
+  locator:
+    note: MoO3 vaporization (Ackermann & Rauh; Blackburn) — this family is explicitly a cross-check surface; use a primary
+      MoO3 series distinct from whatever coefficients sit on the row.
+    record: PENDING-pages#MoO3_VP

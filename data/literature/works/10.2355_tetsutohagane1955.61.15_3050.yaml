@@ -1,0 +1,364 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/tetsutohagane1955.61.15_3050
+  citation: Furukawa, T. and Kato, E. (1975), "Thermodynamic Properties of the Fe-V, Fe-V-Cr Alloys at 1600 C by Mass-Spectrometry",
+    Tetsu-to-Hagane 61(15):3050-3059, DOI 10.2355/tetsutohagane1955.61.15_3050
+  source_ids:
+  - kems-119-furukawa-1975
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-119-furukawa-1975
+      role: pdf
+      path: raw/kems-119-furukawa-1975/kems-119-furukawa-1975.pdf
+      sha256:
+        tag: value
+        value: f2e3d5a84037dac5c18fffab90a809f99e7297854de0a4779036f8ca585202d3
+    - asset_id: pdftotext:kems-119-furukawa-1975
+      role: pdftotext
+      path: text/kems-119-furukawa-1975
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-119-furukawa-1975
+      role: table_csv
+      path: tables/kems-119-furukawa-1975
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2355/tetsutohagane1955.61.15_3050
+experiments:
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/tetsutohagane1955.61.15_3050
+  locator:
+    published_page: 3051
+    pdf_page_index: 2
+    figure: '1'
+    section: '3.1'
+    note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). Body inner diameter 9 mm, outer diameter 11 mm,
+          height 12 mm. Lid diameter 11.5 mm, thickness 1 mm or 0.5 mm. Orifice diameter 0.5 mm or 0.3 mm. Lid/body contact
+          faces precision-ground. Cell in a tantalum susceptor with isothermal plates (Fig. 2). Homemade cell-support and
+          filament-support on a Hitachi RM-6K Knudsen-cell mass spectrometer (90 deg magnetic-scan single-focusing, analyser
+          radius 200 mm).
+      locator:
+        published_page: 3051
+        pdf_page_index: 2
+        figure: '1'
+        section: '3.1'
+        note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.61.15_3050
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    figure: '10'
+    note: log(I_Cr+/I_Fe+) and log(I_Cr+/I_V+) vs 1/T at N_V=0.2 and 0.3
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::12
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.61.15_3050
+  locator:
+    published_page: 3058
+    pdf_page_index: 9
+    figure: '12'
+    note: a_Fe and a_V in Fe-V-Cr at 1600 C vs 1-(N_V+N_Cr)
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/tetsutohagane1955.61.15_3050
+  locator:
+    published_page: 3054
+    pdf_page_index: 5
+    table: '2'
+    note: Table 2 ion-current-ratio slopes and 1600 C intercepts for Fe-V
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). Body inner diameter 9 mm, outer diameter 11 mm,
+          height 12 mm. Lid diameter 11.5 mm, thickness 1 mm or 0.5 mm. Orifice diameter 0.5 mm or 0.3 mm. Lid/body contact
+          faces precision-ground. Cell in a tantalum susceptor with isothermal plates (Fig. 2). Homemade cell-support and
+          filament-support on a Hitachi RM-6K Knudsen-cell mass spectrometer (90 deg magnetic-scan single-focusing, analyser
+          radius 200 mm).
+      locator:
+        published_page: 3051
+        pdf_page_index: 2
+        figure: '1'
+        section: '3.1'
+        note: Hitachi RM-6K; alumina SSA-S cell; Ta susceptor Fig. 2
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.61.15_3050
+  locator:
+    published_page: 3053
+    pdf_page_index: 4
+    figure: '3'
+    note: 1600 C liquidus 66 at% V, solidus 69 at% V from ion-ratio breaks
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.61.15_3050
+  locator:
+    published_page: 3054
+    pdf_page_index: 5
+    figure: '4'
+    note: log(I_V+/I_Fe+) vs 1/T; 0.3 and 0.5 mm orifices; heating/cooling
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.61.15_3050
+  locator:
+    published_page: 3055
+    pdf_page_index: 6
+    figure: '6'
+    note: a_V and a_Fe vs N_Fe at 1600 C; liquid and solid references
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.61.15_3050
+  locator:
+    published_page: 3056
+    pdf_page_index: 7
+    figure: '7'
+    note: a_V vs N_V compared with Fruehan and Kay; VO-saturated recalculation dashed
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.61.15_3050
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    figure: '9'
+    note: H^M_Fe = -4.5 kcal mol^-1 at infinite dilution from Table 2 slopes via eq. (2)
+- experiment_id: 10.2355/tetsutohagane1955.61.15_3050::kems-119-furukawa-1975
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.61.15_3050
+  locator:
+    published_page: 3057
+    pdf_page_index: 8
+    equation: '10'
+    note: eq. (10) from Gibbs-Duhem on Table 2 / Fig. 5; also synopsis p. 3050

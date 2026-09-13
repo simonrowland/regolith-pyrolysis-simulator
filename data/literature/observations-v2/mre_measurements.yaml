@@ -1,0 +1,880 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/mre_measurements.yaml
+observations:
+- observation_id: yu_2025_hollow_anode_measurements:one_hour:mre_anode_o2_mass_kg
+  experiment_id: 10.1016/j.actaastro.2025.06.028::2
+  identity:
+    quantity: o2_yield
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile o2_yield does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile o2_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile o2_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile o2_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile o2_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile o2_yield does not use wall
+  value:
+    kind: point
+    point: '0.00007'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mre sidecar does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: yu_2025_hollow_anode_measurements
+  locator:
+    table: 2
+    note: row=1 h; column=O2 Produced
+  read_from: pdf:yu_2025_hollow_anode_measurements
+- observation_id: yu_2025_hollow_anode_measurements:one_hour:mre_applied_charge_C
+  experiment_id: 10.1016/j.actaastro.2025.06.028::yu_2025_hollow_anode_measurements
+  identity:
+    quantity: mass_loss_fraction
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '1800'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mre sidecar does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: yu_2025_hollow_anode_measurements
+  locator:
+    section: 2.2.2
+    note: derivation=0.5 A times 3600 s
+  read_from: pdf:yu_2025_hollow_anode_measurements
+- observation_id: yu_2025_hollow_anode_measurements:one_hour:mre_extraction_efficiency_fraction
+  experiment_id: 10.1016/j.actaastro.2025.06.028::2
+  identity:
+    quantity: mass_loss_fraction
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.004'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mre sidecar does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: yu_2025_hollow_anode_measurements
+  locator:
+    table: 2
+    note: row=1 h; column=Extraction Efficiency
+  read_from: pdf:yu_2025_hollow_anode_measurements
+- observation_id: yu_2025_hollow_anode_measurements:one_hour:mre_faradaic_efficiency_fraction
+  experiment_id: 10.1016/j.actaastro.2025.06.028::2
+  identity:
+    quantity: mass_loss_fraction
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.47'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mre sidecar does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: yu_2025_hollow_anode_measurements
+  locator:
+    table: 2
+    note: row=1 h; column=Faradaic Efficiency
+  read_from: pdf:yu_2025_hollow_anode_measurements
+- observation_id: yu_2025_hollow_anode_measurements:three_hour:mre_anode_o2_mass_kg
+  experiment_id: 10.1016/j.actaastro.2025.06.028::2
+  identity:
+    quantity: o2_yield
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile o2_yield does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile o2_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile o2_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile o2_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile o2_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile o2_yield does not use wall
+  value:
+    kind: point
+    point: '0.000237'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mre sidecar does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: yu_2025_hollow_anode_measurements
+  locator:
+    table: 2
+    note: row=3 h; column=O2 Produced
+  read_from: pdf:yu_2025_hollow_anode_measurements
+- observation_id: yu_2025_hollow_anode_measurements:three_hour:mre_applied_charge_C
+  experiment_id: 10.1016/j.actaastro.2025.06.028::yu_2025_hollow_anode_measurements
+  identity:
+    quantity: mass_loss_fraction
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '5400'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mre sidecar does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: yu_2025_hollow_anode_measurements
+  locator:
+    section: 2.2.2
+    note: derivation=0.5 A times 10800 s
+  read_from: pdf:yu_2025_hollow_anode_measurements
+- observation_id: yu_2025_hollow_anode_measurements:three_hour:mre_extraction_efficiency_fraction
+  experiment_id: 10.1016/j.actaastro.2025.06.028::2
+  identity:
+    quantity: mass_loss_fraction
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.012'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mre sidecar does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: yu_2025_hollow_anode_measurements
+  locator:
+    table: 2
+    note: row=3 h; column=Extraction Efficiency
+  read_from: pdf:yu_2025_hollow_anode_measurements
+- observation_id: yu_2025_hollow_anode_measurements:three_hour:mre_faradaic_efficiency_fraction
+  experiment_id: 10.1016/j.actaastro.2025.06.028::2
+  identity:
+    quantity: mass_loss_fraction
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.53'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mre sidecar does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: yu_2025_hollow_anode_measurements
+  locator:
+    table: 2
+    note: row=3 h; column=Faradaic Efficiency
+  read_from: pdf:yu_2025_hollow_anode_measurements
+- observation_id: yu_2025_hollow_anode_measurements:twelve_hour:mre_anode_o2_mass_kg
+  experiment_id: 10.1016/j.actaastro.2025.06.028::2
+  identity:
+    quantity: o2_yield
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile o2_yield does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile o2_yield does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile o2_yield does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile o2_yield does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile o2_yield does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile o2_yield does not use wall
+  value:
+    kind: point
+    point: '0.000749'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mre sidecar does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: yu_2025_hollow_anode_measurements
+  locator:
+    table: 2
+    note: row=12 h; column=O2 Produced
+  read_from: pdf:yu_2025_hollow_anode_measurements
+- observation_id: yu_2025_hollow_anode_measurements:twelve_hour:mre_applied_charge_C
+  experiment_id: 10.1016/j.actaastro.2025.06.028::yu_2025_hollow_anode_measurements
+  identity:
+    quantity: mass_loss_fraction
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '21600'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mre sidecar does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: yu_2025_hollow_anode_measurements
+  locator:
+    section: 2.2.2
+    note: derivation=0.5 A times 43200 s
+  read_from: pdf:yu_2025_hollow_anode_measurements
+- observation_id: yu_2025_hollow_anode_measurements:twelve_hour:mre_extraction_efficiency_fraction
+  experiment_id: 10.1016/j.actaastro.2025.06.028::2
+  identity:
+    quantity: mass_loss_fraction
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.037'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mre sidecar does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: yu_2025_hollow_anode_measurements
+  locator:
+    table: 2
+    note: row=12 h; column=Extraction Efficiency
+  read_from: pdf:yu_2025_hollow_anode_measurements
+- observation_id: yu_2025_hollow_anode_measurements:twelve_hour:mre_faradaic_efficiency_fraction
+  experiment_id: 10.1016/j.actaastro.2025.06.028::2
+  identity:
+    quantity: mass_loss_fraction
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_fraction does not use wall
+  value:
+    kind: point
+    point: '0.42'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mre sidecar does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: yu_2025_hollow_anode_measurements
+  locator:
+    table: 2
+    note: row=12 h; column=Faradaic Efficiency
+  read_from: pdf:yu_2025_hollow_anode_measurements

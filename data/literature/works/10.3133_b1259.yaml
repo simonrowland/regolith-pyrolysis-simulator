@@ -1,0 +1,49 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.3133/b1259
+  citation: 'Robie, R. A. and Waldbaum, D. R., 1968, Thermodynamic properties of minerals and related substances at 298.15
+    K (25.0 C) and one atmosphere (1.013 bars) pressure and at higher temperatures: U.S. Geological Survey Bulletin 1259,
+    256 p.'
+  source_ids:
+  - robie-waldbaum-1968-usgs-b1259
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: pdf:robie-waldbaum-1968-usgs-b1259
+      role: pdf
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+  doi: 10.3133/b1259
+experiments:
+- experiment_id: 10.3133/b1259::robie-waldbaum-1968-usgs-b1259
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1259
+  locator:
+    note: b1259-298k-0001-silver

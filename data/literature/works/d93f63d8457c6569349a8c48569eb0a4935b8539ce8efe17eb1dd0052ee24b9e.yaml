@@ -1,0 +1,90 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: d93f63d8457c6569349a8c48569eb0a4935b8539ce8efe17eb1dd0052ee24b9e
+  citation: Datz, S. & Smith, W. T. Jr. (and related Datz 1961 tabulations) — Na2Cl2 dissociation equilibrium constants (Table
+    II lineage) as transcribed in vp-acquire-5 chloride-dimers DRAFT
+  source_ids:
+  - datz-and-smith-1961
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:datz-and-smith-1961
+      role: pdf
+      path: raw/datz-and-smith-1961/datz-and-smith-1961.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:datz-and-smith-1961
+      role: pdftotext
+      path: text/datz-and-smith-1961
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:datz-and-smith-1961
+      role: table_csv
+      path: tables/datz-and-smith-1961
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: d93f63d8457c6569349a8c48569eb0a4935b8539ce8efe17eb1dd0052ee24b9e::II
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d93f63d8457c6569349a8c48569eb0a4935b8539ce8efe17eb1dd0052ee24b9e
+  locator:
+    table: II
+    note: Datz 1961 correlation Datz1961_TableII_Kd
+    record: Datz1961_TableII_Kd
+- experiment_id: d93f63d8457c6569349a8c48569eb0a4935b8539ce8efe17eb1dd0052ee24b9e::JANAF1998_WebBook_Shomate
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d93f63d8457c6569349a8c48569eb0a4935b8539ce8efe17eb1dd0052ee24b9e
+  locator:
+    section: recorded_disagreement
+    note: Kp(1300 K) ~8× larger than Datz; do not average
+    record: JANAF1998_WebBook_Shomate

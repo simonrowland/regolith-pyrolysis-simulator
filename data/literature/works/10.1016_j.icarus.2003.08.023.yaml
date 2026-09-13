@@ -1,0 +1,311 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.icarus.2003.08.023
+  citation: Schaefer, L. & Fegley, B. (2004), "A thermodynamic model of high temperature lava vaporization on Io", Icarus
+    169:216-241 (MAGMA code; α_s survey Table 10)
+  source_ids:
+  - kems-008-schaefer-fegley-2004
+  - ref-016-sio-kems-1700-2000k
+  - sf04-magma-companion-workbook
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-008-schaefer-fegley-2004
+      role: pdf
+      path: raw/kems-008-schaefer-fegley-2004/kems-008-schaefer-fegley-2004.pdf
+      sha256:
+        tag: value
+        value: c50765341a3be2cdd0e305cda582f996f4f3a7046469e327043a70493f46c46c
+    - asset_id: pdftotext:kems-008-schaefer-fegley-2004
+      role: pdftotext
+      path: text/kems-008-schaefer-fegley-2004
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-008-schaefer-fegley-2004
+      role: table_csv
+      path: tables/kems-008-schaefer-fegley-2004
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: pdf:ref-016-sio-kems-1700-2000k
+      role: pdf
+      path: raw/ref-016-sio-kems-1700-2000k/ref-016-sio-kems-1700-2000k.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:ref-016-sio-kems-1700-2000k
+      role: pdftotext
+      path: text/ref-016-sio-kems-1700-2000k
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ref-016-sio-kems-1700-2000k
+      role: table_csv
+      path: tables/ref-016-sio-kems-1700-2000k
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: pdf:sf04-magma-companion-workbook
+      role: pdf
+      path: raw/sf04-magma-companion-workbook/sf04-magma-companion-workbook.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:sf04-magma-companion-workbook
+      role: pdftotext
+      path: text/sf04-magma-companion-workbook
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:sf04-magma-companion-workbook
+      role: table_csv
+      path: tables/sf04-magma-companion-workbook
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1016/j.icarus.2003.08.023
+experiments:
+- experiment_id: 10.1016/j.icarus.2003.08.023::10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'review_compilation' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2003.08.023
+  locator:
+    table: '10'
+    line_range: 649-661
+    source_path: docs-private/research/ocr-artifacts/kems-008-schaefer-fegley-2004/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
+- experiment_id: 10.1016/j.icarus.2003.08.023::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermodynamic_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2003.08.023
+  locator:
+    page: 218
+    table: '2'
+    note: row=K2 O (liq) + SiO2 (liq) = K2 SiO3 (liq)
+    source_path: tables/kems-008-schaefer-fegley-2004/t2.csv
+- experiment_id: 10.1016/j.icarus.2003.08.023::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermodynamic_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2003.08.023
+  locator:
+    page: 221
+    table: '4'
+    note: row=SiO
+    source_path: tables/kems-008-schaefer-fegley-2004/t4.csv
+- experiment_id: 10.1016/j.icarus.2003.08.023::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermodynamic_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2003.08.023
+  locator:
+    page: 226
+    table: '7'
+    note: row=Tholeiites
+    source_path: tables/kems-008-schaefer-fegley-2004/t7.csv
+- experiment_id: 10.1016/j.icarus.2003.08.023::8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermodynamic_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2003.08.023
+  locator:
+    page: 232
+    table: '8'
+    note: row=Na
+    source_path: tables/kems-008-schaefer-fegley-2004/t8.csv
+- experiment_id: 10.1016/j.icarus.2003.08.023::9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermodynamic_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2003.08.023
+  locator:
+    page: 234
+    table: '9'
+    note: row=SiO
+    source_path: tables/kems-008-schaefer-fegley-2004/t9.csv
+- experiment_id: 10.1016/j.icarus.2003.08.023::REF-016#SiO_KEMS_1700_2000K
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2003.08.023
+  locator:
+    note: "(1) Costa, G.C.C. & Jacobson, N.S. (2015) olivine KEMS SiO partials —\n    Clausius–Clapeyron A=7.83, B=22.43 (grid-25-sio\
+      \ cj2015 @1700–2000 K:\n    4.32e-3 … 4.12e-1 Pa) — project REF-016; docs-private/vapor-pressure-\n    calibration-sio-tsweep-2026-05-19.md.\n\
+      (2) Schaefer, L. & Fegley, B. (2004) Icar"
+    record: REF-016#SiO_KEMS_1700_2000K
+- experiment_id: 10.1016/j.icarus.2003.08.023::tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'magma_model_companion_workbook' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.icarus.2003.08.023
+  locator:
+    published_page: 227
+    pdf_page_index: 12
+    figure: 10a
+    note: Numerical cells are from the preserved companion workbook; Fig. 10a is graphical only.
+    record: tests/fixtures/imcc_sf04_magma_workbook.csv sheet=tho

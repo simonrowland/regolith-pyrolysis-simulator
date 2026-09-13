@@ -1,0 +1,174 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational.33.26
+  citation: Wu, P., Eriksson, G., Pelton, A. D. & Blander, M. (1993), "Prediction of the Thermodynamic Properties and Phase
+    Diagrams of Silicate Systems—Evaluation of the FeO-MgO-SiO2 System", ISIJ International 33(1):26–35
+  source_ids:
+  - kems-190-wu-1993
+  - wu-1993-feo-mgo-sio2
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-190-wu-1993
+      role: pdf
+      path: raw/kems-190-wu-1993/kems-190-wu-1993.pdf
+      sha256:
+        tag: value
+        value: 7f0812efada072157055f4330e0ef484d17612385a8140b8d7c0027b9765f1de
+    - asset_id: pdftotext:kems-190-wu-1993
+      role: pdftotext
+      path: text/kems-190-wu-1993
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-190-wu-1993
+      role: table_csv
+      path: tables/kems-190-wu-1993
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: pdf:wu-1993-feo-mgo-sio2
+      role: pdf
+      path: raw/wu-1993-feo-mgo-sio2/wu-1993-feo-mgo-sio2.pdf
+      sha256:
+        tag: value
+        value: 7f0812efada072157055f4330e0ef484d17612385a8140b8d7c0027b9765f1de
+    - asset_id: pdftotext:wu-1993-feo-mgo-sio2
+      role: pdftotext
+      path: text/wu-1993-feo-mgo-sio2
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:wu-1993-feo-mgo-sio2
+      role: table_csv
+      path: tables/wu-1993-feo-mgo-sio2
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2355/isijinternational.33.26
+experiments:
+- experiment_id: 10.2355/isijinternational.33.26::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'evaluated_pure_component_thermochemistry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational.33.26
+  locator:
+    published_page: 28
+    table: '1'
+    note: MgO liquid and solid rows
+    source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t1.csv
+- experiment_id: 10.2355/isijinternational.33.26::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'modified_quasichemical_model_binary_optimization' is not a closed method token (kems_effusion alone is
+      insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational.33.26
+  locator:
+    published_page: 32
+    table: '2'
+    note: MgO-SiO2 system, RT ln gamma_MgO columns
+    source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t2.csv
+- experiment_id: 10.2355/isijinternational.33.26::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'reported_quench_experiment_from_Bowen_and_Schairer_1935' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational.33.26
+  locator:
+    published_page: 33
+    table: '3'
+    note: Reported column, wt% Fe2SiO4 along Mg2SiO4-Fe2SiO4 pseudobinary join
+    source_path: docs-private/research/2026-09-06-wave-3/W3-wu-1993-feo-mgo-sio2/kems-190-wu-1993/tables/t3.csv
+- experiment_id: 10.2355/isijinternational.33.26::kems-190-wu-1993
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'reported_quench_experiment_from_Bowen_and_Schairer_1935' is not a closed method token (kems_effusion alone
+      is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational.33.26
+  locator:
+    published_page: 33
+    paragraph: The MgO-FeO-SiO2 System
+    note: Reported ternary peritectic and phase compositions from reference 16

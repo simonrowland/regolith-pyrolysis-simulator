@@ -1,0 +1,79 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/iupac-o2-solid-psat.yaml
+observations:
+- observation_id: iupac-o2-solid-psat::anchor_O2_pure_Psat
+  experiment_id: b80351af13deea8174098c6bc953d0aa42731dbb6caa8b21c00a27cbbe2993f9::IUPAC-O2-solid-Psat
+  identity:
+    quantity: p_sat
+    species:
+      formula: O2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '23.88'
+    interval_high: '54.36'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: iupac-o2-solid-psat
+  locator:
+    note: Wagner, W., Ewers, J. & Schmidt, R. oxygen multiparameter EOS / solid oxygen vapor-pressure evaluations (IUPAC);
+      not FS09. Plant O2 is gas inventory, not frost Psat — validated frost row does not certify melt pO2.
+    record: IUPAC-O2-solid-Psat
+  read_from: pdf:iupac-o2-solid-psat

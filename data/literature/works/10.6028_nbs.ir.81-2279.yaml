@@ -1,0 +1,388 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.6028/nbs.ir.81-2279
+  citation: Hastie, J. W., Plante, E. R. & Bonnell, D. W. (1981), "Alkali Vapor Transport in Coal Conversion and Combustion
+    Systems", NBSIR 81-2279, National Bureau of Standards, May 1981 (interim report)
+  source_ids:
+  - kems-020-hastie-1981-nbsir
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-020-hastie-1981-nbsir
+      role: pdf
+      path: raw/kems-020-hastie-1981-nbsir/kems-020-hastie-1981-nbsir.pdf
+      sha256:
+        tag: value
+        value: 0d636804cffa773a18ff3c81cf68ff139939eedf4fa882faf76911b4552e8a8d
+    - asset_id: pdftotext:kems-020-hastie-1981-nbsir
+      role: pdftotext
+      path: text/kems-020-hastie-1981-nbsir
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-020-hastie-1981-nbsir
+      role: table_csv
+      path: tables/kems-020-hastie-1981-nbsir
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.6028/nbs.ir.81-2279
+experiments:
+- experiment_id: 10.6028/nbs.ir.81-2279::11
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'mixed_kms_tms' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+- experiment_id: 10.6028/nbs.ir.81-2279::15
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'transpiration_mass_spectrometry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 63
+    pdf_page_index: 75
+    figure: '15'
+    paragraph: report p. 35-36
+- experiment_id: 10.6028/nbs.ir.81-2279::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: KMS (Plante 1979a); TMS apparatus is Pt (section 6.1) but Table 2 footnote d is KMS
+      locator:
+        page: 9
+        paragraph: primary experimental methods KMS and TMS
+- experiment_id: 10.6028/nbs.ir.81-2279::20
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 28
+    figure: '20'
+    paragraph: relatively small effusion orifice (0.34 mm diameter)
+  apparatus:
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.00000009079226'
+        locator:
+          page: 28
+          paragraph: relatively small effusion orifice (0.34 mm diameter)
+- experiment_id: 10.6028/nbs.ir.81-2279::21
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'mixed_kms_tms' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 53
+    published_page: 53
+    pdf_page_index: 58
+    figure: '21'
+    note: Caption locator; plotted pages recorded in completeness ledger.
+- experiment_id: 10.6028/nbs.ir.81-2279::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 43
+    published_page: 43
+    pdf_page_index: 49
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+- experiment_id: 10.6028/nbs.ir.81-2279::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 51
+    figure: '4'
+    note: also Figs 8-9; caption list report p. 51
+- experiment_id: 10.6028/nbs.ir.81-2279::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'mixed_kms_tms' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 51
+    figure: '5'
+- experiment_id: 10.6028/nbs.ir.81-2279::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'transpiration_mass_spectrometry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 60
+    pdf_page_index: 66
+    figure: '6'
+- experiment_id: 10.6028/nbs.ir.81-2279::docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'transpiration_mass_spectrometry' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 11
+    published_page: 11
+    pdf_page_index: 17
+    paragraph: log P_NaCl (atm) = 4.85 (+- 0.3) - 8820 (+- 200)/T
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: platinum TMS reactor (boat, carrier, probe)
+      locator:
+        page: 9
+        paragraph: all of these components were fabricated from platinum metal
+- experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'mixed_kms_tms' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.6028/nbs.ir.81-2279
+  locator:
+    page: 51
+    section: '15'
+    note: figure captions report pp. 51-53; figures PDF 61-81

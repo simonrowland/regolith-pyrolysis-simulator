@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 1da060e35fce19163b31d98694e96bc486d7d1a682ac627b43f68eb7f5154a0e
+  citation: Classical OsO4 vapor-pressure measurements (multiple 20th-c. lab series; e.g. Ogawa / later reviews). JANAF OsO4(g/l).
+    With no fit yet, land first primary as fit and second as anchor in the same promotion commit.
+  source_ids:
+  - pending-dual-primary-oso4
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:pending-dual-primary-oso4
+      role: pdf
+      path: raw/pending-dual-primary-oso4/pending-dual-primary-oso4.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:pending-dual-primary-oso4
+      role: pdftotext
+      path: text/pending-dual-primary-oso4
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pending-dual-primary-oso4
+      role: table_csv
+      path: tables/pending-dual-primary-oso4
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 1da060e35fce19163b31d98694e96bc486d7d1a682ac627b43f68eb7f5154a0e::PENDING-dual-primary#OsO4
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 1da060e35fce19163b31d98694e96bc486d7d1a682ac627b43f68eb7f5154a0e
+  locator:
+    note: Classical OsO4 vapor-pressure measurements (multiple 20th-c. lab series; e.g. Ogawa / later reviews). JANAF OsO4(g/l).
+      With no fit yet, land first primary as fit and second as anchor in the same promotion commit.
+    record: PENDING-dual-primary#OsO4

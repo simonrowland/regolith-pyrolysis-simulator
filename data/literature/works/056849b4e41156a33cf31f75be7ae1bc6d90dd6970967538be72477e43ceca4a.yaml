@@ -1,0 +1,256 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a
+  citation: Piacente, V., Matoušek, J., Spoliti, M. & Di Paolo, V. (1975), "Mass spectrometric investigation of the olivine
+    vaporization process", Silikáty č. 4, 1975, 289–299. Official archive PDF https://www2.irsm.cas.cz/materialy/cs_content/1975/Piacente_CS_1975_0000.pdf
+  source_ids:
+  - kems-093-piacente-1975
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-093-piacente-1975
+      role: pdf
+      path: raw/kems-093-piacente-1975/kems-093-piacente-1975.pdf
+      sha256:
+        tag: value
+        value: 5cd60861bd4d04a70a44ea0b3203b6931b139c68b3a9d2d70c6ded39f39b8797
+    - asset_id: pdftotext:kems-093-piacente-1975
+      role: pdftotext
+      path: text/kems-093-piacente-1975
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-093-piacente-1975
+      role: table_csv
+      path: tables/kems-093-piacente-1975
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a
+  locator:
+    published_page: 291
+    pdf_page_index: 3
+    figure: '2'
+- experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a
+  locator:
+    published_page: 293
+    pdf_page_index: 5
+    figure: '3'
+- experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a
+  locator:
+    published_page: 294
+    pdf_page_index: 6
+    figure: '4'
+- experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a
+  locator:
+    published_page: 295
+    pdf_page_index: 7
+    figure: '5'
+- experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a
+  locator:
+    published_page: 296
+    pdf_page_index: 8
+    figure: '6'
+- experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::I
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_second_law' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a
+  locator:
+    published_page: 292
+    pdf_page_index: 4
+    table: I
+    note: Table I Fe column; second-law ΔH_sub at 1800 K
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: ThO2, ZrO2, Re
+      locator:
+        published_page: 292
+        pdf_page_index: 4
+        table: I
+- experiment_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a::kems-093-piacente-1975
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 056849b4e41156a33cf31f75be7ae1bc6d90dd6970967538be72477e43ceca4a
+  locator:
+    published_page: 289
+    pdf_page_index: 1
+    section: PROCEDURE AND EXPERIMENTAL RESULTS
+    note: Apparatus p.289–294; AP values p.290; 45 eV p.291; Ag calibration and Mann/Colin cross sections p.293–294. SCHEMA
+      has no metadata type.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: alumina, thorium dioxide, zirconium dioxide, platinum and rhenium Knudsen crucibles
+      locator:
+        published_page: 290
+        pdf_page_index: 2
+        paragraph: crucibles of various materials

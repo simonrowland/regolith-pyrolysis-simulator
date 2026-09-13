@@ -1,0 +1,50 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.3133/b1452
+  citation: 'Robie, R. A., Hemingway, B. S. and Fisher, J. R., 1978 (reprinted 1979), Thermodynamic properties of minerals
+    and related substances at 298.15 K and 1 bar (10^5 pascals) pressure and at higher temperatures: U.S. Geological Survey
+    Bulletin 1452, 456 p.'
+  source_ids:
+  - robie-hemingway-fisher-1978-usgs-b1452
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: pdf:robie-hemingway-fisher-1978-usgs-b1452
+      role: pdf
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+  doi: 10.3133/b1452
+experiments:
+- experiment_id: 10.3133/b1452::robie-hemingway-fisher-1978-usgs-b1452
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.3133/b1452
+  locator:
+    note: source_file=robie-hemingway-fisher-1978-usgs-b1452.pdf; pdf_pages=[9]; printed_pages=[3]; extraction=mineru table_body
+      + page-image cross-check; mineru_chunk=chunk-p001-p090; mineru_page_idx=8; mineru_table_index=0

@@ -1,0 +1,82 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/pound-1972-cr-langmuir-knudsen.yaml
+observations:
+- observation_id: pound-1972-cr-langmuir-knudsen::pound_1972_cr_langmuir_knudsen
+  experiment_id: 10.1063/1.3253096::pound_1972_cr_langmuir_knudsen
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: Cr
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: point
+    point: '0.9'
+  uncertainty:
+    kind: printed
+    verbatim:
+      alpha_range:
+      - '0.8'
+      - '1'
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: pound-1972-cr-langmuir-knudsen
+  locator:
+    note: Pound, G. M. (1972), J. Phys. Chem. Ref. Data 1:135-146 Table 1, DOI 10.1063/1.3253096; primary McCabe, Hudson &
+      Paxton (1958), Trans. Met. Soc. AIME 212:102
+    record: pound_1972_cr_langmuir_knudsen
+  read_from: pdf:pound-1972-cr-langmuir-knudsen

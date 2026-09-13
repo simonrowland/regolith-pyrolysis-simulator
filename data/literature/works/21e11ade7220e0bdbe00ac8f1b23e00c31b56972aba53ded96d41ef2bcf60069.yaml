@@ -1,0 +1,89 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 21e11ade7220e0bdbe00ac8f1b23e00c31b56972aba53ded96d41ef2bcf60069
+  citation: Costa, G. C. C. & Jacobson, N. S. (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry,
+    NASA NTRS 20150002321
+  source_ids:
+  - costa-jacobson-2015
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:costa-jacobson-2015
+      role: pdf
+      path: raw/costa-jacobson-2015/costa-jacobson-2015.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:costa-jacobson-2015
+      role: pdftotext
+      path: text/costa-jacobson-2015
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:costa-jacobson-2015
+      role: table_csv
+      path: tables/costa-jacobson-2015
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 21e11ade7220e0bdbe00ac8f1b23e00c31b56972aba53ded96d41ef2bcf60069::costa_jacobson_2015_fe_olivine_kems
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 21e11ade7220e0bdbe00ac8f1b23e00c31b56972aba53ded96d41ef2bcf60069
+  locator:
+    note: Costa, G. C. C. & Jacobson, N. S. (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry,
+      NASA NTRS 20150002321
+    record: costa_jacobson_2015_fe_olivine_kems
+- experiment_id: 21e11ade7220e0bdbe00ac8f1b23e00c31b56972aba53ded96d41ef2bcf60069::costa_jacobson_2015_sio_olivine_kems
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 21e11ade7220e0bdbe00ac8f1b23e00c31b56972aba53ded96d41ef2bcf60069
+  locator:
+    note: Costa & Jacobson (2015) NASA NTRS 20150002321; D(SiO+) plot band ~0.01-0.04 class (prior runtime cross-check REF-016)
+    record: costa_jacobson_2015_sio_olivine_kems

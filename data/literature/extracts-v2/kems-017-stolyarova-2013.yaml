@@ -1,0 +1,929 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-017-stolyarova-2013.yaml
+observations:
+- observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig1_mgo_activity_figure_only
+  experiment_id: 10.2174/1874396x01307010057::1
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: MgO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+      note: Figure 1 prints no activity uncertainties.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only_measured_kems
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: mine-multicarrier-gk
+      date: '2026-08-04'
+      evidence:
+        published_page: '62'
+        figure: '1'
+        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-06.png
+  notices: []
+  source_id: kems-017-stolyarova-2013
+  locator:
+    published_page: '62'
+    figure: '1'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-06.png
+  read_from: pdf:kems-017-stolyarova-2013
+- observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig2_bao_gltas_contours_model
+  experiment_id: 10.2174/1874396x01307010057::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: BaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: mine-multicarrier-gk
+      date: '2026-08-04'
+      evidence:
+        published_page: '62'
+        figure: '2'
+        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-06.png
+  notices: []
+  source_id: kems-017-stolyarova-2013
+  locator:
+    published_page: '62'
+    figure: '2'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-06.png
+  read_from: pdf:kems-017-stolyarova-2013
+- observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig2_bao_kems_contours_figure_only
+  experiment_id: 10.2174/1874396x01307010057::2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: BaO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+      note: Figure 2 prints no uncertainties.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only_measured_kems
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: mine-multicarrier-gk
+      date: '2026-08-04'
+      evidence:
+        published_page: '62'
+        figure: '2'
+        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-06.png
+  notices: []
+  source_id: kems-017-stolyarova-2013
+  locator:
+    published_page: '62'
+    figure: '2'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-06.png
+  read_from: pdf:kems-017-stolyarova-2013
+- observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig3_b2o3_gltas_contours_model
+  experiment_id: 10.2174/1874396x01307010057::3
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: B2O3
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: mine-multicarrier-gk
+      date: '2026-08-04'
+      evidence:
+        published_page: '63'
+        figure: '3'
+        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+  notices: []
+  source_id: kems-017-stolyarova-2013
+  locator:
+    published_page: '63'
+    figure: '3'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+  read_from: pdf:kems-017-stolyarova-2013
+- observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig3_b2o3_kems_contours_figure_only
+  experiment_id: 10.2174/1874396x01307010057::3
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: B2O3
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+      note: Figure 3 prints no uncertainties.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only_measured_kems
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: mine-multicarrier-gk
+      date: '2026-08-04'
+      evidence:
+        published_page: '63'
+        figure: '3'
+        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+  notices: []
+  source_id: kems-017-stolyarova-2013
+  locator:
+    published_page: '63'
+    figure: '3'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+  read_from: pdf:kems-017-stolyarova-2013
+- observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig4_sio2_gltas_contours_model
+  experiment_id: 10.2174/1874396x01307010057::4
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: mine-multicarrier-gk
+      date: '2026-08-04'
+      evidence:
+        published_page: '63'
+        figure: '4'
+        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+  notices: []
+  source_id: kems-017-stolyarova-2013
+  locator:
+    published_page: '63'
+    figure: '4'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+  read_from: pdf:kems-017-stolyarova-2013
+- observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig4_sio2_kems_contours_figure_only
+  experiment_id: 10.2174/1874396x01307010057::4
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+      note: Figure 4 prints no uncertainties.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only_measured_kems
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: mine-multicarrier-gk
+      date: '2026-08-04'
+      evidence:
+        published_page: '63'
+        figure: '4'
+        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+  notices: []
+  source_id: kems-017-stolyarova-2013
+  locator:
+    published_page: '63'
+    figure: '4'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-07.png
+  read_from: pdf:kems-017-stolyarova-2013
+- observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig5_gibbs_gltas_contours_model
+  experiment_id: 10.2174/1874396x01307010057::5
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Model output; no measurement uncertainty applies and no model uncertainty is printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: mine-multicarrier-gk
+      date: '2026-08-04'
+      evidence:
+        published_page: '64'
+        figure: '5'
+        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-08.png
+  notices: []
+  source_id: kems-017-stolyarova-2013
+  locator:
+    published_page: '64'
+    figure: '5'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-08.png
+  read_from: pdf:kems-017-stolyarova-2013
+- observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig5_gibbs_kems_contours_figure_only
+  experiment_id: 10.2174/1874396x01307010057::5
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      reported_status: not_reported
+      note: Figure 5 prints no uncertainties.
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only_measured_kems
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_complete_figure_digitization
+    decided_by:
+      worker: mine-multicarrier-gk
+      date: '2026-08-04'
+      evidence:
+        published_page: '64'
+        figure: '5'
+        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-08.png
+  notices: []
+  source_id: kems-017-stolyarova-2013
+  locator:
+    published_page: '64'
+    figure: '5'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-08.png
+  read_from: pdf:kems-017-stolyarova-2013
+- observation_id: kems-017-stolyarova-2013::stolyarova_2013_fig6_gibbs_gltas_model_figure_only
+  experiment_id: 10.2174/1874396x01307010057::6
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Model output; no model uncertainty is printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_model_output_not_measurement
+    decided_by:
+      worker: mine-multicarrier-gk
+      date: '2026-08-04'
+      evidence:
+        published_page: '65'
+        figure: '6'
+        source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-09.png
+  notices: []
+  source_id: kems-017-stolyarova-2013
+  locator:
+    published_page: '65'
+    figure: '6'
+    source_path: docs-private/research/2026-09-06-wave-3/W3-kems-193-stolyarova-2013-open-thermodyn/kems-017-stolyarova-2013/pages/page-09.png
+  read_from: pdf:kems-017-stolyarova-2013
+- observation_id: kems-017-stolyarova-2013::stolyarova_2013_ternary_silicate_vapour_species_map_table1
+  experiment_id: 10.2174/1874396x01307010057::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-017-stolyarova-2013
+  locator:
+    table: '1'
+    paragraph: Composition of Vapour Over the Ternary Silicate Systems Studied
+    line_range: 104-126
+    source_path: docs-private/research/ocr-artifacts/kems-017-stolyarova-2013/spool/out/kems-017-stolyarova-2013/vlm/kems-017-stolyarova-2013.md
+  read_from: pdf:kems-017-stolyarova-2013

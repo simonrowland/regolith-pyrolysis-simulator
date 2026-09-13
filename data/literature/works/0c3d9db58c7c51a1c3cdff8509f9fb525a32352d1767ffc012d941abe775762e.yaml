@@ -1,0 +1,64 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  citation: 'Richter, F. M., Davis, A. M., Ebel, D. S. & Hashimoto, A. (2002), "Elemental and isotopic fractionation of Type
+    B calcium-, aluminum-rich inclusions: experiments, theoretical considerations, and constraints on their thermal evolution",
+    Geochim. Cosmochim. Acta 66:521-540'
+  source_ids:
+  - kems-037-richter-2002
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-037-richter-2002
+      role: pdf
+      path: raw/kems-037-richter-2002/kems-037-richter-2002.pdf
+      sha256:
+        tag: value
+        value: c64b38eacaa46219824d76d546304aa62e866e989e4260c7188d321e3122d8ae
+    - asset_id: pdftotext:kems-037-richter-2002
+      role: pdftotext
+      path: text/kems-037-richter-2002
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-037-richter-2002
+      role: table_csv
+      path: tables/kems-037-richter-2002
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e::1
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 0c3d9db58c7c51a1c3cdff8509f9fb525a32352d1767ffc012d941abe775762e
+  locator:
+    table: '1'
+    figure: '12'
+    line_range: 174-178
+    note: γ_Mg evaporation coefficients from vacuum and H2 experiments
+    source_path: docs-private/research/ocr-artifacts/kems-037-richter-2002/spool/out/kems-037-richter-2002/vlm/kems-037-richter-2002.md

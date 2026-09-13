@@ -1,0 +1,48 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: e39404440aa5d50e5d0702998c739843f256cf837fa93009f6dfa87301ca4bab
+  citation: pankratz-1984-usbm-b677
+  source_ids:
+  - pankratz-1984-usbm-b677
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: pdf:pankratz-1984-usbm-b677
+      role: pdf
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+experiments:
+- experiment_id: e39404440aa5d50e5d0702998c739843f256cf837fa93009f6dfa87301ca4bab::pankratz-1984-usbm-b677
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: e39404440aa5d50e5d0702998c739843f256cf837fa93009f6dfa87301ca4bab
+  locator:
+    note: file=source/mineru/pankratz-1984-usbm-b677-p001-p040.md; table_index=1; table_sha256=3dc54620122c055d329f33265dcc5333b955de74efc741c08ac33418e2a6242e;
+      note_block_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; complete_source_block_sha256=a7d093cda3b6d04789c0bc2311d72d1fc1d535c292c050d30135e7bfb553879e;
+      bbox=[256, 215, 651, 479]

@@ -1,0 +1,49 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 3e3d8427f4d28450bd23b59fd130ff98ce1aead74c1084bb9b03c294eace0a04
+  citation: 'Burcat, A. and Ruscic, B., Third Millennium Ideal Gas and Condensed Phase Thermochemical Database for Combustion
+    with updates from Active Thermochemical Tables, ANL-05/20 and TAE 960, Argonne National Laboratory / Technion, September
+    2005; current electronic files (species last added 3 January 2023) from the ELTE RESPECTH mirror of the Technion distribution.
+    Database authors: Elke Goos, Alexander Burcat and Branko Ruscic.'
+  source_ids:
+  - burcat
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: pdf:burcat
+      role: pdf
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+experiments:
+- experiment_id: 3e3d8427f4d28450bd23b59fd130ff98ce1aead74c1084bb9b03c294eace0a04::burcat
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 3e3d8427f4d28450bd23b59fd130ff98ce1aead74c1084bb9b03c294eace0a04
+  locator:
+    note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=128; header_line=131; end_line=134

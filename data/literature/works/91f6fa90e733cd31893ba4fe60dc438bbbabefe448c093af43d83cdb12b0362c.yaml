@@ -1,0 +1,129 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c
+  citation: Behrens, Robert G., and Rinehart, Gary H. (1979). Vaporization Thermodynamics and Kinetics of Hexagonal Silicon
+    Carbide. Characterization of High Temperature Vapors and Gases, NBS Special Publication 561, volume 1, pp. 125–142.
+  source_ids:
+  - kems-184-behrens-1979
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-184-behrens-1979
+      role: pdf
+      path: raw/kems-184-behrens-1979/kems-184-behrens-1979.pdf
+      sha256:
+        tag: value
+        value: 02bcfb56d0d2cb67ad7686bd574c625abc6227910cebce3cf2cf9a38e7571e57
+    - asset_id: pdftotext:kems-184-behrens-1979
+      role: pdftotext
+      path: text/kems-184-behrens-1979
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-184-behrens-1979
+      role: table_csv
+      path: tables/kems-184-behrens-1979
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c
+  locator:
+    page: 136
+    table: '1'
+    note: column=second_law this_work; quote=119.2±2.1
+- experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'thermochemical_equilibrium_model' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c
+  locator:
+    page: 136
+    table: '2'
+    note: column=this_work; quote=Comparison of calculated equilibrium pressures in the SiC(hex)-C system.
+- experiment_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c::kems-184-behrens-1979
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 91f6fa90e733cd31893ba4fe60dc438bbbabefe448c093af43d83cdb12b0362c
+  locator:
+    page: 132
+    section: '4.1'
+    note: quote=The most important vapor molecule in the SiC-C system over the experimental temperature range of 1835-2264
+      K is found to be Si(g) with Si₂C(g) and SiC₂(g) being the next most important molecules.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: graphite
+      locator:
+        page: 130
+        section: '3.2'
+        note: quote=Knudsen effusion cells used in the equilibrium vapor pressure measurements are machined from graphite

@@ -1,0 +1,152 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3
+  citation: 'Yakovlev, O.I., Markova, O.M., Semenov, G.A. & Belov, A.N. (1984), "The vaporization peculiarities of CAI inclusions
+    in chondrites: experimental data", Lunar and Planetary Science XV, 945–946'
+  source_ids:
+  - kems-028-yakovlev-1984
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-028-yakovlev-1984
+      role: pdf
+      path: raw/kems-028-yakovlev-1984/kems-028-yakovlev-1984.pdf
+      sha256:
+        tag: value
+        value: b56d27b46e86b6a2358972a92dfa38f644dbc18eb9c0a9202571379f68b0a43f
+    - asset_id: pdftotext:kems-028-yakovlev-1984
+      role: pdftotext
+      path: text/kems-028-yakovlev-1984
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-028-yakovlev-1984
+      role: table_csv
+      path: tables/kems-028-yakovlev-1984
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3
+  locator:
+    published_page: 946
+    pdf_page_index: 2
+    figure: '1'
+    note: Partial pressures of the components in the vapor phase released from the heated samples of Murchison (1)
+- experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3
+  locator:
+    published_page: 946
+    pdf_page_index: 2
+    figure: '2'
+    note: Partial pressures of the components in the vapor phase released from CAI inclusions of Efremovka (2)
+- experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::Po2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3
+  locator:
+    published_page: 946
+    pdf_page_index: 2
+    table: Po2
+    note: Po2 pressure in the vapor during the vaporization of hightemperature residuals of chondrite Murchison and CAI inclusions
+      of Efremovka
+- experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3
+  locator:
+    published_page: 945
+    pdf_page_index: 1
+    paragraph: The experiments were carried out using the Knudsen effusion cell

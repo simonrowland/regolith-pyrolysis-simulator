@@ -1,0 +1,111 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.pss.2009.09.011
+  citation: Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CH4-1 correlation; disagreement
+    vs Grundy already stored on the family row (~69.5% at 37 K).
+  source_ids:
+  - fray-schmitt-2009-ch4-1
+  - fray-schmitt-2009-co-1
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:fray-schmitt-2009-ch4-1
+      role: pdf
+      path: raw/fray-schmitt-2009-ch4-1/fray-schmitt-2009-ch4-1.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:fray-schmitt-2009-ch4-1
+      role: pdftotext
+      path: text/fray-schmitt-2009-ch4-1
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:fray-schmitt-2009-ch4-1
+      role: table_csv
+      path: tables/fray-schmitt-2009-ch4-1
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: pdf:fray-schmitt-2009-co-1
+      role: pdf
+      path: raw/fray-schmitt-2009-co-1/fray-schmitt-2009-co-1.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:fray-schmitt-2009-co-1
+      role: pdftotext
+      path: text/fray-schmitt-2009-co-1
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:fray-schmitt-2009-co-1
+      role: table_csv
+      path: tables/fray-schmitt-2009-co-1
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1016/j.pss.2009.09.011
+experiments:
+- experiment_id: 10.1016/j.pss.2009.09.011::Fray-Schmitt-2009#CH4-1
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.pss.2009.09.011
+  locator:
+    note: Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CH4-1 correlation; disagreement
+      vs Grundy already stored on the family row (~69.5% at 37 K).
+    record: Fray-Schmitt-2009#CH4-1
+- experiment_id: 10.1016/j.pss.2009.09.011::Fray-Schmitt-2009#CO-1
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.pss.2009.09.011
+  locator:
+    note: Fray & Schmitt (2009), Planet. Space Sci. 57:2053–2080, DOI 10.1016/j.pss.2009.09.011, CO-1 correlation (coefficients
+      in NASA NTRS 20210019502 supplementary Table 2). Row already records disagreement at 31 K (~513% vs Grundy); use FS09
+      as the independent promotion check, not a second fit of Grundy.
+    record: Fray-Schmitt-2009#CO-1

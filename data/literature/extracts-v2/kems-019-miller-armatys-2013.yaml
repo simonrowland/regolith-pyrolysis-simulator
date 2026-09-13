@@ -1,0 +1,2310 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-019-miller-armatys-2013.yaml
+observations:
+- observation_id: kems-019-miller-armatys-2013::miller_2013_al2o_major_al_species
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Al
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; species presence only
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    paragraph: aluminate systems / Al2O3-containing systems
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_al2o_major_al_species_quoted
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Al
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+    attribution: The same deals with the aluminate systems, where only minor amounts of CaAlO(g) could be identified in the
+      cited studies. Al2O(g) is a major Al-containing species in all the system containing Al2O3 as one of the oxide components.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-019-miller-armatys-2013::miller_2013_al2o_major_al_species
+    decided_by:
+      worker: wave-WA-1
+      date: '2026-09-06'
+      evidence:
+        page: 7
+        published_page: 7
+        pdf_page_index: 7
+        section: 4. OXIDES
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_alkali_borate_vapour
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; species presence only
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    paragraph: boron oxide-containing systems
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_alkali_borate_vapour_quoted
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+    attribution: Vapour phase of the boron oxide-containing systems is rather complex due to the vaporization of B2O3 in form
+      of different gaseous species (BO, B2O2, B2O3) as well as due to stability of the gaseous metal borides, as ABO2 (A –
+      alkali metal), Ca(BO2)2, SrBO2, BaBO2. Dimeric borate species A2(BO2)2 were identified as well.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-019-miller-armatys-2013::miller_2013_alkali_borate_vapour
+    decided_by:
+      worker: wave-WA-1
+      date: '2026-09-06'
+      evidence:
+        page: 7
+        published_page: 7
+        pdf_page_index: 7
+        section: 4. OXIDES
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_alkaline_earth_borate_vapour
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ca
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; species presence only
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    paragraph: boron oxide-containing systems
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_alkaline_earth_borate_vapour_quoted
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ca
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+    attribution: Vapour phase of the boron oxide-containing systems is rather complex due to the vaporization of B2O3 in form
+      of different gaseous species (BO, B2O2, B2O3) as well as due to stability of the gaseous metal borides, as ABO2 (A –
+      alkali metal), Ca(BO2)2, SrBO2, BaBO2. Dimeric borate species A2(BO2)2 were identified as well.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-019-miller-armatys-2013::miller_2013_alkaline_earth_borate_vapour
+    decided_by:
+      worker: wave-WA-1
+      date: '2026-09-06'
+      evidence:
+        page: 7
+        published_page: 7
+        pdf_page_index: 7
+        section: 4. OXIDES
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_borate_silicate_glasses
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    paragraph: Over 30 binary and multicomponent borate or silicate glasses
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_chatillon_silica_phosphates
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    paragraph: Chatillon et al. ternary systems containing silica in addition to the metal phosphates
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_chatillon_silica_phosphates_quoted
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+    attribution: Chatillon et al. studied ternary systems containing silica in addition to the metal phosphates. Determination
+      of the thermodynamic activities of components was the aim of these studies.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-019-miller-armatys-2013::miller_2013_chatillon_silica_phosphates
+    decided_by:
+      worker: wave-WA-1
+      date: '2026-09-06'
+      evidence:
+        page: 7
+        published_page: 7
+        pdf_page_index: 7
+        section: 4. OXIDES
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_gaseous_silicates_minor
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ca
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; species presence only
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    paragraph: silica-containing materials / gaseous silicates
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_gaseous_silicates_minor_quoted
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ca
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+    attribution: Few gaseous silicates were identified in the multicomponent silicate systems; they can be exemplified by
+      CaSiO3, BaSiO3, SrSiO, and AlSiO all being the minor components of the equilibrium vapours.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-019-miller-armatys-2013::miller_2013_gaseous_silicates_minor
+    decided_by:
+      worker: wave-WA-1
+      date: '2026-09-06'
+      evidence:
+        page: 7
+        published_page: 7
+        pdf_page_index: 7
+        section: 4. OXIDES
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_ir_cell_2200k
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 6
+    published_page: 6
+    pdf_page_index: 6
+    paragraph: Hilpert et al. Ir effusion cells
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_kems_p_and_t_window
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class method_only'
+    original_method_class: method_only
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 2
+    published_page: 2
+    pdf_page_index: 2
+    section: 2.1 Principles of the Method
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_popovic_pzt
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ti
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated in this review
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 9
+    published_page: 9
+    pdf_page_index: 9
+    paragraph: '[55]'
+    note: Bibliography [55] is published/PDF page 9. Body mention of the monomer/dimer method [55] is published/PDF page 4.
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_popovic_pzt_quoted
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ti
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+    attribution: Knudsen cell mass spectrometric investigation of the PbO-ZrO2-TiO2System
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-019-miller-armatys-2013::miller_2013_popovic_pzt
+    decided_by:
+      worker: wave-WA-1
+      date: '2026-09-06'
+      evidence:
+        page: 9
+        published_page: 9
+        pdf_page_index: 9
+        paragraph: '[55]'
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 9
+    published_page: 9
+    pdf_page_index: 9
+    paragraph: '[55]'
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_refractory_oxide_small_alpha
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; qualitative only
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 6
+    published_page: 6
+    pdf_page_index: 6
+    paragraph: small vaporization coefficient, particularly for the refractory oxides
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_refractory_oxide_small_alpha_quoted
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: evaporation_coefficient_alpha
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: unknown
+      reason: source does not state subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile evaporation_coefficient_alpha does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+    attribution: Another specific problem for the vaporization investigations of oxide systems is a small vaporization coefficient,
+      particularly for the refractory oxides.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-019-miller-armatys-2013::miller_2013_refractory_oxide_small_alpha
+    decided_by:
+      worker: wave-WA-1
+      date: '2026-09-06'
+      evidence:
+        page: 6
+        published_page: 6
+        pdf_page_index: 6
+        section: 4. OXIDES
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 6
+    published_page: 6
+    pdf_page_index: 6
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_silica_vapour_species
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated; species presence only
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    paragraph: silica-containing materials
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_silica_vapour_species_quoted
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+    attribution: Silica-containing materials vaporize typically as SiO(g), O2/O(g) and the component metal oxides if their
+      volatility is high enough. High stability of the gaseous silicium monoxide is very well established.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-019-miller-armatys-2013::miller_2013_silica_vapour_species
+    decided_by:
+      worker: wave-WA-1
+      date: '2026-09-06'
+      evidence:
+        page: 7
+        published_page: 7
+        pdf_page_index: 7
+        section: 4. OXIDES
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_sio2_steam_hydroxides
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 6
+    published_page: 6
+    pdf_page_index: 6
+    paragraph: Vaporisation of SiO2, V2O5, and TcxOy in the H2O atmosphere
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_sio2_steam_hydroxides_quoted
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+    attribution: Vaporisation of SiO2, V2O5, and TcxOy in the H2O atmosphere was also investigated. Gaseous hydroxides and
+      oxyhydroxides were identified in these studies in addition to the vapour species present over respective pure oxides.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-019-miller-armatys-2013::miller_2013_sio2_steam_hydroxides
+    decided_by:
+      worker: wave-WA-1
+      date: '2026-09-06'
+      evidence:
+        page: 6
+        published_page: 6
+        pdf_page_index: 6
+        section: 4. OXIDES
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 6
+    published_page: 6
+    pdf_page_index: 6
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_supp_tables_1_7_true_absence
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; no cells
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 4
+    published_page: 4
+    pdf_page_index: 4
+    paragraph: Supplementary material Tables 1-7
+    section: 2.4 Thermodynamic Properties
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_ti_oxides_and_titanates
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ti
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 6
+    published_page: 6
+    pdf_page_index: 6
+    paragraph: Ti10O19 and titanates of the perovskite structure
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_ti_oxides_and_titanates_quoted
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ti
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+    attribution: Other studies on pure oxides concerned ZnO, PuO2, Ti10O19 and some other compounds (Table 4).
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-019-miller-armatys-2013::miller_2013_ti_oxides_and_titanates
+    decided_by:
+      worker: wave-WA-1
+      date: '2026-09-06'
+      evidence:
+        page: 6
+        published_page: 6
+        pdf_page_index: 6
+        section: 4. OXIDES
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 6
+    published_page: 6
+    pdf_page_index: 6
+    section: 4. OXIDES
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_zaitsev_fe_si_nonmetal
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 5
+    paragraph: metal-nonmetal systems; Zaitsev et al.
+    section: 3.2 Thermodynamic Properties of Condensed Phases
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_zaitsev_fe_si_nonmetal_quoted
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+    attribution: Extensive investigations of different binary and ternary systems containing non-metal element (B, Si, or
+      P) in addition to Mn, Cr, and Fe were carried out by Zaitsev et al.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-019-miller-armatys-2013::miller_2013_zaitsev_fe_si_nonmetal
+    decided_by:
+      worker: wave-WA-1
+      date: '2026-09-06'
+      evidence:
+        page: 5
+        published_page: 5
+        pdf_page_index: 5
+        section: 3.2 Thermodynamic Properties of Condensed Phases
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 5
+    published_page: 5
+    pdf_page_index: 5
+    section: 3.2 Thermodynamic Properties of Condensed Phases
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_zaitsev_na2o_sio2
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none stated in this review
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 7
+    published_page: 7
+    pdf_page_index: 7
+    paragraph: slag models (e.g. [63])
+    section: 4. OXIDES / mixed oxide-halide
+  read_from: pdf:kems-019-miller-armatys-2013
+- observation_id: kems-019-miller-armatys-2013::miller_2013_zaitsev_na2o_sio2_quoted
+  experiment_id: 10.2174/1874396x01307010002::kems-019-miller-armatys-2013
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: qualitative_review_compilation
+    attribution: Thermodynamics of Na2O-SiO2 melts
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-019-miller-armatys-2013::miller_2013_zaitsev_na2o_sio2
+    decided_by:
+      worker: wave-WA-1
+      date: '2026-09-06'
+      evidence:
+        page: 9
+        published_page: 9
+        pdf_page_index: 9
+        paragraph: '[63]'
+  notices: []
+  source_id: kems-019-miller-armatys-2013
+  locator:
+    page: 9
+    published_page: 9
+    pdf_page_index: 9
+    paragraph: '[63]'
+  read_from: pdf:kems-019-miller-armatys-2013

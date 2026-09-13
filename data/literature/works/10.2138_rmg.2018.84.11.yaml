@@ -1,0 +1,416 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2138/rmg.2018.84.11
+  citation: Sossi, P.A. & Fegley, B. Jr. (2018), review compilation of metal-oxide vapour speciation and melt activity coefficients
+    (Table 1 pure oxides; Table 2 complex silicate melts)
+  source_ids:
+  - kems-041-sossi-fegley-2018
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-041-sossi-fegley-2018
+      role: pdf
+      path: raw/kems-041-sossi-fegley-2018/kems-041-sossi-fegley-2018.pdf
+      sha256:
+        tag: value
+        value: d46a4c09ea9b57e89f34ba41630dd839fb2f64ed4943a886b779bde262dca282
+    - asset_id: pdftotext:kems-041-sossi-fegley-2018
+      role: pdftotext
+      path: text/kems-041-sossi-fegley-2018
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-041-sossi-fegley-2018
+      role: table_csv
+      path: tables/kems-041-sossi-fegley-2018
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2138/rmg.2018.84.11
+experiments:
+- experiment_id: 10.2138/rmg.2018.84.11::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_pure_oxide_vapour' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    page: 404
+    pdf_page_index: 12
+    table: 1
+    note: The metal bearing gases in the saturated vapour over 77 pure oxides
+- experiment_id: 10.2138/rmg.2018.84.11::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_melt_activity' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    table: '2'
+    paragraph: Metal oxide activity coefficients of 28 species in complex silicate melts
+    source_path: docs-private/research/ocr-artifacts/kems-041-sossi-fegley-2018/spool/out/kems-041-sossi-fegley-2018/vlm/kems-041-sossi-fegley-2018.md
+- experiment_id: 10.2138/rmg.2018.84.11::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_qualitative_volatility_order' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    page: 424
+    pdf_page_index: 32
+    table: '3'
+    note: Qualitative order of element volatilities, from least to most
+- experiment_id: 10.2138/rmg.2018.84.11::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_model_fugacity' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    page: 428
+    pdf_page_index: 36
+    table: '4'
+    note: Illustrative elemental fugacities for key volatiles (2000 K, one bar) steam atmosphere
+- experiment_id: 10.2138/rmg.2018.84.11::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_speciation_by_environment' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    page: 431
+    pdf_page_index: 39
+    table: '5'
+    note: Speciation of major gases at these conditions
+- experiment_id: 10.2138/rmg.2018.84.11::SF18_Eu2O3_window
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    note: SF18_Eu2O3_window
+    record: SF18_Eu2O3_window
+- experiment_id: 10.2138/rmg.2018.84.11::SF18_Mk86_PO2_from_silicate_melt
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84:393-459, text citing Markova et al. 1986 (PO and PO2 from silicate
+      liquids)
+    record: SF18_Mk86_PO2_from_silicate_melt
+- experiment_id: 10.2138/rmg.2018.84.11::SF18_Mk86_PO_from_silicate_melt
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84:393-459, Table 5 p.431 (PO in solar-nebula column) and text citing
+      Markova et al. 1986 for PO/PO2 from silicate liquids
+    record: SF18_Mk86_PO_from_silicate_melt
+- experiment_id: 10.2138/rmg.2018.84.11::SF18_T1_P4O10_KEMS_dominance
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84 Table 1 p.405; Hashizume et al. (1966) Bull. Chem. Soc. Jpn. 39:150-155;
+      Muenow et al. (1970) J. Inorg. Nucl. Chem. 32:3459-3467; Kazenas & Petrov (1997) Russ. Metall. 29-34
+    record: SF18_T1_P4O10_KEMS_dominance
+- experiment_id: 10.2138/rmg.2018.84.11::SF18_T5_P4O6_Hchondrite_column
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    note: Sossi & Fegley (2018) Rev. Mineral. Geochem. 84:393-459, Table 5 p.431 (P as P4O6 under H-chondrite outgassing);
+      Schaefer & Fegley (2007) Icarus 186:462-483
+    record: SF18_T5_P4O6_Hchondrite_column
+- experiment_id: 10.2138/rmg.2018.84.11::SF18_Yb2O3_window
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    note: SF18_Yb2O3_window
+    record: SF18_Yb2O3_window
+- experiment_id: 10.2138/rmg.2018.84.11::kems-041-sossi-fegley-2018
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    section: SF18-T1 / speciation ordering
+    note: 'SF18-T1 p.407: VO dominant over VO(s) and V2O3; VO2 over V2O4;
+
+      V4O10 over V2O5; 1003–2270 K. Berkowitz et al. 1957a; Farber et al.
+
+      1972b; Frantseva & Semenov 1969.
+
+      '
+- experiment_id: 10.2138/rmg.2018.84.11::melt_associative_P4O10
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2138/rmg.2018.84.11
+  locator:
+    note: stoichiometry of associative evaporation of P4O10; SF18 Table 1 pure-oxide limit
+    record: melt_associative_P4O10

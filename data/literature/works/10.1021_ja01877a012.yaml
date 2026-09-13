@@ -1,0 +1,64 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1021/ja01877a012
+  citation: Giauque, W.F. & Powell, T.M. (1939), "Chlorine. The Heat Capacity, Vapor Pressure, Heats of Fusion and Vaporization,
+    and Entropy", J. Am. Chem. Soc. 61:1970–1974, DOI 10.1021/ja01877a012 — primary calorimetry/VP (use solid and liquid branches
+    separately; do not promote a single Antoine across the triple point).
+  source_ids:
+  - giauque-powell-1939-cl2
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:giauque-powell-1939-cl2
+      role: pdf
+      path: raw/giauque-powell-1939-cl2/giauque-powell-1939-cl2.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:giauque-powell-1939-cl2
+      role: pdftotext
+      path: text/giauque-powell-1939-cl2
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:giauque-powell-1939-cl2
+      role: table_csv
+      path: tables/giauque-powell-1939-cl2
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1021/ja01877a012
+experiments:
+- experiment_id: 10.1021/ja01877a012::Giauque-Powell-1939#Cl2
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1021/ja01877a012
+  locator:
+    note: Giauque, W.F. & Powell, T.M. (1939), "Chlorine. The Heat Capacity, Vapor Pressure, Heats of Fusion and Vaporization,
+      and Entropy", J. Am. Chem. Soc. 61:1970–1974, DOI 10.1021/ja01877a012 — primary calorimetry/VP (use solid and liquid
+      branches separately; do not promote a single Antoine across the tr
+    record: Giauque-Powell-1939#Cl2

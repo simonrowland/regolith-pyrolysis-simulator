@@ -1,0 +1,1469 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-137-bischof-2023.yaml
+observations:
+- observation_id: kems-137-bischof-2023::bischof_2023_ga2o3_henrian_log10_gamma_model
+  experiment_id: 10.1016/j.gca.2023.08.027::9
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Ga
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 30
+    table: '9'
+    note: 'Henrian coefficients used in FactSage T50c. Caption: For Ga2O3(l), A = -4800, B = 0'
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_ion_currents_table4_r2
+  experiment_id: 10.1016/j.gca.2023.08.027::4
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: Ga
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured KEMS
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    page: 10
+    table: '4'
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_ga_psat_s1_1low_polytherm
+  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  identity:
+    quantity: p_partial
+    species:
+      formula: Ga
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_preferred_1700k
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Ga
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1700'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      gamma_absolute_last_digit: '0.006'
+      as_printed: 0.036(6)
+      note: number in parenthesis is uncertainty in the last digit, as printed
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped measured_reduced but source does not supply lineage
+    original_method_class: authors_preferred_average_of_kems_derived_gammas
+    model: authors_preferred_average_of_kems_derived_gammas
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 23
+    paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
+    note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines 593-596, not Table 8 on
+      page 22
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1700'
+      locator:
+        pdf_page_index: 23
+        paragraph: yielding γ(GaO1.5) = 0.036(6) at an average T of 1700 K
+        note: authors preferred average of Fig. 5a red points plus the isotherm value; AM page 23 lines 593-596, not Table
+          8 on page 22
+- observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s1_1low_polytherm
+  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Ga
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: SD columns as printed in Table S1; f_M+=1 (no M2O fragmentation correction) for 1_low
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived_from_kems_equilibrium_constants'
+    original_method_class: derived_from_kems_equilibrium_constants
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+    note: supplement 1_low polytherm
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s2_1low_isotherm
+  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Ga
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: SD columns as printed in Table S2
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived_from_kems_equilibrium_constants'
+    original_method_class: derived_from_kems_equilibrium_constants
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 3
+    table: S2
+    note: supplement 1_low isotherm ~1742 K
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s3_2low_polytherm
+  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Ga
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: SD as printed; high-T plateau is the authors' selected regime (Fig. 5 red)
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived_from_kems_equilibrium_constants'
+    original_method_class: derived_from_kems_equilibrium_constants
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 5
+    table: S3-cont
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_gao15_gamma_s4_3high_polytherm
+  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Ga
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: SD as printed; f_M+(Ga)=0.18 in run 3_high
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived_from_kems_equilibrium_constants'
+    original_method_class: derived_from_kems_equilibrium_constants
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 6
+    table: S4-gamma
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_in2o3_henrian_log10_gamma_model
+  experiment_id: 10.1016/j.gca.2023.08.027::9
+  identity:
+    quantity: delta_fG
+    species:
+      formula: In
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 30
+    table: '9'
+    note: 'Henrian coefficients used in FactSage T50c. Caption: for In2O3(s), A = -7230 and B = 0'
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_in_ion_currents_table4_r2
+  experiment_id: 10.1016/j.gca.2023.08.027::4
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: In
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured KEMS
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    page: 10
+    table: '4'
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_in_psat_s1_1low_polytherm
+  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  identity:
+    quantity: p_partial
+    species:
+      formula: In
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_partial does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_partial does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_partial does not use standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_partial does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_partial does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_partial does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_partial does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_partial does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_kems
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_preferred_1674k
+  experiment_id: 10.1016/j.gca.2023.08.027::kems-137-bischof-2023
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: In
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1674'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      gamma_absolute_last_digit: '0.012'
+      as_printed: 0.017(12)
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped measured_reduced but source does not supply lineage
+    original_method_class: authors_preferred_average_of_kems_derived_gammas
+    model: authors_preferred_average_of_kems_derived_gammas
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 23
+    paragraph: giving γ(InO1.5) = 0.017(12) at an average T of 1674 K
+    note: AM page 23 lines 593-596; not Table 8 on page 22
+  read_from: pdf:kems-137-bischof-2023
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1674'
+      locator:
+        pdf_page_index: 23
+        paragraph: giving γ(InO1.5) = 0.017(12) at an average T of 1674 K
+        note: AM page 23 lines 593-596; not Table 8 on page 22
+- observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s1_1low_polytherm
+  experiment_id: 10.1016/j.gca.2023.08.027::S1
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: In
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: SD as printed; f_M+=1 for 1_low
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived_from_kems_equilibrium_constants'
+    original_method_class: derived_from_kems_equilibrium_constants
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 2
+    table: S1
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s2_1low_isotherm
+  experiment_id: 10.1016/j.gca.2023.08.027::S2
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: In
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: SD as printed
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived_from_kems_equilibrium_constants'
+    original_method_class: derived_from_kems_equilibrium_constants
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 3
+    table: S2
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s3_2low_polytherm
+  experiment_id: 10.1016/j.gca.2023.08.027::S3-cont
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: In
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: SD as printed; low-T gammas >>1 are pre-plateau
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived_from_kems_equilibrium_constants'
+    original_method_class: derived_from_kems_equilibrium_constants
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 5
+    table: S3-cont
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_ino15_gamma_s4_3high_polytherm
+  experiment_id: 10.1016/j.gca.2023.08.027::S4-gamma
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: In
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: series list had no numeric coordinate/value pairs
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: SD as printed; f_M+(In)=0.26 in run 3_high
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived_from_kems_equilibrium_constants'
+    original_method_class: derived_from_kems_equilibrium_constants
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 6
+    table: S4-gamma
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_t50c_ga_factsage_table9
+  experiment_id: 10.1016/j.gca.2023.08.027::9
+  identity:
+    quantity: transition_temperature
+    species:
+      formula: Ga
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: value
+      value: T50_condensation_K
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 30
+    table: '9'
+    note: Table 9 Tc50 ADeu [K]; FactSage 8.2 Slag-LiqA 50% condensation temperatures
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_t50c_in_factsage_table9
+  experiment_id: 10.1016/j.gca.2023.08.027::9
+  identity:
+    quantity: transition_temperature
+    species:
+      formula: In
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: value
+      value: T50_condensation_K
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 30
+    table: '9'
+    note: Table 9 Tc50 ADeu [K]; FactSage 8.2 Slag-LiqA 50% condensation temperatures
+  read_from: pdf:kems-137-bischof-2023
+- observation_id: kems-137-bischof-2023::bischof_2023_table8_x_gao15
+  experiment_id: 10.1016/j.gca.2023.08.027::8
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Ga
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Table 8: number in parenthesis is uncertainty in the last digit'
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_LA_ICP_MS
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-137-bischof-2023
+  locator:
+    pdf_page_index: 22
+    table: '8'
+  read_from: pdf:kems-137-bischof-2023

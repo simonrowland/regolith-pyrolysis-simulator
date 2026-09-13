@@ -1,0 +1,80 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/datz-smith-taylor-1961-nacl-vapor.yaml
+observations:
+- observation_id: datz-smith-taylor-1961-nacl-vapor::anchor_NaCl_pure_Psat
+  experiment_id: 10.1063/1.1700984::Datz-Smith-Taylor-1961#NaCl_vapor
+  identity:
+    quantity: p_sat
+    species:
+      formula: NaCl
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '1100'
+    interval_high: '1500'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: datz-smith-taylor-1961-nacl-vapor
+  locator:
+    note: 'Zimmermann, K. / later KEMS salt reviews; preferred primary: Barton, J.L. & Bloom, H. (1956–), molten alkali-halide
+      vapor pressures (transpirations), and Datz, S., Smith, W.T. & Taylor, E.H. (1961), "The Molecular Composition of Sodium
+      Chloride Vapor", J. Chem. Phys. 34:558–564, DOI 10.1063/1.170098'
+    record: Datz-Smith-Taylor-1961#NaCl_vapor
+  read_from: pdf:datz-smith-taylor-1961-nacl-vapor

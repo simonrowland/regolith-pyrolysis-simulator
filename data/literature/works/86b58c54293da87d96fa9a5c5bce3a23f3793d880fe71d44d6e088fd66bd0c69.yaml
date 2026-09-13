@@ -1,0 +1,63 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 86b58c54293da87d96fa9a5c5bce3a23f3793d880fe71d44d6e088fd66bd0c69
+  citation: Safarian, J. & Engh, T. A. (2013), "Vacuum Evaporation of Pure Metals", Metall. Mater. Trans. A (Hertz-Knudsen
+    / Schrage theory; pure Si context in corpus)
+  source_ids:
+  - kems-009-safarian-2013
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-009-safarian-2013
+      role: pdf
+      path: raw/kems-009-safarian-2013/kems-009-safarian-2013.pdf
+      sha256:
+        tag: value
+        value: 4b8330567349e54b9642880efc46f7633c1af7ccfa280ae3808cf8601fa624d3
+    - asset_id: pdftotext:kems-009-safarian-2013
+      role: pdftotext
+      path: text/kems-009-safarian-2013
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-009-safarian-2013
+      role: table_csv
+      path: tables/kems-009-safarian-2013
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 86b58c54293da87d96fa9a5c5bce3a23f3793d880fe71d44d6e088fd66bd0c69::docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'langmuir_free_evaporation_theory' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 86b58c54293da87d96fa9a5c5bce3a23f3793d880fe71d44d6e088fd66bd0c69
+  locator:
+    page: '747'
+    section: Hertz-Knudsen / Schrage / vapor velocity / flux (theory review)
+    line_range: 112-245
+    note: Primary theory block; S_cr and p_eff at line 229; flux-ratio figure context 245; repaired_table_path=docs-private/research/2026-08-27-ocr-repair/kems-009-safarian-2013/tables.md
+    source_path: docs-private/research/ocr-artifacts/kems-009-safarian-2013/spool/out/kems-009-safarian-2013/vlm/kems-009-safarian-2013.md

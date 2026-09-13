@@ -1,0 +1,809 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml
+observations:
+- observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_apparatus_and_pressure_regime
+  experiment_id: 10.1016/j.pss.2019.05.001::2-4
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: NU-LHT-2M
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: pressures printed as orders of magnitude (10^{-8}, 10^{-4}, approximately 10^{-1}). Balance readability 0.001
+        g.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: The RGA filament can be operated below its maximum gas pressure of 10^{-4} mbar. The operating pressure of
+      the lower section is on the order of 10^{-8} mbar. Sample heating was activated when the pressure in the lower section
+      of the volatiles extraction system reached values <10^{-4} mbar. The system was continuously evacuated for the entire
+      duration of the experiment. A 0.5 mm diameter Type K mantle thermocouple was inserted into the heater to measure the
+      temperature of the sample holder.
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: reiss-2019-thermal-extraction-nulht2m
+  locator:
+    page: 5
+    pdf_page_index: 5
+    figure: 2-4
+    section: '2.2'
+    note: Volatiles extraction system; 350 dpi renders of PDF pages 4-7 and 11
+  read_from: pdf:reiss-2019-thermal-extraction-nulht2m
+- observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_co2_high_t_printed_and_figure_only
+  experiment_id: 10.1016/j.pss.2019.05.001::6,10
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: CO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: attribution printed as above 650 °C; no ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: traces of calcite in NU-LHT-2M were found to decompose above 650 °C and produce CO2.
+  admission:
+    status: pending
+    reason: source admission_status=figure_only_curve_plus_printed_T_attribution is not a closed v2.1 token
+  notices: []
+  source_id: reiss-2019-thermal-extraction-nulht2m
+  locator:
+    pdf_page_index: 18
+    figure: 6,10
+    paragraph: conclusions 447-448
+    note: printed attribution calcite >650 °C; curve figure-only
+  read_from: pdf:reiss-2019-thermal-extraction-nulht2m
+- observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_fig5_printed_adsorption_fits
+  experiment_id: 10.1016/j.pss.2019.05.001::5
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: H2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: R^2 printed; no ± on K, qmax, csat
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=printed_on_figure_not_axis_digitised is not a closed v2.1 token
+  notices: []
+  source_id: reiss-2019-thermal-extraction-nulht2m
+  locator:
+    page: 10
+    pdf_page_index: 10
+    figure: '5'
+    note: Type I and Type II coefficients printed on Fig. 5 plate; curve itself not digitised
+  read_from: pdf:reiss-2019-thermal-extraction-nulht2m
+- observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_h2_identified_in_rga_figure_only
+  experiment_id: 10.1016/j.pss.2019.05.001::6-7
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: H2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; figure not digitised
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 'the prevailing species in the gas mixture can be clearly identified by their fragmentation pattern (major
+      mass fragments underlined): H2O (m/z 16, 17, 18, 19, 20), H2 (m/z 1, 2), and CO2 (m/z 12, 16, 28, 44, 45, 46).'
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: reiss-2019-thermal-extraction-nulht2m
+  locator:
+    pdf_page_index: 12
+    figure: 6-7
+    paragraph: 206-207
+  read_from: pdf:reiss-2019-thermal-extraction-nulht2m
+- observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_h2s_mz32_peak_around_550C
+  experiment_id: 10.1016/j.pss.2019.05.001::9
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: H2S
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: around 550 °C as printed; no ±
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: In the experiments presented here, a significant peak in the m/z 32 signal was detected around 550 °C. This
+      was mainly attributed to H2S (fragments m/z 1, 32, 33, 34, 35, 36) and traces of SO2. Sulfur-bearing minerals in NU-LHT-2M
+      were found to decompose above 550 °C and produce mainly H2S.
+  admission:
+    status: pending
+    reason: source admission_status=figure_only_curve_plus_printed_T_attribution is not a closed v2.1 token
+  notices: []
+  source_id: reiss-2019-thermal-extraction-nulht2m
+  locator:
+    pdf_page_index: 18
+    figure: '9'
+    paragraph: 336-337
+  read_from: pdf:reiss-2019-thermal-extraction-nulht2m
+- observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_mz18_yield_phase2_model_derived
+  experiment_id: 10.1016/j.pss.2019.05.001::reiss-2019-thermal-extraction-nulht2m
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: H2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: authors call the values indicative; saturated runs span 0.4 % to 6.3 %; no ± printed on the default 0.2–0.3 %
+        band
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source admission_status=authors_integral_of_figure_curves_with_assumed_pump_rate is not a closed v2.1 token
+  notices: []
+  source_id: reiss-2019-thermal-extraction-nulht2m
+  locator:
+    page: 17
+    pdf_page_index: 17
+    paragraph: 297-318
+    note: §Volatiles yield; integrals of RGA p(t) with assumed q_pump, not a balance measurement
+  read_from: pdf:reiss-2019-thermal-extraction-nulht2m
+- observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_printed_peak_temperature_bands
+  experiment_id: 10.1016/j.pss.2019.05.001::6
+  identity:
+    quantity: transition_temperature
+    species:
+      formula: H2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: value
+      value: printed_release_peak_temperature_bands
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: bands printed as between/around/above; no ± on the band edges
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: An initial peak (A) between -100 °C and -50 °C (phase 1), a broader feature (B) between -50 °C and 300 °C
+      (phase 2), and two separately identifiable peaks (C-D) at temperatures above 300 °C (phase 3). When a sample was present
+      the pressure rise started at a set point temperature around -120 °C to -110 C°, while for the empty sample holder the
+      pressure rise started between -100 °C and -80 °C. A significant peak in the m/z 32 signal was detected around 550 °C.
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: reiss-2019-thermal-extraction-nulht2m
+  locator:
+    page: 12
+    pdf_page_index: 12
+    figure: '6'
+    paragraph: 201-207
+    note: Printed peak-band temperatures in prose, not read off Fig. 6
+  read_from: pdf:reiss-2019-thermal-extraction-nulht2m
+- observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_rga_release_curves_figure_only
+  experiment_id: 10.1016/j.pss.2019.05.001::6-11
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: H2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable; figures not digitised
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 'Figure 6 shows a typical progression of partial pressures of the predominant masses detected by the RGA.
+      For all parameter combinations in the experiments this typical diagram can be divided into three distinct phases: An
+      initial peak (A) between -100 °C and -50 °C (phase 1), a broader feature (B) between -50 °C and 300 °C (phase 2), and
+      two separately identifiable peaks (C-D) at temperatures above 300 °C (phase 3).'
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: reiss-2019-thermal-extraction-nulht2m
+  locator:
+    figure: 6-11
+    note: RGA partial-pressure and total-pressure vs set-point T; not digitised; pdf_page_index=12-20
+  read_from: pdf:reiss-2019-thermal-extraction-nulht2m
+- observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_table1_test_parameters
+  experiment_id: 10.1016/j.pss.2019.05.001::1
+  identity:
+    quantity: mass_loss_rate
+    species:
+      formula: NU-LHT-2M
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: unknown
+      reason: source does not state sweep_gas
+    exposure:
+      tag: unknown
+      reason: source does not state exposure
+    sample_mass_kg:
+      tag: unknown
+      reason: source does not state sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile mass_loss_rate does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table prints ranges (33-36 mg, approx. densities). No ± on the heating set points.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: 'Table 1: Test parameters for the volatiles extraction. Sample mass 33-36 mg / 66-72 mg. Heating mode -190
+      °C to 800 °C at 6 °C/min / -190 °C to 800 °C at 4 °C/min.'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: reiss-2019-thermal-extraction-nulht2m
+  locator:
+    page: 10
+    pdf_page_index: 10
+    table: '1'
+    note: Table 1 Test parameters for the volatiles extraction; 350 dpi pdftoppm of PDF page 10
+  read_from: pdf:reiss-2019-thermal-extraction-nulht2m
+- observation_id: reiss-2019-thermal-extraction-nulht2m::reiss_2019_table2_nulht2m_mineralogy_quoted
+  experiment_id: 10.1016/j.pss.2019.05.001::2
+  identity:
+    quantity: delta_fG
+    species:
+      formula: NU-LHT-2M
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: none printed in Table 2
+  evidence:
+    class:
+      tag: value
+      value: quoted_unattributed
+    original_method_class: quoted_literature
+    attribution: 'Table 2: Major mineral phase abundances in NU-LHT-2M according to Rickman and Lowers (2012). Plagioclase
+      62 / 59; Glass 18.7 / 17.3; Total 99.5 / 99.2.'
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: reiss-2019-thermal-extraction-nulht2m
+  locator:
+    page: 18
+    pdf_page_index: 18
+    table: '2'
+    note: Table 2 Major mineral phase abundances in NU-LHT-2M according to Rickman and Lowers (2012)
+  read_from: pdf:reiss-2019-thermal-extraction-nulht2m

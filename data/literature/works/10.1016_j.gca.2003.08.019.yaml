@@ -1,0 +1,163 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.gca.2003.08.019
+  citation: 'Sephton, M. A., Love, G. D., Watson, J. S., Verchovsky, A. B., Wright, I. P., Snape, C. E. and Gilmour, I. (2004),
+    Hydropyrolysis of insoluble carbonaceous matter in the Murchison meteorite: new insights into its macromolecular structure,
+    Geochimica et Cosmochimica Acta 68(6) 1385-1393, DOI 10.1016/j.gca.2003.08.019'
+  source_ids:
+  - murchison-hydropyrolysis-1990s-gca
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:murchison-hydropyrolysis-1990s-gca
+      role: pdf
+      path: raw/murchison-hydropyrolysis-1990s-gca/murchison-hydropyrolysis-1990s-gca.pdf
+      sha256:
+        tag: value
+        value: b799d6c835330a0cef12ddbbf81847e75f3455b67fce61c4d04054485527595a
+    - asset_id: pdftotext:murchison-hydropyrolysis-1990s-gca
+      role: pdftotext
+      path: text/murchison-hydropyrolysis-1990s-gca
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:murchison-hydropyrolysis-1990s-gca
+      role: table_csv
+      path: tables/murchison-hydropyrolysis-1990s-gca
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1016/j.gca.2003.08.019
+experiments:
+- experiment_id: 10.1016/j.gca.2003.08.019::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'open_system_hydropyrolysis_15_MPa_H2' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.gca.2003.08.019
+  locator:
+    published_page: 1389
+    pdf_page_index: 5
+    table: '1'
+    note: Bulk C (wt%) by IRMS; measured values plain text; calculated italics
+- experiment_id: 10.1016/j.gca.2003.08.019::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'stepped_combustion_classification' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.gca.2003.08.019
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '2'
+    note: Four C/N-bearing components in Murchison HF/HCl residues; Sephton et al. 2003
+- experiment_id: 10.1016/j.gca.2003.08.019::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'stepped_combustion_MS_10_mbar_O2' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: unmapped pressure unit 'mbar oxygen as printed'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: unmapped pressure unit 'mbar oxygen as printed'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: unmapped pressure unit 'mbar oxygen as printed'
+  work_id: 10.1016/j.gca.2003.08.019
+  locator:
+    published_page: 1390
+    pdf_page_index: 6
+    table: '3'
+    note: Carbon experiment on solvent-extracted and decalcified H2-pyrolysis residue
+- experiment_id: 10.1016/j.gca.2003.08.019::murchison-hydropyrolysis-1990s-gca
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'open_system_hydropyrolysis_15_MPa_H2' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: unmapped pressure unit 'MPa hydrogen as printed'
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: unmapped pressure unit 'MPa hydrogen as printed'
+    regime:
+      regime_class:
+        tag: unknown
+        reason: unmapped pressure unit 'MPa hydrogen as printed'
+  work_id: 10.1016/j.gca.2003.08.019
+  locator:
+    published_page: 1386
+    pdf_page_index: 2
+    section: 2.1. H2-Pyrolysis
+    note: thermal program, 15 MPa H2, stainless-steel 316 reactor, dry-ice trap
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: stainless steel (316 grade) reactor tube; open-system fixed-bed H2-pyrolysis
+      locator:
+        published_page: 1386
+        pdf_page_index: 2
+        paragraph: catalyst-loaded samples (50-300 mg) were initially heated in a stainless steel (316 grade) reactor tube

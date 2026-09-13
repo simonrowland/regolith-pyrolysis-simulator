@@ -1,0 +1,385 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational1966.20.244
+  citation: Yamada, K. & Kato, E. (1980), "Mass Spectrometric Study of the Activity of Phosphorus in Iron-Phosphorus Alloys",
+    Trans. ISIJ 20:244-250, DOI 10.2355/isijinternational1966.20.244. Originally published in Tetsu-to-Hagane 65 (1979) 273
+    in Japanese.
+  source_ids:
+  - kems-087-yamada-kato-1980
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-087-yamada-kato-1980
+      role: pdf
+      path: raw/kems-087-yamada-kato-1980/kems-087-yamada-kato-1980.pdf
+      sha256:
+        tag: value
+        value: 66ba65a90fb60f4b3cd8d9aebf31b036b8e0de3465caee7c897ccd39f836a49a
+    - asset_id: pdftotext:kems-087-yamada-kato-1980
+      role: pdftotext
+      path: text/kems-087-yamada-kato-1980
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-087-yamada-kato-1980
+      role: table_csv
+      path: tables/kems-087-yamada-kato-1980
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2355/isijinternational1966.20.244
+experiments:
+- experiment_id: 10.2355/isijinternational1966.20.244::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.20.244
+  locator:
+    published_page: 244
+    pdf_page_index: 1
+    figure: '1'
+    section: II
+    note: Hitachi RM-6K; alumina cell; orifice 0.4-0.6 mm; 22 eV; sample ~1.5 g
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity alumina Knudsen cell; tantalum susceptor, Ta plates and radiation shields (Fig. 1)
+      locator:
+        published_page: 244
+        pdf_page_index: 1
+        figure: '1'
+        note: Alumina Knudsen cell; orifice labelled 6
+- experiment_id: 10.2355/isijinternational1966.20.244::10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.20.244
+  locator:
+    published_page: 249
+    pdf_page_index: 6
+    figure: '10'
+    note: Fig. 10. Concentration dependence of the ratio of I_P2+ to (I_P+)^2
+- experiment_id: 10.2355/isijinternational1966.20.244::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.20.244
+  locator:
+    published_page: 245
+    pdf_page_index: 2
+    figure: '2'
+    note: Fig. 2. Relation between the P2+ ion peak and the background ion peak
+- experiment_id: 10.2355/isijinternational1966.20.244::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.20.244
+  locator:
+    published_page: 245
+    pdf_page_index: 2
+    figure: '3'
+    note: Fig. 3. Temperature dependence of the ion current ratio
+- experiment_id: 10.2355/isijinternational1966.20.244::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.20.244
+  locator:
+    published_page: 246
+    pdf_page_index: 3
+    figure: '4'
+    note: Fig. 4. Ion current ratios for the Fe-P system at 1600 C
+- experiment_id: 10.2355/isijinternational1966.20.244::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.20.244
+  locator:
+    published_page: 246
+    pdf_page_index: 3
+    figure: '5'
+    note: Fig. 5. Integration curve for the Fe-P system at 1600 C
+- experiment_id: 10.2355/isijinternational1966.20.244::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.20.244
+  locator:
+    published_page: 244
+    pdf_page_index: 1
+    figure: '6'
+    note: quoted epsilon_P^P of Urbain, Frohberg et al., Ban-ya and Suzuki, Schenck et al.; Fig. 6 overlays
+- experiment_id: 10.2355/isijinternational1966.20.244::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.20.244
+  locator:
+    published_page: 247
+    pdf_page_index: 4
+    figure: '7'
+    note: Fig. 7. Activities of P and Fe in the dilute solution of P in liquid Fe at 1600 C
+- experiment_id: 10.2355/isijinternational1966.20.244::8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.20.244
+  locator:
+    published_page: 247
+    pdf_page_index: 4
+    figure: '8'
+    note: Fig. 8. Integration curve for the Fe-P system at 1600 C
+- experiment_id: 10.2355/isijinternational1966.20.244::9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/isijinternational1966.20.244
+  locator:
+    published_page: 248
+    pdf_page_index: 5
+    figure: '9'
+    note: 31P+ peak at 1.52 wt% (2.71 at%) P; 120 channels, 16 scans; average 812.7
+- experiment_id: 10.2355/isijinternational1966.20.244::kems-087-yamada-kato-1980
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.20.244
+  locator:
+    published_page: 247
+    pdf_page_index: 4
+    equation: '7'
+    note: epsilon_P^P = 7.3 +/- 0.1; ln gamma_P = 7.3 N_P for [at% P] < 2.7; conclusion also e_P^P = 0.054
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: high-purity alumina Knudsen cell; tantalum susceptor, Ta plates and radiation shields (Fig. 1)
+      locator:
+        published_page: 244
+        pdf_page_index: 1
+        figure: '1'
+        note: Alumina Knudsen cell; orifice labelled 6

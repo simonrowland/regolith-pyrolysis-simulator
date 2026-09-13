@@ -1,0 +1,123 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
+  citation: Markova, O.M., Yakovlev, O.I., Belov, A.N. & Semenov, G.A. (1984), "The role of the vaporization process in the
+    impact-accretion history of the Moon", Lunar and Planetary Science XV, 509–510
+  source_ids:
+  - kems-026-markova-1984
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-026-markova-1984
+      role: pdf
+      path: raw/kems-026-markova-1984/kems-026-markova-1984.pdf
+      sha256:
+        tag: value
+        value: 4fbf0e84facb8d76e57ec8db928316199ae28ebd7b71aef0ed2122568889fe31
+    - asset_id: pdftotext:kems-026-markova-1984
+      role: pdftotext
+      path: text/kems-026-markova-1984
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-026-markova-1984
+      role: table_csv
+      path: tables/kems-026-markova-1984
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '1'
+    note: CHEMICAL COMPOSITIONS OF THE INITIAL SAMPLES TABLE 1; 400 dpi pdftoppm of corpus PDF page 2
+- experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
+  locator:
+    published_page: 510
+    pdf_page_index: 2
+    table: '2'
+    note: COMPOSITIONS OF THE RESIDUAL MELTS DURING THE VAPORIZATION OF THE COMPOSITION VI AND V TABLE 2; 400 dpi pdftoppm
+      of corpus PDF page 2; left panel = composition VI (lherzolite)
+- experiment_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6::kems-026-markova-1984
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 59375f0bee36dc493db94c64ef08918cc605470514de7718d396b3daf9b8cac6
+  locator:
+    published_page: 509
+    pdf_page_index: 1
+    paragraph: The experiments were carried out in the step-wise heating regime till the complete vaporization of the sample
+      under study

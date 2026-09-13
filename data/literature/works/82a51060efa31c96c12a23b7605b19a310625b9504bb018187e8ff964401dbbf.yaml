@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 82a51060efa31c96c12a23b7605b19a310625b9504bb018187e8ff964401dbbf
+  citation: 'Measured monomer/dimer salt vapor pressures: e.g. Hildenbrand / KEMS alkaline-earth chloride literature; Bloom
+    & Welch molten CaCl2 VP. JANAF cannot self-validate a JANAF-derived Antoine.'
+  source_ids:
+  - pending-cacl2-kems-or-transpiration
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:pending-cacl2-kems-or-transpiration
+      role: pdf
+      path: raw/pending-cacl2-kems-or-transpiration/pending-cacl2-kems-or-transpiration.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:pending-cacl2-kems-or-transpiration
+      role: pdftotext
+      path: text/pending-cacl2-kems-or-transpiration
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pending-cacl2-kems-or-transpiration
+      role: table_csv
+      path: tables/pending-cacl2-kems-or-transpiration
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 82a51060efa31c96c12a23b7605b19a310625b9504bb018187e8ff964401dbbf::PENDING#CaCl2_KEMS_or_transpiration
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 82a51060efa31c96c12a23b7605b19a310625b9504bb018187e8ff964401dbbf
+  locator:
+    note: 'Measured monomer/dimer salt vapor pressures: e.g. Hildenbrand / KEMS alkaline-earth chloride literature; Bloom
+      & Welch molten CaCl2 VP. JANAF cannot self-validate a JANAF-derived Antoine.'
+    record: PENDING#CaCl2_KEMS_or_transpiration

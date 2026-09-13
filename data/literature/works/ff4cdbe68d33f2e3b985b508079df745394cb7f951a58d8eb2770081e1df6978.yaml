@@ -1,0 +1,507 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
+  citation: De Maria, G., Balducci, G., Guido, M. & Piacente, V. (1971), "Mass spectrometric investigation of the vaporization
+    process of Apollo 12 lunar samples", Proc. Lunar Sci. Conf. 2, 1367–1380
+  source_ids:
+  - kems-022-demaria-1971
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-022-demaria-1971
+      role: pdf
+      path: raw/kems-022-demaria-1971/kems-022-demaria-1971.pdf
+      sha256:
+        tag: value
+        value: 6068fe24df64202e61bc4f7491f453d0f34158fff962d39dc90d356096fcd796
+    - asset_id: pdftotext:kems-022-demaria-1971
+      role: pdftotext
+      path: text/kems-022-demaria-1971
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-022-demaria-1971
+      role: table_csv
+      path: tables/kems-022-demaria-1971
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
+  locator:
+    table: '1'
+    paragraph: Partial pressures of O2 corresponding approximately to alkali metal vaporization
+    line_range: 103-105
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re
+      locator:
+        paragraph: rhenium containers; passivated Re for 12065
+        line_range: 32-56
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.000004154756'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+- experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
+  locator:
+    table: '2'
+    paragraph: Partial pressures of Mn and Cr over sample 12022; initial points
+    line_range: 157-159
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re
+      locator:
+        paragraph: rhenium containers; passivated Re for 12065
+        line_range: 32-56
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.000004154756'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+- experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
+  locator:
+    table: '3'
+    paragraph: Partial pressures of Mg over samples 12022 and 12065; indicative initial points
+    line_range: 173-175
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re
+      locator:
+        paragraph: rhenium containers; passivated Re for 12065
+        line_range: 32-56
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.000004154756'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+- experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
+  locator:
+    figure: '4'
+    paragraph: Ca partial pressures reported in Fig. 4 only; ion intensity measurement difficult
+    line_range: 169-198
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re
+      locator:
+        paragraph: rhenium containers; passivated Re for 12065
+        line_range: 32-56
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.000004154756'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+- experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
+  locator:
+    figure: '5'
+    paragraph: SiO first observed ~1650 K; partial pressures ~10× below cristobalite
+    line_range: 202-258
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re
+      locator:
+        paragraph: rhenium containers; passivated Re for 12065
+        line_range: 32-56
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.000004154756'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+- experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
+  locator:
+    table: '6'
+    paragraph: FeO among molecular species detected; equilibria in Table 6
+    line_range: 324-328
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re
+      locator:
+        paragraph: rhenium containers; passivated Re for 12065
+        line_range: 32-56
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.000004154756'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+- experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
+  locator:
+    table: '7'
+    paragraph: Third-law heat of SiO2(g)=SiO(g)+1/2O2(g); simultaneous partial pressures
+    line_range: 330-334
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re
+      locator:
+        paragraph: rhenium containers; passivated Re for 12065
+        line_range: 32-56
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.000004154756'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+- experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
+  locator:
+    table: '8'
+    paragraph: Third-law AlO(g)=Al(g)+O(g); 12065 BC; simultaneous Kp
+    line_range: 337-341
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re
+      locator:
+        paragraph: rhenium containers; passivated Re for 12065
+        line_range: 32-56
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.000004154756'
+        locator:
+          paragraph: rhenium containers knife-edge effusion hole 2.3 mm diameter
+          line_range: '32'
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+- experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
+  locator:
+    paragraph: multiple rotating Knudsen cell; three cells 1 mm knife-edge
+    source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re (sample); multi-cell set Re / Fe / MgO; Ta external cap on Fe cell
+      locator:
+        paragraph: rhenium, iron, and magnesium oxide crucibles
+        source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.000000785398'
+        locator:
+          paragraph: knife-edge orifice, 1 mm in diameter
+          source_path: docs-private/research/ocr-artifacts/kems-022-demaria-1971/spool/out/kems-022-demaria-1971/vlm/kems-022-demaria-1971.md
+- experiment_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978::kems-022-demaria-1971
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: ff4cdbe68d33f2e3b985b508079df745394cb7f951a58d8eb2770081e1df6978
+  locator:
+    published_page: 1368
+    pdf_page_index: 2
+    paragraph: On the whole 680.2 mg of sample 12022,57 and 928.6 mg of 12065,36
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Re
+      locator:
+        published_page: 1368
+        pdf_page_index: 2
+        paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.000004154756'
+        locator:
+          published_page: 1368
+          pdf_page_index: 2
+          paragraph: rhenium containers having a knife-edge effusion hole 2.3 mm in diameter

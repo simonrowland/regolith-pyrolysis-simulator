@@ -1,0 +1,348 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ivtan-cro2-g.yaml
+observations:
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_F_polynomials
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::877
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CrO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: expression
+    expression_text: evaluator_segments_as_published
+    expression_domain: segments
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Polynomials are a printed model of the tabulated F° grid. No separate polynomial-fit residual is printed (absent,
+        not 0). Tabulated F° uncertainties are on ivtan_cro2_g_table877_functions.
+
+        '
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 4
+    pdf_page_index: 4
+    table: '877'
+    note: printed F°(T) polynomials under Table 877
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+  read_from: pdf:ivtan-cro2-g
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_adopted_deltafH
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::877
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CrO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed ±15 kJ mol-1 on both DfH°(298.15 K)=-99.2 and DrH°(0 K)=985.971. Authors list reproducibility, ionization
+        cross-sections, DfH°(Cr,g) and thermodynamic-function error as the envelope components. Footer DH° values are printed
+        without a second uncertainty figure.
+
+        '
+      delta_fH_298_15_kJ_mol: '15'
+      DrH_0_kJ_mol: '15'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 2
+    pdf_page_index: 2
+    table: '877'
+    paragraph: thermochemical_quantities
+    note: 'Prose adopted DfH° and DrH°; footer M, DH°(0), DH°(298.15 K), S°яд on PDF page 4. Compilation selection of measured
+      KEMS, not a raw ion-current series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+  read_from: pdf:ivtan-cro2-g
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_gurvich1982_competing_deltafH
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CrO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: ±15 kJ mol-1 as printed for the Gurvich 1982 value
+      delta_fH_298_15_kJ_mol: '15'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: review_compilation
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    paragraph: gurvich_1982_comparison
+    note: '[82ГУР/ВЕЙ] competing DfH° quoted on this page; not adopted here'
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+  read_from: pdf:ivtan-cro2-g
+- observation_id: ivtan-cro2-g::ivtan_cro2_g_table877_functions
+  experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::877
+  identity:
+    quantity: delta_fG
+    species:
+      formula: CrO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: 'Printed total error of F°(T) at 298.15, 1000, 3000 and 6000 K is 1, 2, 3 and 3.5 J K-1 mol-1. Authors attribute
+        this mainly to excited-state energies (0.7-1 J K-1 mol-1) plus the rigid-rotor/harmonic-oscillator approximation.
+        Uncertainties of Cp, S, H-H0 and lg K are not printed on the table (absent, not 0).
+
+        '
+      F_J_molK_at_T_K:
+        '298.15': '1'
+        '1000.0': '2'
+        '3000.0': '3'
+        '6000.0': '3.5'
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_calculated_table
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ivtan-cro2-g
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+  read_from: pdf:ivtan-cro2-g

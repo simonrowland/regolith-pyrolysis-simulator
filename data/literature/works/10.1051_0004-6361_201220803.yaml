@@ -1,0 +1,332 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1051/0004-6361/201220803
+  citation: Wetzel, S., Klevenz, M., Gail, H.-P., Pucci, A. & Trieloff, M. (2013), Laboratory measurement of optical constants
+    of solid SiO and application to circumstellar dust, A&A 553, A92.
+  source_ids:
+  - kems-011-wetzel-gail-2013
+  - wetzel-gail-2013-sio-arrhenius
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-011-wetzel-gail-2013
+      role: pdf
+      path: raw/kems-011-wetzel-gail-2013/kems-011-wetzel-gail-2013.pdf
+      sha256:
+        tag: value
+        value: e4cfdd959dfed9f911cc6afc8a0dc8cdad009f31771596e28834eacf032ccf6b
+    - asset_id: pdftotext:kems-011-wetzel-gail-2013
+      role: pdftotext
+      path: text/kems-011-wetzel-gail-2013
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-011-wetzel-gail-2013
+      role: table_csv
+      path: tables/kems-011-wetzel-gail-2013
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+    - asset_id: pdf:wetzel-gail-2013-sio-arrhenius
+      role: pdf
+      path: raw/wetzel-gail-2013-sio-arrhenius/wetzel-gail-2013-sio-arrhenius.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:wetzel-gail-2013-sio-arrhenius
+      role: pdftotext
+      path: text/wetzel-gail-2013-sio-arrhenius
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:wetzel-gail-2013-sio-arrhenius
+      role: table_csv
+      path: tables/wetzel-gail-2013-sio-arrhenius
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1051/0004-6361/201220803
+experiments:
+- experiment_id: 10.1051/0004-6361/201220803::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'published_model_parameters' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1051/0004-6361/201220803
+  locator:
+    page: 4
+    table: '1'
+- experiment_id: 10.1051/0004-6361/201220803::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'published_model_parameters' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1051/0004-6361/201220803
+  locator:
+    page: 4
+    table: '2'
+- experiment_id: 10.1051/0004-6361/201220803::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'published_model_parameters' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1051/0004-6361/201220803
+  locator:
+    page: 5
+    table: '3'
+- experiment_id: 10.1051/0004-6361/201220803::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'published_model_parameters' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1051/0004-6361/201220803
+  locator:
+    page: 7
+    table: '4'
+- experiment_id: 10.1051/0004-6361/201220803::4a
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_SiO_growth_coefficient' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0000001'
+      locator:
+        paragraph: UHV
+        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state flow regime
+  work_id: 10.1051/0004-6361/201220803
+  locator:
+    figure: 4a
+    paragraph: SiO film growth Arrhenius α(T)
+    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Ta Knudsen cell (source); UHV film growth
+      locator:
+        paragraph: Ta Knudsen cell
+        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+- experiment_id: 10.1051/0004-6361/201220803::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'published_model_parameters' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1051/0004-6361/201220803
+  locator:
+    page: 8
+    table: '5'
+- experiment_id: 10.1051/0004-6361/201220803::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'published_model_parameters' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1051/0004-6361/201220803
+  locator:
+    page: 8
+    table: '6'
+- experiment_id: 10.1051/0004-6361/201220803::docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'solid_SiO_growth_coefficient' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0000001'
+      locator:
+        paragraph: background pressure measured during evaporation
+        line_range: 51-53
+        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state flow regime
+  work_id: 10.1051/0004-6361/201220803
+  locator:
+    equation: '8'
+    line_range: 317-329
+    note: growth coefficient α(T) for solid SiO condensation/growth from lab measurements
+    source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Ta Knudsen cell (electron-bombardment heated) for commercial SiO evaporation under UHV
+      locator:
+        paragraph: evaporated from a tantalum Knudsen cell heated by electron bombardment
+        line_range: '53'
+        source_path: docs-private/research/ocr-artifacts/kems-011-wetzel-gail-2013/spool/out/kems-011-wetzel-gail-2013/vlm/kems-011-wetzel-gail-2013.md
+- experiment_id: 10.1051/0004-6361/201220803::kems-011-wetzel-gail-2013
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'published_fit_used_for_dust_growth' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1051/0004-6361/201220803
+  locator:
+    page: 7
+    section: '3.3'
+    equation: '8'

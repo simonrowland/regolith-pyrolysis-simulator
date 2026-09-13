@@ -1,0 +1,59 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 966c6319416885f2a3eb4cfb9f787c04dfe6b1dfbcd177572846d6ce7284b0b3
+  citation: Classical WO3 / (WO3)n polymer vaporization (Ackermann & Rauh; Blackburn); JANAF WO3(g) polymers
+  source_ids:
+  - pending-pages-wo3-polymer-vp
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:pending-pages-wo3-polymer-vp
+      role: pdf
+      path: raw/pending-pages-wo3-polymer-vp/pending-pages-wo3-polymer-vp.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:pending-pages-wo3-polymer-vp
+      role: pdftotext
+      path: text/pending-pages-wo3-polymer-vp
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:pending-pages-wo3-polymer-vp
+      role: table_csv
+      path: tables/pending-pages-wo3-polymer-vp
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 966c6319416885f2a3eb4cfb9f787c04dfe6b1dfbcd177572846d6ce7284b0b3::PENDING-pages#WO3_polymer_VP
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 966c6319416885f2a3eb4cfb9f787c04dfe6b1dfbcd177572846d6ce7284b0b3
+  locator:
+    note: Classical WO3 / (WO3)n polymer vaporization (Ackermann & Rauh; Blackburn); JANAF WO3(g) polymers
+    record: PENDING-pages#WO3_polymer_VP

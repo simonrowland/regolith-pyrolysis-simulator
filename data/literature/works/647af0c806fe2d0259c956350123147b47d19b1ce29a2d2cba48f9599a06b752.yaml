@@ -1,0 +1,47 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 647af0c806fe2d0259c956350123147b47d19b1ce29a2d2cba48f9599a06b752
+  citation: Costa & Jacobson (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry, NASA NTRS 20150002321
+  source_ids:
+  - REF-016
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: pdf:REF-016
+      role: pdf
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+experiments:
+- experiment_id: 647af0c806fe2d0259c956350123147b47d19b1ce29a2d2cba48f9599a06b752::iron_olivine_kems
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 647af0c806fe2d0259c956350123147b47d19b1ce29a2d2cba48f9599a06b752
+  locator:
+    note: Costa & Jacobson (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry, NASA NTRS 20150002321
+    record: iron_olivine_kems

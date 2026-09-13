@@ -1,0 +1,421 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1016/j.calphad.2022.102507
+  citation: Bischof, L., Sossi, P. A., Sergeev, D., Müller, M. & Schmidt, M. W. (2023), "Quantification of thermodynamic properties
+    for vaporisation reactions above solid Ga2O3 and In2O3 by Knudsen Effusion Mass Spectrometry", Calphad 80:102507, DOI
+    10.1016/j.calphad.2022.102507
+  source_ids:
+  - kems-138-bischof-2023
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-138-bischof-2023
+      role: pdf
+      path: raw/kems-138-bischof-2023/kems-138-bischof-2023.pdf
+      sha256:
+        tag: value
+        value: cd9ab2b731850400e2562fd4b915e9f9737ecac30fdf4944ca2d1cd724a17485
+    - asset_id: pdftotext:kems-138-bischof-2023
+      role: pdftotext
+      path: text/kems-138-bischof-2023
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-138-bischof-2023
+      role: table_csv
+      path: tables/kems-138-bischof-2023
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1016/j.calphad.2022.102507
+experiments:
+- experiment_id: 10.1016/j.calphad.2022.102507::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: value
+        value: '0.0001'
+      locator:
+        published_page: 2
+        pdf_page_index: 3
+        paragraph: experimental
+        note: quote=evacuated through a turbo molecular pump to ~10-6 mbar
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state sweep gas
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state flow regime
+  work_id: 10.1016/j.calphad.2022.102507
+  locator:
+    published_page: 2
+    pdf_page_index: 3
+    figure: '1'
+    paragraph: experimental
+    note: quote=The iridium KC contains the sample to be analysed and is composed of a crucible 8.5 mm high with an outer
+      diameter of 7.8 mm and 0.2 mm wall thickness, and a lid with a 0.4 mm orifice at its centre.
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Ir (iridium Knudsen cell)
+      locator:
+        published_page: 2
+        pdf_page_index: 3
+        paragraph: experimental
+        note: quote=The iridium KC contains the sample to be analysed
+    geometry:
+      orifice_area_m2:
+        state:
+          tag: value
+          value: '0.0000001256637'
+        locator:
+          published_page: 2
+          pdf_page_index: 3
+          paragraph: experimental
+          note: quote=a lid with a 0.4 mm orifice at its centre
+- experiment_id: 10.1016/j.calphad.2022.102507::10
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.calphad.2022.102507
+  locator:
+    published_page: 14
+    pdf_page_index: 15
+    table: '10'
+    note: quote=148816 ± 993 Mean
+- experiment_id: 10.1016/j.calphad.2022.102507::11
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.calphad.2022.102507
+  locator:
+    published_page: 1
+    pdf_page_index: 2
+    table: '11'
+    paragraph: abstract
+    note: quote=Delta_f H298, 3rd (InO(g)) = 157744 ± 3681 Jmol-1
+- experiment_id: 10.1016/j.calphad.2022.102507::12
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.calphad.2022.102507
+  locator:
+    published_page: 16
+    pdf_page_index: 17
+    table: '12'
+    note: quote=p(In) [Pa] 0.003 0.072
+- experiment_id: 10.1016/j.calphad.2022.102507::13
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.calphad.2022.102507
+  locator:
+    published_page: 17
+    pdf_page_index: 18
+    table: '13'
+    note: quote=MEAN 500155 ± 6169
+- experiment_id: 10.1016/j.calphad.2022.102507::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.calphad.2022.102507
+  locator:
+    published_page: 3
+    pdf_page_index: 4
+    table: '3'
+    note: quote=alpha-Ga2O3 (s) 2019 41.4 39.2 1622 12 1510-1750
+- experiment_id: 10.1016/j.calphad.2022.102507::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.calphad.2022.102507
+  locator:
+    published_page: 9
+    pdf_page_index: 10
+    figure: '5'
+    note: Fig. 5a-c P(T) of Ga2O, Ga, GaO; no numeric table besides printed 1752 K points
+- experiment_id: 10.1016/j.calphad.2022.102507::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.calphad.2022.102507
+  locator:
+    published_page: 9
+    pdf_page_index: 10
+    figure: '6'
+- experiment_id: 10.1016/j.calphad.2022.102507::7
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.calphad.2022.102507
+  locator:
+    published_page: 7
+    pdf_page_index: 8
+    table: '7'
+    note: quote=Ga+ 57061 1569
+- experiment_id: 10.1016/j.calphad.2022.102507::8
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.calphad.2022.102507
+  locator:
+    published_page: 8
+    pdf_page_index: 9
+    table: '8'
+    note: quote=Mean 1654037 ± 2365
+- experiment_id: 10.1016/j.calphad.2022.102507::9
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.calphad.2022.102507
+  locator:
+    published_page: 13
+    pdf_page_index: 14
+    table: '9'
+    note: quote=Mean 1457625 ± 6908
+- experiment_id: 10.1016/j.calphad.2022.102507::kems-138-bischof-2023
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1016/j.calphad.2022.102507
+  locator:
+    published_page: 6
+    pdf_page_index: 7
+    paragraph: ionisation_efficiency
+    note: quote=a correction factor fi of 0.14 for Ga+ and of 0.19 for In+

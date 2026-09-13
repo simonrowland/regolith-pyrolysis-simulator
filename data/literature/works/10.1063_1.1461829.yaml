@@ -1,0 +1,65 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1063/1.1461829
+  citation: 'Wagner, W. & Pruß, A. (2002), "The IAPWS Formulation 1995 for the Thermodynamic Properties of Ordinary Water
+    Substance for General and Scientific Use", J. Phys. Chem. Ref. Data 31:387–535, DOI 10.1063/1.1461829; saturation pressure
+    of liquid water (and ice via IAPWS ice formulations). Cross-check: NIST Chemistry WebBook SRD 69 water Antoine liquid
+    branch (separate Stull/Bridgeman compilations — not Feistel 2007).'
+  source_ids:
+  - iapws-95-psat-liquid
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:iapws-95-psat-liquid
+      role: pdf
+      path: raw/iapws-95-psat-liquid/iapws-95-psat-liquid.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:iapws-95-psat-liquid
+      role: pdftotext
+      path: text/iapws-95-psat-liquid
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:iapws-95-psat-liquid
+      role: table_csv
+      path: tables/iapws-95-psat-liquid
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1063/1.1461829
+experiments:
+- experiment_id: 10.1063/1.1461829::IAPWS-95#Psat_liquid
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1063/1.1461829
+  locator:
+    note: 'Wagner, W. & Pruß, A. (2002), "The IAPWS Formulation 1995 for the Thermodynamic Properties of Ordinary Water Substance
+      for General and Scientific Use", J. Phys. Chem. Ref. Data 31:387–535, DOI 10.1063/1.1461829; saturation pressure of
+      liquid water (and ice via IAPWS ice formulations). Cross-check: N'
+    record: IAPWS-95#Psat_liquid

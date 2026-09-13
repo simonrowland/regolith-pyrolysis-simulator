@@ -1,0 +1,3271 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/kems-020-hastie-1981-nbsir.yaml
+observations:
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized
+  experiment_id: 10.6028/nbs.ir.81-2279::11
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: K2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Digitisation ±0.15 dex on log10(gamma). Authors, x(K2O) probably uncertain by ten percent. Run 1 below ~1430 K
+        includes K2SO4/K2CO3 volatile K; not bulk-silicate equilibrium.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 61
+    published_page: 61
+    pdf_page_index: 71
+    figure: '11'
+    note: report figure page after captions; PDF page 71
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::11
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: K2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: KMS data for variation of K2O activity coefficient with temperature and composition for the K1 slag. The
+      numbers, ranging from 0.154 to 0.08, refer to the mole fraction of K2O remaining in the sample at each measurement point.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig11_k1_slag_k2o_gamma_digitized
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '11'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 52
+    published_page: 52
+    pdf_page_index: 57
+    figure: '11'
+    note: Caption locator; plotted pages recorded in completeness ledger.
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig15_kcl_std_pressure_printed
+  experiment_id: 10.6028/nbs.ir.81-2279::15
+  identity:
+    quantity: p_sat
+    species:
+      formula: KCl
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not restated on the figure
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_foreign
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 63
+    pdf_page_index: 75
+    figure: '15'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig15_kcl_std_pressure_printed_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::15
+  identity:
+    quantity: p_sat
+    species:
+      formula: KCl
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig15_kcl_std_pressure_printed
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 52
+        published_page: 52
+        pdf_page_index: 57
+        figure: '15'
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 52
+    published_page: 52
+    pdf_page_index: 57
+    figure: '15'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig15_salt_slag_exchange
+  experiment_id: 10.6028/nbs.ir.81-2279::15
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: NaCl
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: enhancement printed as ~ 10^4; conversion percentages as printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 63
+    pdf_page_index: 75
+    figure: '15'
+    paragraph: report p. 35-36
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig15_salt_slag_exchange_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::15
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: NaCl
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 36
+        section: '10.8'
+      quote: about 50 min.; About six percent; ~ 10^4
+      note: Approximation qualifiers retained; no numeric sigma stated.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+    attribution: After a heating period of about 50 min., the NaCl sample was virtually depleted ... 90 percent of the initial
+      NaCl was converted to Na2O (slag) ... About six percent of the available K2O was converted to KCl vapor ... The remaining
+      ten percent NaCl was lost by vaporization ... (20 to 40 min. region of fig. 15) ... P_KCl / P_K(no NaCl) ~ 10^4
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig15_salt_slag_exchange
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 36
+        published_page: 36
+        pdf_page_index: 41
+        figure: '15'
+        section: '10.8'
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 36
+    published_page: 36
+    pdf_page_index: 41
+    figure: '15'
+    section: '10.8'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked
+  experiment_id: 10.6028/nbs.ir.81-2279::4
+  identity:
+    quantity: p_sat
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        figure: '4'
+        note: also Figs 8-9; caption list report p. 51
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 51
+    figure: '4'
+    note: also Figs 8-9; caption list report p. 51
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::4
+  identity:
+    quantity: p_sat
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Partial pressure data for K, O2, and SiO over illite.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '4'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 51
+    published_page: 51
+    pdf_page_index: 56
+    figure: '4'
+    note: Caption locator; plotted pages recorded in completeness ledger.
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized
+  experiment_id: 10.6028/nbs.ir.81-2279::4
+  identity:
+    quantity: p_sat
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma
+        on Fig. 4
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 58
+    published_page: 58
+    pdf_page_index: 64
+    figure: '4'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::4
+  identity:
+    quantity: p_sat
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Partial pressure data for K, O2, and SiO over illite.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig4_illite_K_SiO_digitized
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '4'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 51
+    published_page: 51
+    pdf_page_index: 56
+    figure: '4'
+    note: Caption locator; plotted pages recorded in completeness ledger.
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_figure_only_blocked
+  experiment_id: 10.6028/nbs.ir.81-2279::5
+  identity:
+    quantity: p_sat
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: rejected
+    reason: source admission_status=rejected_no_figure_reading
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        figure: '5'
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 51
+    figure: '5'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_figure_only_blocked_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::5
+  identity:
+    quantity: p_sat
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Comparison of glass melt Na partial pressure data obtained by various workers (see text) for compositions
+      (wt.%) similar to Na2O(17), CaO(12), and SiO2(71).
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_figure_only_blocked
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '5'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 51
+    published_page: 51
+    pdf_page_index: 56
+    figure: '5'
+    note: Caption locator; plotted pages recorded in completeness ledger.
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized
+  experiment_id: 10.6028/nbs.ir.81-2279::5
+  identity:
+    quantity: p_sat
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum
+        conceivable error.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 59
+    published_page: 59
+    pdf_page_index: 65
+    figure: '5'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::5
+  identity:
+    quantity: p_sat
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Comparison of glass melt Na partial pressure data obtained by various workers (see text) for compositions
+      (wt.%) similar to Na2O(17), CaO(12), and SiO2(71).
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig5_glass_Na_this_work_digitized
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '5'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 51
+    published_page: 51
+    pdf_page_index: 56
+    figure: '5'
+    note: Caption locator; plotted pages recorded in completeness ledger.
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig6_na2co3_gamma_figure_only
+  experiment_id: 10.6028/nbs.ir.81-2279::6
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source admission_status=figure_only is not a closed v2.1 token
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 60
+    pdf_page_index: 66
+    figure: '6'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_fig6_na2co3_gamma_figure_only_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::6
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Activity coefficient data (TMS) for Na2CO3 (0.45 wt.%) in glass
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_fig6_na2co3_gamma_figure_only
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 51
+        published_page: 51
+        pdf_page_index: 56
+        figure: '6'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 51
+    published_page: 51
+    pdf_page_index: 56
+    figure: '6'
+    note: Caption locator; plotted pages recorded in completeness ledger.
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_k2_slag_orifice_0p34mm
+  experiment_id: 10.6028/nbs.ir.81-2279::20
+  identity:
+    quantity: p_sat
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: diameter as printed; area inferred
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source admission_status=equipment_metadata is not a closed v2.1 token
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 28
+    figure: '20'
+    paragraph: relatively small effusion orifice (0.34 mm diameter)
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::20
+  identity:
+    quantity: p_sat
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: 'page_grounded: method_class derived'
+    original_method_class: derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_k2_slag_orifice_0p34mm
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 53
+        published_page: 53
+        pdf_page_index: 58
+        figure: '20'
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 53
+    published_page: 53
+    pdf_page_index: 58
+    figure: '20'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_k2o_liquid_kp_janaf_derived
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: K2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: estimated Cp(l); compilation-derived; no experimental sigma
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 22
+    published_page: 22
+    pdf_page_index: 28
+    equation: '6'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_k2o_liquid_kp_janaf_derived_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: K2O
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_k2o_liquid_kp_janaf_derived
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 22
+        published_page: 22
+        pdf_page_index: 27
+        paragraph: unnumbered log Kp expression below equation (6)
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 22
+    published_page: 22
+    pdf_page_index: 27
+    paragraph: unnumbered log Kp expression below equation (6)
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_kohl1975_na2so4g_foreign_second_law
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity: transition_temperature
+    species:
+      formula: Na2SO4
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: value
+      value: second_law_deltaH_deltaS
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1267'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: +- as printed from Kohl et al. 1975
+  evidence:
+    class:
+      tag: value
+      value: compilation_assessed
+    original_method_class: compilation_foreign
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 13
+    published_page: 13
+    pdf_page_index: 19
+    paragraph: Kohl et al. (1975), who give
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1267'
+      locator:
+        page: 13
+        published_page: 13
+        pdf_page_index: 19
+        paragraph: Kohl et al. (1975), who give
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_kohl1975_na2so4g_foreign_second_law_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Na2SO4
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      deltaH_kcal_per_mol: 3
+      deltaS_cal_per_deg_mol: '2.8'
+      locator:
+        page: 13
+        section: '7.1'
+      quote: 65.9 ± 3; 22.3 ± 2.8
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_kohl1975_na2so4g_foreign_second_law
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 13
+        published_page: 13
+        pdf_page_index: 18
+        section: '7.1'
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 13
+    published_page: 13
+    pdf_page_index: 18
+    section: '7.1'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_na2so4_second_law_prose
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity: transition_temperature
+    species:
+      formula: Na2SO4
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: value
+      value: second_law_deltaH_deltaS
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1550'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: +- 3 as printed on both deltaH and deltaS
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 12
+    published_page: 12
+    pdf_page_index: 18
+    paragraph: Na2SO4(l) = 2Na + SO2 + O2
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1550'
+      locator:
+        page: 12
+        published_page: 12
+        pdf_page_index: 18
+        paragraph: Na2SO4(l) = 2Na + SO2 + O2
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_na2so4_second_law_prose_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Na2SO4
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      deltaH_kcal_per_mol: 3
+      deltaS_cal_per_deg_mol: 3
+      janaf_deltaH_kcal_per_mol: '0.6'
+      locator:
+        page: 12
+        section: '7.1'
+      quote: 69.8 ± 3 (71.7 ± 0.6); 27.8 ± 3 (29.7)
+      note: No uncertainty printed on JANAF entropy.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_na2so4_second_law_prose
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 12
+        published_page: 12
+        pdf_page_index: 17
+        section: '7.1'
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 12
+    published_page: 12
+    pdf_page_index: 17
+    section: '7.1'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_nacl_dimerization_second_law
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity: transition_temperature
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: value
+      value: second_law_deltaH_deltaS
+    per:
+      tag: not_applicable
+      reason: profile transition_temperature does not use per
+    temperature_K:
+      tag: not_applicable
+      reason: profile transition_temperature does not use temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile transition_temperature does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile transition_temperature does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile transition_temperature does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile transition_temperature does not use fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile transition_temperature does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile transition_temperature does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile transition_temperature does not use wall
+  value:
+    kind: point
+    point: '1300'
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: +- as printed on -ΔHd and -ΔSd; JANAF 1971 in parentheses
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 11
+    published_page: 11
+    pdf_page_index: 17
+    paragraph: 2NaCl (g) = (NaCl)2 (g)
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1300'
+      locator:
+        page: 11
+        published_page: 11
+        pdf_page_index: 17
+        paragraph: 2NaCl (g) = (NaCl)2 (g)
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_nacl_dimerization_second_law_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity: delta_fG
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      minus_deltaH_kcal_per_mol: '0.7'
+      minus_deltaS_cal_per_deg_mol: '0.6'
+      janaf_minus_deltaH_kcal_per_mol: '3.5'
+      janaf_minus_deltaS_cal_per_deg_mol: 1
+      locator:
+        page: 12
+        section: '7.1'
+      quote: 46.4 ± 0.7 (47.1 ± 3.5); 30.2 ± 0.6 (29.7 ± 1.0)
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_nacl_dimerization_second_law
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 12
+        published_page: 12
+        pdf_page_index: 17
+        section: '7.1'
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 12
+    published_page: 12
+    pdf_page_index: 17
+    section: '7.1'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_nacl_liquid_logP_prose
+  experiment_id: 10.6028/nbs.ir.81-2279::docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  identity:
+    quantity: p_sat
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      A_sigma: '0.3'
+      B_sigma: '200'
+      note: +- as printed on A and B; second-law envelope at 1300 K as printed
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 11
+    published_page: 11
+    pdf_page_index: 17
+    paragraph: log P_NaCl (atm) = 4.85 (+- 0.3) - 8820 (+- 200)/T
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_nacl_liquid_logP_prose_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity: p_sat
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      A: '0.3'
+      B: 200
+      deltaH_kcal_per_mol: '0.9'
+      deltaS_cal_per_deg_mol: '1.4'
+      janaf_deltaH_kcal_per_mol: '3.5'
+      janaf_deltaS_cal_per_deg_mol: '0.5'
+      locator:
+        page: 11
+        section: '7.1'
+      quote: 4.85 (± 0.3) - 8820 (± 200)/T; 40.4 ± 0.9 (42.7 ± 3.5); 22.2 ± 1.4 (24.2 ± 0.5)
+      note: Printed ± terms; no invented confidence level.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_nacl_liquid_logP_prose
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 11
+        published_page: 11
+        pdf_page_index: 16
+        section: '7.1'
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 11
+    published_page: 11
+    pdf_page_index: 16
+    section: '7.1'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_remaining_figures_ledger
+  experiment_id: 10.6028/nbs.ir.81-2279::kems-020-hastie-1981-nbsir
+  identity:
+    quantity: p_sat
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source admission_status=figure_only_or_proxy is not a closed v2.1 token
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 51
+    section: '15'
+    note: figure captions report pp. 51-53; figures PDF 61-81
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_remaining_figures_ledger_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::21
+  identity:
+    quantity: p_sat
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: value
+      value: figure_only
+    original_method_class: figure_only
+    attribution: Computer-calculated distribution of alkali-containing vapor species as a function of temperature for the
+      non-ideal solution glass-combustion gas system specified in table 3.
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_remaining_figures_ledger
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 53
+        published_page: 53
+        pdf_page_index: 58
+        figure: '21'
+        note: Caption locator; plotted pages recorded in completeness ledger.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 53
+    published_page: 53
+    pdf_page_index: 58
+    figure: '21'
+    note: Caption locator; plotted pages recorded in completeness ledger.
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_17k2o_A_as_printed_note
+  experiment_id: 10.6028/nbs.ir.81-2279::2
+  identity:
+    quantity: p_sat
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: not applicable
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source admission_status=note_parent_unaltered is not a closed v2.1 token
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: rotated Table 2 ~17[K2O] row; report p. 23
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_17k2o_A_as_printed_note_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::2
+  identity:
+    quantity: p_sat
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '1600'
+    interval_high: '2000'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_17k2o_A_as_printed_note
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 28
+        table: '2'
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 28
+    table: '2'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients
+  experiment_id: 10.6028/nbs.ir.81-2279::2
+  identity:
+    quantity: p_sat
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Western slags standard deviation ~30 percent, maximum ~100 percent as printed. ZrO2 row may be low by a factor
+        of two (footnote g). No per-coefficient sigma except those statements.
+  evidence:
+    class:
+      tag: value
+      value: measured_direct
+    original_method_class: measured_direct
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 29
+    table: '2'
+    note: Table 2 continues report pp. 23-25 / PDF pp. 29-31
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::2
+  identity:
+    quantity: p_sat
+    species:
+      formula: K
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      locator:
+        page: 24
+        table: '2'
+        note: Simplified Western Slags comment
+      quote: Standard dev. ~ 30 percent, maximum dev. ~ 100 percent.
+      note: Applies only to the Simplified Western Slags row; other limitations in footnotes f and g.
+      phase_composition:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote f
+        quote: Exact crystalline phase compositions uncertain.
+      orifice_underestimate:
+        locator:
+          page: 25
+          table: '2'
+          note: footnote g; K2O-ZrO2 row
+        quote: Pressure could be low by a factor of two because of vapor unsaturation (large orifice). Also, K2CO3 contamination
+          present.
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table2_k_logP_coefficients
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 23
+        published_page: 23
+        pdf_page_index: 28
+        table: '2'
+        note: Table spans printed pp. 23–25, physical PDF pages 29–31; pdf_page_index is zero-based.
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 23
+    published_page: 23
+    pdf_page_index: 28
+    table: '2'
+    note: Table spans printed pp. 23–25, physical PDF pages 29–31; pdf_page_index is zero-based.
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement
+  experiment_id: 10.6028/nbs.ir.81-2279::3
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: model table; no experimental sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    published_page: 43
+    pdf_page_index: 49
+    table: '3'
+    source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 43
+        published_page: 43
+        pdf_page_index: 49
+        table: '3'
+        source_path: docs-private/research/2026-08-27-ocr-repair/kems-020-hastie-1981-nbsir/tables.md
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::3
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_model_not_measurement
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 43
+        published_page: 43
+        pdf_page_index: 48
+        table: '3'
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    published_page: 43
+    pdf_page_index: 48
+    table: '3'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid
+  experiment_id: 10.6028/nbs.ir.81-2279::3
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: value
+      value: '1400'
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: categorical
+    categorical: bound_not_point_ordering
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: model table; no experimental sigma
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    published_page: 43
+    pdf_page_index: 49
+    table: '3'
+  read_from: pdf:kems-020-hastie-1981-nbsir
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1400'
+      locator:
+        page: 43
+        published_page: 43
+        pdf_page_index: 49
+        table: '3'
+- observation_id: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid_quoted_20260906
+  experiment_id: 10.6028/nbs.ir.81-2279::3
+  identity:
+    quantity: activity_coefficient
+    species:
+      formula: Na
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use formation_elements
+    reference_state:
+      tag: unknown
+      reason: source does not state reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use reservoir
+    composition:
+      tag: unknown
+      reason: source does not state composition
+    fO2_Pa:
+      tag: unknown
+      reason: source does not state fO2_Pa
+    total_pressure_Pa:
+      tag: unknown
+      reason: source does not state total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile activity_coefficient does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: mapped model_derived but source does not supply lineage
+    original_method_class: model_derived
+    model: model_derived
+  admission:
+    status: superseded
+    reason: source supersedes link resolved
+    superseded_by: kems-020-hastie-1981-nbsir::hastie_1981_table3_solgasmix_species_grid
+    decided_by:
+      worker: hunt-RH-47-r2
+      date: '2026-09-06'
+      evidence:
+        page: 43
+        published_page: 43
+        pdf_page_index: 48
+        table: '3'
+  notices: []
+  source_id: kems-020-hastie-1981-nbsir
+  locator:
+    page: 43
+    published_page: 43
+    pdf_page_index: 48
+    table: '3'
+  read_from: pdf:kems-020-hastie-1981-nbsir

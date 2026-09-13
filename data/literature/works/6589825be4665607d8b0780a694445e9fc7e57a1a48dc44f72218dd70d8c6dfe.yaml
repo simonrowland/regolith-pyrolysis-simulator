@@ -1,0 +1,121 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
+  citation: Street Jr., Kenneth W., Ray, Chandra, Rickman, Doug and Scheiman, Daniel A. (2010), Thermal Properties of Lunar
+    Regolith Simulants, NASA/TM—2010-216348. Prepared for the Earth and Space 2010 Conference, Honolulu, Hawaii, March 14-17,
+    2010.
+  source_ids:
+  - street-2010-thermal-properties-simulants
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:street-2010-thermal-properties-simulants
+      role: pdf
+      path: raw/street-2010-thermal-properties-simulants/street-2010-thermal-properties-simulants.pdf
+      sha256:
+        tag: value
+        value: d198b496c7b08cf6e41de9bebf8bd04bf9fe103da6ac768c14092218e8e42b36
+    - asset_id: pdftotext:street-2010-thermal-properties-simulants
+      role: pdftotext
+      path: text/street-2010-thermal-properties-simulants
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:street-2010-thermal-properties-simulants
+      role: table_csv
+      path: tables/street-2010-thermal-properties-simulants
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'dta_flowing_nitrogen' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
+  locator:
+    published_page: 3
+    pdf_page_index: 7
+    table: '1'
+    section: Equipment / Results
+- experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'dta_tga_flowing_nitrogen' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
+  locator:
+    published_page: 5
+    pdf_page_index: 9
+    figure: '3'
+- experiment_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe::street-2010-thermal-properties-simulants
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'tga_ftir_flowing_nitrogen' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 6589825be4665607d8b0780a694445e9fc7e57a1a48dc44f72218dd70d8c6dfe
+  locator:
+    published_page: 1
+    pdf_page_index: 5
+    section: Abstract

@@ -1,0 +1,371 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/isijinternational1966.23.56
+  citation: Yamamoto, M., Mori, S. and Kato, E. (1983), "Mass Spectrometric Study of the Thermodynamic Properties of the Liquid
+    Fe-Sn and Fe-Sn-Cu Alloys", Trans. ISIJ 23(1):56-64, DOI 10.2355/isijinternational1966.23.56. Originally published in
+    Tetsu-to-Hagane, 67 (1981), 1952, in Japanese.
+  source_ids:
+  - kems-118-yamamoto-1983
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-118-yamamoto-1983
+      role: pdf
+      path: raw/kems-118-yamamoto-1983/kems-118-yamamoto-1983.pdf
+      sha256:
+        tag: value
+        value: 128431853efacfcb1a2347221d72858c7ce4e095504a37ec10bfb4bdeedd2769
+    - asset_id: pdftotext:kems-118-yamamoto-1983
+      role: pdftotext
+      path: text/kems-118-yamamoto-1983
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-118-yamamoto-1983
+      role: table_csv
+      path: tables/kems-118-yamamoto-1983
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2355/isijinternational1966.23.56
+experiments:
+- experiment_id: 10.2355/isijinternational1966.23.56::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.23.56
+  locator:
+    published_page: 56
+    pdf_page_index: 1
+    table: '1'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: High-purity alumina Knudsen cell (Nippon Kagaku Togyo SSA-S), inner diameter 9 mm, orifice diameter 0.3 mm
+          (0.7 mm tested for N_Sn=0.2). Hitachi RM-6E. W25%Re-W5%Re thermocouple, calibrated at melting points of pure Fe
+          and Ni. Temperature fluctuation ±1 C.
+      locator:
+        published_page: 56
+        pdf_page_index: 1
+        paragraph: The inner diameter of the high-purity alumina crucible used for a Knudsen-cell (Nippon Kagaku Togyo Co.,
+          SSA-S) was 9 mm and the diameter of the orifice was 0.3 mm.
+        section: II.1
+- experiment_id: 10.2355/isijinternational1966.23.56::14
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.23.56
+  locator:
+    published_page: 56
+    pdf_page_index: 1
+    figure: '14'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: High-purity alumina Knudsen cell (Nippon Kagaku Togyo SSA-S), inner diameter 9 mm, orifice diameter 0.3 mm
+          (0.7 mm tested for N_Sn=0.2). Hitachi RM-6E. W25%Re-W5%Re thermocouple, calibrated at melting points of pure Fe
+          and Ni. Temperature fluctuation ±1 C.
+      locator:
+        published_page: 56
+        pdf_page_index: 1
+        paragraph: The inner diameter of the high-purity alumina crucible used for a Knudsen-cell (Nippon Kagaku Togyo Co.,
+          SSA-S) was 9 mm and the diameter of the orifice was 0.3 mm.
+        section: II.1
+- experiment_id: 10.2355/isijinternational1966.23.56::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.23.56
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '2'
+    note: Table 2 caption prints 'iron current ratios' (ion).
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: High-purity alumina Knudsen cell (Nippon Kagaku Togyo SSA-S), inner diameter 9 mm, orifice diameter 0.3 mm
+          (0.7 mm tested for N_Sn=0.2). Hitachi RM-6E. W25%Re-W5%Re thermocouple, calibrated at melting points of pure Fe
+          and Ni. Temperature fluctuation ±1 C.
+      locator:
+        published_page: 56
+        pdf_page_index: 1
+        paragraph: The inner diameter of the high-purity alumina crucible used for a Knudsen-cell (Nippon Kagaku Togyo Co.,
+          SSA-S) was 9 mm and the diameter of the orifice was 0.3 mm.
+        section: II.1
+- experiment_id: 10.2355/isijinternational1966.23.56::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.23.56
+  locator:
+    published_page: 58
+    pdf_page_index: 3
+    table: '3'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: High-purity alumina Knudsen cell (Nippon Kagaku Togyo SSA-S), inner diameter 9 mm, orifice diameter 0.3 mm
+          (0.7 mm tested for N_Sn=0.2). Hitachi RM-6E. W25%Re-W5%Re thermocouple, calibrated at melting points of pure Fe
+          and Ni. Temperature fluctuation ±1 C.
+      locator:
+        published_page: 56
+        pdf_page_index: 1
+        paragraph: The inner diameter of the high-purity alumina crucible used for a Knudsen-cell (Nippon Kagaku Togyo Co.,
+          SSA-S) was 9 mm and the diameter of the orifice was 0.3 mm.
+        section: II.1
+- experiment_id: 10.2355/isijinternational1966.23.56::4
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.23.56
+  locator:
+    published_page: 59
+    pdf_page_index: 4
+    table: '4'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: High-purity alumina Knudsen cell (Nippon Kagaku Togyo SSA-S), inner diameter 9 mm, orifice diameter 0.3 mm
+          (0.7 mm tested for N_Sn=0.2). Hitachi RM-6E. W25%Re-W5%Re thermocouple, calibrated at melting points of pure Fe
+          and Ni. Temperature fluctuation ±1 C.
+      locator:
+        published_page: 56
+        pdf_page_index: 1
+        paragraph: The inner diameter of the high-purity alumina crucible used for a Knudsen-cell (Nippon Kagaku Togyo Co.,
+          SSA-S) was 9 mm and the diameter of the orifice was 0.3 mm.
+        section: II.1
+- experiment_id: 10.2355/isijinternational1966.23.56::5
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.23.56
+  locator:
+    published_page: 60
+    pdf_page_index: 5
+    table: '5'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: High-purity alumina Knudsen cell (Nippon Kagaku Togyo SSA-S), inner diameter 9 mm, orifice diameter 0.3 mm
+          (0.7 mm tested for N_Sn=0.2). Hitachi RM-6E. W25%Re-W5%Re thermocouple, calibrated at melting points of pure Fe
+          and Ni. Temperature fluctuation ±1 C.
+      locator:
+        published_page: 56
+        pdf_page_index: 1
+        paragraph: The inner diameter of the high-purity alumina crucible used for a Knudsen-cell (Nippon Kagaku Togyo Co.,
+          SSA-S) was 9 mm and the diameter of the orifice was 0.3 mm.
+        section: II.1
+- experiment_id: 10.2355/isijinternational1966.23.56::6
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.23.56
+  locator:
+    published_page: 64
+    pdf_page_index: 9
+    table: '6'
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: High-purity alumina Knudsen cell (Nippon Kagaku Togyo SSA-S), inner diameter 9 mm, orifice diameter 0.3 mm
+          (0.7 mm tested for N_Sn=0.2). Hitachi RM-6E. W25%Re-W5%Re thermocouple, calibrated at melting points of pure Fe
+          and Ni. Temperature fluctuation ±1 C.
+      locator:
+        published_page: 56
+        pdf_page_index: 1
+        paragraph: The inner diameter of the high-purity alumina crucible used for a Knudsen-cell (Nippon Kagaku Togyo Co.,
+          SSA-S) was 9 mm and the diameter of the orifice was 0.3 mm.
+        section: II.1
+- experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/isijinternational1966.23.56
+  locator:
+    published_page: 56
+    pdf_page_index: 1
+    section: II.1
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: High-purity alumina Knudsen cell (Nippon Kagaku Togyo SSA-S), inner diameter 9 mm, orifice diameter 0.3 mm
+          (0.7 mm tested for N_Sn=0.2). Hitachi RM-6E. W25%Re-W5%Re thermocouple, calibrated at melting points of pure Fe
+          and Ni. Temperature fluctuation ±1 C.
+      locator:
+        published_page: 56
+        pdf_page_index: 1
+        paragraph: The inner diameter of the high-purity alumina crucible used for a Knudsen-cell (Nippon Kagaku Togyo Co.,
+          SSA-S) was 9 mm and the diameter of the orifice was 0.3 mm.
+        section: II.1

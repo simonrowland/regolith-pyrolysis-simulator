@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: dfaaa841a84a86c7f0cfdfdde01ebc7e25da2125e3f679fbb1d5140488d58129
+  citation: Declare fit = Stull 1947 total-P Antoine; anchor = Rau (1974) selenium vapor-pressure / speciation measurements
+    (or NEA Chemical Thermodynamics of Selenium if Rau is fit). KEMS allotrope fractions separate from total P.
+  source_ids:
+  - rau-1974-se-vp
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:rau-1974-se-vp
+      role: pdf
+      path: raw/rau-1974-se-vp/rau-1974-se-vp.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:rau-1974-se-vp
+      role: pdftotext
+      path: text/rau-1974-se-vp
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:rau-1974-se-vp
+      role: table_csv
+      path: tables/rau-1974-se-vp
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: dfaaa841a84a86c7f0cfdfdde01ebc7e25da2125e3f679fbb1d5140488d58129::Rau-1974#Se_VP
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: dfaaa841a84a86c7f0cfdfdde01ebc7e25da2125e3f679fbb1d5140488d58129
+  locator:
+    note: Declare fit = Stull 1947 total-P Antoine; anchor = Rau (1974) selenium vapor-pressure / speciation measurements
+      (or NEA Chemical Thermodynamics of Selenium if Rau is fit). KEMS allotrope fractions separate from total P.
+    record: Rau-1974#Se_VP

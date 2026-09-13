@@ -1,0 +1,80 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml
+observations:
+- observation_id: ref-016-sio-kems-1700-2000k::anchor_SiO_melt_partial
+  experiment_id: 10.1016/j.icarus.2003.08.023::REF-016#SiO_KEMS_1700_2000K
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: interval
+    interval_low: '1700'
+    interval_high: '2000'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ref-016-sio-kems-1700-2000k
+  locator:
+    note: "(1) Costa, G.C.C. & Jacobson, N.S. (2015) olivine KEMS SiO partials —\n    Clausius–Clapeyron A=7.83, B=22.43 (grid-25-sio\
+      \ cj2015 @1700–2000 K:\n    4.32e-3 … 4.12e-1 Pa) — project REF-016; docs-private/vapor-pressure-\n    calibration-sio-tsweep-2026-05-19.md.\n\
+      (2) Schaefer, L. & Fegley, B. (2004) Icar"
+    record: REF-016#SiO_KEMS_1700_2000K
+  read_from: pdf:ref-016-sio-kems-1700-2000k

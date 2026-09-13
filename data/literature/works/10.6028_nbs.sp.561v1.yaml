@@ -1,0 +1,73 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.6028/nbs.sp.561v1
+  citation: Plante, E. R. (1979), "Vapor pressure measurements of potassium over K2O-SiO2 solutions by a Knudsen effusion,
+    mass spectrometric method", in Hastie, J. W. (ed.), Characterization of High Temperature Vapors and Gases, NBS Special
+    Publication 561, Vol. 1, pp. 265-281, National Bureau of Standards, Washington, DC.
+  source_ids:
+  - kems-042-plante-1979
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-042-plante-1979
+      role: pdf
+      path: raw/kems-042-plante-1979/kems-042-plante-1979.pdf
+      sha256:
+        tag: value
+        value: a46c2132d5741f6321311cd2d9160d1cc51098bfa30cbb2672bcadf3fa84427b
+    - asset_id: pdftotext:kems-042-plante-1979
+      role: pdftotext
+      path: text/kems-042-plante-1979
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-042-plante-1979
+      role: table_csv
+      path: tables/kems-042-plante-1979
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.6028/nbs.sp.561v1
+experiments:
+- experiment_id: 10.6028/nbs.sp.561v1::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'kems_effusion' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.6028/nbs.sp.561v1
+  locator:
+    published_page: 276
+    pdf_page_index: 300
+    table: '2'
+    note: Series 1104 T=1302 K, 43.94 wt% K2O, P_K=6.910e-07 atm as printed
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: platinum Knudsen cell
+      locator:
+        published_page: 267
+        figure: '2'
+        paragraph: Knudsen cell constructed of platinum

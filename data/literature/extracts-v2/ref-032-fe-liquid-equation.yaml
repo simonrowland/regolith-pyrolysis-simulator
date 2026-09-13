@@ -1,0 +1,80 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/ref-032-fe-liquid-equation.yaml
+observations:
+- observation_id: ref-032-fe-liquid-equation::anchor_Fe_pure_Psat
+  experiment_id: 10.1179/cmq.1984.23.3.309::REF-032#Fe_liquid_equation
+  identity:
+    quantity: p_sat
+    species:
+      formula: Fe
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '298'
+    interval_high: '2500'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: ref-032-fe-liquid-equation
+  locator:
+    note: 'Alcock, C.B., Itkin, V.P. & Horrigan, M.K. (1984), "Vapour Pressure Equations for the Metallic Elements: 298–2500
+      K", Canadian Metallurgical Quarterly 23(3):309–313, DOI 10.1179/cmq.1984.23.3.309 (project REF-032). Fe solid/liquid
+      equations (log10 P form as tabulated).'
+    record: REF-032#Fe_liquid_equation
+  read_from: pdf:ref-032-fe-liquid-equation

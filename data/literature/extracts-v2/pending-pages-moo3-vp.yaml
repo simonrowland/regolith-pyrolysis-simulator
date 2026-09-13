@@ -1,0 +1,79 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/pending-pages-moo3-vp.yaml
+observations:
+- observation_id: pending-pages-moo3-vp::anchor_MoO3_cross_check_pure_Psat
+  experiment_id: cd1d0ac84e37daf0b20071d9cc31c05d7fbd988cca7da54bc5cc567c309ac33e::PENDING-pages#MoO3_VP
+  identity:
+    quantity: p_sat
+    species:
+      formula: MoO3_cross_check
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile p_sat does not use subtype
+    per:
+      tag: not_applicable
+      reason: profile p_sat does not use per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use standard_pressure_Pa
+    reaction:
+      tag: not_applicable
+      reason: profile p_sat does not use reaction
+    formation_elements:
+      tag: not_applicable
+      reason: profile p_sat does not use formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile p_sat does not use reference_state
+    reservoir:
+      tag: unknown
+      reason: source does not state reservoir
+    composition:
+      tag: not_applicable
+      reason: profile p_sat does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile p_sat does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile p_sat does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile p_sat does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile p_sat does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile p_sat does not use wall
+  value:
+    kind: interval
+    interval_low: '1000'
+    interval_high: '1500'
+  uncertainty:
+    kind: none
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: pending-pages-moo3-vp
+  locator:
+    note: MoO3 vaporization (Ackermann & Rauh; Blackburn) — this family is explicitly a cross-check surface; use a primary
+      MoO3 series distinct from whatever coefficients sit on the row.
+    record: PENDING-pages#MoO3_VP
+  read_from: pdf:pending-pages-moo3-vp

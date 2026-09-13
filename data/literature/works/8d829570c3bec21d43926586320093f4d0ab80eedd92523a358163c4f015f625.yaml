@@ -1,0 +1,46 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 8d829570c3bec21d43926586320093f4d0ab80eedd92523a358163c4f015f625
+  citation: robie-hemingway-1995-usgs-b2131
+  source_ids:
+  - robie-hemingway-1995-usgs-b2131
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: unknown
+      reason: INDEX does not give corpus commit
+    files:
+    - asset_id: pdf:robie-hemingway-1995-usgs-b2131
+      role: pdf
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+experiments:
+- experiment_id: 8d829570c3bec21d43926586320093f4d0ab80eedd92523a358163c4f015f625::robie-hemingway-1995-usgs-b2131
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 8d829570c3bec21d43926586320093f4d0ab80eedd92523a358163c4f015f625
+  locator:
+    note: atomic-weight-001

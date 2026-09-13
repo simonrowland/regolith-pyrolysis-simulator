@@ -1,0 +1,160 @@
+schema_version: battery_observations.v2.1
+sources:
+- data/literature/extracts/smales-1971-lpsc-12022.yaml
+observations:
+- observation_id: smales-1971-lpsc-12022::smales_1971_apollo_12022_bulk_composition_tables1_2_3
+  experiment_id: 48aee2c0553ceda33d388352530f665c4897067add0d77b35760b762ebcccabf::docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 reports method-level precision of INAA ±5%, selected INAA ±20%, RNAA ±5%, GAA ±10%, and MSID ±5%; Table
+        3 ES ±20%. Table 2 major-oxide uncertainties are not reported. Approximate values remain strings with the printed
+        tilde.
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: smales-1971-lpsc-12022
+  locator:
+    paragraph: Apollo 12 rock 12022 analytical composition
+    note: tables=['1', '2', '3']; pages=1254–1255
+    source_path: docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+  read_from: pdf:smales-1971-lpsc-12022
+- observation_id: smales-1971-lpsc-12022::smales_1971_apollo_12065_bulk_composition_tables1_2_3
+  experiment_id: 48aee2c0553ceda33d388352530f665c4897067add0d77b35760b762ebcccabf::docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+  identity:
+    quantity: delta_fG
+    species:
+      formula: SiO2
+      phase: g
+      polymorph:
+        tag: not_applicable
+        reason: not crystal
+    subtype:
+      tag: not_applicable
+      reason: profile delta_fG does not use subtype
+    per:
+      tag: unknown
+      reason: source does not state per
+    temperature_K:
+      tag: unknown
+      reason: source does not state temperature_K
+    standard_pressure_Pa:
+      tag: unknown
+      reason: source does not state standard_pressure_Pa
+    reaction:
+      tag: unknown
+      reason: source does not state reaction
+    formation_elements:
+      tag: unknown
+      reason: source does not state formation_elements
+    reference_state:
+      tag: not_applicable
+      reason: profile delta_fG does not use reference_state
+    reservoir:
+      tag: not_applicable
+      reason: profile delta_fG does not use reservoir
+    composition:
+      tag: not_applicable
+      reason: profile delta_fG does not use composition
+    fO2_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use fO2_Pa
+    total_pressure_Pa:
+      tag: not_applicable
+      reason: profile delta_fG does not use total_pressure_Pa
+    sweep_gas:
+      tag: not_applicable
+      reason: profile delta_fG does not use sweep_gas
+    exposure:
+      tag: not_applicable
+      reason: profile delta_fG does not use exposure
+    sample_mass_kg:
+      tag: not_applicable
+      reason: profile delta_fG does not use sample_mass_kg
+    wall:
+      tag: not_applicable
+      reason: profile delta_fG does not use wall
+  value:
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
+  uncertainty:
+    kind: printed
+    verbatim:
+      note: Table 1 reports method-level precision of INAA ±5%, selected INAA ±20%, RNAA ±5%, GAA ±10%, and MSID ±5%; Table
+        3 ES ±20%. Table 2 major-oxide uncertainties are not reported. Approximate values and bounds remain strings exactly
+        as printed.
+  evidence:
+    class:
+      tag: unknown
+      reason: source does not state method_class
+  admission:
+    status: pending
+    reason: source does not state admission_status
+  notices: []
+  source_id: smales-1971-lpsc-12022
+  locator:
+    paragraph: Apollo 12 rock 12065 analytical composition
+    note: tables=['1', '2', '3']; pages=1254–1255
+    source_path: docs-private/research/2026-08-27-ocr-repair/smales-1971-lpsc-12022/tables.md
+  read_from: pdf:smales-1971-lpsc-12022

@@ -1,0 +1,60 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.1007/s11661-012-1464-2
+  citation: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2
+  source_ids:
+  - safarian-engh-2013-si-pure-langmuir
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:safarian-engh-2013-si-pure-langmuir
+      role: pdf
+      path: raw/safarian-engh-2013-si-pure-langmuir/safarian-engh-2013-si-pure-langmuir.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:safarian-engh-2013-si-pure-langmuir
+      role: pdftotext
+      path: text/safarian-engh-2013-si-pure-langmuir
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:safarian-engh-2013-si-pure-langmuir
+      role: table_csv
+      path: tables/safarian-engh-2013-si-pure-langmuir
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.1007/s11661-012-1464-2
+experiments:
+- experiment_id: 10.1007/s11661-012-1464-2::safarian_engh_2013_si_pure_langmuir
+  kind: literature
+  method:
+    tag: value
+    value: langmuir_free_evaporation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.1007/s11661-012-1464-2
+  locator:
+    note: Safarian, J. & Engh, T. A. (2013), Metall. Mater. Trans. A 44:747-753, DOI 10.1007/s11661-012-1464-2
+    record: safarian_engh_2013_si_pure_langmuir

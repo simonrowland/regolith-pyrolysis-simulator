@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: d782e5ffc741a6a623f4217305c522cc5759e3f3b7f29792fc27f1957752b265
+  citation: Ackermann, R.J. & Rauh, E.G. (historical Argonne) thorium metal vapor pressure / effusion; Alcock et al. (1984)
+    Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.
+  source_ids:
+  - ref-032-th
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:ref-032-th
+      role: pdf
+      path: raw/ref-032-th/ref-032-th.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:ref-032-th
+      role: pdftotext
+      path: text/ref-032-th
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ref-032-th
+      role: table_csv
+      path: tables/ref-032-th
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: d782e5ffc741a6a623f4217305c522cc5759e3f3b7f29792fc27f1957752b265::REF-032#Th
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: d782e5ffc741a6a623f4217305c522cc5759e3f3b7f29792fc27f1957752b265
+  locator:
+    note: Ackermann, R.J. & Rauh, E.G. (historical Argonne) thorium metal vapor pressure / effusion; Alcock et al. (1984)
+      Can. Metall. Q. 23:309 (REF-032) Th equation if present; JANAF Th(g) Chase 1998.
+    record: REF-032#Th

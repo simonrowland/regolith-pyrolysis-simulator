@@ -1,0 +1,100 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77
+  citation: 'Osina, E. L. & Gorokhov, L. N. (2009-12-24). IVTANTHERMO electronic continuation, Table 877, CrO2(g). Moscow
+    State University, Faculty of Chemistry. https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+
+    '
+  source_ids:
+  - ivtan-cro2-g
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:ivtan-cro2-g
+      role: pdf
+      path: raw/ivtan-cro2-g/ivtan-cro2-g.pdf
+      sha256:
+        tag: value
+        value: f8929e9bf38d67adf221bad8e8c79beff2aeeb2861c1de095a8630f8e1b0b7f6
+    - asset_id: pdftotext:ivtan-cro2-g
+      role: pdftotext
+      path: text/ivtan-cro2-g
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:ivtan-cro2-g
+      role: table_csv
+      path: tables/ivtan-cro2-g
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::877
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77
+  locator:
+    page: 3
+    pdf_page_index: 3
+    table: '877'
+    note: 'Table 877 continues onto PDF page 4 (rows T=3300-6000 K). Official HTML print-CrO2.html. Calculated (model) thermodynamic
+      functions, not a measured Psat series.
+
+      '
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+    record: CrO2(g)
+- experiment_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77::https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html
+  kind: literature
+  method:
+    tag: value
+    value: tabulation
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 7a7d8a40c38eda4c35e28bdee6b6221167219760ef8a12443a47025f3f4b9b77
+  locator:
+    page: 3
+    pdf_page_index: 3
+    paragraph: gurvich_1982_comparison
+    note: '[82ГУР/ВЕЙ] competing DfH° quoted on this page; not adopted here'
+    source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO2.html

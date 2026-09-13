@@ -1,0 +1,61 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: b80351af13deea8174098c6bc953d0aa42731dbb6caa8b21c00a27cbbe2993f9
+  citation: Wagner, W., Ewers, J. & Schmidt, R. oxygen multiparameter EOS / solid oxygen vapor-pressure evaluations (IUPAC);
+    not FS09. Plant O2 is gas inventory, not frost Psat — validated frost row does not certify melt pO2.
+  source_ids:
+  - iupac-o2-solid-psat
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:iupac-o2-solid-psat
+      role: pdf
+      path: raw/iupac-o2-solid-psat/iupac-o2-solid-psat.pdf
+      sha256:
+        tag: unknown
+        reason: INDEX does not give sha256
+    - asset_id: pdftotext:iupac-o2-solid-psat
+      role: pdftotext
+      path: text/iupac-o2-solid-psat
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:iupac-o2-solid-psat
+      role: table_csv
+      path: tables/iupac-o2-solid-psat
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+experiments:
+- experiment_id: b80351af13deea8174098c6bc953d0aa42731dbb6caa8b21c00a27cbbe2993f9::IUPAC-O2-solid-Psat
+  kind: literature
+  method:
+    tag: unknown
+    reason: source does not state method
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: b80351af13deea8174098c6bc953d0aa42731dbb6caa8b21c00a27cbbe2993f9
+  locator:
+    note: Wagner, W., Ewers, J. & Schmidt, R. oxygen multiparameter EOS / solid oxygen vapor-pressure evaluations (IUPAC);
+      not FS09. Plant O2 is gas inventory, not frost Psat — validated frost row does not certify melt pO2.
+    record: IUPAC-O2-solid-Psat

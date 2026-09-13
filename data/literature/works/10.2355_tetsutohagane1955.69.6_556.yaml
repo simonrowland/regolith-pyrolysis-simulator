@@ -1,0 +1,163 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2355/tetsutohagane1955.69.6_556
+  citation: Ueshima, Y., Ichise, E. & Mori, T. (1983), "Iron-Molybdenum Phase Diagram in the Temperature Range of 1360 to
+    1622 C", Tetsu-to-Hagane 69(6):556-563, DOI 10.2355/tetsutohagane1955.69.6_556
+  source_ids:
+  - kems-200-ueshima-1983
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: 89d752b43956b94263c0f826582fa3d747e7e91b
+    files:
+    - asset_id: pdf:kems-200-ueshima-1983
+      role: pdf
+      path: raw/kems-200-ueshima-1983/kems-200-ueshima-1983.pdf
+      sha256:
+        tag: value
+        value: 19b1bb01fbdaeba3d30822fc8d7fa82f598e7c3437cb1b7ec79d5fa4a1b3bf59
+    - asset_id: pdftotext:kems-200-ueshima-1983
+      role: pdftotext
+      path: text/kems-200-ueshima-1983
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: tables:kems-200-ueshima-1983
+      role: table_csv
+      path: tables/kems-200-ueshima-1983
+      sha256:
+        tag: unknown
+        reason: INDEX does not give table sha256
+  doi: 10.2355/tetsutohagane1955.69.6_556
+experiments:
+- experiment_id: 10.2355/tetsutohagane1955.69.6_556::1
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'annealing_quench_metallography' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.69.6_556
+  locator:
+    published_page: 558
+    pdf_page_index: 3
+    table: '1'
+    note: Table 1. Phases in heat treated samples. IPTS-68. Parentheses = aimed composition
+- experiment_id: 10.2355/tetsutohagane1955.69.6_556::2
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'EPMA_phase_boundary' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.69.6_556
+  locator:
+    published_page: 561
+    pdf_page_index: 6
+    table: '2'
+    note: Table 2. Phase boundary determination by EPMA. Result of analysis as at% of Mo
+- experiment_id: 10.2355/tetsutohagane1955.69.6_556::3
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'compiled_from_this_work_and_quoted_kems' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: source does not state pressure
+    regime:
+      regime_class:
+        tag: unknown
+        reason: source does not state pressure
+  work_id: 10.2355/tetsutohagane1955.69.6_556
+  locator:
+    published_page: 561
+    pdf_page_index: 6
+    figure: '3'
+    note: Revised Fe-Mo binary alloy phase diagram. Thick line this work; thin Metals Handbook; dashed needs revision; inverted
+      triangles Sykes; chain Gibson liquidus; KEMS thermal-analysis invariants as marks
+- experiment_id: 10.2355/tetsutohagane1955.69.6_556::kems-200-ueshima-1983
+  kind: literature
+  method:
+    tag: unknown
+    reason: regime 'annealing_quench_EPMA' is not a closed method token (kems_effusion alone is insufficient)
+  sample: {}
+  conditions:
+    temperature_K:
+      state:
+        tag: unknown
+        reason: source does not state a point temperature
+  pressure_environment:
+    total_pressure_Pa:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    sweep_gas:
+      state:
+        tag: unknown
+        reason: pressure value is not numeric
+    regime:
+      regime_class:
+        tag: unknown
+        reason: pressure value is not numeric
+  work_id: 10.2355/tetsutohagane1955.69.6_556
+  locator:
+    published_page: 556
+    pdf_page_index: 1
+    section: '2'
+    note: Annealing apparatus; not a Knudsen cell. KEMS geometry is not in this paper
+  apparatus:
+    cell_material_and_liner:
+      state:
+        tag: value
+        value: Al2O3 SSA-S crucible in a Ta container (annealing, not a Knudsen cell)
+      locator:
+        published_page: 556
+        pdf_page_index: 1
+        paragraph: Al2O3 SSA-S crucible OD 11 mm, ID 9 mm, height 12 mm in a Ta container
