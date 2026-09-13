@@ -3815,6 +3815,8 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
     observations_v2.mkdir(parents=True, exist_ok=True)
     battery.mkdir(parents=True, exist_ok=True)
 
+    live_work_ids = set(result.works)
+    result.aliases = {k: v for k, v in result.aliases.items() if v in live_work_ids}
     dump_yaml(
         {
             "schema_version": "battery_work_aliases.v1",
@@ -3836,6 +3838,12 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
             ],
         }
         dump_yaml(payload, works_dir / work_filename(work_id))
+
+    live_work_files = {work_filename(wid) for wid in live_work_ids}
+    live_work_files.add("ALIASES.yaml")
+    for path in works_dir.glob("*.yaml"):
+        if path.name not in live_work_files:
+            path.unlink()
 
     extract_stems = {p.stem for p in discover_extracts(root / "data" / "literature" / "extracts")}
     source_of: dict[str, str] = {}

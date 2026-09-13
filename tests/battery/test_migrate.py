@@ -231,6 +231,25 @@ def test_no_default_property_blanked_admission_is_unknown(tmp_path: Path) -> Non
     assert obs.identity.species.phase.value is Phase.G
 
 
+def test_h07_write_outputs_prunes_stale_work_files(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    migrate(root, write=True, validate=True)
+    works_dir = root / "data" / "literature" / "works"
+    stale = works_dir / "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef.yaml"
+    stale.write_text(
+        "schema_version: battery_work.v2.1\nwork:\n  citation: stale\n  source_ids: [stale]\n",
+        encoding="utf-8",
+    )
+    aliases_path = works_dir / "ALIASES.yaml"
+    doc = yaml.safe_load(aliases_path.read_text(encoding="utf-8"))
+    doc["aliases"]["stale-source"] = "deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+    aliases_path.write_text(yaml.safe_dump(doc, sort_keys=False), encoding="utf-8")
+    migrate(root, write=True, validate=True)
+    assert not stale.is_file()
+    aliases = yaml.safe_load(aliases_path.read_text(encoding="utf-8"))["aliases"]
+    assert "stale-source" not in aliases
+
+
 def test_row_conservation_and_idempotency(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     first = migrate(root, write=True, validate=True)
