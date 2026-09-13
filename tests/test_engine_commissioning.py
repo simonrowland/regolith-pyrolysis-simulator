@@ -515,7 +515,7 @@ def test_in_band_sliver_below_observed_floor_still_calls_transport(
 
 
 def test_sio2_free_pot_is_not_a_crash_floor_refusal(monkeypatch) -> None:
-    """C01: SiO2-free pots follow the ordinary SiO2=0 path, not a new floor."""
+    """C01: SiO2-free pots follow the ordinary SiO2=0 basis gate, not a floor."""
     composition = {'CaO': 50.0, 'Al2O3': 50.0}
     backend = AlphaMELTSBackend()
     calls = _install_alphamelts_transport_spy(monkeypatch, backend)
@@ -528,12 +528,13 @@ def test_sio2_free_pot_is_not_a_crash_floor_refusal(monkeypatch) -> None:
         subprocess_run_mode='isothermal',
     )
 
+    assert not calls, 'SiO2-free pots must not launch'
+    assert result.status == 'out_of_domain'
+    assert result.diagnostics.get('backend_status_reason') == 'silicate_window'
     assert result.diagnostics.get('backend_failure_reason_code') != (
         'sio2_below_crash_floor'
     )
     assert result.diagnostics.get('backend_failure_category') != 'engine_crash'
-    assert len(calls) == 1
-    assert result.diagnostics.get('authority') == 'extrapolated'
 
 
 def test_alphamelts_subprocess_death_below_observed_floor_annotates_engine_reason(

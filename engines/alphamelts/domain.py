@@ -338,16 +338,20 @@ class AlphaMELTSDomainGate:
             )
 
         sio2_pct = canonical_wt.get('SiO2', 0.0)
-        if sio2_pct < sio2_min_wt_pct or sio2_pct > sio2_max_wt_pct:
-            # Uncertified, not malformed. The provider must not veto:
-            # the adapter notice path (authority=extrapolated) runs the
-            # engine. Oxide-basis / major-sum refusals stay below.
+        missing_silica = sio2_pct <= 0.0
+        if missing_silica or sio2_pct < sio2_min_wt_pct or sio2_pct > sio2_max_wt_pct:
+            # SiO2=0 is the ordinary no-silicate-network basis gate (a
+            # malformed melt, not an uncertified one). Other band misses
+            # are uncertified: the provider must not veto; the adapter
+            # notice path (authority=extrapolated) runs the engine.
             failed.append(CONSTRAINT_SILICATE_NETWORK_BAND)
             warnings.append(
                 f'AlphaMELTSDomainGate: SiO2 = {sio2_pct:.3f} wt% outside '
                 f'MELTS calibration range '
                 f'[{sio2_min_wt_pct}, {sio2_max_wt_pct}] wt%.'
             )
+            if missing_silica:
+                reason = reason or OutOfDomainReason.SILICATE_WINDOW
 
         # Major oxide sum: MELTS 14-oxide basis members plus FeO_total.
         # FeO_total is not sent to MELTS directly; it is admitted into the
@@ -371,6 +375,7 @@ class AlphaMELTSDomainGate:
         malformed = (
             CONSTRAINT_OXIDE_BASIS in failed
             or CONSTRAINT_MAJOR_OXIDE_SUM in failed
+            or missing_silica
         )
         if malformed and warnings and reason is None:
             reason = OutOfDomainReason.MAJOR_SUM

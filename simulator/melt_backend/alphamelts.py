@@ -2154,7 +2154,15 @@ class _MELTSBackendSupport(MeltBackend):
         #   if not 30.0 <= sio2_pct <= 80.0: refuse SILICATE_WINDOW
         # Certified-band notice lives in _apply_engine_commissioning.
         # Invalid input (forbidden species, major-oxide sum) still refuses
-        # here. There is no pre-run crash-floor refusal.
+        # here. SiO2-free melts keep the ordinary SiO2=0 basis gate from
+        # the pre-table adapter (not a crash-floor refusal).
+        sio2_pct = canonical_wt.get('SiO2', 0.0)
+        if sio2_pct <= 0.0:
+            reason = OutOfDomainReason.SILICATE_WINDOW
+            reasons.append(
+                f'SiO2 {sio2_pct:.3f} wt% — no silicate network '
+                '(ordinary SiO2=0 basis gate)'
+            )
         if major_pct <= MELTS_MAJOR_OXIDE_MIN_TOTAL_WT_PCT:
             reason = reason or OutOfDomainReason.MAJOR_SUM
             reasons.append(
