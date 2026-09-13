@@ -8,7 +8,7 @@ field.
 Pilot sources: JANAF-4th (J-era, kJ/mol, p° = 0.1 MPa) and Pankratz 1987
 USBM B689 (cal-era, kcal/mol, p° = 1 atm). Laptop channels: NASA-CEA
 polynomials, Ellingham dG per mol O2, and vapour-rail pure-component P_sat.
-VapoRock / thermoengine / MELTS are typed-refusal holes on the laptop.
+VapoRock / thermoengine / MELTS are not probed for ΔfG on this instrument.
 """
 
 from __future__ import annotations
@@ -96,6 +96,8 @@ FINDING_ANTOINE_EXTRAPOLATED_BEYOND_FIT = "antoine_extrapolated_beyond_fit"
 # JANAF melting points. Used only to name the H1 hypothesis, not to retune.
 AL_MELTING_K = 933.5
 SI_MELTING_K = 1687.0
+# Channels this instrument does not call for ΔfG. Report them as not_probed,
+# never as an attempted-unavailable / not-importable engine (M14).
 UNAVAILABLE_CHANNELS = ("vaporock", "thermoengine", "melts")
 VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
 
@@ -2014,11 +2016,12 @@ def score_rail(
                         formula=None,
                         T_K=None,
                         channel=channel,
-                        reason="engine_channel_unavailable",
+                        reason="not_probed",
                         provenance_class=PROVENANCE_INDEPENDENT,
                         note=(
-                            "Laptop slice: channel is not importable. "
-                            "The hole is the result; not a silent zero."
+                            "Channel not probed for this thermodynamic "
+                            "quantity (ΔfG). Unsupported quantity on this "
+                            "instrument; not an attempted-unavailable engine."
                         ),
                     ),
                     tier=TIER_MAJOR,

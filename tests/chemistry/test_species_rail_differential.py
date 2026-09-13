@@ -75,6 +75,7 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     score_psat_channel,
     score_psat_nbp_sanity,
     score_psat_pair,
+    UNAVAILABLE_CHANNELS,
     score_rail,
     score_table_self_check,
     table_self_check_residual,
@@ -288,6 +289,49 @@ def test_consistent_o2_identity_still_cea_matches_through_score_rail(
     assert cea[0].score.skip_reason is None
     assert not any(
         p.score.engine_channel == "table_self_check" for p in scored
+    )
+
+
+def test_unprobed_channels_do_not_claim_import_failure(monkeypatch) -> None:
+    """M14: vaporock/thermoengine/melts are not-probed, not 'not importable'."""
+
+    point = _o2_identity_point(log10_Kf=0.0, as_published="0.000")
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.species_rail_differential.iter_source_items",
+        lambda rail: [point],
+    )
+    scored = score_rail()
+    holes = [
+        p for p in scored if p.score.engine_channel in UNAVAILABLE_CHANNELS
+    ]
+    assert {p.score.engine_channel for p in holes} == set(UNAVAILABLE_CHANNELS)
+    assert len(holes) == 3
+    for row in holes:
+        assert row.score.status == "typed-refusal"
+        assert row.score.skip_reason == f"{TYPED_REFUSAL_PREFIX}not_probed"
+        note = (row.score.note or "").lower()
+        assert "not importable" not in note
+        assert "not probed" in note
+        assert "unavailable" not in note or "attempted-unavailable" in note
+
+
+def test_cea_o2_still_scores_alongside_unprobed_channels(monkeypatch) -> None:
+    """M14 control: CEA O2 comparison still succeeds while holes are reported."""
+
+    point = _o2_identity_point(log10_Kf=0.0, as_published="0.000")
+    monkeypatch.setattr(
+        "simulator.diagnostic_helpers.species_rail_differential.iter_source_items",
+        lambda rail: [point],
+    )
+    scored = score_rail()
+    cea = [p for p in scored if p.score.engine_channel == CHANNEL_NASA_CEA]
+    assert len(cea) == 1
+    assert cea[0].score.status == "match"
+    assert cea[0].score.residual_kJ_mol == pytest.approx(0.0, abs=1e-9)
+    assert any(
+        p.score.engine_channel in UNAVAILABLE_CHANNELS
+        and p.score.status == "typed-refusal"
+        for p in scored
     )
 
 
