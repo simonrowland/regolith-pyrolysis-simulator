@@ -623,9 +623,51 @@ def test_g08_model_derived_keeps_table_destination(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path, extract)
     result = migrate(root, write=False, validate=True)
     obs = next(iter(result.observations.values()))
-    assert obs.evidence.class_.is_unknown
-    assert "model_derived" in (obs.evidence.class_.reason or "")
-    assert result.evidence_fallthrough.get("model_derived", 0) >= 1
+    assert obs.evidence.class_.is_value
+    assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+
+
+def test_h08_fourteen_token_table_destinations_are_stored(tmp_path: Path) -> None:
+    from simulator.battery.migrate import METHOD_CLASS_MAP, evidence_for
+
+    tokens = [
+        "model_derived",
+        "model_derived_inverse_fit",
+        "model_derived_from_Kstar_and_external_gamma",
+        "model_derived_from_Kstar_with_alpha_e_adopted_unity",
+        "model_derived_assumption",
+        "model",
+        "derived_from_measured_kems_hertz_knudsen",
+        "derived_third_law_from_measured_kems_and_janaf_fef",
+        "derived_least_squares",
+        "derived_gibbs_duhem_integration",
+        "authors_preferred_average_of_kems_derived_gammas",
+        "directly_reduced_measurement",
+        "model_derived_second_law_fit",
+        "derived_gibbs_duhem",
+    ]
+    assert len(tokens) == 14
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    base = extract["species"]["Na"]["observations"][0]
+    rows = []
+    for i, token in enumerate(tokens):
+        row = yaml.safe_load(yaml.safe_dump(base))
+        row["observation_id"] = f"token_{i}"
+        row["values"]["method_class"] = token
+        row["values"].pop("series", None)
+        rows.append(row)
+    extract["species"]["Na"]["observations"] = rows
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False, validate=True)
+    for i, token in enumerate(tokens):
+        dest = METHOD_CLASS_MAP[token]
+        helper, _reason = evidence_for(token)
+        assert helper.class_.is_value, token
+        assert helper.class_.value is dest, token
+        matches = [o for o in result.observations.values() if f"token_{i}" in o.observation_id]
+        assert matches, token
+        assert matches[0].evidence.class_.is_value, token
+        assert matches[0].evidence.class_.value is dest, token
 
 
 def test_g07_unsupported_quantity_is_unknown_not_relabeled(tmp_path: Path) -> None:

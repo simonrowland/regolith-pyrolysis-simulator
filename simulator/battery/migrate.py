@@ -1445,17 +1445,6 @@ def evidence_for(
             if attribution
             else EvidenceClass.QUOTED_UNATTRIBUTED
         )
-    if mapped in {EvidenceClass.MODEL_DERIVED, EvidenceClass.MEASURED_REDUCED}:
-        return (
-            Evidence(
-                class_=State.unknown(
-                    f"table destination {mapped.value}; source does not supply lineage"
-                ),
-                original_method_class=original,
-                model=model or original,
-            ),
-            f"fall-through {original} -> {mapped.value} (lineage required)",
-        )
     if mapped is EvidenceClass.AUTHOR_ESTIMATE and not (model or original):
         return (
             Evidence(
