@@ -163,7 +163,6 @@ ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED = (
 ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH = (
     'subprocess_fe_free_absolute_fo2_crash'
 )
-ALPHAMELTS_REASON_SIO2_CRASH_FLOOR = 'sio2_below_crash_floor'
 # Retired name: the matching scope is still the two-component
 # Na2O/K2O-SiO2 family, but that is not the crash predicate.
 ALPHAMELTS_REASON_ALKALI_SILICA_BINARY_UNSUPPORTED = (
@@ -261,7 +260,6 @@ ALPHAMELTS_BACKEND_FAILURE_CATEGORY_BY_REASON = {
     ALPHAMELTS_REASON_PRESSURE_UNSUPPORTED: 'out_of_domain',
     ALPHAMELTS_REASON_TEMPERATURE_UNSUPPORTED: 'out_of_domain',
     ALPHAMELTS_REASON_FE_FREE_ABSOLUTE_FO2_CRASH: 'engine_crash',
-    ALPHAMELTS_REASON_SIO2_CRASH_FLOOR: 'engine_crash',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: 'contract_error',
     ALPHAMELTS_REASON_FO2_CONSTRAINT_UNAPPLIED: 'contract_error',
     ALPHAMELTS_REASON_SYSTEM_OUTPUT_MISSING: 'parse_error',
@@ -310,10 +308,6 @@ ALPHAMELTS_BACKEND_FAILURE_MESSAGES = {
         'family that hits that trigger; the predicate is not no-Fe. A '
         'separate Fe-bearing sub-34 wt% SiO2 crash family is gated in '
         'engines/alphamelts/domain.py'
-    ),
-    ALPHAMELTS_REASON_SIO2_CRASH_FLOOR: (
-        'SiO2 is below the measured engine crash floor; refusing without '
-        'calling the engine'
     ),
     ALPHAMELTS_REASON_FO2_CONSTRAINT_INVALID: (
         'AlphaMELTS subprocess fO2 constraint was invalid'
@@ -2132,45 +2126,6 @@ class _MELTSBackendSupport(MeltBackend):
                 f"authority={notice['authority']}; engine will run"
             )
         return pending
-
-    def _crash_floor_result(
-        self,
-        temperature_C: float,
-        pressure_bar: float,
-        fO2_log: Optional[float],
-        *,
-        sio2_wt_pct: float,
-        crash_floor_wt_pct: float,
-        diagnostics: Optional[Mapping[str, object]] = None,
-    ) -> EquilibriumResult:
-        message = ALPHAMELTS_BACKEND_FAILURE_MESSAGES[
-            ALPHAMELTS_REASON_SIO2_CRASH_FLOOR
-        ]
-        detail = (
-            f'SiO2 {sio2_wt_pct:.3f} wt% < crash floor '
-            f'{crash_floor_wt_pct:g} wt%'
-        )
-        diagnostics_out = dict(diagnostics or {})
-        diagnostics_out['authoritative_for_requested_conditions'] = False
-        diagnostics_out['sio2_crash_floor_wt_pct'] = float(crash_floor_wt_pct)
-        diagnostics_out['sio2_wt_pct'] = float(sio2_wt_pct)
-        diagnostics_out['backend_status_reason'] = (
-            ALPHAMELTS_REASON_SIO2_CRASH_FLOOR
-        )
-        _annotate_alphamelts_backend_failure(
-            diagnostics_out,
-            reason_code=ALPHAMELTS_REASON_SIO2_CRASH_FLOOR,
-            backend_status='engine_crash',
-            message=f'{message}: {detail}',
-        )
-        return self._emit_equilibrium_result(
-            temperature_C=temperature_C,
-            pressure_bar=pressure_bar,
-            fO2_log=fO2_log,
-            warnings=[f'{message}: {detail}'],
-            status='out_of_domain',
-            diagnostics=diagnostics_out,
-        )
 
     def _domain_gate(self, comp_wt: Mapping[str, float], *,
                      temperature_C: float,

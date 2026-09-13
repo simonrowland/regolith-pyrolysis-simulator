@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -677,3 +678,13 @@ def test_thermoengine_in_band_ok_omits_crash_template_keys(monkeypatch) -> None:
         'out_of_domain_crash_point',
     ):
         assert key not in diagnostics, key
+
+
+def test_discarded_commissioning_call_and_crash_floor_alias_are_gone() -> None:
+    """C10: no unused engine_commissioning() call or pre-run floor alias."""
+    import simulator.melt_backend.alphamelts as alphamelts_module
+
+    source = inspect.getsource(ThermoEngineBackend._equilibrate_prepared)
+    assert 'engine_commissioning(' not in source
+    assert not hasattr(AlphaMELTSBackend, '_crash_floor_result')
+    assert not hasattr(alphamelts_module, 'ALPHAMELTS_REASON_SIO2_CRASH_FLOOR')

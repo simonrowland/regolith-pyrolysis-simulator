@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import List, Mapping, Optional
 import warnings
 
-from engines.engine_commissioning import engine_commissioning
 from engines.alphamelts.thermoengine import (
     THERMOENGINE_HEALTH_TIMEOUT_S,
     THERMOENGINE_WARM_CALL_TIMEOUT_S,
@@ -318,7 +317,6 @@ class ThermoEngineBackend(_MELTSBackendSupport, RealBackendAuthority):
         # _MELTSBackendSupport commissioning gate
         # (data/engine_commissioning.yaml, engine=thermoengine). There
         # is no ThermoEngine pre-run crash floor.
-        engine_commissioning(self.backend_name)
         return self._equilibrate_thermoengine(
             temperature_C,
             comp_wt,
