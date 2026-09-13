@@ -143,6 +143,10 @@ class UnknownRailSpellingError(ValueError):
     """Legacy rail / key spelling is not in the guard_09_05 map."""
 
 
+class DuplicateObservationIdError(ValueError):
+    """A second source row reused an observation id with a different payload."""
+
+
 # ---------------------------------------------------------------------------
 # Maps (v2.1 §Evidence classes / §Migration / guard_09_05)
 # ---------------------------------------------------------------------------
@@ -498,6 +502,13 @@ class QueueEntry:
 
 
 @dataclass
+class DedupeAlias:
+    observation_id: str
+    source: str
+    row_indices: tuple[int, ...]
+
+
+@dataclass
 class SourceCount:
     path: str
     rows_in: int = 0
@@ -542,6 +553,7 @@ class MigrationResult:
     source_counts: dict[str, SourceCount] = field(default_factory=dict)
     measured: MeasuredCounts = field(default_factory=MeasuredCounts)
     aliases: dict[str, str] = field(default_factory=dict)
+    dedupe_aliases: list[DedupeAlias] = field(default_factory=list)
     validation: ValidationReport | None = None
 
     def add_queue(
@@ -1322,7 +1334,8 @@ class Migrator:
         self._work_source_ids: dict[str, list[str]] = defaultdict(list)
         self._work_index_row: dict[str, Mapping[str, Any] | None] = {}
         self._obs_source: dict[str, str] = {}
-        self._pending_supersedes: list[tuple[str, str, str]] = []
+        self._obs_row_index: dict[str, int] = {}
+        self._pending_supersedes: list[tuple[str, str, str, Locator, str]] = []
 
     def _count(self, path: str) -> SourceCount:
         rec = self.result.source_counts.get(path)
@@ -1452,11 +1465,34 @@ class Migrator:
         self.result.experiments_by_work[work_id].append(experiment_id)
         return experiment
 
-    def _add_observation(self, observation: Observation, source_key: str) -> None:
-        self.result.observations[observation.observation_id] = observation
-        self.result.observations_by_source[source_key].append(observation.observation_id)
-        self._obs_source[observation.observation_id] = source_key
+    def _add_observation(
+        self,
+        observation: Observation,
+        source_key: str,
+        *,
+        source_row_index: int | None = None,
+    ) -> None:
+        oid = observation.observation_id
+        existing = self.result.observations.get(oid)
+        if existing is not None:
+            if to_plain(existing) == to_plain(observation):
+                first = self._obs_row_index.get(oid)
+                indices = tuple(
+                    i for i in (first, source_row_index) if i is not None
+                )
+                self.result.dedupe_aliases.append(
+                    DedupeAlias(observation_id=oid, source=source_key, row_indices=indices)
+                )
+                return
+            raise DuplicateObservationIdError(
+                f"duplicate observation_id {oid!r} with a different payload"
+            )
+        self.result.observations[oid] = observation
+        self.result.observations_by_source[source_key].append(oid)
+        self._obs_source[oid] = source_key
         self._count(source_key).observations_out += 1
+        if source_row_index is not None:
+            self._obs_row_index[oid] = source_row_index
 
     def migrate_extracts(self, directory: Path | None = None) -> None:
         for path in discover_extracts(directory or self.extracts_dir):
@@ -1867,6 +1903,7 @@ class Migrator:
         uncertainty: Uncertainty | None = None,
         method: State[MethodToken] | None = None,
         equipment: object = None,
+        source_row_index: int | None = None,
     ) -> Observation:
         ident_kwargs: dict[str, Any] = {}
         if temperature_K is not None:
@@ -1902,7 +1939,9 @@ class Migrator:
             read_from=work.source_files.files[0].asset_id,
             point_conditions=point_conditions,
         )
-        self._add_observation(observation, source_key)
+        self._add_observation(
+            observation, source_key, source_row_index=source_row_index
+        )
         return observation
 
     def _migrate_kems(self, path: Path) -> None:
@@ -2227,7 +2266,7 @@ class Migrator:
         points = doc.get("points") or []
         if not isinstance(points, list):
             return
-        for point in points:
+        for row_index, point in enumerate(points):
             if not isinstance(point, Mapping):
                 continue
             count.rows_in += 1
@@ -2266,6 +2305,7 @@ class Migrator:
                 evidence=evidence_for(point.get("method_class") or point.get("provenance_class"))[0],
                 temperature_K=t if t is not None and t > 0 else None,
                 method=map_method(point.get("method") or point.get("regime")),
+                source_row_index=row_index,
             )
             if t is not None and t <= 0:
                 self.result.add_queue(
@@ -2766,6 +2806,14 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
                 }
                 for e in result.queue
             ],
+            "dedupe_aliases": [
+                {
+                    "observation_id": alias.observation_id,
+                    "source": alias.source,
+                    "row_indices": list(alias.row_indices),
+                }
+                for alias in result.dedupe_aliases
+            ],
         },
         battery / "migration-queue.yaml",
     )
@@ -2785,6 +2833,7 @@ def write_report(result: MigrationResult, path: Path) -> None:
         f"works: {len(result.works)}",
         f"experiments: {len(result.experiments)}",
         f"queue size: {len(result.queue)}",
+        f"identical-payload dedupe aliases: {len(result.dedupe_aliases)}",
         f"hard issues: {hard}",
         "",
         "## Spec vs measured",

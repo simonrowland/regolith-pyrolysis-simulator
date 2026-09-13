@@ -21,6 +21,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import atm_to_pa, identity_equal
 from simulator.battery.migrate import (
     REPO_ROOT,
+    DuplicateObservationIdError,
     UnknownRailSpellingError,
     canonicalize_doi,
     canonicalize_rail,
@@ -451,6 +452,52 @@ def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
     assert exp.method.is_unknown
     assert obs.evidence.class_.is_unknown
     assert obs.evidence.class_.value is not EvidenceClass.FIGURE_ONLY
+
+
+def test_g05_identical_duplicate_keys_are_aliased(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    point = {
+        "key": "pankratz-dup::T=336.35::delta_fG_kJ_mol",
+        "source_id": "pankratz-1987-usbm-b689",
+        "species": "AgS",
+        "temperature_K": 336.35,
+        "table_kJ_mol": 1.0,
+    }
+    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
+        yaml.safe_dump({"schema_version": 1, "points": [point, dict(point)]}, sort_keys=False),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=True, validate=True)
+    oid = point["key"]
+    assert oid in result.observations
+    assert len(result.observations) == 3  # fixture extract 2 points + 1 unique ledger
+    aliases = [a for a in result.dedupe_aliases if a.observation_id == oid]
+    assert aliases
+    assert aliases[0].row_indices == (0, 1)
+    ledger_count = result.source_counts["data/literature/gibbs_battery_residual_ledger.yaml"]
+    assert ledger_count.rows_in == 2
+    assert ledger_count.observations_out == 1
+    store_obs = sum(c.observations_out for c in result.source_counts.values())
+    assert store_obs == len(result.observations)
+
+
+def test_g05_conflicting_duplicate_key_is_hard_error(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    a = {
+        "key": "conflict-key",
+        "source_id": "pankratz-1987-usbm-b689",
+        "species": "AgS",
+        "temperature_K": 300,
+        "table_kJ_mol": 1.0,
+    }
+    b = dict(a)
+    b["table_kJ_mol"] = 2.0
+    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
+        yaml.safe_dump({"schema_version": 1, "points": [a, b]}, sort_keys=False),
+        encoding="utf-8",
+    )
+    with pytest.raises(DuplicateObservationIdError):
+        migrate(root, write=False, validate=True)
 
 
 def test_g04_supersedes_marks_the_old_row(tmp_path: Path) -> None:
