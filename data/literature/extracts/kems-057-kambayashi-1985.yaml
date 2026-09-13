@@ -1,0 +1,2256 @@
+schema_version: literature_extract.v1
+source_id: kems-057-kambayashi-1985
+source:
+  citation: Kambayashi, S., Awaka, H. and Kato, E. (1985), "Mass Spectrometric Determination of Activities
+    of P2O5 in PbO-P2O5 and FetO-P2O5 Systems", Tetsu-to-Hagane 71(16):1911-1918, DOI 10.2355/tetsutohagane1955.71.16_1911
+  doi: 10.2355/tetsutohagane1955.71.16_1911
+  url: https://doi.org/10.2355/tetsutohagane1955.71.16_1911
+  year: 1985
+extraction:
+  method: Official J-STAGE OA PDF (corpus raw/kems-057-kambayashi-1985/kems-057-kambayashi-1985.pdf, sha256
+    6051eea158c439e144926afffa3f51f5e21254907f186cdfac12029a343355f8). No MinerU decode. Tables 1-7 transcribed
+    from a 400 dpi pdftoppm render of PDF pages 1-8 (published pp. 1911-1918). pdftotext-layout is a noisy
+    OCR layer and was not used as data. Ion-current ratio tables labelled measured. Partial pressures
+    and Raoultian a_P2O5 that pass through JANAF P_Fe or P4O10(s) free-energy functions labelled model_derived.
+    Figs 2-8 listed figure-only; no numbers off axes. P2O5(g) was not detected.
+  date: '2026-09-12'
+  worker: extract-kems-057
+  provenance_path: docs-private/reviews/2026-09-12-kems-extracts/
+review_status: draft
+corrections: []
+fidelity_samples:
+- path: species.P2O5.observations[kambayashi_1985_table5_feto_p2o5_ion_current_ratios].values.rows[0].I_P2_over_I_Fe_x1e2
+  value: 0.66
+  locator:
+    table: '5'
+    published_page: 1915
+    pdf_page_index: 5
+    note: Table 5 sample 1, 1370 C, I(P2+)/I(Fe+) x 10^2 = 0.66
+- path: species.P2O5.observations[kambayashi_1985_table7_raoultian_a_p2o5].values.rows[0].a_P2O5_times_1e17_as_printed
+  value: 1.2
+  locator:
+    table: '7'
+    published_page: 1917
+    pdf_page_index: 7
+    note: Table 7 sample 1, 1370 C, a_P2O5 x 10^17 = 1.2
+- species: P2O5
+  observable: activity_coefficient
+  observation_id: kambayashi_1985_gamma_p2o5_solid_std_henry
+  field: gamma_1370C
+  value: 2.2e-15
+  locator:
+    published_page: 1911
+    pdf_page_index: 1
+    note: 'Synopsis: gamma_P2O5 = (2.2 +/- 0.8) x 10^-15 at 1370 C; standard state P2O5(s)'
+- path: species.P2O5.observations[kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c].values.rows[0].Pb_wt_percent
+  value: 63.84
+  locator:
+    table: '3'
+    published_page: 1913
+    pdf_page_index: 3
+    note: Table 3 first row Pb = 63.84 wt%
+- path: species.P2O5.observations[kambayashi_1985_table4_feto_p2o5_compositions].values.rows[0].P2O5_wt_percent
+  value: 1.52
+  locator:
+    table: '4'
+    published_page: 1914
+    pdf_page_index: 4
+    note: Table 4 sample 1 P2O5 = 1.52 wt%
+- path: species.PO.observations[kambayashi_1985_table6_partial_pressures_and_dg].values.rows[0].P_PO_x1e7_atm_as_printed
+  value: 2.86
+  locator:
+    table: '6'
+    published_page: 1917
+    pdf_page_index: 7
+    note: Table 6 sample 1, 1370 C, P_PO = 2.86 x 10^-7 atm
+- species: PO
+  observable: gibbs_table
+  observation_id: kambayashi_1985_table2_appearance_potentials_this_work
+  field: PO_plus_eV
+  value: 11.7
+  locator:
+    table: '2'
+    published_page: 1913
+    pdf_page_index: 3
+    note: Table 2 this work PO+ appearance potential = 11.7 eV
+- species: Fe
+  observable: gibbs_table
+  observation_id: kambayashi_1985_fe_sublimation_enthalpy_1370c
+  field: delta_H_sub_kJ
+  value: 429
+  locator:
+    published_page: 1916
+    pdf_page_index: 6
+    figure: '8'
+    note: Clausius-Clapeyron slope of Fig. 8 gives Delta-H_sub(Fe) = 429 kJ at 1370 C
+species:
+  P2O5:
+    observations:
+    - observation_id: kambayashi_1985_kems_geometry_and_calibration
+      type: gibbs_table
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+        note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
+      T_range_K:
+      - 1573.0
+      - 1663.0
+      phase: PbO-P2O5_and_FetO-P2O5_oxide_melts
+      condensed_form:
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: PbO-P2O5 at 1300 C; FetO-P2O5 at 1370-1390 C
+      standard_state: method geometry; not a species observation
+      regime: kems_effusion
+      units: as published
+      values:
+        quantity: kems_method_geometry_reference
+        method_class: measured
+        semantics: method_geometry_reference_not_measured_species_observation
+        instrument: Hitachi RM-6E Knudsen-cell mass spectrometer
+        ionizing_electron_energy_eV_PbO_P2O5: 31.1
+        ionizing_electron_energy_eV_FetO_P2O5: 23.0
+        temperature_fluctuation_C: 1.0
+        temperature_fluctuation_as_printed: +/- 1 C at each hold
+        apparatus_constant_variation_percent: 15
+        apparatus_constant_note: c varies about +/-15% run-to-run with orifice shape/position; cancelled
+          by internal standard (Pd(g) or Fe(g))
+        P2O5_gas_detected: false
+        P2O5_gas_note: P2O5(g) was not detected under the measurement conditions; activity from PO(g)
+          and PO2(g) via P2O5(in slag)+PO(g)=3PO2(g)
+        Fe_crucible_P_wt_percent_less_than: 1.0
+        Fe_activity_in_crucible: 1.0
+        FetO_t_average: 0.95
+        FetO_t_note: t from Fe2+/Fe3+ analysis; mean 0.95 used for Gibbs-Duhem as Fe0.95O-P2O5
+        PbO_P2O5_reagents: Pb(PO3)2 99.99% and Pb3(PO4)2 99.99%
+        FetO_P2O5_reagents: FeO 99.9% and 3FeO.P2O5.8H2O 98% or above; premelted 1370 C, 4 h, vacuum in
+          Fe crucible
+        composition_determined: chemical analysis after the mass-spectrometric run
+        missing_for_motzfeldt:
+        - orifice_area
+        - clausing_factor
+        - sample_surface_area
+        orifice_diameter_mm_as_printed:
+          PbO_P2O5: 0.4
+          FetO_P2O5_typical: 0.5
+          FetO_P2O5_asterisk_rows: 0.3
+      uncertainty:
+        note: 'Temperature hold +/-1 C. Apparatus constant c about +/-15% cancelled by internal standard.
+          Contamination ion current after empty-cell blank: Fe+ and PO2+ 2-5%, PO+ about 0.2%, P2+ up
+          to several tens of percent.'
+      equipment: &id001
+        cell_material:
+          value: 'High-purity alumina Knudsen cell (Nihon Kagaku Togyo SSA-S). PbO-P2O5: inner diameter
+            9 mm, orifice diameter about 0.4 mm, Pd inner crucible. FetO-P2O5: inner diameter 15 mm, orifice
+            diameter about 0.5 mm (0.3 mm for Table 5 asterisk rows No. 4 and No. 7), electrolytic-iron
+            inner crucible. Ta susceptor; W-26%Re/W-5%Re thermocouple calibrated at the melting point
+            of pure Ni. Hitachi RM-6E Knudsen-cell mass spectrometer.'
+          locator:
+            published_page: 1912
+            pdf_page_index: 2
+            figure: '1'
+            section: '2.1'
+            note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
+    - observation_id: kambayashi_1985_table1_ionic_species
+      type: rate_series
+      locator:
+        table: '1'
+        published_page: 1913
+        pdf_page_index: 3
+        note: Table 1 ionic species for PbO-P2O5 and FetO-P2O5
+      T_range_K:
+      - 1573.0
+      - 1663.0
+      phase: vapor_over_PbO-P2O5_and_FetO-P2O5_melts
+      standard_state: detected ions as printed
+      regime: kems_effusion
+      units: species list as published
+      values:
+        quantity: detected_ionic_species
+        method_class: measured
+        PbO_P2O5_ions:
+        - Pd+
+        - Pb+
+        - PbO+
+        - PbP3+
+        - P+
+        - P2+
+        - PO+
+        - PO2+
+        FetO_P2O5_ions:
+        - Fe+
+        - P+
+        - P2+
+        - PO+
+        - PO2+
+        layout_note: P+, P2+, PO+, PO2+ span both systems on the right of Table 1; PbP3+ is the last PbO-P2O5-only
+          ion
+      uncertainty:
+        note: species identification table; no numeric uncertainty printed
+    - observation_id: kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 1913
+        pdf_page_index: 3
+        note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
+      T_range_K:
+      - 1573.0
+      - 1573.0
+      phase: PbO-P2O5_oxide_melt_in_Pd_crucible
+      condensed_form: &id003
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: PbO-P2O5 slag in a Pd crucible inside an alumina Knudsen cell
+      standard_state: ion current ratios vs Pd+ internal standard; 1300 C
+      regime: kems_effusion
+      units: wt% as printed; mole fraction X_P2O5; ion current ratios dimensionless
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        T_C_as_printed: 1300
+        T_K: 1573.0
+        T_K_conversion: authors use T_C + 273
+        internal_standard: Pd(g) from the Pd crucible
+        activity_ion_ratio_column: (I(PO2+)/I(Pd+))^3 / (I(PO+)/I(Pd+)); proportional to a_P2O5
+        composition_basis: Pb and P in wt% as printed; X_P2O5 mole fraction
+        rows:
+        - Pb_wt_percent: 63.84
+          P_wt_percent: 10.68
+          X_P2O5: 0.359
+          I_PbO_over_I_Pd: 17.25
+          I_Pb_over_I_Pd: 63.21
+          I_PO2_over_I_Pd: 13.19
+          I_PO_over_I_Pd: 46.05
+          I_PO2_over_I_Pd_cubed_over_I_PO_over_I_Pd: 49.83
+        - Pb_wt_percent: 66.84
+          P_wt_percent: 11.28
+          X_P2O5: 0.361
+          I_PbO_over_I_Pd: 11.75
+          I_Pb_over_I_Pd: 40.98
+          I_PO2_over_I_Pd: 15.95
+          I_PO_over_I_Pd: 41.71
+          I_PO2_over_I_Pd_cubed_over_I_PO_over_I_Pd: 97.28
+        - Pb_wt_percent: 64.79
+          P_wt_percent: 12.0
+          X_P2O5: 0.382
+          I_PbO_over_I_Pd: 9.67
+          I_Pb_over_I_Pd: 35.41
+          I_PO2_over_I_Pd: 19.47
+          I_PO_over_I_Pd: 62.96
+          I_PO2_over_I_Pd_cubed_over_I_PO_over_I_Pd: 117.2
+      uncertainty:
+        note: Three melts only; authors state the activity vs composition is exponential so KEMS was possible
+          only in a narrow composition window. Pb and P analyses leave a few percent unidentified besides
+          Pd; authors say this does not affect the Gibbs-Duhem integral shape.
+      equipment: *id001
+    - observation_id: kambayashi_1985_table4_feto_p2o5_compositions
+      type: activity_coefficient
+      locator:
+        table: '4'
+        published_page: 1914
+        pdf_page_index: 4
+        note: Table 4 FetO-P2O5 chemical compositions (wt% and mole fraction)
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      condensed_form: &id002
+        state: liquid_melt
+        metastable: false
+        basis: explicit_author
+        note: FetO-P2O5 slag in an electrolytic-iron crucible inside an alumina Knudsen cell; Fe_t O with
+          t from Fe2+/Fe3+ analysis, mean t=0.95
+      standard_state: post-run chemical analysis of FetO-P2O5 melts
+      regime: kems_effusion
+      units: wt% as printed; t in FetO dimensionless; X_P2O5 mole fraction
+      values:
+        quantity: melt_composition
+        method_class: measured
+        composition_basis: wt_percent as printed under the Table 4 wt% header; X_P2O5 mole fraction
+        rows:
+        - sample_no: 1
+          P2O5_wt_percent: 1.52
+          Total_Fe_wt_percent: 75.02
+          FeO_wt_percent: 86.55
+          Fe2O3_wt_percent: 10.07
+          t_in_FetO: 0.955
+          X_P2O5: 0.0075
+        - sample_no: 2
+          P2O5_wt_percent: 4.06
+          Total_Fe_wt_percent: 73.5
+          FeO_wt_percent: 84.32
+          Fe2O3_wt_percent: 11.38
+          t_in_FetO: 0.949
+          X_P2O5: 0.0202
+        - sample_no: 3
+          P2O5_wt_percent: 5.42
+          Total_Fe_wt_percent: 72.68
+          FeO_wt_percent: 82.97
+          Fe2O3_wt_percent: 11.71
+          t_in_FetO: 0.947
+          X_P2O5: 0.0271
+        - sample_no: 4
+          P2O5_wt_percent: 8.38
+          Total_Fe_wt_percent: 70.25
+          FeO_wt_percent: 81.5
+          Fe2O3_wt_percent: 9.87
+          t_in_FetO: 0.953
+          X_P2O5: 0.0427
+        - sample_no: 5
+          P2O5_wt_percent: 9.77
+          Total_Fe_wt_percent: 69.5
+          FeO_wt_percent: 80.99
+          Fe2O3_wt_percent: 9.37
+          t_in_FetO: 0.955
+          X_P2O5: 0.0499
+        - sample_no: 6
+          P2O5_wt_percent: 13.29
+          Total_Fe_wt_percent: 66.89
+          FeO_wt_percent: 78.54
+          Fe2O3_wt_percent: 8.35
+          t_in_FetO: 0.958
+          X_P2O5: 0.0691
+        - sample_no: 7
+          P2O5_wt_percent: 14.53
+          Total_Fe_wt_percent: 65.66
+          FeO_wt_percent: 77.17
+          Fe2O3_wt_percent: 8.11
+          t_in_FetO: 0.959
+          X_P2O5: 0.0764
+        - sample_no: 8
+          P2O5_wt_percent: 18.53
+          Total_Fe_wt_percent: 62.96
+          FeO_wt_percent: 73.01
+          Fe2O3_wt_percent: 8.88
+          t_in_FetO: 0.953
+          X_P2O5: 0.0991
+      uncertainty:
+        note: chemical analysis after the KEMS run; no numeric +/- printed on Table 4
+    - observation_id: kambayashi_1985_table5_feto_p2o5_ion_current_ratios
+      type: rate_series
+      locator:
+        table: '5'
+        published_page: 1915
+        pdf_page_index: 5
+        note: Table 5 FetO-P2O5 ion current ratios at 1370-1390 C
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      condensed_form: *id002
+      standard_state: ion current ratios vs Fe+ internal standard; Fe activity taken as 1
+      regime: kems_effusion
+      units: ion current ratios as printed with the stated column scales
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        internal_standard: Fe(g) in equilibrium with the Fe crucible
+        sample_5_note: sample 5 printed at 1370 C only (1380 C and 1390 C cells are em-dashes)
+        asterisk_note: 'Table 5 footnote: orifice diameter about 0.3 mm; the other orifices about 0.5
+          mm. Asterisk rows are extra 1370 C measurements on samples 4 and 7.'
+        activity_ion_ratio_definition: (I(PO2+)/I(Fe+))^3 / (I(PO+)/I(Fe+)) x 10^5; used in eq. (3') for
+          a_P2O5
+        rows:
+        - sample_no: 1
+          T_C: 1370
+          T_K: 1643.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 1.52
+          Total_Fe_wt_percent: 75.02
+          FeO_wt_percent: 86.55
+          Fe2O3_wt_percent: 10.07
+          t_in_FetO: 0.955
+          X_P2O5: 0.0075
+          I_P2_over_I_Fe_x1e2: 0.66
+          I_PO_over_I_Fe_x10: 1.51
+          I_PO2_over_I_Fe_x1e2: 1.21
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 1.2
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 1
+          T_C: 1380
+          T_K: 1653.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 1.52
+          Total_Fe_wt_percent: 75.02
+          FeO_wt_percent: 86.55
+          Fe2O3_wt_percent: 10.07
+          t_in_FetO: 0.955
+          X_P2O5: 0.0075
+          I_P2_over_I_Fe_x1e2: 0.68
+          I_PO_over_I_Fe_x10: 1.54
+          I_PO2_over_I_Fe_x1e2: 1.22
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 1.2
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 1
+          T_C: 1390
+          T_K: 1663.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 1.52
+          Total_Fe_wt_percent: 75.02
+          FeO_wt_percent: 86.55
+          Fe2O3_wt_percent: 10.07
+          t_in_FetO: 0.955
+          X_P2O5: 0.0075
+          I_P2_over_I_Fe_x1e2: 0.74
+          I_PO_over_I_Fe_x10: 1.68
+          I_PO2_over_I_Fe_x1e2: 1.25
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 1.2
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 2
+          T_C: 1370
+          T_K: 1643.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 4.06
+          Total_Fe_wt_percent: 73.5
+          FeO_wt_percent: 84.32
+          Fe2O3_wt_percent: 11.38
+          t_in_FetO: 0.949
+          X_P2O5: 0.0202
+          I_P2_over_I_Fe_x1e2: 1.75
+          I_PO_over_I_Fe_x10: 3.02
+          I_PO2_over_I_Fe_x1e2: 2.22
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 3.7
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 2
+          T_C: 1380
+          T_K: 1653.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 4.06
+          Total_Fe_wt_percent: 73.5
+          FeO_wt_percent: 84.32
+          Fe2O3_wt_percent: 11.38
+          t_in_FetO: 0.949
+          X_P2O5: 0.0202
+          I_P2_over_I_Fe_x1e2: 1.83
+          I_PO_over_I_Fe_x10: 3.11
+          I_PO2_over_I_Fe_x1e2: 2.28
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 3.8
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 2
+          T_C: 1390
+          T_K: 1663.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 4.06
+          Total_Fe_wt_percent: 73.5
+          FeO_wt_percent: 84.32
+          Fe2O3_wt_percent: 11.38
+          t_in_FetO: 0.949
+          X_P2O5: 0.0202
+          I_P2_over_I_Fe_x1e2: 1.93
+          I_PO_over_I_Fe_x10: 3.4
+          I_PO2_over_I_Fe_x1e2: 2.41
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 4.1
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 3
+          T_C: 1370
+          T_K: 1643.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 5.42
+          Total_Fe_wt_percent: 72.68
+          FeO_wt_percent: 82.97
+          Fe2O3_wt_percent: 11.71
+          t_in_FetO: 0.947
+          X_P2O5: 0.0271
+          I_P2_over_I_Fe_x1e2: 0.87
+          I_PO_over_I_Fe_x10: 4.03
+          I_PO2_over_I_Fe_x1e2: 3.03
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 6.9
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 3
+          T_C: 1380
+          T_K: 1653.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 5.42
+          Total_Fe_wt_percent: 72.68
+          FeO_wt_percent: 82.97
+          Fe2O3_wt_percent: 11.71
+          t_in_FetO: 0.947
+          X_P2O5: 0.0271
+          I_P2_over_I_Fe_x1e2: 0.94
+          I_PO_over_I_Fe_x10: 4.34
+          I_PO2_over_I_Fe_x1e2: 3.18
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 7.4
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 3
+          T_C: 1390
+          T_K: 1663.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 5.42
+          Total_Fe_wt_percent: 72.68
+          FeO_wt_percent: 82.97
+          Fe2O3_wt_percent: 11.71
+          t_in_FetO: 0.947
+          X_P2O5: 0.0271
+          I_P2_over_I_Fe_x1e2: 0.95
+          I_PO_over_I_Fe_x10: 4.49
+          I_PO2_over_I_Fe_x1e2: 3.15
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 7.0
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 4
+          T_C: 1370
+          T_K: 1643.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 8.38
+          Total_Fe_wt_percent: 70.25
+          FeO_wt_percent: 81.5
+          Fe2O3_wt_percent: 9.87
+          t_in_FetO: 0.953
+          X_P2O5: 0.0427
+          I_P2_over_I_Fe_x1e2: 3.26
+          I_PO_over_I_Fe_x10: 4.47
+          I_PO2_over_I_Fe_x1e2: 3.49
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 9.5
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 4
+          T_C: 1380
+          T_K: 1653.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 8.38
+          Total_Fe_wt_percent: 70.25
+          FeO_wt_percent: 81.5
+          Fe2O3_wt_percent: 9.87
+          t_in_FetO: 0.953
+          X_P2O5: 0.0427
+          I_P2_over_I_Fe_x1e2: 3.4
+          I_PO_over_I_Fe_x10: 4.77
+          I_PO2_over_I_Fe_x1e2: 3.59
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 9.7
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 4
+          T_C: 1390
+          T_K: 1663.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 8.38
+          Total_Fe_wt_percent: 70.25
+          FeO_wt_percent: 81.5
+          Fe2O3_wt_percent: 9.87
+          t_in_FetO: 0.953
+          X_P2O5: 0.0427
+          I_P2_over_I_Fe_x1e2: 3.55
+          I_PO_over_I_Fe_x10: 4.99
+          I_PO2_over_I_Fe_x1e2: 3.75
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 10.6
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 5
+          T_C: 1370
+          T_K: 1643.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 9.77
+          Total_Fe_wt_percent: 69.5
+          FeO_wt_percent: 80.99
+          Fe2O3_wt_percent: 9.37
+          t_in_FetO: 0.955
+          X_P2O5: 0.0499
+          I_P2_over_I_Fe_x1e2: 4.07
+          I_PO_over_I_Fe_x10: 5.71
+          I_PO2_over_I_Fe_x1e2: 4.07
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 11.8
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 6
+          T_C: 1370
+          T_K: 1643.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 13.29
+          Total_Fe_wt_percent: 66.89
+          FeO_wt_percent: 78.54
+          Fe2O3_wt_percent: 8.35
+          t_in_FetO: 0.958
+          X_P2O5: 0.0691
+          I_P2_over_I_Fe_x1e2: 3.96
+          I_PO_over_I_Fe_x10: 6.23
+          I_PO2_over_I_Fe_x1e2: 4.45
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 14.2
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 6
+          T_C: 1380
+          T_K: 1653.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 13.29
+          Total_Fe_wt_percent: 66.89
+          FeO_wt_percent: 78.54
+          Fe2O3_wt_percent: 8.35
+          t_in_FetO: 0.958
+          X_P2O5: 0.0691
+          I_P2_over_I_Fe_x1e2: 4.14
+          I_PO_over_I_Fe_x10: 6.57
+          I_PO2_over_I_Fe_x1e2: 4.66
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 15.4
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 6
+          T_C: 1390
+          T_K: 1663.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 13.29
+          Total_Fe_wt_percent: 66.89
+          FeO_wt_percent: 78.54
+          Fe2O3_wt_percent: 8.35
+          t_in_FetO: 0.958
+          X_P2O5: 0.0691
+          I_P2_over_I_Fe_x1e2: 4.56
+          I_PO_over_I_Fe_x10: 6.94
+          I_PO2_over_I_Fe_x1e2: 4.78
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 15.7
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 7
+          T_C: 1370
+          T_K: 1643.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 14.53
+          Total_Fe_wt_percent: 65.66
+          FeO_wt_percent: 77.17
+          Fe2O3_wt_percent: 8.11
+          t_in_FetO: 0.959
+          X_P2O5: 0.0764
+          I_P2_over_I_Fe_x1e2: 5.01
+          I_PO_over_I_Fe_x10: 6.37
+          I_PO2_over_I_Fe_x1e2: 4.56
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 14.9
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 7
+          T_C: 1380
+          T_K: 1653.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 14.53
+          Total_Fe_wt_percent: 65.66
+          FeO_wt_percent: 77.17
+          Fe2O3_wt_percent: 8.11
+          t_in_FetO: 0.959
+          X_P2O5: 0.0764
+          I_P2_over_I_Fe_x1e2: 5.27
+          I_PO_over_I_Fe_x10: 6.76
+          I_PO2_over_I_Fe_x1e2: 4.7
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 15.4
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 7
+          T_C: 1390
+          T_K: 1663.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 14.53
+          Total_Fe_wt_percent: 65.66
+          FeO_wt_percent: 77.17
+          Fe2O3_wt_percent: 8.11
+          t_in_FetO: 0.959
+          X_P2O5: 0.0764
+          I_P2_over_I_Fe_x1e2: 5.59
+          I_PO_over_I_Fe_x10: 7.26
+          I_PO2_over_I_Fe_x1e2: 4.79
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 15.1
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 8
+          T_C: 1370
+          T_K: 1643.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 18.53
+          Total_Fe_wt_percent: 62.96
+          FeO_wt_percent: 73.01
+          Fe2O3_wt_percent: 8.88
+          t_in_FetO: 0.953
+          X_P2O5: 0.0991
+          I_P2_over_I_Fe_x1e2: 4.14
+          I_PO_over_I_Fe_x10: 8.06
+          I_PO2_over_I_Fe_x1e2: 5.87
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 25.1
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 8
+          T_C: 1380
+          T_K: 1653.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 18.53
+          Total_Fe_wt_percent: 62.96
+          FeO_wt_percent: 73.01
+          Fe2O3_wt_percent: 8.88
+          t_in_FetO: 0.953
+          X_P2O5: 0.0991
+          I_P2_over_I_Fe_x1e2: 4.34
+          I_PO_over_I_Fe_x10: 8.51
+          I_PO2_over_I_Fe_x1e2: 6.16
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 27.5
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 8
+          T_C: 1390
+          T_K: 1663.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 18.53
+          Total_Fe_wt_percent: 62.96
+          FeO_wt_percent: 73.01
+          Fe2O3_wt_percent: 8.88
+          t_in_FetO: 0.953
+          X_P2O5: 0.0991
+          I_P2_over_I_Fe_x1e2: 4.66
+          I_PO_over_I_Fe_x10: 8.68
+          I_PO2_over_I_Fe_x1e2: 6.79
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 36.1
+          orifice_diameter_mm_as_printed: 0.5
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 4
+          T_C: 1370
+          T_K: 1643.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 8.38
+          Total_Fe_wt_percent: 70.25
+          FeO_wt_percent: 81.5
+          Fe2O3_wt_percent: 9.87
+          t_in_FetO: 0.953
+          X_P2O5: 0.0427
+          I_P2_over_I_Fe_x1e2: 4.75
+          I_PO_over_I_Fe_x10: 5.46
+          I_PO2_over_I_Fe_x1e2: 3.83
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 10.3
+          orifice_diameter_mm_as_printed: 0.3
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+        - sample_no: 7
+          T_C: 1370
+          T_K: 1643.0
+          T_K_conversion: authors use 1370 C = 1643 K (T_C + 273)
+          composition_basis: wt_percent as printed in Table 4; X_P2O5 mole fraction
+          P2O5_wt_percent: 14.53
+          Total_Fe_wt_percent: 65.66
+          FeO_wt_percent: 77.17
+          Fe2O3_wt_percent: 8.11
+          t_in_FetO: 0.959
+          X_P2O5: 0.0764
+          I_P2_over_I_Fe_x1e2: 2.06
+          I_PO_over_I_Fe_x10: 6.99
+          I_PO2_over_I_Fe_x1e2: 4.72
+          I_PO2_over_I_Fe_cubed_over_I_PO_over_I_Fe_x1e5: 15.0
+          orifice_diameter_mm_as_printed: 0.3
+          column_scales_as_printed: I(P2+)/I(Fe+) x 10^2; I(PO+)/I(Fe+) x 10; I(PO2+)/I(Fe+) x 10^2; (I(PO2+)/I(Fe+))^3
+            / (I(PO+)/I(Fe+)) x 10^5
+      uncertainty:
+        note: 'Ion-current ratios averaged after >=2 h of stability. Empty-cell contamination subtracted:
+          Fe+ and PO2+ 2-5%, PO+ about 0.2%.'
+      equipment: *id001
+    - observation_id: kambayashi_1985_table7_raoultian_a_p2o5
+      type: activity_coefficient
+      locator:
+        table: '7'
+        published_page: 1917
+        pdf_page_index: 7
+        note: Table 7 Raoultian a_P2O5 x 10^17; standard state P2O5(s)
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      condensed_form: *id002
+      standard_state: Raoultian a_P2O5 relative to P2O5(s); a = sqrt(P_P4O10 / P_P4O10_sat) via eqs. (12)-(14)
+        and JANAF
+      regime: kems_effusion
+      units: dimensionless activity; table header a_P2O5 x 10^17
+      values:
+        quantity: raoultian_activity
+        method_class: model_derived
+        model_or_data_source: P4O10(g) from the measured PO/PO2 ion currents via eq. (14); P_P4O10_sat
+          from JANAF P4O10(s) free energy extrapolated from 1500 K to 1643-1663 K
+        henry_region_as_printed: X_P2O5 <= 0.08 obeys Henry's law; X_P2O5 > 0.08 positive deviation and
+          a_P2O5 rises steeply
+        rows:
+        - sample_no: 1
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0075
+          P2O5_wt_percent: 1.52
+          t_in_FetO: 0.955
+          a_P2O5_times_1e17_as_printed: 1.2
+          a_P2O5: 1.2000000000000001e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 1
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0075
+          P2O5_wt_percent: 1.52
+          t_in_FetO: 0.955
+          a_P2O5_times_1e17_as_printed: 1.4
+          a_P2O5: 1.4e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 1
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0075
+          P2O5_wt_percent: 1.52
+          t_in_FetO: 0.955
+          a_P2O5_times_1e17_as_printed: 1.5
+          a_P2O5: 1.5e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 2
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0202
+          P2O5_wt_percent: 4.06
+          t_in_FetO: 0.949
+          a_P2O5_times_1e17_as_printed: 3.8
+          a_P2O5: 3.8e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 2
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0202
+          P2O5_wt_percent: 4.06
+          t_in_FetO: 0.949
+          a_P2O5_times_1e17_as_printed: 4.5
+          a_P2O5: 4.5000000000000004e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 2
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0202
+          P2O5_wt_percent: 4.06
+          t_in_FetO: 0.949
+          a_P2O5_times_1e17_as_printed: 5.4
+          a_P2O5: 5.400000000000001e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 3
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0271
+          P2O5_wt_percent: 5.42
+          t_in_FetO: 0.947
+          a_P2O5_times_1e17_as_printed: 7.2
+          a_P2O5: 7.200000000000001e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 3
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0271
+          P2O5_wt_percent: 5.42
+          t_in_FetO: 0.947
+          a_P2O5_times_1e17_as_printed: 8.7
+          a_P2O5: 8.7e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 3
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0271
+          P2O5_wt_percent: 5.42
+          t_in_FetO: 0.947
+          a_P2O5_times_1e17_as_printed: 9.2
+          a_P2O5: 9.2e-17
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 4
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0427
+          P2O5_wt_percent: 8.38
+          t_in_FetO: 0.953
+          a_P2O5_times_1e17_as_printed: 10.0
+          a_P2O5: 1.0000000000000001e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 4
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0427
+          P2O5_wt_percent: 8.38
+          t_in_FetO: 0.953
+          a_P2O5_times_1e17_as_printed: 11.4
+          a_P2O5: 1.14e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 4
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0427
+          P2O5_wt_percent: 8.38
+          t_in_FetO: 0.953
+          a_P2O5_times_1e17_as_printed: 14.0
+          a_P2O5: 1.4e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 5
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0499
+          P2O5_wt_percent: 9.77
+          t_in_FetO: 0.955
+          a_P2O5_times_1e17_as_printed: 12.4
+          a_P2O5: 1.2400000000000002e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 6
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0691
+          P2O5_wt_percent: 13.29
+          t_in_FetO: 0.958
+          a_P2O5_times_1e17_as_printed: 14.8
+          a_P2O5: 1.4800000000000001e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 6
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0691
+          P2O5_wt_percent: 13.29
+          t_in_FetO: 0.958
+          a_P2O5_times_1e17_as_printed: 18.1
+          a_P2O5: 1.8100000000000003e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 6
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0691
+          P2O5_wt_percent: 13.29
+          t_in_FetO: 0.958
+          a_P2O5_times_1e17_as_printed: 20.8
+          a_P2O5: 2.0800000000000003e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 7
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0764
+          P2O5_wt_percent: 14.53
+          t_in_FetO: 0.959
+          a_P2O5_times_1e17_as_printed: 15.6
+          a_P2O5: 1.56e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 7
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0764
+          P2O5_wt_percent: 14.53
+          t_in_FetO: 0.959
+          a_P2O5_times_1e17_as_printed: 18.0
+          a_P2O5: 1.8000000000000002e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 7
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0764
+          P2O5_wt_percent: 14.53
+          t_in_FetO: 0.959
+          a_P2O5_times_1e17_as_printed: 20.0
+          a_P2O5: 2.0000000000000002e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 8
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0991
+          P2O5_wt_percent: 18.53
+          t_in_FetO: 0.953
+          a_P2O5_times_1e17_as_printed: 26.3
+          a_P2O5: 2.6300000000000003e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 8
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0991
+          P2O5_wt_percent: 18.53
+          t_in_FetO: 0.953
+          a_P2O5_times_1e17_as_printed: 32.3
+          a_P2O5: 3.2299999999999997e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+        - sample_no: 8
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0991
+          P2O5_wt_percent: 18.53
+          t_in_FetO: 0.953
+          a_P2O5_times_1e17_as_printed: 47.6
+          a_P2O5: 4.76e-16
+          a_conversion: a = printed cell x 10^-17; header a_P2O5 x 10^17
+          standard_state_as_printed: P2O5(s)
+      uncertainty:
+        note: No per-cell +/- on Table 7. Absolute scale set by JANAF-extrapolated P_P4O10_sat (700, 709,
+          719 atm at 1643, 1653, 1663 K).
+    - observation_id: kambayashi_1985_gamma_p2o5_solid_std_henry
+      type: activity_coefficient
+      locator:
+        published_page: 1911
+        pdf_page_index: 1
+        note: Synopsis and p. 1917/1918 conclusion; Henry region 0 < X_P2O5 < 0.08; standard state P2O5(s)
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      condensed_form: *id002
+      standard_state: Henrian gamma_P2O5 relative to P2O5(s); 0 < X_P2O5 < 0.08
+      regime: kems_effusion
+      units: dimensionless activity coefficient
+      values:
+        quantity: henrian_activity_coefficient
+        method_class: measured
+        derivation_note: 'Authors: obtained from the ion currents of PO+ and PO2+. Absolute Raoultian
+          a in Table 7 uses JANAF P4O10(s); gamma is the Henry slope a/X in X_P2O5 < 0.08. Error is twice
+          the standard deviation of the per-temperature activity coefficients.'
+        X_P2O5_henry_upper: 0.08
+        gamma_1370C: 2.2e-15
+        gamma_1370C_as_printed: (2.2 +/- 0.8) x 10^-15
+        gamma_1380C: 2.5e-15
+        gamma_1380C_as_printed: (2.5 +/- 0.8) x 10^-15
+        gamma_1390C: 2.8e-15
+        gamma_1390C_as_printed: (2.8 +/- 1) x 10^-15
+      uncertainty:
+        gamma_1370C: 8.0e-16
+        gamma_1380C: 8.0e-16
+        gamma_1390C: 1.0e-15
+        as_printed: twice the standard deviation of the activity coefficients obtained at each temperature
+    - observation_id: kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson
+      type: activity_coefficient
+      locator:
+        published_page: 1917
+        pdf_page_index: 7
+        note: Converted using Turkdogan and Pearson P2O5(s)=P2O5(l) Delta-G
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      condensed_form: *id002
+      standard_state: gamma_P2O5 relative to P2O5(l) using Turkdogan and Pearson (ref 17)
+      regime: kems_effusion
+      units: dimensionless activity coefficient
+      values:
+        quantity: henrian_activity_coefficient
+        method_class: model_derived
+        model_or_data_source: Turkdogan and Pearson JISI 175 (1953) 398, P2O5(s)=P2O5(l) standard free-energy
+          change applied to the solid-standard gamma
+        gamma_1370C: 3.4e-13
+        gamma_1370C_as_printed: (3.4 +/- 1.2) x 10^-13
+        gamma_1380C: 4.0e-13
+        gamma_1380C_as_printed: (4.0 +/- 1.3) x 10^-13
+        gamma_1390C: 4.7e-13
+        gamma_1390C_as_printed: (4.7 +/- 1.7) x 10^-13
+      uncertainty:
+        gamma_1370C: 1.2e-13
+        gamma_1380C: 1.3e-13
+        gamma_1390C: 1.7e-13
+        as_printed: +/- as printed on the converted liquid-standard coefficients
+    - observation_id: kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '2'
+        published_page: 1913
+        pdf_page_index: 3
+        note: Ion current ratios vs X_PbO for PbO-P2O5 at 1300 C; dashed Gibbs-Duhem
+      T_range_K:
+      - 1573.0
+      - 1573.0
+      phase: PbO-P2O5_oxide_melt_in_Pd_crucible
+      condensed_form: *id003
+      standard_state: ion current ratios proportional to a_PbO and a_P2O5
+      regime: kems_effusion
+      units: ion current ratios as plotted; not digitised
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        T_C_as_printed: 1300
+        dashed_curve: Gibbs-Duhem calculated values from I(PbO+)/I(Pd+)
+        authors_text: PO+/Pd+ and PO2+/Pd+ points agree with the Gibbs-Duhem dashed curve from PbO+
+      uncertainty:
+        note: figure-only; not digitised
+    - observation_id: kambayashi_1985_fig6_henrian_a_p2o5_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '6'
+        published_page: 1915
+        pdf_page_index: 5
+        note: Henrian activity of P2O5 for FetO-P2O5 from Table 5 and eq. (3')
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      condensed_form: *id002
+      standard_state: Henrian a_P2O5 from ion-current eq. (3'); not the Table 7 Raoultian scale
+      regime: kems_effusion
+      units: Henrian a as plotted; not digitised
+      values:
+        quantity: henrian_activity
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labeled_T_C:
+        - 1370
+        - 1380
+        - 1390
+      uncertainty:
+        note: figure-only; not digitised
+    - observation_id: kambayashi_1985_fig7_raoultian_activities_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '7'
+        published_page: 1916
+        pdf_page_index: 6
+        note: Raoultian a_P2O5 and a_FetO vs X_P2O5
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      condensed_form: *id002
+      standard_state: Raoultian a_P2O5 vs P2O5(s); a_FetO vs Fe0.95O from Gibbs-Duhem
+      regime: kems_effusion
+      units: a_P2O5 x 10^17 and a_FetO as plotted; not digitised
+      values:
+        quantity: raoultian_activity
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        a_FetO_source: Gibbs-Duhem integral of eq. (8) with mean t=0.95
+        labeled_T_C:
+        - 1370
+        - 1380
+        - 1390
+      uncertainty:
+        note: figure-only; a_FetO is Gibbs-Duhem, not a direct ion-current activity
+  PbO:
+    observations:
+    - observation_id: kambayashi_1985_pbo_table3_ion_current_ratios_1300c
+      type: rate_series
+      locator:
+        table: '3'
+        published_page: 1913
+        pdf_page_index: 3
+        note: Table 3 PbO-P2O5 compositions and ion current ratios at 1300 C
+      T_range_K:
+      - 1573.0
+      - 1573.0
+      phase: PbO-P2O5_oxide_melt_in_Pd_crucible
+      condensed_form: *id003
+      standard_state: I(PbO+)/I(Pd+) proportional to a_PbO via eq. (6)
+      regime: kems_effusion
+      units: ion current ratio I(PbO+)/I(Pd+)
+      values:
+        quantity: ion_current_ratio
+        method_class: measured
+        gas_species: PbO(g)
+        T_C_as_printed: 1300
+        internal_standard: Pd+
+        rows:
+        - Pb_wt_percent: 63.84
+          X_P2O5: 0.359
+          I_PbO_over_I_Pd: 17.25
+        - Pb_wt_percent: 66.84
+          X_P2O5: 0.361
+          I_PbO_over_I_Pd: 11.75
+        - Pb_wt_percent: 64.79
+          X_P2O5: 0.382
+          I_PbO_over_I_Pd: 9.67
+      uncertainty:
+        note: same Table 3 series as the P2O5 observation; three melts
+  FeO:
+    observations:
+    - observation_id: kambayashi_1985_feto_raoultian_gibbs_duhem_fig7_figure_only
+      type: activity_coefficient
+      locator:
+        figure: '7'
+        published_page: 1916
+        pdf_page_index: 6
+        equation: '8'
+        note: Raoultian a_FetO from Gibbs-Duhem on Fe0.95O-P2O5
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      condensed_form: *id002
+      standard_state: Raoultian a_FetO for the pseudo-binary Fe0.95O-P2O5
+      regime: kems_effusion
+      units: dimensionless activity as plotted; not digitised
+      values:
+        quantity: raoultian_activity
+        method_class: model_derived
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        oxide_formula_as_published: FetO
+        t_average: 0.95
+        model_or_data_source: Gibbs-Duhem integral eq. (8) of gamma_P2O5; t from Fe2+/Fe3+ analysis
+      uncertainty:
+        note: figure-only Gibbs-Duhem a_FetO; not digitised
+  PO:
+    observations:
+    - observation_id: kambayashi_1985_table2_appearance_potentials_this_work
+      type: gibbs_table
+      locator:
+        table: '2'
+        published_page: 1913
+        pdf_page_index: 3
+        note: Table 2 appearance potentials of the ionic species
+      T_range_K:
+      - 1573.0
+      - 1663.0
+      phase: vapor_over_PbO-P2O5_and_FetO-P2O5_melts
+      standard_state: appearance potential (eV), this work
+      regime: kems_effusion
+      units: eV as published
+      values:
+        quantity: appearance_potential
+        method_class: measured
+        calibration: corrected using literature AP of H2O+ 12.67 eV (ref 4) and Ar+ 15.74 eV (ref 5)
+        P_plus_eV: 10.4
+        P2_plus_eV: 10.9
+        PO_plus_eV: 11.7
+        PO2_plus_eV: 14.0
+        Pb_plus_eV: 7.8
+        PbO_plus_eV: 9.2
+      uncertainty:
+        note: no +/- printed on the this-work row
+    - observation_id: kambayashi_1985_table2_appearance_potentials_literature
+      type: gibbs_table
+      locator:
+        table: '2'
+        published_page: 1913
+        pdf_page_index: 3
+        note: Table 2 appearance potentials of the ionic species
+      T_range_K:
+      - 1573.0
+      - 1663.0
+      phase: literature_AP_comparison
+      standard_state: appearance potential (eV), literature
+      regime: quoted_compilation
+      units: eV as published
+      values:
+        quantity: appearance_potential
+        method_class: quoted_measurement
+        P_plus_eV: 11.0
+        P_plus_ref: 6
+        P2_plus_eV: 11.4
+        P2_plus_ref: 7
+        PO_plus_eV: 9.5
+        PO_plus_ref: 7
+        PO2_plus_eV: 11.5
+        PO2_plus_ref: 7
+        Pb_plus_eV: 7.3
+        Pb_plus_ref: 8
+        PbO_plus_eV: 9.0
+        PbO_plus_ref: 8
+        uncertainty_eV_as_printed: 0.5
+      uncertainty:
+        as_printed: +/- 0.5 eV on each literature cell
+        note: quoted from refs 6-8 as printed in Table 2
+    - observation_id: kambayashi_1985_table6_partial_pressures_and_dg
+      type: psat_series
+      locator:
+        table: '6'
+        published_page: 1917
+        pdf_page_index: 7
+        note: Table 6 partial pressures above FetO-P2O5 and Delta-G for P2+2PO2=4PO
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      condensed_form: *id002
+      standard_state: partial pressure in atm; P_Fe from JANAF at the measurement T
+      regime: kems_effusion
+      units: atm as published (column scales 10^-8, 10^-7, 10^-8); Delta-G in kJ
+      values:
+        quantity: partial_pressure_and_gas_reaction_delta_G
+        method_class: model_derived
+        model_or_data_source: 'Eq. (10) from measured ion currents with Mann ionization cross-section
+          ratios, isotope abundances, and SEM gain ~ sqrt(mass); P_Fe from JANAF. Reaction (11): P2(g)+2PO2(g)=4PO(g).'
+        sigma_P_over_sigma_Fe_Mann: 0.891
+        sigma_P2_over_sigma_P: 1.5
+        sigma_PO_over_sigma_P: 1.2
+        sigma_PO2_over_sigma_PO: 0.7
+        gamma_Fe56: 0.9166
+        gamma_P2_62: 1.0
+        gamma_PO_47: 0.9976
+        gamma_PO2_63: 0.9952
+        otvos_stevenson_alternative_sigma_P_over_sigma_Fe: 0.493
+        otvos_note: authors rejected Otvos-Stevenson; it multiplies P(P2,PO,PO2) by 1.8 and lowers Delta-G
+          by 8 kJ, worsening the JANAF match
+        delta_G_kJ_average:
+          1370C: 93
+          1380C: 90
+          1390C: 87
+        delta_G_kJ_JANAF:
+          1370C: 93.3
+          1380C: 91.7
+          1390C: 90.0
+        rows:
+        - sample_no: 1
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0075
+          P_P2_atm: 1.14e-08
+          P_P2_x1e8_atm_as_printed: 1.14
+          P_PO_atm: 2.86e-07
+          P_PO_x1e7_atm_as_printed: 2.86
+          P_PO2_atm: 3.78e-08
+          P_PO2_x1e8_atm_as_printed: 3.78
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 107
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 1
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0075
+          P_P2_atm: 1.4e-08
+          P_P2_x1e8_atm_as_printed: 1.4
+          P_PO_atm: 3.46e-07
+          P_PO_x1e7_atm_as_printed: 3.46
+          P_PO2_atm: 4.53e-08
+          P_PO2_x1e8_atm_as_printed: 4.53
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 105
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 1
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0075
+          P_P2_atm: 1.81e-08
+          P_P2_x1e8_atm_as_printed: 1.81
+          P_PO_atm: 4.4800000000000004e-07
+          P_PO_x1e7_atm_as_printed: 4.48
+          P_PO2_atm: 5.52e-08
+          P_PO2_x1e8_atm_as_printed: 5.52
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 100
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 2
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0202
+          P_P2_atm: 3.03e-08
+          P_P2_x1e8_atm_as_printed: 3.03
+          P_PO_atm: 5.69e-07
+          P_PO_x1e7_atm_as_printed: 5.69
+          P_PO2_atm: 6.93e-08
+          P_PO2_x1e8_atm_as_printed: 6.93
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 99
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 2
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0202
+          P_P2_atm: 3.77e-08
+          P_P2_x1e8_atm_as_printed: 3.77
+          P_PO_atm: 6.98e-07
+          P_PO_x1e7_atm_as_printed: 6.98
+          P_PO2_atm: 8.470000000000001e-08
+          P_PO2_x1e8_atm_as_printed: 8.47
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 97
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 2
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0202
+          P_P2_atm: 4.72e-08
+          P_P2_x1e8_atm_as_printed: 4.72
+          P_PO_atm: 9.089999999999999e-07
+          P_PO_x1e7_atm_as_printed: 9.09
+          P_PO2_atm: 1.0640000000000001e-07
+          P_PO2_x1e8_atm_as_printed: 10.64
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 3
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0271
+          P_P2_atm: 1.5000000000000002e-08
+          P_P2_x1e8_atm_as_printed: 1.5
+          P_PO_atm: 7.61e-07
+          P_PO_x1e7_atm_as_printed: 7.61
+          P_PO2_atm: 9.449999999999999e-08
+          P_PO2_x1e8_atm_as_printed: 9.45
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 82
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 3
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0271
+          P_P2_atm: 1.93e-08
+          P_P2_x1e8_atm_as_printed: 1.93
+          P_PO_atm: 9.75e-07
+          P_PO_x1e7_atm_as_printed: 9.75
+          P_PO2_atm: 1.181e-07
+          P_PO2_x1e8_atm_as_printed: 11.81
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 78
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 3
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0271
+          P_P2_atm: 2.32e-08
+          P_P2_x1e8_atm_as_printed: 2.32
+          P_PO_atm: 1.2e-06
+          P_PO_x1e7_atm_as_printed: 12.0
+          P_PO2_atm: 1.3900000000000001e-07
+          P_PO2_x1e8_atm_as_printed: 13.9
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 74
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 4
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0427
+          P_P2_atm: 5.6399999999999995e-08
+          P_P2_x1e8_atm_as_printed: 5.64
+          P_PO_atm: 8.439999999999999e-07
+          P_PO_x1e7_atm_as_printed: 8.44
+          P_PO2_atm: 1.089e-07
+          P_PO2_x1e8_atm_as_printed: 10.89
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 98
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 4
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0427
+          P_P2_atm: 7.0e-08
+          P_P2_x1e8_atm_as_printed: 7.0
+          P_PO_atm: 1.072e-06
+          P_PO_x1e7_atm_as_printed: 10.72
+          P_PO2_atm: 1.333e-07
+          P_PO2_x1e8_atm_as_printed: 13.33
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 94
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 4
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0427
+          P_P2_atm: 8.68e-08
+          P_P2_x1e8_atm_as_printed: 8.68
+          P_PO_atm: 1.332e-06
+          P_PO_x1e7_atm_as_printed: 13.32
+          P_PO2_atm: 1.6550000000000002e-07
+          P_PO2_x1e8_atm_as_printed: 16.55
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 5
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0499
+          P_P2_atm: 7.040000000000001e-08
+          P_P2_x1e8_atm_as_printed: 7.04
+          P_PO_atm: 1.0779999999999999e-06
+          P_PO_x1e7_atm_as_printed: 10.78
+          P_PO2_atm: 1.2699999999999999e-07
+          P_PO2_x1e8_atm_as_printed: 12.7
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 6
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0691
+          P_P2_atm: 6.85e-08
+          P_P2_x1e8_atm_as_printed: 6.85
+          P_PO_atm: 1.1759999999999998e-06
+          P_PO_x1e7_atm_as_printed: 11.76
+          P_PO2_atm: 1.389e-07
+          P_PO2_x1e8_atm_as_printed: 13.89
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 89
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 6
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0691
+          P_P2_atm: 8.52e-08
+          P_P2_x1e8_atm_as_printed: 8.52
+          P_PO_atm: 1.4749999999999999e-06
+          P_PO_x1e7_atm_as_printed: 14.75
+          P_PO2_atm: 1.73e-07
+          P_PO2_x1e8_atm_as_printed: 17.3
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 86
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 6
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0691
+          P_P2_atm: 1.1150000000000001e-07
+          P_P2_x1e8_atm_as_printed: 11.15
+          P_PO_atm: 1.853e-06
+          P_PO_x1e7_atm_as_printed: 18.53
+          P_PO2_atm: 2.1100000000000002e-07
+          P_PO2_x1e8_atm_as_printed: 21.1
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 84
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 7
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0764
+          P_P2_atm: 8.660000000000001e-08
+          P_P2_x1e8_atm_as_printed: 8.66
+          P_PO_atm: 1.2019999999999999e-06
+          P_PO_x1e7_atm_as_printed: 12.02
+          P_PO2_atm: 1.423e-07
+          P_PO2_x1e8_atm_as_printed: 14.23
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 92
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 7
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0764
+          P_P2_atm: 1.084e-07
+          P_P2_x1e8_atm_as_printed: 10.84
+          P_PO_atm: 1.519e-06
+          P_PO_x1e7_atm_as_printed: 15.19
+          P_PO2_atm: 1.745e-07
+          P_PO2_x1e8_atm_as_printed: 17.45
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 88
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 7
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0764
+          P_P2_atm: 1.367e-07
+          P_P2_x1e8_atm_as_printed: 13.67
+          P_PO_atm: 1.9399999999999996e-06
+          P_PO_x1e7_atm_as_printed: 19.4
+          P_PO2_atm: 2.114e-07
+          P_PO2_x1e8_atm_as_printed: 21.14
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 84
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 8
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0991
+          P_P2_atm: 7.16e-08
+          P_P2_x1e8_atm_as_printed: 7.16
+          P_PO_atm: 1.522e-06
+          P_PO_x1e7_atm_as_printed: 15.22
+          P_PO2_atm: 1.832e-07
+          P_PO2_x1e8_atm_as_printed: 18.32
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 83
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 8
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0991
+          P_P2_atm: 8.93e-08
+          P_P2_x1e8_atm_as_printed: 8.93
+          P_PO_atm: 1.912e-06
+          P_PO_x1e7_atm_as_printed: 19.12
+          P_PO2_atm: 2.287e-07
+          P_PO2_x1e8_atm_as_printed: 22.87
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 81
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+        - sample_no: 8
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0991
+          P_P2_atm: 1.14e-07
+          P_P2_x1e8_atm_as_printed: 11.4
+          P_PO_atm: 2.3179999999999997e-06
+          P_PO_x1e7_atm_as_printed: 23.18
+          P_PO2_atm: 2.997e-07
+          P_PO2_x1e8_atm_as_printed: 29.97
+          delta_G_kJ_P2_plus_2PO2_eq_4PO: 81
+          pressure_conversion: 'P_atm = printed_mantissa x column_scale (P2, PO2: 10^-8 atm; PO: 10^-7
+            atm)'
+      uncertainty:
+        note: P2 partial pressure carries large error because empty-cell P2+ contamination can be tens
+          of percent; Delta-G scatter follows. Averages still match JANAF.
+  PO2:
+    observations:
+    - observation_id: kambayashi_1985_po2_table6_partial_pressure
+      type: psat_series
+      locator:
+        table: '6'
+        published_page: 1917
+        pdf_page_index: 7
+        note: Table 6 partial pressures above FetO-P2O5 and Delta-G for P2+2PO2=4PO
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      condensed_form: *id002
+      standard_state: P_PO2 in atm from Table 6 (x 10^-8 atm column)
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: partial_pressure
+        gas_species: PO2(g)
+        method_class: model_derived
+        model_or_data_source: same Table 6 reduction as the PO observation (Mann sigma, JANAF P_Fe)
+        column_scale: 10^-8 atm
+        rows:
+        - sample_no: 1
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0075
+          P_PO2_x1e8_atm_as_printed: 3.78
+          P_atm: 3.78e-08
+        - sample_no: 1
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0075
+          P_PO2_x1e8_atm_as_printed: 4.53
+          P_atm: 4.53e-08
+        - sample_no: 1
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0075
+          P_PO2_x1e8_atm_as_printed: 5.52
+          P_atm: 5.52e-08
+        - sample_no: 2
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0202
+          P_PO2_x1e8_atm_as_printed: 6.93
+          P_atm: 6.93e-08
+        - sample_no: 2
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0202
+          P_PO2_x1e8_atm_as_printed: 8.47
+          P_atm: 8.470000000000001e-08
+        - sample_no: 2
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0202
+          P_PO2_x1e8_atm_as_printed: 10.64
+          P_atm: 1.0640000000000001e-07
+        - sample_no: 3
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0271
+          P_PO2_x1e8_atm_as_printed: 9.45
+          P_atm: 9.449999999999999e-08
+        - sample_no: 3
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0271
+          P_PO2_x1e8_atm_as_printed: 11.81
+          P_atm: 1.181e-07
+        - sample_no: 3
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0271
+          P_PO2_x1e8_atm_as_printed: 13.9
+          P_atm: 1.3900000000000001e-07
+        - sample_no: 4
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0427
+          P_PO2_x1e8_atm_as_printed: 10.89
+          P_atm: 1.089e-07
+        - sample_no: 4
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0427
+          P_PO2_x1e8_atm_as_printed: 13.33
+          P_atm: 1.333e-07
+        - sample_no: 4
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0427
+          P_PO2_x1e8_atm_as_printed: 16.55
+          P_atm: 1.6550000000000002e-07
+        - sample_no: 5
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0499
+          P_PO2_x1e8_atm_as_printed: 12.7
+          P_atm: 1.2699999999999999e-07
+        - sample_no: 6
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0691
+          P_PO2_x1e8_atm_as_printed: 13.89
+          P_atm: 1.389e-07
+        - sample_no: 6
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0691
+          P_PO2_x1e8_atm_as_printed: 17.3
+          P_atm: 1.73e-07
+        - sample_no: 6
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0691
+          P_PO2_x1e8_atm_as_printed: 21.1
+          P_atm: 2.1100000000000002e-07
+        - sample_no: 7
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0764
+          P_PO2_x1e8_atm_as_printed: 14.23
+          P_atm: 1.423e-07
+        - sample_no: 7
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0764
+          P_PO2_x1e8_atm_as_printed: 17.45
+          P_atm: 1.745e-07
+        - sample_no: 7
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0764
+          P_PO2_x1e8_atm_as_printed: 21.14
+          P_atm: 2.114e-07
+        - sample_no: 8
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0991
+          P_PO2_x1e8_atm_as_printed: 18.32
+          P_atm: 1.832e-07
+        - sample_no: 8
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0991
+          P_PO2_x1e8_atm_as_printed: 22.87
+          P_atm: 2.287e-07
+        - sample_no: 8
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0991
+          P_PO2_x1e8_atm_as_printed: 29.97
+          P_atm: 2.997e-07
+      uncertainty:
+        note: empty-cell PO2+ contamination 2-5% subtracted
+  P2:
+    observations:
+    - observation_id: kambayashi_1985_p2_table6_partial_pressure
+      type: psat_series
+      locator:
+        table: '6'
+        published_page: 1917
+        pdf_page_index: 7
+        note: Table 6 partial pressures above FetO-P2O5 and Delta-G for P2+2PO2=4PO
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      condensed_form: *id002
+      standard_state: P_P2 in atm from Table 6 (x 10^-8 atm column)
+      regime: kems_effusion
+      units: atm as published
+      values:
+        quantity: partial_pressure
+        gas_species: P2(g)
+        method_class: model_derived
+        model_or_data_source: same Table 6 reduction as the PO observation (Mann sigma, JANAF P_Fe)
+        column_scale: 10^-8 atm
+        fragment_note: authors treat P2+ as parent; P+ contains fragment contributions from P2 and PO
+        rows:
+        - sample_no: 1
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0075
+          P_P2_x1e8_atm_as_printed: 1.14
+          P_atm: 1.14e-08
+        - sample_no: 1
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0075
+          P_P2_x1e8_atm_as_printed: 1.4
+          P_atm: 1.4e-08
+        - sample_no: 1
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0075
+          P_P2_x1e8_atm_as_printed: 1.81
+          P_atm: 1.81e-08
+        - sample_no: 2
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0202
+          P_P2_x1e8_atm_as_printed: 3.03
+          P_atm: 3.03e-08
+        - sample_no: 2
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0202
+          P_P2_x1e8_atm_as_printed: 3.77
+          P_atm: 3.77e-08
+        - sample_no: 2
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0202
+          P_P2_x1e8_atm_as_printed: 4.72
+          P_atm: 4.72e-08
+        - sample_no: 3
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0271
+          P_P2_x1e8_atm_as_printed: 1.5
+          P_atm: 1.5000000000000002e-08
+        - sample_no: 3
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0271
+          P_P2_x1e8_atm_as_printed: 1.93
+          P_atm: 1.93e-08
+        - sample_no: 3
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0271
+          P_P2_x1e8_atm_as_printed: 2.32
+          P_atm: 2.32e-08
+        - sample_no: 4
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0427
+          P_P2_x1e8_atm_as_printed: 5.64
+          P_atm: 5.6399999999999995e-08
+        - sample_no: 4
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0427
+          P_P2_x1e8_atm_as_printed: 7.0
+          P_atm: 7.0e-08
+        - sample_no: 4
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0427
+          P_P2_x1e8_atm_as_printed: 8.68
+          P_atm: 8.68e-08
+        - sample_no: 5
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0499
+          P_P2_x1e8_atm_as_printed: 7.04
+          P_atm: 7.040000000000001e-08
+        - sample_no: 6
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0691
+          P_P2_x1e8_atm_as_printed: 6.85
+          P_atm: 6.85e-08
+        - sample_no: 6
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0691
+          P_P2_x1e8_atm_as_printed: 8.52
+          P_atm: 8.52e-08
+        - sample_no: 6
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0691
+          P_P2_x1e8_atm_as_printed: 11.15
+          P_atm: 1.1150000000000001e-07
+        - sample_no: 7
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0764
+          P_P2_x1e8_atm_as_printed: 8.66
+          P_atm: 8.660000000000001e-08
+        - sample_no: 7
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0764
+          P_P2_x1e8_atm_as_printed: 10.84
+          P_atm: 1.084e-07
+        - sample_no: 7
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0764
+          P_P2_x1e8_atm_as_printed: 13.67
+          P_atm: 1.367e-07
+        - sample_no: 8
+          T_C: 1370
+          T_K: 1643.0
+          X_P2O5: 0.0991
+          P_P2_x1e8_atm_as_printed: 7.16
+          P_atm: 7.16e-08
+        - sample_no: 8
+          T_C: 1380
+          T_K: 1653.0
+          X_P2O5: 0.0991
+          P_P2_x1e8_atm_as_printed: 8.93
+          P_atm: 8.93e-08
+        - sample_no: 8
+          T_C: 1390
+          T_K: 1663.0
+          X_P2O5: 0.0991
+          P_P2_x1e8_atm_as_printed: 11.4
+          P_atm: 1.14e-07
+      uncertainty:
+        note: P2+ empty-cell contamination can be tens of percent; largest pressure error in Table 6
+  P4O10:
+    observations:
+    - observation_id: kambayashi_1985_p4o10_sat_janaf_extrapolated
+      type: psat_series
+      locator:
+        published_page: 1917
+        pdf_page_index: 7
+        section: 4.3.3
+        note: P_P4O10_sat from JANAF P4O10(s) extrapolated past 1500 K
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: P4O10_s_saturation_used_as_P2O5_solid_standard
+      standard_state: P4O10(g) in equilibrium with P4O10(s); atm as printed
+      regime: janaf_extrapolation
+      units: atm as published
+      values:
+        quantity: saturation_pressure
+        method_class: model_derived
+        model_or_data_source: JANAF Thermochemical Tables NSRDS-NBS (1971), Suppl. (1974); P4O10(s) standard
+          free energy tabulated to 1500 K, extrapolated to 1643-1663 K
+        points:
+        - T_C: 1370
+          T_K: 1643.0
+          P_sat_atm: 700.0
+        - T_C: 1380
+          T_K: 1653.0
+          P_sat_atm: 709.0
+        - T_C: 1390
+          T_K: 1663.0
+          P_sat_atm: 719.0
+      uncertainty:
+        note: extrapolation of JANAF P4O10(s) beyond 1500 K; no numeric +/- printed
+  Fe:
+    observations:
+    - observation_id: kambayashi_1985_fe_sublimation_enthalpy_1370c
+      type: gibbs_table
+      locator:
+        published_page: 1916
+        pdf_page_index: 6
+        figure: '8'
+        equation: '9'
+        note: Clausius-Clapeyron of I_Fe+ T vs 1/T at 1370 C
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: Fe_crucible_internal_standard
+      standard_state: Delta-H_sub of Fe at 1370 C from the Fig. 8 slope
+      regime: kems_effusion
+      units: kJ as published (not kJ/mol spelled; Clausius-Clapeyron of Fe sublimation)
+      values:
+        quantity: sublimation_enthalpy
+        method_class: model_derived
+        model_or_data_source: eq. (9') slope of Fig. 8; compared with JANAF 395 kJ
+        delta_H_sub_kJ: 429
+        T_C_as_printed: 1370
+        janaf_comparison_kJ: 395
+        authors_text: 429 kJ agrees with JANAF 395 kJ once long-run sensitivity drift is allowed for;
+          Fe(g) is in equilibrium with the Fe crucible
+      uncertainty:
+        note: authors cite possible sensitivity drift over the long run as the reason 429 vs 395 kJ still
+          'agrees well'
+    - observation_id: kambayashi_1985_fig8_ion_current_vs_1T_figure_only
+      type: psat_series
+      locator:
+        figure: '8'
+        published_page: 1916
+        pdf_page_index: 6
+        note: ln I_Fe+ T vs 1/T x 10^4 for FetO-P2O5 samples
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: Fe_crucible_internal_standard
+      standard_state: I_Fe+ T vs 1/T; not digitised
+      regime: kems_effusion
+      units: ln I T as plotted; not digitised
+      values:
+        quantity: ion_intensity
+        gas_species: Fe
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        labeled_samples:
+        - No.7
+        - No.2
+        - No.1
+        - No.5
+        - No.6
+        - No.3
+        - No.4
+      uncertainty:
+        note: figure-only; not digitised
+    - observation_id: kambayashi_1985_fig3_time_dependence_figure_only
+      type: rate_series
+      locator:
+        figure: '3'
+        published_page: 1914
+        pdf_page_index: 4
+        note: Time dependence of ion current ratios at X_P2O5=0.0499
+      T_range_K:
+      - 1643.0
+      - 1643.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      standard_state: I/I_Fe vs time (h)
+      regime: kems_effusion
+      units: ion current ratios as plotted; not digitised
+      values:
+        quantity: ion_current_ratio_vs_time
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        X_P2O5: 0.0499
+        stability_as_printed: ratios nearly stable after about 1 h at constant T; unchanged for 10 h
+      uncertainty:
+        note: figure-only; not digitised
+    - observation_id: kambayashi_1985_fig4_time_dependence_figure_only
+      type: rate_series
+      locator:
+        figure: '4'
+        published_page: 1914
+        pdf_page_index: 4
+        note: Temperature-cycle reproducibility at X_P2O5=0.0427
+      T_range_K:
+      - 1633.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      standard_state: I/I_Fe vs time through 1370-1390-1380-1370-1360-1370 C holds
+      regime: kems_effusion
+      units: ion current ratios as plotted; not digitised
+      values:
+        quantity: ion_current_ratio_vs_time
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        X_P2O5: 0.0427
+        authors_text: good reproducibility against temperature change
+      uncertainty:
+        note: figure-only; not digitised
+    - observation_id: kambayashi_1985_fig5_temperature_dependence_figure_only
+      type: rate_series
+      locator:
+        figure: '5'
+        published_page: 1915
+        pdf_page_index: 5
+        note: Activity ion-current ratio vs T for samples 1-8
+      T_range_K:
+      - 1643.0
+      - 1663.0
+      phase: FetO-P2O5_oxide_melt_in_Fe_crucible
+      standard_state: (I_PO2/I_Fe)^3/(I_PO/I_Fe) vs T
+      regime: kems_effusion
+      units: ion current ratio as plotted; not digitised
+      values:
+        quantity: ion_current_ratio_vs_T
+        method_class: measured
+        admission_status: figure_only
+        semantics: bound_not_point_ordering
+        weak_T_dependence_below_X: 0.0764
+        T_dependence_at_X: 0.0991
+      uncertainty:
+        note: figure-only; not digitised
+  Pd:
+    observations:
+    - observation_id: kambayashi_1985_pd_internal_standard_pbo_system
+      type: rate_series
+      locator:
+        published_page: 1912
+        pdf_page_index: 2
+        figure: '1'
+        section: '2.1'
+        note: Hitachi RM-6E Knudsen cell; alumina SSA-S; Pd or Fe inner crucible
+      T_range_K:
+      - 1573.0
+      - 1573.0
+      phase: Pd_crucible_internal_standard
+      standard_state: Pd(g) from the Pd crucible; I(Pd+) used in Table 3 ratios
+      regime: kems_effusion
+      units: internal standard; no absolute P_Pd tabulated
+      values:
+        quantity: internal_standard
+        method_class: measured
+        role: internal standard for PbO-P2O5 ion current ratios at 1300 C
+        absolute_P_Pd: not_tabulated
+      uncertainty:
+        note: cancels the +/-15% apparatus constant; no separate P_Pd series
+      equipment: *id001
+deepening:
+  dispatch_id: extract-kems-057
+  date: '2026-09-12'
+  quote_convention: Printed text transcribed with ASCII flattening of subscripts, superscripts, and plus/minus.
+  table_inventory:
+  - table: '1'
+    published_page: 1913
+    pdf_page_index: 3
+    completeness: full
+    note: Ionic species for both melts
+  - table: '2'
+    published_page: 1913
+    pdf_page_index: 3
+    completeness: full
+    note: Appearance potentials this work vs literature
+  - table: '3'
+    published_page: 1913
+    pdf_page_index: 3
+    completeness: full
+    note: Three PbO-P2O5 melts at 1300 C
+  - table: '4'
+    published_page: 1914
+    pdf_page_index: 4
+    completeness: full
+    note: Eight FetO-P2O5 compositions
+  - table: '5'
+    published_page: 1915
+    pdf_page_index: 5
+    completeness: full
+    note: Ion current ratios; sample 5 at 1370 C only; asterisk 0.3 mm orifice rows on 4 and 7
+  - table: '6'
+    published_page: 1917
+    pdf_page_index: 7
+    completeness: full
+    note: Partial pressures and Delta-G; sample 5 at 1370 C only
+  - table: '7'
+    published_page: 1917
+    pdf_page_index: 7
+    completeness: full
+    note: Raoultian a_P2O5 x 10^17; sample 5 at 1370 C only
+  class_ledger:
+    measured:
+    - kambayashi_1985_kems_geometry_and_calibration
+    - kambayashi_1985_table1_ionic_species
+    - kambayashi_1985_table2_appearance_potentials_this_work
+    - kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c
+    - kambayashi_1985_table4_feto_p2o5_compositions
+    - kambayashi_1985_table5_feto_p2o5_ion_current_ratios
+    - kambayashi_1985_gamma_p2o5_solid_std_henry
+    - kambayashi_1985_pbo_table3_ion_current_ratios_1300c
+    - kambayashi_1985_pd_internal_standard_pbo_system
+    quoted_measurement:
+    - kambayashi_1985_table2_appearance_potentials_literature
+    model_derived:
+    - kambayashi_1985_table7_raoultian_a_p2o5
+    - kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson
+    - kambayashi_1985_table6_partial_pressures_and_dg
+    - kambayashi_1985_po2_table6_partial_pressure
+    - kambayashi_1985_p2_table6_partial_pressure
+    - kambayashi_1985_p4o10_sat_janaf_extrapolated
+    - kambayashi_1985_fe_sublimation_enthalpy_1370c
+    - kambayashi_1985_feto_raoultian_gibbs_duhem_fig7_figure_only
+    figure_only:
+    - kambayashi_1985_fig2_pbo_p2o5_ion_ratios_figure_only
+    - kambayashi_1985_fig6_henrian_a_p2o5_figure_only
+    - kambayashi_1985_fig7_raoultian_activities_figure_only
+    - kambayashi_1985_fig8_ion_current_vs_1T_figure_only
+    - kambayashi_1985_fig3_time_dependence_figure_only
+    - kambayashi_1985_fig4_time_dependence_figure_only
+    - kambayashi_1985_fig5_temperature_dependence_figure_only
+  refused:
+  - what: numeric a_P2O5 or a_PbO off Fig. 2, 6, 7 axes
+    why: figure_only; tables already carry the tabulated ion ratios and Table 7 activities
+  - what: orifice area, Clausing factor, melt free-surface area
+    why: only orifice diameter and cell inner diameter are printed; area not invented
+  - what: P2O5(g) partial pressure
+    why: authors report P2O5(g) was not detected
+  - what: Table 5/6/7 sample 5 at 1380 C and 1390 C
+    why: printed as em-dashes; omitted, not interpolated
+  primary_sources_cited:
+  - ref: 1
+    as_printed: S. Ban-ya and T. Watanabe, Tetsu-to-Hagane, 63 (1977), p. 1809
+  - ref: 2
+    as_printed: T. Furukawa and E. Kato, Tetsu-to-Hagane, 61 (1975), p. 3050
+  - ref: 3
+    as_printed: K. Yamada and E. Kato, Tetsu-to-Hagane, 65 (1979), p. 264
+  - ref: 4
+    as_printed: J. D. Murrison, J. Chem. Phys., 19 (1951), p. 1305
+  - ref: 5
+    as_printed: C. E. Melton and W. H. Hamill, J. Chem. Phys., 41 (1964), p. 1469
+  - ref: 6
+    as_printed: C. E. Moore, Natl. Bur. Std. Circ. (1949) No. 467
+  - ref: 7
+    as_printed: S. Smoes and J. Drowart, Faraday Symposia Chem. Soc., 8 (1974), p. 139
+  - ref: 8
+    as_printed: J. Drowart, R. Colin and G. Exsteen, Trans. Faraday Soc., 61 (1965), p. 1376
+  - ref: 9
+    as_printed: R. Sridhar and J. H. E. Jeffes, Trans. Inst. Mining Met., 78 (1969), c 14
+  - ref: 10
+    as_printed: G. Tromel and K. Schwerdtfeger, Arch. Eisenhuttenwes., 34 (1963), p. 55
+  - ref: 11
+    as_printed: JANAF Thermochemical Tables. NSRDS-NBS. (1971), Suppl. (1974)
+  - ref: 12
+    as_printed: J. F. Mann, J. Chem. Phys., 46 (1967), p. 1646
+  - ref: 13
+    as_printed: M. Yamamoto, K. Yamada, L. L. Meshkov, E. Kato, Tetsu-to-Hagane, 66 (1980), p. 2032
+  - ref: 14
+    as_printed: J. Drowart, C. E. Myers, R. Szwarc, A. Vander Auwera-Mahieu and O. M. Uy, J. C. S. Faraday
+      Trans. II, 68 (1972), p. 1749
+  - ref: 15
+    as_printed: H. E. Stanton, W. A. Chupka and M. G. Inghram, Rev. Sci. Instru., 27 (1956), p. 109
+  - ref: 16
+    as_printed: J. W. Otvos and D. P. Stevenson, J. Am. Chem. Soc., 71 (1967), p. 546
+  - ref: 17
+    as_printed: E. T. Turkdogan and J. Pearson, JISI, 175 (1953), p. 398
+  - ref: 18
+    as_printed: H. Suito, R. Inoue, M. Takada, Tetsu-to-Hagane, 67 (1981), p. 2645
+  - ref: 19
+    as_printed: H. Suito, R. Inoue, Tetsu-to-Hagane, 70 (1984), p. 186
