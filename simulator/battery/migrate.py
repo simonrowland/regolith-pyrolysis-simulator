@@ -1475,7 +1475,7 @@ def admission_for(
         decided = None
         if isinstance(extraction, Mapping) and locator is not None:
             worker = str(extraction.get("worker") or extraction.get("method") or "extract")
-            date = str(extraction.get("date") or "1970-01-01")
+            date = str(extraction.get("date") or "unspecified")
             decided = AdmissionDecision(worker=worker, date=date, evidence=locator)
         return Admission(
             status=AdmissionStatus.SUPERSEDED,
@@ -1498,7 +1498,7 @@ def admission_for(
         if isinstance(extraction, Mapping) and locator is not None:
             decided = AdmissionDecision(
                 worker=str(extraction.get("worker") or "extract"),
-                date=str(extraction.get("date") or "1970-01-01"),
+                date=str(extraction.get("date") or "unspecified"),
                 evidence=locator,
             )
         return Admission(
@@ -1511,7 +1511,7 @@ def admission_for(
         if isinstance(extraction, Mapping) and locator is not None:
             decided = AdmissionDecision(
                 worker=str(extraction.get("worker") or "extract"),
-                date=str(extraction.get("date") or "1970-01-01"),
+                date=str(extraction.get("date") or "unspecified"),
                 evidence=locator,
             )
         return Admission(

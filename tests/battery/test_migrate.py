@@ -167,6 +167,18 @@ def test_unknown_rail_spelling_raises() -> None:
         canonicalize_rail("gibbs_thermochemistry")
 
 
+def test_h11_missing_extraction_date_is_unspecified(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["extraction"].pop("date", None)
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    decided = obs.admission.decided_by
+    assert decided is not None
+    assert decided.date != "1970-01-01"
+    assert decided.date in {"unspecified", "unknown"}
+
+
 def test_h10_migrate_has_no_validation_bypass() -> None:
     import inspect
 
