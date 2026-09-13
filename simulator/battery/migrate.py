@@ -526,6 +526,7 @@ class MeasuredCounts:
     admission_statuses: int = 0
     supersedes: int = 0
     series: int = 0
+    tabulated_lists: int = 0
     gibbs_reference_pressures: int = 0
     gibbs_reference_100000: int = 0
     gibbs_reference_101325: int = 0
@@ -1687,8 +1688,12 @@ class Migrator:
             measured.equipment_payloads += 1
 
         value, exploded = empty_value_from_payload(values, obs_type, obs.get("units"))
-        if exploded:
+        if isinstance(values.get("series"), list) and values.get("series"):
             measured.series += 1
+        if isinstance(values.get("tabulated_delta_fG_kJ_mol"), list) and values.get(
+            "tabulated_delta_fG_kJ_mol"
+        ):
+            measured.tabulated_lists += 1
 
         ident_kwargs: dict[str, Any] = {}
         if t_known is not None and quantity is not Quantity.TRANSITION_TEMPERATURE:
@@ -1796,69 +1801,105 @@ class Migrator:
         val = None
         trail = "identity"
         extra_unc = None
+        point_locator = locator
         if isinstance(raw_item, Mapping):
-            for ck in ("T_K", "T", "temperature_K"):
-                if ck in raw_item:
-                    coord = _as_dec_or_none(raw_item.get(ck))
+            if raw_item.get("locator"):
+                point_locator = (
+                    locator_from_mapping(
+                        raw_item.get("locator"), fallback=f"{parent_id}:point:{index}"
+                    )
+                    or locator
+                )
+            if "T_K" in raw_item or "temperature_K" in raw_item:
+                coord = _as_dec_or_none(raw_item.get("T_K", raw_item.get("temperature_K")))
+            elif "T_C" in raw_item:
+                coord, _ = convert_temperature_to_k(raw_item.get("T_C"), "C")
+            elif "T" in raw_item:
+                coord = _as_dec_or_none(raw_item.get("T"))
+            pressure_keys = (
+                ("pressure_atm", "atm"),
+                ("p_atm", "atm"),
+                ("P_atm", "atm"),
+                ("pressure_bar", "bar"),
+                ("P_bar", "bar"),
+                ("p_bar", "bar"),
+                ("P_Pa", "Pa"),
+                ("pressure_Pa", "Pa"),
+                ("p_Pa", "Pa"),
+                ("p_Ga_Pa", "Pa"),
+                ("p_In_Pa", "Pa"),
+                ("p_O2_calc_Pa", "Pa"),
+                ("Pb_Torr", "Torr"),
+                ("Pbar_Torr", "Torr"),
+                ("Po_Torr", "Torr"),
+            )
+            for key, unit in pressure_keys:
+                if key in raw_item:
+                    val, trail_or_why = convert_pressure_to_pa(raw_item.get(key), unit)
+                    trail = trail_or_why or "identity"
                     break
-            if "pressure_atm" in raw_item or (
-                "P" in raw_item and "atm" in units.lower()
-            ):
-                raw_p = raw_item.get("pressure_atm", raw_item.get("P"))
-                if _as_dec_or_none(raw_p) is not None:
-                    val = atm_to_pa(raw_p)
-                    trail = "atm_to_Pa"
-            elif "pressure_bar" in raw_item or "P_bar" in raw_item:
-                raw_p = raw_item.get("pressure_bar", raw_item.get("P_bar"))
-                val = bar_to_pa(raw_p) if _as_dec_or_none(raw_p) is not None else None
-                trail = "bar_to_Pa"
-            else:
-                for vk in ("P_Pa", "pressure_Pa", "alpha", "value", "delta_fG", "P", "p"):
+            if val is None and "P" in raw_item and "atm" in (units or "").lower():
+                val, trail_or_why = convert_pressure_to_pa(raw_item.get("P"), "atm")
+                trail = trail_or_why or "atm_to_Pa"
+            if val is None:
+                for vk in ("alpha", "gamma", "value", "delta_fG", "P", "p"):
                     if vk in raw_item:
                         val = _as_dec_or_none(raw_item.get(vk))
+                        trail = "as_published"
                         break
-            extra_unc = raw_item.get("sigma")
-        if coord is None or val is None:
+            extra_unc = raw_item.get("sigma") or raw_item.get("gamma_SD")
+        point_id = f"{parent_id}::point:{index}"
+        ident_kwargs = dict(ident_kwargs)
+        if coord is not None:
+            ident_kwargs["temperature_K"] = State.of(coord)
+        identity = fill_identity(quantity, species, **ident_kwargs)
+        if val is None:
+            emitted = Value(
+                ValueKind.UNAVAILABLE,
+                unavailable_reason=f"series point {index} has no liftable numeric value",
+            )
             self.result.add_queue(
                 work.work_id,
-                locator,
+                point_locator,
                 ["value"],
-                f"series point {index} missing numeric coordinate/value",
+                f"series point {index} stored with unknown value",
                 source=source_key,
-                observation_id=parent_id,
+                observation_id=point_id,
             )
-            return
-        ident_kwargs = dict(ident_kwargs)
-        ident_kwargs["temperature_K"] = State.of(coord)
-        identity = fill_identity(quantity, species, **ident_kwargs)
-        point_id = f"{parent_id}::point:{index}"
+            derivation = None
+        else:
+            emitted = Value.point_of(val)
+            from simulator.battery.records import Derivation
+
+            derivation = Derivation(
+                relation=trail,
+                inputs=(read_from,),
+                parameters=(),
+                output_unit="Pa" if str(trail).endswith("Pa") else (units or "as_published"),
+            )
         unc = uncertainty
         if extra_unc is not None:
             unc = Uncertainty(
                 kind=UncertaintyKind.PRINTED,
                 verbatim={"sigma": extra_unc, "parent": parent_id},
             )
-        from simulator.battery.records import Derivation
-
+        point_conditions = None
+        if coord is not None:
+            point_conditions = {"temperature_K": located_value(coord, point_locator)}
         observation = Observation(
             observation_id=point_id,
             experiment_id=experiment_id,
             identity=identity,
-            value=Value.point_of(val),
+            value=emitted,
             uncertainty=unc,
             evidence=evidence,
             admission=admission,
             notices=(),
             source_id=source_id,
-            locator=locator,
+            locator=point_locator,
             read_from=read_from,
-            point_conditions={"temperature_K": located_value(coord, locator)},
-            derivation=Derivation(
-                relation=trail,
-                inputs=(read_from,),
-                parameters=(),
-                output_unit="Pa" if trail.endswith("Pa") else (units or "as_published"),
-            ),
+            point_conditions=point_conditions,
+            derivation=derivation,
         )
         self._add_observation(observation, source_key)
 
@@ -2864,6 +2905,9 @@ def write_report(result: MigrationResult, path: Path) -> None:
         got = getattr(measured, attr)
         mark = "" if spec == got else " (mismatch)"
         lines.append(f"| {spec_key} | {spec} | {got}{mark} |")
+    lines.append(
+        f"| tabulated_lists | — | {measured.tabulated_lists} |"
+    )
     lines.extend(["", "## Per source", "", "| source | rows in | observations out | queued |", "|---|---:|---:|---:|"])
     queued_by_source: dict[str, int] = defaultdict(int)
     for entry in result.queue:

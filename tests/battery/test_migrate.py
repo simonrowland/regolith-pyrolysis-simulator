@@ -454,6 +454,55 @@ def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
     assert obs.evidence.class_.value is not EvidenceClass.FIGURE_ONLY
 
 
+def test_g06_p_atm_and_unliftable_series_explode(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = [
+        {
+            "observation_id": "behrens_p_atm",
+            "type": "psat_series",
+            "locator": {"table": "2"},
+            "phase": "gas",
+            "units": "atm",
+            "values": {
+                "quantity": "pure_Psat",
+                "method_class": "measured_direct",
+                "series": [
+                    {"T_K": 1200.0, "p_atm": 1.0},
+                    {"T_K": 1300.0, "p_atm": 2.0},
+                ],
+            },
+        },
+        {
+            "observation_id": "unliftable_row",
+            "type": "psat_series",
+            "locator": {"table": "3"},
+            "phase": "gas",
+            "values": {
+                "quantity": "pure_Psat",
+                "series": [{"quote": "text only", "locator": {"line_range": "4-5"}}],
+            },
+        },
+    ]
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False, validate=True)
+    atm_points = [
+        o
+        for o in result.observations.values()
+        if "behrens_p_atm" in o.observation_id
+    ]
+    assert len(atm_points) == 2
+    assert all(p.derivation is not None and p.derivation.relation == "atm_to_Pa" for p in atm_points)
+    unlift = [
+        o
+        for o in result.observations.values()
+        if "unliftable_row" in o.observation_id
+    ]
+    assert len(unlift) == 1
+    assert unlift[0].value.kind.value == "unavailable"
+    assert result.measured.series == 2
+    assert result.measured.tabulated_lists == 0
+
+
 def test_g05_identical_duplicate_keys_are_aliased(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     point = {
