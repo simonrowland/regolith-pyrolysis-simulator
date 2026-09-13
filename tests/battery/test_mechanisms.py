@@ -282,30 +282,84 @@ def test_m05_tiny_physical_pressure_is_not_a_floor_by_magnitude() -> None:
     a = F.psat_identity("Na", T_K=Decimal("800"))
     b = F.psat_identity("Na", T_K=Decimal("800"))
     assert identity_equal(a, b).kind is IdentityEqualKind.EQUAL
-    # 1e-30 Pa and 1e-25 Pa are different values, not a provenance classifier.
-    tiny = F.observation("tiny", "exp-1", a, Decimal("1e-30"))
-    assert tiny.value.point == Decimal("1e-30")
+    w = F.work()
+    exp = F.tabulation_experiment()
+    tiny = F.observation(
+        "tiny",
+        exp.experiment_id,
+        a,
+        Decimal("1e-30"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    clean_cand = F.engine_obs("tiny-cand", exp.experiment_id, a, Decimal("1e-30"))
+    clean = F.residual(
+        "m05-clean",
+        tiny.observation_id,
+        candidate=clean_cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+        rail=Rail.VAPOUR,
+    )
+    assert validate_corpus([w], [exp], [tiny, clean_cand], [clean]).ok
     floor = F.floor_notice()
-    assert floor.kind is NoticeKind.FLOOR_INVERSION
-    assert floor.original == Decimal("1e-40")
-    converted_floor = F.observation(
-        "converted-floor",
-        "exp-1",
+    floor_cand = F.engine_obs(
+        "floor-cand",
+        exp.experiment_id,
         a,
         Decimal("1e-25"),
         notices=(floor,),
     )
-    assert converted_floor.notices[0].kind is NoticeKind.FLOOR_INVERSION
+    scored_floor = F.residual(
+        "m05-floor-scored",
+        tiny.observation_id,
+        candidate=floor_cand.observation_id,
+        status=ResidualStatus.MISMATCH,
+        score_eligible=True,
+        notices=union_notices(floor_cand.notices),
+        rail=Rail.VAPOUR,
+    )
+    assert not validate_corpus([w], [exp], [tiny, floor_cand], [scored_floor]).ok
+    diagnostic = F.residual(
+        "m05-floor-diagnostic",
+        tiny.observation_id,
+        candidate=floor_cand.observation_id,
+        status=ResidualStatus.MISMATCH,
+        score_eligible=False,
+        notices=union_notices(floor_cand.notices),
+        rail=Rail.VAPOUR,
+    )
+    assert validate_corpus([w], [exp], [tiny, floor_cand], [diagnostic]).ok
 
 
 def test_m06_clamp_emits_floor_inversion_with_original_and_band() -> None:
+    from dataclasses import replace
+
     notice = F.floor_notice("adapter:projection")
-    assert notice.kind is NoticeKind.FLOOR_INVERSION
-    assert notice.original == Decimal("1e-40")
-    assert notice.band is not None
-    assert notice.reason
-    clean = F.observation("clean-m06", "exp-1", F.psat_identity("Na"), Decimal("1"))
+    ident = F.psat_identity("Na")
+    w = F.work()
+    exp = F.tabulation_experiment()
+    complete = F.observation(
+        "floor-complete",
+        exp.experiment_id,
+        ident,
+        Decimal("1e-25"),
+        notices=(notice,),
+    )
+    assert validate_corpus([w], [exp], [complete]).ok
+    incomplete = replace(notice, original=None, band=None)
+    missing = F.observation(
+        "floor-incomplete",
+        exp.experiment_id,
+        ident,
+        Decimal("1e-25"),
+        notices=(incomplete,),
+    )
+    missing_report = validate_corpus([w], [exp], [missing])
+    assert not missing_report.ok
+    assert any("original and band" in i.detail for i in missing_report.issues)
+    clean = F.observation("clean-m06", exp.experiment_id, ident, Decimal("1"))
     assert clean.notices == ()
+    assert validate_corpus([w], [exp], [clean]).ok
 
 
 def test_m07_apparatus_rejects_unknown_calibration_and_invalid_geometry() -> None:

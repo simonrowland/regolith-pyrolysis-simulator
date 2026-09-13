@@ -387,6 +387,15 @@ def _check_identity(path: str, identity: Identity, issues: list[ValidationIssue]
 
 
 def _check_notice(path: str, notice: Notice, issues: list[ValidationIssue]) -> None:
+    if notice.kind is NoticeKind.FLOOR_INVERSION:
+        if notice.original is None or not notice.band:
+            issues.append(
+                _issue(
+                    path,
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "floor_inversion requires original and band",
+                )
+            )
     if notice.kind is NoticeKind.FALLBACK:
         if not notice.source or not notice.destination:
             issues.append(
