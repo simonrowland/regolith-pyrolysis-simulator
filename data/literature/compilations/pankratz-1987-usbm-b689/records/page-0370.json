@@ -267,11 +267,12 @@
           "footnote_markers": []
         },
         "log_k": {
-          "raw": "13.944",
-          "value": 13.944,
-          "ocr_suspect": true,
-          "ocr_check": "not_image_verified",
-          "footnote_markers": []
+          "raw": "-13.944",
+          "value": -13.944,
+          "ocr_suspect": false,
+          "ocr_check": "image_verified",
+          "footnote_markers": [],
+          "raw_ocr_token": "13.944"
         }
       }
     },
@@ -1006,7 +1007,26 @@
       "printed_form_ocr": "Tb "
     }
   ],
-  "corrections": [],
+  "corrections": [
+    {
+      "record_id": "page-0370",
+      "printed_page": 370,
+      "pdf_page": 374,
+      "source_row_index": 4,
+      "column": "log_k",
+      "kind": "repair",
+      "ocr_token": "13.944",
+      "printed_token": "-13.944",
+      "image_quote": "TbS(g), 368.3 K (first transition row): ΔGf° 23.499 kcal/mol; Log Kf −13.944",
+      "render_dpi": 300,
+      "ocr_class": "dropped minus (ink-blotted sign on first 368.3 K transition row)",
+      "image_evidence": {
+        "source_pdf_sha256": "0b4b37822a058193e2d912214d74e0a1884d604ee3dad798d90800cadff70771",
+        "pdf_page": 374,
+        "render_dpi": 300
+      }
+    }
+  ],
   "ambiguities": [
     {
       "kind": "post_table_note_ocr_unverified",
