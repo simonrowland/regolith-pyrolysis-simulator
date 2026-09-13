@@ -32,6 +32,7 @@ and queued; they are never stored as gas.
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 import re
 import unicodedata
@@ -275,6 +276,7 @@ TYPE_QUANTITY = {
 # is absent; never overrides an explicit quantity token.
 UNIT_DECLARED_QUANTITY = {
     "dimensionless alpha vs t_k": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+    "dimensionless activity": Quantity.ACTIVITY,
 }
 
 QUANTITY_ALIASES = {
@@ -1386,6 +1388,44 @@ def map_phase(raw: object) -> tuple[State[Phase], str | None]:
     )
 
 
+# A source field that uniquely names one closed quantity. Pressure columns are
+# omitted: they do not distinguish p_sat from p_partial.
+_UNIQUE_QUANTITY_FIELDS: dict[str, Quantity] = {
+    "activity": Quantity.ACTIVITY,
+    "activity_coefficient": Quantity.ACTIVITY_COEFFICIENT,
+    "gamma": Quantity.ACTIVITY_COEFFICIENT,
+    "alpha": Quantity.EVAPORATION_COEFFICIENT_ALPHA,
+    "delta_fG": Quantity.DELTA_FG,
+    "delta_fG_298_kJ_mol": Quantity.DELTA_FG,
+    "deltafG": Quantity.DELTA_FG,
+    "delta_fG_kJ_mol": Quantity.DELTA_FG,
+    "table_kJ_mol": Quantity.DELTA_FG,
+    "Gf": Quantity.DELTA_FG,
+    "formation_gibbs_energy": Quantity.DELTA_FG,
+    "log10_Kf": Quantity.LOG10_KF,
+    "log10_kf": Quantity.LOG10_KF,
+    "log10_formation_equilibrium_constant": Quantity.LOG10_KF,
+}
+
+
+def _quantities_named_by_payload(
+    values: Mapping[str, Any] | None,
+) -> frozenset[Quantity]:
+    if not isinstance(values, Mapping):
+        return frozenset()
+    named: set[Quantity] = set()
+    for key, quantity in _UNIQUE_QUANTITY_FIELDS.items():
+        if key not in values:
+            continue
+        raw = values.get(key)
+        if raw is None or raw == "":
+            continue
+        if isinstance(raw, Mapping) and raw.get("value") is None and "value" in raw:
+            continue
+        named.add(quantity)
+    return frozenset(named)
+
+
 def map_quantity(
     obs_type: str | None,
     values: Mapping[str, Any] | None,
@@ -1403,6 +1443,15 @@ def map_quantity(
         unit_mapped = UNIT_DECLARED_QUANTITY.get(str(units).strip().lower())
         if unit_mapped is not None:
             return State.of(unit_mapped), None
+    named = _quantities_named_by_payload(values)
+    if quantity_absent and len(named) == 1:
+        return State.of(next(iter(named))), None
+    if quantity_absent and len(named) > 1:
+        labels = ", ".join(sorted(q.value for q in named))
+        return (
+            State.unknown(f"payload names conflicting quantities {labels}"),
+            f"conflicting quantity fields {labels}",
+        )
     if quantity_absent and obs_type in TYPE_QUANTITY:
         return State.of(TYPE_QUANTITY[obs_type]), None
     if isinstance(raw, str) and raw:
@@ -1677,94 +1726,6 @@ def fill_identity(
     return identity
 
 
-def empty_value_from_payload(
-    values: Mapping[str, Any] | None,
-    obs_type: str | None,
-    units: str | None,
-) -> tuple[Value, list[dict[str, Any]]]:
-    """Return the archival Value plus printed-point dicts to explode.
-
-    Explosion list items are ``{coord, value, unit, extra}``.
-    """
-
-    exploded: list[dict[str, Any]] = []
-    if not isinstance(values, Mapping):
-        return Value(ValueKind.UNAVAILABLE, unavailable_reason="empty values"), exploded
-
-    series = values.get("series")
-    if isinstance(series, list) and series:
-        for i, item in enumerate(series):
-            exploded.append({"index": i, "item": item, "units": units})
-        # Parent keeps a series Value of converted points when possible; the
-        # caller may replace this with exploded point Observations.
-        return _series_value(series, units), exploded
-
-    tabulated = values.get("tabulated_delta_fG_kJ_mol")
-    if isinstance(tabulated, list) and tabulated:
-        points: list[tuple[Decimal, Decimal]] = []
-        for i, item in enumerate(tabulated):
-            if not isinstance(item, Mapping):
-                continue
-            t = _as_dec_or_none(item.get("T_K") or item.get("T"))
-            g = _as_dec_or_none(item.get("delta_fG") or item.get("value"))
-            if t is None or g is None:
-                continue
-            points.append((t, g))
-            exploded.append({"index": i, "item": item, "units": "kJ_per_mol"})
-        if points:
-            return Value(ValueKind.SERIES, series=tuple(points)), exploded
-
-    for key, mapped in (
-        ("alpha", Quantity.EVAPORATION_COEFFICIENT_ALPHA),
-        ("activity", Quantity.ACTIVITY),
-        ("activity_coefficient", Quantity.ACTIVITY_COEFFICIENT),
-        ("delta_fG_298_kJ_mol", Quantity.DELTA_FG),
-        ("deltafG", Quantity.DELTA_FG),
-    ):
-        if key in values and _as_dec_or_none(values.get(key)) is not None:
-            del mapped
-            return Value.point_of(values[key]), exploded
-
-    if values.get("segments"):
-        return (
-            Value(
-                ValueKind.EXPRESSION,
-                expression_text="evaluator_segments_as_published",
-                expression_parameters=None,
-                expression_domain=str(values.get("evaluator_family") or "segments"),
-            ),
-            exploded,
-        )
-
-    if obs_type == "gibbs_table" and values.get("reference_pressure_Pa") is not None:
-        return (
-            Value(
-                ValueKind.EXPRESSION,
-                expression_text="gibbs_table_as_published",
-                expression_domain=str(values.get("evaluator_family") or "gibbs_table"),
-            ),
-            exploded,
-        )
-
-    # Qualitative / bound / range payloads stay structured, never a midpoint.
-    if values.get("semantics") in {"bound_not_point_ordering", "bound_not_point"}:
-        return Value(ValueKind.CATEGORICAL, categorical=str(values.get("semantics"))), exploded
-
-    t_range = values.get("T_range_K")
-    if isinstance(t_range, (list, tuple)) and len(t_range) == 2:
-        lo, hi = _as_dec_or_none(t_range[0]), _as_dec_or_none(t_range[1])
-        if lo is not None and hi is not None:
-            return Value(ValueKind.INTERVAL, interval_low=lo, interval_high=hi), exploded
-
-    return (
-        Value(
-            ValueKind.UNAVAILABLE,
-            unavailable_reason="source values have no printed scalar/series point",
-        ),
-        exploded,
-    )
-
-
 _PRESSURE_SERIES_KEYS = (
     ("pressure_atm", "atm"),
     ("p_atm", "atm"),
@@ -1790,6 +1751,615 @@ _ANCILLARY_SERIES_KEYS = (
     "delta_IW",
 )
 
+_PARTIAL_PRESSURE_FIELDS = ("partial_pressure_pa", "p_Ga_Pa", "p_In_Pa", "p_O2_calc_Pa")
+
+QUANTITY_SOURCE_FIELDS: dict[Quantity, tuple[str, ...]] = {
+    Quantity.ACTIVITY: ("activity",),
+    Quantity.ACTIVITY_COEFFICIENT: ("gamma", "activity_coefficient"),
+    Quantity.EVAPORATION_COEFFICIENT_ALPHA: ("alpha",),
+    Quantity.DELTA_FG: (
+        "delta_fG",
+        "delta_fG_298_kJ_mol",
+        "deltafG",
+        "delta_fG_kJ_mol",
+        "table_kJ_mol",
+        "Gf",
+        "formation_gibbs_energy",
+        "value",
+    ),
+    Quantity.LOG10_KF: (
+        "log10_Kf",
+        "log10_kf",
+        "log10_formation_equilibrium_constant",
+        "value",
+    ),
+    Quantity.P_SAT: tuple(k for k, _u in _PRESSURE_SERIES_KEYS) + ("P", "p"),
+    Quantity.P_PARTIAL: tuple(k for k, _u in _PRESSURE_SERIES_KEYS)
+    + ("P", "p")
+    + _PARTIAL_PRESSURE_FIELDS,
+    Quantity.MASS_LOSS_RATE: ("mass_loss_rate",),
+    Quantity.EVAPORATION_RATE: ("evaporation_rate",),
+    Quantity.ION_INTENSITY: ("ion_intensity",),
+    Quantity.ION_INTENSITY_RATIO: ("ion_intensity_ratio", "ion_current_ratio"),
+    Quantity.O2_YIELD: ("o2_yield",),
+    Quantity.MASS_LOSS_FRACTION: ("mass_loss_fraction",),
+    Quantity.YIELD_FRACTION: ("yield_fraction",),
+    Quantity.INTERACTION_PARAMETER: ("wagner_interaction_parameter", "epsilon"),
+    Quantity.TRANSITION_TEMPERATURE: ("T_K", "temperature_K", "T_C", "T"),
+}
+
+_DECLARED_GENERIC_VALUE_KEYS = ("expected_value",)
+_CONDITION_RANGE_KEYS = ("T_range_K", "temperature_range_k", "temperature_range_K")
+AXIS_TEMPERATURE_K = "temperature_K"
+AXIS_STANDARD_PRESSURE_PA = "standard_pressure_Pa"
+
+_PRESSURE_UNIT_BY_KEY = dict(_PRESSURE_SERIES_KEYS)
+_PRESSURE_UNIT_BY_KEY.update({key: "Pa" for key in _PARTIAL_PRESSURE_FIELDS})
+
+
+@dataclass(frozen=True)
+class SourceSelection:
+    """Declared-quantity read of a source payload. Never a borrowed number."""
+
+    value: Value
+    field_name: str | None = None
+    unit_trail: str = "identity"
+    amount: Decimal | None = None
+    reason: str | None = None
+    unused_ancillary: tuple[str, ...] = ()
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...] = ()
+
+    @property
+    def available(self) -> bool:
+        return self.value.kind is not ValueKind.UNAVAILABLE
+
+
+_BOUNDARY_SERVED: list[tuple[str, int, str]] = []
+_BOUNDARY_WRAPPERS = {
+    "select_declared_source",
+    "_record_boundary_caller",
+    "empty_value_from_payload",
+    "_series_point_value",
+    "_selection_from_named_field",
+    "_condition_ranges_from_payload",
+    "_numeric_field",
+    "_unavailable_selection",
+    "_point_selection",
+    "_interval_selection",
+    "_series_selection_from_items",
+}
+
+# Ingestion functions allowed to call select_declared_source. Wrappers above
+# are excluded from the served-caller record; everything else must be here.
+BOUNDARY_INGEST_CALLERS = frozenset(
+    {
+        "_migrate_extract_observation",
+        "_emit_exploded_point",
+        "_migrate_kems",
+        "_migrate_mre",
+        "_migrate_langmuir",
+        "_migrate_refractory",
+        "_migrate_ledger",
+        "_migrate_compilation_file",
+        "_lift_janaf_table",
+    }
+)
+
+
+def reset_boundary_served() -> None:
+    _BOUNDARY_SERVED.clear()
+
+
+def boundary_served_callers() -> tuple[tuple[str, int, str], ...]:
+    return tuple(_BOUNDARY_SERVED)
+
+
+def _record_boundary_caller() -> None:
+    frame = inspect.currentframe()
+    while frame is not None:
+        frame = frame.f_back
+        if frame is None:
+            break
+        name = frame.f_code.co_name
+        if name in _BOUNDARY_WRAPPERS:
+            continue
+        _BOUNDARY_SERVED.append(
+            (Path(frame.f_code.co_filename).name, frame.f_lineno, name)
+        )
+        break
+
+
+def _quantity_token(declared: Quantity | State[Quantity] | str | None) -> Quantity | None:
+    if isinstance(declared, Quantity):
+        return declared
+    if isinstance(declared, State):
+        return declared.value if declared.is_value else None
+    return None
+
+
+def _condition_ranges_from_payload(
+    payload: Mapping[str, Any],
+) -> tuple[tuple[str, Decimal, Decimal], ...]:
+    found: list[tuple[str, Decimal, Decimal]] = []
+    for key in _CONDITION_RANGE_KEYS:
+        raw = payload.get(key)
+        if not isinstance(raw, (list, tuple)) or len(raw) < 2:
+            continue
+        lo, hi = _as_dec_or_none(raw[0]), _as_dec_or_none(raw[1])
+        if lo is not None and hi is not None:
+            found.append((key, lo, hi))
+    return tuple(found)
+
+
+def _numeric_field(payload: Mapping[str, Any], key: str) -> Decimal | None:
+    raw = payload.get(key)
+    if isinstance(raw, Mapping):
+        raw = raw.get("value")
+    return _as_dec_or_none(raw)
+
+
+def _unused_ancillary(payload: Mapping[str, Any], used: str | None) -> tuple[str, ...]:
+    return tuple(k for k in _ANCILLARY_SERIES_KEYS if k in payload and k != used)
+
+
+def _unavailable_selection(
+    reason: str,
+    *,
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...] = (),
+    unused_ancillary: tuple[str, ...] = (),
+    field_name: str | None = None,
+    unit_trail: str = "identity",
+) -> SourceSelection:
+    return SourceSelection(
+        value=Value(ValueKind.UNAVAILABLE, unavailable_reason=reason),
+        field_name=field_name,
+        unit_trail=unit_trail,
+        reason=reason,
+        unused_ancillary=unused_ancillary,
+        condition_ranges=condition_ranges,
+    )
+
+
+def _point_selection(
+    amount: Decimal,
+    field_name: str,
+    unit_trail: str,
+    payload: Mapping[str, Any],
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection:
+    return SourceSelection(
+        value=Value.point_of(amount),
+        field_name=field_name,
+        unit_trail=unit_trail,
+        amount=amount,
+        unused_ancillary=_unused_ancillary(payload, field_name),
+        condition_ranges=condition_ranges,
+    )
+
+
+def _interval_selection(
+    lo: Decimal,
+    hi: Decimal,
+    field_name: str,
+    payload: Mapping[str, Any],
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+    reason: str | None = None,
+) -> SourceSelection:
+    return SourceSelection(
+        value=Value(ValueKind.INTERVAL, interval_low=lo, interval_high=hi),
+        field_name=field_name,
+        unit_trail="as_published",
+        reason=reason,
+        unused_ancillary=_unused_ancillary(payload, field_name),
+        condition_ranges=condition_ranges,
+    )
+
+
+def _selection_from_named_field(
+    payload: Mapping[str, Any],
+    q_token: Quantity,
+    units: str | None,
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection | None:
+    if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
+        for key, unit in _PRESSURE_SERIES_KEYS:
+            if key not in payload:
+                continue
+            val, trail = convert_pressure_to_pa(payload.get(key), unit)
+            if val is not None:
+                return _point_selection(
+                    val, key, trail or "identity", payload, condition_ranges
+                )
+            return _unavailable_selection(
+                trail or f"{key} is not a grounded pressure",
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+                unit_trail=trail or "identity",
+            )
+        if q_token is Quantity.P_PARTIAL:
+            for key in _PARTIAL_PRESSURE_FIELDS:
+                if key not in payload:
+                    continue
+                val, trail = convert_pressure_to_pa(payload.get(key), "Pa")
+                if val is not None:
+                    return _point_selection(
+                        val, key, trail or "identity:Pa", payload, condition_ranges
+                    )
+                if payload.get(key) is None or payload.get(key) == "":
+                    return _unavailable_selection(
+                        f"{key} is null; absence is not a measured zero",
+                        condition_ranges=condition_ranges,
+                        unused_ancillary=_unused_ancillary(payload, key),
+                        field_name=key,
+                    )
+        for key in ("P", "p"):
+            if key not in payload:
+                continue
+            val, trail = convert_pressure_to_pa(payload.get(key), units)
+            if val is not None:
+                return _point_selection(
+                    val, key, trail or "identity", payload, condition_ranges
+                )
+            return _unavailable_selection(
+                trail or "series P is not grounded in a source pressure unit",
+                condition_ranges=condition_ranges,
+                unused_ancillary=_unused_ancillary(payload, key),
+                field_name=key,
+                unit_trail=trail or "identity",
+            )
+        return None
+    for key in QUANTITY_SOURCE_FIELDS.get(q_token, ()):
+        if key not in payload:
+            continue
+        if q_token is Quantity.TRANSITION_TEMPERATURE:
+            unit = "K" if key in {"T_K", "temperature_K"} else ("C" if key == "T_C" else units)
+            amount, trail = convert_temperature_to_k(payload.get(key), unit)
+            if amount is not None:
+                return _point_selection(
+                    amount, key, trail or "identity:K", payload, condition_ranges
+                )
+            continue
+        amount = _numeric_field(payload, key)
+        if amount is None:
+            continue
+        trail = "as_published"
+        if q_token is Quantity.LOG10_KF and key == "value":
+            trail = "identity"
+        return _point_selection(amount, key, trail, payload, condition_ranges)
+    for key in _DECLARED_GENERIC_VALUE_KEYS:
+        if key not in payload:
+            continue
+        amount = _numeric_field(payload, key)
+        if amount is None:
+            continue
+        return _point_selection(amount, key, "as_published", payload, condition_ranges)
+    raw_range = payload.get("range")
+    if isinstance(raw_range, (list, tuple)) and len(raw_range) >= 2:
+        lo, hi = _as_dec_or_none(raw_range[0]), _as_dec_or_none(raw_range[1])
+        if lo is not None and hi is not None:
+            return _interval_selection(lo, hi, "range", payload, condition_ranges)
+    return None
+
+
+def _series_selection_from_items(
+    series: list[Any],
+    q_token: Quantity | None,
+    units: str | None,
+    condition_ranges: tuple[tuple[str, Decimal, Decimal], ...],
+) -> SourceSelection:
+    points: list[tuple[Decimal, Decimal]] = []
+    for item in series:
+        if not isinstance(item, Mapping):
+            continue
+        t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, item)
+        v_sel = select_declared_source(q_token, units, item)
+        if t_sel.amount is not None and v_sel.amount is not None:
+            points.append((t_sel.amount, v_sel.amount))
+    if points:
+        return SourceSelection(
+            value=Value(ValueKind.SERIES, series=tuple(points)),
+            field_name="series",
+            unit_trail="as_published",
+            condition_ranges=condition_ranges,
+        )
+    return _unavailable_selection(
+        "series list had no numeric coordinate/value pairs",
+        condition_ranges=condition_ranges,
+        field_name="series",
+    )
+
+
+def select_declared_source(
+    declared: Quantity | State[Quantity] | str | None,
+    units: str | None,
+    payload: Mapping[str, Any] | None,
+) -> SourceSelection:
+    """The only way source fields become an Observation value or identity axis.
+
+    In: declared quantity token (or axis name), declared units, source payload.
+    Out: the field/unit trail that named that token, or unknown-with-reason.
+    Refuses to return a number the declared token did not name.
+    """
+
+    _record_boundary_caller()
+    if not isinstance(payload, Mapping):
+        return _unavailable_selection("empty values")
+    condition_ranges = _condition_ranges_from_payload(payload)
+    unused = _unused_ancillary(payload, None)
+
+    if declared == AXIS_TEMPERATURE_K:
+        for key, unit in (
+            ("T_K", "K"),
+            ("temperature_K", "K"),
+            ("T_C", "C"),
+        ):
+            if key not in payload:
+                continue
+            raw = payload.get(key)
+            if isinstance(raw, Mapping):
+                raw = raw.get("value")
+                unit = str(payload.get(key).get("units") or unit) if isinstance(
+                    payload.get(key), Mapping
+                ) else unit
+            amount, trail = convert_temperature_to_k(raw, unit)
+            if amount is not None:
+                return _point_selection(amount, key, trail or "identity:K", payload, condition_ranges)
+            return _unavailable_selection(
+                trail or f"{key} is not numeric",
+                condition_ranges=condition_ranges,
+                field_name=key,
+                unit_trail=trail or "identity",
+            )
+        if "temperature" in payload:
+            raw = payload.get("temperature")
+            unit = "K"
+            if isinstance(raw, Mapping):
+                unit = str(raw.get("units") or "K")
+                raw = raw.get("value")
+            amount, trail = convert_temperature_to_k(raw, unit)
+            if amount is not None:
+                return _point_selection(
+                    amount, "temperature", trail or "identity:K", payload, condition_ranges
+                )
+        if "T" in payload:
+            t_unit = payload.get("T_units") or payload.get("temperature_units") or units
+            amount, trail = convert_temperature_to_k(payload.get("T"), t_unit)
+            if amount is not None:
+                return _point_selection(
+                    amount, "T", trail or "identity:K", payload, condition_ranges
+                )
+            return _unavailable_selection(
+                trail
+                or "series T is not grounded in a source unit (T_K / T_C required)",
+                condition_ranges=condition_ranges,
+                field_name="T",
+                unit_trail=trail or "identity",
+            )
+        if condition_ranges:
+            name, lo, hi = condition_ranges[0]
+            return _unavailable_selection(
+                f"source {name} [{lo}, {hi}] is a temperature domain, not a point",
+                condition_ranges=condition_ranges,
+                unused_ancillary=unused,
+                field_name=name,
+            )
+        return _unavailable_selection(
+            "source does not state temperature_K",
+            condition_ranges=condition_ranges,
+            unused_ancillary=unused,
+        )
+
+    if declared == AXIS_STANDARD_PRESSURE_PA:
+        for key, unit in (
+            ("reference_pressure_Pa", "Pa"),
+            ("standard_pressure_Pa", "Pa"),
+            ("nist_janaf_pa", "Pa"),
+            ("P_bar", "bar"),
+            ("pressure_bar", "bar"),
+        ):
+            if key not in payload:
+                continue
+            amount, trail = convert_pressure_to_pa(payload.get(key), unit)
+            if amount is not None:
+                return _point_selection(
+                    amount, key, trail or "identity:Pa", payload, condition_ranges
+                )
+        return _unavailable_selection(
+            "source does not state standard_pressure_Pa",
+            condition_ranges=condition_ranges,
+            unused_ancillary=unused,
+        )
+
+    q_token = _quantity_token(declared)
+    series = payload.get("series")
+    if isinstance(series, list) and series:
+        return _series_selection_from_items(series, q_token, units, condition_ranges)
+
+    tabulated = payload.get("tabulated_delta_fG_kJ_mol")
+    if isinstance(tabulated, list) and tabulated and q_token in {None, Quantity.DELTA_FG}:
+        if q_token is Quantity.DELTA_FG:
+            points: list[tuple[Decimal, Decimal]] = []
+            for item in tabulated:
+                if not isinstance(item, Mapping):
+                    continue
+                t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, item)
+                v_sel = select_declared_source(Quantity.DELTA_FG, "kJ_per_mol", item)
+                if t_sel.amount is not None and v_sel.amount is not None:
+                    points.append((t_sel.amount, v_sel.amount))
+            if points:
+                return SourceSelection(
+                    value=Value(ValueKind.SERIES, series=tuple(points)),
+                    field_name="tabulated_delta_fG_kJ_mol",
+                    unit_trail="as_published",
+                    condition_ranges=condition_ranges,
+                )
+        elif q_token is None:
+            return _unavailable_selection(
+                "tabulated_delta_fG_kJ_mol present but declared quantity is unknown",
+                condition_ranges=condition_ranges,
+                field_name="tabulated_delta_fG_kJ_mol",
+            )
+
+    if q_token is None:
+        if payload.get("segments"):
+            return SourceSelection(
+                value=Value(
+                    ValueKind.EXPRESSION,
+                    expression_text="evaluator_segments_as_published",
+                    expression_domain=str(payload.get("evaluator_family") or "segments"),
+                ),
+                field_name="segments",
+                condition_ranges=condition_ranges,
+            )
+        if payload.get("delta_f_H_298_15") or payload.get(
+            "formation_enthalpy_298_15_K_as_published"
+        ):
+            domain = "J_per_mol"
+            raw = payload.get("formation_enthalpy_298_15_K_as_published")
+            if isinstance(raw, Mapping):
+                domain = str(payload.get("units_as_published") or domain)
+            elif payload.get("units_as_published"):
+                domain = str(payload.get("units_as_published"))
+            return SourceSelection(
+                value=Value(
+                    ValueKind.EXPRESSION,
+                    expression_text="delta_fH_298.15_as_published",
+                    expression_domain=domain,
+                ),
+                field_name="delta_f_H_298_15",
+                condition_ranges=condition_ranges,
+            )
+        if payload.get("g_parameter") or payload.get("functions"):
+            return SourceSelection(
+                value=Value(
+                    ValueKind.EXPRESSION,
+                    expression_text="compilation_coefficient_record",
+                    expression_domain=str(payload.get("phase") or ""),
+                ),
+                field_name="g_parameter",
+                condition_ranges=condition_ranges,
+            )
+        if payload.get("intervals"):
+            return SourceSelection(
+                value=Value(
+                    ValueKind.EXPRESSION,
+                    expression_text="cea_intervals_as_published",
+                    expression_domain=str(payload.get("cea_section") or "intervals"),
+                ),
+                field_name="intervals",
+                condition_ranges=condition_ranges,
+            )
+        if payload.get("semantics") in {"bound_not_point_ordering", "bound_not_point"}:
+            return SourceSelection(
+                value=Value(
+                    ValueKind.CATEGORICAL, categorical=str(payload.get("semantics"))
+                ),
+                field_name="semantics",
+                condition_ranges=condition_ranges,
+            )
+        if condition_ranges:
+            name, lo, hi = condition_ranges[0]
+            return _unavailable_selection(
+                (
+                    f"source values have no printed scalar/series point; "
+                    f"{name} [{lo}, {hi}] is a temperature domain, not the observable"
+                ),
+                condition_ranges=condition_ranges,
+                unused_ancillary=unused,
+                field_name=name,
+            )
+        return _unavailable_selection(
+            "declared quantity is unknown; refusing to pick a number",
+            condition_ranges=condition_ranges,
+            unused_ancillary=unused,
+        )
+
+    named = _selection_from_named_field(payload, q_token, units, condition_ranges)
+    if named is not None:
+        return named
+
+    if payload.get("segments"):
+        return SourceSelection(
+            value=Value(
+                ValueKind.EXPRESSION,
+                expression_text="evaluator_segments_as_published",
+                expression_domain=str(payload.get("evaluator_family") or "segments"),
+            ),
+            field_name="segments",
+            condition_ranges=condition_ranges,
+        )
+    if payload.get("reference_pressure_Pa") is not None and q_token is Quantity.DELTA_FG:
+        return SourceSelection(
+            value=Value(
+                ValueKind.EXPRESSION,
+                expression_text="gibbs_table_as_published",
+                expression_domain=str(payload.get("evaluator_family") or "gibbs_table"),
+            ),
+            field_name="reference_pressure_Pa",
+            condition_ranges=condition_ranges,
+        )
+    if payload.get("semantics") in {"bound_not_point_ordering", "bound_not_point"}:
+        return SourceSelection(
+            value=Value(ValueKind.CATEGORICAL, categorical=str(payload.get("semantics"))),
+            field_name="semantics",
+            condition_ranges=condition_ranges,
+        )
+    if condition_ranges:
+        name, lo, hi = condition_ranges[0]
+        return _unavailable_selection(
+            (
+                f"source values have no printed {q_token.value}; "
+                f"{name} [{lo}, {hi}] is a temperature domain, not the observable"
+            ),
+            condition_ranges=condition_ranges,
+            unused_ancillary=unused,
+            field_name=name,
+        )
+    return _unavailable_selection(
+        f"source does not name a {q_token.value} field",
+        condition_ranges=condition_ranges,
+        unused_ancillary=unused,
+    )
+
+
+def empty_value_from_payload(
+    values: Mapping[str, Any] | None,
+    obs_type: str | None,
+    units: str | None,
+    quantity: Quantity | State[Quantity] | None = None,
+) -> tuple[Value, list[dict[str, Any]], SourceSelection]:
+    """Return the archival Value plus printed-point dicts to explode.
+
+    Explosion list items are ``{coord, value, unit, extra}``. Every numeric
+    lift goes through ``select_declared_source``.
+    """
+
+    exploded: list[dict[str, Any]] = []
+    q_token = _quantity_token(quantity)
+    if q_token is None and obs_type == "gibbs_table":
+        q_token = Quantity.DELTA_FG
+    if not isinstance(values, Mapping):
+        sel = select_declared_source(q_token, units, None)
+        return sel.value, exploded, sel
+
+    series = values.get("series")
+    if isinstance(series, list) and series:
+        for i, item in enumerate(series):
+            exploded.append({"index": i, "item": item, "units": units})
+        sel = select_declared_source(q_token, units, values)
+        return sel.value, exploded, sel
+
+    tabulated = values.get("tabulated_delta_fG_kJ_mol")
+    if isinstance(tabulated, list) and tabulated:
+        for i, item in enumerate(tabulated):
+            exploded.append({"index": i, "item": item, "units": "kJ_per_mol"})
+        sel = select_declared_source(q_token, "kJ_per_mol", values)
+        return sel.value, exploded, sel
+
+    sel = select_declared_source(q_token, units, values)
+    return sel.value, exploded, sel
+
 
 def _series_point_value(
     raw_item: Mapping[str, Any],
@@ -1798,82 +2368,8 @@ def _series_point_value(
 ) -> tuple[Decimal | None, str, tuple[str, ...]]:
     """Pick the printed value from the declared quantity, not the first numeric key."""
 
-    unused = tuple(k for k in _ANCILLARY_SERIES_KEYS if k in raw_item)
-    if q_token is None:
-        return None, "identity", unused
-    if q_token is Quantity.ACTIVITY_COEFFICIENT:
-        for vk in ("gamma", "activity_coefficient"):
-            if vk in raw_item:
-                return _as_dec_or_none(raw_item.get(vk)), "as_published", unused
-        return None, "as_published", unused
-    if q_token is Quantity.EVAPORATION_COEFFICIENT_ALPHA:
-        if "alpha" in raw_item:
-            return _as_dec_or_none(raw_item.get("alpha")), "as_published", unused
-        return None, "as_published", unused
-    if q_token is Quantity.ACTIVITY:
-        if "activity" in raw_item:
-            return _as_dec_or_none(raw_item.get("activity")), "as_published", unused
-        return None, "as_published", unused
-    if q_token is Quantity.DELTA_FG:
-        for vk in ("delta_fG", "value"):
-            if vk in raw_item:
-                return _as_dec_or_none(raw_item.get(vk)), "as_published", unused
-        return None, "as_published", unused
-    if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL}:
-        for key, unit in _PRESSURE_SERIES_KEYS:
-            if key in raw_item:
-                val, trail = convert_pressure_to_pa(raw_item.get(key), unit)
-                return val, trail or "identity", unused
-        # Species-labelled pressures are p_partial only when that is the declared quantity.
-        if q_token is Quantity.P_PARTIAL:
-            for key in ("p_Ga_Pa", "p_In_Pa", "p_O2_calc_Pa"):
-                if key in raw_item:
-                    val, trail = convert_pressure_to_pa(raw_item.get(key), "Pa")
-                    unused_partial = tuple(
-                        k for k in _ANCILLARY_SERIES_KEYS if k in raw_item and k != key
-                    )
-                    return val, trail or "identity:Pa", unused_partial
-        return None, "as_published", unused
-    return None, "identity", unused
-
-
-def _series_value(series: list[Any], units: str | None) -> Value:
-    points: list[tuple[Decimal, Decimal]] = []
-    for item in series:
-        if isinstance(item, Mapping):
-            coord = None
-            val = None
-            for ck in ("T_K", "T", "temperature_K", "t_s"):
-                if ck in item:
-                    coord = _as_dec_or_none(item.get(ck))
-                    break
-            for vk in (
-                "P_Pa",
-                "P",
-                "pressure_Pa",
-                "pressure_atm",
-                "alpha",
-                "value",
-                "delta_fG",
-                "p",
-            ):
-                if vk in item:
-                    val = _as_dec_or_none(item.get(vk))
-                    if val is not None and vk == "pressure_atm":
-                        val = atm_to_pa(val)
-                    break
-            if coord is not None and val is not None:
-                points.append((coord, val))
-        elif isinstance(item, (list, tuple)) and len(item) >= 2:
-            c, v = _as_dec_or_none(item[0]), _as_dec_or_none(item[1])
-            if c is not None and v is not None:
-                points.append((c, v))
-    if points:
-        return Value(ValueKind.SERIES, series=tuple(points))
-    return Value(
-        ValueKind.UNAVAILABLE,
-        unavailable_reason="series list had no numeric coordinate/value pairs",
-    )
+    sel = select_declared_source(q_token, units, raw_item)
+    return sel.amount, sel.unit_trail, sel.unused_ancillary
 
 
 def apparatus_from_equipment(equipment: object) -> Apparatus | None:
@@ -2566,22 +3062,27 @@ class Migrator:
                 observation_id=obs_id,
             )
 
-        t_known: Decimal | None = None
-        t_range = obs.get("T_range_K") or values.get("T_range_K")
-        if isinstance(t_range, (list, tuple)) and len(t_range) == 2:
+        t_payload = dict(values)
+        if obs.get("T_K") is not None:
+            t_payload.setdefault("T_K", obs.get("T_K"))
+        if obs.get("T_range_K") is not None:
+            t_payload.setdefault("T_range_K", obs.get("T_range_K"))
+        t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, t_payload)
+        t_known = t_sel.amount if t_sel.available else None
+        if t_sel.condition_ranges and t_known is None:
             measured.range_only_T += 1
+            name, lo, hi = t_sel.condition_ranges[0]
             self.result.add_queue(
                 work.work_id,
                 locator,
                 ["temperature_K"],
-                "range-only T; no midpoint invented",
+                f"source {name} [{lo}, {hi}]; no midpoint invented",
                 source=source_key,
                 observation_id=obs_id,
             )
-        t_point = values.get("T_K") or obs.get("T_K")
-        t_known = _as_dec_or_none(t_point)
 
-        p_std = _as_dec_or_none(values.get("reference_pressure_Pa"))
+        p_sel = select_declared_source(AXIS_STANDARD_PRESSURE_PA, None, values)
+        p_std = p_sel.amount if p_sel.available else None
         if p_std is not None:
             measured.gibbs_reference_pressures += 1
             if p_std == Decimal("100000") or p_std == Decimal("100000.0"):
@@ -2646,7 +3147,9 @@ class Migrator:
         if obs.get("equipment"):
             measured.equipment_payloads += 1
 
-        value, exploded = empty_value_from_payload(values, obs_type, obs.get("units"))
+        value, exploded, value_sel = empty_value_from_payload(
+            values, obs_type, obs.get("units"), quantity=quantity
+        )
         if isinstance(values.get("series"), list) and values.get("series"):
             measured.series += 1
         if isinstance(values.get("tabulated_delta_fG_kJ_mol"), list) and values.get(
@@ -2658,16 +3161,24 @@ class Migrator:
         q_token = quantity.value if quantity.is_value else None
         if t_known is not None and q_token is not Quantity.TRANSITION_TEMPERATURE:
             ident_kwargs["temperature_K"] = State.of(t_known)
+        elif t_known is None and t_sel.condition_ranges:
+            name, lo, hi = t_sel.condition_ranges[0]
+            ident_kwargs["temperature_K"] = State.unknown(
+                f"source {name} [{lo}, {hi}]; no midpoint invented"
+            )
         if p_std is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(p_std)
         if q_token is Quantity.TRANSITION_TEMPERATURE and isinstance(values.get("quantity"), str):
             ident_kwargs["subtype"] = State.of(str(values["quantity"]))
-        if (
-            q_token is Quantity.TRANSITION_TEMPERATURE
-            and t_known is not None
-            and value.kind in {ValueKind.UNAVAILABLE, ValueKind.INTERVAL}
+        if q_token is Quantity.TRANSITION_TEMPERATURE and (
+            value.kind in {ValueKind.UNAVAILABLE, ValueKind.INTERVAL}
         ):
-            value = Value.point_of(t_known)
+            t_as_value = select_declared_source(
+                Quantity.TRANSITION_TEMPERATURE, None, t_payload
+            )
+            if t_as_value.available:
+                value = t_as_value.value
+                value_sel = t_as_value
         identity = fill_identity(quantity, species, **ident_kwargs)
 
         experiment_id = self._experiment_id(work.work_id, locator, source_id)
@@ -2739,6 +3250,15 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
+        elif not value_sel.available:
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["value"],
+                value_sel.reason or "source values have no printed scalar/series point",
+                source=source_key,
+                observation_id=obs_id,
+            )
 
         observation = Observation(
             observation_id=obs_id,
@@ -2794,6 +3314,7 @@ class Migrator:
         point_locator = locator
         t_trail: str | None = None
         t_original: object = None
+        value_sel: SourceSelection | None = None
         if isinstance(raw_item, Mapping):
             if raw_item.get("locator"):
                 point_locator = (
@@ -2802,70 +3323,36 @@ class Migrator:
                     )
                     or locator
                 )
-            if "T_K" in raw_item or "temperature_K" in raw_item:
-                t_original = raw_item.get("T_K", raw_item.get("temperature_K"))
-                coord, t_trail = convert_temperature_to_k(t_original, "K")
-                if coord is None:
-                    self.result.add_queue(
-                        work.work_id,
-                        point_locator,
-                        ["temperature_K"],
-                        t_trail or "series temperature_K is not numeric",
-                        source=source_key,
-                        observation_id=f"{parent_id}::point:{index}",
-                    )
-            elif "T_C" in raw_item:
-                t_original = raw_item.get("T_C")
-                coord, t_trail = convert_temperature_to_k(t_original, "C")
-                if coord is None:
-                    self.result.add_queue(
-                        work.work_id,
-                        point_locator,
-                        ["temperature_K"],
-                        t_trail or "series T_C is not a grounded temperature",
-                        source=source_key,
-                        observation_id=f"{parent_id}::point:{index}",
-                    )
-            elif "T" in raw_item:
-                t_original = raw_item.get("T")
-                t_unit = raw_item.get("T_units") or raw_item.get("temperature_units")
-                coord, t_trail = convert_temperature_to_k(t_original, t_unit)
-                if coord is None:
-                    self.result.add_queue(
-                        work.work_id,
-                        point_locator,
-                        ["temperature_K"],
-                        t_trail
-                        or "series T is not grounded in a source unit (T_K / T_C required)",
-                        source=source_key,
-                        observation_id=f"{parent_id}::point:{index}",
-                    )
+            t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, raw_item)
+            t_trail = t_sel.unit_trail
+            t_original = raw_item.get(t_sel.field_name) if t_sel.field_name else None
+            coord = t_sel.amount
+            if t_sel.field_name and not t_sel.available:
+                self.result.add_queue(
+                    work.work_id,
+                    point_locator,
+                    ["temperature_K"],
+                    t_sel.reason or "series temperature_K is not numeric",
+                    source=source_key,
+                    observation_id=f"{parent_id}::point:{index}",
+                )
             q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
                 quantity if isinstance(quantity, Quantity) else None
             )
-            val, trail, unused_ancillary = _series_point_value(
-                raw_item, q_token, units
-            )
-            if val is None and ("P" in raw_item or "p" in raw_item) and q_token in {
-                Quantity.P_SAT,
-                Quantity.P_PARTIAL,
-            }:
-                raw_p = raw_item.get("P", raw_item.get("p"))
-                val, trail_or_why = convert_pressure_to_pa(raw_p, units)
-                if val is None:
-                    self.result.add_queue(
-                        work.work_id,
-                        point_locator,
-                        ["value"],
-                        trail_or_why
-                        or "series P is not grounded in a source pressure unit",
-                        source=source_key,
-                        observation_id=f"{parent_id}::point:{index}",
-                    )
-                    trail = trail_or_why or "missing pressure unit"
-                else:
-                    trail = trail_or_why or "identity"
-            for key in unused_ancillary:
+            value_sel = select_declared_source(q_token, units, raw_item)
+            val = value_sel.amount
+            trail = value_sel.unit_trail
+            if not value_sel.available and value_sel.field_name in {"P", "p"}:
+                self.result.add_queue(
+                    work.work_id,
+                    point_locator,
+                    ["value"],
+                    value_sel.reason
+                    or "series P is not grounded in a source pressure unit",
+                    source=source_key,
+                    observation_id=f"{parent_id}::point:{index}",
+                )
+            for key in value_sel.unused_ancillary:
                 self.result.add_queue(
                     work.work_id,
                     point_locator,
@@ -2883,22 +3370,8 @@ class Migrator:
         if coord is not None:
             ident_kwargs["temperature_K"] = State.of(coord)
         identity = fill_identity(quantity, species, **ident_kwargs)
-        if val is None:
-            emitted = Value(
-                ValueKind.UNAVAILABLE,
-                unavailable_reason=f"series point {index} has no liftable numeric value",
-            )
-            self.result.add_queue(
-                work.work_id,
-                point_locator,
-                ["value"],
-                f"series point {index} stored with unknown value",
-                source=source_key,
-                observation_id=point_id,
-            )
-            derivation = None
-        else:
-            emitted = Value.point_of(val)
+        if value_sel is not None and value_sel.available:
+            emitted = value_sel.value
             converted = conversion_derivation(trail, None, point_locator)
             derivation = Derivation(
                 relation=trail if converted is None else converted.relation,
@@ -2910,6 +3383,24 @@ class Migrator:
                     else ("Pa" if str(trail).endswith("Pa") else (units or "as_published"))
                 ),
             )
+        else:
+            if value_sel is None:
+                q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
+                    quantity if isinstance(quantity, Quantity) else None
+                )
+                value_sel = select_declared_source(
+                    q_token, units, raw_item if isinstance(raw_item, Mapping) else None
+                )
+            emitted = value_sel.value
+            self.result.add_queue(
+                work.work_id,
+                point_locator,
+                ["value"],
+                f"series point {index} stored with unknown value",
+                source=source_key,
+                observation_id=point_id,
+            )
+            derivation = None
         unc = uncertainty
         if extra_unc is not None:
             unc = Uncertainty(
@@ -3052,6 +3543,15 @@ class Migrator:
         if standard_pressure_Pa is not None:
             ident_kwargs["standard_pressure_Pa"] = State.of(standard_pressure_Pa)
         identity = fill_identity(quantity, species, **ident_kwargs)
+        if species.phase.is_unknown:
+            self.result.add_queue(
+                work.work_id,
+                locator,
+                ["phase"],
+                species.phase.reason or "missing phase",
+                source=source_key,
+                observation_id=observation_id,
+            )
         experiment_id = self._experiment_id(work.work_id, locator, source_id)
         self._ensure_experiment(
             work_id=work.work_id,
@@ -3131,27 +3631,16 @@ class Migrator:
                 )
                 assert loc is not None
                 formula = str(point.get("species") or "unknown")
-                phase, unmapped = map_phase(point.get("phase"))
-                if unmapped:
-                    self.result.add_queue(
-                        work.work_id,
-                        loc,
-                        ["phase"],
-                        "kems sidecar does not state a closed phase token",
-                        source=rel,
-                        observation_id=str(point.get("observable_id")),
-                    )
+                phase, _unmapped = map_phase(point.get("phase"))
                 species = make_species(formula, phase)
-                t = _as_dec_or_none((point.get("coordinate") or {}).get("temperature_K"))
-                p = point.get("partial_pressure_pa")
-                if p is None:
-                    value = Value(
-                        ValueKind.UNAVAILABLE,
-                        unavailable_reason=str(
-                            point.get("extraction_method")
-                            or "partial_pressure_pa is null; absence is not a measured zero"
-                        ),
-                    )
+                coord = point.get("coordinate") if isinstance(point.get("coordinate"), Mapping) else {}
+                t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, coord or {})
+                t = t_sel.amount if t_sel.available else None
+                p_sel = select_declared_source(
+                    Quantity.P_PARTIAL, "Pa", point
+                )
+                value = p_sel.value
+                if not p_sel.available:
                     self.result.add_queue(
                         work.work_id,
                         loc,
@@ -3160,8 +3649,6 @@ class Migrator:
                         source=rel,
                         observation_id=str(point.get("observable_id")),
                     )
-                else:
-                    value = Value.point_of(p)
                 self._generic_obs(
                     work=work,
                     source_id=src_id,
@@ -3226,15 +3713,17 @@ class Migrator:
                             source=rel,
                             observation_id=f"{meas_id}:{case_id}:{point.get('observable_id')}",
                         )
-                    expected = point.get("expected_value")
-                    value = (
-                        Value.point_of(expected)
-                        if _as_dec_or_none(expected) is not None
-                        else Value(
-                            ValueKind.UNAVAILABLE,
-                            unavailable_reason="mre point has no expected_value",
+                    mre_sel = select_declared_source(mre_quantity, point.get("units"), point)
+                    value = mre_sel.value
+                    if not mre_sel.available:
+                        self.result.add_queue(
+                            work.work_id,
+                            loc,
+                            ["value"],
+                            mre_sel.reason or "mre point has no expected_value",
+                            source=rel,
+                            observation_id=f"{meas_id}:{case_id}:{point.get('observable_id')}",
                         )
-                    )
                     self._generic_obs(
                         work=work,
                         source_id=str(meas_id),
@@ -3275,30 +3764,19 @@ class Migrator:
             work = self._work_from_citation(citation, doi, str((src or {}).get("citation_id") or meas_id))
             loc = Locator(record=str(meas_id), note=citation)
             formula = str(meas.get("species") or "unknown")
-            phase, unmapped = map_phase(meas.get("phase"))
-            if unmapped:
-                self.result.add_queue(
-                    work.work_id,
-                    loc,
-                    ["phase"],
-                    "langmuir sidecar does not state a closed phase token",
-                    source=rel,
-                    observation_id=str(meas_id),
-                )
+            phase, _unmapped = map_phase(meas.get("phase"))
             payload = meas.get("measured_langmuir_to_effusion_flux_ratio") or {}
-            if isinstance(payload, Mapping) and _as_dec_or_none(payload.get("value")) is not None:
-                value = Value.point_of(payload["value"])
-                unc = Uncertainty(
-                    kind=UncertaintyKind.PRINTED,
-                    verbatim=payload,
-                )
-            elif isinstance(payload, Mapping) and isinstance(payload.get("range"), list):
-                lo, hi = payload["range"][:2]
-                value = Value(
-                    ValueKind.INTERVAL,
-                    interval_low=as_decimal(lo),
-                    interval_high=as_decimal(hi),
-                )
+            alpha_payload: dict[str, Any] = {}
+            if isinstance(payload, Mapping):
+                if payload.get("value") is not None:
+                    alpha_payload["alpha"] = payload.get("value")
+                if payload.get("range") is not None:
+                    alpha_payload["range"] = payload.get("range")
+            alpha_sel = select_declared_source(
+                Quantity.EVAPORATION_COEFFICIENT_ALPHA, None, alpha_payload
+            )
+            value = alpha_sel.value
+            if alpha_sel.value.kind is ValueKind.INTERVAL:
                 unc = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=payload)
                 self.result.add_queue(
                     work.work_id,
@@ -3308,20 +3786,32 @@ class Migrator:
                     source=rel,
                     observation_id=str(meas_id),
                 )
+            elif alpha_sel.available:
+                unc = Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=payload)
             else:
-                value = Value(ValueKind.UNAVAILABLE, unavailable_reason="no alpha value")
                 unc = Uncertainty(kind=UncertaintyKind.NONE)
+                self.result.add_queue(
+                    work.work_id,
+                    loc,
+                    ["value"],
+                    alpha_sel.reason or "no alpha value",
+                    source=rel,
+                    observation_id=str(meas_id),
+                )
             t_range = meas.get("temperature_range_k")
-            t = None
+            t_payload: dict[str, Any] = {"temperature_range_k": t_range}
             if isinstance(t_range, list) and len(t_range) == 2 and t_range[0] == t_range[1]:
-                t = _as_dec_or_none(t_range[0])
-            elif isinstance(t_range, list) and len(t_range) == 2:
+                t_payload["T_K"] = t_range[0]
+            t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, t_payload)
+            t = t_sel.amount if t_sel.available else None
+            if t_sel.condition_ranges and t is None:
                 self.result.measured.range_only_T += 1
+                name, lo, hi = t_sel.condition_ranges[0]
                 self.result.add_queue(
                     work.work_id,
                     loc,
                     ["temperature_K"],
-                    "range-only T; no midpoint invented",
+                    f"source {name} [{lo}, {hi}]; no midpoint invented",
                     source=rel,
                     observation_id=str(meas_id),
                 )
@@ -3353,8 +3843,13 @@ class Migrator:
             citation = str(nodes.get("source") or "NIST-JANAF")
             doi = extract_doi(nodes.get("doi"), citation)
             work = self._work_from_citation(citation, doi, "janaf-4th")
-            t = _as_dec_or_none(nodes.get("temperature_K"))
-            p_std = _as_dec_or_none((doc.get("standard_pressure") or {}).get("nist_janaf_pa"))
+            t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, nodes)
+            t = t_sel.amount if t_sel.available else None
+            std_block = doc.get("standard_pressure") if isinstance(doc.get("standard_pressure"), Mapping) else {}
+            p_sel = select_declared_source(
+                AXIS_STANDARD_PRESSURE_PA, None, std_block or {}
+            )
+            p_std = p_sel.amount if p_sel.available else None
             for bucket in ("log10_kf", "condensed_log10_kf"):
                 block = nodes.get(bucket)
                 if not isinstance(block, Mapping):
@@ -3368,17 +3863,8 @@ class Migrator:
                         table=str(payload.get("table") or formula),
                         record=str(payload.get("table") or formula),
                     )
-                    phase, unmapped = map_phase(payload.get("phase"))
-                    if unmapped:
-                        self.result.add_queue(
-                            work.work_id,
-                            loc,
-                            ["phase"],
-                            "refractory node does not state a closed phase token",
-                            source=rel,
-                            observation_id=f"refractory:{bucket}:{formula}",
-                        )
-                    val = payload.get("value")
+                    phase, _unmapped = map_phase(payload.get("phase"))
+                    kf_sel = select_declared_source(Quantity.LOG10_KF, None, payload)
                     self._generic_obs(
                         work=work,
                         source_id="janaf-4th",
@@ -3387,9 +3873,7 @@ class Migrator:
                         locator=loc,
                         quantity=Quantity.LOG10_KF,
                         species=make_species(str(formula), phase),
-                        value=Value.point_of(val) if _as_dec_or_none(val) is not None else Value(
-                            ValueKind.UNAVAILABLE, unavailable_reason="missing log10_Kf"
-                        ),
+                        value=kf_sel.value,
                         evidence=self._evidence_for(payload.get("method_class"))[0],
                         temperature_K=t,
                         standard_pressure_Pa=p_std,
@@ -3406,17 +3890,22 @@ class Migrator:
                 require_rail_if_stated(row)
                 count.rows_in += 1
                 loc = Locator(record=f"raw_pCa[{i}]")
-                t = _as_dec_or_none(row.get("temperature_K"))
-                p_atm = _as_dec_or_none(row.get("pressure_atm"))
-                pa = atm_to_pa(p_atm) if p_atm is not None else None
+                t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, row)
+                t = t_sel.amount if t_sel.available else None
+                p_sel = select_declared_source(Quantity.P_PARTIAL, None, row)
                 from simulator.battery.records import Derivation
 
                 derivation = None
-                if pa is not None:
+                if p_sel.available and p_sel.field_name == "pressure_atm":
                     derivation = Derivation(
                         relation="atm_to_Pa",
                         inputs=(choose_read_from(work, loc),),
-                        parameters=(("pressure_atm", located_value(p_atm, loc)),),
+                        parameters=(
+                            (
+                                "pressure_atm",
+                                located_value(row.get("pressure_atm"), loc),
+                            ),
+                        ),
                         output_unit="Pa",
                     )
                 self._generic_obs(
@@ -3427,9 +3916,7 @@ class Migrator:
                     locator=loc,
                     quantity=Quantity.P_PARTIAL,
                     species=make_species("Ca", map_phase(row.get("phase"))[0]),
-                    value=Value.point_of(pa) if pa is not None else Value(
-                        ValueKind.UNAVAILABLE, unavailable_reason="missing pressure_atm"
-                    ),
+                    value=p_sel.value,
                     evidence=self._evidence_for(row.get("method_class"))[0],
                     temperature_K=t,
                     method=map_method(row.get("method") or row.get("regime")),
@@ -3467,8 +3954,11 @@ class Migrator:
             )
             formula = str(point.get("species") or "unknown")
             stated_q = point.get("comparison_quantity") or point.get("quantity")
+            quantity_payload = dict(point)
+            if stated_q and not quantity_payload.get("quantity"):
+                quantity_payload["quantity"] = stated_q
             ledger_quantity, q_reason = map_quantity(
-                None, {"quantity": stated_q} if stated_q else None
+                None, quantity_payload, units="kJ_per_mol"
             )
             if q_reason:
                 self.result.add_queue(
@@ -3479,15 +3969,10 @@ class Migrator:
                     source=rel,
                     observation_id=str(point.get("key") or point.get("observation_id")),
                 )
-            t = _as_dec_or_none(point.get("temperature_K"))
-            table_val = point.get("table_kJ_mol")
-            if table_val is None:
-                value = Value(
-                    ValueKind.UNAVAILABLE,
-                    unavailable_reason=str(point.get("skip_reason") or "table_kJ_mol is null"),
-                )
-            else:
-                value = Value.point_of(table_val)
+            t_sel = select_declared_source(AXIS_TEMPERATURE_K, None, point)
+            t = t_sel.amount if t_sel.available else None
+            table_sel = select_declared_source(ledger_quantity, "kJ_per_mol", point)
+            value = table_sel.value
             obs_id = str(point.get("key") or f"{source_id}:{point.get('observation_id')}:{t}")
             self._generic_obs(
                 work=work,
@@ -3570,103 +4055,44 @@ class Migrator:
         count.rows_in += 1
         record_id = str(doc.get("record_id") or path.stem)
         formula = str(doc.get("formula") or record_id)
-        phase, unmapped = map_phase(doc.get("phase"))
-        if unmapped:
-            self.result.add_queue(
-                work.work_id,
-                {"record": record_id},
-                ["phase"],
-                f"phase string {doc.get('phase')!r} not in closed map",
-                source=rel,
-                observation_id=f"{source_id}:{record_id}",
-            )
+        phase, _unmapped = map_phase(doc.get("phase"))
         loc_raw = doc.get("source_locator")
         locator = locator_from_mapping(loc_raw, fallback=record_id) or Locator(record=record_id)
         quantity: Quantity | State[Quantity] = State.unknown(
             "compilation record does not state a closed quantity"
         )
-        value: Value
         t = None
         p_std = None
-        if "formation_gibbs_energy" in doc or "delta_f_H_298_15" in doc:
-            payload = doc.get("delta_f_H_298_15")
-            if isinstance(payload, Mapping) and _as_dec_or_none(payload.get("value")) is not None:
-                # Formation enthalpy is not a v2.1 Quantity; archive as expression.
-                value = Value(
-                    ValueKind.EXPRESSION,
-                    expression_text="delta_fH_298.15_as_published",
-                    expression_domain="J_per_mol",
-                )
-                self.result.add_queue(
-                    work.work_id,
-                    locator,
-                    ["quantity"],
-                    "delta_fH is not a v2.1 Quantity token; stored as expression",
-                    source=rel,
-                    observation_id=f"{source_id}:{record_id}",
-                )
-            elif doc.get("intervals"):
-                value = Value(
-                    ValueKind.EXPRESSION,
-                    expression_text="cea_intervals_as_published",
-                    expression_domain=str(doc.get("cea_section") or "intervals"),
-                )
-            else:
-                value = Value(
-                    ValueKind.UNAVAILABLE,
-                    unavailable_reason="compilation record has no printed Gibbs point",
-                )
-        elif "formation_enthalpy_298_15_K_as_published" in doc:
-            raw = doc.get("formation_enthalpy_298_15_K_as_published")
-            amount = _as_dec_or_none(raw if not isinstance(raw, Mapping) else raw.get("value"))
-            value = (
-                Value(
-                    ValueKind.EXPRESSION,
-                    expression_text="delta_fH_298.15_as_published",
-                    expression_domain=str(doc.get("units_as_published") or ""),
-                )
-                if amount is not None
-                else Value(ValueKind.UNAVAILABLE, unavailable_reason="ATcT enthalpy missing")
-            )
+        rows = doc.get("rows")
+        if isinstance(rows, list):
+            series_items: list[dict[str, Any]] = []
+            for row in rows:
+                if not isinstance(row, Mapping):
+                    continue
+                item = dict(row)
+                if "T_K" not in item:
+                    if row.get("T") is not None:
+                        item["T_K"] = row.get("T")
+                    elif isinstance(row.get("temperature"), Mapping):
+                        item["T_K"] = row["temperature"].get("value")
+                    elif row.get("temperature") is not None:
+                        item["T_K"] = row.get("temperature")
+                series_items.append(item)
+            quantity = Quantity.DELTA_FG
+            sel = select_declared_source(quantity, None, {"series": series_items})
+        else:
+            sel = select_declared_source(quantity, None, doc)
+        value = sel.value
+        if sel.field_name in {"delta_f_H_298_15"} or "formation_enthalpy_298_15_K_as_published" in doc:
             self.result.add_queue(
                 work.work_id,
                 locator,
                 ["quantity"],
-                "ATcT formation enthalpy is not a v2.1 Quantity token",
+                "delta_fH is not a v2.1 Quantity token; stored as expression"
+                if "formation_enthalpy_298_15_K_as_published" not in doc
+                else "ATcT formation enthalpy is not a v2.1 Quantity token",
                 source=rel,
                 observation_id=f"{source_id}:{record_id}",
-            )
-        elif doc.get("g_parameter") or doc.get("functions") or doc.get("intervals"):
-            value = Value(
-                ValueKind.EXPRESSION,
-                expression_text="compilation_coefficient_record",
-                expression_domain=str(doc.get("phase") or ""),
-            )
-        elif isinstance(doc.get("rows"), list):
-            series_points: list[tuple[Decimal, Decimal]] = []
-            for row in doc["rows"]:
-                if not isinstance(row, Mapping):
-                    continue
-                t_row = _as_dec_or_none(row.get("T") or row.get("temperature") or row.get("T_K"))
-                g_row = _as_dec_or_none(
-                    row.get("delta_fG")
-                    or row.get("Gf")
-                    or row.get("delta_fG_kJ_mol")
-                )
-                if t_row is not None and g_row is not None:
-                    series_points.append((t_row, g_row))
-            if series_points:
-                quantity = Quantity.DELTA_FG
-                value = Value(ValueKind.SERIES, series=tuple(series_points))
-            else:
-                value = Value(
-                    ValueKind.UNAVAILABLE,
-                    unavailable_reason="printed rows had no T/delta_fG pair",
-                )
-        else:
-            value = Value(
-                ValueKind.UNAVAILABLE,
-                unavailable_reason="compilation record has no mapped numeric payload",
             )
         self._generic_obs(
             work=work,
@@ -3698,50 +4124,33 @@ class Migrator:
         index_entry = table.get("index_entry") if isinstance(table.get("index_entry"), Mapping) else {}
         formula = str((index_entry or {}).get("formula") or table_id)
         state_token = str((index_entry or {}).get("state") or "")
-        phase, unmapped = map_phase(state_token or None)
-        if unmapped:
-            self.result.add_queue(
-                work.work_id,
-                {"table": table_id},
-                ["phase"],
-                (
-                    f"JANAF state {state_token!r} is not in the closed automatic map"
-                    if state_token
-                    else "JANAF table does not state a closed phase"
-                ),
-                source=rel,
-                observation_id=f"{source_id}:{table_id}",
-            )
+        phase, _unmapped = map_phase(state_token or None)
         rows = table.get("values") or []
         count.rows_in += 1
-        dg_points: list[tuple[Decimal, Decimal]] = []
-        log_points: list[tuple[Decimal, Decimal]] = []
+        dg_items: list[dict[str, Any]] = []
+        log_items: list[dict[str, Any]] = []
         if isinstance(rows, list):
             for row in rows:
                 if not isinstance(row, Mapping):
                     continue
                 require_rail_if_stated(row)
+                item: dict[str, Any] = dict(row)
                 t_payload = row.get("temperature")
-                t = None
-                if isinstance(t_payload, Mapping):
-                    t = _as_dec_or_none(t_payload.get("value"))
-                g_payload = row.get("formation_gibbs_energy")
-                if isinstance(g_payload, Mapping) and t is not None:
-                    g = _as_dec_or_none(g_payload.get("value"))
-                    if g is not None:
-                        dg_points.append((t, g))
-                k_payload = row.get("log10_formation_equilibrium_constant")
-                if isinstance(k_payload, Mapping) and t is not None:
-                    k = _as_dec_or_none(k_payload.get("value"))
-                    if k is not None:
-                        log_points.append((t, k))
+                if isinstance(t_payload, Mapping) and t_payload.get("value") is not None:
+                    item["T_K"] = t_payload.get("value")
+                dg_items.append(item)
+                log_items.append(item)
         loc = Locator(table=table_id, source_path=rel, record=table_id)
-        p_std = None
         std = str(table.get("standard_state_as_published") or "")
+        p_payload: dict[str, Any] = {}
         if "0.1 MPa" in std or "1 bar" in std:
-            p_std = bar_to_pa("1")
+            p_payload["P_bar"] = 1
+        p_sel = select_declared_source(AXIS_STANDARD_PRESSURE_PA, None, p_payload)
+        p_std = p_sel.amount if p_sel.available else None
         species = make_species(formula, phase)
-        if dg_points:
+        dg_sel = select_declared_source(Quantity.DELTA_FG, None, {"series": dg_items})
+        log_sel = select_declared_source(Quantity.LOG10_KF, None, {"series": log_items})
+        if dg_sel.available:
             self._generic_obs(
                 work=work,
                 source_id=source_id,
@@ -3750,12 +4159,12 @@ class Migrator:
                 locator=loc,
                 quantity=Quantity.DELTA_FG,
                 species=species,
-                value=Value(ValueKind.SERIES, series=tuple(dg_points)),
+                value=dg_sel.value,
                 evidence=evidence,
                 standard_pressure_Pa=p_std,
                 method=State.of(MethodToken.TABULATION),
             )
-        if log_points:
+        if log_sel.available:
             self._generic_obs(
                 work=work,
                 source_id=source_id,
@@ -3764,12 +4173,12 @@ class Migrator:
                 locator=loc,
                 quantity=Quantity.LOG10_KF,
                 species=species,
-                value=Value(ValueKind.SERIES, series=tuple(log_points)),
+                value=log_sel.value,
                 evidence=evidence,
                 standard_pressure_Pa=p_std,
                 method=State.of(MethodToken.TABULATION),
             )
-        if not dg_points and not log_points:
+        if not dg_sel.available and not log_sel.available:
             self._generic_obs(
                 work=work,
                 source_id=source_id,
@@ -3778,10 +4187,7 @@ class Migrator:
                 locator=loc,
                 quantity=Quantity.DELTA_FG,
                 species=species,
-                value=Value(
-                    ValueKind.UNAVAILABLE,
-                    unavailable_reason="JANAF table had no numeric ΔfG/log10_Kf points",
-                ),
+                value=dg_sel.value,
                 evidence=evidence,
                 standard_pressure_Pa=p_std,
                 method=State.of(MethodToken.TABULATION),

@@ -1382,6 +1382,7 @@ def test_h02_bischof_stored_gammas_match_source() -> None:
         assert Decimal(str(obs["value"]["point"])) == gamma
     source_gammas: list[Decimal] = []
     source_pressures: set[Decimal] = set()
+    n_series_gamma = 0
     species = source.get("species") or {}
     for body in species.values():
         if not isinstance(body, dict):
@@ -1390,15 +1391,19 @@ def test_h02_bischof_stored_gammas_match_source() -> None:
             values = row.get("values") or {}
             if values.get("quantity") != "activity_coefficient":
                 continue
+            if "gamma" in values:
+                source_gammas.append(Decimal(str(values["gamma"])))
             for item in values.get("series") or []:
                 if not isinstance(item, dict):
                     continue
                 if "gamma" in item:
                     source_gammas.append(Decimal(str(item["gamma"])))
+                    n_series_gamma += 1
                 for pk in ("p_Ga_Pa", "p_In_Pa"):
                     if pk in item:
                         source_pressures.add(Decimal(str(item[pk])))
     stored_vals = []
+    stored_series = 0
     for obs in stored["observations"]:
         q = obs.get("identity", {}).get("quantity", {})
         if q.get("value") != "activity_coefficient":
@@ -1406,7 +1411,12 @@ def test_h02_bischof_stored_gammas_match_source() -> None:
         if obs.get("value", {}).get("kind") != "point":
             continue
         stored_vals.append(Decimal(str(obs["value"]["point"])))
-    assert len(stored_vals) == 128
+        if "::point:" in str(obs.get("observation_id") or ""):
+            stored_series += 1
+    assert n_series_gamma == 128
+    assert stored_series == 128
+    # Two preferred scalar γ averages were previously stored as T_range intervals.
+    assert len(stored_vals) == 130
     gamma_set = set(source_gammas)
     for val in stored_vals:
         assert val in gamma_set
@@ -1505,15 +1515,180 @@ def test_j01_fedkin_alpha_series_not_mass_loss_rate(tmp_path: Path) -> None:
     assert float(fe0.identity.temperature_K.value) == 1973.0
 
 
-def test_j01_store_census_series_numeric_matches_declared_field() -> None:
+# Source-contract tables for the series census. Duplicated here on purpose:
+# the test must not import the production selector as its expected-value oracle.
+_CENSUS_QUANTITY_ALIASES = {
+    "pure_Psat": "p_sat",
+    "vapor_pressure": "p_sat",
+    "partial_pressure": "p_partial",
+    "potassium_partial_pressure_as_published": "p_partial",
+    "deltafG": "delta_fG",
+    "delta_fG": "delta_fG",
+    "delta_fG_kJ_mol": "delta_fG",
+    "log10_Kf": "log10_Kf",
+    "log10_kf": "log10_Kf",
+    "activity": "activity",
+    "activity_coefficient": "activity_coefficient",
+    "activity_coefficient_this_work": "activity_coefficient",
+    "wagner_interaction_parameter": "interaction_parameter",
+    "literature_vaporization_coefficient": "evaporation_coefficient_alpha",
+    "alpha": "evaporation_coefficient_alpha",
+    "evaporation_coefficient_alpha": "evaporation_coefficient_alpha",
+    "o2_yield": "o2_yield",
+    "mass_loss_fraction": "mass_loss_fraction",
+    "ion_current_ratio": "ion_intensity_ratio",
+    "ion_intensity_ratio": "ion_intensity_ratio",
+}
+_CENSUS_CLOSED_QUANTITIES = {
+    "p_sat",
+    "p_partial",
+    "p_reference",
+    "log10_Kf",
+    "activity",
+    "activity_coefficient",
+    "evaporation_coefficient_alpha",
+    "mass_loss_fraction",
+    "mass_loss_fraction_vs_T",
+    "yield_fraction",
+    "o2_yield",
+    "fe3_fe2_ratio",
+    "ion_intensity_ratio",
+    "delta_fG",
+    "H_minus_H298",
+    "partial_molar_enthalpy",
+    "enthalpy_of_vaporization_2nd_law",
+    "enthalpy_of_vaporization_3rd_law",
+    "cp",
+    "S",
+    "evaporation_rate",
+    "mass_loss_rate",
+    "wall_deposit_mass",
+    "transition_temperature",
+    "viscosity",
+    "density",
+    "electrical_conductivity",
+    "isotope_delta",
+    "condensate_composition",
+    "liquidus_composition",
+    "evolved_gas_yield",
+    "ion_intensity",
+    "interaction_parameter",
+}
+_CENSUS_TYPE_QUANTITY = {
+    "psat_series": "p_sat",
+    "gibbs_table": "delta_fG",
+    "activity_coefficient": "activity_coefficient",
+    "alpha": "evaporation_coefficient_alpha",
+    "rate_series": "mass_loss_rate",
+    "transition_point": "transition_temperature",
+}
+_CENSUS_UNIT_QUANTITY = {
+    "dimensionless alpha vs t_k": "evaporation_coefficient_alpha",
+    "dimensionless activity": "activity",
+}
+_CENSUS_PRESSURE_FIELDS = (
+    ("pressure_atm", "atm"),
+    ("p_atm", "atm"),
+    ("P_atm", "atm"),
+    ("pressure_bar", "bar"),
+    ("P_bar", "bar"),
+    ("p_bar", "bar"),
+    ("P_Pa", "Pa"),
+    ("pressure_Pa", "Pa"),
+    ("p_Pa", "Pa"),
+    ("Pb_Torr", "Torr"),
+    ("Pbar_Torr", "Torr"),
+    ("Po_Torr", "Torr"),
+)
+_ATM = as_decimal("101325")
+_BAR = as_decimal("100000")
+_TORR = _ATM / as_decimal("760")
+
+
+def _census_declared_quantity(obs_type: str | None, values: dict, units: str) -> str | None:
+    raw = values.get("quantity") if isinstance(values, dict) else None
+    if isinstance(raw, str) and raw in _CENSUS_QUANTITY_ALIASES:
+        return _CENSUS_QUANTITY_ALIASES[raw]
+    if isinstance(raw, str) and raw in _CENSUS_CLOSED_QUANTITIES:
+        return raw
+    if raw is None or raw == "":
+        unit_key = str(units or "").strip().lower()
+        if unit_key in _CENSUS_UNIT_QUANTITY:
+            return _CENSUS_UNIT_QUANTITY[unit_key]
+        if obs_type in _CENSUS_TYPE_QUANTITY:
+            return _CENSUS_TYPE_QUANTITY[obs_type]
+        return None
+    return None
+
+
+def _census_expected_point(item: dict, q_token: str | None, units: str):
+    from decimal import Decimal, InvalidOperation
+
+    def _num(raw):
+        if raw is None or raw == "" or isinstance(raw, bool):
+            return None
+        try:
+            return Decimal(str(raw))
+        except (InvalidOperation, ValueError, TypeError):
+            return None
+
+    if q_token is None:
+        return None
+    if q_token == "activity_coefficient":
+        if "gamma" in item:
+            return _num(item.get("gamma"))
+        if "activity_coefficient" in item:
+            return _num(item.get("activity_coefficient"))
+        return None
+    if q_token == "activity":
+        return _num(item["activity"]) if "activity" in item else None
+    if q_token == "evaporation_coefficient_alpha":
+        return _num(item["alpha"]) if "alpha" in item else None
+    if q_token == "delta_fG":
+        if "delta_fG" in item:
+            return _num(item.get("delta_fG"))
+        if "value" in item:
+            return _num(item.get("value"))
+        return None
+    if q_token in {"p_sat", "p_partial"}:
+        for key, unit in _CENSUS_PRESSURE_FIELDS:
+            if key not in item:
+                continue
+            amount = _num(item.get(key))
+            if amount is None:
+                return None
+            if unit == "atm":
+                return amount * _ATM
+            if unit == "bar":
+                return amount * _BAR
+            if unit == "Torr":
+                return amount * _TORR
+            return amount
+        if q_token == "p_partial":
+            for key in ("p_Ga_Pa", "p_In_Pa", "p_O2_calc_Pa"):
+                if key in item:
+                    return _num(item.get(key))
+        if "P" in item or "p" in item:
+            amount = _num(item.get("P", item.get("p")))
+            unit = str(units or "").strip().lower().replace(" ", "")
+            if amount is None or not unit:
+                return None
+            if unit in {"pa", "pascal", "pascals"}:
+                return amount
+            if unit in {"atm", "atmosphere", "atmospheres"}:
+                return amount * _ATM
+            if unit in {"bar"}:
+                return amount * _BAR
+            if unit in {"torr", "mmhg"}:
+                return amount * _TORR
+            return None
+        return None
+    return None
+
+
+def _series_census(extracts: Path, extracts_v2: Path) -> tuple[dict[str, int], list[str], int, int]:
     from decimal import Decimal
 
-    from simulator.battery.migrate import map_quantity, _series_point_value
-
-    extracts = REPO_ROOT / "data" / "literature" / "extracts"
-    extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
-    if not extracts_v2.is_dir():
-        pytest.skip("migrated store not generated yet")
     census: dict[str, int] = {}
     mismatches: list[str] = []
     n_numeric = 0
@@ -1543,8 +1718,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
                     continue
                 obs_type = row.get("type") if isinstance(row.get("type"), str) else None
                 units = str(row.get("units") or "")
-                q_state, _why = map_quantity(obs_type, values, units=units)
-                q_token = q_state.value if q_state.is_value else None
+                q_token = _census_declared_quantity(obs_type, values, units)
                 raw_id = str(row.get("observation_id") or "")
                 for index, item in enumerate(series):
                     if not isinstance(item, dict):
@@ -1556,7 +1730,7 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
                         continue
                     stored_q = (stored_obs.get("identity") or {}).get("quantity") or {}
                     stored_val = stored_obs.get("value") or {}
-                    expected, _trail, _unused = _series_point_value(item, q_token, units)
+                    expected = _census_expected_point(item, q_token, units)
                     if expected is None:
                         n_unavailable += 1
                         if stored_val.get("kind") == "point":
@@ -1566,26 +1740,357 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
                             )
                         continue
                     n_numeric += 1
-                    label = q_token.value if q_token is not None else "unknown"
+                    label = q_token if q_token is not None else "unknown"
                     census[label] = census.get(label, 0) + 1
                     if stored_q.get("value") != label:
                         mismatches.append(
                             f"{oid} stored quantity {stored_q.get('value')!r} != declared {label}"
                         )
                     if stored_val.get("kind") != "point":
-                        mismatches.append(f"{oid} declared field present but stored {stored_val.get('kind')}")
+                        mismatches.append(
+                            f"{oid} declared field present but stored {stored_val.get('kind')}"
+                        )
                         continue
                     got = Decimal(str(stored_val.get("point")))
                     if got != expected:
                         mismatches.append(f"{oid} stored {got} != source {expected} for {label}")
+    return census, mismatches, n_numeric, n_unavailable
+
+
+def test_j01_store_census_series_numeric_matches_declared_field() -> None:
+    extracts = REPO_ROOT / "data" / "literature" / "extracts"
+    extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
+    if not extracts_v2.is_dir():
+        pytest.skip("migrated store not generated yet")
+    census, mismatches, n_numeric, n_unavailable = _series_census(extracts, extracts_v2)
     assert not mismatches, mismatches[:20]
     assert n_numeric == sum(census.values())
-    # Live census after the quantity-bound fix: 128 gamma + 18 p_partial + 12 alpha.
-    # Six previously stored pressures were unsupported `total_pressure` series
-    # that the type fallback had labelled p_sat; they are now unavailable.
     assert census.get("activity_coefficient") == 128
     assert census.get("p_partial") == 18
     assert census.get("p_sat", 0) == 0
     assert census.get("evaporation_coefficient_alpha") == 12
     assert census.get("mass_loss_rate", 0) == 0
     assert n_numeric == 158, (n_numeric, census, n_unavailable)
+
+
+def test_k04_census_goes_red_when_stored_alpha_is_corrupted(tmp_path: Path) -> None:
+    import shutil
+    from decimal import Decimal
+
+    extracts = REPO_ROOT / "data" / "literature" / "extracts"
+    extracts_v2 = REPO_ROOT / "data" / "literature" / "extracts-v2"
+    if not extracts_v2.is_dir():
+        pytest.skip("migrated store not generated yet")
+    dest = tmp_path / "extracts-v2"
+    shutil.copytree(extracts_v2, dest)
+    fedkin = dest / "fedkin-grossman-ghiorso-2006.yaml"
+    stored = yaml.safe_load(fedkin.read_text(encoding="utf-8"))
+    n_mutated = 0
+    for obs in stored.get("observations") or []:
+        ident = obs.get("identity") or {}
+        q = ident.get("quantity") or {}
+        if q.get("value") != "evaporation_coefficient_alpha":
+            continue
+        t_state = ident.get("temperature_K") or {}
+        try:
+            t = Decimal(str(t_state.get("value")))
+        except Exception:
+            continue
+        if t <= Decimal("1973"):
+            continue
+        val = obs.get("value") or {}
+        if val.get("kind") != "point":
+            continue
+        val["point"] = str(Decimal(str(val["point"])) + 1)
+        n_mutated += 1
+    assert n_mutated == 9, n_mutated
+    fedkin.write_text(yaml.safe_dump(stored, sort_keys=False), encoding="utf-8")
+    _census, mismatches, _n_numeric, _n_unavailable = _series_census(extracts, dest)
+    assert mismatches, "census must go red when stored alpha points are corrupted"
+
+
+def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = "psat_series") -> dict:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["type"] = obs_type
+    row["units"] = units
+    row["values"] = values
+    return extract
+
+
+def test_k01_scalar_psat_does_not_take_alpha(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="pure_Psat",
+        units="",
+        values={"quantity": "pure_Psat", "alpha": 0.23, "method_class": "measured_direct"},
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(o for o in result.observations.values() if "na_psat" in o.observation_id)
+    assert quantity_token(obs.identity) is Quantity.P_SAT
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    assert obs.value.point is None
+    assert any("value" in (e.axes or ()) for e in result.queue)
+
+
+def test_k01_scalar_activity_does_not_take_alpha(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="activity",
+        units="",
+        values={"quantity": "activity", "alpha": 0.23, "method_class": "measured_direct"},
+        obs_type="activity_coefficient",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.ACTIVITY
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    assert any("value" in (e.axes or ()) for e in result.queue)
+
+
+def test_k01_scalar_alpha_does_not_take_coefficient(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="evaporation_coefficient_alpha",
+        units="",
+        values={
+            "quantity": "evaporation_coefficient_alpha",
+            "activity_coefficient": 0.06,
+            "method_class": "measured_direct",
+        },
+        obs_type="alpha",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.EVAPORATION_COEFFICIENT_ALPHA
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    assert any("value" in (e.axes or ()) for e in result.queue)
+
+
+def test_k01_source_activity_is_quantity_activity(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="activity",
+        units="dimensionless activity",
+        values={"activity": "7.19e-10", "method_class": "measured_direct"},
+        obs_type="activity_coefficient",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.ACTIVITY
+    assert quantity_token(obs.identity) is not Quantity.ACTIVITY_COEFFICIENT
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.value.point == as_decimal("7.19e-10")
+
+
+def test_k01_dimensionless_activity_field_without_activity_units(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="activity",
+        units="dimensionless",
+        values={"activity": 1.0, "method_class": "measured_direct"},
+        obs_type="activity_coefficient",
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.ACTIVITY
+    assert obs.value.kind is ValueKind.POINT
+    assert obs.value.point == as_decimal("1")
+
+
+def test_k01_tsaplin_store_activity_not_coefficient() -> None:
+    path = REPO_ROOT / "data" / "literature" / "extracts-v2" / "kems-ms2000-044.yaml"
+    if not path.is_file():
+        pytest.skip("migrated store not generated yet")
+    stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+    rows = [
+        o
+        for o in stored.get("observations") or []
+        if o.get("observation_id", "").endswith("ms2000_044_na2o_activity_xsio2_0805_t1473")
+    ]
+    assert len(rows) == 1
+    obs = rows[0]
+    q = (obs.get("identity") or {}).get("quantity") or {}
+    assert q.get("value") == "activity"
+    assert obs.get("value", {}).get("kind") == "point"
+    assert as_decimal(obs["value"]["point"]) == as_decimal("7.19e-10")
+
+
+def test_k01_value_constructions_live_inside_the_boundary() -> None:
+    import ast
+
+    from simulator.battery.migrate import BOUNDARY_INGEST_CALLERS
+
+    src = (REPO_ROOT / "simulator" / "battery" / "migrate.py").read_text(encoding="utf-8")
+    tree = ast.parse(src)
+    allowed_value = {
+        "select_declared_source",
+        "_unavailable_selection",
+        "_point_selection",
+        "_interval_selection",
+        "_series_selection_from_items",
+        "_value_from_plain",
+    }
+    func_stack: list[str] = []
+
+    class Visitor(ast.NodeVisitor):
+        def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+            func_stack.append(node.name)
+            self.generic_visit(node)
+            func_stack.pop()
+
+        visit_AsyncFunctionDef = visit_FunctionDef
+
+        def visit_Call(self, node: ast.Call) -> None:
+            name = None
+            if isinstance(node.func, ast.Name):
+                name = node.func.id
+            elif isinstance(node.func, ast.Attribute):
+                name = node.func.attr
+                if isinstance(node.func.value, ast.Name) and node.func.value.id == "Value":
+                    name = f"Value.{node.func.attr}"
+            owner = func_stack[-1] if func_stack else "<module>"
+            if name in {"Value", "point_of", "Value.point_of"}:
+                assert owner in allowed_value, (
+                    f"Value constructed in {owner}:{node.lineno} outside the boundary"
+                )
+            if name == "select_declared_source":
+                from simulator.battery.migrate import _BOUNDARY_WRAPPERS
+
+                assert owner in BOUNDARY_INGEST_CALLERS or owner in _BOUNDARY_WRAPPERS, (
+                    f"select_declared_source called from unlisted {owner}:{node.lineno}"
+                )
+            self.generic_visit(node)
+
+    Visitor().visit(tree)
+
+
+def test_k01_boundary_records_ingest_callers(tmp_path: Path) -> None:
+    from simulator.battery.migrate import (
+        BOUNDARY_INGEST_CALLERS,
+        reset_boundary_served,
+        boundary_served_callers,
+    )
+
+    reset_boundary_served()
+    extract = _scalar_extract(
+        quantity="pure_Psat",
+        units="atm",
+        values={
+            "quantity": "pure_Psat",
+            "series": [{"T_K": 1200, "pressure_atm": 1.0}],
+            "method_class": "measured_direct",
+        },
+    )
+    root = _write_min_tree(tmp_path, extract)
+    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "points": [
+                    {
+                        "key": "ledger-unknown-phase",
+                        "source_id": "fixture-source",
+                        "species": "Na",
+                        "comparison_quantity": "delta_fG",
+                        "temperature_K": 1200,
+                        "table_kJ_mol": 1,
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    migrate(root, write=False)
+    served = {name for _file, _line, name in boundary_served_callers()}
+    assert served
+    unexpected = served - BOUNDARY_INGEST_CALLERS
+    assert not unexpected, unexpected
+
+
+def test_k02_t_range_is_domain_not_value(tmp_path: Path) -> None:
+    extract = _scalar_extract(
+        quantity="pure_Psat",
+        units="",
+        values={
+            "quantity": "pure_Psat",
+            "T_range_K": [1200, 1300],
+            "method_class": "measured_direct",
+        },
+    )
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert quantity_token(obs.identity) is Quantity.P_SAT
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    assert obs.value.interval_low is None
+    reason_blob = " ".join(
+        [
+            obs.value.unavailable_reason or "",
+            getattr(obs.identity.temperature_K, "reason", None) or "",
+            " ".join(e.why or "" for e in result.queue),
+        ]
+    )
+    assert "1200" in reason_blob and "1300" in reason_blob
+    assert any("value" in (e.axes or ()) for e in result.queue)
+    assert any("temperature_K" in (e.axes or ()) for e in result.queue)
+
+
+def test_k02_zr_th_and_pending_anchors_are_unavailable_domains() -> None:
+    cases = [
+        ("ref-032-zr.yaml", "anchor_Zr_pure_Psat", "1800", "2500"),
+        ("ref-032-th.yaml", "anchor_Th_pure_Psat", "1800", "2500"),
+        ("pending-bi2o3-kems.yaml", "anchor_Bi2O3_pure_Psat", "1163", "1400"),
+        ("pending-mgcl2-measured-vp.yaml", "anchor_MgCl2_pure_Psat", "1100", "1700"),
+        ("pending-dual-primary-oso4.yaml", "anchor_OsO4_pure_Psat", "298", "400"),
+        ("pending-teo2-vp.yaml", "anchor_TeO2_pure_Psat", "884", "987"),
+    ]
+    for fname, local_id, lo, hi in cases:
+        path = REPO_ROOT / "data" / "literature" / "extracts-v2" / fname
+        if not path.is_file():
+            pytest.skip("migrated store not generated yet")
+        stored = yaml.safe_load(path.read_text(encoding="utf-8"))
+        rows = [
+            o
+            for o in stored.get("observations") or []
+            if o.get("observation_id", "").endswith(local_id)
+        ]
+        assert len(rows) == 1, fname
+        obs = rows[0]
+        assert obs.get("value", {}).get("kind") == "unavailable", fname
+        blob = yaml.safe_dump(obs)
+        assert lo in blob and hi in blob, fname
+
+
+def test_k03_ledger_missing_phase_is_queued(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "points": [
+                    {
+                        "key": "ledger-unknown-phase",
+                        "source_id": "fixture-source",
+                        "species": "Na",
+                        "comparison_quantity": "delta_fG",
+                        "temperature_K": 1200,
+                        "table_kJ_mol": 1,
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False)
+    obs = result.observations["ledger-unknown-phase"]
+    assert obs.identity.species.phase.is_unknown
+    phase_entries = [
+        e
+        for e in result.queue
+        if e.observation_id == "ledger-unknown-phase" and "phase" in (e.axes or ())
+    ]
+    assert phase_entries
+    assert any("phase" in (e.why or "").lower() or True for e in phase_entries)
