@@ -31,12 +31,12 @@ standard_pressure:
   vapour_rail_psat_janaf: 100000 Pa (0.1 MPa)
   vapour_rail_psat_b689: 101325 Pa (1 atm)
 summary:
-  points_total: 23764
+  points_total: 23761
   points_scored: 17992
   points_refused: 5180
   matches: 4487
   mismatches: 13505
-  points_before_ledger_thinning: 130056
+  points_before_ledger_thinning: 130053
 points:
 - key: janaf::Al-001:T=0::nasa_cea_9::delta_fG_kJ_mol
   source_id: janaf
@@ -471865,33 +471865,11 @@ points:
   tier: trace
   compilation_id: pankratz-1987-usbm-b689
   printed_page: 342
-  table_log10_Kf: 416.861
+  table_log10_Kf: -16.861
   n_points: 12
   T_min_K: 298.15
   T_max_K: 717.824
   first_observation_id: page-0342
-- key: pankratz-1987-usbm-b689::page-0342:T=298.15::table_self_check::log10_Kf
-  source_id: pankratz-1987-usbm-b689
-  observation_id: page-0342
-  species: Sb4S3
-  provenance_class: engine_own_input
-  comparison_quantity: log10_Kf
-  temperature_K: 298.15
-  table_kJ_mol: 96.240368
-  engine_kJ_mol: null
-  residual_kJ_mol: null
-  residual_log10K: 433.72158300341437
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: compilation_table_self_check
-  engine_channel: table_self_check
-  cea_key: null
-  skip_reason: null
-  note: printed log10 Kf minus −ΔfG/(R T ln 10); tolerance=0.1 (half last printed place)
-  tier: trace
-  compilation_id: pankratz-1987-usbm-b689
-  printed_page: 342
-  table_log10_Kf: 416.861
 - key: pankratz-1987-usbm-b689::page-0344:T=298.15::nasa_cea_9::delta_fG_kJ_mol
   source_id: pankratz-1987-usbm-b689
   observation_id: page-0344
@@ -472219,29 +472197,7 @@ points:
   tier: minor
   compilation_id: pankratz-1987-usbm-b689
   printed_page: 348
-  table_log10_Kf: 4.841
-- key: pankratz-1987-usbm-b689::page-0348:T=400::table_self_check::log10_Kf
-  source_id: pankratz-1987-usbm-b689
-  observation_id: page-0348
-  species: SiS
-  provenance_class: engine_own_input
-  comparison_quantity: log10_Kf
-  temperature_K: 400.0
-  table_kJ_mol: 37.07442400000001
-  engine_kJ_mol: null
-  residual_kJ_mol: null
-  residual_log10K: 9.682328448601092
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: compilation_table_self_check
-  engine_channel: table_self_check
-  cea_key: null
-  skip_reason: null
-  note: printed log10 Kf minus −ΔfG/(R T ln 10); tolerance=0.1 (half last printed place)
-  tier: minor
-  compilation_id: pankratz-1987-usbm-b689
-  printed_page: 348
-  table_log10_Kf: 4.841
+  table_log10_Kf: -4.841
 - key: pankratz-1987-usbm-b689::page-0348:T=432.02::nasa_cea_9::delta_fG_kJ_mol
   source_id: pankratz-1987-usbm-b689
   observation_id: page-0348
@@ -473232,28 +473188,6 @@ points:
   T_min_K: 298.15
   T_max_K: 717.824
   first_observation_id: page-0370
-- key: pankratz-1987-usbm-b689::page-0370:T=368.3::table_self_check::log10_Kf
-  source_id: pankratz-1987-usbm-b689
-  observation_id: page-0370
-  species: TbS
-  provenance_class: engine_own_input
-  comparison_quantity: log10_Kf
-  temperature_K: 368.3
-  table_kJ_mol: 98.319816
-  engine_kJ_mol: null
-  residual_kJ_mol: null
-  residual_log10K: 27.88806711746529
-  band_kJ_mol: 0.05
-  status: mismatch
-  finding_class: compilation_table_self_check
-  engine_channel: table_self_check
-  cea_key: null
-  skip_reason: null
-  note: printed log10 Kf minus −ΔfG/(R T ln 10); tolerance=0.1 (half last printed place)
-  tier: trace
-  compilation_id: pankratz-1987-usbm-b689
-  printed_page: 370
-  table_log10_Kf: 13.944
 - key: pankratz-1987-usbm-b689::page-0372:T=298.15::nasa_cea_9::delta_fG_kJ_mol
   source_id: pankratz-1987-usbm-b689
   observation_id: page-0372
@@ -518672,7 +518606,7 @@ points:
   tier: trace
   compilation_id: pankratz-1987-usbm-b689
   printed_page: 342
-  table_log10_Kf: 416.861
+  table_log10_Kf: -16.861
   n_points: 8
   T_min_K: 298.15
   T_max_K: 717.824
@@ -519114,7 +519048,7 @@ points:
   tier: trace
   compilation_id: pankratz-1987-usbm-b689
   printed_page: 370
-  table_log10_Kf: 13.944
+  table_log10_Kf: -13.944
   n_points: 2
   T_min_K: 368.3
   T_max_K: 388.36

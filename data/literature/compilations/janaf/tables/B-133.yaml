@@ -2376,3 +2376,29 @@ table:
     locator:
       table_id: B-133
       url: https://janaf.nist.gov/tables/B-133.html
+  compilation_findings:
+  - record_id: B-133
+    field: log10_formation_equilibrium_constant
+    kind: compilation_finding
+    temperature_K: 300.0
+    printed_page: null
+    action: none
+    ocr_token: '966.926'
+    printed_token: '966.926'
+    old: '966.926'
+    new: '966.926'
+    printed_delta_fG: '-5516.922'
+    residual_log10K: 6.363
+    reason: NIST SRD 13 TXT/HTML print both ΔfG = −5516.922 kJ mol⁻¹ and log Kf = 966.926
+      at 300 K. Recomputed log10 K = −ΔfG/(R T ln 10) is 960.563. The 300 K log Kf token
+      is identical to the 298.15 K token (966.926), which does match that row's ΔfG.
+      Chase 1998 monograph PDF is absent from the corpus (source_id janaf-4th, pdf_status
+      ABSENT); the table the janaf manifest cites is B-133.txt. Numbers left as published.
+    verbatim_quote: "300\t324.511\t326.088\t324.085\t0.599\t-5872.569\t-5516.922\t966.926"
+    source: https://janaf.nist.gov/tables/B-133.txt
+    download_url: https://janaf.nist.gov/tables/B-133.txt
+    locator:
+      table_id: B-133
+      url: https://janaf.nist.gov/tables/B-133.html
+      row_temperature_as_published: '300'
+      column: log Kf

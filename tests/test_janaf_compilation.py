@@ -339,6 +339,31 @@ def test_legacy_extract_left_in_place() -> None:
     assert payload["schema_version"] == "literature_extract.v1"
 
 
+def test_b133_300k_log_kf_is_a_compilation_finding_not_a_correction() -> None:
+    """Printed log Kf at 300 K disagrees with printed ΔfG; do not rewrite either."""
+
+    document = load_table_document(TABLES_DIR / "B-133.yaml")
+    row = next(
+        item
+        for item in document["table"]["values"]
+        if item["temperature"]["as_published"] == "300"
+    )
+    assert row["formation_gibbs_energy"]["as_published"] == "-5516.922"
+    assert row["formation_gibbs_energy"]["value"] == -5516.922
+    assert row["log10_formation_equilibrium_constant"]["as_published"] == "966.926"
+    assert row["log10_formation_equilibrium_constant"]["value"] == 966.926
+    findings = document["table"]["compilation_findings"]
+    assert len(findings) == 1
+    finding = findings[0]
+    assert finding["kind"] == "compilation_finding"
+    assert finding["action"] == "none"
+    assert finding["old"] == finding["new"] == "966.926"
+    assert finding["temperature_K"] == 300.0
+    assert "300\t324.511" in finding["verbatim_quote"]
+    assert "-5516.922" in finding["verbatim_quote"]
+    assert "966.926" in finding["verbatim_quote"]
+
+
 def test_every_manifest_entry_carries_formula_as_published() -> None:
     manifest = load_manifest()
     entries = manifest["entries"]
