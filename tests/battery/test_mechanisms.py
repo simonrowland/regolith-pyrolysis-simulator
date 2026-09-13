@@ -687,7 +687,13 @@ def test_m16_refused_residual_cannot_carry_a_numeric_score() -> None:
     ident = F.cao_identity(Phase.CR)
     w = F.work()
     exp = F.tabulation_experiment()
-    ref = F.observation("ref-m16", exp.experiment_id, ident, Decimal("0.064"))
+    ref = F.observation(
+        "ref-m16",
+        exp.experiment_id,
+        ident,
+        Decimal("0.064"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
     cand = F.engine_obs("cand-m16", exp.experiment_id, ident, Decimal("0.064"))
     refused = F.residual(
         "m16-refused",
@@ -702,14 +708,14 @@ def test_m16_refused_residual_cannot_carry_a_numeric_score() -> None:
     from simulator.battery.records import Residual, ResidualNumeric, DecisionBand
     from simulator.battery.enums import MetricOperation
 
-    forged = Residual(
-        key="m16-forged",
+    numeric_only = Residual(
+        key="m16-numeric-on-refused",
         reference=ref.observation_id,
         execution=Execution(state=ExecutionState.PRODUCED),
         rail=Rail.THERMOCHEMISTRY,
         status=ResidualStatus.REFUSED,
         source_relation=SourceRelation.INDEPENDENT,
-        score_eligible=True,
+        score_eligible=False,
         exclusions=(),
         notices=(),
         candidate=cand.observation_id,
@@ -721,8 +727,33 @@ def test_m16_refused_residual_cannot_carry_a_numeric_score() -> None:
         ),
         refusal=ResidualRefusal(RefusalReason.INVALID_IDENTITY, {}),
     )
-    report = validate_corpus([w], [exp], [ref, cand], [forged])
-    assert not report.ok
+    numeric_report = validate_corpus([w], [exp], [ref, cand], [numeric_only])
+    assert not numeric_report.ok
+    assert any("forbids numeric" in i.detail for i in numeric_report.issues)
+    eligible_only = Residual(
+        key="m16-eligible-on-refused",
+        reference=ref.observation_id,
+        execution=Execution(state=ExecutionState.PRODUCED),
+        rail=Rail.THERMOCHEMISTRY,
+        status=ResidualStatus.REFUSED,
+        source_relation=SourceRelation.INDEPENDENT,
+        score_eligible=True,
+        exclusions=(),
+        notices=(),
+        candidate=cand.observation_id,
+        refusal=ResidualRefusal(RefusalReason.INVALID_IDENTITY, {}),
+    )
+    eligible_report = validate_corpus([w], [exp], [ref, cand], [eligible_only])
+    assert not eligible_report.ok
+    assert any("score_eligible cannot be true when status is refused" in i.detail for i in eligible_report.issues)
+    match_ok = F.residual(
+        "m16-match",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, cand], [match_ok]).ok
 
 
 def test_mf_f03_unknown_identity_forbids_numeric_residual() -> None:
