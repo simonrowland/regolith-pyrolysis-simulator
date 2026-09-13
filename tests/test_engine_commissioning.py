@@ -101,6 +101,15 @@ def _spy_prepared(called: list):
     return spy
 
 
+def test_binary_pot_battery_describes_notice_and_run_tmin() -> None:
+    """D04 / grok P2-1: helper text matches notice+run, not the old T-min refusal."""
+    text = Path(
+        'simulator/diagnostic_helpers/binary_pot_battery.py'
+    ).read_text(encoding='utf-8')
+    assert '800 C inline in _equilibrate_subprocess' not in text
+    assert 'notice+run' in text
+
+
 def test_commissioning_yaml_comments_match_notice_and_run() -> None:
     """C14 / G-P3-2: comments describe notice+run and floor-as-metadata."""
     text = Path('data/engine_commissioning.yaml').read_text(encoding='utf-8')

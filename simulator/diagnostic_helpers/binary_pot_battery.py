@@ -1495,7 +1495,7 @@ def qualification_notice(gate: Mapping[str, Any]) -> dict[str, Any]:
             "AlphaMELTSBackend._domain_gate / engines.alphamelts.domain.AlphaMELTSDomainGate (SiO2 band, major-oxide sum, oxide basis)"
         ],
         "not_bypassable_from_harness": [
-            "ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C (800 C inline in _equilibrate_subprocess)",
+            "ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C (certified T min; notice+run, not a pre-launch refusal)",
             "ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR (1 bar inline in _equilibrate_subprocess)",
             "fe_free_and_imposed_absolute_fo2 (Na2O/K2O-SiO2 family; not _domain_gate)",
         ],
