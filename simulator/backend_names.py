@@ -12,6 +12,13 @@ canonicalizes to itself; neither aliases to ``internal-analytical``,
 non-authoritative verdicts and may never certify (see
 ``simulator.fidelity_vocabulary``).
 
+IMCC-SF04 shadow names ``imcc-sf04`` (published model) and ``imcc-sf04-ext``
+(S/P extension model) also route through :func:`canonical_backend_name`.
+Hyphen and underscore spellings fold to the hyphenated token; they are not
+analytical aliases. Promotion into ``REAL_MELT_BACKEND_NAMES`` / active
+recipe eligibility is a separate owner-gated change after the battery
+result (t-890).
+
 This module deliberately has no heavy dependencies so it can be imported from
 the EvalSpec cache-key path without pulling in ``simulator.core``.
 """
@@ -42,6 +49,17 @@ RATIFIED_VAPOUR_ANALYTICAL_EVIDENCE_CLASSES = frozenset(
     }
 )
 
+# Shadow-tier IMCC-SF04 melt-activity backends. Selectable for diagnostics,
+# the battery, and shadow runs; not active-recipe eligible until t-890.
+IMCC_SF04_BACKEND_NAME = "imcc-sf04"
+IMCC_SF04_EXT_BACKEND_NAME = "imcc-sf04-ext"
+IMCC_SF04_BACKEND_NAMES = frozenset(
+    {
+        IMCC_SF04_BACKEND_NAME,
+        IMCC_SF04_EXT_BACKEND_NAME,
+    }
+)
+
 ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME = "InternalAnalyticalBackend"
 ANALYTICAL_BACKEND_QUALIFIED_CLASS_NAME = (
     "simulator.melt_backend.base.InternalAnalyticalBackend"
@@ -58,9 +76,11 @@ def canonical_backend_name(backend_name: str | None) -> str | None:
     Owner-ratified vapour analytical evidence-class tokens
     (``analytical:vaporock_calibrated``, ``analytical:external_grounded``)
     match case-insensitively and canonicalize to themselves — they never fold
-    into ``internal-analytical``. Every other value is returned byte-for-byte,
-    preserving strict matching for real backends and unknown-name refusals.
-    ``None`` is unchanged.
+    into ``internal-analytical``. IMCC-SF04 shadow names ``imcc-sf04`` and
+    ``imcc-sf04-ext`` match case-insensitively and fold hyphen/underscore
+    spellings to the hyphenated token. Every other value is returned
+    byte-for-byte, preserving strict matching for real backends and
+    unknown-name refusals. ``None`` is unchanged.
     """
     if backend_name is None:
         return None
@@ -72,6 +92,9 @@ def canonical_backend_name(backend_name: str | None) -> str | None:
         or normalized in ANALYTICAL_BACKEND_ALIASES
     ):
         return ANALYTICAL_BACKEND_SERIALIZATION_TOKEN
+    folded = normalized.replace("_", "-")
+    if folded in IMCC_SF04_BACKEND_NAMES:
+        return folded
     return backend_name
 
 
