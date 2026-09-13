@@ -15,6 +15,7 @@ from engines.alphamelts.domain import (
     DEFAULT_SIO2_MIN_WT_PCT,
     _SIO2_CRASH_FLOOR_WT_PCT,
 )
+import engines.engine_commissioning as engine_commissioning_module
 from engines.engine_commissioning import (
     PUBLISHED_AUTHORITY_OUTSIDE,
     PUBLISHED_SIO2_CERTIFIED_WT_PCT,
@@ -24,6 +25,7 @@ from engines.engine_commissioning import (
     assess_engine_commissioning,
     engine_commissioning,
     load_engine_commissioning,
+    parse_engine_commissioning_file,
 )
 from engines.alphamelts.thermoengine import ThermoEnginePayload
 from simulator.melt_backend.alphamelts import (
@@ -152,12 +154,29 @@ def test_table_loads_and_pins_published_defaults() -> None:
     )
 
 
+def test_runtime_snapshot_cannot_be_mutated() -> None:
+    """C06 / F6: one frozen process snapshot; mutation cannot change assessment."""
+    table = load_engine_commissioning()
+    original = table.engines['alphamelts']
+    with pytest.raises(TypeError):
+        table.engines['alphamelts'] = table.engines['thermoengine']
+    first = assess_engine_commissioning(
+        'alphamelts', sio2_wt_pct=50.0, temperature_K=1500.0
+    )
+    second = assess_engine_commissioning(
+        'alphamelts', sio2_wt_pct=50.0, temperature_K=1500.0
+    )
+    assert table.engines['alphamelts'] is original
+    assert first.spec is second.spec is original
+    assert not hasattr(engine_commissioning_module, 'clear_engine_commissioning_cache')
+
+
 def test_bad_key_is_rejected(tmp_path: Path) -> None:
     payload = _valid_table_payload()
     payload['engines']['alphamelts']['not_a_field'] = 1
     path = _write_table(tmp_path / 'bad-key.yaml', payload)
     with pytest.raises(EngineCommissioningError, match='unknown key'):
-        load_engine_commissioning(path)
+        parse_engine_commissioning_file(path)
 
 
 def test_authority_outside_certified_is_rejected(tmp_path: Path) -> None:
@@ -166,7 +185,7 @@ def test_authority_outside_certified_is_rejected(tmp_path: Path) -> None:
     payload['engines']['alphamelts']['authority_outside'] = 'certified'
     path = _write_table(tmp_path / 'authority-certified.yaml', payload)
     with pytest.raises(EngineCommissioningError, match='authority_outside'):
-        load_engine_commissioning(path)
+        parse_engine_commissioning_file(path)
 
 
 def test_authority_outside_bridge_is_rejected(tmp_path: Path) -> None:
@@ -174,7 +193,7 @@ def test_authority_outside_bridge_is_rejected(tmp_path: Path) -> None:
     payload['engines']['alphamelts']['authority_outside'] = 'bridge'
     path = _write_table(tmp_path / 'authority-bridge.yaml', payload)
     with pytest.raises(EngineCommissioningError, match='authority_outside'):
-        load_engine_commissioning(path)
+        parse_engine_commissioning_file(path)
 
 
 def test_boolean_bound_is_rejected(tmp_path: Path) -> None:
@@ -183,7 +202,7 @@ def test_boolean_bound_is_rejected(tmp_path: Path) -> None:
     payload['engines']['alphamelts']['sio2_wt_pct']['certified'] = [True, 80]
     path = _write_table(tmp_path / 'bool-bound.yaml', payload)
     with pytest.raises(EngineCommissioningError, match='finite float'):
-        load_engine_commissioning(path)
+        parse_engine_commissioning_file(path)
 
 
 def test_non_integer_schema_version_is_rejected(tmp_path: Path) -> None:
@@ -192,7 +211,7 @@ def test_non_integer_schema_version_is_rejected(tmp_path: Path) -> None:
     payload['schema_version'] = 1.9
     path = _write_table(tmp_path / 'schema-1.9.yaml', payload)
     with pytest.raises(EngineCommissioningError, match='schema_version'):
-        load_engine_commissioning(path)
+        parse_engine_commissioning_file(path)
 
 
 def test_inverted_band_is_rejected(tmp_path: Path) -> None:
@@ -200,7 +219,7 @@ def test_inverted_band_is_rejected(tmp_path: Path) -> None:
     payload['engines']['alphamelts']['sio2_wt_pct']['certified'] = [80.0, 30.0]
     path = _write_table(tmp_path / 'inverted.yaml', payload)
     with pytest.raises(EngineCommissioningError, match='inverted'):
-        load_engine_commissioning(path)
+        parse_engine_commissioning_file(path)
 
 
 def test_in_band_pot_has_no_notice_and_calls_engine(monkeypatch) -> None:

@@ -23,8 +23,8 @@ a second band.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from functools import lru_cache
 from pathlib import Path
+from types import MappingProxyType
 from typing import Any, Mapping
 
 import yaml
@@ -120,7 +120,7 @@ class EngineCommissioning:
 @dataclass(frozen=True)
 class CommissioningTable:
     schema_version: int
-    engines: dict[str, EngineCommissioning]
+    engines: Mapping[str, EngineCommissioning]
     path: Path
 
 
@@ -308,20 +308,23 @@ def _parse_table(payload: object, *, path: Path) -> CommissioningTable:
         )
     return CommissioningTable(
         schema_version=schema_int,
-        engines=engines,
+        engines=MappingProxyType(engines),
         path=path,
     )
 
 
-@lru_cache(maxsize=8)
-def load_engine_commissioning(
-    path: str | Path | None = None,
+def parse_engine_commissioning(
+    payload: object,
+    *,
+    path: Path | None = None,
 ) -> CommissioningTable:
-    """Load and validate the commissioning table (cached per path)."""
+    """Pure parser for tests and diagnostics. Does not touch the runtime snapshot."""
+    return _parse_table(payload, path=path or Path('<parsed>'))
 
-    table_path = (
-        DEFAULT_COMMISSIONING_PATH if path is None else Path(path)
-    )
+
+def parse_engine_commissioning_file(path: str | Path) -> CommissioningTable:
+    """Read and parse a table file without replacing the process snapshot."""
+    table_path = Path(path)
     if not table_path.is_file():
         raise EngineCommissioningError(
             f'engine commissioning table not found: {table_path}'
@@ -332,17 +335,17 @@ def load_engine_commissioning(
         raise EngineCommissioningError(
             f'engine commissioning table is not valid YAML: {table_path}'
         ) from exc
-    return _parse_table(payload, path=table_path)
+    return parse_engine_commissioning(payload, path=table_path)
 
 
-def engine_commissioning(
-    name: str,
-    *,
-    path: str | Path | None = None,
-) -> EngineCommissioning:
-    table = load_engine_commissioning(path)
+def load_engine_commissioning() -> CommissioningTable:
+    """Return the process-lifetime commissioning snapshot."""
+    return _RUNTIME_TABLE
+
+
+def engine_commissioning(name: str) -> EngineCommissioning:
     try:
-        return table.engines[str(name)]
+        return load_engine_commissioning().engines[str(name)]
     except KeyError as exc:
         raise EngineCommissioningError(
             f'no commissioning row for engine {name!r}'
@@ -354,7 +357,6 @@ def assess_engine_commissioning(
     *,
     sio2_wt_pct: float,
     temperature_K: float,
-    path: str | Path | None = None,
 ) -> CommissioningAssessment:
     """Classify a (SiO2, T) point against the project-owned table.
 
@@ -362,7 +364,7 @@ def assess_engine_commissioning(
     SIGABRT floor). It is not a pre-run refusal: the engine still runs.
     """
 
-    spec = engine_commissioning(name, path=path)
+    spec = engine_commissioning(name)
     sio2 = _finite_float(sio2_wt_pct, context='sio2_wt_pct')
     temperature = _finite_float(temperature_K, context='temperature_K')
     crash_floor = spec.sio2_wt_pct.observed_crash_floor_wt_pct
@@ -412,8 +414,7 @@ def assess_engine_commissioning(
     )
 
 
-def clear_engine_commissioning_cache() -> None:
-    load_engine_commissioning.cache_clear()
+_RUNTIME_TABLE = parse_engine_commissioning_file(DEFAULT_COMMISSIONING_PATH)
 
 
 __all__ = (
@@ -434,7 +435,8 @@ __all__ = (
     'SiO2Commissioning',
     'TemperatureCommissioning',
     'assess_engine_commissioning',
-    'clear_engine_commissioning_cache',
     'engine_commissioning',
     'load_engine_commissioning',
+    'parse_engine_commissioning',
+    'parse_engine_commissioning_file',
 )
