@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -316,7 +317,9 @@ def test_recompute_scoring_reclassifies_magemin_projected_ok_cells() -> None:
     assert updated["n_score_eligible"] == 0
 
 
-def test_measured_gamma_scores_when_engine_returns_activity() -> None:
+def test_solid_standard_gamma_is_not_scored_against_liquid_activity() -> None:
+    """M10 confirm: solid-standard KEMS gamma vs liquid melt activity is not scored."""
+
     pots = build_scoring_pots_from_extracts()
     pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
     comparators = [
@@ -326,33 +329,49 @@ def test_measured_gamma_scores_when_engine_returns_activity() -> None:
         and c.temperature_K == pot.temperatures_K[0]
     ]
     assert comparators
-    cell = EquilibrateCell(
-        pot_id=pot.pot_id,
-        engine="alphamelts",
-        temperature_K=float(pot.temperatures_K[0]),
-        po2=Po2Request(mode="engine_default", po2_bar=None),
-        status="ok",
-        refusal_reason=None,
-        engine_status="ok",
-        engine_reason=None,
-        melt_activities={"P2O5": 1.0e-17},
-        gas_partial_pressures_Pa={},
-        liquid_fraction=1.0,
-        wall_s=0.0,
-        cpu_s=0.0,
-        hostname="test",
+    assert "P2O5(s)" in (comparators[0].standard_state or "")
+    rows = score_scoring_arm(
+        pots=(pot,),
+        cells=(_successful_p2o5_cell(pot),),
+        comparators=comparators,
+        envelope=envelope,
+        rail_for=rail_for,
+    )
+    assert len(rows) == 1
+    assert rows[0]["score_eligible"] is False
+    assert rows[0]["predicted"] is not None
+    assert any("no solid/liquid conversion" in n for n in (rows[0].get("notices") or []))
+    assert rows[0]["signed_residual"]["dex"] is None
+    assert rows[0]["rail"] == "melt activities"
+
+
+def test_compatible_liquid_reference_gamma_still_scores() -> None:
+    """M10 control: same-reference measured gamma remains eligible."""
+
+    pots = build_scoring_pots_from_extracts()
+    pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
+    comparators = [
+        c
+        for c in iter_activity_comparators()
+        if c.observation_id == "kambayashi_1985_gamma_p2o5_solid_std_henry"
+        and c.temperature_K == pot.temperatures_K[0]
+    ]
+    assert comparators
+    liquid = replace(
+        comparators[0],
+        standard_state="Henrian gamma_P2O5 relative to P2O5(l)",
     )
     rows = score_scoring_arm(
         pots=(pot,),
-        cells=(cell,),
-        comparators=comparators,
+        cells=(_successful_p2o5_cell(pot),),
+        comparators=(liquid,),
         envelope=envelope,
         rail_for=rail_for,
     )
     assert len(rows) == 1
     assert rows[0]["score_eligible"] is True
     assert rows[0]["authority"] == "bridge"
-    assert rows[0]["signed_residual"]["dex"] is not None
+    assert rows[0]["signed_residual"]["dex"] == pytest.approx(-0.2654656070577966)
     assert rows[0]["rail"] == "melt activities"
 
 

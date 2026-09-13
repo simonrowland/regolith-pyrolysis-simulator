@@ -806,6 +806,47 @@ def _engine_activity(cell: EquilibrateCell, species: str) -> float | None:
     return None
 
 
+def _activity_reference_phase(text: str | None) -> str | None:
+    blob = str(text or "").lower()
+    if not blob:
+        return None
+    if "(s)" in blob or "solid" in blob:
+        return "solid"
+    if "(l)" in blob or "liquid" in blob:
+        return "liquid"
+    return None
+
+
+def _cell_activity_reference_phase(cell: EquilibrateCell, species: str) -> str | None:
+    declared = _activity_reference_phase(cell.engine_reason)
+    if declared is not None:
+        return declared
+    activities = cell.melt_activities or {}
+    if f"{species}_Liq" in activities or f"{species}(l)" in activities:
+        return "liquid"
+    if species in activities:
+        # Melt-engine activity is a liquid-reference quantity.
+        return "liquid"
+    return None
+
+
+def _activity_reference_mismatch(
+    cell: EquilibrateCell, comparator: ActivityComparator
+) -> str | None:
+    measured_phase = _activity_reference_phase(comparator.standard_state)
+    predicted_phase = _cell_activity_reference_phase(cell, comparator.species)
+    if (
+        measured_phase
+        and predicted_phase
+        and measured_phase != predicted_phase
+    ):
+        return (
+            f"KEMS standard state {comparator.standard_state}; "
+            "engine melt_activity is liquid-reference; no solid/liquid conversion"
+        )
+    return None
+
+
 def _predicted_for_comparator(
     cell: EquilibrateCell,
     comparator: ActivityComparator,
@@ -814,10 +855,10 @@ def _predicted_for_comparator(
     """Engine quantity matching the measured observable.
 
     KEMS Raoultian a_P2O5 is relative to P2O5(s). Engines report melt
-    activity on whatever standard state they expose. No solid/liquid
-    conversion is applied: if both numbers exist they are compared as
-    returned, with a notice. Henry gamma uses a = gamma * X, so
-    gamma_pred = a_pred / X_P2O5 when the engine returns activity.
+    activity as a liquid-reference quantity. No solid/liquid conversion
+    is applied; mismatched references are not scored. Henry gamma uses
+    a = gamma * X, so gamma_pred = a_pred / X_P2O5 when the engine
+    returns activity.
     Premise: X_P2O5 = n_P2O5 / sum n_oxide from the converted pot.
     Algebra: n_i = w_i / M_i; X = n_P2O5 / sum n. Sanity: equal moles → 0.5.
     """
@@ -1176,8 +1217,11 @@ def _cell_envelope(*, pot, cell, envelope, rail_for, comparator) -> dict[str, An
 
 def _comparator_envelope(*, pot, cell, comparator, envelope, rail_for) -> dict[str, Any]:
     admission_reason = comparator.admission_reason
+    reference_mismatch = _activity_reference_mismatch(cell, comparator)
     scored_method = (
-        method_class_is_scored(comparator.method_class) and admission_reason is None
+        method_class_is_scored(comparator.method_class)
+        and admission_reason is None
+        and reference_mismatch is None
     )
     predicted, conversion_note = _predicted_for_comparator(cell, comparator, pot)
     refused = cell.status == "refusal" or predicted is None
@@ -1194,6 +1238,8 @@ def _comparator_envelope(*, pot, cell, comparator, envelope, rail_for) -> dict[s
         notices.append(conversion_note)
     if admission_reason:
         notices.append(admission_reason)
+    if reference_mismatch:
+        notices.append(reference_mismatch)
     if not method_class_is_scored(comparator.method_class):
         notices.append(
             f"method_class={comparator.method_class}; model_derived/quoted rows are not scored"
