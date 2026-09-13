@@ -126,7 +126,7 @@ def _write_min_tree(root: Path, extract: dict | None = None) -> Path:
 def test_citation_hash_nfc_and_whitespace() -> None:
     a = "Cafe\u0301  source"
     b = "Caf\u00e9   source"
-    assert unicodedata.normalize("NFC", a) != a or True
+    assert unicodedata.normalize("NFC", a) != a
     assert citation_hash(a) == citation_hash(b)
     assert citation_hash("exactly this") == hashlib.sha256(
         unicodedata.normalize("NFC", "exactly this").encode("utf-8")
