@@ -354,3 +354,119 @@ def test_measured_gamma_scores_when_engine_returns_activity() -> None:
     assert rows[0]["authority"] == "bridge"
     assert rows[0]["signed_residual"]["dex"] is not None
     assert rows[0]["rail"] == "melt activities"
+
+
+def _successful_p2o5_cell(pot) -> EquilibrateCell:
+    return EquilibrateCell(
+        pot_id=pot.pot_id,
+        engine="alphamelts",
+        temperature_K=float(pot.temperatures_K[0]),
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities={"P2O5": 1.0e-17},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=1.0,
+        wall_s=0.0,
+        cpu_s=0.0,
+        hostname="test",
+    )
+
+
+def _mutate_kambayashi_gamma(mutator) -> Path:
+    extract_path = SCORING_EXTRACTS[0]
+    payload = yaml.safe_load(extract_path.read_text(encoding="utf-8"))
+    mutated = copy.deepcopy(payload)
+    found = False
+    for block in mutated["species"].values():
+        for obs in block["observations"]:
+            if obs.get("observation_id") == "kambayashi_1985_gamma_p2o5_solid_std_henry":
+                mutator(obs, block)
+                found = True
+    assert found
+    tmp = extract_path.with_name("kems-057-kambayashi-1985.admission-mutated-for-test.yaml")
+    tmp.write_text(yaml.safe_dump(mutated), encoding="utf-8")
+    return tmp
+
+
+def test_rejected_measured_observation_is_not_scored() -> None:
+    """M12 confirm: canonical rejection is not bypassed by method_class=measured."""
+
+    def mark_rejected(obs, _block) -> None:
+        values = obs.setdefault("values", {})
+        values["method_class"] = "measured"
+        values["admission_status"] = "rejected_model_output_not_measurement"
+        obs["admission_status"] = "rejected_model_output_not_measurement"
+
+    tmp = _mutate_kambayashi_gamma(mark_rejected)
+    try:
+        pots = build_scoring_pots_from_extracts()
+        pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
+        comparators = [
+            c
+            for c in iter_activity_comparators(extract_paths=(tmp,))
+            if c.observation_id == "kambayashi_1985_gamma_p2o5_solid_std_henry"
+            and abs(c.temperature_K - 1643.0) < 1.0
+        ]
+        assert comparators
+        assert all(c.method_class == "measured" for c in comparators)
+        assert all(
+            c.admission_reason == "model_output_not_measurement" for c in comparators
+        )
+        rows = score_scoring_arm(
+            pots=(pot,),
+            cells=(_successful_p2o5_cell(pot),),
+            comparators=comparators,
+            envelope=envelope,
+            rail_for=rail_for,
+        )
+        assert rows
+        assert all(not r["score_eligible"] for r in rows)
+        assert any("model_output_not_measurement" in (r.get("notices") or []) for r in rows)
+    finally:
+        tmp.unlink(missing_ok=True)
+
+
+def test_superseded_parent_observation_is_not_scored() -> None:
+    """M12 confirm: a supersedes edge excludes the parent from scoring."""
+
+    def add_replacement(obs, block) -> None:
+        block["observations"].append(
+            {
+                "observation_id": "kambayashi_1985_gamma_p2o5_solid_std_henry_replacement",
+                "type": "activity_coefficient",
+                "supersedes": "kambayashi_1985_gamma_p2o5_solid_std_henry",
+                "standard_state": obs.get("standard_state"),
+                "values": {
+                    "method_class": "measured",
+                    "gamma_1370C": 2.2e-15,
+                },
+            }
+        )
+
+    tmp = _mutate_kambayashi_gamma(add_replacement)
+    try:
+        pots = build_scoring_pots_from_extracts()
+        pot = next(p for p in pots if p.sample_no == 1 and "feto_p2o5_s" in p.pot_id)
+        parent = [
+            c
+            for c in iter_activity_comparators(extract_paths=(tmp,))
+            if c.observation_id == "kambayashi_1985_gamma_p2o5_solid_std_henry"
+            and abs(c.temperature_K - 1643.0) < 1.0
+        ]
+        assert parent
+        assert all(c.admission_reason == "superseded" for c in parent)
+        rows = score_scoring_arm(
+            pots=(pot,),
+            cells=(_successful_p2o5_cell(pot),),
+            comparators=parent,
+            envelope=envelope,
+            rail_for=rail_for,
+        )
+        assert rows
+        assert all(not r["score_eligible"] for r in rows)
+        assert any("superseded" in (r.get("notices") or []) for r in rows)
+    finally:
+        tmp.unlink(missing_ok=True)

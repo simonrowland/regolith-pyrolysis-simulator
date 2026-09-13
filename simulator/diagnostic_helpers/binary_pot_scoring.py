@@ -31,6 +31,10 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     _refusal_matrix,
     reclassify_projected_composition_cells,
 )
+from simulator.diagnostic_helpers.extract_reproduction import (
+    AdoptedObservation,
+    observation_admission_reason,
+)
 from simulator.state import MOLAR_MASS
 
 
@@ -609,6 +613,7 @@ class ActivityComparator:
     uncertainty: Mapping[str, Any] | None
     doi: str | None
     row: Mapping[str, Any]
+    admission_reason: str | None = None
 
 
 def method_class_is_scored(method_class: str) -> bool:
@@ -629,6 +634,58 @@ def _gamma_field_temperature_K(field: str, obs: Mapping[str, Any]) -> float | No
     return _row_temperature_K({}, obs)
 
 
+def _superseded_observation_ids(extract: Mapping[str, Any]) -> set[str]:
+    ids: set[str] = set()
+    for block in (extract.get("species") or {}).values():
+        if not isinstance(block, Mapping):
+            continue
+        for obs in block.get("observations") or []:
+            if isinstance(obs, Mapping) and obs.get("supersedes"):
+                ids.add(str(obs["supersedes"]))
+    return ids
+
+
+def _canonical_admission_reason(
+    *,
+    extract: Mapping[str, Any],
+    species: str,
+    obs: Mapping[str, Any],
+    values: Mapping[str, Any],
+    superseded_ids: set[str],
+) -> str | None:
+    """Reuse extract_reproduction admission; do not reconstruct a second gate."""
+
+    observation_id = str(obs.get("observation_id") or "")
+    adopted = AdoptedObservation(
+        species_id=str(species),
+        source_id=str(extract.get("source_id") or ""),
+        observation_id=observation_id,
+        obs_type=str(obs.get("type") or ""),
+        review_status=(
+            str(obs["review_status"]) if obs.get("review_status") is not None else None
+        ),
+        phase=str(obs["phase"]) if obs.get("phase") is not None else None,
+        regime=str(obs["regime"]) if obs.get("regime") is not None else None,
+        standard_state=(
+            str(obs["standard_state"]) if obs.get("standard_state") is not None else None
+        ),
+        T_range_K=None,
+        units=str(obs["units"]) if obs.get("units") is not None else None,
+        uncertainty=obs.get("uncertainty"),
+        locator=obs.get("locator"),
+        values=dict(values),
+        equipment={},
+        disagreement_dex=None,
+        is_priority_winner=True,
+        geometry_assumption="",
+        adoption_basis=(
+            "superseded" if observation_id in superseded_ids else "priority_winner"
+        ),
+        admission_metadata=dict(obs),
+    )
+    return observation_admission_reason(adopted)
+
+
 def iter_activity_comparators(
     extract_paths: Sequence[Path] | None = None,
 ) -> tuple[ActivityComparator, ...]:
@@ -645,6 +702,7 @@ def iter_activity_comparators(
         source_block = extract.get("source")
         if isinstance(source_block, Mapping):
             doi = source_block.get("doi")
+        superseded_ids = _superseded_observation_ids(extract)
         for species, block in (extract.get("species") or {}).items():
             for obs in block.get("observations") or []:
                 if not isinstance(obs, Mapping):
@@ -656,6 +714,13 @@ def iter_activity_comparators(
                 observation_id = str(obs.get("observation_id") or "")
                 standard_state = obs.get("standard_state")
                 uncertainty = obs.get("uncertainty") if isinstance(obs.get("uncertainty"), Mapping) else None
+                admission_reason = _canonical_admission_reason(
+                    extract=extract,
+                    species=str(species),
+                    obs=obs,
+                    values=values,
+                    superseded_ids=superseded_ids,
+                )
                 rows = values.get("rows")
                 if isinstance(rows, list) and rows:
                     for row in rows:
@@ -690,6 +755,7 @@ def iter_activity_comparators(
                                 uncertainty=uncertainty,
                                 doi=None if doi is None else str(doi),
                                 row=dict(row),
+                                admission_reason=admission_reason,
                             )
                         )
                     continue
@@ -724,6 +790,7 @@ def iter_activity_comparators(
                             uncertainty=field_unc or uncertainty,
                             doi=None if doi is None else str(doi),
                             row={"field": field_name, "value": measured},
+                            admission_reason=admission_reason,
                         )
                     )
     return tuple(found)
@@ -1108,7 +1175,10 @@ def _cell_envelope(*, pot, cell, envelope, rail_for, comparator) -> dict[str, An
 
 
 def _comparator_envelope(*, pot, cell, comparator, envelope, rail_for) -> dict[str, Any]:
-    scored_method = method_class_is_scored(comparator.method_class)
+    admission_reason = comparator.admission_reason
+    scored_method = (
+        method_class_is_scored(comparator.method_class) and admission_reason is None
+    )
     predicted, conversion_note = _predicted_for_comparator(cell, comparator, pot)
     refused = cell.status == "refusal" or predicted is None
     if cell.status == "refusal":
@@ -1122,7 +1192,9 @@ def _comparator_envelope(*, pot, cell, comparator, envelope, rail_for) -> dict[s
         notices.append(cell.engine_reason)
     if conversion_note:
         notices.append(conversion_note)
-    if not scored_method:
+    if admission_reason:
+        notices.append(admission_reason)
+    if not method_class_is_scored(comparator.method_class):
         notices.append(
             f"method_class={comparator.method_class}; model_derived/quoted rows are not scored"
         )
