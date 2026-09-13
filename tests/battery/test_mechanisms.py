@@ -534,6 +534,63 @@ def test_m16_refused_residual_cannot_carry_a_numeric_score() -> None:
     assert not report.ok
 
 
+def test_mf_f03_unknown_identity_forbids_numeric_residual() -> None:
+    """Unknown/unknown identity is a refused attempt, never a numeric diagnostic."""
+
+    from dataclasses import replace
+
+    ident = F.psat_identity("Na")
+    unknown = replace(ident, temperature_K=State.unknown("not printed"))
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "ref-unknown",
+        exp.experiment_id,
+        unknown,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("cand-unknown", exp.experiment_id, unknown, Decimal("0.1"))
+    numeric = F.residual(
+        "unknown-numeric",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=False,
+        rail=Rail.VAPOUR,
+    )
+    report = validate_corpus([w], [exp], [ref, cand], [numeric])
+    assert not report.ok
+    assert any(i.reason is RefusalReason.IDENTITY_UNKNOWN for i in report.issues)
+    refused = F.residual(
+        "unknown-refused",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.REFUSED,
+        refusal=ResidualRefusal(RefusalReason.IDENTITY_UNKNOWN, {"fields": ["temperature_K"]}),
+        score_eligible=False,
+        rail=Rail.VAPOUR,
+    )
+    assert validate_corpus([w], [exp], [ref, cand], [refused]).ok
+    known_ref = F.observation(
+        "ref-known",
+        exp.experiment_id,
+        ident,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    known_cand = F.engine_obs("cand-known", exp.experiment_id, ident, Decimal("0.1"))
+    known = F.residual(
+        "known-numeric",
+        known_ref.observation_id,
+        candidate=known_cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+        rail=Rail.VAPOUR,
+    )
+    assert validate_corpus([w], [exp], [known_ref, known_cand], [known]).ok
+
+
 def test_m13_sequence_gap_is_preserved() -> None:
     """M13 is not confirmed; do not invent a mechanism or silently promote it."""
 

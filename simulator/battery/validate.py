@@ -605,6 +605,30 @@ def validate_residual(
                     "candidate_request.experiment_id does not resolve",
                 )
             )
+    if residual.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}:
+        if (
+            reference is not None
+            and candidate is not None
+            and isinstance(reference.identity, Identity)
+            and isinstance(candidate.identity, Identity)
+        ):
+            equal = identity_equal(reference.identity, candidate.identity)
+            if equal.kind is not IdentityEqualKind.EQUAL:
+                reason = (
+                    RefusalReason.IDENTITY_MISMATCH
+                    if equal.kind is IdentityEqualKind.IDENTITY_MISMATCH
+                    else RefusalReason.IDENTITY_UNKNOWN
+                    if equal.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+                    else RefusalReason.INVALID_IDENTITY
+                )
+                issues.append(
+                    _issue(
+                        f"{path}.numeric",
+                        reason,
+                        "numeric residual requires identity_equal equal; "
+                        f"got {equal.kind} — unknown identity is a refused attempt, not a diagnostic number",
+                    )
+                )
     if residual.score_eligible:
         if residual.source_relation is not SourceRelation.INDEPENDENT:
             issues.append(
@@ -642,22 +666,6 @@ def validate_residual(
                         "score_eligible requires measured_* reference evidence",
                     )
                 )
-            if candidate is not None and isinstance(reference.identity, Identity) and isinstance(
-                candidate.identity, Identity
-            ):
-                equal = identity_equal(reference.identity, candidate.identity)
-                if equal.kind is not IdentityEqualKind.EQUAL:
-                    issues.append(
-                        _issue(
-                            f"{path}.score_eligible",
-                            RefusalReason.IDENTITY_MISMATCH
-                            if equal.kind is IdentityEqualKind.IDENTITY_MISMATCH
-                            else RefusalReason.IDENTITY_UNKNOWN
-                            if equal.kind is IdentityEqualKind.IDENTITY_UNKNOWN
-                            else RefusalReason.INVALID_IDENTITY,
-                            f"score_eligible requires identity_equal; got {equal.kind}",
-                        )
-                    )
             if candidate is not None:
                 cev = candidate.evidence.class_
                 if not (cev.is_value and cev.value is EvidenceClass.ENGINE_PREDICTION):
