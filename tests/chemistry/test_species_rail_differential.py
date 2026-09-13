@@ -58,6 +58,7 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     elemental_reference_mismatch_applies,
     elemental_reference_shift_kJ_per_mol_O2,
     ellingham_line_product_oxide,
+    ellingham_line_product_phase_kind,
     ellingham_oxide_stoichiometry_for_formula,
     oxide_identity_mismatch_applies,
     engine_cea_delta_fG_kJ_mol,
@@ -914,6 +915,58 @@ def test_fe2o3_ellingham_refuses_as_different_oxide_than_feo_line() -> None:
     assert feo_ell.status in {"match", "mismatch"}
     assert feo_ell.skip_reason is None
     assert feo_ell.finding_class != "oxide_identity_mismatch"
+
+
+def test_cao_liquid_ellingham_refuses_solid_product_phase() -> None:
+    """M03: CaO(l) is not the Ca line product CaO(s) at 1200 K."""
+
+    assert ellingham_line_product_oxide("Ca", 1200.0) == "CaO"
+    assert ellingham_line_product_phase_kind("Ca", 1200.0) == PHASE_SOLID
+    liquid = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Ca-028",
+        formula="CaO",
+        phase="l",
+        phase_kind=PHASE_LIQUID,
+        T_K=1200.0,
+        delta_fG_kJ_mol=-460.415,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    ell = score_ellingham_point(liquid)
+    assert ell is not None
+    assert ell.status == "typed-refusal"
+    assert ell.residual_kJ_mol is None
+    assert ell.engine_kJ_mol is None
+    assert ell.skip_reason == (
+        f"{TYPED_REFUSAL_PREFIX}ellingham_line_is_different_oxide"
+    )
+    assert "CaO(s)" in (ell.note or "") or "solid" in (ell.note or "")
+    assert "not CaO(l)" in (ell.note or "")
+
+
+def test_cao_crystal_ellingham_stays_comparable() -> None:
+    """M03 control: CaO(cr) vs the solid CaO line remains a residual, not a refusal."""
+
+    crystal = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Ca-027",
+        formula="CaO",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=1200.0,
+        delta_fG_kJ_mol=-509.239,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    ell = score_ellingham_point(crystal)
+    assert ell is not None
+    assert ell.status in {"match", "mismatch"}
+    assert ell.skip_reason is None
+    assert ell.residual_kJ_mol == pytest.approx(0.064, abs=5e-4)
+    assert ell.finding_class == "data_integrity"
 
 
 def test_psat_comparator_zero_when_dvapG_is_zero() -> None:

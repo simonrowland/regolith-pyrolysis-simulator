@@ -902,18 +902,10 @@ def oxide_identity_mismatch_applies(oxide: str) -> bool:
     )
 
 
-def ellingham_line_product_oxide(metal: str, T_K: float | None = None) -> str:
-    """Oxide product the Ellingham metal line is fitted to.
-
-    Premise: each metal key is one reaction n_M M + O2 → n_ox oxide,
-    written in EllinghamFitSegment.phase_basis (Fe is
-    ``2 Fe(alpha) + O2 -> 2 FeO(s)``, not hematite).
-    Algebra: take the token after ``->``, drop a leading stoichiometric
-    coefficient (``2``, ``2/3``, ``4/3``), then drop a parenthetical
-    phase suffix.
-    Unit check: the remaining token is a formula (FeO, MgO, Al2O3, …).
-    Sanity: Fe → FeO; Al → Al2O3; Fe2O3 is a different oxide than the Fe line.
-    """
+def _ellingham_line_product_rhs_token(
+    metal: str, T_K: float | None = None
+) -> str:
+    """RHS product token from the Ellingham phase_basis, e.g. ``CaO(s)``."""
 
     if metal not in ELLINGHAM_FIT_SEGMENTS:
         return ""
@@ -929,10 +921,52 @@ def ellingham_line_product_oxide(metal: str, T_K: float | None = None) -> str:
         tokens = tokens[1:]
     if not tokens:
         return ""
-    formula = tokens[0]
+    return tokens[0]
+
+
+def ellingham_line_product_oxide(metal: str, T_K: float | None = None) -> str:
+    """Oxide product the Ellingham metal line is fitted to.
+
+    Premise: each metal key is one reaction n_M M + O2 → n_ox oxide,
+    written in EllinghamFitSegment.phase_basis (Fe is
+    ``2 Fe(alpha) + O2 -> 2 FeO(s)``, not hematite).
+    Algebra: take the token after ``->``, drop a leading stoichiometric
+    coefficient (``2``, ``2/3``, ``4/3``), then drop a parenthetical
+    phase suffix.
+    Unit check: the remaining token is a formula (FeO, MgO, Al2O3, …).
+    Sanity: Fe → FeO; Al → Al2O3; Fe2O3 is a different oxide than the Fe line.
+    """
+
+    formula = _ellingham_line_product_rhs_token(metal, T_K)
     if "(" in formula:
         formula = formula.split("(", 1)[0]
     return formula
+
+
+def ellingham_line_product_phase_kind(
+    metal: str, T_K: float | None = None
+) -> str | None:
+    """Condensed-product phase_kind of the Ellingham line, or None if uncoded.
+
+    Premise: the same phase_basis token that names the oxide also names its
+    condensed state (``2 Ca(l) + O2 -> 2 CaO(s)`` is CaO solid, not CaO
+    liquid). Formula-only matching would score CaO(l) against that solid
+    line (M03).
+    Algebra: parenthetical suffix of the RHS product token, classified with
+    the existing coded-phase map (s/cr → solid, l → liquid). Uncoded or
+    missing suffix is None, not a guessed phase.
+    Unit check: return is a phase_kind string or None, never a residual.
+    Sanity: Ca at 1200 K → solid; CaO(cr) stays comparable, CaO(l) refuses.
+    """
+
+    token = _ellingham_line_product_rhs_token(metal, T_K)
+    if "(" not in token:
+        return None
+    inner = token.split("(", 1)[1].split(")", 1)[0]
+    kind = classify_phase_token(inner)
+    if kind in {PHASE_SOLID, PHASE_LIQUID}:
+        return kind
+    return None
 
 
 def ellingham_provenance(metal: str, compilation_id: str) -> str:
@@ -1399,6 +1433,28 @@ def score_ellingham_point(point: KeyedTablePoint) -> GibbsPointScore | None:
                 f"{point.note}; Ellingham {metal} line is {line_oxide} "
                 f"(n_M={n_M:g} n_ox={n_ox:g}: {phase_basis}); "
                 f"not {point.formula}"
+            ).strip("; "),
+        )
+    line_phase = ellingham_line_product_phase_kind(metal, point.T_K)
+    if line_phase is not None and point.phase_kind != line_phase:
+        line_oxide = ellingham_line_product_oxide(metal, point.T_K)
+        n_M, n_ox = ellingham_stoichiometry(metal)
+        phase_basis = ellingham_segment_for_temperature(
+            metal, point.T_K
+        ).phase_basis
+        return _refusal_score(
+            compilation_id=point.compilation_id,
+            record_id=point.record_id,
+            formula=point.formula,
+            T_K=point.T_K,
+            channel=CHANNEL_ELLINGHAM,
+            reason="ellingham_line_is_different_oxide",
+            provenance_class=PROVENANCE_INDEPENDENT,
+            table_kJ_mol=point.delta_fG_kJ_mol,
+            note=(
+                f"{point.note}; Ellingham {metal} line is {line_oxide} "
+                f"({line_phase}: {phase_basis}); "
+                f"not {point.formula}({point.phase})"
             ).strip("; "),
         )
     # Certified band is per-species ellingham_fit_range_K, not the legacy
