@@ -138,7 +138,11 @@ def test_m01_inconsistent_o2_table_is_invalid_source() -> None:
         dg.observation_id,
         candidate=cand.observation_id,
         status=ResidualStatus.REFUSED,
-        refusal=ResidualRefusal(RefusalReason.INVALID_SOURCE, {"gate": "table"}),
+        refusal=ResidualRefusal(
+            RefusalReason.INVALID_SOURCE,
+            {"gate": "table"},
+            check_refs=("delta_fG_logK",),
+        ),
         score_eligible=False,
     )
     assert validate_corpus([w], [exp], [dg, lk_bad, cand], [refused]).ok
@@ -272,7 +276,99 @@ def test_r01_failed_gate_refusal_must_carry_invalid_source_and_check_evidence() 
         candidate=cand.observation_id,
         status=ResidualStatus.REFUSED,
         score_eligible=False,
-        refusal=ResidualRefusal(RefusalReason.INVALID_SOURCE, {"gate": "delta_fG_logK"}),
+        refusal=ResidualRefusal(
+            RefusalReason.INVALID_SOURCE,
+            {"gate": "delta_fG_logK"},
+            check_refs=("delta_fG_logK",),
+        ),
+    )
+    assert validate_corpus([w], [exp], [ref, bad_log, cand], [correct]).ok
+
+
+def test_r10_failed_gate_refusal_requires_failed_check_evidence() -> None:
+    """Codex F02: invalid_source with empty or foreign check evidence is invalid.
+
+    A nonempty detail string is not failed-check evidence. The checks tuple
+    must name the primary table check.
+    """
+
+    from dataclasses import replace
+
+    ident_g = F.o2_identity()
+    ident_k = replace(ident_g, quantity=Quantity.LOG10_KF)
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r10-ref",
+        exp.experiment_id,
+        ident_g,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r10-cand", exp.experiment_id, ident_g, Decimal("0"))
+    bad_log = F.observation(
+        "r10-bad-logK",
+        exp.experiment_id,
+        ident_k,
+        Decimal("-59.154"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    def refused(key: str, refusal: ResidualRefusal) -> Residual:
+        return F.residual(
+            key,
+            ref.observation_id,
+            candidate=cand.observation_id,
+            status=ResidualStatus.REFUSED,
+            score_eligible=False,
+            refusal=refusal,
+        )
+
+    foreign_detail = refused(
+        "r10-foreign-detail",
+        ResidualRefusal(RefusalReason.INVALID_SOURCE, {"gate": "made-up-unrelated-check"}),
+    )
+    foreign_report = validate_corpus([w], [exp], [ref, bad_log, cand], [foreign_detail])
+    assert not foreign_report.ok
+    assert any(i.reason is RefusalReason.INVALID_SOURCE for i in foreign_report.issues)
+    empty_refs = refused(
+        "r10-empty-refs",
+        ResidualRefusal(
+            RefusalReason.INVALID_SOURCE,
+            {"gate": "delta_fG_logK"},
+            check_refs=(),
+        ),
+    )
+    empty_report = validate_corpus([w], [exp], [ref, bad_log, cand], [empty_refs])
+    assert not empty_report.ok
+    foreign_refs = refused(
+        "r10-foreign-refs",
+        ResidualRefusal(
+            RefusalReason.INVALID_SOURCE,
+            {"gate": "delta_fG_logK"},
+            check_refs=("made-up-unrelated-check",),
+        ),
+    )
+    foreign_refs_report = validate_corpus([w], [exp], [ref, bad_log, cand], [foreign_refs])
+    assert not foreign_refs_report.ok
+    wrong_reason = refused(
+        "r10-wrong-reason-valid-refs",
+        ResidualRefusal(
+            RefusalReason.IDENTITY_MISMATCH,
+            {"gate": "delta_fG_logK"},
+            check_refs=("delta_fG_logK",),
+        ),
+    )
+    wrong_report = validate_corpus([w], [exp], [ref, bad_log, cand], [wrong_reason])
+    assert not wrong_report.ok
+    assert any(i.reason is RefusalReason.INVALID_SOURCE for i in wrong_report.issues)
+    correct = refused(
+        "r10-correct-refs",
+        ResidualRefusal(
+            RefusalReason.INVALID_SOURCE,
+            {"gate": "delta_fG_logK"},
+            check_refs=("delta_fG_logK",),
+        ),
     )
     assert validate_corpus([w], [exp], [ref, bad_log, cand], [correct]).ok
 
@@ -568,7 +664,11 @@ def test_m07_wall_identity_and_determinants_required_for_deposit() -> None:
         ref.observation_id,
         candidate=cand.observation_id,
         status=ResidualStatus.REFUSED,
-        refusal=ResidualRefusal(RefusalReason.UNDERDETERMINED_APPARATUS, {"missing": ["wall"]}),
+        refusal=ResidualRefusal(
+            RefusalReason.UNDERDETERMINED_APPARATUS,
+            {"missing": ["wall"]},
+            check_refs=("geometry_determinants",),
+        ),
         score_eligible=False,
         rail=Rail.WALL_DEPOSITION,
     )

@@ -1037,24 +1037,27 @@ def validate_residual(
             if not gates.passed:
                 gate_reason = gates.reason or RefusalReason.INVALID_SOURCE
                 refusal = residual.refusal
+                primary_check = gates.primary_check
                 wrong_shape = (
                     residual.score_eligible
                     or residual.status is not ResidualStatus.REFUSED
                     or residual.numeric is not None
                 )
-                wrong_reason = (
+                wrong_evidence = (
                     refusal is None
                     or refusal.reason is not gate_reason
-                    or not refusal.detail
+                    or not refusal.check_refs
+                    or primary_check is None
+                    or refusal.check_refs[0] != primary_check
                 )
-                if wrong_shape or wrong_reason:
+                if wrong_shape or wrong_evidence:
                     issues.append(
                         _issue(
                             path,
                             gate_reason,
                             "validity gate failed; residual must be refused with no numeric, "
                             f"score_eligible=false, reason {gate_reason.value} and check "
-                            f"evidence ({gates.primary_check})",
+                            f"evidence ({primary_check})",
                         )
                     )
     if residual.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}:
