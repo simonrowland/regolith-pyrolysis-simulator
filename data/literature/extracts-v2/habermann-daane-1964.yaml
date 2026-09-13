@@ -63,7 +63,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: none
   evidence:
@@ -101,7 +101,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [623, 931]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -140,7 +140,7 @@ observations:
       reason: profile p_sat does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a p_sat field
   uncertainty:
     kind: printed
     verbatim:

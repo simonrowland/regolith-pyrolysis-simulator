@@ -61,9 +61,12 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2242.0, 2690.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -108,9 +111,12 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2242.0, 2690.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:

@@ -16,6 +16,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 2173.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -98,6 +101,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 2173.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -188,7 +194,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 2173.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -227,7 +233,7 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a evaporation_coefficient_alpha field
   uncertainty:
     kind: printed
     verbatim:
@@ -272,7 +278,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -325,9 +331,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 2173.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -366,9 +375,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1973.15, 2173.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -413,7 +425,7 @@ observations:
       value: '2173.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 0 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -750,7 +762,7 @@ observations:
       value: '2173.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 1 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1087,7 +1099,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 10 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1424,7 +1436,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 11 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1761,7 +1773,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 12 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -2098,7 +2110,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 13 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -2435,7 +2447,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 14 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -2772,7 +2784,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 15 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -3109,7 +3121,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 16 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -3446,7 +3458,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 17 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -3783,7 +3795,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 18 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -4120,7 +4132,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 19 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -4457,7 +4469,7 @@ observations:
       value: '2173.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 2 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -4794,7 +4806,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 20 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -5131,7 +5143,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 21 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -5468,7 +5480,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 22 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -5805,7 +5817,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 23 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -6142,7 +6154,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 24 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -6479,7 +6491,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 25 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -6816,7 +6828,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 26 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -7153,7 +7165,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 27 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -7490,7 +7502,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 28 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -7827,7 +7839,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 29 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -8164,7 +8176,7 @@ observations:
       value: '2173.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 3 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -8501,7 +8513,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 30 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -8838,7 +8850,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 31 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -9175,7 +9187,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 32 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -9512,7 +9524,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 33 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -9849,7 +9861,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 34 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -10186,7 +10198,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 35 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -10523,7 +10535,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 36 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -10860,7 +10872,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 37 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -11197,7 +11209,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 38 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -11534,7 +11546,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 39 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -11871,7 +11883,7 @@ observations:
       value: '2173.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 4 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -12208,7 +12220,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 40 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -12545,7 +12557,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 41 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -12882,7 +12894,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 42 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -13219,7 +13231,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 43 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -13556,7 +13568,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 44 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -13893,7 +13905,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 45 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -14230,7 +14242,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 46 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -14567,7 +14579,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 47 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -14904,7 +14916,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 48 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -15241,7 +15253,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 49 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -15578,7 +15590,7 @@ observations:
       value: '2173.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 5 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -15915,7 +15927,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 50 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -16252,7 +16264,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 6 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -16589,7 +16601,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 7 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -16926,7 +16938,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 8 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -17263,7 +17275,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 9 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -17603,7 +17615,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 2173.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -17642,7 +17654,7 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a evaporation_coefficient_alpha field
   uncertainty:
     kind: printed
     verbatim:
@@ -17685,7 +17697,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -17743,7 +17755,7 @@ observations:
       value: '2173.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 0 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -17831,7 +17843,7 @@ observations:
       value: '2173.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 1 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -17919,7 +17931,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 10 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -18007,7 +18019,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 11 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -18095,7 +18107,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 12 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -18183,7 +18195,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 13 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -18271,7 +18283,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 14 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -18359,7 +18371,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 15 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -18447,7 +18459,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 16 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -18535,7 +18547,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 17 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -18623,7 +18635,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 18 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -18711,7 +18723,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 19 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -18799,7 +18811,7 @@ observations:
       value: '2173.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 2 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -18887,7 +18899,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 20 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -18975,7 +18987,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 21 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19063,7 +19075,7 @@ observations:
       value: '1973.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 22 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19151,7 +19163,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 23 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19239,7 +19251,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 24 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19327,7 +19339,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 25 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19415,7 +19427,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 26 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19503,7 +19515,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 27 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19591,7 +19603,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 28 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19679,7 +19691,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 29 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19767,7 +19779,7 @@ observations:
       value: '2173.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 3 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19855,7 +19867,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 30 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -19943,7 +19955,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 31 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20031,7 +20043,7 @@ observations:
       value: '2173.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 4 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20119,7 +20131,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 5 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20207,7 +20219,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 6 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20295,7 +20307,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 7 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20383,7 +20395,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 8 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20471,7 +20483,7 @@ observations:
       value: '2073.15'
   value:
     kind: unavailable
-    unavailable_reason: series point 9 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -20556,7 +20568,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -20594,7 +20606,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -20632,7 +20644,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -20670,7 +20682,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -20708,7 +20720,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -20746,7 +20758,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:

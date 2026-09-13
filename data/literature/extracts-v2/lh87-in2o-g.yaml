@@ -24,7 +24,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [873, 1223]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
       reason: source does not state standard_pressure_Pa
@@ -62,9 +62,8 @@ observations:
       tag: not_applicable
       reason: profile delta_fG does not use wall
   value:
-    kind: interval
-    interval_low: '873'
-    interval_high: '1223'
+    kind: unavailable
+    unavailable_reason: source values have no printed delta_fG; T_range_K [873, 1223] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:

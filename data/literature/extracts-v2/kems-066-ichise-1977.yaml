@@ -21,7 +21,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -80,7 +80,7 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -126,9 +126,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: value
+      value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -150,6 +153,16 @@ observations:
     equation: 10-11
     note: linear fits of ln(I+_Al/I+_Fe)-ln(N_Al/N_Fe) vs N_Al at 1400 C
   read_from: pdf:kems-066-ichise-1977
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1673.15'
+      locator:
+        published_page: 420
+        pdf_page_index: 4
+        equation: 10-11
+        note: linear fits of ln(I+_Al/I+_Fe)-ln(N_Al/N_Fe) vs N_Al at 1400 C
 - observation_id: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C
   experiment_id: 10.2355/tetsutohagane1955.63.3_417::1
   identity:
@@ -169,7 +182,7 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -215,6 +228,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -252,6 +268,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -290,6 +309,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -327,6 +349,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -364,6 +389,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1743.15, 1743.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -401,6 +429,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -438,6 +469,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1473.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -475,6 +509,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -513,6 +550,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1673.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -551,6 +591,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -589,6 +632,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -632,7 +678,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -682,7 +728,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -733,7 +779,7 @@ observations:
       value: '1673.15'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -827,7 +873,7 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a ion_intensity_ratio field
   uncertainty:
     kind: printed
     verbatim:
@@ -872,9 +918,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -912,9 +961,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -950,9 +1002,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -988,9 +1043,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1673.15, 1873.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1075,7 +1133,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a p_partial field
   uncertainty:
     kind: printed
     verbatim:

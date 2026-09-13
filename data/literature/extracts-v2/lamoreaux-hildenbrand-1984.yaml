@@ -63,7 +63,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: none
   evidence:
@@ -102,7 +102,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [298, 3000]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
       reason: source does not state standard_pressure_Pa
@@ -141,7 +141,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -184,7 +184,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [298, 3000]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
       reason: source does not state standard_pressure_Pa
@@ -223,7 +223,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -304,7 +304,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -384,7 +384,7 @@ observations:
       reason: profile transition_temperature does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a transition_temperature field
   uncertainty:
     kind: printed
     verbatim:
@@ -422,6 +422,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1405.0, 3000.0]; no midpoint invented
   value:
     kind: expression
     expression_text: evaluator_segments_as_published
@@ -459,6 +462,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.0, 1405.0]; no midpoint invented
   value:
     kind: expression
     expression_text: evaluator_segments_as_published
@@ -504,7 +510,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
       reason: source does not state standard_pressure_Pa
@@ -543,7 +549,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -580,6 +586,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.0, 3000.0]; no midpoint invented
   value:
     kind: expression
     expression_text: evaluator_segments_as_published
@@ -625,7 +634,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
       reason: source does not state standard_pressure_Pa
@@ -664,7 +673,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -701,6 +710,9 @@ observations:
       polymorph:
         tag: not_applicable
         reason: not crystal
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [298.0, 3000.0]; no midpoint invented
   value:
     kind: expression
     expression_text: evaluator_segments_as_published
@@ -746,7 +758,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [298.15, 298.15]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
       reason: source does not state standard_pressure_Pa
@@ -785,7 +797,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -830,7 +842,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [298, 3000]; no midpoint invented
     standard_pressure_Pa:
       tag: unknown
       reason: source does not state standard_pressure_Pa
@@ -869,7 +881,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -950,7 +962,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -1030,7 +1042,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: none
   evidence:
@@ -1108,7 +1120,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: none
   evidence:
@@ -1185,7 +1197,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: none
   evidence:
@@ -1262,7 +1274,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: none
   evidence:
@@ -1339,7 +1351,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: none
   evidence:
@@ -1416,7 +1428,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: none
   evidence:

@@ -24,7 +24,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -107,7 +107,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -181,6 +181,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -225,7 +228,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -307,7 +310,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -389,7 +392,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -471,7 +474,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -553,7 +556,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -635,7 +638,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -709,9 +712,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -754,7 +760,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -828,9 +834,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -873,7 +882,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -955,7 +964,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1038,7 +1047,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1120,7 +1129,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1203,7 +1212,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1286,7 +1295,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1369,7 +1378,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1452,7 +1461,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1534,7 +1543,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1617,7 +1626,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa

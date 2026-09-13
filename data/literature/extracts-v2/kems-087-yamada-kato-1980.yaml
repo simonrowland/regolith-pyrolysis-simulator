@@ -16,9 +16,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: value
+      value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -39,6 +42,16 @@ observations:
     figure: '9'
     note: 31P+ peak at 1.52 wt% (2.71 at%) P; 120 channels, 16 scans; average 812.7
   read_from: pdf:kems-087-yamada-kato-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 248
+        pdf_page_index: 5
+        figure: '9'
+        note: 31P+ peak at 1.52 wt% (2.71 at%) P; 120 channels, 16 scans; average 812.7
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_epsilon_P_P_1600C
   experiment_id: 10.2355/isijinternational1966.20.244::kems-087-yamada-kato-1980
   identity:
@@ -58,7 +71,7 @@ observations:
       value: '1873.15'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -115,7 +128,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity does not use standard_pressure_Pa
@@ -190,6 +203,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -227,6 +243,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -264,6 +283,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -301,6 +323,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -338,6 +363,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -375,6 +403,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -413,6 +444,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -451,6 +485,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -489,6 +526,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -527,6 +567,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -564,9 +607,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.15, 1873.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -610,8 +656,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '1873.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -650,7 +696,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a p_partial field
   uncertainty:
     kind: printed
     verbatim:
@@ -670,6 +716,15 @@ observations:
     pdf_page_index: 2
     note: vapor pressure of P in iron at 1600 C when [wt% P]=1 is considered to be about 1e-9 atm
   read_from: pdf:kems-087-yamada-kato-1980
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1873.15'
+      locator:
+        published_page: 245
+        pdf_page_index: 2
+        note: vapor pressure of P in iron at 1600 C when [wt% P]=1 is considered to be about 1e-9 atm
 - observation_id: kems-087-yamada-kato-1980::yamada_kato_1980_quoted_epsilon_P_P
   experiment_id: 10.2355/isijinternational1966.20.244::6
   identity:
@@ -684,9 +739,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1573.15, 1873.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:

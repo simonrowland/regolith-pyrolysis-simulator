@@ -16,9 +16,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2148.15, 2621.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -52,9 +55,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2148.15, 2621.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -96,8 +102,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '2148.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -135,8 +141,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.8265964'
   uncertainty:
     kind: printed
     verbatim:
@@ -156,6 +162,15 @@ observations:
     pdf_page_index: 2
     paragraph: SiO pressure reaches the maximum value P_SiO=6.2×10^-3 tor at T=1875 C
   read_from: pdf:kems-028-yakovlev-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2148.15'
+      locator:
+        published_page: 946
+        pdf_page_index: 2
+        paragraph: SiO pressure reaches the maximum value P_SiO=6.2×10^-3 tor at T=1875 C
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_Po2_table_calculated
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::Po2
   identity:
@@ -178,7 +193,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [2293.15, 2621.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -217,7 +232,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a p_partial field
   uncertainty:
     kind: printed
     verbatim:
@@ -265,7 +280,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1273.15, 2473.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -347,7 +362,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.15, 2573.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -421,9 +436,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1273.15, 2773.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -464,8 +482,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '2373.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -503,8 +521,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.2266474'
   uncertainty:
     kind: printed
     verbatim:
@@ -525,6 +543,16 @@ observations:
     paragraph: The pressure of aluminium increases accordingly to the temperature rises to 2100 C and reaches the maximum
       pressure P_Al=1.7×10^-3 tor
   read_from: pdf:kems-028-yakovlev-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2373.15'
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: The pressure of aluminium increases accordingly to the temperature rises to 2100 C and reaches the maximum
+          pressure P_Al=1.7×10^-3 tor
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Ca_1825C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -546,8 +574,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '2098.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -585,8 +613,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.00999915'
   uncertainty:
     kind: printed
     verbatim:
@@ -606,6 +634,15 @@ observations:
     pdf_page_index: 1
     paragraph: Ca (P_Ca=7.5×10^-5 tor) are observed in vapor at this temperature
   read_from: pdf:kems-028-yakovlev-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '2098.15'
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Ca (P_Ca=7.5×10^-5 tor) are observed in vapor at this temperature
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Ca_max_1950_2025C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -628,7 +665,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [2223.15, 2298.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -666,8 +703,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.05866168'
   uncertainty:
     kind: printed
     verbatim:
@@ -708,8 +745,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '1923.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -747,8 +784,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.010799082000000002'
   uncertainty:
     kind: printed
     verbatim:
@@ -768,6 +805,15 @@ observations:
     pdf_page_index: 1
     paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
   read_from: pdf:kems-028-yakovlev-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1923.15'
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: The top pressure of iron oxide (P_FeO=8.1×10^-5 tor) relates to T=1650 C
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Fe_max_1450_1725C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -790,7 +836,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1723.15, 1998.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -828,8 +874,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '1.33322'
   uncertainty:
     kind: printed
     verbatim:
@@ -870,8 +916,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '1323.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -909,8 +955,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.002399796'
   uncertainty:
     kind: printed
     verbatim:
@@ -931,6 +977,16 @@ observations:
     paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C and that is clearly connected
       with the decay of troilite
   read_from: pdf:kems-028-yakovlev-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1323.15'
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: Iron on the level of pressure 1.8×10^-5 tor have been already observed at T=1050 C and that is clearly
+          connected with the decay of troilite
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_K_P_1225C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -952,8 +1008,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '1498.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -991,8 +1047,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.005599524'
   uncertainty:
     kind: printed
     verbatim:
@@ -1012,6 +1068,15 @@ observations:
     pdf_page_index: 1
     paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
   read_from: pdf:kems-028-yakovlev-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1498.15'
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_Mg_max_1750_1825C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -1034,7 +1099,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [2023.15, 2098.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1072,8 +1137,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '1.1065726'
   uncertainty:
     kind: printed
     verbatim:
@@ -1114,8 +1179,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use per
     temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
+      tag: value
+      value: '1498.15'
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1153,8 +1218,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.03599694'
   uncertainty:
     kind: printed
     verbatim:
@@ -1175,6 +1240,15 @@ observations:
     pdf_page_index: 1
     paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
   read_from: pdf:kems-028-yakovlev-1984
+  point_conditions:
+    temperature_K:
+      state:
+        tag: value
+        value: '1498.15'
+      locator:
+        published_page: 945
+        pdf_page_index: 1
+        paragraph: At T=1225 C P_Na=2.7×10^-4 tor and P_K=4.2×10^-5 tor
 - observation_id: kems-028-yakovlev-1984::yakovlev_1984_murchison_SiO_Mg_max_1750_1825C
   experiment_id: 9c23c4aa30f9099447a3f6d06f4ae200c16b33be0e601ff7552ed76d597be4d3::kems-028-yakovlev-1984
   identity:
@@ -1197,7 +1271,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [2023.15, 2098.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1235,8 +1309,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '2.66644'
   uncertainty:
     kind: printed
     verbatim:
@@ -1278,7 +1352,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [2223.15, 2298.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -1359,7 +1433,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1173.15, 1273.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa

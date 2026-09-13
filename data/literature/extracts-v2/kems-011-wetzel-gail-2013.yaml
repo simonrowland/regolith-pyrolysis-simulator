@@ -109,7 +109,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1000.0, 1800.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -148,7 +148,7 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a evaporation_coefficient_alpha field
   uncertainty:
     kind: printed
     verbatim:
@@ -199,7 +199,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1000.0, 1400.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -238,7 +238,7 @@ observations:
       reason: profile evaporation_coefficient_alpha does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a evaporation_coefficient_alpha field
   uncertainty:
     kind: none
   evidence:
@@ -280,7 +280,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:

@@ -24,7 +24,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [2273.15, 2673.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -62,8 +62,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.1'
   uncertainty:
     kind: printed
     verbatim:
@@ -107,7 +107,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [2293.15, 2621.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -146,7 +146,7 @@ observations:
       reason: profile p_partial does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a p_partial field
   uncertainty:
     kind: printed
     verbatim:
@@ -185,9 +185,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1173.15, 2273.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -231,7 +234,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1073.15, 2673.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -313,7 +316,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.15, 2673.15]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -387,9 +390,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1173.15, 2873.15]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:

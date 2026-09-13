@@ -24,7 +24,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1234.0, 1234.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -107,7 +107,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [2403.0, 2403.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -193,7 +193,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1171.0, 1552.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -279,7 +279,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [2357.0, 2870.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -359,7 +359,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -473,7 +473,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1318.0, 1563.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -557,7 +557,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1318.0, 1563.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -628,6 +628,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1600.0, 1800.0]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -711,7 +714,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1358.0, 1520.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -794,7 +797,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1540.0, 1740.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -878,7 +881,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1600.0, 1800.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -957,7 +960,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [339.85, 392.45]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile evaporation_coefficient_alpha does not use standard_pressure_Pa
@@ -1035,6 +1038,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1500.0, 1500.0]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1073,6 +1079,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1500.0, 1500.0]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -1111,9 +1120,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [2200.0, 2200.0]; no midpoint invented
   value:
-    kind: point
-    point: '0.998'
+    kind: unavailable
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:

@@ -16,10 +16,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [800, 1000]; no midpoint invented
   value:
-    kind: interval
-    interval_low: '800'
-    interval_high: '1000'
+    kind: unavailable
+    unavailable_reason: source values have no printed delta_fG; T_range_K [800, 1000] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:

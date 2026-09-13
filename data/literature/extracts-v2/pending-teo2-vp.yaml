@@ -24,7 +24,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [884, 987]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -62,9 +62,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: interval
-    interval_low: '884'
-    interval_high: '987'
+    kind: unavailable
+    unavailable_reason: source values have no printed p_sat; T_range_K [884, 987] is a temperature domain, not the observable
   uncertainty:
     kind: none
   evidence:

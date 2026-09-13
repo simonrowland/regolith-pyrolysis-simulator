@@ -16,10 +16,13 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1835, 2264]; no midpoint invented
   value:
-    kind: interval
-    interval_low: '1835'
-    interval_high: '2264'
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point; T_range_K [1835, 2264] is a temperature domain,
+      not the observable
   uncertainty:
     kind: none
   evidence:
@@ -99,7 +102,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: none
   evidence:
@@ -181,7 +184,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -358,7 +361,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: none
   evidence:
@@ -394,7 +397,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -431,7 +434,7 @@ observations:
       value: '2400'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -521,7 +524,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -698,7 +701,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: none
   evidence:
@@ -779,7 +782,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: none
   evidence:
@@ -861,7 +864,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -948,7 +951,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -1035,7 +1038,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -1122,7 +1125,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -1209,7 +1212,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -1296,7 +1299,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -1383,7 +1386,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -1470,7 +1473,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -1557,7 +1560,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -1644,7 +1647,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -1731,7 +1734,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -1818,7 +1821,7 @@ observations:
       reason: profile delta_fG does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -3663,7 +3666,7 @@ observations:
       value: '1800'
   value:
     kind: unavailable
-    unavailable_reason: series point 0 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -3708,7 +3711,7 @@ observations:
       value: '2000'
   value:
     kind: unavailable
-    unavailable_reason: series point 1 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -3753,7 +3756,7 @@ observations:
       value: '2200'
   value:
     kind: unavailable
-    unavailable_reason: series point 2 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -3798,7 +3801,7 @@ observations:
       value: '1800'
   value:
     kind: unavailable
-    unavailable_reason: series point 0 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -3843,7 +3846,7 @@ observations:
       value: '2000'
   value:
     kind: unavailable
-    unavailable_reason: series point 1 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -3888,7 +3891,7 @@ observations:
       value: '2200'
   value:
     kind: unavailable
-    unavailable_reason: series point 2 has no liftable numeric value
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -3930,7 +3933,7 @@ observations:
         reason: phase unknown; polymorph unresolved
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:
@@ -3968,7 +3971,7 @@ observations:
       value: '2498'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: none
   evidence:

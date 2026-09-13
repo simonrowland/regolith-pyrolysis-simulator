@@ -16,6 +16,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -61,7 +64,7 @@ observations:
       reason: profile p_partial does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_partial does not use standard_pressure_Pa
@@ -143,7 +146,7 @@ observations:
       reason: profile ion_intensity does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1723.0, 1823.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity does not use standard_pressure_Pa
@@ -225,7 +228,7 @@ observations:
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1333.0, 2000.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -299,6 +302,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1371.15, 1773.15]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -336,9 +342,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -382,7 +391,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -420,8 +429,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '180'
   uncertainty:
     kind: printed
     verbatim:
@@ -464,7 +473,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -502,8 +511,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '8.1'
   uncertainty:
     kind: printed
     verbatim:
@@ -546,7 +555,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -584,8 +593,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '3.7'
   uncertainty:
     kind: printed
     verbatim:
@@ -628,7 +637,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -666,8 +675,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '25'
   uncertainty:
     kind: printed
     verbatim:
@@ -710,7 +719,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -748,8 +757,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '120'
   uncertainty:
     kind: printed
     verbatim:
@@ -792,7 +801,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -830,8 +839,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '8'
   uncertainty:
     kind: printed
     verbatim:
@@ -874,7 +883,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -912,8 +921,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '46'
   uncertainty:
     kind: printed
     verbatim:
@@ -956,7 +965,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -994,8 +1003,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '5200'
   uncertainty:
     kind: printed
     verbatim:
@@ -1038,7 +1047,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1076,8 +1085,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.0000021'
   uncertainty:
     kind: printed
     verbatim:
@@ -1120,7 +1129,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1158,8 +1167,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.0000001'
   uncertainty:
     kind: printed
     verbatim:
@@ -1202,7 +1211,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1240,8 +1249,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '3.8'
   uncertainty:
     kind: printed
     verbatim:
@@ -1284,7 +1293,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1322,8 +1331,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.00014'
   uncertainty:
     kind: printed
     verbatim:
@@ -1366,7 +1375,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1404,8 +1413,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '7.3'
   uncertainty:
     kind: printed
     verbatim:
@@ -1448,7 +1457,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1486,8 +1495,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '1.7'
   uncertainty:
     kind: printed
     verbatim:
@@ -1530,7 +1539,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1568,8 +1577,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.88'
   uncertainty:
     kind: printed
     verbatim:
@@ -1612,7 +1621,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1650,8 +1659,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '120'
   uncertainty:
     kind: printed
     verbatim:
@@ -1694,7 +1703,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1732,8 +1741,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.00000000043'
   uncertainty:
     kind: printed
     verbatim:
@@ -1776,7 +1785,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1814,8 +1823,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.15'
   uncertainty:
     kind: printed
     verbatim:
@@ -1858,7 +1867,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1896,8 +1905,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.02'
   uncertainty:
     kind: printed
     verbatim:
@@ -1940,7 +1949,7 @@ observations:
       reason: profile p_sat does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1873.0, 1873.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile p_sat does not use standard_pressure_Pa
@@ -1978,8 +1987,8 @@ observations:
       tag: not_applicable
       reason: profile p_sat does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.000000000067'
   uncertainty:
     kind: printed
     verbatim:

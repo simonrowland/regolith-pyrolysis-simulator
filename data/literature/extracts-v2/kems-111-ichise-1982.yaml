@@ -16,9 +16,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -65,7 +68,7 @@ observations:
       reason: profile ion_intensity does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1665.0, 1809.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity does not use standard_pressure_Pa
@@ -146,7 +149,7 @@ observations:
       reason: profile ion_intensity does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity does not use standard_pressure_Pa
@@ -227,7 +230,7 @@ observations:
       reason: profile ion_intensity does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity does not use standard_pressure_Pa
@@ -308,7 +311,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity does not use standard_pressure_Pa
@@ -389,7 +392,7 @@ observations:
       reason: source does not state per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile activity_coefficient does not use standard_pressure_Pa
@@ -463,6 +466,9 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -505,7 +511,7 @@ observations:
       value: '1823'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -605,7 +611,7 @@ observations:
       reason: profile interaction_parameter does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a interaction_parameter field
   uncertainty:
     kind: printed
     verbatim:
@@ -652,9 +658,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
@@ -734,8 +743,8 @@ observations:
       tag: not_applicable
       reason: profile p_partial does not use wall
   value:
-    kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    kind: point
+    point: '0.0000303975'
   uncertainty:
     kind: printed
     verbatim:
@@ -786,7 +795,7 @@ observations:
       reason: profile ion_intensity_ratio does not use per
     temperature_K:
       tag: unknown
-      reason: source does not state temperature_K
+      reason: source T_range_K [1823.0, 1823.0]; no midpoint invented
     standard_pressure_Pa:
       tag: not_applicable
       reason: profile ion_intensity_ratio does not use standard_pressure_Pa
@@ -825,7 +834,7 @@ observations:
       reason: profile ion_intensity_ratio does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a ion_intensity_ratio field
   uncertainty:
     kind: printed
     verbatim:
@@ -907,7 +916,7 @@ observations:
       reason: profile activity does not use wall
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a activity field
   uncertainty:
     kind: printed
     verbatim:
@@ -958,7 +967,7 @@ observations:
       value: '1823'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1008,7 +1017,7 @@ observations:
       value: '1823'
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: declared quantity is unknown; refusing to pick a number
   uncertainty:
     kind: printed
     verbatim:
@@ -1055,9 +1064,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
+    temperature_K:
+      tag: unknown
+      reason: source T_range_K [1665.0, 1873.0]; no midpoint invented
   value:
     kind: unavailable
-    unavailable_reason: source values have no printed scalar/series point
+    unavailable_reason: source does not name a delta_fG field
   uncertainty:
     kind: printed
     verbatim:
