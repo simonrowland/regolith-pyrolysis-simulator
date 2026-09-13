@@ -2003,6 +2003,19 @@ def test_r09_union_fingerprint_isolates_each_constituent() -> None:
     assert union_notices((projected,), (projected,)) == (projected,)
 
 
+def test_r09_union_fingerprint_isolates_origin() -> None:
+    """Two notices identical except origin remain two after union."""
+
+    from dataclasses import replace
+
+    floor = F.floor_notice()
+    origin_only = replace(floor, origin="catalog:K")
+    united = union_notices((floor,), (origin_only,))
+    assert united == (floor, origin_only)
+    assert len(united) == 2
+    assert union_notices((floor,), (floor,)) == (floor,)
+
+
 def test_r09_floor_notice_with_band_requires_original() -> None:
     from dataclasses import replace
 
