@@ -60,7 +60,7 @@ _SOURCE_KEYS: frozenset[str] = frozenset({'kind', 'ref', 'note'})
 _SOURCE_KINDS: frozenset[str] = frozenset(
     {'adapter_default', 'battery_qualification'}
 )
-_AUTHORITIES: frozenset[str] = frozenset({'certified', 'bridge', 'extrapolated'})
+_AUTHORITIES: frozenset[str] = frozenset({'extrapolated'})
 
 CONSTRAINT_SILICATE_NETWORK_BAND = 'silicate_network_band'
 CONSTRAINT_TEMPERATURE_RANGE = 'temperature_range'

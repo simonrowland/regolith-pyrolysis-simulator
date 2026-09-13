@@ -160,6 +160,23 @@ def test_bad_key_is_rejected(tmp_path: Path) -> None:
         load_engine_commissioning(path)
 
 
+def test_authority_outside_certified_is_rejected(tmp_path: Path) -> None:
+    """C03 / F3: only extrapolated may leave the certified band."""
+    payload = _valid_table_payload()
+    payload['engines']['alphamelts']['authority_outside'] = 'certified'
+    path = _write_table(tmp_path / 'authority-certified.yaml', payload)
+    with pytest.raises(EngineCommissioningError, match='authority_outside'):
+        load_engine_commissioning(path)
+
+
+def test_authority_outside_bridge_is_rejected(tmp_path: Path) -> None:
+    payload = _valid_table_payload()
+    payload['engines']['alphamelts']['authority_outside'] = 'bridge'
+    path = _write_table(tmp_path / 'authority-bridge.yaml', payload)
+    with pytest.raises(EngineCommissioningError, match='authority_outside'):
+        load_engine_commissioning(path)
+
+
 def test_inverted_band_is_rejected(tmp_path: Path) -> None:
     payload = _valid_table_payload()
     payload['engines']['alphamelts']['sio2_wt_pct']['certified'] = [80.0, 30.0]
