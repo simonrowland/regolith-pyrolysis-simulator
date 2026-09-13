@@ -453,6 +453,61 @@ def test_g02_kems_row_without_method_is_unknown(tmp_path: Path) -> None:
     assert obs.evidence.class_.value is not EvidenceClass.FIGURE_ONLY
 
 
+def test_g04_supersedes_marks_the_old_row(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = [
+        {
+            "observation_id": "homma_1966_mn_olette_alpha_exp_table1",
+            "type": "alpha",
+            "locator": {"table": "1"},
+            "phase": "gas",
+            "values": {
+                "quantity": "literature_vaporization_coefficient",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+            },
+        },
+        {
+            "observation_id": "homma_1966_mn_olette_experimental_quoted_deep",
+            "supersedes": "homma_1966_mn_olette_alpha_exp_table1",
+            "type": "alpha",
+            "locator": {"table": "1", "page": 517},
+            "phase": "gas",
+            "values": {
+                "quantity": "literature_vaporization_coefficient",
+                "method_class": "measured_direct",
+                "admission_status": "admitted",
+            },
+        },
+        {
+            "observation_id": "newer_list",
+            "supersedes": [
+                "homma_1966_mn_olette_experimental_quoted_deep",
+                "missing_target",
+            ],
+            "type": "alpha",
+            "locator": {"table": "2"},
+            "phase": "gas",
+            "values": {
+                "quantity": "literature_vaporization_coefficient",
+                "admission_status": "admitted",
+            },
+        },
+    ]
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False, validate=True)
+    old = result.observations["fixture-source::homma_1966_mn_olette_alpha_exp_table1"]
+    new = result.observations["fixture-source::homma_1966_mn_olette_experimental_quoted_deep"]
+    newer = result.observations["fixture-source::newer_list"]
+    assert old.admission.status is AdmissionStatus.SUPERSEDED
+    assert old.admission.superseded_by == new.observation_id
+    assert new.admission.status is AdmissionStatus.SUPERSEDED
+    assert new.admission.superseded_by == newer.observation_id
+    assert newer.admission.status is AdmissionStatus.ADMITTED
+    assert newer.admission.superseded_by is None
+    assert any("missing_target" in (e.why or "") for e in result.queue)
+
+
 def test_g03_blank_pressure_unit_is_unknown() -> None:
     pa, why = convert_pressure_to_pa(1, "")
     assert pa is None

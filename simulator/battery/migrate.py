@@ -1616,26 +1616,33 @@ class Migrator:
             measured.absent_admissions += 1
         else:
             measured.admission_statuses += 1
-        superseded_target = None
         if obs.get("supersedes"):
             measured.supersedes += 1
-            target = obs.get("supersedes")
-            if isinstance(target, list) and target:
-                target = target[0]
-            if isinstance(target, str) and target in local_ids:
-                superseded_target = f"{source_id}::{target}"
-            else:
-                self.result.add_queue(
-                    work.work_id,
-                    locator,
-                    ["admission.superseded_by"],
-                    f"supersedes target {target!r} unresolved in this extract",
-                    source=source_key,
-                    observation_id=obs_id,
-                )
+            targets = obs.get("supersedes")
+            if isinstance(targets, str):
+                targets = [targets]
+            if not isinstance(targets, list):
+                targets = [targets]
+            for target in targets:
+                if not isinstance(target, str) or not target:
+                    continue
+                old_id = f"{source_id}::{target}"
+                if target in local_ids:
+                    self._pending_supersedes.append(
+                        (old_id, obs_id, work.work_id, locator, source_key)
+                    )
+                else:
+                    self.result.add_queue(
+                        work.work_id,
+                        locator,
+                        ["admission.superseded_by"],
+                        f"supersedes target {target!r} unresolved in this extract",
+                        source=source_key,
+                        observation_id=obs_id,
+                    )
         admission = admission_for(
             raw_adm if raw_adm is not None else obs.get("admission_status"),
-            superseded_by=superseded_target,
+            superseded_by=None,
             extraction=extraction,
             locator=locator,
         )
@@ -2573,8 +2580,60 @@ class Migrator:
                 index_row=row,
             )
 
+    def _apply_supersedes(self) -> None:
+        for old_id, new_id, work_id, locator, source_key in self._pending_supersedes:
+            old = self.result.observations.get(old_id)
+            if old is None:
+                matches = [
+                    oid
+                    for oid in self.result.observations
+                    if oid == old_id or oid.startswith(old_id + "::")
+                ]
+                if not matches:
+                    self.result.add_queue(
+                        work_id,
+                        locator,
+                        ["admission.superseded_by"],
+                        f"supersedes target {old_id!r} unresolved in this extract",
+                        source=source_key,
+                        observation_id=new_id,
+                    )
+                    continue
+            else:
+                matches = [old_id]
+            surviving_new = new_id if new_id in self.result.observations else None
+            if surviving_new is None:
+                children = [
+                    oid
+                    for oid in self.result.observations
+                    if oid.startswith(new_id + "::")
+                ]
+                surviving_new = children[0] if children else None
+            if surviving_new is None:
+                self.result.add_queue(
+                    work_id,
+                    locator,
+                    ["admission.superseded_by"],
+                    f"superseding observation {new_id!r} was not retained",
+                    source=source_key,
+                    observation_id=new_id,
+                )
+                continue
+            for match_id in matches:
+                old_obs = self.result.observations[match_id]
+                object.__setattr__(
+                    old_obs,
+                    "admission",
+                    Admission(
+                        status=AdmissionStatus.SUPERSEDED,
+                        reason="superseded by a later observation in the same extract",
+                        superseded_by=surviving_new,
+                    ),
+                )
+
     def finalize(self) -> None:
         self._rebuild_works()
+        self._apply_supersedes()
         # Drop superseded_by pointers that do not resolve in the corpus.
         for obs in list(self.result.observations.values()):
             target = obs.admission.superseded_by
