@@ -40,6 +40,8 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     ScoredRailPoint,
     build_report,
     classify_phase_token,
+    elemental_reference_mismatch_applies,
+    elemental_reference_shift_kJ_per_mol_O2,
     engine_cea_delta_fG_kJ_mol,
     kcal_per_mol_to_kJ_per_mol,
     log10K_from_delta_fG_kJ_mol,
@@ -532,3 +534,57 @@ def test_ledger_aggregates_refusals_relationally(tmp_path: Path) -> None:
     assert all("n_points" not in row for row in scored_payload)
     assert {row["n_points"] for row in refusal_payload} == {3, 1}
     assert sum(row["n_points"] for row in refusal_payload) == 5
+
+
+def test_na2o_reference_shift_accounts_for_the_bulk_of_the_gap() -> None:
+    """4 ΔG_vap(Na) at 1600 K is −140.10 kJ/mol O2; leftover is ~19 kJ."""
+
+    T = 1600.0
+    shift = elemental_reference_shift_kJ_per_mol_O2("Na2O", T)
+    assert shift == pytest.approx(-140.10, abs=0.05)
+    assert elemental_reference_mismatch_applies("Na2O", T) is True
+    assert elemental_reference_mismatch_applies("MgO", 1100.0) is False
+    assert elemental_reference_mismatch_applies("MgO", 1600.0) is True
+    assert elemental_reference_mismatch_applies("K2O", 1600.0) is True
+
+    na2o = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Na-014",
+        formula="Na2O",
+        phase="l",
+        phase_kind=PHASE_LIQUID,
+        T_K=T,
+        delta_fG_kJ_mol=-200.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    cea = score_cea_point(na2o)
+    ell = score_ellingham_point(na2o)
+    assert cea.status in {"match", "mismatch"}
+    assert ell is not None and ell.status in {"match", "mismatch"}
+    vs = score_channel_vs_channel(na2o, cea, ell)
+    assert vs is not None
+    assert vs.finding_class == "elemental_reference_state_mismatch"
+    leftover = float(vs.residual_kJ_mol) - float(shift)
+    assert leftover == pytest.approx(19.4, abs=2.0)
+    assert cea.finding_class == "elemental_reference_state_mismatch"
+
+    mgo = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Mg-008",
+        formula="MgO",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=1100.0,
+        delta_fG_kJ_mol=-481.399,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    mgo_ell = score_ellingham_point(mgo)
+    mgo_cea = score_cea_point(mgo)
+    assert mgo_ell is not None
+    mgo_vs = score_channel_vs_channel(mgo, mgo_cea, mgo_ell)
+    if mgo_vs is not None:
+        assert mgo_vs.finding_class != "elemental_reference_state_mismatch"

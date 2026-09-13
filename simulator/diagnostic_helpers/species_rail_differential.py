@@ -27,8 +27,10 @@ import yaml
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_FIT_SEGMENTS,
+    ELLINGHAM_METAL_PHASE_GAS,
     ellingham_delta_g_kj_per_mol_o2,
     ellingham_fit_range_K,
+    ellingham_metal_phase_kind,
 )
 from simulator.diagnostic_helpers.gibbs_battery import (
     INDEPENDENT_AGREEMENT_BAND_KJ_MOL,
@@ -671,6 +673,99 @@ def oxide_dG_per_mol_O2_kJ(delta_fG_kJ_mol: float, oxide: str) -> float | None:
     return 2.0 * float(delta_fG_kJ_mol) / float(n_oxygen)
 
 
+def cea_elemental_vaporization_dG_kJ_mol(element: str, T_K: float) -> float | None:
+    """G_CEA(M(g)) − G_CEA(M(condensed)) in kJ/mol at T.
+
+    Returns None when either phase is missing or off its CEA T cover.
+    """
+
+    T = float(T_K)
+    hits = list(cea_by_formula().get(element, ()))
+    gas = [e for e in hits if e.phase == "gas" and e.T_min_K <= T <= e.T_max_K]
+    condensed = [
+        e for e in hits if e.phase != "gas" and e.T_min_K <= T <= e.T_max_K
+    ]
+    if len(gas) != 1 or len(condensed) != 1:
+        return None
+    try:
+        g_gas = cea_polynomial(gas[0].cea_key).evaluate(T).g_J_per_mol
+        g_cond = cea_polynomial(condensed[0].cea_key).evaluate(T).g_J_per_mol
+    except NasaCeaDomainError:
+        return None
+    return (g_gas - g_cond) / 1000.0
+
+
+def elemental_reference_shift_kJ_per_mol_O2(
+    oxide: str, T_K: float
+) -> float | None:
+    """CEA condensed-metal vs gas-metal, scaled onto the Ellingham O2 basis.
+
+    Premise: JANAF ΔfG of M_xO_y above the metal boiling point is vs M(g).
+    Ellingham segments above T_b are n_M M(g) + O2 → n_ox oxide. CEA
+    formation via ``_elemental_cea_entry`` selects the non-gas (condensed)
+    record while it still covers T (Na_L to 2300 K, K_L to 2200 K, Mg_L
+    to 6000 K, Ca_L to 6000 K), so CEA ΔfG is vs M(l/s).
+
+    Algebra, Na2O (OXIDE_TO_METAL['Na2O'] = (Na, 2, 1)):
+      per mol Na2O:  2 Na + 1/2 O2 → Na2O
+      per mol O2:    4 Na + O2 → 2 Na2O
+      ΔG_vap(Na) = G(Na(g)) − G(Na(l))          [kJ/mol Na]
+      n_M per mol O2 = 2 n_metal / n_O = 4
+      shift per mol O2 = 4 ΔG_vap(Na)
+
+    Unit check: (mol metal / mol O2) × (kJ / mol metal) = kJ / mol O2.
+
+    Sanity at 1600 K: CEA ΔG_vap(Na) = −35.025 kJ/mol;
+    4 ΔG_vap = −140.10 kJ/mol O2. The CEA-vs-Ellingham residual at
+    1600 K is −120.7 kJ/mol O2, so the reference-state shift accounts
+    for the bulk of the gap (leftover residual − shift = +19.4 kJ/mol O2).
+    At T_b, ΔG_vap ≈ 0 and the shift vanishes. Same construction for
+    K2O (4 K per mol O2; T_b ≈ 1032 K, all envelope points are gas-basis
+    on Ellingham) and MgO / CaO (2 M per mol O2; Mg T_b = 1363.15 K,
+    Ca T_b = 1757 K).
+    """
+
+    stoich = OXIDE_TO_METAL.get(oxide)
+    if stoich is None:
+        return None
+    metal, n_metal, n_oxygen = stoich
+    if n_oxygen <= 0:
+        return None
+    dG_vap = cea_elemental_vaporization_dG_kJ_mol(metal, T_K)
+    if dG_vap is None:
+        return None
+    n_metal_per_mol_O2 = 2.0 * float(n_metal) / float(n_oxygen)
+    return n_metal_per_mol_O2 * dG_vap
+
+
+def _cea_elemental_is_condensed(element: str, T_K: float) -> bool:
+    resolved = _elemental_cea_entry(element, T_K)
+    if resolved.cea_key is None:
+        return False
+    for entry in cea_by_formula().get(element, ()):
+        if entry.cea_key == resolved.cea_key:
+            return entry.phase != "gas"
+    return False
+
+
+def elemental_reference_mismatch_applies(oxide: str, T_K: float) -> bool:
+    """True when Ellingham is M(g)-basis and CEA formation is M(condensed)."""
+
+    stoich = OXIDE_TO_METAL.get(oxide)
+    if stoich is None:
+        return False
+    metal = stoich[0]
+    if metal not in ELLINGHAM_FIT_SEGMENTS:
+        return False
+    try:
+        phase = ellingham_metal_phase_kind(metal, T_K)
+    except (KeyError, ValueError):
+        return False
+    if phase != ELLINGHAM_METAL_PHASE_GAS:
+        return False
+    return _cea_elemental_is_condensed(metal, T_K)
+
+
 def ellingham_provenance(metal: str, compilation_id: str) -> str:
     segments = ELLINGHAM_FIT_SEGMENTS.get(metal)
     if not segments:
@@ -803,6 +898,26 @@ def score_cea_point(point: KeyedTablePoint) -> GibbsPointScore:
         )
     residual = engine - float(point.delta_fG_kJ_mol)
     status = _status_for_residual(residual, provenance)
+    finding = _finding_class(provenance, status)
+    note = point.note
+    if status == "mismatch" and elemental_reference_mismatch_applies(
+        point.formula, point.T_K
+    ):
+        finding = "elemental_reference_state_mismatch"
+        shift = elemental_reference_shift_kJ_per_mol_O2(point.formula, point.T_K)
+        n_oxygen = OXIDE_TO_METAL[point.formula][2]
+        shift_per_formula = (
+            None if shift is None else shift * float(n_oxygen) / 2.0
+        )
+        shift_s = (
+            "None"
+            if shift_per_formula is None
+            else f"{shift_per_formula:.3f}"
+        )
+        note = (
+            f"{note}; CEA condensed-metal vs table/Ellingham gas-metal; "
+            f"ΔG_vap scaled to formula = {shift_s} kJ/mol"
+        ).strip("; ")
     return GibbsPointScore(
         key=_point_key(
             point.compilation_id, point.record_id, point.T_K, CHANNEL_NASA_CEA
@@ -819,11 +934,11 @@ def score_cea_point(point: KeyedTablePoint) -> GibbsPointScore:
         residual_log10K=residual_log10K_from_kJ(residual, point.T_K),
         band_kJ_mol=PIN_BAND_KJ_MOL,
         status=status,
-        finding_class=_finding_class(provenance, status),
+        finding_class=finding,
         engine_channel=CHANNEL_NASA_CEA,
         cea_key=resolved.cea_key,
         skip_reason=None,
-        note=point.note,
+        note=note,
     )
 
 
@@ -923,6 +1038,23 @@ def score_channel_vs_channel(
     finding = (
         "channel_disagreement" if status == "mismatch" else "channel_agreement"
     )
+    note = (
+        "channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). "
+        "Descriptive magnitude band only; never an acceptance verdict."
+    )
+    if status == "mismatch" and elemental_reference_mismatch_applies(
+        point.formula, point.T_K
+    ):
+        finding = "elemental_reference_state_mismatch"
+        shift = elemental_reference_shift_kJ_per_mol_O2(point.formula, point.T_K)
+        leftover = None if shift is None else float(residual) - shift
+        shift_s = "None" if shift is None else f"{shift:.3f}"
+        leftover_s = "None" if leftover is None else f"{leftover:.3f}"
+        note = (
+            f"{note} CEA condensed-metal vs Ellingham gas-metal; "
+            f"n_M ΔG_vap = {shift_s} kJ/mol O2; leftover residual−shift = "
+            f"{leftover_s} kJ/mol O2."
+        )
     return GibbsPointScore(
         key=_point_key(
             point.compilation_id,
@@ -947,10 +1079,7 @@ def score_channel_vs_channel(
         engine_channel=CHANNEL_CEA_VS_ELLINGHAM,
         cea_key=cea_score.cea_key,
         skip_reason=None,
-        note=(
-            "channel-vs-channel (CEA ΔfG rescaled per mol O2 minus Ellingham). "
-            "Descriptive magnitude band only; never an acceptance verdict."
-        ),
+        note=note,
     )
 
 
@@ -1455,6 +1584,26 @@ def _channel_vs_channel_table(
     return rows
 
 
+def _elemental_reference_accounting() -> dict[str, Any]:
+    T = 1600.0
+    shift = elemental_reference_shift_kJ_per_mol_O2("Na2O", T)
+    dG_vap = cea_elemental_vaporization_dG_kJ_mol("Na", T)
+    return {
+        "oxide": "Na2O",
+        "T_K": T,
+        "stoichiometry": "4 Na + O2 -> 2 Na2O; shift = 4 ΔG_vap(Na)",
+        "dG_vap_Na_kJ_mol": dG_vap,
+        "shift_kJ_per_mol_O2": shift,
+        "also_checked": ("K2O", "MgO", "CaO"),
+        "note": (
+            "CEA elemental Na is Na_L (condensed) at 1600 K; Ellingham is "
+            "4 Na(g)+O2. The −140.10 kJ/mol O2 shift is the cheap hypothesis "
+            "for the −120.7 kJ/mol O2 CEA-vs-Ellingham residual; leftover "
+            "+19.4 kJ/mol O2 is not a 1 kJ agreement."
+        ),
+    }
+
+
 def _self_check_failures(points: Sequence[ScoredRailPoint]) -> list[dict[str, Any]]:
     rows = []
     for point in points:
@@ -1499,6 +1648,7 @@ def build_report(points: Sequence[ScoredRailPoint]) -> dict[str, Any]:
         "channel_vs_channel_species_fit": vs[:50],
         "channel_vs_channel_species_fit_n": len(vs),
         "table_self_check_failures": _self_check_failures(points),
+        "elemental_reference_accounting": _elemental_reference_accounting(),
         "note": (
             "divergence_label is a descriptive magnitude band only; "
             "never an acceptance verdict."
@@ -1621,21 +1771,22 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
             "",
             "### Inside the (1100, 1700) K Ellingham fit window",
             "",
-            "| species | T_K | CEA kJ/mol O2 | Ellingham kJ/mol O2 | residual | label |",
-            "|---|---:|---:|---:|---:|---|",
+            "| species | T_K | CEA kJ/mol O2 | Ellingham kJ/mol O2 | residual | finding_class | label |",
+            "|---|---:|---:|---:|---:|---|---|",
         ]
     )
     vs = report["channel_vs_channel"]
     if not vs:
-        lines.append("| — | — | — | — | — | no_matched_points |")
+        lines.append("| — | — | — | — | — | no_matched_points | — |")
     for row in vs[:20]:
         lines.append(
-            "| {species} | {T} | {cea:.4g} | {ell:.4g} | {res:.4g} | `{label}` |".format(
+            "| {species} | {T} | {cea:.4g} | {ell:.4g} | {res:.4g} | `{finding}` | `{label}` |".format(
                 species=row["species"],
                 T=row["temperature_K"],
                 cea=float(row["cea_kJ_per_mol_O2"]),
                 ell=float(row["ellingham_kJ_per_mol_O2"]),
                 res=float(row["residual_kJ_per_mol_O2"]),
+                finding=row["finding_class"],
                 label=row["divergence_label"],
             )
         )
@@ -1644,24 +1795,44 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
             "",
             "### Inside per-species `ellingham_fit_range_K` (includes 2000-2600 K primary-refit)",
             "",
-            "| species | T_K | CEA kJ/mol O2 | Ellingham kJ/mol O2 | residual | label |",
-            "|---|---:|---:|---:|---:|---|",
+            "| species | T_K | CEA kJ/mol O2 | Ellingham kJ/mol O2 | residual | finding_class | label |",
+            "|---|---:|---:|---:|---:|---|---|",
         ]
     )
     vs_all = report["channel_vs_channel_species_fit"]
     if not vs_all:
-        lines.append("| — | — | — | — | — | no_matched_points |")
+        lines.append("| — | — | — | — | — | no_matched_points | — |")
     for row in vs_all[:20]:
         lines.append(
-            "| {species} | {T} | {cea:.4g} | {ell:.4g} | {res:.4g} | `{label}` |".format(
+            "| {species} | {T} | {cea:.4g} | {ell:.4g} | {res:.4g} | `{finding}` | `{label}` |".format(
                 species=row["species"],
                 T=row["temperature_K"],
                 cea=float(row["cea_kJ_per_mol_O2"]),
                 ell=float(row["ellingham_kJ_per_mol_O2"]),
                 res=float(row["residual_kJ_per_mol_O2"]),
+                finding=row["finding_class"],
                 label=row["divergence_label"],
             )
         )
+    accounting = report.get("elemental_reference_accounting") or {}
+    lines.extend(
+        [
+            "",
+            "## Na2O elemental-reference accounting (1600 K)",
+            "",
+            (
+                f"- stoichiometry: `{accounting.get('stoichiometry', '')}`"
+            ),
+            (
+                "- ΔG_vap(Na) = {vap:.3f} kJ/mol; shift = {shift:.2f} kJ/mol O2".format(
+                    vap=float(accounting.get("dG_vap_Na_kJ_mol") or 0.0),
+                    shift=float(accounting.get("shift_kJ_per_mol_O2") or 0.0),
+                )
+            ),
+            f"- {accounting.get('note', '')}",
+            "",
+        ]
+    )
     failures = report["table_self_check_failures"]
     lines.extend(["", "## Table self-check failures", ""])
     if not failures:
