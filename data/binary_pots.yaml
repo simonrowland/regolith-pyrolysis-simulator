@@ -117,3 +117,624 @@ pots:
       FeO: 30.0
       MgO: 20.0
       SiO2: 50.0
+
+# Scoring-arm pots (measured KEMS compositions). Generated from the extracts;
+# do not hand-list. The eight engine-arm pots above are unchanged.
+scoring_pots:
+  kambayashi_1985_feto_p2o5_s01:
+    source_id: kems-057-kambayashi-1985
+    observation_id: kambayashi_1985_table4_feto_p2o5_compositions
+    sample_no: 1
+    temperatures_K:
+    - 1643.0
+    - 1653.0
+    - 1663.0
+    composition_basis: oxide_wt_percent
+    composition_conversion: printed_oxide_wt_pct_renormalized
+    composition_as_printed:
+      P2O5_wt_percent: 1.52
+      FeO_wt_percent: 86.55
+      Fe2O3_wt_percent: 10.07
+    composition_wt_pct:
+      P2O5: 1.548807826
+      FeO: 88.19034033
+      Fe2O3: 10.26085184
+    why: KEMS scoring pot from kems-057-kambayashi-1985 kambayashi_1985_table4_feto_p2o5_compositions
+      sample 1; printed oxide_wt_percent converted by printed_oxide_wt_pct_renormalized.
+    doi: 10.2355/tetsutohagane1955.71.16_1911
+  kambayashi_1985_feto_p2o5_s02:
+    source_id: kems-057-kambayashi-1985
+    observation_id: kambayashi_1985_table4_feto_p2o5_compositions
+    sample_no: 2
+    temperatures_K:
+    - 1643.0
+    - 1653.0
+    - 1663.0
+    composition_basis: oxide_wt_percent
+    composition_conversion: printed_oxide_wt_pct_renormalized
+    composition_as_printed:
+      P2O5_wt_percent: 4.06
+      FeO_wt_percent: 84.32
+      Fe2O3_wt_percent: 11.38
+    composition_wt_pct:
+      P2O5: 4.069767442
+      FeO: 84.52285485
+      Fe2O3: 11.40737771
+    why: KEMS scoring pot from kems-057-kambayashi-1985 kambayashi_1985_table4_feto_p2o5_compositions
+      sample 2; printed oxide_wt_percent converted by printed_oxide_wt_pct_renormalized.
+    doi: 10.2355/tetsutohagane1955.71.16_1911
+  kambayashi_1985_feto_p2o5_s03:
+    source_id: kems-057-kambayashi-1985
+    observation_id: kambayashi_1985_table4_feto_p2o5_compositions
+    sample_no: 3
+    temperatures_K:
+    - 1643.0
+    - 1653.0
+    - 1663.0
+    composition_basis: oxide_wt_percent
+    composition_conversion: printed_oxide_wt_pct_renormalized
+    composition_as_printed:
+      P2O5_wt_percent: 5.42
+      FeO_wt_percent: 82.97
+      Fe2O3_wt_percent: 11.71
+    composition_wt_pct:
+      P2O5: 5.414585415
+      FeO: 82.88711289
+      Fe2O3: 11.6983017
+    why: KEMS scoring pot from kems-057-kambayashi-1985 kambayashi_1985_table4_feto_p2o5_compositions
+      sample 3; printed oxide_wt_percent converted by printed_oxide_wt_pct_renormalized.
+    doi: 10.2355/tetsutohagane1955.71.16_1911
+  kambayashi_1985_feto_p2o5_s04:
+    source_id: kems-057-kambayashi-1985
+    observation_id: kambayashi_1985_table4_feto_p2o5_compositions
+    sample_no: 4
+    temperatures_K:
+    - 1643.0
+    - 1653.0
+    - 1663.0
+    composition_basis: oxide_wt_percent
+    composition_conversion: printed_oxide_wt_pct_renormalized
+    composition_as_printed:
+      P2O5_wt_percent: 8.38
+      FeO_wt_percent: 81.5
+      Fe2O3_wt_percent: 9.87
+    composition_wt_pct:
+      P2O5: 8.401002506
+      FeO: 81.70426065
+      Fe2O3: 9.894736842
+    why: KEMS scoring pot from kems-057-kambayashi-1985 kambayashi_1985_table4_feto_p2o5_compositions
+      sample 4; printed oxide_wt_percent converted by printed_oxide_wt_pct_renormalized.
+    doi: 10.2355/tetsutohagane1955.71.16_1911
+  kambayashi_1985_feto_p2o5_s05:
+    source_id: kems-057-kambayashi-1985
+    observation_id: kambayashi_1985_table4_feto_p2o5_compositions
+    sample_no: 5
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_wt_percent
+    composition_conversion: printed_oxide_wt_pct_renormalized
+    composition_as_printed:
+      P2O5_wt_percent: 9.77
+      FeO_wt_percent: 80.99
+      Fe2O3_wt_percent: 9.37
+    composition_wt_pct:
+      P2O5: 9.75731549
+      FeO: 80.8848497
+      Fe2O3: 9.357834815
+    why: KEMS scoring pot from kems-057-kambayashi-1985 kambayashi_1985_table4_feto_p2o5_compositions
+      sample 5; printed oxide_wt_percent converted by printed_oxide_wt_pct_renormalized.
+    doi: 10.2355/tetsutohagane1955.71.16_1911
+  kambayashi_1985_feto_p2o5_s06:
+    source_id: kems-057-kambayashi-1985
+    observation_id: kambayashi_1985_table4_feto_p2o5_compositions
+    sample_no: 6
+    temperatures_K:
+    - 1643.0
+    - 1653.0
+    - 1663.0
+    composition_basis: oxide_wt_percent
+    composition_conversion: printed_oxide_wt_pct_renormalized
+    composition_as_printed:
+      P2O5_wt_percent: 13.29
+      FeO_wt_percent: 78.54
+      Fe2O3_wt_percent: 8.35
+    composition_wt_pct:
+      P2O5: 13.26612098
+      FeO: 78.39888201
+      Fe2O3: 8.334997005
+    why: KEMS scoring pot from kems-057-kambayashi-1985 kambayashi_1985_table4_feto_p2o5_compositions
+      sample 6; printed oxide_wt_percent converted by printed_oxide_wt_pct_renormalized.
+    doi: 10.2355/tetsutohagane1955.71.16_1911
+  kambayashi_1985_feto_p2o5_s07:
+    source_id: kems-057-kambayashi-1985
+    observation_id: kambayashi_1985_table4_feto_p2o5_compositions
+    sample_no: 7
+    temperatures_K:
+    - 1643.0
+    - 1653.0
+    - 1663.0
+    composition_basis: oxide_wt_percent
+    composition_conversion: printed_oxide_wt_pct_renormalized
+    composition_as_printed:
+      P2O5_wt_percent: 14.53
+      FeO_wt_percent: 77.17
+      Fe2O3_wt_percent: 8.11
+    composition_wt_pct:
+      P2O5: 14.55765955
+      FeO: 77.31690211
+      Fe2O3: 8.125438333
+    why: KEMS scoring pot from kems-057-kambayashi-1985 kambayashi_1985_table4_feto_p2o5_compositions
+      sample 7; printed oxide_wt_percent converted by printed_oxide_wt_pct_renormalized.
+    doi: 10.2355/tetsutohagane1955.71.16_1911
+  kambayashi_1985_feto_p2o5_s08:
+    source_id: kems-057-kambayashi-1985
+    observation_id: kambayashi_1985_table4_feto_p2o5_compositions
+    sample_no: 8
+    temperatures_K:
+    - 1643.0
+    - 1653.0
+    - 1663.0
+    composition_basis: oxide_wt_percent
+    composition_conversion: printed_oxide_wt_pct_renormalized
+    composition_as_printed:
+      P2O5_wt_percent: 18.53
+      FeO_wt_percent: 73.01
+      Fe2O3_wt_percent: 8.88
+    composition_wt_pct:
+      P2O5: 18.4524995
+      FeO: 72.70464051
+      Fe2O3: 8.842859988
+    why: KEMS scoring pot from kems-057-kambayashi-1985 kambayashi_1985_table4_feto_p2o5_compositions
+      sample 8; printed oxide_wt_percent converted by printed_oxide_wt_pct_renormalized.
+    doi: 10.2355/tetsutohagane1955.71.16_1911
+  kambayashi_1985_pbo_p2o5_r1:
+    source_id: kems-057-kambayashi-1985
+    observation_id: kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c
+    temperatures_K:
+    - 1573.0
+    composition_basis: elemental_wt_percent
+    composition_conversion: elemental_Pb_P_wt_pct_to_PbO_P2O5_renormalized
+    composition_as_printed:
+      Pb_wt_percent: 63.84
+      P_wt_percent: 10.68
+    composition_wt_pct:
+      PbO: 73.75458361
+      P2O5: 26.24541639
+    why: KEMS scoring pot from kems-057-kambayashi-1985 kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c;
+      printed elemental_wt_percent converted by elemental_Pb_P_wt_pct_to_PbO_P2O5_renormalized.
+    doi: 10.2355/tetsutohagane1955.71.16_1911
+  kambayashi_1985_pbo_p2o5_r2:
+    source_id: kems-057-kambayashi-1985
+    observation_id: kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c
+    temperatures_K:
+    - 1573.0
+    composition_basis: elemental_wt_percent
+    composition_conversion: elemental_Pb_P_wt_pct_to_PbO_P2O5_renormalized
+    composition_as_printed:
+      Pb_wt_percent: 66.84
+      P_wt_percent: 11.28
+    composition_wt_pct:
+      PbO: 73.58511569
+      P2O5: 26.41488431
+    why: KEMS scoring pot from kems-057-kambayashi-1985 kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c;
+      printed elemental_wt_percent converted by elemental_Pb_P_wt_pct_to_PbO_P2O5_renormalized.
+    doi: 10.2355/tetsutohagane1955.71.16_1911
+  kambayashi_1985_pbo_p2o5_r3:
+    source_id: kems-057-kambayashi-1985
+    observation_id: kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c
+    temperatures_K:
+    - 1573.0
+    composition_basis: elemental_wt_percent
+    composition_conversion: elemental_Pb_P_wt_pct_to_PbO_P2O5_renormalized
+    composition_as_printed:
+      Pb_wt_percent: 64.79
+      P_wt_percent: 12.0
+    composition_wt_pct:
+      PbO: 71.73773314
+      P2O5: 28.26226686
+    why: KEMS scoring pot from kems-057-kambayashi-1985 kambayashi_1985_table3_pbo_p2o5_ion_current_ratios_1300c;
+      printed elemental_wt_percent converted by elemental_Pb_P_wt_pct_to_PbO_P2O5_renormalized.
+    doi: 10.2355/tetsutohagane1955.71.16_1911
+  ohara_1987_feto_p2o5_i_s01:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 1
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 3.92
+      FetO_mol_percent: 92.46
+      CaO_mol_percent: 3.64
+      Fe2_over_Fe3: 9.2
+    composition_wt_pct:
+      P2O5: 7.769039619
+      CaO: 2.850065894
+      FeO: 79.74752044
+      Fe2O3: 9.633374044
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 1; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s02:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 2
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 7.13
+      FetO_mol_percent: 88.07
+      CaO_mol_percent: 4.8
+      Fe2_over_Fe3: 10.8
+    composition_wt_pct:
+      P2O5: 13.66049447
+      CaO: 3.633208952
+      FeO: 74.98968185
+      Fe2O3: 7.716614731
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 2; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s03:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 3
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 9.13
+      FetO_mol_percent: 86.43
+      CaO_mol_percent: 4.44
+      Fe2_over_Fe3: 10.6
+    composition_wt_pct:
+      P2O5: 17.15347181
+      CaO: 3.295615024
+      FeO: 72.00194766
+      Fe2O3: 7.54896551
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 3; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s04:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 4
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 9.52
+      FetO_mol_percent: 86.57
+      CaO_mol_percent: 3.92
+      Fe2_over_Fe3: 9.3
+    composition_wt_pct:
+      P2O5: 17.85810951
+      CaO: 2.905071653
+      FeO: 70.77878851
+      Fe2O3: 8.458030332
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 4; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s05:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 5
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 4.23
+      FetO_mol_percent: 91.54
+      MgO_mol_percent: 4.23
+      Fe2_over_Fe3: 10.7
+    composition_wt_pct:
+      P2O5: 8.411565253
+      MgO: 2.388429601
+      FeO: 80.8070564
+      Fe2O3: 8.39294875
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 5; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s06:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 6
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 6.3
+      FetO_mol_percent: 89.45
+      MgO_mol_percent: 4.25
+      Fe2_over_Fe3: 8.6
+    composition_wt_pct:
+      P2O5: 12.34337016
+      MgO: 2.364382631
+      FeO: 75.53158647
+      Fe2O3: 9.760660735
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 6; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s07:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 7
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 7.26
+      FetO_mol_percent: 87.98
+      MgO_mol_percent: 4.76
+      Fe2_over_Fe3: 9.4
+    composition_wt_pct:
+      P2O5: 14.0821254
+      MgO: 2.621646708
+      FeO: 74.48946936
+      Fe2O3: 8.806758537
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 7; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s08:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 8
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 8.12
+      FetO_mol_percent: 87.65
+      MgO_mol_percent: 4.23
+      Fe2_over_Fe3: 9.7
+    composition_wt_pct:
+      P2O5: 15.57180625
+      MgO: 2.303344809
+      FeO: 73.68287703
+      Fe2O3: 8.441971912
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 8; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s09:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 9
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 1.8
+      FetO_mol_percent: 93.21
+      MnO_mol_percent: 4.99
+      Fe2_over_Fe3: 9.7
+    composition_wt_pct:
+      P2O5: 3.611936731
+      MnO: 5.004131785
+      FeO: 81.99017804
+      Fe2O3: 9.393753448
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 9; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s10:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 10
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 4.51
+      FetO_mol_percent: 90.76
+      MnO_mol_percent: 4.72
+      Fe2_over_Fe3: 10.1
+    composition_wt_pct:
+      P2O5: 8.796951141
+      MnO: 4.601063216
+      FeO: 78.01740314
+      Fe2O3: 8.584582503
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 10; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s11:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 11
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 5.84
+      FetO_mol_percent: 89.57
+      MnO_mol_percent: 4.59
+      Fe2_over_Fe3: 8.5
+    composition_wt_pct:
+      P2O5: 11.29427264
+      MnO: 4.436277142
+      FeO: 74.52550042
+      Fe2O3: 9.743949789
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 11; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s12:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 12
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 6.06
+      FetO_mol_percent: 89.42
+      MnO_mol_percent: 4.52
+      Fe2_over_Fe3: 9.2
+    composition_wt_pct:
+      P2O5: 11.66848862
+      MnO: 4.349516485
+      FeO: 74.93050829
+      Fe2O3: 9.051486612
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 12; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s13:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 13
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 8.33
+      FetO_mol_percent: 87.26
+      MnO_mol_percent: 4.4
+      Fe2_over_Fe3: 9.7
+    composition_wt_pct:
+      P2O5: 15.66884398
+      MnO: 4.136234903
+      FeO: 71.95133491
+      Fe2O3: 8.243586202
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 13; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s14:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 14
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 1.88
+      FetO_mol_percent: 93.13
+      SiO2_mol_percent: 4.98
+      Fe2_over_Fe3: 8.9
+    composition_wt_pct:
+      P2O5: 3.808440338
+      SiO2: 4.270293602
+      FeO: 81.71721522
+      Fe2O3: 10.20405084
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 14; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s15:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 15
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 4.35
+      FetO_mol_percent: 89.87
+      SiO2_mol_percent: 5.79
+      Fe2_over_Fe3: 9.1
+    composition_wt_pct:
+      P2O5: 8.593339812
+      SiO2: 4.841616409
+      FeO: 77.14379118
+      Fe2O3: 9.421252597
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 15; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s16:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 16
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 4.75
+      FetO_mol_percent: 90.69
+      SiO2_mol_percent: 4.56
+      Fe2_over_Fe3: 9.2
+    composition_wt_pct:
+      P2O5: 9.329182034
+      SiO2: 3.791000887
+      FeO: 77.51600639
+      Fe2O3: 9.363810685
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 16; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s17:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 17
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 6.35
+      FetO_mol_percent: 88.9
+      SiO2_mol_percent: 4.75
+      Fe2_over_Fe3: 8.7
+    composition_wt_pct:
+      P2O5: 12.29602309
+      SiO2: 3.89335173
+      FeO: 74.31727334
+      Fe2O3: 9.493351838
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 17; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s18:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 18
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 6.79
+      FetO_mol_percent: 83.49
+      CaO_mol_percent: 4.44
+      SiO2_mol_percent: 5.28
+      Fe2_over_Fe3: 10.9
+    composition_wt_pct:
+      P2O5: 13.13018273
+      CaO: 3.392002895
+      SiO2: 4.321892936
+      FeO: 71.83204827
+      Fe2O3: 7.323873165
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 18; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
+  ohara_1987_feto_p2o5_i_s19:
+    source_id: kems-058-ohara-1987
+    observation_id: ohara_1987_table2_compositions_and_raoultian_a_p2o5
+    sample_no: 19
+    temperatures_K:
+    - 1643.0
+    composition_basis: oxide_mol_percent
+    composition_conversion: mol_pct_feto_split_to_oxide_wt_pct
+    composition_as_printed:
+      P2O5_mol_percent: 8.49
+      FetO_mol_percent: 82.27
+      CaO_mol_percent: 4.43
+      SiO2_mol_percent: 4.81
+      Fe2_over_Fe3: 12.2
+    composition_wt_pct:
+      P2O5: 16.09914628
+      CaO: 3.31872396
+      SiO2: 3.860817903
+      FeO: 70.31595796
+      Fe2O3: 6.405353892
+    why: KEMS scoring pot from kems-058-ohara-1987 ohara_1987_table2_compositions_and_raoultian_a_p2o5
+      sample 19; printed oxide_mol_percent converted by mol_pct_feto_split_to_oxide_wt_pct.
+    doi: 10.2355/tetsutohagane1955.73.10_1337
