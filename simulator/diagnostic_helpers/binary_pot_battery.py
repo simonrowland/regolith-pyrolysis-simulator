@@ -70,6 +70,8 @@ REFUSAL_NO_LIQUID = "no_liquid"
 REFUSAL_TIMEOUT = "engine_timeout"
 REFUSAL_UNAVAILABLE = "unavailable"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
+# Token published by engines/builtin/vapor_pressure.py on pO2-floor inversion.
+_FLOOR_INVERSION_REASON = "melt_dissociation_pO2_floor_inverted_through_mass_action"
 
 FINDING_CLASS_FALLBACK_VS_SPECIATION = "fallback_vs_speciation"
 AUTHORITY_FALLBACK = "fallback"
@@ -449,32 +451,47 @@ def residual_log10(value_a: float, value_b: float) -> float:
     return math.log10(a / b)
 
 
+def _reported_value_has_floor_provenance(
+    source_label: str | None,
+    backend_status_reason: str | None,
+    engine_reason: str | None,
+) -> bool:
+    blob = " ".join(
+        str(part)
+        for part in (source_label, backend_status_reason, engine_reason)
+        if part
+    )
+    if not blob:
+        return False
+    return (
+        _FLOOR_INVERSION_REASON in blob
+        or REFUSAL_VALUE_IS_FLOOR in blob
+    )
+
+
 def classify_reported_value(
     value: Any,
     *,
     quantity: str,
     engine: str,
+    source_label: str | None = None,
+    backend_status_reason: str | None = None,
+    engine_reason: str | None = None,
 ) -> dict[str, Any] | None:
     """Typed refusal when a reported number is a floor, sentinel, or absence.
 
-    The adapter pO2 clamp is ``max(pO2_bar, 1e-30)``
-    (``alphamelts.py:5139``, ``thermoengine.py:430``; same number as
-    ``MELT_DISSOCIATION_PO2_MIN_BAR``). For Si the Antoine fallback then
-    applies ``(pO2 / pO2_ref) ** (-1)`` with ``pO2_ref = 1e-9 bar``, so a
-    clamped 1e-30 bar becomes a ~1e21 boost and P_Si lands at ~4.5e20 Pa
-    at 1700 K — a floor scored as a vapor pressure.
+    Floor-derived pressures are identified by provenance on the cell
+    (source label / backend reason / engine reason), not by matching the
+    oxygen-bar clamp ``MELT_DISSOCIATION_PO2_MIN_BAR`` as if it were Pa.
 
     Premise: a gas partial pressure at or above
     ``CATALOG_PHYSICAL_PRESSURE_CEILING_PA`` (1e9 Pa = 10 kbar) is not a
-    vacuum-pyrolysis vapor pressure; it is that clamp inverted through a
+    vacuum-pyrolysis vapor pressure; it is the pO2 clamp inverted through a
     negative mass-action exponent. Algebra: P_Si = a_SiO2 * P_ref *
     (pO2 / 1e-9) ** (-1); with pO2 floored at 1e-30 bar the pO2 term is
     1e21. Unit check: bar/bar dimensionless, P_ref in Pa. Sanity: 1e9 Pa
     is 10 kbar, already above any vacuum-pyrolysis vapor; the 1700 K
     exploded Si cell is ~4.5e20 Pa.
-
-    A reported value equal to the clamp itself (1e-30) is the fill
-    constant used as a Pa number.
     """
 
     number = _finite_float(value)
@@ -489,7 +506,9 @@ def classify_reported_value(
             "floor_value": MELT_DISSOCIATION_PO2_MIN_BAR,
             "reported_value": number,
         }
-    if number == MELT_DISSOCIATION_PO2_MIN_BAR:
+    if _reported_value_has_floor_provenance(
+        source_label, backend_status_reason, engine_reason
+    ):
         return {
             "reason": REFUSAL_VALUE_IS_FLOOR,
             "engine": str(engine),
@@ -517,7 +536,14 @@ def collect_floor_refusals(
         ):
             for name, raw in dict(payload.get(field_name) or {}).items():
                 refusal = classify_reported_value(
-                    raw, quantity=quantity, engine=engine
+                    raw,
+                    quantity=quantity,
+                    engine=engine,
+                    source_label=_source_label_for_species(payload, str(name)),
+                    backend_status_reason=payload.get(
+                        "vapor_pressure_backend_status_reason"
+                    ),
+                    engine_reason=payload.get("engine_reason"),
                 )
                 if refusal is None:
                     continue
@@ -583,9 +609,23 @@ def pairwise_residuals(
                         value_a = float((left.get(field_name) or {})[name])
                         value_b = float((right.get(field_name) or {})[name])
                         if classify_reported_value(
-                            value_a, quantity=quantity, engine=engine_a
+                            value_a,
+                            quantity=quantity,
+                            engine=engine_a,
+                            source_label=_source_label_for_species(left, name),
+                            backend_status_reason=left.get(
+                                "vapor_pressure_backend_status_reason"
+                            ),
+                            engine_reason=left.get("engine_reason"),
                         ) or classify_reported_value(
-                            value_b, quantity=quantity, engine=engine_b
+                            value_b,
+                            quantity=quantity,
+                            engine=engine_b,
+                            source_label=_source_label_for_species(right, name),
+                            backend_status_reason=right.get(
+                                "vapor_pressure_backend_status_reason"
+                            ),
+                            engine_reason=right.get("engine_reason"),
                         ):
                             continue
                         if not _pressure_pair_is_like_for_like_speciation(

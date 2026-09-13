@@ -18,6 +18,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     REFUSAL_TIMEOUT,
     REFUSAL_UNAVAILABLE,
     REFUSAL_VALUE_IS_FLOOR,
+    _FLOOR_INVERSION_REASON,
     BinaryPot,
     EngineHandle,
     EquilibrateCell,
@@ -508,8 +509,17 @@ def test_floor_value_is_typed_refusal_not_residual() -> None:
     floor_exploded = 4.527934710618984e20
     physical = 7.318136019588876e-12
 
+    assert (
+        classify_reported_value(
+            floor_fill, quantity=QUANTITY_PRESSURE, engine="thermoengine"
+        )
+        is None
+    )
     fill_refusal = classify_reported_value(
-        floor_fill, quantity=QUANTITY_PRESSURE, engine="thermoengine"
+        floor_fill,
+        quantity=QUANTITY_PRESSURE,
+        engine="thermoengine",
+        source_label=_FLOOR_INVERSION_REASON,
     )
     assert fill_refusal is not None
     assert fill_refusal["reason"] == REFUSAL_VALUE_IS_FLOOR
@@ -550,7 +560,10 @@ def test_floor_value_is_typed_refusal_not_residual() -> None:
     floor_cell = _ok_cell(
         engine="thermoengine",
         gas={"Si": floor_fill, "SiO": 0.013},
-        vapor_pressures_source=_speciation_builtin,
+        vapor_pressures_source={
+            "Si": _FLOOR_INVERSION_REASON,
+            "SiO": "builtin_authoritative:standard_reaction_term",
+        },
     )
     partner = _ok_cell(
         engine="alphamelts",
@@ -619,6 +632,134 @@ def test_floor_value_is_typed_refusal_not_residual() -> None:
         for row in rebuilt["largest_in_envelope_residuals"]
         if row["species"] == "Si" and row["quantity"] == QUANTITY_PRESSURE
     )
+
+
+def test_floor_labelled_subceiling_pressure_is_refused() -> None:
+    """M05 confirm: floor provenance, not magnitude, refuses a 1 Pa source."""
+
+    labelled = classify_reported_value(
+        1.0,
+        quantity=QUANTITY_PRESSURE,
+        engine="thermoengine",
+        source_label=_FLOOR_INVERSION_REASON,
+    )
+    assert labelled is not None
+    assert labelled["reason"] == REFUSAL_VALUE_IS_FLOOR
+    assert labelled["reported_value"] == 1.0
+
+    po2 = Po2Request(mode="commanded", po2_bar=1.0e-8)
+    floor_one = _ok_cell(
+        engine="thermoengine",
+        gas={"Si": 1.0},
+        po2=po2,
+        vapor_pressures_source={"Si": _FLOOR_INVERSION_REASON},
+    )
+    physical_tenth = _ok_cell(
+        engine="alphamelts",
+        gas={"Si": 0.1},
+        po2=po2,
+        vapor_pressures_source={
+            "Si": "builtin_authoritative:standard_reaction_term",
+        },
+    )
+    rows = pairwise_residuals([floor_one, physical_tenth])
+    assert all(row["species"] != "Si" for row in rows)
+    refusals = collect_floor_refusals([floor_one, physical_tenth])
+    assert {row["engine"] for row in refusals} == {"thermoengine"}
+    assert {row["species"] for row in refusals} == {"Si"}
+    assert {row["reported_value"] for row in refusals} == {1.0}
+
+    tiny = classify_reported_value(
+        1.0e-30, quantity=QUANTITY_PRESSURE, engine="alphamelts"
+    )
+    converted = classify_reported_value(
+        1.0e-25, quantity=QUANTITY_PRESSURE, engine="alphamelts"
+    )
+    assert tiny is None
+    assert converted is None
+    physical_tiny = _ok_cell(
+        engine="thermoengine",
+        gas={"Si": 1.0e-30},
+        po2=po2,
+        vapor_pressures_source={
+            "Si": "builtin_authoritative:standard_reaction_term",
+        },
+    )
+    physical_peer = _ok_cell(
+        engine="alphamelts",
+        gas={"Si": 1.0e-29},
+        po2=po2,
+        vapor_pressures_source={
+            "Si": "builtin_authoritative:standard_reaction_term",
+        },
+    )
+    tiny_rows = pairwise_residuals([physical_tiny, physical_peer])
+    si_tiny = [
+        row
+        for row in tiny_rows
+        if row["species"] == "Si" and row["quantity"] == QUANTITY_PRESSURE
+    ]
+    assert len(si_tiny) == 1
+    assert si_tiny[0]["engine_a"] == "alphamelts"
+    assert si_tiny[0]["engine_b"] == "thermoengine"
+    assert si_tiny[0]["delta_log10_a_minus_b"] == pytest.approx(1.0)
+    converted_cell = _ok_cell(
+        engine="thermoengine",
+        gas={"Si": 1.0e-25},
+        po2=po2,
+        vapor_pressures_source={
+            "Si": "builtin_authoritative:standard_reaction_term",
+        },
+    )
+    converted_peer = _ok_cell(
+        engine="alphamelts",
+        gas={"Si": 1.0e-24},
+        po2=po2,
+        vapor_pressures_source={
+            "Si": "builtin_authoritative:standard_reaction_term",
+        },
+    )
+    converted_rows = pairwise_residuals([converted_cell, converted_peer])
+    si_converted = [
+        row
+        for row in converted_rows
+        if row["species"] == "Si" and row["quantity"] == QUANTITY_PRESSURE
+    ]
+    assert len(si_converted) == 1
+    assert si_converted[0]["delta_log10_a_minus_b"] == pytest.approx(1.0)
+
+
+def test_ordinary_sub_pascal_pressure_still_scores() -> None:
+    """M05 control: unlabelled 1 Pa vs 0.1 Pa remains a 1 dex residual."""
+
+    po2 = Po2Request(mode="commanded", po2_bar=1.0e-8)
+    one = _ok_cell(
+        engine="thermoengine",
+        gas={"Si": 1.0},
+        po2=po2,
+        vapor_pressures_source={
+            "Si": "builtin_authoritative:standard_reaction_term",
+        },
+    )
+    tenth = _ok_cell(
+        engine="alphamelts",
+        gas={"Si": 0.1},
+        po2=po2,
+        vapor_pressures_source={
+            "Si": "builtin_authoritative:standard_reaction_term",
+        },
+    )
+    rows = pairwise_residuals([one, tenth])
+    si_rows = [
+        row
+        for row in rows
+        if row["species"] == "Si" and row["quantity"] == QUANTITY_PRESSURE
+    ]
+    assert len(si_rows) == 1
+    assert si_rows[0]["engine_a"] == "alphamelts"
+    assert si_rows[0]["engine_b"] == "thermoengine"
+    assert si_rows[0]["delta_log10_a_minus_b"] == pytest.approx(-1.0)
+    assert collect_floor_refusals([one, tenth]) == []
 
 
 def test_fallback_vs_speciation_finding_class_reads_engine_flags() -> None:
