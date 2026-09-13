@@ -2105,6 +2105,61 @@ def test_r09_printed_table_pairing_requires_reaction_and_formation_elements() ->
     assert any(i.reason is RefusalReason.INVALID_SOURCE for i in matching_report.issues)
 
 
+def test_r09_printed_table_pairing_requires_per_and_species_formula() -> None:
+    """Spec :239: table pairing locks per and species.formula independently."""
+
+    from dataclasses import replace
+
+    ident_g = F.o2_identity()
+    ident_k = replace(ident_g, quantity=Quantity.LOG10_KF)
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r09-per-ref",
+        exp.experiment_id,
+        ident_g,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r09-per-cand", exp.experiment_id, ident_g, Decimal("0"))
+    different_per = replace(ident_k, per=State.of(PerBasis.MOL_O2))
+    per_log = F.observation(
+        "r09-per-logK",
+        exp.experiment_id,
+        different_per,
+        Decimal("-59.154"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    per_scored = F.residual(
+        "r09-per-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    per_report = validate_corpus([w], [exp], [ref, per_log, cand], [per_scored])
+    assert per_report.ok
+    assert not any(i.reason is RefusalReason.INVALID_SOURCE for i in per_report.issues)
+    different_formula = replace(ident_k, species=Species("N2", Phase.G))
+    formula_log = F.observation(
+        "r09-formula-logK",
+        exp.experiment_id,
+        different_formula,
+        Decimal("-59.154"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    formula_scored = F.residual(
+        "r09-formula-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    formula_report = validate_corpus([w], [exp], [ref, formula_log, cand], [formula_scored])
+    assert formula_report.ok
+    assert not any(i.reason is RefusalReason.INVALID_SOURCE for i in formula_report.issues)
+
+
 def test_r09_pressure_blocking_applies_to_partial_and_reference() -> None:
     ident_partial = replace_pref_as_partial()
     ident_pref = F.pref_identity()
