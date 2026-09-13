@@ -534,6 +534,12 @@ def resolve_cea_species(formula: str, phase_kind: str, T_K: float) -> CeaResolut
     Multiple condensed allotropes of one formula are an ambiguity (refuse),
     not a name pick. ``ref`` (JANAF elemental standard) accepts the unique
     formula match when exactly one CEA record exists.
+
+    G9 (2026-09-12): the CEA extract has no condensed MnO or CoO record
+    under any key spelling (MnO, CoO, MnO(a), CoO(cr), MNO, COO, Mn1O1,
+    Co1O1). Elemental Mn_* / Co_* exist; CO is carbon monoxide and must
+    never case-fold onto Co. Those oxides stay ``cea_formula_unmapped``;
+    no polynomial is invented from another source.
     """
 
     T = float(T_K)

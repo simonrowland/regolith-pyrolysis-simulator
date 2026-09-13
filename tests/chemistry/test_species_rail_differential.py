@@ -29,6 +29,7 @@ from simulator.diagnostic_helpers.species_rail import (
 from simulator.diagnostic_helpers.species_rail_differential import (
     CHANNEL_CEA_VS_ELLINGHAM,
     CHANNEL_NASA_CEA,
+    cea_by_formula,
     ENVELOPE_BANDS,
     PHASE_GAS,
     PHASE_LIQUID,
@@ -126,6 +127,51 @@ def test_unit_conversion_identities() -> None:
     recomputed = log10K_from_delta_fG_kJ_mol(kcal_per_mol_to_kJ_per_mol(80.700), 298.15)
     assert recomputed == pytest.approx(-59.154, abs=0.001)
     assert R_KJ_PER_MOL_K * 298.15 * LN10 == pytest.approx(RT_LN10_298_15_KJ)
+
+
+def test_cea_mno_and_coo_remain_unmapped() -> None:
+    """CEA extract has no MnO/CoO condensed records (G9). Never case-fold Co→CO."""
+
+    index = cea_by_formula()
+    assert "MnO" not in index
+    assert "CoO" not in index
+    for spelling in (
+        "MnO(a)",
+        "CoO(cr)",
+        "MNO",
+        "COO",
+        "Mn1O1",
+        "Co1O1",
+    ):
+        assert spelling not in index
+    for formula in ("MnO", "CoO"):
+        for T_K in (298.15, 1100.0, 1500.0):
+            resolved = resolve_cea_species(formula, PHASE_SOLID, T_K)
+            assert resolved.cea_key is None
+            assert resolved.reason == "cea_formula_unmapped"
+            point = KeyedTablePoint(
+                compilation_id="janaf",
+                record_id=f"{formula}-absent",
+                formula=formula,
+                phase="cr",
+                phase_kind=PHASE_SOLID,
+                T_K=T_K,
+                delta_fG_kJ_mol=-200.0,
+                log10_Kf=None,
+                log10_Kf_as_published=None,
+                printed_page=None,
+            )
+            score = score_cea_point(point)
+            assert score.status == "typed-refusal"
+            assert score.residual_kJ_mol is None
+            assert score.skip_reason == (
+                f"{TYPED_REFUSAL_PREFIX}cea_formula_unmapped"
+            )
+    # CO is carbon monoxide; Co is cobalt. Exact-key only.
+    co_gas = resolve_cea_species("CO", PHASE_GAS, 298.15)
+    assert co_gas.cea_key == "CO"
+    co_metal = resolve_cea_species("Co", PHASE_SOLID, 1100.0)
+    assert co_metal.cea_key == "Co_b"
 
 
 def test_o2_identity_point_is_a_match() -> None:
