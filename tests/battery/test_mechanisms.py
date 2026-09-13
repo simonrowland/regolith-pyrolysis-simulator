@@ -91,22 +91,47 @@ def test_m01_inconsistent_o2_table_is_invalid_source() -> None:
 
 
 def test_m02_floor_notice_keeps_numeric_but_not_score_eligible() -> None:
-    """Same identity can hold a diagnostic residual with score_eligible=False."""
+    """Floor-tagged vapour residual cannot be score_eligible; diagnostic numeric can.
+
+    Inputs do not carry the answer: the validator must refuse a measured +
+    certified pair that claims score_eligible=True with a floor notice.
+    """
 
     ident = F.psat_identity("Na")
     w = F.work()
     exp = F.tabulation_experiment()
-    ref = F.observation("ref-m02", exp.experiment_id, ident, Decimal("0.1"))
+    ref = F.observation(
+        "ref-m02",
+        exp.experiment_id,
+        ident,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
     cand = F.engine_obs(
         "cand-m02",
         exp.experiment_id,
         ident,
         Decimal("1"),
         notices=(F.floor_notice(),),
-        authority=Authority.EXTRAPOLATED,
+        authority=Authority.CERTIFIED,
     )
-    res = F.residual(
-        "m02",
+    scored = F.residual(
+        "m02-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MISMATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=True,
+        notices=union_notices(ref.notices, cand.notices),
+    )
+    scored_report = validate_corpus([w], [exp], [ref, cand], [scored])
+    assert not scored_report.ok
+    assert any(
+        i.reason is RefusalReason.CONDITIONAL_FIELD and "floor" in i.detail
+        for i in scored_report.issues
+    )
+    diagnostic = F.residual(
+        "m02-diagnostic",
         ref.observation_id,
         candidate=cand.observation_id,
         status=ResidualStatus.MISMATCH,
@@ -114,12 +139,26 @@ def test_m02_floor_notice_keeps_numeric_but_not_score_eligible() -> None:
         score_eligible=False,
         notices=union_notices(ref.notices, cand.notices),
     )
-    report = validate_corpus([w], [exp], [ref, cand], [res])
-    assert report.ok
-    assert res.numeric is not None
-    assert res.score_eligible is False
-    assert any(n.kind is NoticeKind.FLOOR_INVERSION for n in res.notices)
-    assert Quantity.P_SAT in res.notices[0].affected_quantities
+    diagnostic_report = validate_corpus([w], [exp], [ref, cand], [diagnostic])
+    assert diagnostic_report.ok
+    assert diagnostic.numeric is not None
+    assert any(n.kind is NoticeKind.FLOOR_INVERSION for n in diagnostic.notices)
+    clean_cand = F.engine_obs(
+        "cand-m02-clean",
+        exp.experiment_id,
+        ident,
+        Decimal("0.1"),
+        authority=Authority.CERTIFIED,
+    )
+    clean = F.residual(
+        "m02-clean",
+        ref.observation_id,
+        candidate=clean_cand.observation_id,
+        status=ResidualStatus.MATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, clean_cand], [clean]).ok
 
 
 def test_m03_cao_liquid_vs_crystal_is_identity_mismatch() -> None:
@@ -159,7 +198,7 @@ def test_m04_residual_notice_union_survives_endpoint_ancestry() -> None:
         candidate=cand.observation_id,
         status=ResidualStatus.MATCH,
         notices=union_notices(ref.notices, cand.notices),
-        score_eligible=True,
+        score_eligible=False,
         rail=Rail.VAPOUR,
     )
     assert any(n.kind is NoticeKind.FLOOR_INVERSION for n in res.notices)

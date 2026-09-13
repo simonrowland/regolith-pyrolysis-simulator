@@ -17,9 +17,13 @@ Ambiguity resolutions:
   required when execution is produced; candidate_request required when no
   candidate; attempted_unavailable requires call_evidence.
   ``score_eligible`` cannot be true when status is refused, admission is
-  not admitted, evidence is not measured_*, or identity_equal is not
-  equal. Full scoring policy (quantity-scoped blocking qualifications,
-  lineage independence) is chunk 2; this is the schema-level floor.
+  not admitted, evidence is not measured_*, identity_equal is not
+  equal, or a vapour-equilibrium residual carries a blocking pressure
+  qualification (floor_inversion / fallback / pressure_provenance_unknown
+  on p_sat, p_partial, or p_reference). Diagnostic numeric residuals with
+  those notices remain valid at score_eligible=False (M02). Full scoring
+  policy (lineage independence, live clamps) is chunk 2; this is the
+  schema-level floor.
 - Compilation pairs with legitimate ``not_applicable`` axes are valid
   records. The validator must not refuse them.
 """
@@ -73,6 +77,19 @@ class ValidationIssue:
 
 _ADVISORY_REASONS = frozenset({RefusalReason.IDENTITY_INCOMPLETE})
 
+# v2.1 vapour-equilibrium blocking qualifications. Sibling activity is
+# not blocked by a pressure-only floor (quantity-scoped affected_quantities).
+_VAPOUR_EQUILIBRIUM = frozenset(
+    {Quantity.P_SAT, Quantity.P_PARTIAL, Quantity.P_REFERENCE}
+)
+_PRESSURE_BLOCKING_NOTICES = frozenset(
+    {
+        NoticeKind.FLOOR_INVERSION,
+        NoticeKind.FALLBACK,
+        NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+    }
+)
+
 
 @dataclass(frozen=True)
 class ValidationReport:
@@ -89,6 +106,19 @@ class ValidationReport:
 
 def _issue(path: str, reason: RefusalReason, detail: str) -> ValidationIssue:
     return ValidationIssue(path, reason, detail)
+
+
+def _pressure_blocking_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
+    found: list[Notice] = []
+    for group in groups:
+        if not group:
+            continue
+        for notice in group:
+            if notice.kind not in _PRESSURE_BLOCKING_NOTICES:
+                continue
+            if any(q in _VAPOUR_EQUILIBRIUM for q in notice.affected_quantities):
+                found.append(notice)
+    return tuple(found)
 
 
 def reaction_atom_balance(reaction: Reaction) -> dict[str, float]:
@@ -622,6 +652,25 @@ def validate_residual(
                             f"{path}.score_eligible",
                             RefusalReason.CONDITIONAL_FIELD,
                             "score_eligible requires engine_prediction candidate",
+                        )
+                    )
+            quantity = None
+            if isinstance(reference.identity, Identity):
+                quantity = reference.identity.quantity
+            if quantity in _VAPOUR_EQUILIBRIUM:
+                blocking = _pressure_blocking_notices(
+                    residual.notices,
+                    reference.notices,
+                    None if candidate is None else candidate.notices,
+                )
+                if blocking:
+                    issues.append(
+                        _issue(
+                            f"{path}.score_eligible",
+                            RefusalReason.CONDITIONAL_FIELD,
+                            "vapour-equilibrium score_eligible cannot be true with "
+                            "floor_inversion/fallback/pressure_provenance_unknown; "
+                            "diagnostic numeric residuals keep score_eligible=false",
                         )
                     )
     for i, notice in enumerate(residual.notices):
