@@ -656,6 +656,48 @@ def engine_cea_delta_fG_kJ_mol(cea_key: str, T_K: float) -> float:
 # ---------------------------------------------------------------------------
 
 
+def resolve_ellingham_oxide(formula: str) -> tuple[str, float, float] | None:
+    """Map an oxide formula onto the Ellingham metal key.
+
+    Premise: Ellingham segments are keyed by metal (n_M M + O2 → n_ox oxide).
+    Compilation rows are keyed by oxide formula (MgO, Na2O, …). Passing the
+    oxide string to ``ellingham_fit_range_K`` KeyErrors (G10). The project's
+    own dissociation map ``OXIDE_TO_METAL[oxide] = (metal, n_metal, n_O)`` is
+    the adapter: n_O oxygen atoms per formula unit, so moles O2 per formula
+    = n_O / 2 and dG per mol O2 = 2 ΔfG / n_O (see oxide_dG_per_mol_O2_kJ).
+    Algebra: exact-key lookup, never case-folded (CoO is cobalt oxide; CO is
+    carbon monoxide).
+    Unit check: n_O is oxygen atoms / formula; 2/n_O has units
+    mol-oxide / mol-O2.
+    Sanity: MgO → (Mg, 1, 1) and the Mg line matches JANAF MgO(cr) inside
+    the fit window; CoO → (Co, 1, 1) but Co is absent from
+    ELLINGHAM_FIT_SEGMENTS (typed refusal ellingham_species_unsupported);
+    an oxide with no map entry has no metal key.
+    """
+
+    stoich = OXIDE_TO_METAL.get(formula)
+    if stoich is None:
+        return None
+    metal, n_metal, n_oxygen = stoich
+    return str(metal), float(n_metal), float(n_oxygen)
+
+
+def _binary_oxide_without_metal_key(formula: str) -> bool:
+    """True for a two-element oxide (M + O) that OXIDE_TO_METAL does not map."""
+
+    if formula in OXIDE_TO_METAL:
+        return False
+    composition = parse_formula_composition(formula)
+    if not composition:
+        return False
+    elements = {str(el): float(n) for el, n in composition}
+    oxygen = elements.get("O", 0.0)
+    if oxygen <= 0.0:
+        return False
+    others = [el for el, n in elements.items() if el != "O" and n > 0.0]
+    return len(others) == 1
+
+
 def oxide_dG_per_mol_O2_kJ(delta_fG_kJ_mol: float, oxide: str) -> float | None:
     """Rescale oxide ΔfG onto the Ellingham per-mol-O2 basis.
 
@@ -666,7 +708,7 @@ def oxide_dG_per_mol_O2_kJ(delta_fG_kJ_mol: float, oxide: str) -> float | None:
     Sanity: Na2O has n_O = 1 → 2 ΔfG(Na2O), matching 4 Na + O2 → 2 Na2O.
     """
 
-    stoich = OXIDE_TO_METAL.get(oxide)
+    stoich = resolve_ellingham_oxide(oxide)
     if stoich is None:
         return None
     _metal, _n_metal, n_oxygen = stoich
@@ -799,7 +841,8 @@ def oxide_identity_mismatch_applies(oxide: str) -> bool:
     Premise: the harness maps OXIDE_TO_METAL[oxide][0] onto
     ELLINGHAM_FIT_SEGMENTS[metal]. That metal key is one oxide's line
     (Fe is 2 Fe + O2 → 2 FeO, n_M=2, n_ox=2), not every oxide of that
-    metal (Fe2O3 would be 4/3 Fe + O2 → 2/3 Fe2O3).
+    metal (Fe2O3 would be 4/3 Fe + O2 → 2/3 Fe2O3). Mapping Fe2O3 onto
+    the Fe line is the wrong reaction (b-489); the adapter refuses it.
     Algebra: mismatch iff (n_M, n_ox)_Ellingham ≠ (2 n_metal/n_O, 2/n_O).
     Unit check: both pairs are mole ratios per mol O2.
     Sanity: Fe2O3 vs Fe is a mismatch; FeO, Al2O3, Cr2O3, Na2O match.
@@ -819,6 +862,39 @@ def oxide_identity_mismatch_applies(oxide: str) -> bool:
         math.isclose(expected[0], actual[0], rel_tol=0.0, abs_tol=1e-9)
         and math.isclose(expected[1], actual[1], rel_tol=0.0, abs_tol=1e-9)
     )
+
+
+def ellingham_line_product_oxide(metal: str, T_K: float | None = None) -> str:
+    """Oxide product the Ellingham metal line is fitted to.
+
+    Premise: each metal key is one reaction n_M M + O2 → n_ox oxide,
+    written in EllinghamFitSegment.phase_basis (Fe is
+    ``2 Fe(alpha) + O2 -> 2 FeO(s)``, not hematite).
+    Algebra: take the token after ``->``, drop a leading stoichiometric
+    coefficient (``2``, ``2/3``, ``4/3``), then drop a parenthetical
+    phase suffix.
+    Unit check: the remaining token is a formula (FeO, MgO, Al2O3, …).
+    Sanity: Fe → FeO; Al → Al2O3; Fe2O3 is a different oxide than the Fe line.
+    """
+
+    if metal not in ELLINGHAM_FIT_SEGMENTS:
+        return ""
+    if T_K is None:
+        phase_basis = ELLINGHAM_FIT_SEGMENTS[metal][0].phase_basis
+    else:
+        phase_basis = ellingham_segment_for_temperature(metal, T_K).phase_basis
+    _lhs, sep, rhs = str(phase_basis).partition("->")
+    if not sep:
+        return ""
+    tokens = rhs.strip().split()
+    if tokens and all(ch.isdigit() or ch in "./" for ch in tokens[0]):
+        tokens = tokens[1:]
+    if not tokens:
+        return ""
+    formula = tokens[0]
+    if "(" in formula:
+        formula = formula.split("(", 1)[0]
+    return formula
 
 
 def ellingham_provenance(metal: str, compilation_id: str) -> str:
@@ -1004,9 +1080,24 @@ def score_ellingham_point(point: KeyedTablePoint) -> GibbsPointScore | None:
     # not a formation residual).
     if point.phase_kind not in {PHASE_SOLID, PHASE_LIQUID}:
         return None
-    if point.formula not in OXIDE_TO_METAL:
+    resolved = resolve_ellingham_oxide(point.formula)
+    if resolved is None:
+        if _binary_oxide_without_metal_key(point.formula):
+            return _refusal_score(
+                compilation_id=point.compilation_id,
+                record_id=point.record_id,
+                formula=point.formula,
+                T_K=point.T_K,
+                channel=CHANNEL_ELLINGHAM,
+                reason="ellingham_species_unsupported",
+                provenance_class=PROVENANCE_INDEPENDENT,
+                table_kJ_mol=point.delta_fG_kJ_mol,
+                note=(
+                    f"{point.note}; oxide has no OXIDE_TO_METAL metal key"
+                ).strip("; "),
+            )
         return None
-    metal, _n_metal, n_oxygen = OXIDE_TO_METAL[point.formula]
+    metal, _n_metal, n_oxygen = resolved
     if metal not in ELLINGHAM_FIT_SEGMENTS:
         return _refusal_score(
             compilation_id=point.compilation_id,
@@ -1017,15 +1108,45 @@ def score_ellingham_point(point: KeyedTablePoint) -> GibbsPointScore | None:
             reason="ellingham_species_unsupported",
             provenance_class=PROVENANCE_INDEPENDENT,
             table_kJ_mol=point.delta_fG_kJ_mol,
-            note=point.note,
+            note=(
+                f"{point.note}; via OXIDE_TO_METAL[{point.formula!r}] → {metal} "
+                "(no Ellingham segment)"
+            ).strip("; "),
+        )
+    # Each metal key is one oxide reaction. Fe is 2 Fe + O2 → 2 FeO, not
+    # hematite (b-489). Map only when the line's own oxide IS this formula.
+    if oxide_identity_mismatch_applies(point.formula):
+        line_oxide = ellingham_line_product_oxide(metal, point.T_K)
+        n_M, n_ox = ellingham_stoichiometry(metal)
+        phase_basis = ellingham_segment_for_temperature(
+            metal, point.T_K
+        ).phase_basis
+        return _refusal_score(
+            compilation_id=point.compilation_id,
+            record_id=point.record_id,
+            formula=point.formula,
+            T_K=point.T_K,
+            channel=CHANNEL_ELLINGHAM,
+            reason="ellingham_line_is_different_oxide",
+            provenance_class=PROVENANCE_INDEPENDENT,
+            table_kJ_mol=point.delta_fG_kJ_mol,
+            note=(
+                f"{point.note}; Ellingham {metal} line is {line_oxide} "
+                f"(n_M={n_M:g} n_ox={n_ox:g}: {phase_basis}); "
+                f"not {point.formula}"
+            ).strip("; "),
         )
     # Certified band is per-species ellingham_fit_range_K, not the legacy
     # ELLINGHAM_FIT_RANGE_K = (1100, 1700) constant. Na/Mg/Fe/Ca primary-refit
     # segments run to 2600 K; a 2000-2600 K point is in-range for those metals
     # and stays a residual, not a refusal. Same skip token as the CEA channel:
-    # engine_channel_out_of_range:<low>-<high>K.
+    # engine_channel_out_of_range:<low>-<high>K. K and Ni keep their
+    # certified-band flags (no invented slope beyond the segment).
     low, high = ellingham_fit_range_K(metal)
     if not (low <= point.T_K <= high):
+        band_note = (
+            f"certified_band_flag fit_range_K=({low:g},{high:g})"
+        )
         return _refusal_score(
             compilation_id=point.compilation_id,
             record_id=point.record_id,
@@ -1036,7 +1157,7 @@ def score_ellingham_point(point: KeyedTablePoint) -> GibbsPointScore | None:
             provenance_class=ellingham_provenance(metal, point.compilation_id),
             table_kJ_mol=oxide_dG_per_mol_O2_kJ(point.delta_fG_kJ_mol, point.formula),
             band=(low, high),
-            note=point.note,
+            note=f"{point.note}; {band_note}".strip("; "),
         )
     table_per_o2 = oxide_dG_per_mol_O2_kJ(point.delta_fG_kJ_mol, point.formula)
     if table_per_o2 is None:
@@ -1050,22 +1171,6 @@ def score_ellingham_point(point: KeyedTablePoint) -> GibbsPointScore | None:
         f"{point.note}; rescaled 2*ΔfG/n_O with n_O={n_oxygen} "
         f"via OXIDE_TO_METAL[{point.formula!r}] → {metal}"
     )
-    if status == "mismatch" and oxide_identity_mismatch_applies(point.formula):
-        finding = "oxide_identity_mismatch"
-        n_M, n_ox = ellingham_stoichiometry(metal)
-        expected = ellingham_oxide_stoichiometry_for_formula(point.formula)
-        expected_s = (
-            "None"
-            if expected is None
-            else f"n_M={expected[0]:g} n_ox={expected[1]:g}"
-        )
-        phase_basis = ellingham_segment_for_temperature(
-            metal, point.T_K
-        ).phase_basis
-        note = (
-            f"{note}; Ellingham {metal} is n_M={n_M:g} n_ox={n_ox:g} "
-            f"({phase_basis}); {point.formula} expects {expected_s}"
-        )
     return GibbsPointScore(
         key=_point_key(
             point.compilation_id, point.record_id, point.T_K, CHANNEL_ELLINGHAM,

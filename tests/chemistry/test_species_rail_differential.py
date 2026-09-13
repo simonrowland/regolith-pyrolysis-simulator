@@ -42,6 +42,7 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     classify_phase_token,
     elemental_reference_mismatch_applies,
     elemental_reference_shift_kJ_per_mol_O2,
+    ellingham_line_product_oxide,
     ellingham_oxide_stoichiometry_for_formula,
     oxide_identity_mismatch_applies,
     engine_cea_delta_fG_kJ_mol,
@@ -49,6 +50,7 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     log10K_from_delta_fG_kJ_mol,
     render_report_markdown,
     resolve_cea_species,
+    resolve_ellingham_oxide,
     score_cea_point,
     score_channel_vs_channel,
     score_ellingham_point,
@@ -185,6 +187,125 @@ def test_ellingham_matches_condensed_mgo_not_gas() -> None:
     assert score is not None
     assert score.status == "match"
     assert score.residual_kJ_mol == pytest.approx(0.0, abs=0.05)
+    assert resolve_ellingham_oxide("MgO") == ("Mg", 1.0, 1.0)
+    assert "OXIDE_TO_METAL['MgO'] → Mg" in (score.note or "")
+
+
+def test_ellingham_coo_is_unsupported() -> None:
+    """CoO maps to Co; Co has no Ellingham segment (typed refusal, not a zero)."""
+
+    assert resolve_ellingham_oxide("CoO") == ("Co", 1.0, 1.0)
+    point = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Co-oxide",
+        formula="CoO",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=1100.0,
+        delta_fG_kJ_mol=-200.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    score = score_ellingham_point(point)
+    assert score is not None
+    assert score.status == "typed-refusal"
+    assert score.residual_kJ_mol is None
+    assert score.skip_reason == f"{TYPED_REFUSAL_PREFIX}ellingham_species_unsupported"
+
+
+def test_ellingham_oxide_without_metal_key_is_typed_refusal() -> None:
+    assert resolve_ellingham_oxide("WO3") is None
+    point = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="W-oxide",
+        formula="WO3",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=1100.0,
+        delta_fG_kJ_mol=-700.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    score = score_ellingham_point(point)
+    assert score is not None
+    assert score.status == "typed-refusal"
+    assert score.residual_kJ_mol is None
+    assert score.skip_reason == f"{TYPED_REFUSAL_PREFIX}ellingham_species_unsupported"
+    assert "no OXIDE_TO_METAL metal key" in (score.note or "")
+
+
+def test_ellingham_k_and_ni_keep_certified_band_flags() -> None:
+    """K and Ni stay fail-closed at their certified ellingham_fit_range_K."""
+
+    k_low, k_high = ellingham_fit_range_K("K")
+    ni_low, ni_high = ellingham_fit_range_K("Ni")
+    assert (k_low, k_high) == (1100.0, 2000.0)
+    assert (ni_low, ni_high) == (1100.0, 2000.0)
+    assert resolve_ellingham_oxide("K2O") == ("K", 2.0, 1.0)
+    assert resolve_ellingham_oxide("NiO") == ("Ni", 1.0, 1.0)
+
+    k_oor = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="K-012",
+        formula="K2O",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=2100.0,
+        delta_fG_kJ_mol=-50.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    k_score = score_ellingham_point(k_oor)
+    assert k_score is not None
+    assert k_score.status == "typed-refusal"
+    assert k_score.skip_reason is not None
+    assert k_score.skip_reason.startswith(
+        f"{TYPED_REFUSAL_PREFIX}engine_channel_out_of_range:"
+    )
+    assert f"{k_low:g}-{k_high:g}K" in k_score.skip_reason
+    assert "certified_band_flag" in (k_score.note or "")
+
+    ni_oor = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Ni-oxide",
+        formula="NiO",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=2100.0,
+        delta_fG_kJ_mol=-150.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    ni_score = score_ellingham_point(ni_oor)
+    assert ni_score is not None
+    assert ni_score.status == "typed-refusal"
+    assert ni_score.skip_reason is not None
+    assert ni_score.skip_reason.startswith(
+        f"{TYPED_REFUSAL_PREFIX}engine_channel_out_of_range:"
+    )
+    assert f"{ni_low:g}-{ni_high:g}K" in ni_score.skip_reason
+    assert "certified_band_flag" in (ni_score.note or "")
+
+    k_inside = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="K-012",
+        formula="K2O",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=1600.0,
+        delta_fG_kJ_mol=-50.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    k_in = score_ellingham_point(k_inside)
+    assert k_in is not None
+    assert k_in.status in {"match", "mismatch"}
+    assert k_in.skip_reason is None
 
 
 def test_prose_phase_is_typed_refusal_not_a_guess() -> None:
@@ -592,8 +713,8 @@ def test_na2o_reference_shift_accounts_for_the_bulk_of_the_gap() -> None:
         assert mgo_vs.finding_class != "elemental_reference_state_mismatch"
 
 
-def test_fe2o3_ellingham_is_oxide_identity_mismatch_not_channel_disagreement() -> None:
-    """Fe Ellingham is 2 Fe + O2 → 2 FeO; Fe2O3 is 4/3 Fe + O2 → 2/3 Fe2O3."""
+def test_fe2o3_ellingham_refuses_as_different_oxide_than_feo_line() -> None:
+    """Fe Ellingham is 2 Fe + O2 → 2 FeO; Fe2O3 is not that line."""
 
     assert ellingham_oxide_stoichiometry_for_formula("Fe2O3") == (
         pytest.approx(4.0 / 3.0),
@@ -609,6 +730,9 @@ def test_fe2o3_ellingham_is_oxide_identity_mismatch_not_channel_disagreement() -
     assert oxide_identity_mismatch_applies("Al2O3") is False
     assert oxide_identity_mismatch_applies("Cr2O3") is False
     assert oxide_identity_mismatch_applies("Na2O") is False
+    assert ellingham_line_product_oxide("Fe", 1500.0) == "FeO"
+    assert ellingham_line_product_oxide("Al", 1500.0) == "Al2O3"
+    assert ellingham_line_product_oxide("Mg", 1100.0) == "MgO"
 
     T = 1500.0
     fe2o3 = KeyedTablePoint(
@@ -625,16 +749,17 @@ def test_fe2o3_ellingham_is_oxide_identity_mismatch_not_channel_disagreement() -
     )
     cea = score_cea_point(fe2o3)
     ell = score_ellingham_point(fe2o3)
-    assert ell is not None and ell.status == "mismatch"
-    assert ell.finding_class == "oxide_identity_mismatch"
-    # 2 * ΔfG / n_O with n_O=3: 2*(-438.347)/3 = -292.231 kJ/mol O2.
-    assert ell.table_kJ_mol == pytest.approx(-292.231, abs=0.001)
-    # Ellingham Fe at 1500 K is the FeO line, not hematite.
-    assert ell.engine_kJ_mol == pytest.approx(-350.8884, abs=0.001)
-    assert ell.residual_kJ_mol == pytest.approx(-58.657, abs=0.01)
+    assert ell is not None
+    assert ell.status == "typed-refusal"
+    assert ell.residual_kJ_mol is None
+    assert ell.engine_kJ_mol is None
+    assert ell.skip_reason == (
+        f"{TYPED_REFUSAL_PREFIX}ellingham_line_is_different_oxide"
+    )
+    assert "FeO" in (ell.note or "")
+    assert "not Fe2O3" in (ell.note or "")
     vs = score_channel_vs_channel(fe2o3, cea, ell)
-    assert vs is not None
-    assert vs.finding_class == "oxide_identity_mismatch"
+    assert vs is None
     assert cea.finding_class != "oxide_identity_mismatch"
 
     feo = KeyedTablePoint(
@@ -651,4 +776,6 @@ def test_fe2o3_ellingham_is_oxide_identity_mismatch_not_channel_disagreement() -
     )
     feo_ell = score_ellingham_point(feo)
     assert feo_ell is not None
+    assert feo_ell.status in {"match", "mismatch"}
+    assert feo_ell.skip_reason is None
     assert feo_ell.finding_class != "oxide_identity_mismatch"
