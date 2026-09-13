@@ -1105,9 +1105,23 @@ def _studio_cell(**overrides):
         'liquid_fraction': 1.0,
         'notices': [],
         'authority': None,
+        'engine_annotation': None,
     }
     cell.update(overrides)
     return cell
+
+
+def _crash_studio_cell(**overrides):
+    return _studio_cell(
+        status='refusal',
+        refusal_reason='engine_crash',
+        engine_status='engine_crash',
+        engine_reason='subprocess_died',
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=None,
+        **overrides,
+    )
 
 
 def test_studio_diff_classifies_allowed_and_other_verdicts() -> None:
@@ -1127,15 +1141,7 @@ def test_studio_diff_classifies_allowed_and_other_verdicts() -> None:
         authority='extrapolated',
         notices=[{'kind': 'engine_commissioning', 'authority': 'extrapolated'}],
     )
-    crash_base = _studio_cell(
-        status='refusal',
-        refusal_reason='engine_crash',
-        engine_status='engine_crash',
-        engine_reason='subprocess_died',
-        melt_activities={},
-        gas_partial_pressures_Pa={},
-        liquid_fraction=None,
-    )
+    crash_base = _crash_studio_cell()
     crash_tip = dict(crash_base)
     crash_tip['engine_annotation'] = 'sio2_below_observed_crash_floor'
     other_tip = _studio_cell(liquid_fraction=0.5)
@@ -1180,16 +1186,70 @@ def test_studio_diff_classifies_allowed_and_other_verdicts() -> None:
         'reclassified_refusal_to_notice',
         'crash_annotation',
     }
+    crash_row = next(
+        row for row in report['cells'] if row['verdict'] == 'crash_annotation'
+    )
+    assert 'engine_annotation' in crash_row['base']
+    assert crash_row['base']['engine_annotation'] is None
+    assert (
+        crash_row['tip']['engine_annotation']
+        == 'sio2_below_observed_crash_floor'
+    )
 
 
 def test_studio_diff_timeout_is_not_subprocess_death() -> None:
     """E02 / Codex R2: engine_timeout is not crash evidence."""
     diff = _load_studio_diff_module()
+    assert 'engine_annotation' in diff.COMPARE_FIELDS
     base = _studio_cell(
         status='refusal',
         refusal_reason='engine_timeout',
+        engine_status='engine_timeout',
         engine_reason='timeout',
         liquid_fraction=None,
     )
-    tip = dict(base, engine_reason='sio2_below_observed_crash_floor')
+    tip = dict(base, engine_annotation='sio2_below_observed_crash_floor')
     assert diff.classify_cell(base, tip) == 'OTHER'
+
+
+@pytest.mark.parametrize(
+    'case,expected',
+    [
+        ('timeout_gains_annotation', 'OTHER'),
+        ('ok_gains_annotation', 'OTHER'),
+        ('thermoengine_death_gains_annotation', 'OTHER'),
+        ('alphamelts_death_loses_annotation', 'OTHER'),
+        ('alphamelts_death_gains_annotation', 'crash_annotation'),
+    ],
+)
+def test_studio_diff_annotation_changes_are_classified(
+    case: str, expected: str,
+) -> None:
+    """Codex R1 / grok P3-1: only an AlphaMELTS death may gain the floor note."""
+    diff = _load_studio_diff_module()
+    assert 'engine_annotation' in diff.COMPARE_FIELDS
+    annotation = 'sio2_below_observed_crash_floor'
+    if case == 'timeout_gains_annotation':
+        base = _studio_cell(
+            status='refusal',
+            refusal_reason='engine_timeout',
+            engine_status='engine_timeout',
+            engine_reason='timeout',
+            liquid_fraction=None,
+        )
+        tip = dict(base, engine_annotation=annotation)
+    elif case == 'ok_gains_annotation':
+        base = _studio_cell()
+        tip = dict(base, engine_annotation=annotation)
+    elif case == 'thermoengine_death_gains_annotation':
+        base = _crash_studio_cell(engine='thermoengine')
+        tip = dict(base, engine_annotation=annotation)
+    elif case == 'alphamelts_death_loses_annotation':
+        tip = _crash_studio_cell()
+        base = dict(tip, engine_annotation=annotation)
+    elif case == 'alphamelts_death_gains_annotation':
+        base = _crash_studio_cell()
+        tip = dict(base, engine_annotation=annotation)
+    else:
+        raise AssertionError(f'unknown case {case!r}')
+    assert diff.classify_cell(base, tip) == expected

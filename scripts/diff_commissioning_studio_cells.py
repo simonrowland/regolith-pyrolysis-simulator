@@ -9,8 +9,8 @@ table with one row per cell, including identical cells. Verdicts:
 - crash_annotation
 - OTHER  (any OTHER is a stop)
 
-Compared fields: status, refusal_reason, engine_reason, melt_activities,
-gas_partial_pressures_Pa, liquid_fraction.
+Compared fields: status, refusal_reason, engine_reason, engine_annotation,
+melt_activities, gas_partial_pressures_Pa, liquid_fraction.
 
 Captures may be a raw battery report or a wrapper with revision_id,
 run_timestamp, hostname, and report=.
@@ -35,6 +35,7 @@ COMPARE_FIELDS = (
     "status",
     "refusal_reason",
     "engine_reason",
+    "engine_annotation",
     "melt_activities",
     "gas_partial_pressures_Pa",
     "liquid_fraction",
@@ -162,15 +163,39 @@ def _snapshot(cell: Mapping[str, Any] | None) -> dict[str, Any] | None:
     return {field: cell.get(field) for field in COMPARE_FIELDS}
 
 
+def _is_timeout(cell: Mapping[str, Any]) -> bool:
+    engine_reason = str(cell.get("engine_reason") or "")
+    return (
+        cell.get("refusal_reason") == "engine_timeout"
+        or cell.get("engine_status") == "engine_timeout"
+        or engine_reason == "timeout"
+    )
+
+
 def _is_crash(cell: Mapping[str, Any]) -> bool:
+    if _is_timeout(cell):
+        return False
     reason = cell.get("refusal_reason")
     engine_status = cell.get("engine_status")
     engine_reason = str(cell.get("engine_reason") or "")
     return (
         reason in CRASH_REFUSALS
         or engine_status in CRASH_REFUSALS
-        or engine_reason == CRASH_ANNOTATION_REASON
+        or engine_reason == "engine_crash"
         or "subprocess_died" in engine_reason
+    )
+
+
+def _is_alphamelts_subprocess_death(cell: Mapping[str, Any]) -> bool:
+    return str(cell.get("engine") or "") == "alphamelts" and _is_crash(cell)
+
+
+def _gained_crash_floor_annotation(
+    base: Mapping[str, Any], tip: Mapping[str, Any]
+) -> bool:
+    return (
+        base.get("engine_annotation") != CRASH_ANNOTATION_REASON
+        and tip.get("engine_annotation") == CRASH_ANNOTATION_REASON
     )
 
 
@@ -204,14 +229,20 @@ def classify_cell(
         for field in COMPARE_FIELDS
     }
     if all(equal.values()):
+        return VERDICT_IDENTICAL
+    annotation_only = all(
+        equal[field]
+        for field in COMPARE_FIELDS
+        if field != "engine_annotation"
+    ) and not equal["engine_annotation"]
+    if annotation_only:
         if (
-            _is_crash(base)
-            and _is_crash(tip)
-            and base.get("engine_annotation") != CRASH_ANNOTATION_REASON
-            and tip.get("engine_annotation") == CRASH_ANNOTATION_REASON
+            _is_alphamelts_subprocess_death(base)
+            and _is_alphamelts_subprocess_death(tip)
+            and _gained_crash_floor_annotation(base, tip)
         ):
             return VERDICT_CRASH_ANNOTATION
-        return VERDICT_IDENTICAL
+        return VERDICT_OTHER
     if (
         base.get("status") in REFUSAL_STATUSES
         and tip.get("status") in OK_STATUSES
@@ -298,7 +329,8 @@ def render_markdown(diff: Mapping[str, Any]) -> str:
         f"- OTHER: {diff.get('n_OTHER')}",
         "",
         "Compared fields: status, refusal_reason, engine_reason, "
-        "melt_activities, gas_partial_pressures_Pa, liquid_fraction.",
+        "engine_annotation, melt_activities, gas_partial_pressures_Pa, "
+        "liquid_fraction.",
         "",
         "| identity | verdict | base status | tip status | base refusal | tip refusal |",
         "|---|---|---|---|---|---|",
