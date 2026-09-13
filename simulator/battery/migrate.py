@@ -725,6 +725,63 @@ def convert_mass_to_kg(
     return None, f"unmapped mass unit {units!r}"
 
 
+# trail -> (factor, arithmetic, output_unit, original_unit)
+_CONVERSION_META: dict[str, tuple[Decimal, str, str, str]] = {
+    "Torr_to_Pa": (
+        PA_PER_TORR,
+        "P_Pa = P_Torr × 101325 / 760",
+        "Pa",
+        "Torr",
+    ),
+    "atm_to_Pa": (
+        Decimal(str(int(STANDARD_ATMOSPHERE_PA))),
+        "P_Pa = P_atm × 101325",
+        "Pa",
+        "atm",
+    ),
+    "bar_to_Pa": (Decimal("100000"), "P_Pa = P_bar × 1e5", "Pa", "bar"),
+    "kPa_to_Pa": (Decimal("1000"), "P_Pa = P_kPa × 1000", "Pa", "kPa"),
+    "mbar_to_Pa": (Decimal("100"), "P_Pa = P_mbar × 100", "Pa", "mbar"),
+    "celsius_to_kelvin": (
+        Decimal("273.15"),
+        "T_K = T_C + 273.15",
+        "K",
+        "C",
+    ),
+    "cm2_to_m2": (Decimal("10000"), "A_m2 = A_cm2 / 10000", "m2", "cm2"),
+    "mm2_to_m2": (Decimal("1000000"), "A_m2 = A_mm2 / 1e6", "m2", "mm2"),
+    "g_to_kg": (Decimal("1000"), "m_kg = m_g / 1000", "kg", "g"),
+    "mg_to_kg": (Decimal("1000000"), "m_kg = m_mg / 1e6", "kg", "mg"),
+}
+
+
+def conversion_derivation(
+    trail: str | None,
+    original_value: object,
+    locator: Locator | None,
+) -> Derivation | None:
+    """Attach original unit, factor, and arithmetic on a unit conversion."""
+
+    if not trail or str(trail).startswith("identity"):
+        return None
+    meta = _CONVERSION_META.get(str(trail))
+    if meta is None:
+        return None
+    factor, arithmetic, output_unit, original_unit = meta
+    params: list[tuple[str, Located[Decimal]]] = [
+        ("factor", Located(State.of(factor), locator=locator)),
+    ]
+    original = _as_dec_or_none(original_value)
+    if original is not None:
+        params.insert(0, ("original", Located(State.of(original), locator=locator)))
+    return Derivation(
+        relation=str(trail),
+        inputs=(arithmetic, f"original_unit={original_unit}"),
+        parameters=tuple(params),
+        output_unit=output_unit,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Record builders
 # ---------------------------------------------------------------------------
@@ -1234,20 +1291,20 @@ def apparatus_from_equipment(equipment: object) -> Apparatus | None:
             continue
         loc = locator_from_mapping(payload.get("locator"))
         if src in {"orifice_area", "sample_surface_area"}:
-            converted, why = convert_area_to_m2(amount, payload.get("units"))
+            converted, trail = convert_area_to_m2(amount, payload.get("units"))
             if converted is None:
-                geometry_kwargs[dest] = located_unknown(why or "unmapped area unit")
+                geometry_kwargs[dest] = located_unknown(trail or "unmapped area unit")
             else:
                 inference = None
                 if payload.get("inferred") or payload.get("inference"):
-                    from simulator.battery.records import Derivation
-
                     inference = Derivation(
                         relation=str(payload.get("inference") or "inferred"),
                         inputs=(str(payload.get("locator") or dest),),
                         parameters=(),
                         output_unit="m2",
                     )
+                elif trail:
+                    inference = conversion_derivation(trail, amount, loc)
                 geometry_kwargs[dest] = Located(
                     State.of(converted), locator=loc, inference=inference
                 )
@@ -1304,11 +1361,15 @@ def sample_from_equipment(equipment: object) -> Sample:
     if isinstance(mass_src, Mapping) and mass_src.get("value") is not None:
         units = mass_src.get("units") or implied_unit
         loc = locator_from_mapping(mass_src.get("locator"))
-        kg, why = convert_mass_to_kg(mass_src.get("value"), units)
+        kg, trail = convert_mass_to_kg(mass_src.get("value"), units)
         if kg is None:
-            mass_located = located_unknown(why or "missing mass unit")
+            mass_located = located_unknown(trail or "missing mass unit")
         else:
-            mass_located = located_value(kg, loc)
+            mass_located = Located(
+                State.of(kg),
+                locator=loc,
+                inference=conversion_derivation(trail, mass_src.get("value"), loc),
+            )
     if mass_located is None and form_located is None and container_located is None:
         return Sample()
     return Sample(
@@ -1332,7 +1393,11 @@ def pressure_from_equipment(equipment: object) -> PressureEnvironment:
             trail or "chamber_pressure is not a numeric pressure"
         )
     return PressureEnvironment(
-        total_pressure_Pa=located_value(pa, loc),
+        total_pressure_Pa=Located(
+            State.of(pa),
+            locator=loc,
+            inference=conversion_derivation(trail, payload.get("value"), loc),
+        ),
         sweep_gas=located_unknown("source does not state sweep gas"),
         regime=FlowRegime(
             regime_class=State.unknown("source does not state flow regime")
@@ -2054,6 +2119,8 @@ class Migrator:
         trail = "identity"
         extra_unc = None
         point_locator = locator
+        t_trail: str | None = None
+        t_original: object = None
         if isinstance(raw_item, Mapping):
             if raw_item.get("locator"):
                 point_locator = (
@@ -2063,9 +2130,8 @@ class Migrator:
                     or locator
                 )
             if "T_K" in raw_item or "temperature_K" in raw_item:
-                coord, t_trail = convert_temperature_to_k(
-                    raw_item.get("T_K", raw_item.get("temperature_K")), "K"
-                )
+                t_original = raw_item.get("T_K", raw_item.get("temperature_K"))
+                coord, t_trail = convert_temperature_to_k(t_original, "K")
                 if coord is None:
                     self.result.add_queue(
                         work.work_id,
@@ -2076,7 +2142,8 @@ class Migrator:
                         observation_id=f"{parent_id}::point:{index}",
                     )
             elif "T_C" in raw_item:
-                coord, t_trail = convert_temperature_to_k(raw_item.get("T_C"), "C")
+                t_original = raw_item.get("T_C")
+                coord, t_trail = convert_temperature_to_k(t_original, "C")
                 if coord is None:
                     self.result.add_queue(
                         work.work_id,
@@ -2087,8 +2154,9 @@ class Migrator:
                         observation_id=f"{parent_id}::point:{index}",
                     )
             elif "T" in raw_item:
+                t_original = raw_item.get("T")
                 t_unit = raw_item.get("T_units") or raw_item.get("temperature_units")
-                coord, t_trail = convert_temperature_to_k(raw_item.get("T"), t_unit)
+                coord, t_trail = convert_temperature_to_k(t_original, t_unit)
                 if coord is None:
                     self.result.add_queue(
                         work.work_id,
@@ -2159,14 +2227,21 @@ class Migrator:
             derivation = None
         else:
             emitted = Value.point_of(val)
-            from simulator.battery.records import Derivation
-
-            derivation = Derivation(
-                relation=trail,
-                inputs=(read_from,),
-                parameters=(),
-                output_unit="Pa" if str(trail).endswith("Pa") else (units or "as_published"),
-            )
+            converted = conversion_derivation(trail, None, point_locator)
+            if converted is not None:
+                derivation = Derivation(
+                    relation=converted.relation,
+                    inputs=(read_from,) + converted.inputs,
+                    parameters=converted.parameters,
+                    output_unit=converted.output_unit,
+                )
+            else:
+                derivation = Derivation(
+                    relation=trail,
+                    inputs=(read_from,),
+                    parameters=(),
+                    output_unit="Pa" if str(trail).endswith("Pa") else (units or "as_published"),
+                )
         unc = uncertainty
         if extra_unc is not None:
             unc = Uncertainty(
@@ -2175,7 +2250,13 @@ class Migrator:
             )
         point_conditions = None
         if coord is not None:
-            point_conditions = {"temperature_K": located_value(coord, point_locator)}
+            point_conditions = {
+                "temperature_K": Located(
+                    State.of(coord),
+                    locator=point_locator,
+                    inference=conversion_derivation(t_trail, t_original, point_locator),
+                )
+            }
         observation = Observation(
             observation_id=point_id,
             experiment_id=experiment_id,

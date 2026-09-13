@@ -771,6 +771,35 @@ def test_g04_supersedes_marks_the_old_row(tmp_path: Path) -> None:
     assert any("missing_target" in (e.why or "") for e in result.queue)
 
 
+def test_h03_pressure_conversion_keeps_derivation_trail() -> None:
+    env = pressure_from_equipment(
+        {"chamber_pressure": {"value": 1, "units": "Torr", "locator": {"table": "1"}}}
+    )
+    located = env.total_pressure_Pa
+    assert located.state.is_value
+    assert located.inference is not None
+    assert located.inference.relation == "Torr_to_Pa"
+    joined = " ".join(located.inference.inputs)
+    assert "101325" in joined and "760" in joined
+    params = dict(located.inference.parameters)
+    assert "factor" in params
+    assert params["factor"].state.is_value
+    tiny = pressure_from_equipment(
+        {
+            "chamber_pressure": {
+                "value": "1.0e-05",
+                "units": "Torr",
+                "locator": {"figure": "8"},
+            }
+        }
+    )
+    assert tiny.total_pressure_Pa.inference is not None
+    assert tiny.total_pressure_Pa.inference.relation == "Torr_to_Pa"
+    assert tiny.total_pressure_Pa.state.value == as_decimal("1.0e-05") * as_decimal(
+        "101325"
+    ) / as_decimal("760")
+
+
 def test_g03_blank_pressure_unit_is_unknown() -> None:
     pa, why = convert_pressure_to_pa(1, "")
     assert pa is None
