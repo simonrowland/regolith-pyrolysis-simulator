@@ -1413,6 +1413,36 @@ def map_quantity(
     return State.unknown("source does not state a closed quantity"), "missing quantity"
 
 
+def lineage_parents_from_source(
+    obs: Mapping[str, Any],
+    values: Mapping[str, Any],
+    source_id: str,
+    local_ids: set[str],
+) -> tuple[str, ...]:
+    """Observation ids the source named as parents. Never invents a pointer."""
+
+    raw = values.get("derived_from")
+    if raw is None:
+        raw = obs.get("derived_from")
+    if raw is None or raw == "":
+        return ()
+    if isinstance(raw, str):
+        items = [raw]
+    elif isinstance(raw, (list, tuple)):
+        items = [str(x) for x in raw if x]
+    else:
+        return ()
+    parents: list[str] = []
+    prefix = f"{source_id}::"
+    for item in items:
+        local = item[len(prefix):] if item.startswith(prefix) else item
+        if local in local_ids:
+            parents.append(f"{prefix}{local}")
+        else:
+            parents.append(item if "::" in item else f"{prefix}{item}")
+    return tuple(parents)
+
+
 def map_method(regime: object) -> State[MethodToken]:
     if not isinstance(regime, str) or not regime.strip():
         return State.unknown("source does not state method")
@@ -2687,6 +2717,9 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
+        derived_from = lineage_parents_from_source(
+            obs, values, source_id, local_ids
+        ) or None
         if exploded and isinstance(values.get("series"), list):
             before = self._count(source_key).observations_out
             for item in exploded:
@@ -2704,6 +2737,7 @@ class Migrator:
                     uncertainty=uncertainty_for(obs.get("uncertainty")),
                     units=str(obs.get("units") or ""),
                     read_from=read_from,
+                    derived_from=derived_from,
                 )
             if self._count(source_key).observations_out > before:
                 return
@@ -2729,6 +2763,16 @@ class Migrator:
             locator=locator,
             read_from=read_from,
             point_conditions=point_conditions,
+            derived_from=derived_from,
+        )
+        self._queue_unstated_derived_lineage(
+            work.work_id,
+            locator,
+            source_key,
+            obs_id,
+            evidence,
+            derived_from,
+            None,
         )
         self._add_observation(observation, source_key)
 
@@ -2748,6 +2792,7 @@ class Migrator:
         uncertainty: Uncertainty,
         units: str,
         read_from: str,
+        derived_from: tuple[str, ...] | None = None,
     ) -> None:
         raw_item = item.get("item")
         index = item.get("index", 0)
@@ -2903,9 +2948,55 @@ class Migrator:
             locator=point_locator,
             read_from=read_from,
             point_conditions=point_conditions,
+            derived_from=derived_from,
             derivation=derivation,
         )
+        self._queue_unstated_derived_lineage(
+            work.work_id,
+            point_locator,
+            source_key,
+            point_id,
+            evidence,
+            derived_from,
+            derivation,
+        )
         self._add_observation(observation, source_key)
+
+    def _queue_unstated_derived_lineage(
+        self,
+        work_id: str,
+        locator: Locator,
+        source_key: str,
+        observation_id: str,
+        evidence: Evidence,
+        derived_from: tuple[str, ...] | None,
+        derivation: Derivation | None,
+    ) -> None:
+        if not evidence.class_.is_value:
+            return
+        if evidence.class_.value not in {
+            EvidenceClass.MODEL_DERIVED,
+            EvidenceClass.MEASURED_REDUCED,
+        }:
+            return
+        if not derived_from:
+            self.result.add_queue(
+                work_id,
+                locator,
+                ["derived_from"],
+                "derived evidence class with unstated ancestry; queued for page-grounding",
+                source=source_key,
+                observation_id=observation_id,
+            )
+        if derivation is None:
+            self.result.add_queue(
+                work_id,
+                locator,
+                ["derivation"],
+                "derived evidence class with unstated derivation; queued for page-grounding",
+                source=source_key,
+                observation_id=observation_id,
+            )
 
     # ------------------------------------------------------------------
     # Named sidecars + ledgers + compilations

@@ -360,7 +360,11 @@ def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
     assert works
     assert observations
     report = validate_corpus(works, experiments, observations, residuals=None)
-    assert report.hard_issues == ()
+    # J02 restored C(derived) derived_from+derivation. Unstated ancestry is a
+    # hard conditional_field, not a silent pass. Other reasons must stay zero.
+    for issue in report.hard_issues:
+        assert issue.reason.value == "conditional_field", issue
+        assert issue.path.endswith(".derived_from") or issue.path.endswith(".derivation"), issue
     assert extracts_v2.is_dir() or obs_dir.is_dir()
 
 
@@ -712,10 +716,54 @@ def test_g08_model_derived_keeps_table_destination(tmp_path: Path) -> None:
     obs = next(iter(result.observations.values()))
     assert obs.evidence.class_.is_value
     assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert not obs.derived_from
+
+
+def test_j02_model_derived_without_parent_is_conditional_field(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["values"]["method_class"] = "model_derived"
+    extract["species"]["Na"]["observations"][0]["values"].pop("series", None)
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    obs = next(iter(result.observations.values()))
+    assert obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert not obs.derived_from
+    assert obs.derivation is None
     report = validate_corpus(
         result.works, result.experiments, result.observations, residuals=None
     )
-    assert report.hard_issues == ()
+    paths = [i.path for i in report.hard_issues]
+    assert any(p.endswith(".derived_from") for p in paths), report.hard_issues
+    assert any(p.endswith(".derivation") for p in paths), report.hard_issues
+    assert all(
+        i.reason.value == "conditional_field"
+        for i in report.hard_issues
+        if i.path.endswith(".derived_from") or i.path.endswith(".derivation")
+    )
+    assert any(
+        "derived_from" in (e.axes or ()) or "derivation" in (e.axes or ())
+        for e in result.queue
+    )
+
+
+def test_j02_source_stated_derived_from_is_stored(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    parent = yaml.safe_load(yaml.safe_dump(extract["species"]["Na"]["observations"][0]))
+    parent["observation_id"] = "raw_parent"
+    parent["values"]["method_class"] = "measured_direct"
+    parent["values"].pop("series", None)
+    child = yaml.safe_load(yaml.safe_dump(parent))
+    child["observation_id"] = "derived_child"
+    child["values"]["method_class"] = "model_derived"
+    child["values"]["derived_from"] = "raw_parent"
+    extract["species"]["Na"]["observations"] = [parent, child]
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False)
+    child_obs = next(
+        o for o in result.observations.values() if "derived_child" in o.observation_id
+    )
+    assert child_obs.evidence.class_.value is EvidenceClass.MODEL_DERIVED
+    assert child_obs.derived_from == ("fixture-source::raw_parent",)
 
 
 def test_h08_fourteen_token_table_destinations_are_stored(tmp_path: Path) -> None:

@@ -701,6 +701,26 @@ def validate_observation(
                         "authority must be extrapolated",
                     )
                 )
+    if ev.is_value and ev.value in {
+        EvidenceClass.MODEL_DERIVED,
+        EvidenceClass.MEASURED_REDUCED,
+    }:
+        if not observation.derived_from:
+            issues.append(
+                _issue(
+                    f"{path}.derived_from",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "derived observation requires derived_from",
+                )
+            )
+        if observation.derivation is None:
+            issues.append(
+                _issue(
+                    f"{path}.derivation",
+                    RefusalReason.CONDITIONAL_FIELD,
+                    "derived observation requires derivation",
+                )
+            )
     if observation.derived_from:
         for parent in observation.derived_from:
             if parent not in observations:
