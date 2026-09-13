@@ -22,6 +22,7 @@ from simulator.battery.enums import (
     ExecutionState,
     IdentityEqualKind,
     MethodToken,
+    MetricOperation,
     NoticeKind,
     PerBasis,
     Phase,
@@ -32,9 +33,11 @@ from simulator.battery.enums import (
     ResidualStatus,
     SourceRelation,
     StateTag,
+    ValueKind,
 )
 from simulator.battery.identity import (
     Identity,
+    WallIdentity,
     atm_to_pa,
     bar_to_pa,
     celsius_to_kelvin,
@@ -44,14 +47,18 @@ from simulator.battery.identity import (
     rescale_energy_per_basis,
 )
 from simulator.battery.records import (
+    Admission,
     Annotations,
+    CandidateRequest,
     Composition,
     Derivation,
     Execution,
     Located,
     Notice,
+    Residual,
     ResidualRefusal,
     Species,
+    StandardState,
     State,
     Uncertainty,
     Value,
@@ -951,6 +958,600 @@ def test_r02_lineage_overlap_is_observation_table_not_work_or_asset() -> None:
         score_eligible=True,
     )
     assert validate_corpus([w], [exp], [ref, asset], [asset_res]).ok
+
+
+def _r03_vapour_pair():
+    ident = F.psat_identity("Na")
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r03-vap-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0.1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    return ident, w, exp, ref
+
+
+def test_r03_fallback_notice_blocks_vapour_score_eligible() -> None:
+    ident, w, exp, ref = _r03_vapour_pair()
+    notice = Notice(
+        kind=NoticeKind.FALLBACK,
+        affected_quantities=(Quantity.P_SAT,),
+        reason="fallback producer",
+        origin="adapter",
+        source="melt",
+        destination="vacuum-floor",
+    )
+    cand = F.engine_obs(
+        "r03-fallback-cand",
+        exp.experiment_id,
+        ident,
+        Decimal("1"),
+        notices=(notice,),
+    )
+    scored = F.residual(
+        "r03-fallback-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MISMATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=True,
+        notices=union_notices(cand.notices),
+    )
+    report = validate_corpus([w], [exp], [ref, cand], [scored])
+    assert not report.ok
+    clean = F.engine_obs("r03-fallback-clean", exp.experiment_id, ident, Decimal("0.1"))
+    control = F.residual(
+        "r03-fallback-clean",
+        ref.observation_id,
+        candidate=clean.observation_id,
+        status=ResidualStatus.MATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, clean], [control]).ok
+
+
+def test_r03_pressure_provenance_unknown_blocks_vapour_score_eligible() -> None:
+    ident, w, exp, ref = _r03_vapour_pair()
+    notice = Notice(
+        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        affected_quantities=(Quantity.P_SAT,),
+        reason="provenance unknown",
+        origin="candidate",
+    )
+    cand = F.engine_obs(
+        "r03-prov-cand",
+        exp.experiment_id,
+        ident,
+        Decimal("1"),
+        notices=(notice,),
+    )
+    scored = F.residual(
+        "r03-prov-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MISMATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=True,
+        notices=union_notices(cand.notices),
+    )
+    assert not validate_corpus([w], [exp], [ref, cand], [scored]).ok
+    clean = F.engine_obs("r03-prov-clean", exp.experiment_id, ident, Decimal("0.1"))
+    control = F.residual(
+        "r03-prov-clean",
+        ref.observation_id,
+        candidate=clean.observation_id,
+        status=ResidualStatus.MATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, clean], [control]).ok
+
+
+def test_r03_floor_inversion_blocks_regardless_of_original_magnitude() -> None:
+    from dataclasses import replace
+
+    ident, w, exp, ref = _r03_vapour_pair()
+    floor = replace(F.floor_notice(), original=Decimal("1e-60"))
+    cand = F.engine_obs(
+        "r03-tiny-floor-cand",
+        exp.experiment_id,
+        ident,
+        Decimal("1e-25"),
+        notices=(floor,),
+    )
+    scored = F.residual(
+        "r03-tiny-floor-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MISMATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=True,
+        notices=union_notices(cand.notices),
+    )
+    assert not validate_corpus([w], [exp], [ref, cand], [scored]).ok
+    clean = F.engine_obs("r03-tiny-floor-clean", exp.experiment_id, ident, Decimal("0.1"))
+    control = F.residual(
+        "r03-tiny-floor-clean",
+        ref.observation_id,
+        candidate=clean.observation_id,
+        status=ResidualStatus.MATCH,
+        rail=Rail.VAPOUR,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, clean], [control]).ok
+
+
+def test_r03_floor_notice_with_original_requires_band() -> None:
+    from dataclasses import replace
+
+    ident, w, exp, ref = _r03_vapour_pair()
+    missing_band = replace(F.floor_notice(), band=None)
+    obs = F.observation(
+        "r03-floor-no-band",
+        exp.experiment_id,
+        ident,
+        Decimal("1e-25"),
+        notices=(missing_band,),
+    )
+    report = validate_corpus([w], [exp], [obs])
+    assert not report.ok
+    assert any("original and band" in i.detail for i in report.issues)
+    complete = F.observation(
+        "r03-floor-band-ok",
+        exp.experiment_id,
+        ident,
+        Decimal("1e-25"),
+        notices=(F.floor_notice(),),
+    )
+    assert validate_corpus([w], [exp], [complete]).ok
+
+
+def test_r03_out_of_certified_band_forbids_certified() -> None:
+    ident, w, exp, _ref = _r03_vapour_pair()
+    notice = Notice(
+        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+        affected_quantities=(Quantity.P_SAT,),
+        reason="outside certified temperature domain",
+        origin="candidate",
+        band="1000..1100 K",
+    )
+    certified = F.engine_obs(
+        "r03-band-certified",
+        exp.experiment_id,
+        ident,
+        Decimal("1"),
+        authority=Authority.CERTIFIED,
+        notices=(notice,),
+        certified_band={"temperature_K": (Decimal("1000"), Decimal("1100"))},
+    )
+    report = validate_corpus([w], [exp], [certified])
+    assert not report.ok
+    assert any("extrapolated" in i.detail for i in report.issues)
+    extrapolated = F.engine_obs(
+        "r03-band-extrapolated",
+        exp.experiment_id,
+        ident,
+        Decimal("1"),
+        authority=Authority.EXTRAPOLATED,
+        notices=(notice,),
+        certified_band={"temperature_K": (Decimal("1000"), Decimal("1100"))},
+    )
+    assert validate_corpus([w], [exp], [extrapolated]).ok
+    clean = F.engine_obs("r03-band-clean", exp.experiment_id, ident, Decimal("1"))
+    assert validate_corpus([w], [exp], [clean]).ok
+
+
+def test_r03_superseded_admission_cannot_score() -> None:
+    from dataclasses import replace
+
+    ident = F.activity_identity()
+    w = F.work()
+    exp = F.tabulation_experiment()
+    kept = F.observation(
+        "r03-kept",
+        exp.experiment_id,
+        ident,
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    superseded = F.observation(
+        "r03-superseded",
+        exp.experiment_id,
+        ident,
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        admission=AdmissionStatus.SUPERSEDED,
+    )
+    superseded = replace(
+        superseded,
+        admission=replace(superseded.admission, superseded_by=kept.observation_id),
+    )
+    cand = F.engine_obs("r03-sup-cand", exp.experiment_id, ident, Decimal("0.5"))
+    bad = F.residual(
+        "r03-sup-scored",
+        superseded.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+        rail=Rail.MELT_ACTIVITY,
+    )
+    report = validate_corpus([w], [exp], [kept, superseded, cand], [bad])
+    assert not report.ok
+    assert any(i.reason is RefusalReason.ADMISSION_NOT_ADMITTED for i in report.issues)
+    good = F.residual(
+        "r03-sup-control",
+        kept.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+        rail=Rail.MELT_ACTIVITY,
+    )
+    assert validate_corpus([w], [exp], [kept, superseded, cand], [good]).ok
+
+
+def test_r03_produced_execution_requires_candidate() -> None:
+    ident = F.o2_identity()
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r03-prod-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    missing = Residual(
+        key="r03-produced-missing",
+        reference=ref.observation_id,
+        execution=Execution(state=ExecutionState.PRODUCED),
+        rail=Rail.THERMOCHEMISTRY,
+        status=ResidualStatus.REFUSED,
+        source_relation=SourceRelation.UNKNOWN,
+        score_eligible=False,
+        exclusions=(),
+        notices=(),
+        candidate=None,
+        candidate_request=CandidateRequest(
+            exp.experiment_id, Quantity.DELTA_FG, Engine.NASA_CEA_9, "cea"
+        ),
+        refusal=ResidualRefusal(RefusalReason.ATTEMPTED_UNAVAILABLE, {"channel": "cea"}),
+    )
+    report = validate_corpus([w], [exp], [ref], [missing])
+    assert not report.ok
+    assert any("produced execution requires candidate" in i.detail for i in report.issues)
+    cand = F.engine_obs("r03-prod-cand", exp.experiment_id, ident, Decimal("0"))
+    control = F.residual(
+        "r03-produced-ok",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, cand], [control]).ok
+
+
+def test_r03_numeric_branch_forbids_refusal_payload() -> None:
+    from dataclasses import replace
+
+    ident = F.o2_identity()
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r03-num-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r03-num-cand", exp.experiment_id, ident, Decimal("0"))
+    match = F.residual(
+        "r03-num-match",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, cand], [match]).ok
+    with_refusal = replace(
+        match,
+        key="r03-num-refusal",
+        refusal=ResidualRefusal(RefusalReason.IDENTITY_MISMATCH, {"fields": ["quantity"]}),
+    )
+    report = validate_corpus([w], [exp], [ref, cand], [with_refusal])
+    assert not report.ok
+    assert any("numeric branch forbids refusal" in i.detail for i in report.issues)
+
+
+def test_r03_match_mismatch_requires_numeric() -> None:
+    ident = F.o2_identity()
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r03-match-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r03-match-cand", exp.experiment_id, ident, Decimal("0"))
+    missing = Residual(
+        key="r03-match-no-numeric",
+        reference=ref.observation_id,
+        execution=Execution(state=ExecutionState.PRODUCED),
+        rail=Rail.THERMOCHEMISTRY,
+        status=ResidualStatus.MATCH,
+        source_relation=SourceRelation.INDEPENDENT,
+        score_eligible=False,
+        exclusions=(),
+        notices=(),
+        candidate=cand.observation_id,
+        numeric=None,
+        refusal=None,
+    )
+    report = validate_corpus([w], [exp], [ref, cand], [missing])
+    assert not report.ok
+    assert any("match/mismatch requires numeric" in i.detail for i in report.issues)
+    control = F.residual(
+        "r03-match-numeric-ok",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, cand], [control]).ok
+
+
+def test_r03_score_eligible_requires_measured_evidence() -> None:
+    ident = F.o2_identity()
+    w = F.work()
+    exp = F.tabulation_experiment()
+    compiled = F.observation(
+        "r03-compiled",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.COMPILATION_ASSESSED,
+    )
+    cand = F.engine_obs("r03-meas-cand", exp.experiment_id, ident, Decimal("0"))
+    bad = F.residual(
+        "r03-compiled-scored",
+        compiled.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    report = validate_corpus([w], [exp], [compiled, cand], [bad])
+    assert not report.ok
+    assert any("measured_*" in i.detail for i in report.issues)
+    measured = F.observation(
+        "r03-measured",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    good = F.residual(
+        "r03-measured-scored",
+        measured.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [measured, cand], [good]).ok
+
+
+def test_r03_no_output_residual_requires_candidate_request() -> None:
+    ident = F.o2_identity()
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r03-req-ref",
+        exp.experiment_id,
+        ident,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    missing = Residual(
+        key="r03-no-request",
+        reference=ref.observation_id,
+        execution=Execution(state=ExecutionState.UNSUPPORTED),
+        rail=Rail.THERMOCHEMISTRY,
+        status=ResidualStatus.REFUSED,
+        source_relation=SourceRelation.UNKNOWN,
+        score_eligible=False,
+        exclusions=(),
+        notices=(),
+        candidate=None,
+        candidate_request=None,
+        refusal=ResidualRefusal(RefusalReason.UNSUPPORTED, {"channel": "melts"}),
+    )
+    report = validate_corpus([w], [exp], [ref], [missing])
+    assert not report.ok
+    assert any("candidate_request" in i.detail for i in report.issues)
+    control = F.residual(
+        "r03-request-ok",
+        ref.observation_id,
+        status=ResidualStatus.REFUSED,
+        execution=ExecutionState.UNSUPPORTED,
+        refusal=ResidualRefusal(RefusalReason.UNSUPPORTED, {"channel": "melts"}),
+    )
+    assert control.candidate_request is not None
+    assert validate_corpus([w], [exp], [ref], [control]).ok
+
+
+def test_r03_p4o10_component_basis_difference_is_mismatch() -> None:
+    p2o5 = F.activity_identity(formula="P2O5", component_basis="P2O5")
+    p4o10 = F.activity_identity(formula="P2O5", component_basis="P4O10")
+    outcome = identity_equal(p2o5, p4o10)
+    assert outcome.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert identity_equal(
+        p2o5, F.activity_identity(formula="P2O5", component_basis="P2O5")
+    ).kind is IdentityEqualKind.EQUAL
+
+
+def test_r03_reference_pressure_bar_difference_is_mismatch() -> None:
+    from dataclasses import replace
+
+    a = F.activity_identity()
+    ss = a.reference_state.value
+    assert isinstance(ss, StandardState)
+    b = replace(
+        a,
+        reference_state=State.of(replace(ss, reference_pressure_bar=Decimal("1.01325"))),
+    )
+    assert identity_equal(a, b).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert identity_equal(a, F.activity_identity()).kind is IdentityEqualKind.EQUAL
+
+
+def test_r03_value_branch_exclusivity_without_nan() -> None:
+    with pytest.raises(ValueError):
+        Value(
+            kind=ValueKind.POINT,
+            point=Decimal("1"),
+            bound_operator="<",
+            bound_value=Decimal("1"),
+        )
+    assert Value.point_of(Decimal("1")).point == Decimal("1")
+
+
+def test_r03_composition_nonnegativity_without_duplicate_keys() -> None:
+    with pytest.raises(ValueError, match="nonnegative"):
+        Composition(
+            "ordered_complete_mole_inventory",
+            (("Na2O", Decimal("-0.1")),),
+            AmountBasis.MOLE_FRACTION,
+        )
+    control = Composition(
+        "ordered_complete_mole_inventory",
+        (("Na2O", Decimal("0.1")),),
+        AmountBasis.MOLE_FRACTION,
+    )
+    assert control.components[0][1] == Decimal("0.1")
+
+
+def test_r03_decided_admission_requires_decided_by() -> None:
+    from dataclasses import replace
+
+    ident = F.o2_identity()
+    w = F.work()
+    exp = F.tabulation_experiment()
+    admitted = F.observation("r03-decided-ok", exp.experiment_id, ident, Decimal("0"))
+    assert admitted.admission.decided_by is not None
+    assert validate_corpus([w], [exp], [admitted]).ok
+    missing = replace(
+        admitted,
+        observation_id="r03-decided-missing",
+        admission=Admission(AdmissionStatus.ADMITTED, "canonical", decided_by=None),
+    )
+    report = validate_corpus([w], [exp], [missing])
+    assert not report.ok
+    assert any("decided_by" in i.detail for i in report.issues)
+
+
+def test_r03_source_id_membership_with_valid_read_from() -> None:
+    from dataclasses import replace
+
+    ident = F.o2_identity()
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ok = F.observation("r03-src-ok", exp.experiment_id, ident, Decimal("0"))
+    assert ok.read_from == "pdf-1"
+    assert validate_corpus([w], [exp], [ok]).ok
+    bad = replace(ok, observation_id="r03-src-bad", source_id="not-in-work")
+    report = validate_corpus([w], [exp], [bad])
+    assert not report.ok
+    assert any("source_id" in i.detail for i in report.issues)
+
+
+def test_r03_fo2_reconciliation_vs_experiment_point_conditions() -> None:
+    from dataclasses import replace
+
+    ident = F.activity_identity(fO2_Pa=Decimal("1e-8"))
+    w = F.work()
+    exp = F.tabulation_experiment(T_K=ident.temperature_K.value)
+    exp = replace(
+        exp,
+        conditions={
+            "temperature_K": F.located(ident.temperature_K.value),
+            "fO2_Pa": F.located(Decimal("1e-8")),
+        },
+    )
+    matching = F.observation(
+        "r03-fo2-ok",
+        exp.experiment_id,
+        ident,
+        Decimal("0.5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    assert validate_corpus([w], [exp], [matching]).ok
+    disagreed = replace(
+        matching,
+        observation_id="r03-fo2-bad",
+        identity=replace(ident, fO2_Pa=State.of(Decimal("1e-2"))),
+        point_conditions={"temperature_K": F.located(ident.temperature_K.value)},
+    )
+    report = validate_corpus([w], [exp], [disagreed])
+    assert not report.ok
+    assert any(i.reason is RefusalReason.INVALID_IDENTITY for i in report.issues)
+
+
+def test_r03_union_fingerprint_honours_from_to_dropped_and_fraction() -> None:
+    fallback_a = Notice(
+        kind=NoticeKind.FALLBACK,
+        affected_quantities=(Quantity.P_SAT,),
+        reason="fallback producer",
+        origin="adapter",
+        source="from-a",
+        destination="to-a",
+    )
+    fallback_b = Notice(
+        kind=NoticeKind.FALLBACK,
+        affected_quantities=(Quantity.P_SAT,),
+        reason="fallback producer",
+        origin="adapter",
+        source="from-b",
+        destination="to-b",
+    )
+    assert union_notices((fallback_a,), (fallback_b,)) == (fallback_a, fallback_b)
+    assert union_notices((fallback_a,), (fallback_a,)) == (fallback_a,)
+    projected_a = Notice(
+        kind=NoticeKind.COMPOSITION_PROJECTED,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="dropped oxide",
+        origin="engine",
+        dropped=("P2O5",),
+        dropped_mass_fraction=Decimal("0.0152"),
+    )
+    projected_b = Notice(
+        kind=NoticeKind.COMPOSITION_PROJECTED,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="dropped oxide",
+        origin="engine",
+        dropped=("P2O5",),
+        dropped_mass_fraction=Decimal("0.02"),
+    )
+    assert union_notices((projected_a,), (projected_b,)) == (projected_a, projected_b)
+
+
+def test_r03_wall_identity_compares_area_and_location() -> None:
+    from dataclasses import replace
+
+    a = F.wall_deposit_identity()
+    wall = a.wall.value
+    assert isinstance(wall, WallIdentity)
+    area = replace(a, wall=State.of(replace(wall, area_m2=State.of(Decimal("0.99")))))
+    location = replace(a, wall=State.of(replace(wall, location=State.of("baffle"))))
+    area_out = identity_equal(a, area)
+    loc_out = identity_equal(a, location)
+    assert area_out.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert "wall.area_m2" in area_out.fields
+    assert loc_out.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert "wall.location" in loc_out.fields
+    assert identity_equal(a, F.wall_deposit_identity()).kind is IdentityEqualKind.EQUAL
 
 
 def test_m16_refused_residual_cannot_carry_a_numeric_score() -> None:
