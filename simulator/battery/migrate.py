@@ -25,9 +25,8 @@ Residuals are not generated (chunk 2). Pins are not touched.
 Absence is never a measured zero: missing admission/class/pressure/phase/
 method become ``unknown`` (or ``pending`` for admission), never admitted /
 certified / 101325 Pa / liquid / knudsen_effusion. Unknown rail spellings
-raise. Unmapped phase strings cannot be stored as ``State.unknown`` because
-``Species.phase`` is a closed enum — they are queued and the Observation is
-still emitted with a schema-required placeholder documented in the queue.
+raise. Unmapped phase strings are ``State.unknown`` on ``Species.phase``
+and queued; they are never stored as gas.
 """
 
 from __future__ import annotations
@@ -212,15 +211,22 @@ PAGE_METHOD_CLASSES = frozenset(
     }
 )
 
-# Closed automatic phase map only (v2.1 §Migration). Already-canonical
-# Phase enum values are accepted as themselves; everything else is queued.
-PHASE_MAP = {
+# Closed automatic phase map (v2.1 §Migration) plus already-canonical Phase
+# spellings (g/cr/l/aq/glass/supercooled_l). Extra rows are explicit
+# source-spelling entries only — no title inference, no substring heuristics.
+PHASE_MAP: dict[str, Phase] = {
     "gas": Phase.G,
     "condensed_solid": Phase.CR,
     "condensed_liquid": Phase.L,
+    "g": Phase.G,
+    "cr": Phase.CR,
+    "l": Phase.L,
+    "aq": Phase.AQ,
+    "glass": Phase.GLASS,
+    "supercooled_l": Phase.SUPERCOOLED_L,
+    # Reviewed source spelling: extract states solid arsenolite + polymorph.
+    "solid_arsenolite": Phase.CR,
 }
-for _phase in Phase:
-    PHASE_MAP.setdefault(_phase.value, _phase)
 
 TYPE_QUANTITY = {
     "psat_series": Quantity.P_SAT,
@@ -673,14 +679,19 @@ def unknown_pressure_environment(reason: str = "source does not state pressure")
     )
 
 
-def map_phase(raw: object) -> tuple[Phase | None, str | None]:
+def map_phase(raw: object) -> tuple[State[Phase], str | None]:
     if raw is None or raw == "":
-        return None, "missing"
+        return State.unknown("source does not state phase"), "missing phase"
     text = str(raw).strip()
+    if not text:
+        return State.unknown("source does not state phase"), "missing phase"
     mapped = PHASE_MAP.get(text) or PHASE_MAP.get(text.lower())
     if mapped is not None:
-        return mapped, None
-    return None, text
+        return State.of(mapped), None
+    return (
+        State.unknown(f"phase string {text!r} is not in the closed automatic map"),
+        text,
+    )
 
 
 def map_quantity(obs_type: str | None, values: Mapping[str, Any] | None) -> Quantity:
@@ -852,18 +863,28 @@ def uncertainty_for(raw: object) -> Uncertainty:
     return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=str(raw))
 
 
-def make_species(formula: str, phase: Phase) -> Species:
-    if phase is Phase.CR:
-        return Species(
-            formula=formula,
-            phase=phase,
-            polymorph=State.unknown("source does not state polymorph"),
-        )
-    return Species(
-        formula=formula,
-        phase=phase,
-        polymorph=State.not_applicable("not crystal"),
-    )
+def make_species(
+    formula: str,
+    phase: Phase | State[Phase],
+    polymorph: State[str] | None = None,
+) -> Species:
+    phase_state = phase if isinstance(phase, State) else State.of(phase)
+    token = phase_state.value if phase_state.is_value else None
+    if polymorph is None:
+        if token is Phase.CR:
+            polymorph = State.unknown("source does not state polymorph")
+        elif token is None:
+            polymorph = State.unknown("phase unknown; polymorph unresolved")
+        else:
+            polymorph = State.not_applicable("not crystal")
+    return Species(formula=formula, phase=phase_state, polymorph=polymorph)
+
+
+def polymorph_from_extract(obs: Mapping[str, Any]) -> State[str] | None:
+    form = obs.get("condensed_form")
+    if isinstance(form, Mapping) and form.get("polymorph"):
+        return State.of(str(form["polymorph"]))
+    return None
 
 
 def fill_identity(
@@ -1466,23 +1487,22 @@ class Migrator:
                 source=source_key,
                 observation_id=obs_id,
             )
-            phase = Phase.G
         elif unmapped_phase:
             measured.system_like_phases += 1
             self.result.add_queue(
                 work.work_id,
                 locator,
                 ["phase"],
-                f"phase string {unmapped_phase!r} is not in the closed automatic map; "
-                "Species.phase cannot be unknown so g is a schema placeholder",
+                f"phase string {unmapped_phase!r} is not in the closed automatic map",
                 source=source_key,
                 observation_id=obs_id,
             )
-            phase = Phase.G
         species_formula = str(values.get("formula") or formula)
         if values.get("formula"):
             measured.formulas += 1
-        species = make_species(species_formula, phase)
+        species = make_species(
+            species_formula, phase, polymorph=polymorph_from_extract(obs)
+        )
         quantity = map_quantity(obs_type, values)
         if values.get("quantity") and str(values.get("quantity")) not in QUANTITY_ALIASES:
             if obs_type not in TYPE_QUANTITY:
@@ -1854,8 +1874,17 @@ class Migrator:
                 )
                 assert loc is not None
                 formula = str(point.get("species") or "unknown")
-                phase, unmapped = map_phase("gas")
-                species = make_species(formula, phase or Phase.G)
+                phase, unmapped = map_phase(point.get("phase"))
+                if unmapped:
+                    self.result.add_queue(
+                        work.work_id,
+                        loc,
+                        ["phase"],
+                        "kems sidecar does not state a closed phase token",
+                        source=rel,
+                        observation_id=str(point.get("observable_id")),
+                    )
+                species = make_species(formula, phase)
                 t = _as_dec_or_none((point.get("coordinate") or {}).get("temperature_K"))
                 p = point.get("partial_pressure_pa")
                 if p is None:
@@ -1929,7 +1958,7 @@ class Migrator:
                         point.get("source_locator"), fallback=str(point.get("observable_id"))
                     )
                     assert loc is not None
-                    formula = str(point.get("species") or "O2")
+                    formula = str(point.get("species") or "unknown")
                     expected = point.get("expected_value")
                     value = (
                         Value.point_of(expected)
@@ -1948,7 +1977,9 @@ class Migrator:
                         quantity=Quantity.O2_YIELD
                         if "o2" in str(point.get("observable_id", "")).lower()
                         else Quantity.MASS_LOSS_FRACTION,
-                        species=make_species(formula, Phase.G),
+                        species=make_species(
+                            formula, map_phase(point.get("phase"))[0]
+                        ),
                         value=value,
                         evidence=Evidence(
                             class_=State.unknown("mre sidecar does not state method_class")
@@ -1977,6 +2008,16 @@ class Migrator:
             work = self._work_from_citation(citation, doi, str((src or {}).get("citation_id") or meas_id))
             loc = Locator(record=str(meas_id), note=citation)
             formula = str(meas.get("species") or "unknown")
+            phase, unmapped = map_phase(meas.get("phase"))
+            if unmapped:
+                self.result.add_queue(
+                    work.work_id,
+                    loc,
+                    ["phase"],
+                    "langmuir sidecar does not state a closed phase token",
+                    source=rel,
+                    observation_id=str(meas_id),
+                )
             payload = meas.get("measured_langmuir_to_effusion_flux_ratio") or {}
             if isinstance(payload, Mapping) and _as_dec_or_none(payload.get("value")) is not None:
                 value = Value.point_of(payload["value"])
@@ -2024,7 +2065,7 @@ class Migrator:
                 observation_id=str(meas_id),
                 locator=loc,
                 quantity=Quantity.EVAPORATION_COEFFICIENT_ALPHA,
-                species=make_species(formula, Phase.CR if "solid" in str(meas.get("material", "")).lower() else Phase.L),
+                species=make_species(formula, phase),
                 value=value,
                 evidence=Evidence(class_=State.of(EvidenceClass.MEASURED_DIRECT)),
                 temperature_K=t,
@@ -2059,7 +2100,16 @@ class Migrator:
                         table=str(payload.get("table") or formula),
                         record=str(payload.get("table") or formula),
                     )
-                    phase = Phase.G if bucket == "log10_kf" else Phase.CR
+                    phase, unmapped = map_phase(payload.get("phase"))
+                    if unmapped:
+                        self.result.add_queue(
+                            work.work_id,
+                            loc,
+                            ["phase"],
+                            "refractory node does not state a closed phase token",
+                            source=rel,
+                            observation_id=f"refractory:{bucket}:{formula}",
+                        )
                     val = payload.get("value")
                     self._generic_obs(
                         work=work,
@@ -2099,7 +2149,7 @@ class Migrator:
                     observation_id=f"cao_raw_pCa_{i}",
                     locator=loc,
                     quantity=Quantity.P_PARTIAL,
-                    species=make_species("Ca", Phase.G),
+                    species=make_species("Ca", map_phase(row.get("phase"))[0]),
                     value=Value.point_of(pa) if pa is not None else Value(
                         ValueKind.UNAVAILABLE, unavailable_reason="missing pressure_atm"
                     ),
@@ -2154,7 +2204,7 @@ class Migrator:
                 observation_id=obs_id,
                 locator=loc,
                 quantity=Quantity.DELTA_FG,
-                species=make_species(formula, Phase.G),
+                species=make_species(formula, map_phase(point.get("phase"))[0]),
                 value=value,
                 evidence=Evidence(
                     class_=State.of(EvidenceClass.COMPILATION_ASSESSED),
@@ -2352,7 +2402,7 @@ class Migrator:
             observation_id=f"{source_id}:{record_id}",
             locator=locator,
             quantity=quantity,
-            species=make_species(formula, phase or Phase.G),
+            species=make_species(formula, phase),
             value=value,
             evidence=evidence,
             temperature_K=t,
@@ -2374,33 +2424,20 @@ class Migrator:
         index_entry = table.get("index_entry") if isinstance(table.get("index_entry"), Mapping) else {}
         formula = str((index_entry or {}).get("formula") or table_id)
         state_token = str((index_entry or {}).get("state") or "")
-        phase, unmapped = map_phase(state_token if state_token in PHASE_MAP else None)
-        title = str(table.get("title_as_published") or "")
-        if phase is None:
-            if "(g)" in title or "gas" in title.lower() or state_token in {"g", "ref"}:
-                # "ref" is JANAF's elemental reference, not a closed phase.
-                if state_token == "ref":
-                    self.result.add_queue(
-                        work.work_id,
-                        {"table": table_id},
-                        ["phase"],
-                        "JANAF state=ref is not in the closed automatic map",
-                        source=rel,
-                        observation_id=table_id,
-                    )
-                phase = Phase.CR if state_token == "ref" else Phase.G
-            elif unmapped or state_token:
-                self.result.add_queue(
-                    work.work_id,
-                    {"table": table_id},
-                    ["phase"],
-                    f"JANAF state {state_token!r} not in closed map",
-                    source=rel,
-                    observation_id=table_id,
-                )
-                phase = Phase.G
-            else:
-                phase = Phase.G
+        phase, unmapped = map_phase(state_token or None)
+        if unmapped:
+            self.result.add_queue(
+                work.work_id,
+                {"table": table_id},
+                ["phase"],
+                (
+                    f"JANAF state {state_token!r} is not in the closed automatic map"
+                    if state_token
+                    else "JANAF table does not state a closed phase"
+                ),
+                source=rel,
+                observation_id=f"{source_id}:{table_id}",
+            )
         rows = table.get("values") or []
         count.rows_in += 1
         dg_points: list[tuple[Decimal, Decimal]] = []

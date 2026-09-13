@@ -60,6 +60,7 @@ from simulator.battery.records import (
     State,
     as_decimal,
     as_fraction,
+    phase_token,
 )
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
@@ -605,14 +606,35 @@ def _axis_state(identity: Identity, name: str) -> State[Any] | None:
     return getattr(identity, name)
 
 
+def _phase_state(species: Species) -> State[Phase]:
+    phase = species.phase
+    if isinstance(phase, State):
+        return phase
+    return State.of(phase)
+
+
 def _species_equal(a: Species, b: Species) -> IdentityEqualOutcome:
     fields: list[str] = []
+    unknown: list[str] = []
     if a.formula != b.formula:
         fields.append("species.formula")
-    if a.phase is not b.phase:
+    phase_cmp = _state_compare(
+        "species.phase", _phase_state(a), _phase_state(b), required=True
+    )
+    if phase_cmp.kind is IdentityEqualKind.IDENTITY_UNKNOWN:
+        unknown.append("species.phase")
+    elif phase_cmp.kind is IdentityEqualKind.IDENTITY_MISMATCH:
         fields.append("species.phase")
-    poly = _state_compare("species.polymorph", a.polymorph, b.polymorph, required=a.phase is Phase.CR)
-    if a.phase is Phase.CR:
+    elif phase_cmp.kind is IdentityEqualKind.INVALID_IDENTITY:
+        return phase_cmp
+    a_token = phase_token(a)
+    poly = _state_compare(
+        "species.polymorph",
+        a.polymorph,
+        b.polymorph,
+        required=a_token is Phase.CR,
+    )
+    if a_token is Phase.CR:
         if poly.kind is not IdentityEqualKind.EQUAL:
             return poly
         # Crystal phase requires a physically resolved polymorph value.
@@ -622,10 +644,12 @@ def _species_equal(a: Species, b: Species) -> IdentityEqualOutcome:
                 ("species.polymorph",),
                 "crystal phase requires a resolved polymorph",
             )
-    elif poly.kind is IdentityEqualKind.INVALID_IDENTITY:
+    elif a_token is not None and poly.kind is IdentityEqualKind.INVALID_IDENTITY:
         return poly
     if fields:
         return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_MISMATCH, tuple(fields))
+    if unknown:
+        return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_UNKNOWN, tuple(unknown))
     return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
 
 
@@ -824,7 +848,20 @@ def _reservoir_rule(identity: Identity) -> IdentityEqualOutcome | None:
             ("reservoir",),
             "p_sat reservoir must be the same formula as the gas species",
         )
-    if src.phase not in CONDENSED_PHASES:
+    token = phase_token(src)
+    if token is None:
+        if _phase_state(src).is_unknown:
+            return IdentityEqualOutcome(
+                IdentityEqualKind.IDENTITY_UNKNOWN,
+                ("reservoir",),
+                "reservoir phase unknown",
+            )
+        return IdentityEqualOutcome(
+            IdentityEqualKind.INVALID_IDENTITY,
+            ("reservoir",),
+            "p_sat reservoir must be condensed",
+        )
+    if token not in CONDENSED_PHASES:
         return IdentityEqualOutcome(
             IdentityEqualKind.INVALID_IDENTITY,
             ("reservoir",),

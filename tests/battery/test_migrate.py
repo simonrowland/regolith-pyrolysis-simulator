@@ -9,19 +9,22 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import AdmissionStatus, Phase, Rail, StateTag
-from simulator.battery.identity import atm_to_pa
+from simulator.battery.enums import AdmissionStatus, IdentityEqualKind, Phase, Rail, StateTag
+from simulator.battery.identity import atm_to_pa, identity_equal
 from simulator.battery.migrate import (
     REPO_ROOT,
     UnknownRailSpellingError,
     canonicalize_doi,
     canonicalize_rail,
     citation_hash,
+    map_phase,
     migrate,
     work_id_for,
     write_outputs,
 )
+from simulator.battery.records import Species, State
 from simulator.battery.validate import validate_corpus
+from tests.battery import factories as F
 
 FIXTURE_EXTRACT = {
     "schema_version": "literature_extract.v1",
@@ -173,7 +176,8 @@ def test_no_default_property_blanked_admission_is_unknown(tmp_path: Path) -> Non
     assert "does not state admission" in obs.admission.reason
     assert obs.evidence.class_.tag is StateTag.UNKNOWN
     # Phase was stated as gas — that is a lift, not a default.
-    assert obs.identity.species.phase is Phase.G
+    assert obs.identity.species.phase.is_value
+    assert obs.identity.species.phase.value is Phase.G
 
 
 def test_row_conservation_and_idempotency(tmp_path: Path) -> None:
@@ -237,3 +241,146 @@ def test_validate_corpus_zero_hard_issues_on_migrated_store() -> None:
         rows_in = int(cells[1])
         obs_out = int(cells[2])
         assert obs_out >= rows_in, line
+
+
+def _phase_state(obs):
+    return obs.identity.species.phase
+
+
+def test_g01_blank_phase_is_unknown_not_gas(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["phase"] = ""
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False, validate=True)
+    obs = next(iter(result.observations.values()))
+    phase = _phase_state(obs)
+    assert phase.is_unknown, phase
+    assert phase.value is None
+    report = validate_corpus(
+        result.works, result.experiments, result.observations, residuals=None
+    )
+    assert report.hard_issues == ()
+
+
+def test_g01_unmapped_and_sidecar_phases_are_unknown(tmp_path: Path) -> None:
+    """Grok P0-1 table: unmapped/missing source phases must not become g."""
+
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    rows = extract["species"]["Na"]["observations"]
+    base = rows[0]
+    mislifts = [
+        ("solid_arsenolite", {"condensed_form": {"polymorph": "arsenolite"}}),
+        ("silicate_melt", {}),
+        ("liquid_Fe_Mn_alloy", {}),
+        ("solid_metal", {}),
+        ("liquid_H2O_to_H2O_g", {}),
+        ("solid_O2_to_O2_g", {}),
+        ("", {}),
+        ("steelmaking_silicate_slag", {}),
+        ("graphite", {}),
+        ("ref", {}),
+        ("cr,l", {}),
+    ]
+    rows.clear()
+    for i, (phase, extra) in enumerate(mislifts):
+        row = yaml.safe_load(yaml.safe_dump(base))
+        row["observation_id"] = f"mislift_{i}"
+        row["phase"] = phase
+        row.update(extra)
+        rows.append(row)
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False, validate=True)
+
+    def by_prefix(suffix: str):
+        matches = [o for o in result.observations.values() if suffix in o.observation_id]
+        assert matches, sorted(result.observations)
+        return matches[0]
+
+    arsenolite = by_prefix("mislift_0")
+    assert arsenolite.identity.species.phase.is_value
+    assert arsenolite.identity.species.phase.value is Phase.CR
+    assert arsenolite.identity.species.polymorph is not None
+    assert arsenolite.identity.species.polymorph.is_value
+    assert arsenolite.identity.species.polymorph.value == "arsenolite"
+    for i, (phase, _extra) in enumerate(mislifts[1:], start=1):
+        obs = by_prefix(f"mislift_{i}")
+        stored = _phase_state(obs)
+        assert stored.is_unknown, (phase, stored)
+        assert stored.value is not Phase.G
+        assert stored.value is not Phase.CR
+
+
+def test_g01_sidecar_without_phase_is_unknown(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    lit = root / "data" / "literature"
+    (lit / "kems_measurements.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "sources": {
+                    "kems-src": {
+                        "citation": "KEMS sidecar fixture",
+                        "doi": "10.1234/KEMS",
+                    }
+                },
+                "cases": {
+                    "case": {
+                        "source_id": "kems-src",
+                        "points": [
+                            {
+                                "observable_id": "kems_no_phase",
+                                "species": "Ca",
+                                "coordinate": {"temperature_K": 2000.0},
+                                "partial_pressure_pa": 1.0,
+                                "source_locator": {"figure": 1},
+                            }
+                        ],
+                    }
+                },
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    result = migrate(root, write=False, validate=True)
+    kems = result.observations["kems_no_phase"]
+    assert kems.identity.species.phase.is_unknown
+
+
+def test_g01_identity_unknown_phase_never_equals() -> None:
+    from dataclasses import replace
+
+    known = F.psat_identity("Na")
+    unknown_species = Species(
+        "Na",
+        State.unknown("source does not state phase"),
+        polymorph=State.unknown("phase unknown"),
+    )
+    unknown = replace(known, species=unknown_species)
+    outcome = identity_equal(known, unknown)
+    assert outcome.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    assert "species.phase" in outcome.fields
+    both_unknown = identity_equal(unknown, unknown)
+    assert both_unknown.kind is IdentityEqualKind.IDENTITY_UNKNOWN
+    exp = F.tabulation_experiment()
+    report = validate_corpus(
+        [F.work()],
+        [exp],
+        [F.observation("unk-phase", exp.experiment_id, unknown, 1)],
+    )
+    assert report.hard_issues == ()
+
+
+def test_g01_map_phase_refuses_heuristics() -> None:
+    mapped, why = map_phase("gas")
+    assert mapped.is_value and mapped.value is Phase.G and why is None
+    mapped, why = map_phase("condensed_solid")
+    assert mapped.is_value and mapped.value is Phase.CR and why is None
+    mapped, why = map_phase("")
+    assert mapped.is_unknown and why is not None
+    mapped, why = map_phase("ref")
+    assert mapped.is_unknown
+    mapped, why = map_phase("cr,l")
+    assert mapped.is_unknown
+    mapped, why = map_phase("silicate_melt")
+    assert mapped.is_unknown

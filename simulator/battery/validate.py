@@ -74,6 +74,7 @@ from simulator.battery.records import (
     Species,
     Work,
     as_decimal,
+    phase_token,
     union_notices,
 )
 from simulator.battery.validity import run_validity_gates
@@ -224,7 +225,7 @@ def _is_printed_observation(observation: Observation) -> bool:
 def _table_identity_matches(left: Identity, right: Identity) -> bool:
     return (
         left.species.formula == right.species.formula
-        and left.species.phase is right.species.phase
+        and left.species.phase == right.species.phase
         and left.temperature_K == right.temperature_K
         and left.reaction == right.reaction
         and left.per == right.per
@@ -320,7 +321,8 @@ def reaction_atom_balance(reaction: Reaction) -> dict[str, float]:
 
 
 def _check_species(path: str, species: Species, issues: list[ValidationIssue]) -> None:
-    if species.phase is Phase.CR:
+    token = phase_token(species)
+    if token is Phase.CR:
         if species.polymorph is None:
             issues.append(
                 _issue(
@@ -337,6 +339,8 @@ def _check_species(path: str, species: Species, issues: list[ValidationIssue]) -
                     "crystal polymorph cannot be not_applicable",
                 )
             )
+    elif token is None:
+        return
     elif species.polymorph is not None and species.polymorph.is_value:
         issues.append(
             _issue(

@@ -193,14 +193,35 @@ class Located(Generic[T]):
 @dataclass(frozen=True)
 class Species:
     formula: str
-    phase: Phase
+    phase: State[Phase] | Phase
     polymorph: State[str] | None = None
 
     def __post_init__(self) -> None:
         if not self.formula:
             raise ValueError("Species.formula is required")
-        if self.phase not in Phase:
-            raise ValueError(f"Species.phase must be a closed Phase token, not {self.phase!r}")
+        phase = self.phase
+        if isinstance(phase, Phase):
+            object.__setattr__(self, "phase", State.of(phase))
+            phase = self.phase
+        if not isinstance(phase, State):
+            raise ValueError(
+                f"Species.phase must be a closed Phase token or State[Phase], not {phase!r}"
+            )
+        if phase.is_value and phase.value not in Phase:
+            raise ValueError(
+                f"Species.phase must be a closed Phase token, not {phase.value!r}"
+            )
+
+
+def phase_token(species: Species) -> Phase | None:
+    """Closed Phase token when the axis is a value; None for unknown / n/a."""
+
+    phase = species.phase
+    if isinstance(phase, Phase):
+        return phase
+    if isinstance(phase, State) and phase.is_value:
+        return phase.value
+    return None
 
 
 @dataclass(frozen=True)

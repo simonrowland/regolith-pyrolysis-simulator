@@ -2726,7 +2726,7 @@ def test_pi_p1_1_formation_elements_na_liquid_vs_gas() -> None:
     assert outcome.kind is IdentityEqualKind.IDENTITY_MISMATCH
     assert "formation_elements" in outcome.fields or "species.phase" in str(outcome.fields)
     # Same product Na2O(l) but elemental Na(l) vs Na(g).
-    assert liquid.species.phase is gas.species.phase
+    assert liquid.species.phase == gas.species.phase
     assert outcome.fields == ("formation_elements",) or "formation_elements" in outcome.fields
 
 
