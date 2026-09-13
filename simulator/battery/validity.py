@@ -19,9 +19,12 @@ Ambiguity resolutions:
   Millibar bench kinetic experiments are out of this gate's scope.
 - Apparatus determinants are those the actual derivation needs: effusion
   pressure requires orifice area + Clausing/geometry; Langmuir
-  pressure/alpha requires exposed area. Missing required geometry is
-  ``underdetermined_apparatus``. Archival storage of incomplete apparatus
-  is allowed; the gate fails the comparison, not the record.
+  pressure/alpha requires exposed area. Determinants must be grounded
+  VALUES (unknown calibration fails), physically valid (area > 0,
+  Clausing in (0, 1]), and present for TGA/solar/vacuum kinetic area.
+  Missing required geometry is ``underdetermined_apparatus``. Archival
+  storage of incomplete apparatus is allowed; the gate fails the
+  comparison, not the record.
 """
 
 from __future__ import annotations
@@ -92,6 +95,29 @@ def _located_decimal(located: Located[Decimal] | None) -> Decimal | None:
     if located is None or not located.state.is_value or located.state.value is None:
         return None
     return as_decimal(located.state.value)
+
+
+def _finite_positive(located: Located[Decimal] | None) -> Decimal | None:
+    value = _located_decimal(located)
+    if value is None or not value.is_finite() or value <= 0:
+        return None
+    return value
+
+
+def _clausing_ok(located: Located[Decimal] | None) -> bool:
+    value = _located_decimal(located)
+    return value is not None and value.is_finite() and value > 0 and value <= 1
+
+
+def _calibration_grounded(calibration: object) -> bool:
+    if not calibration or not isinstance(calibration, dict):
+        return False
+    for located in calibration.values():
+        if not isinstance(located, Located):
+            return False
+        if not located.state.is_value or located.state.value is None:
+            return False
+    return True
 
 
 def table_self_consistency(
@@ -198,17 +224,18 @@ def underdetermined_apparatus(
         if geometry is None:
             missing.extend(["orifice_area_m2", "clausing_factor"])
         else:
-            if _located_decimal(geometry.orifice_area_m2) is None and _located_decimal(
-                geometry.orifice_diameter_m
-            ) is None:
+            if (
+                _finite_positive(geometry.orifice_area_m2) is None
+                and _finite_positive(geometry.orifice_diameter_m) is None
+            ):
                 missing.append("orifice_area_m2")
-            if _located_decimal(geometry.clausing_factor) is None:
+            if not _clausing_ok(geometry.clausing_factor):
                 missing.append("clausing_factor")
         calibration = None if experiment.apparatus is None else experiment.apparatus.calibration
-        if not calibration:
+        if not _calibration_grounded(calibration):
             missing.append("calibration")
     if _is_langmuir_pressure_or_alpha(method, quantity):
-        if geometry is None or _located_decimal(geometry.exposed_area_m2) is None:
+        if geometry is None or _finite_positive(geometry.exposed_area_m2) is None:
             missing.append("exposed_area_m2")
     if _is_kinetic_or_yield(quantity) and method in {
         MethodToken.KNUDSEN_EFFUSION,
@@ -222,8 +249,8 @@ def underdetermined_apparatus(
             if not wall or "temperature_K" not in wall or "material" not in wall:
                 missing.append("wall.temperature_K/material")
         if geometry is None or (
-            _located_decimal(geometry.exposed_area_m2) is None
-            and _located_decimal(geometry.orifice_area_m2) is None
+            _finite_positive(geometry.exposed_area_m2) is None
+            and _finite_positive(geometry.orifice_area_m2) is None
         ):
             if method is MethodToken.LANGMUIR_FREE_EVAPORATION:
                 if "exposed_area_m2" not in missing:
@@ -231,6 +258,8 @@ def underdetermined_apparatus(
             elif method is MethodToken.KNUDSEN_EFFUSION:
                 if "orifice_area_m2" not in missing:
                     missing.append("orifice_area_m2")
+            elif "exposed_area_m2" not in missing:
+                missing.append("exposed_area_m2")
     checks.append(
         GateCheck(
             "geometry_determinants",

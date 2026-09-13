@@ -236,6 +236,42 @@ def test_m06_clamp_emits_floor_inversion_with_original_and_band() -> None:
     assert clean.notices == ()
 
 
+def test_m07_apparatus_rejects_unknown_calibration_and_invalid_geometry() -> None:
+    """Grounded, physically valid determinants; TGA kinetic area is required."""
+
+    from dataclasses import replace
+
+    from simulator.battery.records import Apparatus, ApparatusGeometry, Located
+
+    ke = F.kems_experiment()
+    bad_geometry = ApparatusGeometry(
+        orifice_area_m2=Located(State.of(Decimal("-1")), locator=F.loc()),
+        clausing_factor=Located(State.of(Decimal("0")), locator=F.loc()),
+    )
+    unknown_cal = {"constant": Located(State.unknown("not known"), locator=F.loc())}
+    bad = replace(
+        ke,
+        apparatus=Apparatus(geometry=bad_geometry, calibration=unknown_cal),
+    )
+    bad_gate = underdetermined_apparatus(bad, Quantity.P_SAT)
+    assert bad_gate.passed is False
+    assert bad_gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    missing = next(c.detail["missing"] for c in bad_gate.checks if c.name == "geometry_determinants")
+    assert "orifice_area_m2" in missing
+    assert "clausing_factor" in missing
+    assert "calibration" in missing
+    tga = F.tabulation_experiment(method=MethodToken.TGA)
+    tga_gate = underdetermined_apparatus(tga, Quantity.MASS_LOSS_RATE)
+    assert tga_gate.passed is False
+    assert tga_gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    complete = F.kems_experiment()
+    assert underdetermined_apparatus(complete, Quantity.P_SAT).passed
+    assert run_validity_gates(
+        complete,
+        F.observation("kems-ok-geom", complete.experiment_id, F.psat_identity("Na"), Decimal("1")),
+    ).passed
+
+
 def test_m07_wall_identity_and_determinants_required_for_deposit() -> None:
     a = F.wall_deposit_identity(wall_T=Decimal("1673.15"), wall_material="SiO2")
     b = F.wall_deposit_identity(wall_T=Decimal("1773.15"), wall_material="SiO2")
