@@ -1,7 +1,9 @@
 """Referential integrity and conditional-field rules (v2.1).
 
-Order: this validator, then validity gates, then identity_equal, then
-metric/score policy (chunk 2). Missing required identity axes become
+Order: this validator, then validity gates (``run_validity_gates`` on
+each Residual's reference), then identity_equal, then metric/score
+policy (chunk 2). A failed gate requires Residual.status=refused, no
+numeric, score_eligible=false. Missing required identity axes become
 ``unknown`` for archival storage; they never equal another hole.
 
 Ambiguity resolutions:
@@ -66,6 +68,7 @@ from simulator.battery.records import (
     Species,
     Work,
 )
+from simulator.battery.validity import run_validity_gates
 from simulator.reference_data.janaf import formula_composition
 
 
@@ -110,6 +113,54 @@ class ValidationReport:
 
 def _issue(path: str, reason: RefusalReason, detail: str) -> ValidationIssue:
     return ValidationIssue(path, reason, detail)
+
+
+def _table_payload(
+    reference: Observation,
+    observations: Mapping[str, Observation],
+) -> dict | None:
+    """Paired ΔfG / log10_Kf printed values at the same identity point."""
+
+    ident = reference.identity
+    if not isinstance(ident, Identity):
+        return None
+    if ident.quantity not in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
+        return None
+    want = Quantity.LOG10_KF if ident.quantity is Quantity.DELTA_FG else Quantity.DELTA_FG
+    sibling = None
+    for other in observations.values():
+        if other.observation_id == reference.observation_id:
+            continue
+        if other.experiment_id != reference.experiment_id:
+            continue
+        other_ident = other.identity
+        if not isinstance(other_ident, Identity) or other_ident.quantity is not want:
+            continue
+        if other_ident.species.formula != ident.species.formula:
+            continue
+        if other_ident.species.phase is not ident.species.phase:
+            continue
+        if ident.temperature_K != other_ident.temperature_K:
+            continue
+        sibling = other
+        break
+    if sibling is None:
+        return None
+    delta_obs = reference if ident.quantity is Quantity.DELTA_FG else sibling
+    log_obs = sibling if ident.quantity is Quantity.DELTA_FG else reference
+    if delta_obs.value.kind is not ValueKind.POINT or log_obs.value.kind is not ValueKind.POINT:
+        return None
+    if ident.temperature_K is None or not ident.temperature_K.is_value:
+        return None
+    return {
+        "delta_fG_kJ_mol": delta_obs.value.point,
+        "log10_Kf": log_obs.value.point,
+        "T_K": ident.temperature_K.value,
+        "per": None if ident.per is None or not ident.per.is_value else ident.per.value,
+        "standard_pressure_Pa": None
+        if ident.standard_pressure_Pa is None or not ident.standard_pressure_Pa.is_value
+        else ident.standard_pressure_Pa.value,
+    }
 
 
 def _pressure_blocking_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
@@ -605,6 +656,25 @@ def validate_residual(
                     "candidate_request.experiment_id does not resolve",
                 )
             )
+    if reference is not None:
+        experiment = experiments.get(reference.experiment_id)
+        if experiment is not None:
+            table = _table_payload(reference, observations)
+            gates = run_validity_gates(experiment, reference, table=table)
+            if not gates.passed:
+                if (
+                    residual.score_eligible
+                    or residual.status is not ResidualStatus.REFUSED
+                    or residual.numeric is not None
+                ):
+                    issues.append(
+                        _issue(
+                            path,
+                            gates.reason or RefusalReason.INVALID_SOURCE,
+                            "validity gate failed; residual must be refused with no numeric "
+                            f"and score_eligible=false ({gates.primary_check})",
+                        )
+                    )
     if residual.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}:
         if (
             reference is not None

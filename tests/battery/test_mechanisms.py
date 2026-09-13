@@ -69,7 +69,9 @@ from tests.battery import factories as F
 
 
 def test_m01_inconsistent_o2_table_is_invalid_source() -> None:
-    """O2 ΔfG=0 and logK=−59.154 → invalid_source; consistent 0/0 passes."""
+    """O2 ΔfG=0 and logK=−59.154 → invalid_source before comparison; 0/0 passes."""
+
+    from dataclasses import replace
 
     bad = table_self_consistency(
         delta_fG_kJ_mol=Decimal("0"),
@@ -89,6 +91,60 @@ def test_m01_inconsistent_o2_table_is_invalid_source() -> None:
     )
     assert good.passed is True
     assert good.reason is None
+
+    ident_g = F.o2_identity()
+    ident_k = replace(ident_g, quantity=Quantity.LOG10_KF)
+    w = F.work()
+    exp = F.tabulation_experiment()
+    dg = F.observation(
+        "o2-dg",
+        exp.experiment_id,
+        ident_g,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    lk_bad = F.observation(
+        "o2-lk-bad",
+        exp.experiment_id,
+        ident_k,
+        Decimal("-59.154"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("o2-eng", exp.experiment_id, ident_g, Decimal("0"))
+    scored = F.residual(
+        "m01-scored",
+        dg.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    scored_report = validate_corpus([w], [exp], [dg, lk_bad, cand], [scored])
+    assert not scored_report.ok
+    assert any(i.reason is RefusalReason.INVALID_SOURCE for i in scored_report.issues)
+    refused = F.residual(
+        "m01-refused",
+        dg.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.REFUSED,
+        refusal=ResidualRefusal(RefusalReason.INVALID_SOURCE, {"gate": "table"}),
+        score_eligible=False,
+    )
+    assert validate_corpus([w], [exp], [dg, lk_bad, cand], [refused]).ok
+    lk_good = F.observation(
+        "o2-lk-good",
+        exp.experiment_id,
+        ident_k,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    consistent = F.residual(
+        "m01-consistent",
+        dg.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [dg, lk_good, cand], [consistent]).ok
 
 
 def test_m02_floor_notice_keeps_numeric_but_not_score_eligible() -> None:
@@ -283,6 +339,36 @@ def test_m07_wall_identity_and_determinants_required_for_deposit() -> None:
     gate = underdetermined_apparatus(exp, Quantity.WALL_DEPOSIT_MASS)
     assert gate.passed is False
     assert gate.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    w = F.work()
+    ref = F.observation(
+        "wall-ref",
+        exp.experiment_id,
+        a,
+        Decimal("0.001"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("wall-cand", exp.experiment_id, a, Decimal("0.001"))
+    scored = F.residual(
+        "m07-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+        rail=Rail.WALL_DEPOSITION,
+    )
+    scored_report = validate_corpus([w], [exp], [ref, cand], [scored])
+    assert not scored_report.ok
+    assert any(i.reason is RefusalReason.UNDERDETERMINED_APPARATUS for i in scored_report.issues)
+    refused = F.residual(
+        "m07-refused",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.REFUSED,
+        refusal=ResidualRefusal(RefusalReason.UNDERDETERMINED_APPARATUS, {"missing": ["wall"]}),
+        score_eligible=False,
+        rail=Rail.WALL_DEPOSITION,
+    )
+    assert validate_corpus([w], [exp], [ref, cand], [refused]).ok
 
 
 def test_m08_out_of_gamma_domain_is_extrapolated_notice_not_certified() -> None:
