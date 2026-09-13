@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import math
 from pathlib import Path
 
 import pytest
@@ -29,7 +30,13 @@ from simulator.diagnostic_helpers.species_rail import (
 from simulator.diagnostic_helpers.species_rail_differential import (
     CHANNEL_CEA_VS_ELLINGHAM,
     CHANNEL_NASA_CEA,
+    CHANNEL_VAPOUR_RAIL_PSAT,
+    JANAF_STANDARD_PRESSURE_PA,
+    MG_NBP_K,
+    NA_NBP_K,
+    QUANTITY_LOG10_PSAT,
     cea_by_formula,
+    _evaluate_rail_pressure_Pa,
     ENVELOPE_BANDS,
     PHASE_GAS,
     PHASE_LIQUID,
@@ -49,12 +56,17 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     engine_cea_delta_fG_kJ_mol,
     kcal_per_mol_to_kJ_per_mol,
     log10K_from_delta_fG_kJ_mol,
+    log10_psat_over_P0_from_dfg,
     render_report_markdown,
     resolve_cea_species,
     resolve_ellingham_oxide,
+    resolve_rail_species_id,
     score_cea_point,
     score_channel_vs_channel,
     score_ellingham_point,
+    score_psat_channel,
+    score_psat_nbp_sanity,
+    score_psat_pair,
     table_self_check_residual,
     temperature_band_for,
     thin_points_for_ledger,
@@ -825,3 +837,124 @@ def test_fe2o3_ellingham_refuses_as_different_oxide_than_feo_line() -> None:
     assert feo_ell.status in {"match", "mismatch"}
     assert feo_ell.skip_reason is None
     assert feo_ell.finding_class != "oxide_identity_mismatch"
+
+
+def test_psat_comparator_zero_when_dvapG_is_zero() -> None:
+    """ln(P_sat/P0)=0 when dfG(g)=dfG(condensed); Na NBP identity."""
+
+    assert log10_psat_over_P0_from_dfg(0.0, 0.0, NA_NBP_K) == pytest.approx(0.0)
+    assert log10_psat_over_P0_from_dfg(0.0, 0.0, MG_NBP_K) == pytest.approx(0.0)
+    # Unit: 1 kJ/mol at 298.15 K is 0.1752 dex.
+    dex = log10_psat_over_P0_from_dfg(RT_LN10_298_15_KJ, 0.0, 298.15)
+    assert dex == pytest.approx(-1.0)
+
+
+def test_psat_o2_alias_is_catalog_id_and_evaluator_absent() -> None:
+    """G12: O2 maps to catalog id O2; missing evaluator is rail_row_absent."""
+
+    assert resolve_rail_species_id("O2") == "O2"
+    assert resolve_rail_species_id("Na") == "Na"
+    pressure = _evaluate_rail_pressure_Pa("O2", 90.0)
+    assert pressure == "rail_row_absent"
+
+
+def test_psat_channel_refuses_missing_gas_or_condensed_or_rail() -> None:
+    rail = derive_species_rail()
+    gas = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Fe2O3-g",
+        formula="Fe2O3",
+        phase="g",
+        phase_kind=PHASE_GAS,
+        T_K=1500.0,
+        delta_fG_kJ_mol=-100.0,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    scores = score_psat_channel([gas], rail)
+    refusals = [
+        p for p in scores
+        if p.score.species == "Fe2O3" and p.score.status == "typed-refusal"
+        and p.score.temperature_K == 1500.0
+    ]
+    assert refusals
+    assert any(
+        p.score.skip_reason == f"{TYPED_REFUSAL_PREFIX}condensed_row_absent"
+        for p in refusals
+    )
+
+    condensed = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Fe2O3-cr",
+        formula="Fe2O3",
+        phase="cr",
+        phase_kind=PHASE_SOLID,
+        T_K=1500.0,
+        delta_fG_kJ_mol=-438.347,
+        log10_Kf=None,
+        log10_Kf_as_published=None,
+        printed_page=None,
+    )
+    both = score_psat_channel([gas, condensed], rail)
+    both_refusals = [
+        p for p in both
+        if p.score.species == "Fe2O3"
+        and p.score.temperature_K == 1500.0
+        and p.score.status == "typed-refusal"
+    ]
+    assert any(
+        p.score.skip_reason == f"{TYPED_REFUSAL_PREFIX}rail_row_absent"
+        for p in both_refusals
+    )
+
+
+def test_psat_pair_identity_and_nbp_sanity_rows() -> None:
+    gas = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Na-005",
+        formula="Na",
+        phase="g",
+        phase_kind=PHASE_GAS,
+        T_K=NA_NBP_K,
+        delta_fG_kJ_mol=0.0,
+        log10_Kf=0.0,
+        log10_Kf_as_published="0.000",
+        printed_page=None,
+        note="synthetic NBP pair",
+    )
+    liquid = KeyedTablePoint(
+        compilation_id="janaf",
+        record_id="Na-003",
+        formula="Na",
+        phase="l",
+        phase_kind=PHASE_LIQUID,
+        T_K=NA_NBP_K,
+        delta_fG_kJ_mol=0.0,
+        log10_Kf=0.0,
+        log10_Kf_as_published="0.000",
+        printed_page=None,
+    )
+    score = score_psat_pair(gas, liquid, JANAF_STANDARD_PRESSURE_PA, "Na")
+    assert score.comparison_quantity == QUANTITY_LOG10_PSAT
+    assert score.engine_channel == CHANNEL_VAPOUR_RAIL_PSAT
+    assert score.residual_log10K == pytest.approx(0.0, abs=1e-12)
+    assert score.status == "match"
+
+    rail = derive_species_rail()
+    sanity = score_psat_nbp_sanity(rail)
+    by_species = {p.score.species: p for p in sanity}
+    assert "Na" in by_species
+    assert "Mg" in by_species
+    assert by_species["Na"].score.temperature_K == NA_NBP_K
+    assert by_species["Mg"].score.temperature_K == MG_NBP_K
+    na = by_species["Na"].score
+    assert na.status in {"match", "mismatch", "typed-refusal"}
+    if na.status != "typed-refusal":
+        assert na.residual_log10K is not None
+        assert math.isfinite(float(na.residual_log10K))
+
+    report = build_report(sanity)
+    markdown = render_report_markdown(report)
+    assert "## Vapour-rail P_sat" in markdown
+    assert "Na/Mg boiling-point sanity" in markdown

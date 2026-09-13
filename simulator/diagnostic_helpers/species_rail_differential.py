@@ -6,9 +6,9 @@ the result. No pass/fail gate, no coefficient retune, no ``scoring_eligible``
 field.
 
 Pilot sources: JANAF-4th (J-era, kJ/mol, p° = 0.1 MPa) and Pankratz 1987
-USBM B689 (cal-era, kcal/mol, p° = 1 atm). Pilot channels: NASA-CEA
-polynomials and Ellingham dG per mol O2. VapoRock / thermoengine / MELTS are
-typed-refusal holes on the laptop.
+USBM B689 (cal-era, kcal/mol, p° = 1 atm). Laptop channels: NASA-CEA
+polynomials, Ellingham dG per mol O2, and vapour-rail pure-component P_sat.
+VapoRock / thermoengine / MELTS are typed-refusal holes on the laptop.
 """
 
 from __future__ import annotations
@@ -67,6 +67,10 @@ from simulator.reference_data.janaf import (
     load_table_document,
 )
 from simulator.state import OXIDE_TO_METAL
+from simulator.vapour_rail.catalog import (
+    CatalogCompileError,
+    compile_vapour_rail_catalog,
+)
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 from simulator.vapour_rail.nasa_cea import NasaCeaDomainError
 
@@ -80,7 +84,25 @@ COMPILATION_B689 = "pankratz-1987-usbm-b689"
 CHANNEL_NASA_CEA = "nasa_cea_9"
 CHANNEL_ELLINGHAM = "ellingham"
 CHANNEL_CEA_VS_ELLINGHAM = "nasa_cea_vs_ellingham"
+CHANNEL_VAPOUR_RAIL_PSAT = "vapour_rail_psat"
+QUANTITY_LOG10_PSAT = "log10_Psat_over_P0"
 UNAVAILABLE_CHANNELS = ("vaporock", "thermoengine", "melts")
+VAPOR_PRESSURES_PATH = REPO_ROOT / "data" / "vapor_pressures.yaml"
+
+# JANAF printed p° = 0.1 MPa = 1 bar = 1e5 Pa. B689 p° = 1 atm.
+# Na NBP 1156 K and Mg NBP 1363 K are the brief's 1-bar sanity rows
+# (NIST Mg T_b = 1363.15 K). P_sat(T_b) = 1 bar by definition.
+JANAF_STANDARD_PRESSURE_PA = 1.0e5
+B689_STANDARD_PRESSURE_PA = 101325.0
+NA_NBP_K = 1156.0
+MG_NBP_K = 1363.0
+
+# G12: only the alias the gap analysis named (O2 vs the rail id).
+# The catalog species_id is already "O2"; this is identity, not invention.
+# A missing row is rail_row_absent, not a guessed synonym.
+RAIL_SPECIES_ALIASES = {
+    "O2": "O2",
+}
 
 # Operating-envelope temperature bands for the headline residual tables.
 # Boundary sources (each cut is a named project constant, not a round number):
@@ -916,6 +938,114 @@ def ellingham_provenance(metal: str, compilation_id: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Vapour-rail P_sat channel
+# ---------------------------------------------------------------------------
+
+
+@lru_cache(maxsize=1)
+def vapour_rail_catalog():
+    """Compiled schema-v2 vapour rail (evaluators only; no U0 request rules)."""
+
+    payload = yaml.safe_load(VAPOR_PRESSURES_PATH.read_text(encoding="utf-8")) or {}
+    return compile_vapour_rail_catalog(payload, emit_u0_request_rules=False)
+
+
+def standard_pressure_Pa(compilation_id: str) -> float:
+    if compilation_id == COMPILATION_B689:
+        return B689_STANDARD_PRESSURE_PA
+    return JANAF_STANDARD_PRESSURE_PA
+
+
+def log10_psat_over_P0_from_dfg(
+    delta_fG_gas_kJ_mol: float,
+    delta_fG_condensed_kJ_mol: float,
+    T_K: float,
+) -> float:
+    """Compilation-derived log10(P_sat/P0) from gas and condensed ΔfG at T.
+
+    Premise: the vaporisation equilibrium is M(cr or l) ⇌ M(g) with
+    a_condensed = 1. Standard-state pressure P0 is 0.1 MPa for JANAF
+    (1 bar) and 1 atm for B689.
+    Algebra: ΔvapG° = dfG(g) − dfG(cr or l);
+    K = P_sat/P0; ln K = −ΔvapG°/(R T);
+    ln(P_sat/P0) = −[dfG(g) − dfG(cr or l)] / (R T);
+    log10(P_sat/P0) = −ΔvapG° / (R T ln 10)
+    = log10K_from_delta_fG_kJ_mol(ΔvapG°, T).
+    Unit check: kJ/mol / (kJ/(mol·K) · K) is dimensionless; P_sat and P0
+    are both pressures so P_sat/P0 is dimensionless.
+    Sanity: Na at 1156 K, P_sat = 1 bar = JANAF P0 → log10(P_sat/P0) = 0
+    when ΔvapG° = 0 (the definition of the normal boiling point). Same
+    construction for Mg at 1363 K (NIST T_b = 1363.15 K).
+    """
+
+    dvap = float(delta_fG_gas_kJ_mol) - float(delta_fG_condensed_kJ_mol)
+    return log10K_from_delta_fG_kJ_mol(dvap, T_K)
+
+
+def resolve_rail_species_id(formula: str, catalog=None) -> str | None:
+    """Catalog species_id for a compilation formula. Exact id, then unique formula.
+
+    The only naming alias is O2 (G12). A missing row is not an alias.
+    """
+
+    catalog = catalog or vapour_rail_catalog()
+    alias = RAIL_SPECIES_ALIASES.get(formula, formula)
+    if alias in catalog.species:
+        return alias
+    if formula in catalog.species:
+        return formula
+    hits = [
+        sid
+        for sid, spec in catalog.species.items()
+        if str(spec.formula) == formula
+    ]
+    if len(hits) == 1:
+        return hits[0]
+    return None
+
+
+def _evaluate_rail_pressure_Pa(species_id: str, T_K: float, catalog=None) -> float | str:
+    """Pure-component limit: a_melt = 1. Refusal reason string on failure."""
+
+    catalog = catalog or vapour_rail_catalog()
+    compiled = catalog.species.get(species_id)
+    if compiled is None or compiled.evaluator is None:
+        return "rail_row_absent"
+    ev = compiled.evaluator
+    kwargs: dict[str, Any] = {}
+    if abs(float(ev.activity_exponent or 0.0)) > 0.0:
+        kwargs["source_activity"] = 1.0
+    needs_o2 = (
+        abs(float(ev.pO2_exponent or 0.0)) > 0.0
+        or ev.o2_channel_term is not None
+    )
+    if needs_o2:
+        kwargs["pO2_bar"] = float(ev.pO2_reference_bar or 1.0)
+    try:
+        result = ev.evaluate(float(T_K), **kwargs)
+    except CatalogCompileError:
+        return "rail_row_absent"
+    P = float(result.pressure_pa)
+    if not math.isfinite(P) or P <= 0.0:
+        return "rail_row_absent"
+    return P
+
+
+def _pick_condensed_psat(
+    points: Sequence[KeyedTablePoint],
+) -> KeyedTablePoint | None:
+    """Prefer liquid (the boiling reference); else the lowest-ΔfG solid."""
+
+    liquids = [p for p in points if p.phase_kind == PHASE_LIQUID]
+    if liquids:
+        return min(liquids, key=lambda p: p.delta_fG_kJ_mol)
+    solids = [p for p in points if p.phase_kind == PHASE_SOLID]
+    if not solids:
+        return None
+    return min(solids, key=lambda p: p.delta_fG_kJ_mol)
+
+
+# ---------------------------------------------------------------------------
 # Scoring
 # ---------------------------------------------------------------------------
 
@@ -965,6 +1095,7 @@ def _refusal_score(
     cea_key: str | None = None,
     note: str = "",
     band: tuple[float, float] | None = None,
+    comparison_quantity: str = "delta_fG_kJ_mol",
 ) -> GibbsPointScore:
     skip = reason if reason.startswith(TYPED_REFUSAL_PREFIX) else (
         f"{TYPED_REFUSAL_PREFIX}{reason}"
@@ -976,12 +1107,14 @@ def _refusal_score(
         )
     t_for_key = float(T_K) if T_K is not None else 0.0
     return GibbsPointScore(
-        key=_point_key(compilation_id, record_id, t_for_key, channel),
+        key=_point_key(
+            compilation_id, record_id, t_for_key, channel, comparison_quantity
+        ),
         source_id=compilation_id,
         observation_id=record_id,
         species=str(formula or ""),
         provenance_class=provenance_class,
-        comparison_quantity="delta_fG_kJ_mol",
+        comparison_quantity=comparison_quantity,
         temperature_K=T_K,
         table_kJ_mol=table_kJ_mol,
         engine_kJ_mol=None,
@@ -1328,6 +1461,202 @@ def score_table_self_check(point: KeyedTablePoint) -> GibbsPointScore | None:
     )
 
 
+def score_psat_pair(
+    gas: KeyedTablePoint,
+    condensed: KeyedTablePoint,
+    pressure_Pa: float,
+    species_id: str,
+) -> GibbsPointScore:
+    """Score rail P_sat against compilation-derived log10(P_sat/P0)."""
+
+    T = float(gas.T_K)
+    P0 = standard_pressure_Pa(gas.compilation_id)
+    table_log10 = log10_psat_over_P0_from_dfg(
+        gas.delta_fG_kJ_mol, condensed.delta_fG_kJ_mol, T
+    )
+    engine_log10 = math.log10(float(pressure_Pa) / P0)
+    residual_log10 = engine_log10 - table_log10
+    table_dvap = float(gas.delta_fG_kJ_mol) - float(condensed.delta_fG_kJ_mol)
+    engine_dvap = -R_KJ_PER_MOL_K * T * LN10 * engine_log10
+    residual_kJ = engine_dvap - table_dvap
+    provenance = PROVENANCE_INDEPENDENT
+    status = _status_for_residual(residual_kJ, provenance)
+    return GibbsPointScore(
+        key=_point_key(
+            gas.compilation_id,
+            gas.record_id,
+            T,
+            CHANNEL_VAPOUR_RAIL_PSAT,
+            QUANTITY_LOG10_PSAT,
+        ),
+        source_id=gas.compilation_id,
+        observation_id=gas.record_id,
+        species=gas.formula,
+        provenance_class=provenance,
+        comparison_quantity=QUANTITY_LOG10_PSAT,
+        temperature_K=T,
+        table_kJ_mol=table_dvap,
+        engine_kJ_mol=engine_dvap,
+        residual_kJ_mol=residual_kJ,
+        residual_log10K=residual_log10,
+        band_kJ_mol=PIN_BAND_KJ_MOL,
+        status=status,
+        finding_class=_finding_class(provenance, status),
+        engine_channel=CHANNEL_VAPOUR_RAIL_PSAT,
+        cea_key=None,
+        skip_reason=None,
+        note=(
+            f"{gas.note}; ln(P_sat/P0)=-[dfG(g)-dfG({condensed.phase})]/(R T); "
+            f"P0={P0:g} Pa; rail_id={species_id}; "
+            f"condensed_record={condensed.record_id}; a_melt=1"
+        ),
+    )
+
+
+def _psat_refusal(
+    point: KeyedTablePoint,
+    reason: str,
+    *,
+    note: str = "",
+) -> GibbsPointScore:
+    return _refusal_score(
+        compilation_id=point.compilation_id,
+        record_id=point.record_id,
+        formula=point.formula,
+        T_K=point.T_K,
+        channel=CHANNEL_VAPOUR_RAIL_PSAT,
+        reason=reason,
+        provenance_class=PROVENANCE_INDEPENDENT,
+        table_kJ_mol=None,
+        note=note or point.note,
+        comparison_quantity=QUANTITY_LOG10_PSAT,
+    )
+
+
+def score_psat_nbp_sanity(
+    rail: SpeciesRail,
+    catalog=None,
+) -> list[ScoredRailPoint]:
+    """Na 1156 K and Mg 1363 K vs P_sat = 1 bar (JANAF P0)."""
+
+    catalog = catalog or vapour_rail_catalog()
+    out: list[ScoredRailPoint] = []
+    for formula, T_K in (("Na", NA_NBP_K), ("Mg", MG_NBP_K)):
+        if not rail.in_rail(formula):
+            continue
+        point = KeyedTablePoint(
+            compilation_id=COMPILATION_JANAF,
+            record_id=f"{formula}-nbp-sanity",
+            formula=formula,
+            phase="l",
+            phase_kind=PHASE_LIQUID,
+            T_K=T_K,
+            delta_fG_kJ_mol=0.0,
+            log10_Kf=0.0,
+            log10_Kf_as_published="0",
+            printed_page=None,
+            note="NBP sanity: P_sat(T_b)=1 bar = JANAF P0",
+        )
+        sid = resolve_rail_species_id(formula, catalog)
+        if sid is None:
+            out.append(_wrap(_psat_refusal(point, "rail_row_absent"), point, rail))
+            continue
+        pressure = _evaluate_rail_pressure_Pa(sid, T_K, catalog)
+        if isinstance(pressure, str):
+            out.append(_wrap(_psat_refusal(point, pressure), point, rail))
+            continue
+        P0 = JANAF_STANDARD_PRESSURE_PA
+        engine_log10 = math.log10(float(pressure) / P0)
+        residual_log10 = engine_log10  # table log10(1 bar / P0) = 0
+        engine_dvap = -R_KJ_PER_MOL_K * T_K * LN10 * engine_log10
+        provenance = PROVENANCE_INDEPENDENT
+        status = _status_for_residual(engine_dvap, provenance)
+        score = GibbsPointScore(
+            key=_point_key(
+                COMPILATION_JANAF,
+                point.record_id,
+                T_K,
+                CHANNEL_VAPOUR_RAIL_PSAT,
+                QUANTITY_LOG10_PSAT,
+            ),
+            source_id=COMPILATION_JANAF,
+            observation_id=point.record_id,
+            species=formula,
+            provenance_class=provenance,
+            comparison_quantity=QUANTITY_LOG10_PSAT,
+            temperature_K=T_K,
+            table_kJ_mol=0.0,
+            engine_kJ_mol=engine_dvap,
+            residual_kJ_mol=engine_dvap,
+            residual_log10K=residual_log10,
+            band_kJ_mol=PIN_BAND_KJ_MOL,
+            status=status,
+            finding_class=_finding_class(provenance, status),
+            engine_channel=CHANNEL_VAPOUR_RAIL_PSAT,
+            cea_key=None,
+            skip_reason=None,
+            note=(
+                f"{point.note}; rail_id={sid}; P_engine={float(pressure):.6g} Pa; "
+                f"P0={P0:g} Pa; a_melt=1"
+            ),
+        )
+        out.append(_wrap(score, point, rail))
+    return out
+
+
+def score_psat_channel(
+    table_points: Sequence[KeyedTablePoint],
+    rail: SpeciesRail,
+    catalog=None,
+) -> list[ScoredRailPoint]:
+    """Score vapour-rail P_sat at compilation T with both gas and condensed rows."""
+
+    catalog = catalog or vapour_rail_catalog()
+    grouped: dict[
+        tuple[str, str, float], dict[str, list[KeyedTablePoint]]
+    ] = defaultdict(lambda: {"gas": [], "condensed": []})
+    for point in table_points:
+        key = (point.compilation_id, point.formula, round(float(point.T_K), 4))
+        if point.phase_kind == PHASE_GAS:
+            grouped[key]["gas"].append(point)
+        elif point.phase_kind in {PHASE_SOLID, PHASE_LIQUID}:
+            grouped[key]["condensed"].append(point)
+    out: list[ScoredRailPoint] = []
+    for (_comp, _formula, _T), buckets in grouped.items():
+        gas_rows = buckets["gas"]
+        cond_rows = buckets["condensed"]
+        wrap_point = gas_rows[0] if gas_rows else cond_rows[0]
+        gas = gas_rows[0] if len(gas_rows) == 1 else None
+        condensed = _pick_condensed_psat(cond_rows)
+        if gas is None:
+            out.append(
+                _wrap(_psat_refusal(wrap_point, "gas_row_absent"), wrap_point, rail)
+            )
+            continue
+        if condensed is None:
+            out.append(
+                _wrap(
+                    _psat_refusal(wrap_point, "condensed_row_absent"),
+                    wrap_point,
+                    rail,
+                )
+            )
+            continue
+        sid = resolve_rail_species_id(gas.formula, catalog)
+        if sid is None:
+            out.append(
+                _wrap(_psat_refusal(gas, "rail_row_absent"), gas, rail)
+            )
+            continue
+        pressure = _evaluate_rail_pressure_Pa(sid, gas.T_K, catalog)
+        if isinstance(pressure, str):
+            out.append(_wrap(_psat_refusal(gas, pressure), gas, rail))
+            continue
+        out.append(_wrap(score_psat_pair(gas, condensed, pressure, sid), gas, rail))
+    out.extend(score_psat_nbp_sanity(rail, catalog))
+    return out
+
+
 @dataclass
 class ScoredRailPoint:
     score: GibbsPointScore
@@ -1412,11 +1741,13 @@ def score_rail(
 ) -> list[ScoredRailPoint]:
     rail = rail or derive_species_rail()
     out: list[ScoredRailPoint] = []
+    table_points: list[KeyedTablePoint] = []
     unavailable_emitted: set[tuple[str, str]] = set()
     for item in iter_source_items(rail):
         if isinstance(item, KeyRefusal):
             out.append(_wrap_refusal(item, rail, CHANNEL_NASA_CEA))
             continue
+        table_points.append(item)
         cea = score_cea_point(item)
         out.append(_wrap(cea, item, rail))
         ell = score_ellingham_point(item)
@@ -1453,6 +1784,7 @@ def score_rail(
                     compilation_id=item.compilation_id,
                 )
             )
+    out.extend(score_psat_channel(table_points, rail))
     return out
 
 
@@ -1495,6 +1827,8 @@ LEDGER_HEADER = {
         "nasa_cea_gas": "100000 Pa (0.1 MPa)",
         "nasa_cea_condensed": "101325 Pa (1 atm)",
         "pankratz-1987-usbm-b689": "1 atm",
+        "vapour_rail_psat_janaf": "100000 Pa (0.1 MPa)",
+        "vapour_rail_psat_b689": "101325 Pa (1 atm)",
     },
 }
 
@@ -1785,6 +2119,82 @@ def _channel_vs_channel_table(
     return rows
 
 
+def _top_psat_residuals(
+    points: Sequence[ScoredRailPoint],
+    *,
+    n: int = 20,
+    envelope_only: bool = True,
+) -> list[dict[str, Any]]:
+    candidates = [
+        p
+        for p in points
+        if p.score.engine_channel == CHANNEL_VAPOUR_RAIL_PSAT
+        and p.score.status in {"match", "mismatch"}
+        and p.score.residual_log10K is not None
+        and not str(p.score.observation_id or "").endswith("-nbp-sanity")
+    ]
+    if envelope_only:
+        candidates = [
+            p
+            for p in candidates
+            if (temperature_band_for(p.score.temperature_K) or TemperatureBand(
+                "", None, None, False
+            )).envelope
+        ]
+    candidates.sort(
+        key=lambda p: abs(float(p.score.residual_log10K or 0.0)),
+        reverse=True,
+    )
+    rows = []
+    for point in candidates[:n]:
+        residual = float(point.score.residual_log10K or 0.0)
+        assigned = temperature_band_for(point.score.temperature_K)
+        rows.append(
+            {
+                "key": point.score.key,
+                "compilation_id": point.compilation_id,
+                "record_id": point.score.observation_id,
+                "species": point.score.species,
+                "tier": point.tier,
+                "engine_channel": point.score.engine_channel,
+                "temperature_K": point.score.temperature_K,
+                "residual_log10": residual,
+                "residual_kJ_mol": point.score.residual_kJ_mol,
+                "finding_class": point.score.finding_class,
+                "provenance_class": point.score.provenance_class,
+                "band": None if assigned is None else assigned.label,
+                "divergence_label": divergence_label(abs(residual)),
+                "note": point.score.note,
+            }
+        )
+    return rows
+
+
+def _psat_sanity_rows(
+    points: Sequence[ScoredRailPoint],
+) -> list[dict[str, Any]]:
+    rows = []
+    for point in points:
+        if point.score.engine_channel != CHANNEL_VAPOUR_RAIL_PSAT:
+            continue
+        if not str(point.score.observation_id or "").endswith("-nbp-sanity"):
+            continue
+        rows.append(
+            {
+                "species": point.score.species,
+                "temperature_K": point.score.temperature_K,
+                "status": point.score.status,
+                "residual_log10": point.score.residual_log10K,
+                "residual_kJ_mol": point.score.residual_kJ_mol,
+                "skip_reason": point.score.skip_reason,
+                "note": point.score.note,
+                "finding_class": point.score.finding_class,
+            }
+        )
+    rows.sort(key=lambda row: str(row["species"]))
+    return rows
+
+
 def _elemental_reference_accounting() -> dict[str, Any]:
     T = 1600.0
     shift = elemental_reference_shift_kJ_per_mol_O2("Na2O", T)
@@ -1850,6 +2260,15 @@ def build_report(points: Sequence[ScoredRailPoint]) -> dict[str, Any]:
         "channel_vs_channel_species_fit_n": len(vs),
         "table_self_check_failures": _self_check_failures(points),
         "elemental_reference_accounting": _elemental_reference_accounting(),
+        "psat_top20_in_envelope": _top_psat_residuals(
+            points, n=20, envelope_only=True
+        ),
+        "psat_sanity": _psat_sanity_rows(points),
+        "g9_cea_mno_coo": (
+            "no condensed MnO or CoO record in nasa-cea-thermo.yaml "
+            "under any key spelling; typed refusal cea_formula_unmapped; "
+            "CO is carbon monoxide and is not case-folded onto Co"
+        ),
         "note": (
             "divergence_label is a descriptive magnitude band only; "
             "never an acceptance verdict."
@@ -2034,6 +2453,62 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
             "",
         ]
     )
+    lines.extend(
+        [
+            "",
+            "## Vapour-rail P_sat (compilation-derived comparator)",
+            "",
+            (
+                "Comparator: ln(P_sat/P0) = −[dfG(g) − dfG(cr or l)] / (R T) "
+                "at the same printed T. JANAF P0 = 0.1 MPa. Residual in log10. "
+                "Na 1156 K and Mg 1363 K are 1-bar boiling-point sanity rows."
+            ),
+            "",
+            f"- G9 NASA-CEA MnO/CoO: {report.get('g9_cea_mno_coo', '')}",
+            "",
+            "### Twenty largest in-envelope |residual| (log10)",
+            "",
+            "| species | T_K | residual log10 | finding_class | label |",
+            "|---|---:|---:|---|---|",
+        ]
+    )
+    psat_rows = report.get("psat_top20_in_envelope") or []
+    if not psat_rows:
+        lines.append("| — | — | — | no_scored_points | — |")
+    for row in psat_rows:
+        lines.append(
+            "| {species} | {T} | {res:.4g} | `{finding}` | `{label}` |".format(
+                species=row["species"],
+                T=row["temperature_K"],
+                res=float(row["residual_log10"]),
+                finding=row["finding_class"],
+                label=row["divergence_label"],
+            )
+        )
+    lines.extend(
+        [
+            "",
+            "### Na/Mg boiling-point sanity",
+            "",
+            "| species | T_K | status | residual log10 | note |",
+            "|---|---:|---|---:|---|",
+        ]
+    )
+    sanity = report.get("psat_sanity") or []
+    if not sanity:
+        lines.append("| — | — | missing | — | no sanity rows |")
+    for row in sanity:
+        res = row.get("residual_log10")
+        res_s = "—" if res is None else f"{float(res):.4g}"
+        lines.append(
+            "| {species} | {T} | {status} | {res} | {note} |".format(
+                species=row["species"],
+                T=row["temperature_K"],
+                status=row["status"],
+                res=res_s,
+                note=str(row.get("note") or "").replace("|", "/"),
+            )
+        )
     failures = report["table_self_check_failures"]
     lines.extend(["", "## Table self-check failures", ""])
     if not failures:
