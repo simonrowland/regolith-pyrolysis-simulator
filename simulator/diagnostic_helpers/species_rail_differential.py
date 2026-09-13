@@ -1005,6 +1005,10 @@ class ScoredRailPoint:
     compilation_id: str
     printed_page: int | None = None
     table_log10_Kf: float | None = None
+    n_points: int | None = None
+    T_min_K: float | None = None
+    T_max_K: float | None = None
+    first_observation_id: str | None = None
 
     def ledger_row(self) -> dict[str, Any]:
         row = self.score.pin_dict()
@@ -1016,6 +1020,11 @@ class ScoredRailPoint:
             row["printed_page"] = self.printed_page
         if self.table_log10_Kf is not None:
             row["table_log10_Kf"] = self.table_log10_Kf
+        if self.n_points is not None:
+            row["n_points"] = self.n_points
+            row["T_min_K"] = self.T_min_K
+            row["T_max_K"] = self.T_max_K
+            row["first_observation_id"] = self.first_observation_id
         # Never emit scoring_eligible — absent, not false.
         row.pop("scoring_eligible", None)
         return row
@@ -1160,19 +1169,6 @@ LEDGER_HEADER = {
 }
 
 
-_LEDGER_COLLAPSE_REASONS = frozenset(
-    {
-        "cea_formula_unmapped",
-        "mixed_phase",
-        "prose_phase",
-        "ellingham_species_unsupported",
-        "engine_channel_unavailable",
-        "missing_formula",
-        "nonpositive_temperature",
-    }
-)
-
-
 def _refusal_reason_key(skip_reason: str | None) -> str:
     reason = skip_reason or "typed-refusal"
     if reason.startswith(TYPED_REFUSAL_PREFIX):
@@ -1183,32 +1179,53 @@ def _refusal_reason_key(skip_reason: str | None) -> str:
 def thin_points_for_ledger(
     points: Sequence[ScoredRailPoint],
 ) -> list[ScoredRailPoint]:
-    """Keep every comparable residual; collapse T-invariant refusals per record.
+    """Keep every scored residual; one aggregate refusal per group.
 
-    ``cea_formula_unmapped`` does not depend on T. Writing it once per record
-    still shows the hole; repeating it on every printed temperature inflates
-    the ledger without new information. Out-of-range refusals stay per-T
-    because the certified band is T-specific.
+    Group key is (compilation, record_id, engine_channel, reason). The
+    aggregate carries n_points, T_min_K, T_max_K, and the first
+    observation_id so a reader can still find the record. Scored points
+    stay one row each.
     """
 
     kept: list[ScoredRailPoint] = []
-    seen: set[tuple[str, str, str, str]] = set()
+    groups: dict[tuple[str, str, str, str], int] = {}
     for point in points:
         if point.score.status != "typed-refusal":
             kept.append(point)
             continue
         reason = _refusal_reason_key(point.score.skip_reason)
-        if reason in _LEDGER_COLLAPSE_REASONS:
-            key = (
-                point.compilation_id,
-                point.score.observation_id,
-                str(point.score.engine_channel or ""),
-                reason,
+        key = (
+            point.compilation_id,
+            str(point.score.observation_id or ""),
+            str(point.score.engine_channel or ""),
+            reason,
+        )
+        T = point.score.temperature_K
+        if key not in groups:
+            groups[key] = len(kept)
+            kept.append(
+                ScoredRailPoint(
+                    score=point.score,
+                    tier=point.tier,
+                    compilation_id=point.compilation_id,
+                    printed_page=point.printed_page,
+                    table_log10_Kf=point.table_log10_Kf,
+                    n_points=1,
+                    T_min_K=T,
+                    T_max_K=T,
+                    first_observation_id=point.score.observation_id,
+                )
             )
-            if key in seen:
-                continue
-            seen.add(key)
-        kept.append(point)
+            continue
+        existing = kept[groups[key]]
+        existing.n_points = int(existing.n_points or 1) + 1
+        if T is not None:
+            existing.T_min_K = (
+                T if existing.T_min_K is None else min(existing.T_min_K, T)
+            )
+            existing.T_max_K = (
+                T if existing.T_max_K is None else max(existing.T_max_K, T)
+            )
     return kept
 
 

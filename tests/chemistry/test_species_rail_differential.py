@@ -50,6 +50,7 @@ from simulator.diagnostic_helpers.species_rail_differential import (
     score_ellingham_point,
     table_self_check_residual,
     temperature_band_for,
+    thin_points_for_ledger,
     write_ledger,
 )
 from simulator.reference_data.janaf import FEEDSTOCKS_PATH
@@ -423,3 +424,111 @@ def test_channel_vs_channel_headline_is_legacy_fit_window() -> None:
         row["temperature_K"] for row in report["channel_vs_channel_species_fit"]
     ]
     assert species_fit_T == [2300.0, 1600.0, 1100.0]
+
+
+def _refusal_point(
+    *,
+    record_id: str,
+    T_K: float | None,
+    channel: str,
+    reason: str,
+    formula: str = "XeO2",
+) -> ScoredRailPoint:
+    skip = reason if reason.startswith(TYPED_REFUSAL_PREFIX) else (
+        f"{TYPED_REFUSAL_PREFIX}{reason}"
+    )
+    t_for_key = 0.0 if T_K is None else T_K
+    return ScoredRailPoint(
+        score=GibbsPointScore(
+            key=f"janaf::{record_id}:T={t_for_key}::{channel}",
+            source_id="janaf",
+            observation_id=record_id,
+            species=formula,
+            provenance_class="independent_tabulation",
+            comparison_quantity="delta_fG_kJ_mol",
+            temperature_K=T_K,
+            table_kJ_mol=None,
+            engine_kJ_mol=None,
+            residual_kJ_mol=None,
+            residual_log10K=None,
+            band_kJ_mol=PIN_BAND_KJ_MOL,
+            status="typed-refusal",
+            finding_class=None,
+            engine_channel=channel,
+            cea_key=None,
+            skip_reason=skip,
+        ),
+        tier=TIER_TRACE,
+        compilation_id="janaf",
+    )
+
+
+def test_ledger_aggregates_refusals_relationally(tmp_path: Path) -> None:
+    scored_a = _major_score(species="SiO2", T_K=1500.0, residual_kJ_mol=2.0)
+    scored_b = _major_score(species="SiO2", T_K=1600.0, residual_kJ_mol=3.0)
+    refusals_same = [
+        _refusal_point(
+            record_id="X-001",
+            T_K=T,
+            channel=CHANNEL_NASA_CEA,
+            reason="engine_channel_out_of_range:200-6000K",
+        )
+        for T in (200.0, 500.0, 800.0)
+    ]
+    refusal_other_reason = _refusal_point(
+        record_id="X-001",
+        T_K=900.0,
+        channel=CHANNEL_NASA_CEA,
+        reason="cea_formula_unmapped",
+    )
+    refusal_other_record = _refusal_point(
+        record_id="X-002",
+        T_K=200.0,
+        channel=CHANNEL_NASA_CEA,
+        reason="engine_channel_out_of_range:200-6000K",
+    )
+    raw = [
+        scored_a,
+        *refusals_same,
+        scored_b,
+        refusal_other_reason,
+        refusal_other_record,
+    ]
+    thinned = thin_points_for_ledger(raw)
+    scored_rows = [
+        p for p in thinned if p.score.status in {"match", "mismatch"}
+    ]
+    refusal_rows = [p for p in thinned if p.score.status == "typed-refusal"]
+    assert len(scored_rows) == 2
+    assert len(refusal_rows) == 3
+    assert sum(p.n_points or 0 for p in refusal_rows) == 5
+    grouped = {
+        (
+            p.compilation_id,
+            p.score.observation_id,
+            p.score.engine_channel,
+            p.score.skip_reason.split(":", 2)[1]
+            if p.score.skip_reason
+            else None,
+        ): p
+        for p in refusal_rows
+    }
+    same = grouped[("janaf", "X-001", CHANNEL_NASA_CEA, "engine_channel_out_of_range")]
+    assert same.n_points == 3
+    assert same.T_min_K == 200.0
+    assert same.T_max_K == 800.0
+    assert same.first_observation_id == "X-001"
+    dest = tmp_path / "species_rail_differential_ledger.yaml"
+    write_ledger(dest, points=raw)
+    payload = yaml.safe_load(dest.read_text(encoding="utf-8"))
+    assert payload["never_widen"] is True
+    assert "The residual IS the result" in payload["doctrine"]
+    assert "scoring_eligible" not in payload
+    points = payload["points"]
+    assert len(points) == 5
+    refusal_payload = [row for row in points if row["status"] == "typed-refusal"]
+    scored_payload = [row for row in points if row["status"] in {"match", "mismatch"}]
+    assert len(scored_payload) == 2
+    assert all("n_points" not in row for row in scored_payload)
+    assert {row["n_points"] for row in refusal_payload} == {3, 1}
+    assert sum(row["n_points"] for row in refusal_payload) == 5
