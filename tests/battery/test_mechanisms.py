@@ -861,13 +861,7 @@ def test_sc_f03_pi_p2_4_alpha_ordering_transition_subtypes() -> None:
         species=Species("Na", Phase.CR, polymorph=State.of("bcc")),
         subtype=State.of("melting"),
         total_pressure_Pa=State.of(Decimal("101325")),
-        composition=State.of(
-            Composition(
-                "ordered_complete_mole_inventory",
-                (("Na", Decimal("1")),),
-                AmountBasis.MOLE_FRACTION,
-            )
-        ),
+        composition=State.not_applicable("pure Na melting; no invented pot"),
         fO2_Pa=State.not_applicable("pure Na melting is not redox"),
         temperature_K=State.not_applicable("T is the result"),
         per=State.not_applicable("temperature quantity"),
@@ -882,7 +876,24 @@ def test_sc_f03_pi_p2_4_alpha_ordering_transition_subtypes() -> None:
         wall=State.not_applicable("not deposit"),
     )
     boil = Identity(**{**melt.__dict__, "subtype": State.of("boiling")})
+    assert identity_equal(melt, melt).kind is IdentityEqualKind.EQUAL
     assert identity_equal(melt, boil).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    liquidus = Identity(
+        **{
+            **melt.__dict__,
+            "subtype": State.of("liquidus"),
+            "composition": State.of(
+                Composition(
+                    "ordered_complete_mole_inventory",
+                    (("Na", Decimal("0.5")), ("K", Decimal("0.5"))),
+                    AmountBasis.MOLE_FRACTION,
+                )
+            ),
+        }
+    )
+    assert identity_equal(liquidus, liquidus).kind is IdentityEqualKind.EQUAL
+    missing_pot = Identity(**{**liquidus.__dict__, "composition": State.not_applicable("missing mixture")})
+    assert identity_equal(liquidus, missing_pot).kind is IdentityEqualKind.INVALID_IDENTITY
     from simulator.battery.enums import ValueKind
 
     bound = Value(kind=ValueKind.BOUND, bound_operator="<", bound_value=Decimal("1"))

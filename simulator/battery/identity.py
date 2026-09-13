@@ -67,7 +67,6 @@ from simulator.physical_constants import (
     PA_PER_BAR,
     STANDARD_ATMOSPHERE_PA,
 )
-from simulator.reference_data.janaf import formula_composition
 
 # ---------------------------------------------------------------------------
 # Unit / standard-state conversion helpers
@@ -376,7 +375,11 @@ def profile_for(identity: Identity) -> QuantityProfile:
     elif q is Quantity.PARTIAL_MOLAR_ENTHALPY:
         req("per", "temperature_K", "standard_pressure_Pa", "composition", "total_pressure_Pa", "reference_state")
         na("sweep_gas", "exposure", "sample_mass_kg", "wall", "reservoir", "formation_elements", "subtype")
-        if _reaction_includes_redox(identity):
+        reaction_state = identity.reaction
+        if reaction_state is not None and reaction_state.is_unknown:
+            req("fO2_Pa")
+            req("reaction")
+        elif _reaction_includes_redox(identity):
             req("fO2_Pa")
             req("reaction")
         else:
@@ -519,16 +522,14 @@ def profile_for(identity: Identity) -> QuantityProfile:
             "sample_mass_kg",
             "wall",
         )
-        # composition required for mixture solidus/liquidus; permitted n/a for
-        # pure-substance melting/boiling.
-        if identity.species.phase is Phase.G:
-            na("composition", "fO2_Pa")
-        else:
+        subtype = ""
+        if identity.subtype is not None and identity.subtype.is_value and identity.subtype.value is not None:
+            subtype = str(identity.subtype.value)
+        if subtype in {"solidus", "liquidus", "glass"}:
             req("composition")
-            if _species_redox_sensitive(identity.species):
-                req("fO2_Pa")
-            else:
-                na("fO2_Pa")
+        else:
+            na("composition")
+        na("fO2_Pa")
     elif q in {
         Quantity.VISCOSITY,
         Quantity.DENSITY,
@@ -537,7 +538,7 @@ def profile_for(identity: Identity) -> QuantityProfile:
         Quantity.FE3_FE2_RATIO,
     }:
         req("temperature_K", "total_pressure_Pa", "composition")
-        if q is Quantity.FE3_FE2_RATIO or _species_redox_sensitive(identity.species):
+        if q is Quantity.FE3_FE2_RATIO:
             req("fO2_Pa")
         else:
             na("fO2_Pa")
@@ -586,13 +587,6 @@ def _reaction_includes_redox(identity: Identity) -> bool:
     if reaction_state is None or not reaction_state.is_value or reaction_state.value is None:
         return False
     return any(term.species.formula == "O2" for term in reaction_state.value.terms)
-
-
-def _species_redox_sensitive(species: Species) -> bool:
-    parsed = formula_composition(species.formula)
-    if not parsed:
-        return False
-    return any(el == "Fe" for el, _n in parsed)
 
 
 def _axis_state(identity: Identity, name: str) -> State[Any] | None:
