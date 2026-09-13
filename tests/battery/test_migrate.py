@@ -38,7 +38,7 @@ from simulator.battery.migrate import (
     work_id_for,
     write_outputs,
 )
-from simulator.battery.records import Species, State
+from simulator.battery.records import Species, State, as_decimal
 from simulator.battery.validate import validate_corpus
 from tests.battery import factories as F
 
@@ -871,3 +871,149 @@ def test_h01_blank_sample_area_units_queued_and_sample_transferred(tmp_path: Pat
     assert exp.sample.form is not None
     assert exp.sample.form.state.is_value
     assert exp.sample.form.state.value == "powder"
+
+
+def test_h02_activity_coefficient_uses_gamma_not_pressure(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"] = [
+        {
+            "observation_id": "gao15_gamma_s1_1low_polytherm",
+            "type": "activity_coefficient",
+            "locator": {"table": "S1"},
+            "phase": "gas",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "method_class": "measured_direct",
+                "series": [
+                    {
+                        "T_K": 1586.4,
+                        "gamma": 0.0632,
+                        "gamma_SD": 0.0558,
+                        "p_Ga_Pa": 4.04e-05,
+                        "p_O2_calc_Pa": 0.000112,
+                        "K_Ga": 4.54e-15,
+                        "delta_IW": 1.66,
+                    }
+                ],
+            },
+        },
+        {
+            "observation_id": "gao15_gamma_s2_1low_isotherm",
+            "type": "activity_coefficient",
+            "locator": {"table": "S2"},
+            "phase": "gas",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "series": [{"T_K": 1741.9, "gamma": 0.0353, "p_Ga_Pa": 0.000881}],
+            },
+        },
+        {
+            "observation_id": "ino15_gamma_s1_1low_polytherm",
+            "type": "activity_coefficient",
+            "locator": {"table": "S1b"},
+            "phase": "gas",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "series": [{"T_K": 1586.4, "gamma": 0.0527, "p_In_Pa": 6.69e-05}],
+            },
+        },
+        {
+            "observation_id": "ino15_gamma_s2_1low_isotherm",
+            "type": "activity_coefficient",
+            "locator": {"table": "S2b"},
+            "phase": "gas",
+            "units": "dimensionless",
+            "values": {
+                "quantity": "activity_coefficient",
+                "series": [{"T_K": 1741.9, "gamma": 0.0211, "p_In_Pa": 0.00032}],
+            },
+        },
+    ]
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False, validate=True)
+    expected = {
+        "gao15_gamma_s1_1low_polytherm": "0.0632",
+        "gao15_gamma_s2_1low_isotherm": "0.0353",
+        "ino15_gamma_s1_1low_polytherm": "0.0527",
+        "ino15_gamma_s2_1low_isotherm": "0.0211",
+    }
+    for suffix, gamma in expected.items():
+        points = [
+            o
+            for o in result.observations.values()
+            if suffix in o.observation_id and "::point:0" in o.observation_id
+        ]
+        assert len(points) == 1, suffix
+        obs = points[0]
+        assert quantity_token(obs.identity) is Quantity.ACTIVITY_COEFFICIENT
+        assert obs.value.kind is ValueKind.POINT
+        assert obs.value.point == as_decimal(gamma)
+        pressures = []
+        # The stored coefficient must not equal a pressure column from its row.
+        assert obs.value.point != as_decimal("4.04e-05")
+        assert obs.value.point != as_decimal("0.000881")
+        assert obs.value.point != as_decimal("6.69e-05")
+        assert obs.value.point != as_decimal("0.00032")
+        del pressures
+    queued_axes = " ".join(e.why or "" for e in result.queue)
+    assert "p_Ga_Pa" in queued_axes or "ancillary" in queued_axes.lower()
+
+
+def test_h02_bischof_stored_gammas_match_source() -> None:
+    from decimal import Decimal
+
+    src_path = REPO_ROOT / "data" / "literature" / "extracts" / "kems-137-bischof-2023.yaml"
+    store_path = (
+        REPO_ROOT / "data" / "literature" / "extracts-v2" / "kems-137-bischof-2023.yaml"
+    )
+    if not src_path.is_file() or not store_path.is_file():
+        pytest.skip("Bischof extract or v2 store not present")
+    source = yaml.safe_load(src_path.read_text(encoding="utf-8"))
+    stored = yaml.safe_load(store_path.read_text(encoding="utf-8"))
+    first = {
+        "bischof_2023_gao15_gamma_s1_1low_polytherm": Decimal("0.0632"),
+        "bischof_2023_gao15_gamma_s2_1low_isotherm": Decimal("0.0353"),
+        "bischof_2023_ino15_gamma_s1_1low_polytherm": Decimal("0.0527"),
+        "bischof_2023_ino15_gamma_s2_1low_isotherm": Decimal("0.0211"),
+    }
+    by_id = {o["observation_id"]: o for o in stored["observations"]}
+    for suffix, gamma in first.items():
+        oid = f"kems-137-bischof-2023::{suffix}::point:0"
+        obs = by_id[oid]
+        q = obs["identity"]["quantity"]
+        assert q.get("value") == "activity_coefficient"
+        assert Decimal(str(obs["value"]["point"])) == gamma
+    source_gammas: list[Decimal] = []
+    source_pressures: set[Decimal] = set()
+    species = source.get("species") or {}
+    for body in species.values():
+        if not isinstance(body, dict):
+            continue
+        for row in body.get("observations") or []:
+            values = row.get("values") or {}
+            if values.get("quantity") != "activity_coefficient":
+                continue
+            for item in values.get("series") or []:
+                if not isinstance(item, dict):
+                    continue
+                if "gamma" in item:
+                    source_gammas.append(Decimal(str(item["gamma"])))
+                for pk in ("p_Ga_Pa", "p_In_Pa"):
+                    if pk in item:
+                        source_pressures.add(Decimal(str(item[pk])))
+    stored_vals = []
+    for obs in stored["observations"]:
+        q = obs.get("identity", {}).get("quantity", {})
+        if q.get("value") != "activity_coefficient":
+            continue
+        if obs.get("value", {}).get("kind") != "point":
+            continue
+        stored_vals.append(Decimal(str(obs["value"]["point"])))
+    assert len(stored_vals) == 128
+    gamma_set = set(source_gammas)
+    for val in stored_vals:
+        assert val in gamma_set
+        assert val not in source_pressures

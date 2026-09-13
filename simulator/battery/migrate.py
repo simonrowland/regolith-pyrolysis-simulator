@@ -1101,6 +1101,77 @@ def empty_value_from_payload(
     )
 
 
+_PRESSURE_SERIES_KEYS = (
+    ("pressure_atm", "atm"),
+    ("p_atm", "atm"),
+    ("P_atm", "atm"),
+    ("pressure_bar", "bar"),
+    ("P_bar", "bar"),
+    ("p_bar", "bar"),
+    ("P_Pa", "Pa"),
+    ("pressure_Pa", "Pa"),
+    ("p_Pa", "Pa"),
+    ("Pb_Torr", "Torr"),
+    ("Pbar_Torr", "Torr"),
+    ("Po_Torr", "Torr"),
+)
+
+# Species-labelled pressure columns are never the activity_coefficient value.
+_ANCILLARY_SERIES_KEYS = (
+    "p_Ga_Pa",
+    "p_In_Pa",
+    "p_O2_calc_Pa",
+    "K_Ga",
+    "K_In",
+    "delta_IW",
+)
+
+
+def _series_point_value(
+    raw_item: Mapping[str, Any],
+    q_token: Quantity | None,
+    units: str | None,
+) -> tuple[Decimal | None, str, tuple[str, ...]]:
+    """Pick the printed value from the declared quantity, not the first numeric key."""
+
+    unused: list[str] = []
+    if q_token is Quantity.ACTIVITY_COEFFICIENT:
+        for vk in ("gamma", "activity_coefficient"):
+            if vk in raw_item:
+                val = _as_dec_or_none(raw_item.get(vk))
+                unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
+                return val, "as_published", tuple(unused)
+        unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
+        return None, "as_published", tuple(unused)
+    if q_token is Quantity.EVAPORATION_COEFFICIENT_ALPHA and "alpha" in raw_item:
+        unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
+        return _as_dec_or_none(raw_item.get("alpha")), "as_published", tuple(unused)
+    if q_token is Quantity.DELTA_FG:
+        for vk in ("delta_fG", "value"):
+            if vk in raw_item:
+                unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
+                return _as_dec_or_none(raw_item.get(vk)), "as_published", tuple(unused)
+    if q_token in {Quantity.P_SAT, Quantity.P_PARTIAL, None}:
+        for key, unit in _PRESSURE_SERIES_KEYS:
+            if key in raw_item:
+                val, trail = convert_pressure_to_pa(raw_item.get(key), unit)
+                unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
+                return val, trail or "identity", tuple(unused)
+        # Species-labelled pressures are p_partial only when that is the declared quantity.
+        if q_token is Quantity.P_PARTIAL:
+            for key in ("p_Ga_Pa", "p_In_Pa", "p_O2_calc_Pa"):
+                if key in raw_item:
+                    val, trail = convert_pressure_to_pa(raw_item.get(key), "Pa")
+                    unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item and k != key]
+                    return val, trail or "identity:Pa", tuple(unused)
+    for vk in ("alpha", "gamma", "value", "delta_fG"):
+        if vk in raw_item:
+            unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
+            return _as_dec_or_none(raw_item.get(vk)), "as_published", tuple(unused)
+    unused = [k for k in _ANCILLARY_SERIES_KEYS if k in raw_item]
+    return None, "identity", tuple(unused)
+
+
 def _series_value(series: list[Any], units: str | None) -> Value:
     points: list[tuple[Decimal, Decimal]] = []
     for item in series:
@@ -2028,29 +2099,17 @@ class Migrator:
                         source=source_key,
                         observation_id=f"{parent_id}::point:{index}",
                     )
-            pressure_keys = (
-                ("pressure_atm", "atm"),
-                ("p_atm", "atm"),
-                ("P_atm", "atm"),
-                ("pressure_bar", "bar"),
-                ("P_bar", "bar"),
-                ("p_bar", "bar"),
-                ("P_Pa", "Pa"),
-                ("pressure_Pa", "Pa"),
-                ("p_Pa", "Pa"),
-                ("p_Ga_Pa", "Pa"),
-                ("p_In_Pa", "Pa"),
-                ("p_O2_calc_Pa", "Pa"),
-                ("Pb_Torr", "Torr"),
-                ("Pbar_Torr", "Torr"),
-                ("Po_Torr", "Torr"),
+            q_token = quantity.value if isinstance(quantity, State) and quantity.is_value else (
+                quantity if isinstance(quantity, Quantity) else None
             )
-            for key, unit in pressure_keys:
-                if key in raw_item:
-                    val, trail_or_why = convert_pressure_to_pa(raw_item.get(key), unit)
-                    trail = trail_or_why or "identity"
-                    break
-            if val is None and ("P" in raw_item or "p" in raw_item):
+            val, trail, unused_ancillary = _series_point_value(
+                raw_item, q_token, units
+            )
+            if val is None and ("P" in raw_item or "p" in raw_item) and q_token in {
+                Quantity.P_SAT,
+                Quantity.P_PARTIAL,
+                None,
+            }:
                 raw_p = raw_item.get("P", raw_item.get("p"))
                 val, trail_or_why = convert_pressure_to_pa(raw_p, units)
                 if val is None:
@@ -2066,12 +2125,18 @@ class Migrator:
                     trail = trail_or_why or "missing pressure unit"
                 else:
                     trail = trail_or_why or "identity"
-            if val is None:
-                for vk in ("alpha", "gamma", "value", "delta_fG"):
-                    if vk in raw_item:
-                        val = _as_dec_or_none(raw_item.get(vk))
-                        trail = "as_published"
-                        break
+            for key in unused_ancillary:
+                self.result.add_queue(
+                    work.work_id,
+                    point_locator,
+                    ["value"],
+                    (
+                        f"ancillary column {key} is not the declared quantity; "
+                        "left out (own-quantity identity incomplete)"
+                    ),
+                    source=source_key,
+                    observation_id=f"{parent_id}::point:{index}",
+                )
             extra_unc = raw_item.get("sigma") or raw_item.get("gamma_SD")
         point_id = f"{parent_id}::point:{index}"
         ident_kwargs = dict(ident_kwargs)
