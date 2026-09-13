@@ -736,3 +736,237 @@ def test_discarded_commissioning_call_and_crash_floor_alias_are_gone() -> None:
     assert 'engine_commissioning(' not in source
     assert not hasattr(AlphaMELTSBackend, '_crash_floor_result')
     assert not hasattr(alphamelts_module, 'ALPHAMELTS_REASON_SIO2_CRASH_FLOOR')
+
+
+def _reviewer_ptt_payload(temperature_C: float) -> dict:
+    """Codex R1 fake: 100 g, fO2=-9, liquid/olivine from clip((T-1200)/400,0,1)."""
+    frac = max(0.0, min(1.0, (float(temperature_C) - 1200.0) / 400.0))
+    liquid_mass = 100.0 * frac
+    olivine_mass = 100.0 - liquid_mass
+    payload: dict = {
+        'Conditions': {
+            'mass': 100.0,
+            'fO2_log': -9.0,
+            'P_bar': 1.0,
+        },
+    }
+    if liquid_mass > 0.0:
+        payload['liquid1'] = {'SiO2': 50.0}
+        payload['liquid1_prop'] = {'mass': liquid_mass}
+    if olivine_mass > 0.0:
+        payload['olivine1'] = {'SiO2': 40.0}
+        payload['olivine1_prop'] = {'mass': olivine_mass}
+    return payload
+
+
+def _install_python_api_transport_spy(monkeypatch, backend):
+    """Fake `_run_petthermotools_isolated`; keep real entry points and parser."""
+    calls: list = []
+    backend._mode = 'python_api'
+    backend._engine_version = 'test'
+    backend._vaporock_available = False
+    backend._pet_payload_preloaded = True
+    backend._pet_melts = object()
+    backend._pet_module = SimpleNamespace(
+        findLiq_MELTS=lambda **_kwargs: 1600.0,
+        isothermal_decompression=object(),
+    )
+    backend._redox_buffer = 'QFM'
+    backend._fo2_offset = 0.0
+
+    def fake_isolated(operation, *, args=(), kwargs=None):
+        kwargs = dict(kwargs or {})
+        calls.append({'operation': operation, 'kwargs': kwargs})
+        if operation in ('findLiq_MELTS', 'findLiq'):
+            return 1600.0
+        temperature_C = float(kwargs.get('T_C', 1400.0))
+        payload = _reviewer_ptt_payload(temperature_C)
+        if operation == 'isothermal_decompression':
+            return {0: payload}
+        return payload
+
+    monkeypatch.setattr(backend, '_run_petthermotools_isolated', fake_isolated)
+    monkeypatch.setattr(
+        backend,
+        '_activities_times_antoine_or_fail',
+        lambda *args, **kwargs: {},
+    )
+    return calls
+
+
+def _python_api_path_result(
+    backend,
+    path: str,
+    composition_kg: dict,
+    temperature_C: float,
+    *,
+    min_T_C: float = 1000.0,
+    max_T_C: float = 1800.0,
+):
+    composition = {
+        'composition_kg': composition_kg,
+        'fO2_log': -9.0,
+    }
+    if path == 'equilibrate':
+        return backend.equilibrate(
+            temperature_C, pressure_bar=1.0, **composition
+        )
+    if path == 'find_liquidus_solidus':
+        return backend.find_liquidus_solidus(
+            min_T_C=min_T_C,
+            max_T_C=max_T_C,
+            scan_step_C=100.0,
+            tolerance_C=2.0,
+            pressure_bar=1.0,
+            **composition,
+        )
+    if path == 'decompression_path':
+        results = backend.decompression_path(
+            temperature_C, 1.0, 1.0, 1.0, **composition
+        )
+        assert results, 'decompression_path must return at least one result'
+        return results[0]
+    raise AssertionError(f'unknown path {path!r}')
+
+
+def _assert_structured_commissioning(result) -> None:
+    diagnostics = result.diagnostics or {}
+    assert diagnostics.get('authority') == 'extrapolated'
+    assert diagnostics['certified_band']['sio2_wt_pct'] == [30.0, 80.0]
+    assert diagnostics['certified_band']['temperature_K'] == [1073.15, 1700.0]
+    notice = diagnostics['commissioning_notice']
+    assert notice['kind'] == 'engine_commissioning'
+    assert notice['authority'] == 'extrapolated'
+
+
+def _assert_no_structured_commissioning(result) -> None:
+    diagnostics = result.diagnostics or {}
+    assert 'commissioning_notice' not in diagnostics
+    assert diagnostics.get('authority') is None
+    assert 'certified_band' not in diagnostics
+
+
+@pytest.mark.parametrize(
+    'path',
+    ['equilibrate', 'find_liquidus_solidus', 'decompression_path'],
+)
+def test_python_api_high_silica_returns_structured_commissioning(
+    monkeypatch, path,
+) -> None:
+    """D01 / Codex R1: 85/9/6 wt% python_api success still carries the notice."""
+    backend = AlphaMELTSBackend()
+    calls = _install_python_api_transport_spy(monkeypatch, backend)
+    result = _python_api_path_result(
+        backend, path, {'SiO2': 85.0, 'FeO': 9.0, 'MgO': 6.0}, 1400.0,
+    )
+    assert calls, f'{path} must call the PetThermoTools transport'
+    assert result.status == 'ok'
+    _assert_structured_commissioning(result)
+
+
+@pytest.mark.parametrize(
+    'path',
+    ['equilibrate', 'decompression_path'],
+)
+def test_python_api_in_band_omits_structured_commissioning(
+    monkeypatch, path,
+) -> None:
+    """D01 in-band control: 50/30/20 wt% at 1400 C carries none of the three fields."""
+    backend = AlphaMELTSBackend()
+    calls = _install_python_api_transport_spy(monkeypatch, backend)
+    result = _python_api_path_result(
+        backend, path, {'SiO2': 50.0, 'FeO': 30.0, 'MgO': 20.0}, 1400.0,
+    )
+    assert calls, f'{path} must call the PetThermoTools transport'
+    assert result.status == 'ok'
+    _assert_no_structured_commissioning(result)
+
+
+def test_python_api_in_band_liquidus_omits_structured_commissioning(
+    monkeypatch,
+) -> None:
+    """In-band composition and in-band evaluated T: liquidus carries no notice."""
+    backend = AlphaMELTSBackend()
+    calls = _install_python_api_transport_spy(monkeypatch, backend)
+    backend._pet_module.findLiq_MELTS = lambda **_kwargs: 1300.0
+
+    def fake_isolated(operation, *, args=(), kwargs=None):
+        kwargs = dict(kwargs or {})
+        calls.append({'operation': operation, 'kwargs': kwargs})
+        if operation in ('findLiq_MELTS', 'findLiq'):
+            return 1300.0
+        temperature_C = float(kwargs.get('T_C', 1300.0))
+        frac = max(0.0, min(1.0, (temperature_C - 1000.0) / 300.0))
+        payload = {
+            'Conditions': {
+                'mass': 100.0,
+                'fO2_log': -9.0,
+                'P_bar': 1.0,
+            },
+            'liquid1': {'SiO2': 50.0},
+            'liquid1_prop': {'mass': 100.0 * frac if frac > 0.0 else 0.0},
+        }
+        if frac < 1.0:
+            payload['olivine1'] = {'SiO2': 40.0}
+            payload['olivine1_prop'] = {'mass': 100.0 * (1.0 - frac)}
+        if payload['liquid1_prop']['mass'] <= 0.0:
+            payload.pop('liquid1')
+            payload.pop('liquid1_prop')
+        return payload
+
+    monkeypatch.setattr(backend, '_run_petthermotools_isolated', fake_isolated)
+    result = backend.find_liquidus_solidus(
+        composition_kg={'SiO2': 50.0, 'FeO': 30.0, 'MgO': 20.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=1000.0,
+        max_T_C=1400.0,
+        scan_step_C=100.0,
+        tolerance_C=2.0,
+    )
+    assert calls, 'in-band liquidus must still evaluate samples'
+    assert result.status == 'ok'
+    _assert_no_structured_commissioning(result)
+
+
+def test_python_api_hot_in_band_composition_notices(monkeypatch) -> None:
+    """D01 / grok P1-1: python_api equilibrate at 2200 C, in-band composition."""
+    backend = AlphaMELTSBackend()
+    calls = _install_python_api_transport_spy(monkeypatch, backend)
+    result = backend.equilibrate(
+        2200.0,
+        composition_kg={'SiO2': 50.0, 'FeO': 30.0, 'MgO': 20.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+    )
+    assert calls, 'python_api equilibrate must still call the transport'
+    assert result.status == 'ok'
+    _assert_structured_commissioning(result)
+
+
+@pytest.mark.parametrize(
+    'composition_kg,temperature_C',
+    [
+        ({'SiO2': 50.0, 'FeO': 30.0, 'MgO': 20.0}, 2200.0),
+        ({'SiO2': 85.0, 'FeO': 9.0, 'MgO': 6.0}, 1400.0),
+    ],
+    ids=['hot_in_band', 'high_silica'],
+)
+def test_python_api_decompression_notices_out_of_band(
+    monkeypatch, composition_kg, temperature_C,
+) -> None:
+    """D01 / grok P1-1: FakePTT decompression at 2200 C and at SiO2=85 wt%."""
+    backend = AlphaMELTSBackend()
+    calls = _install_python_api_transport_spy(monkeypatch, backend)
+    results = backend.decompression_path(
+        temperature_C,
+        1.0,
+        1.0,
+        1.0,
+        composition_kg=composition_kg,
+        fO2_log=-9.0,
+    )
+    assert calls, 'decompression_path must call isothermal_decompression'
+    assert results
+    assert results[0].status == 'ok'
+    _assert_structured_commissioning(results[0])

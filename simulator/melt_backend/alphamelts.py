@@ -1468,6 +1468,7 @@ class _MELTSBackendSupport(MeltBackend):
                 warnings,
                 total_input_kg=total_input_kg,
                 require_solved_fo2=True,
+                crash_diagnostics=crash_diagnostics,
             )
         if self._mode == 'subprocess':
             return self._equilibrate_subprocess(
@@ -2392,6 +2393,7 @@ class _MELTSBackendSupport(MeltBackend):
         *,
         total_input_kg: float = 0.1,
         require_solved_fo2: bool = False,
+        crash_diagnostics: Optional[Mapping[str, object]] = None,
     ):
         """
         Use PetThermoTools for equilibrium calculation.
@@ -2434,7 +2436,18 @@ class _MELTSBackendSupport(MeltBackend):
                 total_input_kg=total_input_kg,
                 require_solved_fo2=require_solved_fo2,
                 warnings=result_warnings,
-                diagnostics=clamp_diagnostics,
+                diagnostics=self._merge_diagnostics(
+                    {
+                        key: crash_diagnostics[key]
+                        for key in (
+                            'commissioning_notice',
+                            'authority',
+                            'certified_band',
+                        )
+                        if crash_diagnostics and key in crash_diagnostics
+                    },
+                    clamp_diagnostics,
+                ),
             )
             if eq.status != 'ok':
                 return eq
@@ -4705,11 +4718,13 @@ class _MELTSBackendSupport(MeltBackend):
         )
         if domain_rejection is not None:
             return [domain_rejection]
-        self._apply_engine_commissioning(
+        commissioning_warnings: List[str] = []
+        commissioning_fields = self._apply_engine_commissioning(
             raw_comp_wt,
             temperature_C=T_C,
             pressure_bar=P_start_bar,
             fO2_log=fO2_log,
+            warnings=commissioning_warnings,
         )
         comp_wt = self._normalize_composition_to_melts_basis(raw_comp_wt)
         ptt = self._require_petthermotools_runtime()
@@ -4742,6 +4757,10 @@ class _MELTSBackendSupport(MeltBackend):
             runs = list(results.values())
         else:
             runs = [results]
+        result_warnings = [
+            *self._last_normalization_warnings,
+            *commissioning_warnings,
+        ]
         return [
             self._parse_petthermotools_result(
                 run,
@@ -4751,7 +4770,8 @@ class _MELTSBackendSupport(MeltBackend):
                 comp_wt=comp_wt,
                 total_input_kg=total_input_kg,
                 require_solved_fo2=True,
-                warnings=self._last_normalization_warnings,
+                warnings=result_warnings,
+                diagnostics=commissioning_fields,
             )
             for run in runs
         ]
