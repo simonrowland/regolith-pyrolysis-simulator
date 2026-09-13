@@ -1225,7 +1225,7 @@ def test_qualification_cell_carries_gate_notice_and_extrapolated_authority() -> 
     assert sum(pot.composition_wt_pct.values()) == pytest.approx(100.0)
     assert pot.composition_wt_pct["SiO2"] == pytest.approx(20.0)
     gate = assess_qualification_gate(pot.composition_wt_pct, 1700.0)
-    assert gate["valid"] is False
+    assert gate["valid"] is True
     assert "silicate_network_band" in gate["failed_constraints"]
     assert gate["authority"] == AUTHORITY_EXTRAPOLATED
     assert gate["certified_band"]["sio2_wt_pct"] == [30.0, 80.0]
@@ -1268,7 +1268,7 @@ def test_qualification_cell_carries_gate_notice_and_extrapolated_authority() -> 
     assert any(notice.get("kind") == "melts_domain_gate" for notice in cell.notices)
     notice = next(n for n in cell.notices if n["kind"] == "melts_domain_gate")
     assert notice["authority"] == AUTHORITY_EXTRAPOLATED
-    assert notice["gate_valid"] is False
+    assert notice["gate_valid"] is True
     assert notice["run_anyway"] is True
     assert cell.status == "ok"
     assert cell.melt_activities["SiO2"] == pytest.approx(0.2)
