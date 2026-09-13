@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import inspect
 from pathlib import Path
 from types import SimpleNamespace
@@ -1024,3 +1025,107 @@ def test_python_api_decompression_notices_out_of_band(
     assert results
     assert results[0].status == 'ok'
     _assert_structured_commissioning(results[0])
+
+
+def _load_studio_diff_module():
+    path = Path('scripts/diff_commissioning_studio_cells.py')
+    spec = importlib.util.spec_from_file_location(
+        'diff_commissioning_studio_cells', path,
+    )
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    return module
+
+
+def _studio_cell(**overrides):
+    cell = {
+        'pot_id': 'feo_mgo_sio2_30_20_50',
+        'engine': 'alphamelts',
+        'temperature_K': 1700.0,
+        'po2': {'mode': 'engine_default', 'po2_bar': None},
+        'arm': 'headline',
+        'status': 'ok',
+        'refusal_reason': None,
+        'engine_reason': None,
+        'engine_status': 'ok',
+        'melt_activities': {'SiO2': 0.4},
+        'gas_partial_pressures_Pa': {'Fe': 1.0},
+        'liquid_fraction': 1.0,
+        'notices': [],
+        'authority': None,
+    }
+    cell.update(overrides)
+    return cell
+
+
+def test_studio_diff_classifies_allowed_and_other_verdicts() -> None:
+    """D03: per-cell table includes identical cells and names OTHER."""
+    diff = _load_studio_diff_module()
+    identical = _studio_cell()
+    reclassified_base = _studio_cell(
+        status='refusal',
+        refusal_reason='gate_refused_in_adapter',
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=None,
+        engine_status='out_of_domain',
+    )
+    reclassified_tip = _studio_cell(
+        status='ok',
+        authority='extrapolated',
+        notices=[{'kind': 'engine_commissioning', 'authority': 'extrapolated'}],
+    )
+    crash_base = _studio_cell(
+        status='refusal',
+        refusal_reason='engine_crash',
+        engine_status='engine_crash',
+        engine_reason='subprocess_died',
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=None,
+    )
+    crash_tip = dict(crash_base)
+    crash_tip['engine_reason'] = 'sio2_below_observed_crash_floor'
+    other_tip = _studio_cell(liquid_fraction=0.5)
+
+    assert diff.classify_cell(identical, identical) == 'identical'
+    assert diff.classify_cell(reclassified_base, reclassified_tip) == (
+        'reclassified_refusal_to_notice'
+    )
+    assert diff.classify_cell(crash_base, crash_tip) == 'crash_annotation'
+    assert diff.classify_cell(identical, other_tip) == 'OTHER'
+    assert diff.classify_cell(identical, None) == 'OTHER'
+
+    report = diff.diff_captures(
+        {
+            'hostname': 'Mac-Studio-256-1.local',
+            'revision_id': 'base',
+            'run_timestamp': 't0',
+            'cells': [
+                identical,
+                {**reclassified_base, 'pot_id': 'high_silica'},
+                {**crash_base, 'pot_id': 'crash'},
+            ],
+        },
+        {
+            'hostname': 'Mac-Studio-256-1.local',
+            'revision_id': 'tip',
+            'run_timestamp': 't1',
+            'cells': [
+                identical,
+                {**reclassified_tip, 'pot_id': 'high_silica'},
+                {**crash_tip, 'pot_id': 'crash'},
+            ],
+        },
+    )
+    assert report['n_cells'] == 3
+    assert report['n_identical'] == 1
+    assert report['n_reclassified_refusal_to_notice'] == 1
+    assert report['n_crash_annotation'] == 1
+    assert report['n_OTHER'] == 0
+    assert {row['verdict'] for row in report['cells']} == {
+        'identical',
+        'reclassified_refusal_to_notice',
+        'crash_annotation',
+    }
