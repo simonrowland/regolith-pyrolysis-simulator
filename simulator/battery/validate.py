@@ -192,39 +192,31 @@ def _walk_located(obj: object, path: str, issues: list[ValidationIssue], seen: s
             _walk_located(getattr(obj, field.name), f"{path}.{field.name}", issues, seen)
 
 
-def _table_payload(
-    reference: Observation,
-    observations: Mapping[str, Observation],
-) -> dict | None:
-    """Paired ΔfG / log10_Kf printed values at the same identity point."""
+def _is_printed_observation(observation: Observation) -> bool:
+    """Engine/candidate rows never supply a printed ΔfG↔logK half."""
 
-    ident = reference.identity
+    if observation.engine is not None:
+        return False
+    ev = observation.evidence.class_
+    return not (ev.is_value and ev.value is EvidenceClass.ENGINE_PREDICTION)
+
+
+def _table_identity_matches(left: Identity, right: Identity) -> bool:
+    return (
+        left.species.formula == right.species.formula
+        and left.species.phase is right.species.phase
+        and left.temperature_K == right.temperature_K
+        and left.reaction == right.reaction
+        and left.per == right.per
+        and left.formation_elements == right.formation_elements
+        and left.standard_pressure_Pa == right.standard_pressure_Pa
+    )
+
+
+def _table_pair_payload(delta_obs: Observation, log_obs: Observation) -> dict | None:
+    ident = delta_obs.identity
     if not isinstance(ident, Identity):
         return None
-    if ident.quantity not in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
-        return None
-    want = Quantity.LOG10_KF if ident.quantity is Quantity.DELTA_FG else Quantity.DELTA_FG
-    sibling = None
-    for other in observations.values():
-        if other.observation_id == reference.observation_id:
-            continue
-        if other.experiment_id != reference.experiment_id:
-            continue
-        other_ident = other.identity
-        if not isinstance(other_ident, Identity) or other_ident.quantity is not want:
-            continue
-        if other_ident.species.formula != ident.species.formula:
-            continue
-        if other_ident.species.phase is not ident.species.phase:
-            continue
-        if ident.temperature_K != other_ident.temperature_K:
-            continue
-        sibling = other
-        break
-    if sibling is None:
-        return None
-    delta_obs = reference if ident.quantity is Quantity.DELTA_FG else sibling
-    log_obs = sibling if ident.quantity is Quantity.DELTA_FG else reference
     if delta_obs.value.kind is not ValueKind.POINT or log_obs.value.kind is not ValueKind.POINT:
         return None
     if ident.temperature_K is None or not ident.temperature_K.is_value:
@@ -237,7 +229,44 @@ def _table_payload(
         "standard_pressure_Pa": None
         if ident.standard_pressure_Pa is None or not ident.standard_pressure_Pa.is_value
         else ident.standard_pressure_Pa.value,
+        "reaction_id": ident.species.formula,
+        "printed_log10_Kf": log_obs.observation_id,
     }
+
+
+def _table_payloads(
+    reference: Observation,
+    observations: Mapping[str, Observation],
+) -> tuple[dict, ...]:
+    """Every printed ΔfG / log10_Kf pair at the complete identity point."""
+
+    ident = reference.identity
+    if not isinstance(ident, Identity):
+        return ()
+    if ident.quantity not in {Quantity.DELTA_FG, Quantity.LOG10_KF}:
+        return ()
+    if not _is_printed_observation(reference):
+        return ()
+    want = Quantity.LOG10_KF if ident.quantity is Quantity.DELTA_FG else Quantity.DELTA_FG
+    payloads: list[dict] = []
+    for other in observations.values():
+        if other.observation_id == reference.observation_id:
+            continue
+        if other.experiment_id != reference.experiment_id:
+            continue
+        if not _is_printed_observation(other):
+            continue
+        other_ident = other.identity
+        if not isinstance(other_ident, Identity) or other_ident.quantity is not want:
+            continue
+        if not _table_identity_matches(ident, other_ident):
+            continue
+        delta_obs = reference if ident.quantity is Quantity.DELTA_FG else other
+        log_obs = other if ident.quantity is Quantity.DELTA_FG else reference
+        payload = _table_pair_payload(delta_obs, log_obs)
+        if payload is not None:
+            payloads.append(payload)
+    return tuple(payloads)
 
 
 def _pressure_blocking_notices(*groups: tuple[Notice, ...] | None) -> tuple[Notice, ...]:
@@ -868,20 +897,29 @@ def validate_residual(
     if reference is not None:
         experiment = experiments.get(reference.experiment_id)
         if experiment is not None:
-            table = _table_payload(reference, observations)
-            gates = run_validity_gates(experiment, reference, table=table)
+            tables = _table_payloads(reference, observations)
+            gates = run_validity_gates(experiment, reference, tables=tables)
             if not gates.passed:
-                if (
+                gate_reason = gates.reason or RefusalReason.INVALID_SOURCE
+                refusal = residual.refusal
+                wrong_shape = (
                     residual.score_eligible
                     or residual.status is not ResidualStatus.REFUSED
                     or residual.numeric is not None
-                ):
+                )
+                wrong_reason = (
+                    refusal is None
+                    or refusal.reason is not gate_reason
+                    or not refusal.detail
+                )
+                if wrong_shape or wrong_reason:
                     issues.append(
                         _issue(
                             path,
-                            gates.reason or RefusalReason.INVALID_SOURCE,
-                            "validity gate failed; residual must be refused with no numeric "
-                            f"and score_eligible=false ({gates.primary_check})",
+                            gate_reason,
+                            "validity gate failed; residual must be refused with no numeric, "
+                            f"score_eligible=false, reason {gate_reason.value} and check "
+                            f"evidence ({gates.primary_check})",
                         )
                     )
     if residual.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}:

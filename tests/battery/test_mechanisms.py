@@ -147,6 +147,124 @@ def test_m01_inconsistent_o2_table_is_invalid_source() -> None:
     assert validate_corpus([w], [exp], [dg, lk_good, cand], [consistent]).ok
 
 
+def test_r01_engine_sibling_cannot_mask_printed_table_inconsistency() -> None:
+    """Printed ΔfG/logK pairing ignores engine observations and keeps every printed pair.
+
+    Codex F01: inserting an engine logK=0 before a printed logK=-59.154 must not
+    repair the invalid source. Distinct p° are distinct identity points.
+    """
+
+    from dataclasses import replace
+
+    ident_g = F.o2_identity()
+    ident_k = replace(ident_g, quantity=Quantity.LOG10_KF)
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r01-ref",
+        exp.experiment_id,
+        ident_g,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r01-cand", exp.experiment_id, ident_g, Decimal("0"))
+    bad_log = F.observation(
+        "r01-bad-logK",
+        exp.experiment_id,
+        ident_k,
+        Decimal("-59.154"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    engine_log = F.engine_obs("r01-engine-logK", exp.experiment_id, ident_k, Decimal("0"))
+    scored = F.residual(
+        "r01-scored",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    printed_only = validate_corpus([w], [exp], [ref, bad_log, cand], [scored])
+    assert not printed_only.ok
+    assert any(i.reason is RefusalReason.INVALID_SOURCE for i in printed_only.issues)
+    engine_first = validate_corpus(
+        [w], [exp], [ref, engine_log, bad_log, cand], [scored]
+    )
+    assert not engine_first.ok
+    assert any(i.reason is RefusalReason.INVALID_SOURCE for i in engine_first.issues)
+    good_log = F.observation(
+        "r01-good-logK",
+        exp.experiment_id,
+        ident_k,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    all_printed = validate_corpus(
+        [w], [exp], [ref, good_log, bad_log, cand], [scored]
+    )
+    assert not all_printed.ok
+    other_pressure = replace(
+        bad_log,
+        observation_id="r01-bad-101325",
+        identity=replace(ident_k, standard_pressure_Pa=State.of(Decimal("101325"))),
+    )
+    distinct_p = validate_corpus([w], [exp], [ref, other_pressure, cand], [scored])
+    assert distinct_p.ok
+    consistent = F.residual(
+        "r01-consistent",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.MATCH,
+        score_eligible=True,
+    )
+    assert validate_corpus([w], [exp], [ref, good_log, cand], [consistent]).ok
+
+
+def test_r01_failed_gate_refusal_must_carry_invalid_source_and_check_evidence() -> None:
+    """A refused residual for a failed table gate cannot hide behind another reason."""
+
+    from dataclasses import replace
+
+    ident_g = F.o2_identity()
+    ident_k = replace(ident_g, quantity=Quantity.LOG10_KF)
+    w = F.work()
+    exp = F.tabulation_experiment()
+    ref = F.observation(
+        "r01-ref-reason",
+        exp.experiment_id,
+        ident_g,
+        Decimal("0"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    cand = F.engine_obs("r01-cand-reason", exp.experiment_id, ident_g, Decimal("0"))
+    bad_log = F.observation(
+        "r01-bad-reason-logK",
+        exp.experiment_id,
+        ident_k,
+        Decimal("-59.154"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    wrong = F.residual(
+        "r01-wrong-reason",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.REFUSED,
+        score_eligible=False,
+        refusal=ResidualRefusal(RefusalReason.IDENTITY_MISMATCH, {}),
+    )
+    report = validate_corpus([w], [exp], [ref, bad_log, cand], [wrong])
+    assert not report.ok
+    assert any(i.reason is RefusalReason.INVALID_SOURCE for i in report.issues)
+    correct = F.residual(
+        "r01-correct-reason",
+        ref.observation_id,
+        candidate=cand.observation_id,
+        status=ResidualStatus.REFUSED,
+        score_eligible=False,
+        refusal=ResidualRefusal(RefusalReason.INVALID_SOURCE, {"gate": "delta_fG_logK"}),
+    )
+    assert validate_corpus([w], [exp], [ref, bad_log, cand], [correct]).ok
+
+
 def test_m02_floor_notice_keeps_numeric_but_not_score_eligible() -> None:
     """Floor-tagged vapour residual cannot be score_eligible; diagnostic numeric can.
 

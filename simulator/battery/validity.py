@@ -31,7 +31,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Any
+from typing import Any, Sequence
 
 from simulator.battery.enums import (
     MethodToken,
@@ -386,6 +386,7 @@ def run_validity_gates(
     observation: Observation,
     *,
     table: dict[str, Any] | None = None,
+    tables: Sequence[dict[str, Any]] | None = None,
 ) -> GateOutcome:
     """Run all four gates. Record every failure; first is the primary reason."""
 
@@ -401,16 +402,23 @@ def run_validity_gates(
             primary = outcome.reason
             primary_name = outcome.primary_check
 
-    if table is not None and "delta_fG_kJ_mol" in table and "log10_Kf" in table:
+    payloads: list[dict[str, Any]] = []
+    if tables:
+        payloads.extend(tables)
+    elif table is not None:
+        payloads.append(table)
+    for payload in payloads:
+        if "delta_fG_kJ_mol" not in payload or "log10_Kf" not in payload:
+            continue
         absorb(
             table_self_consistency(
-                delta_fG_kJ_mol=table["delta_fG_kJ_mol"],
-                log10_Kf=table["log10_Kf"],
-                T_K=table["T_K"],
-                per=table.get("per"),
-                standard_pressure_Pa=table.get("standard_pressure_Pa"),
-                reaction_id=table.get("reaction_id"),
-                printed_log10_Kf=table.get("printed_log10_Kf"),
+                delta_fG_kJ_mol=payload["delta_fG_kJ_mol"],
+                log10_Kf=payload["log10_Kf"],
+                T_K=payload["T_K"],
+                per=payload.get("per"),
+                standard_pressure_Pa=payload.get("standard_pressure_Pa"),
+                reaction_id=payload.get("reaction_id"),
+                printed_log10_Kf=payload.get("printed_log10_Kf"),
             )
         )
     absorb(underdetermined_apparatus(experiment, quantity))
