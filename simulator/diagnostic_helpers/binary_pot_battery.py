@@ -87,6 +87,7 @@ REFUSAL_MAJOR_SUM = "sum_below_95_wt_pct"
 REFUSAL_NO_LIQUID = "no_liquid"
 REFUSAL_TIMEOUT = "engine_timeout"
 REFUSAL_ENGINE_CRASH = "engine_crash"
+ENGINE_ANNOTATION_CRASH_FLOOR = "sio2_below_observed_crash_floor"
 REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
 REFUSAL_UNAVAILABLE = "unavailable"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
@@ -244,6 +245,7 @@ class EquilibrateCell:
     exit_signal: int | None = None
     exit_code: int | None = None
     model_id: str | None = None
+    engine_annotation: str | None = None
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -255,6 +257,7 @@ class EquilibrateCell:
             "refusal_reason": self.refusal_reason,
             "engine_status": self.engine_status,
             "engine_reason": self.engine_reason,
+            "engine_annotation": self.engine_annotation,
             "melt_activities": dict(self.melt_activities),
             "gas_partial_pressures_Pa": dict(self.gas_partial_pressures_Pa),
             "liquid_fraction": self.liquid_fraction,
@@ -304,6 +307,7 @@ class EquilibrateCell:
             refusal_reason=payload.get("refusal_reason"),
             engine_status=payload.get("engine_status"),
             engine_reason=payload.get("engine_reason"),
+            engine_annotation=payload.get("engine_annotation"),
             melt_activities=dict(payload.get("melt_activities") or {}),
             gas_partial_pressures_Pa=dict(
                 payload.get("gas_partial_pressures_Pa") or {}
@@ -1041,6 +1045,16 @@ def _composition_projected_notice(
         "dropped_components": dropped,
         "dropped_mass_fraction": fraction_number,
     }
+
+
+def crash_floor_engine_annotation(
+    diagnostics: Mapping[str, Any] | None,
+) -> str | None:
+    """Copy the adapter floor annotation; never overwrite the typed reason."""
+    annotation = (diagnostics or {}).get("engine_reason")
+    if annotation == ENGINE_ANNOTATION_CRASH_FLOOR:
+        return ENGINE_ANNOTATION_CRASH_FLOOR
+    return None
 
 
 def classify_equilibrate_outcome(
@@ -2140,24 +2154,25 @@ def equilibrate_cell(
             timeout,
         )
         status, refusal, engine_reason = classify_equilibrate_outcome(result)
+        diagnostics = dict(getattr(result, "diagnostics", None) or {})
+        engine_annotation = crash_floor_engine_annotation(diagnostics)
         if (
             qualification
             and status == "refusal"
             and refusal not in {REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH}
         ):
-            result_diagnostics = dict(getattr(result, "diagnostics", None) or {})
             gate_name = (
-                result_diagnostics.get("backend_failure_reason_code")
-                or result_diagnostics.get("backend_status_reason")
+                diagnostics.get("backend_failure_reason_code")
+                or diagnostics.get("backend_status_reason")
                 or engine_reason
                 or refusal
             )
             refusal = REFUSAL_GATE_REFUSED_IN_ADAPTER
             engine_reason = f"{gate_name}"
+            engine_annotation = None
         activities, pressures = extract_reported_quantities(result)
         vapor_authority = extract_vapor_authority(result)
         result_notices = list(getattr(result, "imcc_notices", None) or [])
-        diagnostics = dict(getattr(result, "diagnostics", None) or {})
         result_notices.extend(list(diagnostics.get("imcc_notices") or []))
         crash_diag = diagnostics.get("subprocess_failure") or {}
         exit_code = _optional_int(
@@ -2171,6 +2186,7 @@ def equilibrate_cell(
             refusal_reason=refusal,
             engine_status=str(getattr(result, "status", None) or status),
             engine_reason=engine_reason,
+            engine_annotation=engine_annotation,
             melt_activities=activities,
             gas_partial_pressures_Pa=pressures,
             liquid_fraction=_finite_float(getattr(result, "liquid_fraction", None)),

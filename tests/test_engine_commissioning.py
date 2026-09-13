@@ -1137,7 +1137,7 @@ def test_studio_diff_classifies_allowed_and_other_verdicts() -> None:
         liquid_fraction=None,
     )
     crash_tip = dict(crash_base)
-    crash_tip['engine_reason'] = 'sio2_below_observed_crash_floor'
+    crash_tip['engine_annotation'] = 'sio2_below_observed_crash_floor'
     other_tip = _studio_cell(liquid_fraction=0.5)
 
     assert diff.classify_cell(identical, identical) == 'identical'

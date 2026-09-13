@@ -1419,3 +1419,75 @@ def test_classify_subprocess_died_is_engine_crash() -> None:
     assert status == "refusal"
     assert reason == REFUSAL_ENGINE_CRASH
     assert engine_reason
+
+
+def _subprocess_death_result(*, annotated: bool):
+    diagnostics = {
+        "backend_status_reason": "subprocess_died",
+        "backend_failure_reason_code": "subprocess_died",
+        "backend_failure_category": "engine_crash",
+        "subprocess_failure": {"returncode": -6, "signal": "SIGABRT"},
+    }
+    if annotated:
+        diagnostics["engine_reason"] = "sio2_below_observed_crash_floor"
+    return SimpleNamespace(
+        status="out_of_domain",
+        diagnostics=diagnostics,
+        warnings=["AlphaMELTS subprocess exited before producing a result"],
+        activity_coefficients={},
+        vapor_pressures_Pa={},
+        liquid_fraction=None,
+    )
+
+
+def _inline_death_cell(*, annotated: bool):
+    pot = BinaryPot(
+        pot_id="qual_sio2_30_feo_mgo",
+        kato_1993_table4_system=None,
+        why="below observed crash floor",
+        composition_wt_pct={"SiO2": 30.0, "FeO": 42.0, "MgO": 28.0},
+    )
+    po2 = Po2Request(mode="engine_default", po2_bar=None)
+
+    class _DeathBackend:
+        def equilibrate(self, **kwargs):
+            return _subprocess_death_result(annotated=annotated)
+
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=_DeathBackend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    return equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1700.0,
+        po2=po2,
+        qualification=True,
+        isolated=False,
+    )
+
+
+def test_annotated_subprocess_death_carries_engine_annotation() -> None:
+    """E03 / grok P2-1: adapter floor annotation is a separate battery field."""
+    cell = _inline_death_cell(annotated=True)
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_ENGINE_CRASH
+    assert cell.engine_reason == "subprocess_died"
+    assert cell.engine_annotation == "sio2_below_observed_crash_floor"
+    assert cell.as_payload()["engine_annotation"] == (
+        "sio2_below_observed_crash_floor"
+    )
+
+
+def test_plain_subprocess_death_has_no_engine_annotation() -> None:
+    """E03 control: a plain subprocess death does not invent the annotation."""
+    cell = _inline_death_cell(annotated=False)
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_ENGINE_CRASH
+    assert cell.engine_reason == "subprocess_died"
+    assert cell.engine_annotation is None
+    assert cell.as_payload().get("engine_annotation") is None

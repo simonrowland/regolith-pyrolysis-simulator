@@ -204,25 +204,14 @@ def classify_cell(
         for field in COMPARE_FIELDS
     }
     if all(equal.values()):
+        if (
+            _is_crash(base)
+            and _is_crash(tip)
+            and base.get("engine_annotation") != CRASH_ANNOTATION_REASON
+            and tip.get("engine_annotation") == CRASH_ANNOTATION_REASON
+        ):
+            return VERDICT_CRASH_ANNOTATION
         return VERDICT_IDENTICAL
-    numeric_equal = all(
-        equal[field]
-        for field in (
-            "melt_activities",
-            "gas_partial_pressures_Pa",
-            "liquid_fraction",
-        )
-    )
-    if (
-        numeric_equal
-        and equal["status"]
-        and equal["refusal_reason"]
-        and _is_crash(base)
-        and _is_crash(tip)
-        and base.get("engine_reason") != CRASH_ANNOTATION_REASON
-        and tip.get("engine_reason") == CRASH_ANNOTATION_REASON
-    ):
-        return VERDICT_CRASH_ANNOTATION
     if (
         base.get("status") in REFUSAL_STATUSES
         and tip.get("status") in OK_STATUSES
