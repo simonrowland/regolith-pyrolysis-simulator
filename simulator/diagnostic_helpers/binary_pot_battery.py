@@ -21,8 +21,10 @@ import inspect
 import json
 import math
 import os
+import signal
 import socket
 import subprocess
+import sys
 import threading
 import time
 from collections import Counter, defaultdict
@@ -35,7 +37,9 @@ import yaml
 
 from simulator.physical_constants import (
     CATALOG_PHYSICAL_PRESSURE_CEILING_PA,
+    CELSIUS_TO_KELVIN_OFFSET,
     MELT_DISSOCIATION_PO2_MIN_BAR,
+    PA_PER_BAR,
 )
 from simulator.vapour_rail.engine_crosscheck import divergence_label
 
@@ -55,7 +59,21 @@ BATTERY_ENGINE_NAMES: tuple[str, ...] = (
     "vaporock",
     "magemin",
     "cached-real",
+    "imcc_sf04",
+    "imcc_sf04_ext",
 )
+IMCC_ENGINE_NAMES: tuple[str, ...] = ("imcc_sf04", "imcc_sf04_ext")
+IMCC_MODEL_IDS: dict[str, str] = {
+    "imcc_sf04": "IMCC-SF04",
+    "imcc_sf04_ext": "IMCC-SF04-EXT",
+}
+IMCC_DATAPACK_RELATIVE: dict[str, str] = {
+    "imcc_sf04": "data/melt_activity/imcc/imcc-sf04-v1.0.2.json",
+    "imcc_sf04_ext": "data/melt_activity/imcc/imcc-sf04-ext-v4.json",
+}
+MELTS_FAMILY_ENGINES: tuple[str, ...] = ("alphamelts", "thermoengine")
+ARM_HEADLINE = "headline"
+ARM_QUALIFICATION = "qualification"
 
 QUANTITY_ACTIVITY = "melt_activity"
 QUANTITY_PRESSURE = "gas_partial_pressure_Pa"
@@ -68,8 +86,11 @@ REFUSAL_COMPOSITION_PROJECTED = "composition_projected"
 REFUSAL_MAJOR_SUM = "sum_below_95_wt_pct"
 REFUSAL_NO_LIQUID = "no_liquid"
 REFUSAL_TIMEOUT = "engine_timeout"
+REFUSAL_ENGINE_CRASH = "engine_crash"
+REFUSAL_GATE_REFUSED_IN_ADAPTER = "gate_refused_in_adapter"
 REFUSAL_UNAVAILABLE = "unavailable"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
+AUTHORITY_EXTRAPOLATED = "extrapolated"
 # Token published by engines/builtin/vapor_pressure.py on pO2-floor inversion.
 _FLOOR_INVERSION_REASON = "melt_dissociation_pO2_floor_inverted_through_mass_action"
 
@@ -90,8 +111,27 @@ _NO_LIQUID_TOKENS = frozenset(
 _TIMEOUT_TOKENS = frozenset(
     {"engine_timeout", "timeout", "engine_worker_timeout"}
 )
+_CRASH_TOKENS = frozenset(
+    {
+        "engine_crash",
+        "subprocess_died",
+        "sigabrt",
+        "sigsegv",
+        "sigbus",
+        "sigkill",
+    }
+)
 _UNAVAILABLE_TOKENS = frozenset(
     {"unavailable", "backend_unavailable", "not_initialized"}
+)
+_IMCC_OUT_OF_BASIS_CODES = frozenset(
+    {
+        "imcc_component_outside_domain",
+        "imcc_ferric_input_unsupported",
+        "imcc_sp_extension_required",
+        "imcc_composition_outside_validated_envelope",
+        "imcc_composition_incomplete",
+    }
 )
 
 _DEFAULT_PRESSURE_BAR = 1.0e-6
@@ -109,7 +149,33 @@ _ENGINE_OUTER_TIMEOUT_S: dict[str, float] = {
     "vaporock": 70.0,
     "magemin": 20.0,
     "cached-real": 30.0,
+    "imcc_sf04": 15.0,
+    "imcc_sf04_ext": 15.0,
 }
+
+QUALIFICATION_SIO2_SWEEP_WT_PCT: tuple[float, ...] = (
+    20.0,
+    25.0,
+    30.0,
+    35.0,
+    85.0,
+    90.0,
+)
+QUALIFICATION_TEMPERATURES_K: tuple[float, ...] = (
+    1100.0,
+    1200.0,
+    2400.0,
+    2600.0,
+)
+QUALIFICATION_SWEEP_T_K = 1700.0
+QUALIFICATION_SOURCE_POT_ID = "feo_mgo_sio2_30_20_50"
+
+_ISOLATED_CELL_BOOTSTRAP = (
+    "import json,sys;"
+    "from simulator.diagnostic_helpers.binary_pot_battery import "
+    "run_isolated_cell_worker;"
+    "run_isolated_cell_worker(json.load(sys.stdin))"
+)
 
 
 class BinaryPotBatteryError(RuntimeError):
@@ -171,6 +237,13 @@ class EquilibrateCell:
     vapor_pressure_backend_status: str | None = None
     vapor_pressure_backend_status_reason: str | None = None
     authoritative_for_requested_vapor_pressure: bool | None = None
+    arm: str = ARM_HEADLINE
+    notices: list[dict[str, Any]] = field(default_factory=list)
+    authority: str | None = None
+    certified_band: dict[str, Any] | None = None
+    exit_signal: int | None = None
+    exit_code: int | None = None
+    model_id: str | None = None
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -196,12 +269,26 @@ class EquilibrateCell:
             "authoritative_for_requested_vapor_pressure": (
                 self.authoritative_for_requested_vapor_pressure
             ),
+            "arm": self.arm,
+            "notices": [dict(row) for row in self.notices],
+            "authority": self.authority,
+            "certified_band": (
+                None if self.certified_band is None else dict(self.certified_band)
+            ),
+            "exit_signal": self.exit_signal,
+            "exit_code": self.exit_code,
+            "model_id": self.model_id,
         }
 
     @classmethod
     def from_payload(cls, payload: Mapping[str, Any]) -> "EquilibrateCell":
         po2_raw = payload.get("po2") or {}
         po2_bar = po2_raw.get("po2_bar") if isinstance(po2_raw, Mapping) else None
+        notices_raw = payload.get("notices") or []
+        notices = [
+            dict(row) for row in notices_raw if isinstance(row, Mapping)
+        ]
+        certified_raw = payload.get("certified_band")
         return cls(
             pot_id=str(payload.get("pot_id") or ""),
             engine=str(payload.get("engine") or ""),
@@ -249,6 +336,23 @@ class EquilibrateCell:
                 else bool(
                     payload.get("authoritative_for_requested_vapor_pressure")
                 )
+            ),
+            arm=str(payload.get("arm") or ARM_HEADLINE),
+            notices=notices,
+            authority=(
+                None
+                if payload.get("authority") is None
+                else str(payload.get("authority"))
+            ),
+            certified_band=(
+                None if not isinstance(certified_raw, Mapping) else dict(certified_raw)
+            ),
+            exit_signal=_optional_int(payload.get("exit_signal")),
+            exit_code=_optional_int(payload.get("exit_code")),
+            model_id=(
+                None
+                if payload.get("model_id") is None
+                else str(payload.get("model_id"))
             ),
         )
 
@@ -685,6 +789,15 @@ def _finite_float(value: Any) -> float | None:
     return number
 
 
+def _optional_int(value: Any) -> int | None:
+    if value is None or value is False:
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def extract_reported_quantities(
     result: Any,
 ) -> tuple[dict[str, float], dict[str, float]]:
@@ -867,6 +980,8 @@ def _haystack(*parts: Any) -> str:
 def _bucket_from_text(text: str) -> str | None:
     if any(token in text for token in _TIMEOUT_TOKENS):
         return REFUSAL_TIMEOUT
+    if any(token in text for token in _CRASH_TOKENS):
+        return REFUSAL_ENGINE_CRASH
     if any(token in text for token in _MAJOR_SUM_TOKENS):
         return REFUSAL_MAJOR_SUM
     if any(token in text for token in _OUT_OF_BASIS_TOKENS):
@@ -940,13 +1055,28 @@ def classify_equilibrate_outcome(
     """
 
     if error is not None:
-        reason_code = str(getattr(error, "reason_code", "") or "")
+        reason_code = str(
+            getattr(error, "reason_code", "")
+            or getattr(error, "backend_status_reason", "")
+            or getattr(error, "code", "")
+            or ""
+        )
         status_reason = str(getattr(error, "backend_status_reason", "") or "")
+        category = str(getattr(error, "backend_failure_category", "") or "")
         message = str(error)
         engine_reason = status_reason or reason_code or message
-        haystack = _haystack(type(error).__name__, reason_code, status_reason, message)
+        haystack = _haystack(
+            type(error).__name__, reason_code, status_reason, category, message
+        )
         if "timeout" in type(error).__name__.lower() or isinstance(error, TimeoutError):
             return "refusal", REFUSAL_TIMEOUT, engine_reason
+        if category == REFUSAL_ENGINE_CRASH or reason_code in {
+            "subprocess_died",
+            REFUSAL_ENGINE_CRASH,
+        }:
+            return "refusal", REFUSAL_ENGINE_CRASH, engine_reason
+        if reason_code in _IMCC_OUT_OF_BASIS_CODES:
+            return "refusal", REFUSAL_OUT_OF_BASIS, engine_reason
         bucket = _bucket_from_text(haystack) or REFUSAL_UNAVAILABLE
         return "refusal", bucket, engine_reason
 
@@ -959,10 +1089,18 @@ def classify_equilibrate_outcome(
     structured = str(
         diagnostics.get("backend_status_reason")
         or diagnostics.get("empty_speciation_cause")
+        or diagnostics.get("backend_failure_reason_code")
         or ""
     )
+    category = str(diagnostics.get("backend_failure_category") or "")
     engine_reason = structured or ("; ".join(str(w) for w in warnings) if warnings else engine_status)
-    haystack = _haystack(engine_status, structured, warnings, diagnostics)
+    haystack = _haystack(engine_status, structured, category, warnings, diagnostics)
+    if (
+        category == REFUSAL_ENGINE_CRASH
+        or structured in {"subprocess_died", REFUSAL_ENGINE_CRASH}
+        or engine_status == REFUSAL_ENGINE_CRASH
+    ):
+        return "refusal", REFUSAL_ENGINE_CRASH, engine_reason
     projected = _composition_projected_notice(diagnostics)
     if projected is not None:
         return (
@@ -1063,6 +1201,663 @@ def reclassify_projected_composition_cells(
 
 
 # ---------------------------------------------------------------------------
+# IMCC-SF04(+EXT) battery adapter
+# ---------------------------------------------------------------------------
+
+
+class _ImccBatteryBackend:
+    """Thin MeltBackend-shaped wrapper around ``imcc_sf04.adapter.evaluate``.
+
+    Not registered in ``simulator.backends``: IMCC is a diagnostic shadow
+    and has no ledger authority. The engine arm is the first caller.
+    """
+
+    supports_intrinsic_fO2 = False
+
+    def __init__(self, engine_name: str) -> None:
+        if engine_name not in IMCC_MODEL_IDS:
+            raise BinaryPotBatteryError(f"unknown IMCC engine {engine_name!r}")
+        self.engine_name = engine_name
+        self.model_id = IMCC_MODEL_IDS[engine_name]
+        self._pack: Any = None
+        self._gas: Any = None
+        self._gas_error: str | None = None
+        self._identity: dict[str, str] = {
+            "name": self.model_id,
+            "version": "",
+            "digest": "",
+        }
+        self._load()
+
+    def _datapack_path(self) -> Path:
+        return REPO_ROOT / IMCC_DATAPACK_RELATIVE[self.engine_name]
+
+    def _load(self) -> None:
+        from simulator.melt_backend.imcc_sf04 import load_datapack
+
+        pack = load_datapack(self._datapack_path())
+        self._pack = pack
+        self._identity = {
+            "name": str(pack.model_id),
+            "version": str(pack.version),
+            "digest": str(
+                getattr(pack.kernel_datapack, "published_manifest_sha256", "") or ""
+            ),
+            "model_id": str(pack.model_id),
+            "datapack": str(self._datapack_path().relative_to(REPO_ROOT)),
+        }
+        try:
+            from simulator.melt_backend.imcc_sf04.gas import load_gas_datapack
+
+            self._gas = load_gas_datapack()
+            self._gas_error = None
+        except Exception as exc:  # noqa: BLE001 - gas is optional; activities still run
+            self._gas = None
+            self._gas_error = f"{type(exc).__name__}: {exc}"
+
+    def equilibrate(
+        self,
+        temperature_C: float,
+        composition_kg: Mapping[str, float] | None = None,
+        fO2_log: float | None = None,
+        pressure_bar: float = 1.0e-6,
+        *,
+        composition_mol: Mapping[str, float] | None = None,
+        **_unused: object,
+    ) -> Any:
+        from types import SimpleNamespace
+
+        from simulator.melt_backend.imcc_sf04 import evaluate
+        from simulator.melt_backend.imcc_sf04.kernel import ImccRefusal
+
+        del composition_mol, pressure_bar
+        if self._pack is None:
+            raise RuntimeError("IMCC datapack failed to load")
+        composition_wt = {
+            str(name): float(mass_kg) * 100.0
+            for name, mass_kg in dict(composition_kg or {}).items()
+            if float(mass_kg) > 0.0
+        }
+        total = sum(composition_wt.values())
+        temperature_K = float(temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        enable_sp = self.engine_name == "imcc_sf04_ext"
+        result = evaluate(
+            composition_wt,
+            temperature_K,
+            self._pack,
+            basis=total if total > 0.0 else None,
+            basis_type="wt",
+            enable_sp_extension=enable_sp,
+            allow_extrapolation=True,
+            allow_out_of_envelope=True,
+        )
+        activities: dict[str, float] = {}
+        for name, value in zip(result.parent_oxides, result.parent_activity):
+            number = _finite_float(value)
+            if number is not None and number > 0.0:
+                activities[str(name)] = number
+        notices: list[dict[str, Any]] = []
+        if result.extrapolated:
+            notices.append(
+                {
+                    "kind": "imcc_temperature_extrapolated",
+                    "authority": AUTHORITY_EXTRAPOLATED,
+                    "reason": "T outside datapack T_domain_K; evaluate(allow_extrapolation=True)",
+                }
+            )
+        envelope = getattr(getattr(result, "labels", None), "envelope_status", None)
+        if envelope == "outside_validated":
+            notices.append(
+                {
+                    "kind": "imcc_composition_outside_validated_envelope",
+                    "authority": AUTHORITY_EXTRAPOLATED,
+                    "reason": "X_Me2O above the validated 0.5 bound; evaluate(allow_out_of_envelope=True)",
+                }
+            )
+        pressures: dict[str, float] = {}
+        gas_error: str | None = None
+        if self._gas is None:
+            gas_error = self._gas_error or "imcc_gas_datapack_unavailable"
+        else:
+            try:
+                from simulator.melt_backend.imcc_sf04.gas import evaluate_gas
+
+                fo2_bar = (
+                    10.0 ** float(fO2_log)
+                    if fO2_log is not None and math.isfinite(float(fO2_log))
+                    else 10.0 ** _DEFAULT_FO2_LOG
+                )
+                gas_bar = evaluate_gas(
+                    activities,
+                    temperature_K,
+                    fo2_bar,
+                    self._gas,
+                    parent_oxides=result.parent_oxides,
+                    allow_extrapolation=True,
+                )
+                for name, value in dict(gas_bar).items():
+                    number = _finite_float(value)
+                    if number is not None and number > 0.0:
+                        pressures[str(name)] = number * PA_PER_BAR
+            except ImccRefusal as exc:
+                gas_error = f"{getattr(exc, 'code', type(exc).__name__)}: {exc}"
+            except Exception as exc:  # noqa: BLE001 - gas is optional
+                gas_error = f"{type(exc).__name__}: {exc}"
+        if gas_error:
+            notices.append(
+                {
+                    "kind": "imcc_gas_unavailable",
+                    "authority": None,
+                    "reason": gas_error,
+                }
+            )
+        labels = getattr(result, "labels", None)
+        identity = dict(getattr(labels, "identity", None) or {})
+        diagnostics = {
+            "imcc_model_id": identity.get("model_id") or self.model_id,
+            "imcc_datapack_version": identity.get("datapack_version")
+            or self._identity.get("version"),
+            "imcc_extrapolated": bool(result.extrapolated),
+            "imcc_envelope_status": envelope,
+            "imcc_notices": notices,
+        }
+        return SimpleNamespace(
+            status="ok",
+            diagnostics=diagnostics,
+            warnings=[],
+            activity_coefficients=activities,
+            vapor_pressures_Pa=pressures,
+            liquid_fraction=1.0,
+            phase_assemblage_available=True,
+            imcc_notices=notices,
+            imcc_model_id=identity.get("model_id") or self.model_id,
+        )
+
+
+# ---------------------------------------------------------------------------
+# Qualification (out-of-domain) MELTS arm
+# ---------------------------------------------------------------------------
+
+
+def melts_certified_band() -> dict[str, Any]:
+    """Published MELTS SiO2 + T band as the adapter/spec actually states it.
+
+    SiO2: ``engines/alphamelts/domain.py``
+    ``DEFAULT_SILICATE_NETWORK_BAND_WT_PCT`` = [30, 80] wt%, with measured
+    crash floor 34.0 wt% (``_SIO2_CRASH_FLOOR_WT_PCT``). Adapter
+    ``AlphaMELTSBackend._domain_gate`` uses the same 30–80 window.
+
+    Temperature: subprocess floor
+    ``ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C`` = 800 °C (1073.15 K) in
+    ``simulator/melt_backend/alphamelts.py``; calibration ceiling
+    ``T_calib_max_K`` = 1700 K in
+    ``simulator/melt_backend/melt_envelope.py``
+    ``MELT_ENVELOPE_CONSTANTS['MELTS-v1.0']`` (HT1-audit conservative
+    top of pMELTS/rhyolite-MELTS liquid calibration).
+    """
+
+    from engines.alphamelts.domain import (
+        DEFAULT_SILICATE_NETWORK_BAND_WT_PCT,
+        _SIO2_CRASH_FLOOR_WT_PCT,
+    )
+    from simulator.melt_backend.alphamelts import (
+        ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C,
+    )
+    from simulator.melt_backend.melt_envelope import MELT_ENVELOPE_CONSTANTS
+
+    t_min_k = float(ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C) + CELSIUS_TO_KELVIN_OFFSET
+    t_max_k = float(MELT_ENVELOPE_CONSTANTS["MELTS-v1.0"]["T_calib_max_K"])
+    sio2_min, sio2_max = DEFAULT_SILICATE_NETWORK_BAND_WT_PCT
+    return {
+        "sio2_wt_pct": [float(sio2_min), float(sio2_max)],
+        "temperature_K": [t_min_k, t_max_k],
+        "sio2_crash_floor_wt_pct": float(_SIO2_CRASH_FLOOR_WT_PCT),
+        "citations": {
+            "sio2_band": (
+                "engines/alphamelts/domain.py "
+                "DEFAULT_SILICATE_NETWORK_BAND_WT_PCT"
+            ),
+            "sio2_crash_floor_wt_pct": (
+                "engines/alphamelts/domain.py _SIO2_CRASH_FLOOR_WT_PCT"
+            ),
+            "T_min_C": (
+                "simulator/melt_backend/alphamelts.py "
+                "ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C"
+            ),
+            "T_max_K": (
+                "simulator/melt_backend/melt_envelope.py "
+                "MELT_ENVELOPE_CONSTANTS['MELTS-v1.0']['T_calib_max_K']"
+            ),
+        },
+    }
+
+
+def assess_qualification_gate(
+    composition_wt_pct: Mapping[str, float],
+    temperature_K: float,
+) -> dict[str, Any]:
+    """Record the MELTS domain-gate verdict without refusing the call."""
+
+    from engines.alphamelts.domain import AlphaMELTSDomainGate
+
+    band = melts_certified_band()
+    assessment = AlphaMELTSDomainGate.assess(composition_wt_pct)
+    t_min, t_max = band["temperature_K"]
+    t_value = float(temperature_K)
+    t_failed = t_value < float(t_min) or t_value > float(t_max)
+    warnings = list(assessment.warnings)
+    failed = list(assessment.failed_constraints)
+    if t_failed:
+        failed.append("temperature_range")
+        warnings.append(
+            f"temperature {t_value:g} K outside published MELTS band "
+            f"[{t_min:g}, {t_max:g}] K"
+        )
+    sio2 = float(composition_wt_pct.get("SiO2", 0.0) or 0.0)
+    crash_floor = float(band["sio2_crash_floor_wt_pct"])
+    below_crash_floor = sio2 < crash_floor
+    if below_crash_floor and "silicate_network_band" not in failed:
+        # 30–34 wt% sliver: default band admits it; crash floor does not.
+        warnings.append(
+            f"SiO2 = {sio2:.3f} wt% is below the measured alphaMELTS "
+            f"crash floor {crash_floor:g} wt%"
+        )
+    valid = bool(assessment.valid) and not t_failed
+    return {
+        "valid": valid,
+        "warnings": warnings,
+        "reason": assessment.reason,
+        "failed_constraints": tuple(failed),
+        "silicate_network_band_wt_pct": list(assessment.silicate_network_band_wt_pct),
+        "temperature_K": t_value,
+        "temperature_in_band": not t_failed,
+        "sio2_wt_pct": sio2,
+        "below_crash_floor": below_crash_floor,
+        "authority": AUTHORITY_EXTRAPOLATED,
+        "certified_band": band,
+    }
+
+
+def qualification_notice(gate: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "kind": "melts_domain_gate",
+        "authority": AUTHORITY_EXTRAPOLATED,
+        "certified_band": dict(gate.get("certified_band") or {}),
+        "gate_valid": bool(gate.get("valid")),
+        "gate_reason": gate.get("reason"),
+        "failed_constraints": list(gate.get("failed_constraints") or ()),
+        "warnings": list(gate.get("warnings") or ()),
+        "temperature_in_band": bool(gate.get("temperature_in_band")),
+        "below_crash_floor": bool(gate.get("below_crash_floor")),
+        "sio2_wt_pct": gate.get("sio2_wt_pct"),
+        "run_anyway": True,
+        "bypassable_from_harness": [
+            "AlphaMELTSBackend._domain_gate / engines.alphamelts.domain.AlphaMELTSDomainGate (SiO2 band, major-oxide sum, oxide basis)"
+        ],
+        "not_bypassable_from_harness": [
+            "ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C (800 C inline in _equilibrate_subprocess)",
+            "ALPHAMELTS_SUBPROCESS_MIN_PRESSURE_BAR (1 bar inline in _equilibrate_subprocess)",
+            "fe_free_and_imposed_absolute_fo2 (Na2O/K2O-SiO2 family; not _domain_gate)",
+        ],
+    }
+
+
+def scale_feo_mgo_for_sio2(
+    sio2_wt_pct: float,
+    source: Mapping[str, float],
+) -> dict[str, float]:
+    """Scale the FeO:MgO remainder of ``feo_mgo_sio2_30_20_50`` to a new SiO2.
+
+    The named source pot has no CaO; the brief's "FeO-MgO-CaO" remainder
+    is the FeO:MgO pair of that pot. Algebra: remainder = 100 − SiO2;
+    FeO:MgO stays 30:20 of the original 50 wt% non-silica.
+    """
+
+    sio2 = float(sio2_wt_pct)
+    if not math.isfinite(sio2) or sio2 < 0.0 or sio2 > 100.0:
+        raise BinaryPotBatteryError(f"qualification SiO2 {sio2_wt_pct!r} is not in [0, 100]")
+    feo = float(source.get("FeO") or 0.0)
+    mgo = float(source.get("MgO") or 0.0)
+    pair = feo + mgo
+    if pair <= 0.0:
+        raise BinaryPotBatteryError("qualification source pot has no FeO+MgO to scale")
+    remainder = 100.0 - sio2
+    composition = {
+        "SiO2": sio2,
+        "FeO": remainder * feo / pair,
+        "MgO": remainder * mgo / pair,
+    }
+    total = sum(composition.values())
+    if not math.isclose(total, 100.0, rel_tol=0.0, abs_tol=_WT_PCT_SUM_TOLERANCE):
+        composition = {k: 100.0 * v / total for k, v in composition.items()}
+    return composition
+
+
+def qualification_sio2_sweep_pots(
+    source: BinaryPot | None = None,
+) -> tuple[BinaryPot, ...]:
+    if source is None:
+        loaded, _grid = load_binary_pots()
+        source = next(
+            pot for pot in loaded if pot.pot_id == QUALIFICATION_SOURCE_POT_ID
+        )
+    pots_out: list[BinaryPot] = []
+    for sio2 in QUALIFICATION_SIO2_SWEEP_WT_PCT:
+        tag = f"{sio2:g}".replace(".", "p")
+        pots_out.append(
+            BinaryPot(
+                pot_id=f"qual_sio2_{tag}_feo_mgo",
+                kato_1993_table4_system=source.kato_1993_table4_system,
+                why=(
+                    f"QUALIFICATION SiO2 sweep at {sio2:g} wt%; FeO:MgO scaled "
+                    f"from {QUALIFICATION_SOURCE_POT_ID} (no CaO in that pot)."
+                ),
+                composition_wt_pct=scale_feo_mgo_for_sio2(
+                    sio2, source.composition_wt_pct
+                ),
+            )
+        )
+    return tuple(pots_out)
+
+
+def _cell_identity_key(cell: EquilibrateCell | Mapping[str, Any]) -> tuple[Any, ...]:
+    payload = cell.as_payload() if isinstance(cell, EquilibrateCell) else dict(cell)
+    po2 = payload.get("po2") or {}
+    return (
+        str(payload.get("pot_id") or ""),
+        str(payload.get("engine") or ""),
+        float(payload.get("temperature_K") or 0.0),
+        str(po2.get("mode") or ""),
+        None if po2.get("po2_bar") is None else float(po2.get("po2_bar")),
+        str(payload.get("arm") or ARM_HEADLINE),
+    )
+
+
+def load_cells_from_report(path: Path) -> list[EquilibrateCell]:
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    return load_cells_from_payload(payload)
+
+
+def load_cells_from_payload(payload: Mapping[str, Any]) -> list[EquilibrateCell]:
+    cells: list[EquilibrateCell] = []
+    for key in ("cells", "qualification_cells"):
+        for row in payload.get(key) or []:
+            if isinstance(row, Mapping):
+                cells.append(EquilibrateCell.from_payload(row))
+    return cells
+
+
+def load_engine_blocks_from_report(path: Path) -> dict[str, dict[str, Any]]:
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    blocks = payload.get("engines") or {}
+    return {
+        str(name): dict(block)
+        for name, block in blocks.items()
+        if isinstance(block, Mapping)
+    }
+
+
+def _bypass_melts_domain_gate(backend: Any) -> None:
+    """Qualification: record-and-run. Do not change gate VALUES."""
+
+    def _pass(*_args: Any, **_kwargs: Any) -> None:
+        return None
+
+    if hasattr(backend, "_domain_gate"):
+        backend._domain_gate = _pass  # type: ignore[method-assign]
+
+
+def run_isolated_cell_worker(payload: Mapping[str, Any]) -> None:
+    """Child-process entry: one cell, JSON on stdout, crash becomes a signal."""
+
+    simulate = payload.get("simulate_crash")
+    if simulate:
+        sig_name = str(simulate)
+        sig = getattr(signal, sig_name, None)
+        if sig is None:
+            os.kill(os.getpid(), signal.SIGABRT)
+        os.kill(os.getpid(), int(sig))
+        raise SystemExit(1)
+
+    pot = BinaryPot(
+        pot_id=str(payload["pot_id"]),
+        kato_1993_table4_system=payload.get("kato_1993_table4_system"),
+        why=str(payload.get("why") or ""),
+        composition_wt_pct=dict(payload.get("composition_wt_pct") or {}),
+    )
+    po2_raw = payload.get("po2") or {}
+    po2 = Po2Request(
+        mode=str(po2_raw.get("mode") or PO2_ENGINE_DEFAULT),
+        po2_bar=(
+            None if po2_raw.get("po2_bar") is None else float(po2_raw["po2_bar"])
+        ),
+    )
+    handle = open_battery_engine(str(payload["engine"]))
+    if (
+        bool(payload.get("qualification"))
+        and handle.name in MELTS_FAMILY_ENGINES
+        and handle.backend is not None
+    ):
+        _bypass_melts_domain_gate(handle.backend)
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=float(payload["temperature_K"]),
+        po2=po2,
+        timeout_s=_finite_float(payload.get("timeout_s")),
+        qualification=bool(payload.get("qualification")),
+        isolated=False,
+        arm=str(payload.get("arm") or ARM_HEADLINE),
+    )
+    sys.stdout.write(json.dumps(cell.as_payload(), default=str))
+    sys.stdout.write("\n")
+    sys.stdout.flush()
+
+
+def _crash_cell_from_returncode(
+    *,
+    handle: EngineHandle,
+    pot: BinaryPot,
+    temperature_K: float,
+    po2: Po2Request,
+    wall0: float,
+    cpu0: float,
+    hostname: str,
+    returncode: int | None,
+    timed_out: bool,
+    stderr: str,
+    arm: str,
+    notices: Sequence[Mapping[str, Any]],
+    authority: str | None,
+    certified_band: Mapping[str, Any] | None,
+) -> EquilibrateCell:
+    if timed_out:
+        status, refusal, engine_reason = (
+            "refusal",
+            REFUSAL_TIMEOUT,
+            "isolated cell exceeded hard timeout",
+        )
+        engine_status = "TimeoutError"
+        exit_signal = None
+        exit_code = None
+    elif returncode is not None and int(returncode) < 0:
+        sig = -int(returncode)
+        try:
+            sig_name = signal.Signals(sig).name
+        except ValueError:
+            sig_name = f"signal {sig}"
+        status, refusal, engine_reason = (
+            "refusal",
+            REFUSAL_ENGINE_CRASH,
+            f"{sig_name} (returncode {returncode})",
+        )
+        engine_status = REFUSAL_ENGINE_CRASH
+        exit_signal = sig
+        exit_code = int(returncode)
+    else:
+        status, refusal, engine_reason = (
+            "refusal",
+            REFUSAL_ENGINE_CRASH,
+            f"isolated worker exit_code={returncode}: {stderr.strip()[:400]}",
+        )
+        engine_status = REFUSAL_ENGINE_CRASH
+        exit_signal = None
+        exit_code = None if returncode is None else int(returncode)
+    return EquilibrateCell(
+        pot_id=pot.pot_id,
+        engine=handle.name,
+        temperature_K=float(temperature_K),
+        po2=po2,
+        status=status,
+        refusal_reason=refusal,
+        engine_status=engine_status,
+        engine_reason=engine_reason,
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=None,
+        wall_s=time.perf_counter() - wall0,
+        cpu_s=time.process_time() - cpu0,
+        hostname=hostname,
+        arm=arm,
+        notices=[dict(row) for row in notices],
+        authority=authority,
+        certified_band=None if certified_band is None else dict(certified_band),
+        exit_signal=exit_signal,
+        exit_code=exit_code,
+        model_id=IMCC_MODEL_IDS.get(handle.name),
+    )
+
+
+def _run_cell_in_subprocess(
+    handle: EngineHandle,
+    pot: BinaryPot,
+    *,
+    temperature_K: float,
+    po2: Po2Request,
+    timeout_s: float,
+    qualification: bool,
+    arm: str,
+    notices: Sequence[Mapping[str, Any]],
+    authority: str | None,
+    certified_band: Mapping[str, Any] | None,
+    simulate_crash: str | None = None,
+) -> EquilibrateCell:
+    hostname = _hostname()
+    wall0 = time.perf_counter()
+    cpu0 = time.process_time()
+    payload = {
+        "pot_id": pot.pot_id,
+        "kato_1993_table4_system": pot.kato_1993_table4_system,
+        "why": pot.why,
+        "composition_wt_pct": dict(pot.composition_wt_pct),
+        "engine": handle.name,
+        "temperature_K": float(temperature_K),
+        "po2": po2.as_payload(),
+        "timeout_s": float(timeout_s),
+        "qualification": bool(qualification),
+        "arm": arm,
+        "simulate_crash": simulate_crash,
+    }
+    env = dict(os.environ)
+    env.setdefault("PYTHONPATH", str(REPO_ROOT))
+    pythonpath = env.get("PYTHONPATH") or ""
+    if str(REPO_ROOT) not in pythonpath.split(os.pathsep):
+        env["PYTHONPATH"] = os.pathsep.join(
+            [str(REPO_ROOT), pythonpath] if pythonpath else [str(REPO_ROOT)]
+        )
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-c", _ISOLATED_CELL_BOOTSTRAP],
+            input=json.dumps(payload),
+            cwd=str(REPO_ROOT),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=float(timeout_s) + 2.0,
+            start_new_session=True,
+        )
+    except subprocess.TimeoutExpired as exc:
+        child = getattr(exc, "process", None)
+        if child is not None and getattr(child, "pid", None):
+            try:
+                os.killpg(child.pid, signal.SIGKILL)
+            except (OSError, ProcessLookupError):
+                pass
+        return _crash_cell_from_returncode(
+            handle=handle,
+            pot=pot,
+            temperature_K=temperature_K,
+            po2=po2,
+            wall0=wall0,
+            cpu0=cpu0,
+            hostname=hostname,
+            returncode=None,
+            timed_out=True,
+            stderr=str(getattr(exc, "stderr", "") or ""),
+            arm=arm,
+            notices=notices,
+            authority=authority,
+            certified_band=certified_band,
+        )
+    if proc.returncode != 0:
+        return _crash_cell_from_returncode(
+            handle=handle,
+            pot=pot,
+            temperature_K=temperature_K,
+            po2=po2,
+            wall0=wall0,
+            cpu0=cpu0,
+            hostname=hostname,
+            returncode=proc.returncode,
+            timed_out=False,
+            stderr=proc.stderr or proc.stdout or "",
+            arm=arm,
+            notices=notices,
+            authority=authority,
+            certified_band=certified_band,
+        )
+    try:
+        raw = json.loads(proc.stdout.strip().splitlines()[-1])
+    except (json.JSONDecodeError, IndexError) as exc:
+        return _crash_cell_from_returncode(
+            handle=handle,
+            pot=pot,
+            temperature_K=temperature_K,
+            po2=po2,
+            wall0=wall0,
+            cpu0=cpu0,
+            hostname=hostname,
+            returncode=proc.returncode,
+            timed_out=False,
+            stderr=f"unparseable worker stdout ({exc}): {proc.stdout[:400]}",
+            arm=arm,
+            notices=notices,
+            authority=authority,
+            certified_band=certified_band,
+        )
+    cell = EquilibrateCell.from_payload(raw)
+    merged_notices: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for row in list(notices) + list(cell.notices):
+        key = json.dumps(row, sort_keys=True, default=str)
+        if key in seen:
+            continue
+        seen.add(key)
+        merged_notices.append(dict(row))
+    return replace(
+        cell,
+        arm=arm,
+        notices=[dict(row) for row in merged_notices],
+        authority=cell.authority or authority,
+        certified_band=cell.certified_band or (
+            None if certified_band is None else dict(certified_band)
+        ),
+        wall_s=time.perf_counter() - wall0,
+        hostname=cell.hostname or hostname,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Engine resolution
 # ---------------------------------------------------------------------------
 
@@ -1104,6 +1899,8 @@ def _open_resolved_backend(name: str) -> Any:
     from simulator.melt_backend.magemin import MAGEMinBackend
     from simulator.vapour_rail.calibration import open_warm_vaporock_backend
 
+    if name in IMCC_ENGINE_NAMES:
+        return _ImccBatteryBackend(name)
     if name == "vaporock":
         return open_warm_vaporock_backend(warm_pool_size=1)
     if name == "magemin":
@@ -1124,6 +1921,8 @@ def open_battery_engine(name: str) -> EngineHandle:
     identity_block = _engine_identities_from_toml().get(name, {})
     try:
         backend = _open_resolved_backend(name)
+        if name in IMCC_ENGINE_NAMES and hasattr(backend, "_identity"):
+            identity_block = {**identity_block, **dict(backend._identity)}
     except BackendUnavailableError as exc:
         return EngineHandle(
             name=name,
@@ -1229,14 +2028,28 @@ def equilibrate_cell(
     temperature_K: float,
     po2: Po2Request,
     timeout_s: float | None = None,
+    qualification: bool = False,
+    isolated: bool | None = None,
+    arm: str | None = None,
+    simulate_crash: str | None = None,
 ) -> EquilibrateCell:
     """One pot × engine × T × pO2 call. Refusals are rows, never exceptions."""
 
     hostname = _hostname()
     wall0 = time.perf_counter()
     cpu0 = time.process_time()
+    cell_arm = arm or (ARM_QUALIFICATION if qualification else ARM_HEADLINE)
+    notices: list[dict[str, Any]] = []
+    authority: str | None = None
+    certified_band: dict[str, Any] | None = None
+    if qualification and handle.name in MELTS_FAMILY_ENGINES:
+        gate = assess_qualification_gate(pot.composition_wt_pct, temperature_K)
+        notices.append(qualification_notice(gate))
+        authority = AUTHORITY_EXTRAPOLATED
+        certified_band = dict(gate["certified_band"])
 
     def _done(**kwargs: Any) -> EquilibrateCell:
+        extra_notices = list(kwargs.pop("notices", None) or [])
         return EquilibrateCell(
             pot_id=pot.pot_id,
             engine=handle.name,
@@ -1245,7 +2058,34 @@ def equilibrate_cell(
             wall_s=time.perf_counter() - wall0,
             cpu_s=time.process_time() - cpu0,
             hostname=hostname,
+            arm=cell_arm,
+            notices=[*notices, *extra_notices],
+            authority=kwargs.pop("authority", None) or authority,
+            certified_band=kwargs.pop("certified_band", None) or certified_band,
+            model_id=kwargs.pop("model_id", None) or IMCC_MODEL_IDS.get(handle.name),
             **kwargs,
+        )
+
+    timeout = float(timeout_s or _ENGINE_OUTER_TIMEOUT_S.get(handle.name, 30.0))
+    use_isolated = isolated
+    if use_isolated is None:
+        use_isolated = bool(
+            simulate_crash
+            or (qualification and handle.name in MELTS_FAMILY_ENGINES)
+        )
+    if use_isolated:
+        return _run_cell_in_subprocess(
+            handle,
+            pot,
+            temperature_K=temperature_K,
+            po2=po2,
+            timeout_s=timeout,
+            qualification=qualification,
+            arm=cell_arm,
+            notices=notices,
+            authority=authority,
+            certified_band=certified_band,
+            simulate_crash=simulate_crash,
         )
 
     if not handle.available or handle.backend is None:
@@ -1259,10 +2099,12 @@ def equilibrate_cell(
             liquid_fraction=None,
         )
 
+    if qualification and handle.name in MELTS_FAMILY_ENGINES:
+        _bypass_melts_domain_gate(handle.backend)
+
     composition_kg, composition_mol = composition_kg_and_mol(pot.composition_wt_pct)
-    temperature_C = float(temperature_K) - 273.15
+    temperature_C = float(temperature_K) - CELSIUS_TO_KELVIN_OFFSET
     fo2_log = _fo2_log_for_request(handle, po2)
-    timeout = float(timeout_s or _ENGINE_OUTER_TIMEOUT_S.get(handle.name, 30.0))
     physical_pressure_bar = _DEFAULT_PRESSURE_BAR
     pressure_bar = physical_pressure_bar
     if handle.name == "alphamelts":
@@ -1298,8 +2140,32 @@ def equilibrate_cell(
             timeout,
         )
         status, refusal, engine_reason = classify_equilibrate_outcome(result)
+        if (
+            qualification
+            and status == "refusal"
+            and refusal not in {REFUSAL_TIMEOUT, REFUSAL_ENGINE_CRASH}
+        ):
+            result_diagnostics = dict(getattr(result, "diagnostics", None) or {})
+            gate_name = (
+                result_diagnostics.get("backend_failure_reason_code")
+                or result_diagnostics.get("backend_status_reason")
+                or engine_reason
+                or refusal
+            )
+            refusal = REFUSAL_GATE_REFUSED_IN_ADAPTER
+            engine_reason = f"{gate_name}"
         activities, pressures = extract_reported_quantities(result)
-        authority = extract_vapor_authority(result)
+        vapor_authority = extract_vapor_authority(result)
+        result_notices = list(getattr(result, "imcc_notices", None) or [])
+        diagnostics = dict(getattr(result, "diagnostics", None) or {})
+        result_notices.extend(list(diagnostics.get("imcc_notices") or []))
+        crash_diag = diagnostics.get("subprocess_failure") or {}
+        exit_code = _optional_int(
+            crash_diag.get("returncode") if isinstance(crash_diag, Mapping) else None
+        )
+        exit_signal = None
+        if exit_code is not None and exit_code < 0:
+            exit_signal = -exit_code
         return _done(
             status=status,
             refusal_reason=refusal,
@@ -1308,16 +2174,20 @@ def equilibrate_cell(
             melt_activities=activities,
             gas_partial_pressures_Pa=pressures,
             liquid_fraction=_finite_float(getattr(result, "liquid_fraction", None)),
-            vapor_pressures_source=dict(authority["vapor_pressures_source"]),
-            vapor_pressure_backend_status=authority[
+            vapor_pressures_source=dict(vapor_authority["vapor_pressures_source"]),
+            vapor_pressure_backend_status=vapor_authority[
                 "vapor_pressure_backend_status"
             ],
-            vapor_pressure_backend_status_reason=authority[
+            vapor_pressure_backend_status_reason=vapor_authority[
                 "vapor_pressure_backend_status_reason"
             ],
-            authoritative_for_requested_vapor_pressure=authority[
+            authoritative_for_requested_vapor_pressure=vapor_authority[
                 "authoritative_for_requested_vapor_pressure"
             ],
+            notices=result_notices,
+            exit_signal=exit_signal,
+            exit_code=exit_code,
+            model_id=getattr(result, "imcc_model_id", None),
         )
     except Exception as exc:  # noqa: BLE001 - typed refusal, never a hang/crash
         status, refusal, engine_reason = classify_equilibrate_outcome(error=exc)
@@ -1350,6 +2220,80 @@ def equilibrate_cell(
         )
 
 
+@dataclass(frozen=True)
+class _ArmJob:
+    pot: BinaryPot
+    temperatures_K: tuple[float, ...]
+    use_grid_po2: bool
+    arm: str
+    qualification: bool
+
+
+def _engine_arm_jobs(
+    *,
+    pots: Sequence[BinaryPot],
+    grid: BatteryGrid,
+    include_scoring_pots: bool,
+    qualification: bool,
+    pots_path: Path | None,
+) -> tuple[list[_ArmJob], tuple[BinaryPot, ...]]:
+    jobs: list[_ArmJob] = [
+        _ArmJob(
+            pot=pot,
+            temperatures_K=tuple(grid.temperatures_K),
+            use_grid_po2=True,
+            arm=ARM_HEADLINE,
+            qualification=False,
+        )
+        for pot in pots
+    ]
+    extra_pots: list[BinaryPot] = []
+    if include_scoring_pots:
+        from simulator.diagnostic_helpers.binary_pot_scoring import load_scoring_pots
+
+        for scoring in load_scoring_pots(pots_path):
+            binary = scoring.as_binary_pot()
+            extra_pots.append(binary)
+            jobs.append(
+                _ArmJob(
+                    pot=binary,
+                    temperatures_K=tuple(scoring.temperatures_K),
+                    use_grid_po2=False,
+                    arm=ARM_HEADLINE,
+                    qualification=False,
+                )
+            )
+    if qualification:
+        source = next(
+            (pot for pot in pots if pot.pot_id == QUALIFICATION_SOURCE_POT_ID),
+            None,
+        )
+        sweep = qualification_sio2_sweep_pots(source)
+        extra_pots.extend(sweep)
+        for pot in sweep:
+            jobs.append(
+                _ArmJob(
+                    pot=pot,
+                    temperatures_K=(QUALIFICATION_SWEEP_T_K,),
+                    use_grid_po2=False,
+                    arm=ARM_QUALIFICATION,
+                    qualification=True,
+                )
+            )
+        for pot in pots:
+            jobs.append(
+                _ArmJob(
+                    pot=pot,
+                    temperatures_K=QUALIFICATION_TEMPERATURES_K,
+                    use_grid_po2=False,
+                    arm=ARM_QUALIFICATION,
+                    qualification=True,
+                )
+            )
+    catalog = tuple(list(pots) + extra_pots)
+    return jobs, catalog
+
+
 def run_engine_arm(
     *,
     pots_path: Path | None = None,
@@ -1358,6 +2302,10 @@ def run_engine_arm(
     pots: Sequence[BinaryPot] | None = None,
     grid: BatteryGrid | None = None,
     progress_log: Path | None = None,
+    qualification: bool = False,
+    include_scoring_pots: bool = False,
+    reuse_cells: Sequence[EquilibrateCell] | None = None,
+    reuse_engine_blocks: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Run every pot × engine × T × pO2 cell and build the report."""
 
@@ -1365,38 +2313,84 @@ def run_engine_arm(
         loaded_pots, loaded_grid = load_binary_pots(pots_path)
         pots = pots or loaded_pots
         grid = grid or loaded_grid
+    jobs, catalog = _engine_arm_jobs(
+        pots=pots,
+        grid=grid,
+        include_scoring_pots=include_scoring_pots,
+        qualification=qualification,
+        pots_path=pots_path,
+    )
     wall0 = time.perf_counter()
     cpu0 = time.process_time()
     hostname = _hostname()
     resolved = dict(handles) if handles is not None else probe_battery_engines(engine_names)
+    reused = {
+        _cell_identity_key(cell): cell
+        for cell in (reuse_cells or ())
+    }
 
     n_expected = 0
-    for pot in pots:
+    for job in jobs:
         for name in engine_names:
             handle = resolved.get(name) or open_battery_engine(name)
             resolved[name] = handle
-            n_expected += len(grid.temperatures_K) * len(
-                po2_requests_for_engine(grid, takes_fo2=handle.takes_fo2)
+            n_po2 = (
+                len(po2_requests_for_engine(grid, takes_fo2=handle.takes_fo2))
+                if job.use_grid_po2
+                else 1
             )
+            n_expected += len(job.temperatures_K) * n_po2
     _emit_progress(
         progress_log,
-        f"{_utc_stamp()} START hostname={hostname} n_expected={n_expected}",
+        (
+            f"{_utc_stamp()} START hostname={hostname} n_expected={n_expected} "
+            f"qualification={str(qualification).lower()} "
+            f"scoring={str(include_scoring_pots).lower()} "
+            f"reuse={len(reused)}"
+        ),
     )
 
     cells: list[EquilibrateCell] = []
-    for pot in pots:
+    for job in jobs:
         for name in engine_names:
             handle = resolved.get(name) or open_battery_engine(name)
             resolved[name] = handle
-            requests = po2_requests_for_engine(grid, takes_fo2=handle.takes_fo2)
-            for temperature_K in grid.temperatures_K:
+            requests = (
+                po2_requests_for_engine(grid, takes_fo2=handle.takes_fo2)
+                if job.use_grid_po2
+                else (Po2Request(mode=PO2_ENGINE_DEFAULT, po2_bar=None),)
+            )
+            for temperature_K in job.temperatures_K:
                 for po2 in requests:
-                    cell = equilibrate_cell(
-                        handle,
-                        pot,
+                    probe = EquilibrateCell(
+                        pot_id=job.pot.pot_id,
+                        engine=name,
                         temperature_K=float(temperature_K),
                         po2=po2,
+                        status="",
+                        refusal_reason=None,
+                        engine_status=None,
+                        engine_reason=None,
+                        melt_activities={},
+                        gas_partial_pressures_Pa={},
+                        liquid_fraction=None,
+                        wall_s=0.0,
+                        cpu_s=0.0,
+                        hostname="",
+                        arm=job.arm,
                     )
+                    existing = reused.get(_cell_identity_key(probe))
+                    if existing is not None:
+                        cell = existing
+                    else:
+                        cell = equilibrate_cell(
+                            handle,
+                            job.pot,
+                            temperature_K=float(temperature_K),
+                            po2=po2,
+                            qualification=job.qualification,
+                            arm=job.arm,
+                        )
                     cells.append(cell)
                     po2_label = (
                         "default"
@@ -1407,7 +2401,7 @@ def run_engine_arm(
                         progress_log,
                         (
                             f"{_utc_stamp()} {len(cells)}/{n_expected} "
-                            f"pot={cell.pot_id} engine={cell.engine} "
+                            f"arm={cell.arm} pot={cell.pot_id} engine={cell.engine} "
                             f"T={cell.temperature_K:g} po2={po2_label} "
                             f"status={cell.status} "
                             f"reason={cell.refusal_reason or '-'} "
@@ -1426,7 +2420,7 @@ def run_engine_arm(
                             handle = revived
 
     report = build_report(
-        pots=pots,
+        pots=catalog,
         grid=grid,
         handles=resolved,
         cells=cells,
@@ -1434,6 +2428,7 @@ def run_engine_arm(
         wall_s=time.perf_counter() - wall0,
         cpu_s=time.process_time() - cpu0,
         engine_names=engine_names,
+        reuse_engine_blocks=reuse_engine_blocks,
     )
     _emit_progress(
         progress_log,
@@ -1442,6 +2437,7 @@ def run_engine_arm(
             f"n_cells={report['n_cells']} n_ok={report['n_ok']} "
             f"n_refused={report['n_refused']} "
             f"n_matched_residuals={report['n_matched_residuals']} "
+            f"n_qualification_cells={report.get('n_qualification_cells', 0)} "
             f"wall={report['receipt']['wall_s']:.3f} "
             f"cpu={report['receipt']['cpu_s']:.3f}"
         ),
@@ -1539,6 +2535,164 @@ def _per_pot_residual_tables(
     return tables
 
 
+def _qualification_engine_summary(
+    cells: Sequence[EquilibrateCell],
+    engine_names: Sequence[str],
+) -> dict[str, dict[str, Any]]:
+    summary: dict[str, dict[str, Any]] = {}
+    for name in engine_names:
+        group = [cell for cell in cells if cell.engine == name]
+        n_returned = sum(
+            1
+            for cell in group
+            if cell.status == "ok"
+            and (cell.melt_activities or cell.gas_partial_pressures_Pa)
+        )
+        n_crash = sum(
+            1 for cell in group if cell.refusal_reason == REFUSAL_ENGINE_CRASH
+        )
+        n_timeout = sum(
+            1 for cell in group if cell.refusal_reason == REFUSAL_TIMEOUT
+        )
+        summary[name] = {
+            "n_cells": len(group),
+            "n_returned": n_returned,
+            "n_ok": sum(1 for cell in group if cell.status == "ok"),
+            "n_crashed": n_crash,
+            "n_timed_out": n_timeout,
+            "n_refused": sum(1 for cell in group if cell.status == "refusal"),
+        }
+    return summary
+
+
+def _residual_shift_in_vs_out_of_band(
+    headline_residuals: Sequence[Mapping[str, Any]],
+    qualification_residuals: Sequence[Mapping[str, Any]],
+    *,
+    engine: str,
+    peer: str,
+) -> dict[str, Any]:
+    def _max_for(rows: Sequence[Mapping[str, Any]]) -> float | None:
+        values = [
+            abs(float(row["delta_log10_a_minus_b"]))
+            for row in rows
+            if engine in (row.get("engine_a"), row.get("engine_b"))
+            and peer in (row.get("engine_a"), row.get("engine_b"))
+        ]
+        return max(values) if values else None
+
+    in_band = _max_for(headline_residuals)
+    out_of_band = _max_for(qualification_residuals)
+    shift = None
+    if in_band is not None and out_of_band is not None:
+        shift = out_of_band - in_band
+    elif out_of_band is not None:
+        shift = out_of_band
+    return {
+        "engine": engine,
+        "peer": peer,
+        "largest_in_band_abs_dex": in_band,
+        "largest_out_of_band_abs_dex": out_of_band,
+        "out_minus_in_dex": shift,
+    }
+
+
+def qualification_section(
+    *,
+    cells: Sequence[EquilibrateCell],
+    headline_residuals: Sequence[Mapping[str, Any]],
+    engine_names: Sequence[str],
+) -> dict[str, Any]:
+    """Out-of-domain residuals. NOT headline accuracy."""
+
+    qual_cells = [cell for cell in cells if cell.arm == ARM_QUALIFICATION]
+    qual_residuals = pairwise_residuals(qual_cells)
+    per_engine: dict[str, Any] = {}
+    for name in engine_names:
+        group = [cell for cell in qual_cells if cell.engine == name]
+        rows_vs_imcc = [
+            row
+            for row in qual_residuals
+            if name in (row.get("engine_a"), row.get("engine_b"))
+            and (
+                row.get("engine_a") in IMCC_ENGINE_NAMES
+                or row.get("engine_b") in IMCC_ENGINE_NAMES
+            )
+        ]
+        rows_vs_vaporock = [
+            row
+            for row in qual_residuals
+            if name in (row.get("engine_a"), row.get("engine_b"))
+            and "vaporock" in (row.get("engine_a"), row.get("engine_b"))
+        ]
+        per_engine[name] = {
+            **_qualification_engine_summary(group, (name,))[name],
+            "gate_verdicts": [
+                {
+                    "pot_id": cell.pot_id,
+                    "temperature_K": cell.temperature_K,
+                    "gate_valid": next(
+                        (
+                            notice.get("gate_valid")
+                            for notice in cell.notices
+                            if notice.get("kind") == "melts_domain_gate"
+                        ),
+                        None,
+                    ),
+                    "failed_constraints": next(
+                        (
+                            notice.get("failed_constraints")
+                            for notice in cell.notices
+                            if notice.get("kind") == "melts_domain_gate"
+                        ),
+                        [],
+                    ),
+                    "returned_number": bool(
+                        cell.status == "ok"
+                        and (cell.melt_activities or cell.gas_partial_pressures_Pa)
+                    ),
+                    "status": cell.status,
+                    "refusal_reason": cell.refusal_reason,
+                    "exit_signal": cell.exit_signal,
+                    "exit_code": cell.exit_code,
+                    "authority": cell.authority,
+                }
+                for cell in group
+            ],
+            "residuals_vs_imcc": rows_vs_imcc[:20],
+            "residuals_vs_vaporock": rows_vs_vaporock[:20],
+            "residual_shift_vs_imcc": _residual_shift_in_vs_out_of_band(
+                headline_residuals,
+                qual_residuals,
+                engine=name,
+                peer="imcc_sf04",
+            ),
+            "residual_shift_vs_imcc_ext": _residual_shift_in_vs_out_of_band(
+                headline_residuals,
+                qual_residuals,
+                engine=name,
+                peer="imcc_sf04_ext",
+            ),
+            "residual_shift_vs_vaporock": _residual_shift_in_vs_out_of_band(
+                headline_residuals,
+                qual_residuals,
+                engine=name,
+                peer="vaporock",
+            ),
+        }
+    return {
+        "label": (
+            "Qualification (out-of-domain) residuals. NOT headline accuracy. "
+            "MELTS-family cells record the domain-gate verdict with "
+            "authority=extrapolated and certified_band, then run anyway."
+        ),
+        "certified_band": melts_certified_band(),
+        "n_cells": len(qual_cells),
+        "per_engine": per_engine,
+        "summary": _qualification_engine_summary(qual_cells, engine_names),
+    }
+
+
 def build_report(
     *,
     pots: Sequence[BinaryPot],
@@ -1550,15 +2704,32 @@ def build_report(
     cpu_s: float,
     engine_names: Sequence[str] = BATTERY_ENGINE_NAMES,
     generated_at: str | None = None,
+    reuse_engine_blocks: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    residuals = pairwise_residuals(cells)
-    floor_refusals = collect_floor_refusals(cells)
+    headline_cells = [cell for cell in cells if cell.arm != ARM_QUALIFICATION]
+    qualification_cells = [cell for cell in cells if cell.arm == ARM_QUALIFICATION]
+    residuals = pairwise_residuals(headline_cells)
+    floor_refusals = collect_floor_refusals(headline_cells)
     identities = _engine_identities_from_toml()
     engines_block: dict[str, Any] = {}
     for name in engine_names:
         handle = handles.get(name)
+        reused_block = dict((reuse_engine_blocks or {}).get(name) or {})
+        local_available = bool(handle.available) if handle is not None else False
+        if not local_available and reused_block:
+            engines_block[name] = {
+                "available": bool(reused_block.get("available")),
+                "unavailable_reason": reused_block.get("unavailable_reason"),
+                "takes_fo2": bool(reused_block.get("takes_fo2")),
+                "supports_intrinsic_fo2": bool(
+                    reused_block.get("supports_intrinsic_fo2")
+                ),
+                "identity": dict(reused_block.get("identity") or {}),
+                "availability_source": "reused_studio_cells",
+            }
+            continue
         engines_block[name] = {
-            "available": bool(handle.available) if handle is not None else False,
+            "available": local_available,
             "unavailable_reason": (
                 handle.unavailable_reason if handle is not None else "not_probed"
             ),
@@ -1574,6 +2745,17 @@ def build_report(
         }
     cpu = float(cpu_s)
     wall = float(wall_s)
+    headline_pot_ids = {cell.pot_id for cell in headline_cells}
+    headline_pots = [pot for pot in pots if pot.pot_id in headline_pot_ids] or list(pots)
+    qual_payload = (
+        qualification_section(
+            cells=cells,
+            headline_residuals=residuals,
+            engine_names=engine_names,
+        )
+        if qualification_cells
+        else None
+    )
     return {
         "schema_version": REPORT_SCHEMA_VERSION,
         "kind": "binary_pot_engine_arm",
@@ -1616,12 +2798,12 @@ def build_report(
             for pot in pots
         ],
         "engines": engines_block,
-        "refusal_matrix": _refusal_matrix(pots, engine_names, cells),
-        "per_pot_residuals": _per_pot_residual_tables(pots, residuals),
+        "refusal_matrix": _refusal_matrix(headline_pots, engine_names, headline_cells),
+        "per_pot_residuals": _per_pot_residual_tables(headline_pots, residuals),
         "largest_in_envelope_residuals": residuals[:20],
-        "n_cells": len(cells),
-        "n_ok": sum(1 for cell in cells if cell.status == "ok"),
-        "n_refused": sum(1 for cell in cells if cell.status == "refusal"),
+        "n_cells": len(headline_cells),
+        "n_ok": sum(1 for cell in headline_cells if cell.status == "ok"),
+        "n_refused": sum(1 for cell in headline_cells if cell.status == "refusal"),
         "n_matched_residuals": len(residuals),
         "n_floor_refusals": len(floor_refusals),
         "n_fallback_vs_speciation": sum(
@@ -1629,12 +2811,15 @@ def build_report(
             for row in residuals
             if row.get("finding_class") == FINDING_CLASS_FALLBACK_VS_SPECIATION
         ),
+        "n_qualification_cells": len(qualification_cells),
         "floor_refusals": floor_refusals,
         "cells": [cell.as_payload() for cell in cells],
+        "qualification": qual_payload,
         "note": (
             "divergence_label is a descriptive magnitude band only; "
             "never an acceptance verdict. Floor/sentinel/absent values "
-            "are value_is_floor refusals and are excluded from residuals."
+            "are value_is_floor refusals and are excluded from residuals. "
+            "Qualification (out-of-domain) residuals are NOT headline accuracy."
         ),
     }
 
@@ -1662,30 +2847,52 @@ def recompute_residuals_from_report(
         if isinstance(row, (EquilibrateCell, Mapping))
     ]
     cells = reclassify_projected_composition_cells(raw_cells, pots)
-    residuals = pairwise_residuals(cells)
-    floor_refusals = collect_floor_refusals(cells)
+    headline_cells = [cell for cell in cells if cell.arm != ARM_QUALIFICATION]
+    qualification_cells = [cell for cell in cells if cell.arm == ARM_QUALIFICATION]
+    residuals = pairwise_residuals(headline_cells)
+    floor_refusals = collect_floor_refusals(headline_cells)
     engine_names = list((report.get("engines") or {}).keys()) or list(
         BATTERY_ENGINE_NAMES
     )
+    headline_pot_ids = {cell.pot_id for cell in headline_cells}
+    headline_pots = [pot for pot in pots if pot.pot_id in headline_pot_ids] or list(
+        pots
+    )
     updated = dict(report)
     updated["cells"] = [cell.as_payload() for cell in cells]
-    updated["refusal_matrix"] = _refusal_matrix(pots, engine_names, cells)
-    updated["n_ok"] = sum(1 for cell in cells if cell.status == "ok")
-    updated["n_refused"] = sum(1 for cell in cells if cell.status == "refusal")
+    updated["refusal_matrix"] = _refusal_matrix(
+        headline_pots, engine_names, headline_cells
+    )
+    updated["n_cells"] = len(headline_cells)
+    updated["n_ok"] = sum(1 for cell in headline_cells if cell.status == "ok")
+    updated["n_refused"] = sum(
+        1 for cell in headline_cells if cell.status == "refusal"
+    )
     updated["largest_in_envelope_residuals"] = residuals[:20]
     updated["n_matched_residuals"] = len(residuals)
-    updated["per_pot_residuals"] = _per_pot_residual_tables(pots, residuals)
+    updated["per_pot_residuals"] = _per_pot_residual_tables(headline_pots, residuals)
     updated["n_floor_refusals"] = len(floor_refusals)
     updated["n_fallback_vs_speciation"] = sum(
         1
         for row in residuals
         if row.get("finding_class") == FINDING_CLASS_FALLBACK_VS_SPECIATION
     )
+    updated["n_qualification_cells"] = len(qualification_cells)
     updated["floor_refusals"] = floor_refusals
+    updated["qualification"] = (
+        qualification_section(
+            cells=cells,
+            headline_residuals=residuals,
+            engine_names=engine_names,
+        )
+        if qualification_cells
+        else None
+    )
     updated["note"] = (
         "divergence_label is a descriptive magnitude band only; "
         "never an acceptance verdict. Floor/sentinel/absent values "
-        "are value_is_floor refusals and are excluded from residuals."
+        "are value_is_floor refusals and are excluded from residuals. "
+        "Qualification (out-of-domain) residuals are NOT headline accuracy."
     )
     return updated
 
@@ -1949,7 +3156,116 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
                 "",
             ]
         )
+    qualification = report.get("qualification")
+    if isinstance(qualification, Mapping):
+        lines.extend(_render_qualification_markdown(qualification, engine_names))
     return "\n".join(lines)
+
+
+def _render_qualification_markdown(
+    qualification: Mapping[str, Any],
+    engine_names: Sequence[str],
+) -> list[str]:
+    band = qualification.get("certified_band") or {}
+    lines = [
+        "## Qualification (out-of-domain) residuals",
+        "",
+        "**NOT headline accuracy.** MELTS-family engines record the domain-gate "
+        "verdict (`authority=extrapolated`, `certified_band`) and then run anyway "
+        "in an isolated subprocess with a hard timeout. A SIGABRT / nonzero "
+        f"exit is `{REFUSAL_ENGINE_CRASH}`, never a hang or a silent skip.",
+        "",
+        (
+            f"- published MELTS SiO2 band: `{band.get('sio2_wt_pct')}` wt% "
+            f"(crash floor `{band.get('sio2_crash_floor_wt_pct')}` wt%)"
+        ),
+        (
+            f"- published MELTS T band: `{band.get('temperature_K')}` K "
+            "(800 °C subprocess min; 1700 K `T_calib_max_K`)"
+        ),
+        f"- citations: `{band.get('citations')}`",
+        "",
+        "### Per-engine qualification summary",
+        "",
+        "| engine | cells run | returned a number | crashed | timed out |",
+        "|---|---:|---:|---:|---:|",
+    ]
+    summary = qualification.get("summary") or {}
+    for name in engine_names:
+        row = summary.get(name) or {}
+        lines.append(
+            f"| `{name}` | {row.get('n_cells', 0)} | {row.get('n_returned', 0)} | "
+            f"{row.get('n_crashed', 0)} | {row.get('n_timed_out', 0)} |"
+        )
+    lines.extend(
+        [
+            "",
+            "### Largest in-band vs out-of-band residual shift",
+            "",
+            "| engine | vs | in-band max \\|Δ\\| dex | out-of-band max \\|Δ\\| dex | out−in dex |",
+            "|---|---|---:|---:|---:|",
+        ]
+    )
+    per_engine = qualification.get("per_engine") or {}
+    for name in engine_names:
+        block = per_engine.get(name) or {}
+        for key, peer in (
+            ("residual_shift_vs_imcc", "imcc_sf04"),
+            ("residual_shift_vs_imcc_ext", "imcc_sf04_ext"),
+            ("residual_shift_vs_vaporock", "vaporock"),
+        ):
+            shift = block.get(key) or {}
+            lines.append(
+                "| `{engine}` | `{peer}` | {in_band} | {out_band} | {delta} |".format(
+                    engine=name,
+                    peer=peer,
+                    in_band=_fmt_dex(shift.get("largest_in_band_abs_dex")).lstrip("+"),
+                    out_band=_fmt_dex(shift.get("largest_out_of_band_abs_dex")).lstrip(
+                        "+"
+                    ),
+                    delta=_fmt_dex(shift.get("out_minus_in_dex")),
+                )
+            )
+    lines.extend(["", "### Gate verdicts (per engine)", ""])
+    for name in engine_names:
+        block = per_engine.get(name) or {}
+        lines.extend(
+            [
+                f"#### `{name}`",
+                "",
+                (
+                    "| pot | T K | gate valid | failed constraints | returned | "
+                    "status | crash/timeout |"
+                ),
+                "|---|---:|---|---|---|---|---|",
+            ]
+        )
+        verdicts = block.get("gate_verdicts") or []
+        if not verdicts:
+            lines.append("| — | — | — | — | — | — | — |")
+        for row in verdicts:
+            crash = "—"
+            if row.get("refusal_reason") == REFUSAL_ENGINE_CRASH:
+                crash = (
+                    f"engine_crash signal={row.get('exit_signal')} "
+                    f"exit={row.get('exit_code')}"
+                )
+            elif row.get("refusal_reason") == REFUSAL_TIMEOUT:
+                crash = "engine_timeout"
+            lines.append(
+                "| `{pot}` | {T:g} | `{valid}` | `{failed}` | `{returned}` | "
+                "`{status}` | {crash} |".format(
+                    pot=row.get("pot_id"),
+                    T=float(row.get("temperature_K") or 0.0),
+                    valid=row.get("gate_valid"),
+                    failed=",".join(str(x) for x in (row.get("failed_constraints") or [])),
+                    returned=str(bool(row.get("returned_number"))).lower(),
+                    status=row.get("status") or row.get("refusal_reason") or "—",
+                    crash=crash,
+                )
+            )
+        lines.append("")
+    return lines
 
 
 def write_reports(

@@ -9,12 +9,19 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.diagnostic_helpers.binary_pot_battery import (
+    ARM_QUALIFICATION,
+    AUTHORITY_EXTRAPOLATED,
     BATTERY_ENGINE_NAMES,
     DEFAULT_POTS_PATH,
     FINDING_CLASS_FALLBACK_VS_SPECIATION,
+    IMCC_ENGINE_NAMES,
+    IMCC_MODEL_IDS,
+    QUALIFICATION_SIO2_SWEEP_WT_PCT,
     QUANTITY_ACTIVITY,
     QUANTITY_PRESSURE,
     REFUSAL_COMPOSITION_PROJECTED,
+    REFUSAL_ENGINE_CRASH,
+    REFUSAL_GATE_REFUSED_IN_ADAPTER,
     REFUSAL_TIMEOUT,
     REFUSAL_UNAVAILABLE,
     REFUSAL_VALUE_IS_FLOOR,
@@ -23,6 +30,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     EngineHandle,
     EquilibrateCell,
     Po2Request,
+    assess_qualification_gate,
     classify_equilibrate_outcome,
     classify_reported_value,
     collect_floor_refusals,
@@ -31,11 +39,15 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     extract_vapor_authority,
     finding_class_for_pair,
     load_binary_pots,
+    melts_certified_band,
+    open_battery_engine,
     pairwise_residuals,
+    qualification_sio2_sweep_pots,
     reclassify_projected_composition_cells,
     recompute_residuals_from_report,
     render_report_markdown,
     residual_log10,
+    scale_feo_mgo_for_sio2,
     vapor_authority_kind,
     write_reports,
 )
@@ -458,7 +470,7 @@ def test_domain_exception_does_not_kill_engine_handle() -> None:
 
 
 def test_battery_engine_names_match_backends_py_surface() -> None:
-    assert BATTERY_ENGINE_NAMES == (
+    assert BATTERY_ENGINE_NAMES[:6] == (
         "internal-analytical",
         "alphamelts",
         "thermoengine",
@@ -466,6 +478,9 @@ def test_battery_engine_names_match_backends_py_surface() -> None:
         "magemin",
         "cached-real",
     )
+    assert BATTERY_ENGINE_NAMES[-2:] == IMCC_ENGINE_NAMES
+    assert IMCC_MODEL_IDS["imcc_sf04"] == "IMCC-SF04"
+    assert IMCC_MODEL_IDS["imcc_sf04_ext"] == "IMCC-SF04-EXT"
 
 
 def _ok_cell(
@@ -1142,3 +1157,265 @@ def test_equilibrate_cell_payload_round_trip_keeps_flags() -> None:
     assert EquilibrateCell.from_payload(flagged.as_payload()).vapor_pressures_source[
         "Si"
     ].startswith("antoine_fallback_from_vaporock")
+
+
+def test_imcc_cell_round_trips_through_harness() -> None:
+    pot = BinaryPot(
+        pot_id="mgo_sio2_40_60",
+        kato_1993_table4_system="MgO-SiO2",
+        why="IMCC round-trip fixture",
+        composition_wt_pct={"MgO": 40.0, "SiO2": 60.0},
+    )
+    po2 = Po2Request(mode="engine_default", po2_bar=None)
+    handle = open_battery_engine("imcc_sf04")
+    assert handle.available is True
+    assert handle.backend is not None
+    cell = equilibrate_cell(
+        handle, pot, temperature_K=1700.0, po2=po2, isolated=False
+    )
+    assert cell.engine == "imcc_sf04"
+    assert cell.model_id == "IMCC-SF04"
+    if cell.status == "ok":
+        assert cell.melt_activities
+        assert "SiO2" in cell.melt_activities
+        assert cell.melt_activities["SiO2"] > 0.0
+    else:
+        assert cell.refusal_reason is not None
+    rebuilt = EquilibrateCell.from_payload(cell.as_payload())
+    assert rebuilt.as_payload() == cell.as_payload()
+    assert rebuilt.model_id == "IMCC-SF04"
+
+    ext = open_battery_engine("imcc_sf04_ext")
+    assert ext.available is True
+    ext_cell = equilibrate_cell(
+        ext, pot, temperature_K=1700.0, po2=po2, isolated=False
+    )
+    assert ext_cell.model_id == "IMCC-SF04-EXT"
+    rebuilt_ext = EquilibrateCell.from_payload(ext_cell.as_payload())
+    assert rebuilt_ext.as_payload() == ext_cell.as_payload()
+
+
+def test_imcc_refuses_species_outside_parent_basis() -> None:
+    pot = BinaryPot(
+        pot_id="pbo_p2o5",
+        kato_1993_table4_system=None,
+        why="PbO is not an IMCC parent",
+        composition_wt_pct={"PbO": 73.75, "P2O5": 26.25},
+    )
+    po2 = Po2Request(mode="engine_default", po2_bar=None)
+    handle = open_battery_engine("imcc_sf04")
+    cell = equilibrate_cell(
+        handle, pot, temperature_K=1573.0, po2=po2, isolated=False
+    )
+    assert cell.status == "refusal"
+    assert cell.refusal_reason is not None
+    assert cell.melt_activities == {}
+    assert cell.gas_partial_pressures_Pa == {}
+
+
+def test_qualification_cell_carries_gate_notice_and_extrapolated_authority() -> None:
+    pot = BinaryPot(
+        pot_id="qual_sio2_20_feo_mgo",
+        kato_1993_table4_system="FeO-MgO-SiO2",
+        why="qualification SiO2=20",
+        composition_wt_pct=scale_feo_mgo_for_sio2(
+            20.0, {"FeO": 30.0, "MgO": 20.0, "SiO2": 50.0}
+        ),
+    )
+    assert sum(pot.composition_wt_pct.values()) == pytest.approx(100.0)
+    assert pot.composition_wt_pct["SiO2"] == pytest.approx(20.0)
+    gate = assess_qualification_gate(pot.composition_wt_pct, 1700.0)
+    assert gate["valid"] is False
+    assert "silicate_network_band" in gate["failed_constraints"]
+    assert gate["authority"] == AUTHORITY_EXTRAPOLATED
+    assert gate["certified_band"]["sio2_wt_pct"] == [30.0, 80.0]
+    assert gate["certified_band"]["temperature_K"][1] == 1700.0
+
+    po2 = Po2Request(mode="engine_default", po2_bar=None)
+
+    class _OkBackend:
+        def equilibrate(self, **kwargs):
+            return SimpleNamespace(
+                status="ok",
+                diagnostics={},
+                warnings=[],
+                activity_coefficients={"SiO2": 0.2},
+                vapor_pressures_Pa={},
+                liquid_fraction=1.0,
+                phase_assemblage_available=True,
+            )
+
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=_OkBackend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1700.0,
+        po2=po2,
+        qualification=True,
+        isolated=False,
+    )
+    assert cell.arm == ARM_QUALIFICATION
+    assert cell.authority == AUTHORITY_EXTRAPOLATED
+    assert cell.certified_band is not None
+    assert cell.certified_band["sio2_wt_pct"] == [30.0, 80.0]
+    assert any(notice.get("kind") == "melts_domain_gate" for notice in cell.notices)
+    notice = next(n for n in cell.notices if n["kind"] == "melts_domain_gate")
+    assert notice["authority"] == AUTHORITY_EXTRAPOLATED
+    assert notice["gate_valid"] is False
+    assert notice["run_anyway"] is True
+    assert cell.status == "ok"
+    assert cell.melt_activities["SiO2"] == pytest.approx(0.2)
+    rebuilt = EquilibrateCell.from_payload(cell.as_payload())
+    assert rebuilt.authority == AUTHORITY_EXTRAPOLATED
+    assert rebuilt.certified_band == cell.certified_band
+    assert rebuilt.notices == cell.notices
+
+
+def test_qualification_temperature_below_and_above_published_band() -> None:
+    pot = BinaryPot(
+        pot_id="feo_mgo_sio2_30_20_50",
+        kato_1993_table4_system="FeO-MgO-SiO2",
+        why="in-band composition",
+        composition_wt_pct={"FeO": 30.0, "MgO": 20.0, "SiO2": 50.0},
+    )
+    band = melts_certified_band()
+    t_min, t_max = band["temperature_K"]
+    low = assess_qualification_gate(pot.composition_wt_pct, 1100.0)
+    high = assess_qualification_gate(pot.composition_wt_pct, 2600.0)
+    in_band = assess_qualification_gate(pot.composition_wt_pct, 1700.0)
+    assert t_min == pytest.approx(800.0 + 273.15)
+    assert t_max == pytest.approx(1700.0)
+    assert 2600.0 > t_max
+    assert high["temperature_in_band"] is False
+    assert "temperature_range" in high["failed_constraints"]
+    assert in_band["temperature_in_band"] is True
+    # 1100 K (826.85 C) is above the 800 C subprocess min, so the T gate
+    # is valid; 1100/1200 K remain requested qualification points below
+    # the engine-arm 1500 K start.
+    assert 1100.0 > t_min
+    assert low["temperature_in_band"] is True
+
+
+def test_qualification_sio2_sweep_pots_sum_to_100() -> None:
+    pots = qualification_sio2_sweep_pots(
+        BinaryPot(
+            pot_id="feo_mgo_sio2_30_20_50",
+            kato_1993_table4_system="FeO-MgO-SiO2",
+            why="source",
+            composition_wt_pct={"FeO": 30.0, "MgO": 20.0, "SiO2": 50.0},
+        )
+    )
+    assert len(pots) == len(QUALIFICATION_SIO2_SWEEP_WT_PCT)
+    for pot, sio2 in zip(pots, QUALIFICATION_SIO2_SWEEP_WT_PCT):
+        assert pot.composition_wt_pct["SiO2"] == pytest.approx(sio2)
+        assert sum(pot.composition_wt_pct.values()) == pytest.approx(100.0)
+        assert "CaO" not in pot.composition_wt_pct
+        ratio = pot.composition_wt_pct["FeO"] / pot.composition_wt_pct["MgO"]
+        assert ratio == pytest.approx(30.0 / 20.0)
+
+
+def test_simulated_crash_yields_engine_crash() -> None:
+    pot = BinaryPot(
+        pot_id="qual_crash",
+        kato_1993_table4_system=None,
+        why="simulated SIGABRT",
+        composition_wt_pct={"SiO2": 20.0, "FeO": 48.0, "MgO": 32.0},
+    )
+    po2 = Po2Request(mode="engine_default", po2_bar=None)
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=object(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1700.0,
+        po2=po2,
+        qualification=True,
+        isolated=True,
+        simulate_crash="SIGABRT",
+        timeout_s=10.0,
+    )
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_ENGINE_CRASH
+    assert cell.exit_signal == 6  # SIGABRT
+    assert cell.exit_code == -6
+    assert cell.arm == ARM_QUALIFICATION
+    assert cell.authority == AUTHORITY_EXTRAPOLATED
+    assert any(notice.get("kind") == "melts_domain_gate" for notice in cell.notices)
+
+
+def test_qualification_inline_adapter_gate_is_gate_refused_in_adapter() -> None:
+    pot = BinaryPot(
+        pot_id="na2o_sio2_25_75",
+        kato_1993_table4_system=None,
+        why="fe-free absolute fO2 family",
+        composition_wt_pct={"Na2O": 25.0, "SiO2": 75.0},
+    )
+    po2 = Po2Request(mode="engine_default", po2_bar=None)
+
+    class _InlineGateBackend:
+        def equilibrate(self, **kwargs):
+            return SimpleNamespace(
+                status="out_of_domain",
+                diagnostics={
+                    "backend_status_reason": "subprocess_fe_free_absolute_fo2_crash",
+                    "backend_failure_reason_code": "subprocess_fe_free_absolute_fo2_crash",
+                },
+                warnings=["Fe-free absolute fO2 crash family"],
+                activity_coefficients={},
+                vapor_pressures_Pa={},
+                liquid_fraction=None,
+            )
+
+    handle = EngineHandle(
+        name="alphamelts",
+        backend=_InlineGateBackend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=False,
+    )
+    cell = equilibrate_cell(
+        handle,
+        pot,
+        temperature_K=1700.0,
+        po2=po2,
+        qualification=True,
+        isolated=False,
+    )
+    assert cell.status == "refusal"
+    assert cell.refusal_reason == REFUSAL_GATE_REFUSED_IN_ADAPTER
+    assert "fe_free" in (cell.engine_reason or "")
+
+
+def test_classify_subprocess_died_is_engine_crash() -> None:
+    status, reason, engine_reason = classify_equilibrate_outcome(
+        SimpleNamespace(
+            status="out_of_domain",
+            diagnostics={
+                "backend_status_reason": "subprocess_died",
+                "backend_failure_reason_code": "subprocess_died",
+                "backend_failure_category": "engine_crash",
+                "subprocess_failure": {"returncode": -6, "signal": "SIGABRT"},
+            },
+            warnings=["AlphaMELTS subprocess exited before producing a result"],
+            activity_coefficients={},
+            vapor_pressures_Pa={},
+            liquid_fraction=None,
+        )
+    )
+    assert status == "refusal"
+    assert reason == REFUSAL_ENGINE_CRASH
+    assert engine_reason

@@ -22,6 +22,8 @@ from simulator.diagnostic_helpers.binary_pot_battery import (  # noqa: E402
     BATTERY_ENGINE_NAMES,
     DEFAULT_POTS_PATH,
     REPORT_DIR,
+    load_cells_from_report,
+    load_engine_blocks_from_report,
     probe_battery_engines,
     recompute_residuals_from_report,
     run_engine_arm,
@@ -60,13 +62,43 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help="re-score an existing engine-arm JSON (no engine re-run)",
     )
+    parser.add_argument(
+        "--engines",
+        default=None,
+        help="comma-separated engine names (default: all battery engines, including IMCC)",
+    )
+    parser.add_argument(
+        "--qualification",
+        action="store_true",
+        help=(
+            "MELTS QUALIFICATION mode: record domain-gate verdict as "
+            "authority=extrapolated and run anyway in an isolated subprocess"
+        ),
+    )
+    parser.add_argument(
+        "--include-scoring-pots",
+        action="store_true",
+        help="also run the 30 Kambayashi/Ohara scoring pots at their extract T",
+    )
+    parser.add_argument(
+        "--reuse-cells",
+        type=Path,
+        action="append",
+        default=None,
+        help="reuse cells from an existing engine-arm/scoring JSON (repeatable)",
+    )
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv)
+    engine_names = BATTERY_ENGINE_NAMES
+    if args.engines:
+        engine_names = tuple(
+            name.strip() for name in str(args.engines).split(",") if name.strip()
+        )
     if args.probe_only:
-        handles = probe_battery_engines(BATTERY_ENGINE_NAMES)
+        handles = probe_battery_engines(engine_names)
         payload = {
             name: {
                 "available": handle.available,
@@ -85,8 +117,19 @@ def main(argv: list[str] | None = None) -> int:
             json.loads(source.read_text(encoding="utf-8"))
         )
     else:
+        reuse_cells = []
+        reuse_engine_blocks: dict = {}
+        for path in args.reuse_cells or []:
+            reuse_cells.extend(load_cells_from_report(path))
+            reuse_engine_blocks.update(load_engine_blocks_from_report(path))
         report = run_engine_arm(
-            pots_path=args.pots, progress_log=args.progress_log
+            pots_path=args.pots,
+            progress_log=args.progress_log,
+            engine_names=engine_names,
+            qualification=bool(args.qualification),
+            include_scoring_pots=bool(args.include_scoring_pots),
+            reuse_cells=reuse_cells or None,
+            reuse_engine_blocks=reuse_engine_blocks or None,
         )
     json_path, markdown_path = write_reports(report, args.output_dir)
     print(f"hostname={report['hostname']}")
