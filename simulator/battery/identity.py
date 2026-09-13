@@ -177,6 +177,22 @@ def o2_coefficient(reaction: Reaction) -> Fraction:
     return total
 
 
+def product_coefficient(reaction: Reaction) -> Fraction:
+    """Positive coefficient of the single non-O2 product."""
+
+    total = Fraction(0)
+    count = 0
+    for term in reaction.terms:
+        if term.species.formula == "O2":
+            continue
+        if term.coefficient > 0:
+            total += term.coefficient
+            count += 1
+    if count != 1:
+        raise ValueError("rescale requires exactly one non-O2 product species")
+    return total
+
+
 def rescale_energy_per_basis(
     value_kJ: object,
     from_per: PerBasis,
@@ -185,6 +201,7 @@ def rescale_energy_per_basis(
 ) -> Decimal:
     """Rescale a molar energy between mol_species and mol_O2.
 
+    ΔG_per_mol_O2 = ΔG_per_mol_species × |ν_product| / |ν_O2|.
     Does not invent a conversion for other ``per`` tokens.
     """
 
@@ -193,17 +210,12 @@ def rescale_energy_per_basis(
     nu_o2 = abs(o2_coefficient(reaction))
     if nu_o2 == 0:
         raise ValueError("reaction has no O2 term; cannot rescale to/from mol_O2")
-    factor = as_decimal(nu_o2)
+    nu_product = abs(product_coefficient(reaction))
+    factor = as_decimal(nu_product) / as_decimal(nu_o2)
     if from_per is PerBasis.MOL_SPECIES and to_per is PerBasis.MOL_O2:
-        # ΔG_per_mol_O2 = ΔG_per_mol_species / |ν_O2| * |ν_product_on_species_write|
-        # For the formation write aA + (n/2)O2 = a oxide, per-mol-oxide × a/n
-        # equals per-mol-O2 when a/n = 1/|ν_O2| on the formation reaction
-        # (ν_O2 is negative on the formation write). |ν_O2| on the products-
-        # positive formation reaction is the O2 consumed per formula-unit
-        # write-up; per-mol-O2 = per-mol-species / |ν_O2|.
-        return as_decimal(value_kJ) / factor
-    if from_per is PerBasis.MOL_O2 and to_per is PerBasis.MOL_SPECIES:
         return as_decimal(value_kJ) * factor
+    if from_per is PerBasis.MOL_O2 and to_per is PerBasis.MOL_SPECIES:
+        return as_decimal(value_kJ) / factor
     raise ValueError(f"no recorded conversion {from_per} → {to_per}")
 
 

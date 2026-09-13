@@ -54,11 +54,21 @@ def test_per_mol_o2_rescaling_cao() -> None:
     product = Species("CaO", Phase.CR, polymorph=State.of("lime"))
     metal = Species("Ca", Phase.L)
     reaction = formation_reaction(product, metal, Fraction(1), Fraction(1, 2))
-    # |ν_O2| = 1/2 on the per-formula write-up; per-mol-O2 = per-mol-species / 0.5.
+    # |ν_product|/|ν_O2| = 1 / (1/2) = 2 on the per-formula write-up.
     per_species = Decimal("100")
     per_o2 = rescale_energy_per_basis(per_species, PerBasis.MOL_SPECIES, PerBasis.MOL_O2, reaction)
     assert per_o2 == Decimal("200")
     assert rescale_energy_per_basis(per_o2, PerBasis.MOL_O2, PerBasis.MOL_SPECIES, reaction) == per_species
+    from simulator.battery.records import Reaction, ReactionTerm
+
+    doubled = Reaction(
+        (
+            ReactionTerm(product, Fraction(2)),
+            ReactionTerm(metal, Fraction(-2)),
+            ReactionTerm(Species("O2", Phase.G), Fraction(-1)),
+        )
+    )
+    assert rescale_energy_per_basis(per_species, PerBasis.MOL_SPECIES, PerBasis.MOL_O2, doubled) == Decimal("200")
 
 
 def test_engine_enum_is_closed_and_includes_imcc_sf04() -> None:
