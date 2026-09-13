@@ -1537,6 +1537,27 @@ def test_r03_union_fingerprint_honours_from_to_dropped_and_fraction() -> None:
     assert union_notices((projected_a,), (projected_b,)) == (projected_a, projected_b)
 
 
+def test_r05_relative_series_rejects_nonfinite_values() -> None:
+    with pytest.raises(ValueError, match="finite"):
+        Value(
+            ValueKind.RELATIVE_SERIES,
+            relative_series=((Decimal("1"), Decimal("NaN")),),
+            relative_normalization="first point",
+        )
+    with pytest.raises(ValueError, match="finite"):
+        Value(
+            ValueKind.RELATIVE_SERIES,
+            relative_series=((Decimal("NaN"), Decimal("1")),),
+            relative_normalization="first point",
+        )
+    control = Value(
+        ValueKind.RELATIVE_SERIES,
+        relative_series=((Decimal("1"), Decimal("0.5")),),
+        relative_normalization="first point",
+    )
+    assert control.relative_series[0][1] == Decimal("0.5")
+
+
 def test_r04_domain_extrapolation_projection_are_unknown_kinds() -> None:
     """Closed policy tokens only; aliases must not bypass certification policy."""
 

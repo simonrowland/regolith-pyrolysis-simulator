@@ -406,13 +406,11 @@ class Value:
         elif kind is ValueKind.RELATIVE_SERIES:
             if not self.relative_series or not self.relative_normalization:
                 raise ValueError("Value.relative_series requires series and normalization")
-            object.__setattr__(
-                self,
-                "relative_series",
-                tuple(
-                    (as_decimal(c), as_decimal(v)) for c, v in self.relative_series
-                ),
-            )
+            series = tuple((as_decimal(c), as_decimal(v)) for c, v in self.relative_series)
+            for coord, val in series:
+                _require_finite("Value.relative_series coordinate", coord)
+                _require_finite("Value.relative_series value", val)
+            object.__setattr__(self, "relative_series", series)
         elif kind is ValueKind.EXPRESSION:
             if not self.expression_text:
                 raise ValueError("Value.expression requires text")
