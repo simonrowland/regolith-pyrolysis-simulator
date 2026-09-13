@@ -984,6 +984,10 @@ def test_m15_growth_is_not_a_census_gate_and_roles_are_not_counts() -> None:
     )
     same_work_report = validate_corpus([w], [exp], rows + [same_work], [same_work_res])
     assert not same_work_report.ok
+    assert any(
+        "coefficient_sources" in i.detail or "lineage" in i.detail
+        for i in same_work_report.issues
+    )
 
 
 def test_r02_lineage_overlap_is_observation_table_not_work_or_asset() -> None:
@@ -1056,6 +1060,10 @@ def test_r02_lineage_overlap_is_observation_table_not_work_or_asset() -> None:
     )
     same_work_report = validate_corpus([w], [exp], [ref, same_work], [same_work_res])
     assert not same_work_report.ok
+    assert any(
+        "coefficient_sources" in i.detail or "lineage" in i.detail
+        for i in same_work_report.issues
+    )
     asset = replace(
         cand,
         observation_id="r02-asset",
@@ -1070,6 +1078,10 @@ def test_r02_lineage_overlap_is_observation_table_not_work_or_asset() -> None:
     )
     asset_report = validate_corpus([w], [exp], [ref, asset], [asset_res])
     assert not asset_report.ok
+    assert any(
+        "coefficient_sources" in i.detail or "lineage" in i.detail
+        for i in asset_report.issues
+    )
 
 
 def _r08_scored_o2(*, observation_id: str, coefficient_sources: tuple[str, ...], T_K=None):
