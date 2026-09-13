@@ -827,3 +827,44 @@ def test_fallback_vs_speciation_finding_class_reads_engine_flags() -> None:
     assert FINDING_CLASS_FALLBACK_VS_SPECIATION in markdown or (
         "fallback vs speciation" in markdown
     )
+
+
+def test_equilibrate_cell_payload_round_trip_keeps_flags() -> None:
+    po2 = Po2Request(mode="commanded", po2_bar=1.0e-8)
+    flagged = _ok_cell(
+        engine="thermoengine",
+        gas={"Si": 0.005, "Mg": 85017.0},
+        po2=po2,
+        temperature_K=1600.0,
+        vapor_pressures_source={
+            "Si": "antoine_fallback_from_vaporock:standard_reaction_term",
+            "Mg": "antoine_fallback_from_vaporock:legacy_pure_component_estimate",
+        },
+        vapor_pressure_backend_status="fallback",
+        vapor_pressure_backend_status_reason="vaporock_to_antoine_fallback",
+        authoritative_for_requested_vapor_pressure=False,
+    )
+    projected = EquilibrateCell(
+        pot_id="kambayashi_1985_feto_p2o5_s01",
+        engine="magemin",
+        temperature_K=1643.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="refusal",
+        refusal_reason=REFUSAL_COMPOSITION_PROJECTED,
+        engine_status="out_of_domain",
+        engine_reason="dropped P2O5 (mass_fraction=0.0154881)",
+        melt_activities={},
+        gas_partial_pressures_Pa={},
+        liquid_fraction=None,
+        wall_s=0.2,
+        cpu_s=0.0,
+        hostname="test",
+    )
+    for cell in (flagged, projected):
+        rebuilt = EquilibrateCell.from_payload(cell.as_payload())
+        assert rebuilt.as_payload() == cell.as_payload()
+    assert rebuilt.refusal_reason == REFUSAL_COMPOSITION_PROJECTED
+    assert flagged.as_payload()["vapor_pressure_backend_status"] == "fallback"
+    assert EquilibrateCell.from_payload(flagged.as_payload()).vapor_pressures_source[
+        "Si"
+    ].startswith("antoine_fallback_from_vaporock")

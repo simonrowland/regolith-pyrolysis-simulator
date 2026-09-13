@@ -223,6 +223,31 @@ class EquilibrateCell:
             wall_s=float(payload.get("wall_s") or 0.0),
             cpu_s=float(payload.get("cpu_s") or 0.0),
             hostname=str(payload.get("hostname") or ""),
+            vapor_pressures_source={
+                str(name): str(label)
+                for name, label in dict(
+                    payload.get("vapor_pressures_source") or {}
+                ).items()
+                if label is not None
+            },
+            vapor_pressure_backend_status=(
+                None
+                if payload.get("vapor_pressure_backend_status") is None
+                else str(payload.get("vapor_pressure_backend_status"))
+            ),
+            vapor_pressure_backend_status_reason=(
+                None
+                if payload.get("vapor_pressure_backend_status_reason") is None
+                else str(payload.get("vapor_pressure_backend_status_reason"))
+            ),
+            authoritative_for_requested_vapor_pressure=(
+                None
+                if payload.get("authoritative_for_requested_vapor_pressure")
+                is None
+                else bool(
+                    payload.get("authoritative_for_requested_vapor_pressure")
+                )
+            ),
         )
 
 
