@@ -70,6 +70,11 @@ REFUSAL_TIMEOUT = "engine_timeout"
 REFUSAL_UNAVAILABLE = "unavailable"
 REFUSAL_VALUE_IS_FLOOR = "value_is_floor"
 
+FINDING_CLASS_FALLBACK_VS_SPECIATION = "fallback_vs_speciation"
+AUTHORITY_FALLBACK = "fallback"
+AUTHORITY_SPECIATION = "speciation"
+_ANTOINE_FALLBACK_PREFIX = "antoine_fallback_from_vaporock"
+
 _MAJOR_SUM_TOKENS = frozenset(
     {"major_sum", "sum_below_95_wt_pct", "major oxide sum"}
 )
@@ -159,6 +164,10 @@ class EquilibrateCell:
     wall_s: float
     cpu_s: float
     hostname: str
+    vapor_pressures_source: dict[str, str] = field(default_factory=dict)
+    vapor_pressure_backend_status: str | None = None
+    vapor_pressure_backend_status_reason: str | None = None
+    authoritative_for_requested_vapor_pressure: bool | None = None
 
     def as_payload(self) -> dict[str, Any]:
         return {
@@ -176,6 +185,14 @@ class EquilibrateCell:
             "wall_s": self.wall_s,
             "cpu_s": self.cpu_s,
             "hostname": self.hostname,
+            "vapor_pressures_source": dict(self.vapor_pressures_source),
+            "vapor_pressure_backend_status": self.vapor_pressure_backend_status,
+            "vapor_pressure_backend_status_reason": (
+                self.vapor_pressure_backend_status_reason
+            ),
+            "authoritative_for_requested_vapor_pressure": (
+                self.authoritative_for_requested_vapor_pressure
+            ),
         }
 
 
@@ -534,6 +551,9 @@ def pairwise_residuals(
                                 "value_b": value_b,
                                 "delta_log10_a_minus_b": delta,
                                 "divergence_label": divergence_label(abs(delta)),
+                                "finding_class": finding_class_for_pair(
+                                    left, right, species=name, quantity=quantity
+                                ),
                             }
                         )
     rows.sort(
@@ -592,6 +612,100 @@ def extract_reported_quantities(
         if number is not None and number > 0.0:
             pressures[str(name)] = number
     return activities, pressures
+
+
+def extract_vapor_authority(result: Any) -> dict[str, Any]:
+    """Copy EquilibriumResult vapor-authority flags the harness used to drop.
+
+    ThermoEngine/AlphaMELTS mark an Antoine fallback on
+    ``vapor_pressures_source`` (prefix ``antoine_fallback_from_vaporock``)
+    and ``diagnostics['vapor_pressure_backend_status'] == 'fallback'``.
+    Standalone VapoRock blanks ``vapor_pressures_Pa`` on the
+    non-authoritative path and keeps live speciation on
+    ``vaporock_full_speciation_Pa``; that is still a speciation result.
+    """
+
+    diagnostics = dict(getattr(result, "diagnostics", None) or {})
+    sources = {
+        str(name): str(label)
+        for name, label in dict(
+            getattr(result, "vapor_pressures_source", None) or {}
+        ).items()
+        if label is not None
+    }
+    auth = diagnostics.get("authoritative_for_requested_vapor_pressure")
+    return {
+        "vapor_pressures_source": sources,
+        "vapor_pressure_backend_status": diagnostics.get(
+            "vapor_pressure_backend_status"
+        ),
+        "vapor_pressure_backend_status_reason": diagnostics.get(
+            "vapor_pressure_backend_status_reason"
+        ),
+        "authoritative_for_requested_vapor_pressure": (
+            None if auth is None else bool(auth)
+        ),
+    }
+
+
+def _source_label_for_species(payload: Mapping[str, Any], species: str) -> str:
+    sources = payload.get("vapor_pressures_source") or {}
+    if not isinstance(sources, Mapping):
+        return ""
+    raw = sources.get(species)
+    if raw is None:
+        raw = sources.get(str(species))
+    return str(raw or "")
+
+
+def vapor_authority_kind(
+    payload: Mapping[str, Any],
+    *,
+    species: str,
+    quantity: str,
+) -> str | None:
+    """Return ``fallback`` or ``speciation`` from flags the engine actually set.
+
+    Does not infer from the number. A missing flag is ``None`` — that is
+    the previous harness dropping the field, not an unflagged fallback.
+    """
+
+    if quantity != QUANTITY_PRESSURE:
+        return None
+    source = _source_label_for_species(payload, species)
+    status = str(payload.get("vapor_pressure_backend_status") or "")
+    if status == "fallback" or source.startswith(_ANTOINE_FALLBACK_PREFIX):
+        return AUTHORITY_FALLBACK
+    if source == "vaporock" or source.startswith("vaporock"):
+        return AUTHORITY_SPECIATION
+    # Standalone VapoRock keeps live speciation off vapor_pressures_Pa.
+    if str(payload.get("engine") or "") == "vaporock":
+        return AUTHORITY_SPECIATION
+    # AlphaMELTS VapoRock helper succeeds with a full gas inventory
+    # (Si2/Mg2/SiO2_gas) but labels rows builtin_authoritative:* rather
+    # than 'vaporock'. That is still a speciation number, not the Antoine
+    # fallback ThermoEngine records as antoine_fallback_from_vaporock.
+    if source.startswith("builtin_authoritative"):
+        return AUTHORITY_SPECIATION
+    return None
+
+
+def finding_class_for_pair(
+    left: Mapping[str, Any],
+    right: Mapping[str, Any],
+    *,
+    species: str,
+    quantity: str,
+) -> str | None:
+    """Tag a residual when one side is Antoine fallback and the other speciation."""
+
+    kinds = {
+        vapor_authority_kind(left, species=species, quantity=quantity),
+        vapor_authority_kind(right, species=species, quantity=quantity),
+    }
+    if kinds == {AUTHORITY_FALLBACK, AUTHORITY_SPECIATION}:
+        return FINDING_CLASS_FALLBACK_VS_SPECIATION
+    return None
 
 
 def _utc_stamp() -> str:
@@ -930,6 +1044,7 @@ def equilibrate_cell(
         )
         status, refusal, engine_reason = classify_equilibrate_outcome(result)
         activities, pressures = extract_reported_quantities(result)
+        authority = extract_vapor_authority(result)
         return _done(
             status=status,
             refusal_reason=refusal,
@@ -938,6 +1053,16 @@ def equilibrate_cell(
             melt_activities=activities,
             gas_partial_pressures_Pa=pressures,
             liquid_fraction=_finite_float(getattr(result, "liquid_fraction", None)),
+            vapor_pressures_source=dict(authority["vapor_pressures_source"]),
+            vapor_pressure_backend_status=authority[
+                "vapor_pressure_backend_status"
+            ],
+            vapor_pressure_backend_status_reason=authority[
+                "vapor_pressure_backend_status_reason"
+            ],
+            authoritative_for_requested_vapor_pressure=authority[
+                "authoritative_for_requested_vapor_pressure"
+            ],
         )
     except Exception as exc:  # noqa: BLE001 - typed refusal, never a hang/crash
         status, refusal, engine_reason = classify_equilibrate_outcome(error=exc)
@@ -1233,6 +1358,11 @@ def build_report(
         "n_refused": sum(1 for cell in cells if cell.status == "refusal"),
         "n_matched_residuals": len(residuals),
         "n_floor_refusals": len(floor_refusals),
+        "n_fallback_vs_speciation": sum(
+            1
+            for row in residuals
+            if row.get("finding_class") == FINDING_CLASS_FALLBACK_VS_SPECIATION
+        ),
         "floor_refusals": floor_refusals,
         "cells": [cell.as_payload() for cell in cells],
         "note": (
@@ -1266,6 +1396,11 @@ def recompute_residuals_from_report(
     updated["n_matched_residuals"] = len(residuals)
     updated["per_pot_residuals"] = _per_pot_residual_tables(pots, residuals)
     updated["n_floor_refusals"] = len(floor_refusals)
+    updated["n_fallback_vs_speciation"] = sum(
+        1
+        for row in residuals
+        if row.get("finding_class") == FINDING_CLASS_FALLBACK_VS_SPECIATION
+    )
     updated["floor_refusals"] = floor_refusals
     updated["note"] = (
         "divergence_label is a descriptive magnitude band only; "
@@ -1301,6 +1436,10 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
         (
             f"- floor refusals: `{report.get('n_floor_refusals', 0)}` "
             f"(`{REFUSAL_VALUE_IS_FLOOR}`; excluded from residuals)"
+        ),
+        (
+            f"- fallback vs speciation: `{report.get('n_fallback_vs_speciation', 0)}` "
+            f"(`{FINDING_CLASS_FALLBACK_VS_SPECIATION}`)"
         ),
         (
             f"- wall: `{receipt.get('wall_s'):.3f} s`; "
@@ -1450,22 +1589,23 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
             "",
             (
                 "| pot | T K | pO2 | species | quantity | engine_a | engine_b | "
-                "Δ dex (a−b) | label |"
+                "Δ dex (a−b) | label | finding_class |"
             ),
-            "|---|---:|---|---|---|---|---|---:|---|",
+            "|---|---:|---|---|---|---|---|---:|---|---|",
         ]
     )
     top = report.get("largest_in_envelope_residuals") or []
     if not top:
-        lines.append("| — | — | — | — | — | — | — | — | `no_matched_points` |")
+        lines.append("| — | — | — | — | — | — | — | — | `no_matched_points` | — |")
     for row in top[:20]:
         po2 = row.get("po2_bar")
         po2_label = (
             "default" if row.get("po2_mode") == PO2_ENGINE_DEFAULT else f"{po2:g} bar"
         )
+        finding = row.get("finding_class") or "—"
         lines.append(
             "| `{pot}` | {T:g} | {po2} | {species} | {qty} | `{a}` | `{b}` | "
-            "{delta} | `{label}` |".format(
+            "{delta} | `{label}` | `{finding}` |".format(
                 pot=row["pot_id"],
                 T=float(row["temperature_K"]),
                 po2=po2_label,
@@ -1475,6 +1615,7 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
                 b=row["engine_b"],
                 delta=_fmt_dex(row["delta_log10_a_minus_b"]),
                 label=row["divergence_label"],
+                finding=finding,
             )
         )
     lines.extend(
@@ -1488,7 +1629,14 @@ def render_report_markdown(report: Mapping[str, Any]) -> str:
                 f"`{REFUSAL_VALUE_IS_FLOOR}` (floor_value="
                 f"{MELT_DISSOCIATION_PO2_MIN_BAR:g} bar pO2 clamp, or a "
                 f"gas partial pressure ≥ {CATALOG_PHYSICAL_PRESSURE_CEILING_PA:g} Pa) "
-                "and are excluded from residuals. No result is used to change "
+                "and are excluded from residuals. "
+                f"`{FINDING_CLASS_FALLBACK_VS_SPECIATION}` marks a pair where "
+                "one engine reported an Antoine fallback authority "
+                f"(`{_ANTOINE_FALLBACK_PREFIX}` / "
+                "`vapor_pressure_backend_status=fallback`) and the other a "
+                "speciation result. The Pa number itself is indistinguishable "
+                "from a speciation value; the harness now copies the engine "
+                "flags instead of dropping them. No result is used to change "
                 "a coefficient."
             ),
             "",

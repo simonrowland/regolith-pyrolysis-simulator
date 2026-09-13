@@ -11,6 +11,7 @@ import pytest
 from simulator.diagnostic_helpers.binary_pot_battery import (
     BATTERY_ENGINE_NAMES,
     DEFAULT_POTS_PATH,
+    FINDING_CLASS_FALLBACK_VS_SPECIATION,
     QUANTITY_ACTIVITY,
     QUANTITY_PRESSURE,
     REFUSAL_TIMEOUT,
@@ -25,11 +26,14 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     collect_floor_refusals,
     equilibrate_cell,
     extract_reported_quantities,
+    extract_vapor_authority,
+    finding_class_for_pair,
     load_binary_pots,
     pairwise_residuals,
     recompute_residuals_from_report,
     render_report_markdown,
     residual_log10,
+    vapor_authority_kind,
     write_reports,
 )
 from simulator.physical_constants import (
@@ -358,12 +362,18 @@ def _ok_cell(
     engine: str,
     gas: dict[str, float],
     activities: dict[str, float] | None = None,
+    po2: Po2Request | None = None,
+    temperature_K: float = 1700.0,
+    vapor_pressures_source: dict[str, str] | None = None,
+    vapor_pressure_backend_status: str | None = None,
+    vapor_pressure_backend_status_reason: str | None = None,
+    authoritative_for_requested_vapor_pressure: bool | None = None,
 ) -> EquilibrateCell:
     return EquilibrateCell(
         pot_id="feo_mgo_sio2_30_20_50",
         engine=engine,
-        temperature_K=1700.0,
-        po2=Po2Request(mode="engine_default", po2_bar=None),
+        temperature_K=temperature_K,
+        po2=po2 or Po2Request(mode="engine_default", po2_bar=None),
         status="ok",
         refusal_reason=None,
         engine_status="ok",
@@ -374,6 +384,12 @@ def _ok_cell(
         wall_s=0.0,
         cpu_s=0.0,
         hostname="test",
+        vapor_pressures_source=dict(vapor_pressures_source or {}),
+        vapor_pressure_backend_status=vapor_pressure_backend_status,
+        vapor_pressure_backend_status_reason=vapor_pressure_backend_status_reason,
+        authoritative_for_requested_vapor_pressure=(
+            authoritative_for_requested_vapor_pressure
+        ),
     )
 
 
@@ -478,4 +494,226 @@ def test_floor_value_is_typed_refusal_not_residual() -> None:
         "thermoengine" not in (row["engine_a"], row["engine_b"])
         for row in rebuilt["largest_in_envelope_residuals"]
         if row["species"] == "Si" and row["quantity"] == QUANTITY_PRESSURE
+    )
+
+
+def test_fallback_vs_speciation_finding_class_reads_engine_flags() -> None:
+    """Null hypothesis: the fallback is flagged; the harness must read it."""
+
+    po2 = Po2Request(mode="commanded", po2_bar=1.0e-8)
+    thermoengine = _ok_cell(
+        engine="thermoengine",
+        gas={"Si": 0.005055980955421236, "Mg": 85017.20906779557},
+        po2=po2,
+        temperature_K=1600.0,
+        vapor_pressures_source={
+            "Si": "antoine_fallback_from_vaporock:standard_reaction_term",
+            "Mg": "antoine_fallback_from_vaporock:legacy_pure_component_estimate",
+        },
+        vapor_pressure_backend_status="fallback",
+        vapor_pressure_backend_status_reason="vaporock_to_antoine_fallback",
+        authoritative_for_requested_vapor_pressure=False,
+    )
+    alphamelts = _ok_cell(
+        engine="alphamelts",
+        gas={"Si": 1.5412127415317158e-15, "Mg": 1.5650644335189703e-5},
+        po2=po2,
+        temperature_K=1600.0,
+        vapor_pressures_source={
+            "Si": "builtin_authoritative:standard_reaction_term",
+            "Mg": "builtin_authoritative:gas_standard_fugacity",
+        },
+    )
+    vaporock = _ok_cell(
+        engine="vaporock",
+        gas={"Si": 2.6888346520180887e-15, "Mg": 1.077023000421466e-5},
+        po2=po2,
+        temperature_K=1600.0,
+    )
+    unflagged = _ok_cell(
+        engine="thermoengine",
+        gas={"Si": 0.005055980955421236, "Mg": 85017.20906779557},
+        po2=po2,
+        temperature_K=1600.0,
+    )
+
+    flagged = SimpleNamespace(
+        activity_coefficients={"SiO2": 0.4},
+        vapor_pressures_Pa={"Si": 0.005, "Mg": 85017.0},
+        vaporock_full_speciation_Pa=None,
+        vapor_pressures_source={
+            "Si": "antoine_fallback_from_vaporock:standard_reaction_term",
+            "Mg": "antoine_fallback_from_vaporock:legacy_pure_component_estimate",
+        },
+        diagnostics={
+            "vapor_pressure_backend_status": "fallback",
+            "vapor_pressure_backend_status_reason": "vaporock_to_antoine_fallback",
+            "authoritative_for_requested_vapor_pressure": False,
+        },
+    )
+    authority = extract_vapor_authority(flagged)
+    assert authority["vapor_pressure_backend_status"] == "fallback"
+    assert authority["authoritative_for_requested_vapor_pressure"] is False
+    assert authority["vapor_pressures_source"]["Si"].startswith(
+        "antoine_fallback_from_vaporock"
+    )
+
+    assert (
+        vapor_authority_kind(
+            thermoengine.as_payload(), species="Si", quantity=QUANTITY_PRESSURE
+        )
+        == "fallback"
+    )
+    assert (
+        vapor_authority_kind(
+            alphamelts.as_payload(), species="Si", quantity=QUANTITY_PRESSURE
+        )
+        == "speciation"
+    )
+    assert (
+        vapor_authority_kind(
+            vaporock.as_payload(), species="Si", quantity=QUANTITY_PRESSURE
+        )
+        == "speciation"
+    )
+    assert (
+        vapor_authority_kind(
+            unflagged.as_payload(), species="Si", quantity=QUANTITY_PRESSURE
+        )
+        is None
+    )
+
+    assert (
+        finding_class_for_pair(
+            thermoengine.as_payload(),
+            alphamelts.as_payload(),
+            species="Si",
+            quantity=QUANTITY_PRESSURE,
+        )
+        == FINDING_CLASS_FALLBACK_VS_SPECIATION
+    )
+    assert (
+        finding_class_for_pair(
+            alphamelts.as_payload(),
+            vaporock.as_payload(),
+            species="Si",
+            quantity=QUANTITY_PRESSURE,
+        )
+        is None
+    )
+    assert (
+        finding_class_for_pair(
+            unflagged.as_payload(),
+            vaporock.as_payload(),
+            species="Si",
+            quantity=QUANTITY_PRESSURE,
+        )
+        is None
+    )
+
+    rows = pairwise_residuals([thermoengine, alphamelts, vaporock])
+    si_rows = [
+        row
+        for row in rows
+        if row["species"] == "Si" and row["quantity"] == QUANTITY_PRESSURE
+    ]
+    assert si_rows
+    te_pairs = [
+        row
+        for row in si_rows
+        if "thermoengine" in (row["engine_a"], row["engine_b"])
+    ]
+    assert te_pairs
+    assert all(
+        row["finding_class"] == FINDING_CLASS_FALLBACK_VS_SPECIATION
+        for row in te_pairs
+    )
+    am_vr = [
+        row
+        for row in si_rows
+        if {row["engine_a"], row["engine_b"]} == {"alphamelts", "vaporock"}
+    ]
+    assert am_vr
+    assert all(row["finding_class"] is None for row in am_vr)
+
+    captured: dict[str, object] = {}
+
+    class _FlaggedBackend:
+        def equilibrate(self, **kwargs):
+            captured.update(kwargs)
+            return SimpleNamespace(
+                status="ok",
+                diagnostics={
+                    "vapor_pressure_backend_status": "fallback",
+                    "vapor_pressure_backend_status_reason": (
+                        "vaporock_to_antoine_fallback"
+                    ),
+                    "authoritative_for_requested_vapor_pressure": False,
+                },
+                warnings=[],
+                activity_coefficients={"SiO2": 0.4},
+                vapor_pressures_Pa={"Si": 0.005, "Mg": 85017.0},
+                vapor_pressures_source={
+                    "Si": "antoine_fallback_from_vaporock:standard_reaction_term",
+                    "Mg": "antoine_fallback_from_vaporock:legacy_pure_component_estimate",
+                },
+                liquid_fraction=1.0,
+                phase_assemblage_available=True,
+            )
+
+    handle = EngineHandle(
+        name="thermoengine",
+        backend=_FlaggedBackend(),
+        available=True,
+        unavailable_reason=None,
+        takes_fo2=True,
+        supports_intrinsic_fo2=True,
+    )
+    pot = BinaryPot(
+        pot_id="feo_mgo_sio2_30_20_50",
+        kato_1993_table4_system="FeO-MgO-SiO2",
+        why="fixture",
+        composition_wt_pct={"FeO": 30.0, "MgO": 20.0, "SiO2": 50.0},
+    )
+    cell = equilibrate_cell(handle, pot, temperature_K=1600.0, po2=po2)
+    assert cell.status == "ok"
+    assert cell.vapor_pressure_backend_status == "fallback"
+    assert cell.authoritative_for_requested_vapor_pressure is False
+    assert cell.vapor_pressures_source["Si"].startswith(
+        "antoine_fallback_from_vaporock"
+    )
+    assert "vapor_pressures_source" in cell.as_payload()
+    assert captured["temperature_C"] == pytest.approx(1326.85)
+
+    rebuilt = recompute_residuals_from_report(
+        {
+            "pots": [
+                {
+                    "pot_id": "feo_mgo_sio2_30_20_50",
+                    "kato_1993_table4_system": "FeO-MgO-SiO2",
+                    "why": "fixture",
+                    "composition_wt_pct": {
+                        "FeO": 30.0,
+                        "MgO": 20.0,
+                        "SiO2": 50.0,
+                    },
+                }
+            ],
+            "cells": [
+                thermoengine.as_payload(),
+                alphamelts.as_payload(),
+                vaporock.as_payload(),
+            ],
+        }
+    )
+    assert rebuilt["n_fallback_vs_speciation"] >= 2
+    assert any(
+        row.get("finding_class") == FINDING_CLASS_FALLBACK_VS_SPECIATION
+        for row in rebuilt["largest_in_envelope_residuals"]
+    )
+    fixture = json.loads(FIXTURE_REPORT.read_text(encoding="utf-8"))
+    markdown = render_report_markdown(recompute_residuals_from_report(fixture))
+    assert "finding_class" in markdown
+    assert FINDING_CLASS_FALLBACK_VS_SPECIATION in markdown or (
+        "fallback vs speciation" in markdown
     )
