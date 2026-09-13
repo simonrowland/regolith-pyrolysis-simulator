@@ -239,9 +239,16 @@ PAGE_METHOD_CLASSES = frozenset(
     }
 )
 
-# Closed automatic phase map (v2.1 §Migration) plus already-canonical Phase
-# spellings (g/cr/l/aq/glass/supercooled_l). Extra rows are explicit
-# source-spelling entries only — no title inference, no substring heuristics.
+# Closed automatic phase map (v2.1 §Migration) plus reviewed extras.
+# Automatic: the three legacy extract strings only.
+# Reviewed identity: source already printed a closed Phase enum token
+# (g/cr/l/aq/glass/supercooled_l). These are identity, not heuristics —
+# a source that wrote "aq" is Phase.AQ. Chosen over queueing the 38 aq
+# rows: inventing an archival hole where the source used the closed
+# vocabulary is the wrong absence. glass/supercooled_l have no current
+# rows but are the same identity class.
+# Reviewed source spelling: solid_arsenolite (explicit extract + polymorph).
+# No title inference, no substring heuristics.
 PHASE_MAP: dict[str, Phase] = {
     "gas": Phase.G,
     "condensed_solid": Phase.CR,
@@ -252,7 +259,6 @@ PHASE_MAP: dict[str, Phase] = {
     "aq": Phase.AQ,
     "glass": Phase.GLASS,
     "supercooled_l": Phase.SUPERCOOLED_L,
-    # Reviewed source spelling: extract states solid arsenolite + polymorph.
     "solid_arsenolite": Phase.CR,
 }
 

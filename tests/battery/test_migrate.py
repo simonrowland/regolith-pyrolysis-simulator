@@ -1013,6 +1013,24 @@ def test_g03_blank_pressure_unit_is_unknown() -> None:
     assert mass is None and why_m is not None
 
 
+def test_h13_canonical_phase_tokens_are_reviewed_identity() -> None:
+    from simulator.battery.migrate import PHASE_MAP
+
+    for spelling, token in (
+        ("aq", Phase.AQ),
+        ("glass", Phase.GLASS),
+        ("supercooled_l", Phase.SUPERCOOLED_L),
+        ("g", Phase.G),
+        ("cr", Phase.CR),
+        ("l", Phase.L),
+    ):
+        assert PHASE_MAP[spelling] is token
+        mapped, why = map_phase(spelling)
+        assert mapped.is_value and mapped.value is token and why is None
+    mapped, why = map_phase("silicate_melt")
+    assert mapped.is_unknown and why is not None
+
+
 def test_g01_map_phase_refuses_heuristics() -> None:
     mapped, why = map_phase("gas")
     assert mapped.is_value and mapped.value is Phase.G and why is None
