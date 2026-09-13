@@ -1188,6 +1188,65 @@ def apparatus_from_equipment(equipment: object) -> Apparatus | None:
     return Apparatus(cell_material_and_liner=cell, geometry=geometry)
 
 
+def sample_from_equipment(equipment: object) -> Sample:
+    """Transfer a stated sample payload; never invent mass, form, or units."""
+
+    if not isinstance(equipment, Mapping) or not equipment:
+        return Sample()
+    mass_src: Mapping[str, Any] | None = None
+    implied_unit: str | None = None
+    form_located: Located[str] | None = None
+    container_located: Located[str] | None = None
+    raw_sample = equipment.get("sample")
+    if isinstance(raw_sample, Mapping):
+        nested = raw_sample.get("mass") or raw_sample.get("mass_kg")
+        if isinstance(nested, Mapping):
+            mass_src = nested
+        form = raw_sample.get("form")
+        container = raw_sample.get("container")
+        loc = locator_from_mapping(raw_sample.get("locator"))
+        if isinstance(form, str) and form:
+            form_located = located_value(form, loc)
+        elif isinstance(form, Mapping) and form.get("value") is not None:
+            form_located = located_value(
+                str(form["value"]), locator_from_mapping(form.get("locator")) or loc
+            )
+        if isinstance(container, str) and container:
+            container_located = located_value(container, loc)
+        elif isinstance(container, Mapping) and container.get("value") is not None:
+            container_located = located_value(
+                str(container["value"]),
+                locator_from_mapping(container.get("locator")) or loc,
+            )
+    for key, unit in (
+        ("sample_mass", None),
+        ("sample_mass_kg", "kg"),
+        ("sample_mass_g", "g"),
+        ("sample_mass_mg", "mg"),
+    ):
+        payload = equipment.get(key)
+        if isinstance(payload, Mapping) and payload.get("value") is not None:
+            mass_src = payload
+            implied_unit = unit
+            break
+    mass_located: Located[Decimal] | None = None
+    if isinstance(mass_src, Mapping) and mass_src.get("value") is not None:
+        units = mass_src.get("units") or implied_unit
+        loc = locator_from_mapping(mass_src.get("locator"))
+        kg, why = convert_mass_to_kg(mass_src.get("value"), units)
+        if kg is None:
+            mass_located = located_unknown(why or "missing mass unit")
+        else:
+            mass_located = located_value(kg, loc)
+    if mass_located is None and form_located is None and container_located is None:
+        return Sample()
+    return Sample(
+        mass_kg=mass_located,
+        form=form_located,
+        container=container_located,
+    )
+
+
 def pressure_from_equipment(equipment: object) -> PressureEnvironment:
     reason = "source does not state pressure"
     if not isinstance(equipment, Mapping):
@@ -1521,6 +1580,7 @@ class Migrator:
         }
         pressure_env = pressure_from_equipment(equipment)
         apparatus = apparatus_from_equipment(equipment)
+        sample = sample_from_equipment(equipment)
         if (
             isinstance(equipment, Mapping)
             and isinstance(equipment.get("chamber_pressure"), Mapping)
@@ -1534,11 +1594,34 @@ class Migrator:
                 source=source,
                 observation_id=observation_id,
             )
+        if (
+            apparatus is not None
+            and apparatus.geometry is not None
+            and apparatus.geometry.exposed_area_m2 is not None
+            and apparatus.geometry.exposed_area_m2.state.is_unknown
+        ):
+            self.result.add_queue(
+                work_id,
+                locator,
+                ["exposed_area_m2"],
+                apparatus.geometry.exposed_area_m2.state.reason or "missing area unit",
+                source=source,
+                observation_id=observation_id,
+            )
+        if sample.mass_kg is not None and sample.mass_kg.state.is_unknown:
+            self.result.add_queue(
+                work_id,
+                locator,
+                ["sample.mass_kg"],
+                sample.mass_kg.state.reason or "missing mass unit",
+                source=source,
+                observation_id=observation_id,
+            )
         experiment = Experiment(
             experiment_id=experiment_id,
             kind=ExperimentKind.LITERATURE,
             method=method,
-            sample=Sample(),
+            sample=sample,
             conditions=cond,
             pressure_environment=pressure_env,
             work_id=work_id,
@@ -1909,11 +1992,42 @@ class Migrator:
                     or locator
                 )
             if "T_K" in raw_item or "temperature_K" in raw_item:
-                coord = _as_dec_or_none(raw_item.get("T_K", raw_item.get("temperature_K")))
+                coord, t_trail = convert_temperature_to_k(
+                    raw_item.get("T_K", raw_item.get("temperature_K")), "K"
+                )
+                if coord is None:
+                    self.result.add_queue(
+                        work.work_id,
+                        point_locator,
+                        ["temperature_K"],
+                        t_trail or "series temperature_K is not numeric",
+                        source=source_key,
+                        observation_id=f"{parent_id}::point:{index}",
+                    )
             elif "T_C" in raw_item:
-                coord, _ = convert_temperature_to_k(raw_item.get("T_C"), "C")
+                coord, t_trail = convert_temperature_to_k(raw_item.get("T_C"), "C")
+                if coord is None:
+                    self.result.add_queue(
+                        work.work_id,
+                        point_locator,
+                        ["temperature_K"],
+                        t_trail or "series T_C is not a grounded temperature",
+                        source=source_key,
+                        observation_id=f"{parent_id}::point:{index}",
+                    )
             elif "T" in raw_item:
-                coord = _as_dec_or_none(raw_item.get("T"))
+                t_unit = raw_item.get("T_units") or raw_item.get("temperature_units")
+                coord, t_trail = convert_temperature_to_k(raw_item.get("T"), t_unit)
+                if coord is None:
+                    self.result.add_queue(
+                        work.work_id,
+                        point_locator,
+                        ["temperature_K"],
+                        t_trail
+                        or "series T is not grounded in a source unit (T_K / T_C required)",
+                        source=source_key,
+                        observation_id=f"{parent_id}::point:{index}",
+                    )
             pressure_keys = (
                 ("pressure_atm", "atm"),
                 ("p_atm", "atm"),
@@ -1936,11 +2050,24 @@ class Migrator:
                     val, trail_or_why = convert_pressure_to_pa(raw_item.get(key), unit)
                     trail = trail_or_why or "identity"
                     break
-            if val is None and "P" in raw_item and "atm" in (units or "").lower():
-                val, trail_or_why = convert_pressure_to_pa(raw_item.get("P"), "atm")
-                trail = trail_or_why or "atm_to_Pa"
+            if val is None and ("P" in raw_item or "p" in raw_item):
+                raw_p = raw_item.get("P", raw_item.get("p"))
+                val, trail_or_why = convert_pressure_to_pa(raw_p, units)
+                if val is None:
+                    self.result.add_queue(
+                        work.work_id,
+                        point_locator,
+                        ["value"],
+                        trail_or_why
+                        or "series P is not grounded in a source pressure unit",
+                        source=source_key,
+                        observation_id=f"{parent_id}::point:{index}",
+                    )
+                    trail = trail_or_why or "missing pressure unit"
+                else:
+                    trail = trail_or_why or "identity"
             if val is None:
-                for vk in ("alpha", "gamma", "value", "delta_fG", "P", "p"):
+                for vk in ("alpha", "gamma", "value", "delta_fG"):
                     if vk in raw_item:
                         val = _as_dec_or_none(raw_item.get(vk))
                         trail = "as_published"

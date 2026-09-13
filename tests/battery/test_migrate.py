@@ -18,6 +18,7 @@ from simulator.battery.enums import (
     Quantity,
     Rail,
     StateTag,
+    ValueKind,
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.migrate import (
@@ -803,3 +804,70 @@ def test_g01_map_phase_refuses_heuristics() -> None:
     assert mapped.is_unknown
     mapped, why = map_phase("silicate_melt")
     assert mapped.is_unknown
+
+
+def test_h01_bare_series_T_P_without_units_stay_unknown(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row["units"] = ""
+    row["values"]["series"] = [{"T": 1200, "P": 1}]
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False, validate=True)
+    obs = next(iter(result.observations.values()))
+    temp = obs.identity.temperature_K
+    assert temp is not None and temp.is_unknown, temp
+    assert temp.value != 1200
+    assert obs.value.kind is not ValueKind.POINT or obs.value.point != 1
+    assert obs.value.kind.value in {"unavailable", "unknown"} or (
+        obs.value.kind is ValueKind.POINT and obs.derivation is None
+    )
+    assert obs.value.kind is ValueKind.UNAVAILABLE
+    axes = {(e.observation_id, tuple(e.axes), e.why) for e in result.queue}
+    assert any("temperature" in (why or "").lower() or "temperature_K" in axes_
+               for _oid, axes_, why in axes)
+    assert any("value" in axes_ or "unit" in (why or "").lower()
+               for _oid, axes_, why in axes)
+
+
+def test_h01_explicit_T_K_pressure_atm_still_converts(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    result = migrate(root, write=False, validate=True)
+    points = [
+        o
+        for o in result.observations.values()
+        if o.observation_id.startswith("fixture-source::na_psat")
+    ]
+    assert len(points) == 2
+    assert all(p.identity.temperature_K is not None and p.identity.temperature_K.is_value
+               for p in points)
+    assert {p.identity.temperature_K.value for p in points} == {1200, 1300} or (
+        {float(p.identity.temperature_K.value) for p in points} == {1200.0, 1300.0}
+    )
+    assert all(p.value.kind is ValueKind.POINT for p in points)
+    assert all(p.derivation is not None and p.derivation.relation == "atm_to_Pa" for p in points)
+
+
+def test_h01_blank_sample_area_units_queued_and_sample_transferred(tmp_path: Path) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    extract["species"]["Na"]["observations"][0]["equipment"] = {
+        "sample_surface_area": {"value": 1, "units": "", "locator": {"table": "I"}},
+        "sample": {
+            "mass": {"value": 10, "units": "g", "locator": {"table": "I"}},
+            "form": "powder",
+        },
+    }
+    root = _write_min_tree(tmp_path, extract)
+    result = migrate(root, write=False, validate=True)
+    obs = next(iter(result.observations.values()))
+    exp = result.experiments[obs.experiment_id]
+    area = exp.apparatus.geometry.exposed_area_m2 if exp.apparatus and exp.apparatus.geometry else None
+    assert area is not None and area.state.is_unknown
+    assert any(
+        "exposed_area" in (e.axes or ()) or "area" in (e.why or "").lower()
+        for e in result.queue
+    )
+    assert exp.sample.mass_kg is not None
+    assert exp.sample.mass_kg.state.is_value
+    assert exp.sample.form is not None
+    assert exp.sample.form.state.is_value
+    assert exp.sample.form.state.value == "powder"
