@@ -1510,6 +1510,8 @@ class Migrator:
         method: State[MethodToken],
         equipment: object,
         conditions: dict[str, Located[Decimal]] | None = None,
+        observation_id: str | None = None,
+        source: str | None = None,
     ) -> Experiment:
         existing = self.result.experiments.get(experiment_id)
         if existing is not None:
@@ -1529,6 +1531,8 @@ class Migrator:
                 locator,
                 ["total_pressure_Pa"],
                 pressure_env.total_pressure_Pa.state.reason or "missing pressure unit",
+                source=source,
+                observation_id=observation_id,
             )
         experiment = Experiment(
             experiment_id=experiment_id,
@@ -1822,6 +1826,8 @@ class Migrator:
             locator=locator,
             method=method,
             equipment=obs.get("equipment"),
+            observation_id=obs_id,
+            source=source_key,
         )
         read_from = choose_read_from(work, locator)
         if exploded and isinstance(values.get("series"), list):
@@ -2052,6 +2058,8 @@ class Migrator:
             locator=locator,
             method=method or State.unknown("source does not state method"),
             equipment=equipment,
+            observation_id=observation_id,
+            source=source_key,
         )
         point_conditions = None
         if temperature_K is not None:
