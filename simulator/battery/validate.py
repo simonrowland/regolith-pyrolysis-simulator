@@ -68,6 +68,7 @@ from simulator.battery.records import (
     Residual,
     Species,
     Work,
+    as_decimal,
 )
 from simulator.battery.validity import run_validity_gates
 from simulator.reference_data.janaf import formula_composition
@@ -123,6 +124,42 @@ def _check_located(path: str, located: Located[Any], issues: list[ValidationIssu
                 path,
                 RefusalReason.CONDITIONAL_FIELD,
                 "empirical Located value requires a locator",
+            )
+        )
+
+
+def _located_decimal_value(located: Located[Any] | None) -> Any:
+    if located is None or not located.state.is_value or located.state.value is None:
+        return None
+    try:
+        return as_decimal(located.state.value)
+    except TypeError:
+        return located.state.value
+
+
+def _reconcile_identity_axis(
+    path: str,
+    identity_state: Any,
+    experiment_located: Located[Any] | None,
+    point_located: Located[Any] | None,
+    issues: list[ValidationIssue],
+) -> None:
+    if identity_state is None or not identity_state.is_value or identity_state.value is None:
+        return
+    source = point_located if point_located is not None else experiment_located
+    source_value = _located_decimal_value(source)
+    if source_value is None:
+        return
+    try:
+        ident_value = as_decimal(identity_state.value)
+    except TypeError:
+        ident_value = identity_state.value
+    if ident_value != source_value:
+        issues.append(
+            _issue(
+                path,
+                RefusalReason.INVALID_IDENTITY,
+                "identity disagrees with Experiment conditions / point_conditions",
             )
         )
 
@@ -543,6 +580,29 @@ def validate_observation(
         )
     else:
         _check_identity(f"{path}.identity", identity, issues)
+        if experiment is not None:
+            pc = observation.point_conditions or {}
+            _reconcile_identity_axis(
+                f"{path}.identity.temperature_K",
+                identity.temperature_K,
+                experiment.conditions.get("temperature_K"),
+                pc.get("temperature_K"),
+                issues,
+            )
+            _reconcile_identity_axis(
+                f"{path}.identity.fO2_Pa",
+                identity.fO2_Pa,
+                experiment.conditions.get("fO2_Pa"),
+                pc.get("fO2_Pa"),
+                issues,
+            )
+            _reconcile_identity_axis(
+                f"{path}.identity.total_pressure_Pa",
+                identity.total_pressure_Pa,
+                experiment.pressure_environment.total_pressure_Pa,
+                pc.get("total_pressure_Pa"),
+                issues,
+            )
     ev = observation.evidence.class_
     if ev.is_value and ev.value is EvidenceClass.ENGINE_PREDICTION:
         if observation.engine is None:

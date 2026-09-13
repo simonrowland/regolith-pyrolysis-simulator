@@ -510,6 +510,13 @@ def observation(
     decided = None
     if admission is not AdmissionStatus.PENDING:
         decided = AdmissionDecision(worker="test", date="2026-09-13", evidence=loc())
+    point_conditions = {}
+    if identity.temperature_K is not None and identity.temperature_K.is_value:
+        point_conditions["temperature_K"] = located(identity.temperature_K.value)
+    if identity.fO2_Pa is not None and identity.fO2_Pa.is_value:
+        point_conditions["fO2_Pa"] = located(identity.fO2_Pa.value)
+    if identity.total_pressure_Pa is not None and identity.total_pressure_Pa.is_value:
+        point_conditions["total_pressure_Pa"] = located(identity.total_pressure_Pa.value)
     return Observation(
         observation_id=observation_id,
         experiment_id=experiment_id,
@@ -528,6 +535,7 @@ def observation(
         authority=authority,
         annotations=annotations,
         certified_band=certified_band,
+        point_conditions=point_conditions or None,
     )
 
 

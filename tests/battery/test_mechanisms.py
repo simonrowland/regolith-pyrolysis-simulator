@@ -1226,6 +1226,32 @@ def test_physics_false_refuse_compilation_not_applicable_axes_equal() -> None:
     assert identity_equal(clean_psat, F.psat_identity("Na")).kind is IdentityEqualKind.EQUAL
 
 
+def test_identity_must_agree_with_experiment_or_point_conditions() -> None:
+    from dataclasses import replace
+
+    ident = F.o2_identity(T_K=Decimal("298.15"))
+    w = F.work()
+    exp = F.tabulation_experiment(T_K=Decimal("298.15"))
+    matching = F.observation("match-T", exp.experiment_id, ident, Decimal("0"))
+    assert validate_corpus([w], [exp], [matching]).ok
+    disagreed = replace(
+        matching,
+        observation_id="bad-T",
+        identity=replace(ident, temperature_K=State.of(Decimal("999"))),
+        point_conditions=None,
+    )
+    bad_report = validate_corpus([w], [exp], [disagreed])
+    assert not bad_report.ok
+    assert any(i.reason is RefusalReason.INVALID_IDENTITY for i in bad_report.issues)
+    varying = replace(
+        matching,
+        observation_id="point-T",
+        identity=replace(ident, temperature_K=State.of(Decimal("999"))),
+        point_conditions={"temperature_K": F.located(Decimal("999"))},
+    )
+    assert validate_corpus([w], [exp], [varying]).ok
+
+
 def test_referential_integrity_rejects_duplicates_and_dangling_refs() -> None:
     from dataclasses import replace
 
