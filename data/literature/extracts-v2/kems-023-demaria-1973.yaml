@@ -995,8 +995,8 @@ observations:
   experiment_id: 48e345db1dccb49ce5f03a8e1fd763d0815af54206355856f29c6b72fa815562::kems-023-demaria-1973
   identity:
     quantity:
-      tag: value
-      value: mass_loss_rate
+      tag: unknown
+      reason: unsupported quantity 'kems_method_geometry_reference'
     species:
       formula: Na
       phase:
@@ -1005,51 +1005,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use reference_state
-    reservoir:
-      tag: unknown
-      reason: source does not state reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: unknown
-      reason: source does not state sweep_gas
-    exposure:
-      tag: unknown
-      reason: source does not state exposure
-    sample_mass_kg:
-      tag: unknown
-      reason: source does not state sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile mass_loss_rate does not use wall
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point

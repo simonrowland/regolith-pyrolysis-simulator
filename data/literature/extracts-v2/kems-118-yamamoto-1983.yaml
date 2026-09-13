@@ -6,8 +6,8 @@ observations:
   experiment_id: 10.2355/isijinternational1966.23.56::14
   identity:
     quantity:
-      tag: value
-      value: transition_temperature
+      tag: unknown
+      reason: unsupported quantity 'consolute_temperature'
     species:
       formula: Sn
       phase:
@@ -16,54 +16,12 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: value
-      value: consolute_temperature
-    per:
-      tag: not_applicable
-      reason: profile transition_temperature does not use per
     temperature_K:
-      tag: not_applicable
-      reason: profile transition_temperature does not use temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile transition_temperature does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile transition_temperature does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile transition_temperature does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile transition_temperature does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile transition_temperature does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile transition_temperature does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile transition_temperature does not use fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile transition_temperature does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile transition_temperature does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile transition_temperature does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile transition_temperature does not use wall
+      tag: value
+      value: '1778'
   value:
-    kind: point
-    point: '1778'
+    kind: unavailable
+    unavailable_reason: source values have no printed scalar/series point
   uncertainty:
     kind: printed
     verbatim:
@@ -96,8 +54,8 @@ observations:
   experiment_id: 10.2355/isijinternational1966.23.56::3
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: unsupported quantity 'activity_and_related_plots'
     species:
       formula: Sn
       phase:
@@ -106,51 +64,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -261,8 +174,8 @@ observations:
   experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient_and_wagner_epsilon'
     species:
       formula: Sn
       phase:
@@ -271,51 +184,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point
@@ -344,8 +212,8 @@ observations:
   experiment_id: 10.2355/isijinternational1966.23.56::kems-118-yamamoto-1983
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: unsupported quantity 'kems_method_geometry_reference'
     species:
       formula: Fe
       phase:
@@ -354,51 +222,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: unknown
-      reason: source does not state standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: unknown
-      reason: source does not state formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point
@@ -425,8 +248,8 @@ observations:
   experiment_id: 10.2355/isijinternational1966.23.56::1
   identity:
     quantity:
-      tag: value
-      value: delta_fG
+      tag: unknown
+      reason: unsupported quantity 'starting_metal_assay'
     species:
       formula: Fe
       phase:
@@ -435,51 +258,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile delta_fG does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: unknown
-      reason: source does not state standard_pressure_Pa
-    reaction:
-      tag: unknown
-      reason: source does not state reaction
-    formation_elements:
-      tag: unknown
-      reason: source does not state formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile delta_fG does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile delta_fG does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile delta_fG does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use fO2_Pa
-    total_pressure_Pa:
-      tag: not_applicable
-      reason: profile delta_fG does not use total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile delta_fG does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile delta_fG does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile delta_fG does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile delta_fG does not use wall
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point
@@ -588,8 +366,8 @@ observations:
   experiment_id: 10.2355/isijinternational1966.23.56::3
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: unsupported quantity 'activity_gamma_and_partial_molar_heats'
     species:
       formula: Sn
       phase:
@@ -598,51 +376,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point
@@ -760,8 +493,8 @@ observations:
   experiment_id: 10.2355/isijinternational1966.23.56::5
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: unsupported quantity 'ion_current_ratio_and_wagner_interaction_parameter'
     species:
       formula: Sn
       phase:
@@ -770,51 +503,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point
@@ -842,8 +530,8 @@ observations:
   experiment_id: 10.2355/isijinternational1966.23.56::6
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: unsupported quantity 'infinite_dilution_activity_coefficient'
     species:
       formula: Sn
       phase:
@@ -852,51 +540,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point

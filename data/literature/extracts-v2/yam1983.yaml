@@ -6,8 +6,8 @@ observations:
   experiment_id: 10.2320/jinstmet1952.47.9_736::yam1983
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: unsupported quantity 'activity_range'
     species:
       formula: Na2O
       phase:
@@ -16,51 +16,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point
@@ -85,8 +40,8 @@ observations:
   experiment_id: 10.2320/jinstmet1952.47.9_736::1
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: unsupported quantity 'activity_and_raoultian_gamma'
     species:
       formula: Na2O
       phase:
@@ -95,51 +50,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point
@@ -172,8 +82,8 @@ observations:
   experiment_id: 10.2320/jinstmet1952.47.9_736::2
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: unsupported quantity 'activity_gibbs_duhem_from_Na2O'
     species:
       formula: SiO2
       phase:
@@ -182,51 +92,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point
@@ -250,3 +115,5 @@ observations:
     note: 'Gibbs-Duhem of Table 1 a_Na2O; tridymite standard. Table 2 caption: "Coefficients of least square lines for -log
       a_SiO2 = A''/T + B''." Column headers: X_Na2O, 10^{-4}·A'', 10^{-4}·δA'', B'', δB''.'
   read_from: pdf:yam1983
+  derived_from:
+  - yam1983::yam1983_na2o_table1_minus_log10_a_AT_B

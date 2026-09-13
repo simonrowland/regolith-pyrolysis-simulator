@@ -4115,19 +4115,45 @@ def write_report(result: MigrationResult, path: Path) -> None:
             f"| `{src}` | {rec.rows_in} | {rec.observations_out} | {queued_by_source.get(src, 0)} |"
         )
     if result.validation is not None and result.validation.hard_issues:
+        hard_census: dict[str, int] = defaultdict(int)
+        for issue in result.validation.hard_issues:
+            axis = issue.path.rsplit(".", 1)[-1]
+            hard_census[f"{issue.reason.value}:{axis}"] += 1
+        lines.extend(
+            [
+                "",
+                "## Hard issue census",
+                "",
+                f"hard issues: {len(result.validation.hard_issues)}",
+                "",
+                "MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. "
+                "Parent pointers are not fabricated. Unstated derived_from / derivation "
+                "is a hard conditional_field queued for page-grounding.",
+                "",
+                "| kind | count |",
+                "|---|---:|",
+            ]
+        )
+        for kind, n in sorted(hard_census.items(), key=lambda kv: (-kv[1], kv[0])):
+            lines.append(f"| `{kind}` | {n} |")
         lines.extend(["", "## Hard issues (first 50)", ""])
         for issue in result.validation.hard_issues[:50]:
             lines.append(f"- `{issue.path}` {issue.reason.value}: {issue.detail}")
     if result.validation is not None and result.validation.issues:
         census: dict[str, int] = defaultdict(int)
+        advisory_n = 0
+        hard_ids = {id(issue) for issue in result.validation.hard_issues}
         for issue in result.validation.issues:
+            if id(issue) in hard_ids:
+                continue
             census[issue.reason.value] += 1
+            advisory_n += 1
         lines.extend(
             [
                 "",
                 "## Advisory issue census",
                 "",
-                f"advisory issues: {len(result.validation.issues)}",
+                f"advisory issues: {advisory_n}",
                 "",
                 "| kind | count |",
                 "|---|---:|",

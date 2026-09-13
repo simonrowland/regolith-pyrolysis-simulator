@@ -1580,9 +1580,12 @@ def test_j01_store_census_series_numeric_matches_declared_field() -> None:
                         mismatches.append(f"{oid} stored {got} != source {expected} for {label}")
     assert not mismatches, mismatches[:20]
     assert n_numeric == sum(census.values())
-    # Live census after the quantity-bound fix: 128 gamma + 24 pressure + 12 alpha.
+    # Live census after the quantity-bound fix: 128 gamma + 18 p_partial + 12 alpha.
+    # Six previously stored pressures were unsupported `total_pressure` series
+    # that the type fallback had labelled p_sat; they are now unavailable.
     assert census.get("activity_coefficient") == 128
-    assert census.get("p_sat", 0) + census.get("p_partial", 0) == 24
+    assert census.get("p_partial") == 18
+    assert census.get("p_sat", 0) == 0
     assert census.get("evaporation_coefficient_alpha") == 12
     assert census.get("mass_loss_rate", 0) == 0
-    assert n_numeric == 164, (n_numeric, census, n_unavailable)
+    assert n_numeric == 158, (n_numeric, census, n_unavailable)

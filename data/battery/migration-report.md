@@ -4,11 +4,11 @@ rows in: 45718
 records out (observations): 48304
 works: 165
 experiments: 5857
-queue size: 32486
+queue size: 35349
 identical-payload dedupe aliases: 4
 metadata files: 39
 index sources: 167
-hard issues: 0
+hard issues: 1188
 
 ## Spec vs measured
 
@@ -36,7 +36,9 @@ hard issues: 0
 
 | source method_class | count |
 |---|---:|
-| `absent` | 557 |
+| `independent_tabulation` | 23489 |
+| `absent` | 579 |
+| `engine_own_input` | 246 |
 | `method_only` | 35 |
 | `derived` | 26 |
 | `author_derived` | 19 |
@@ -17926,13 +17928,13 @@ hard issues: 0
 | `data/literature/extracts/banchor-matsui-naito-1986.yaml` | 1 | 1 | 2 |
 | `data/literature/extracts/behrens-rosenblatt-1972.yaml` | 1 | 1 | 3 |
 | `data/literature/extracts/berkowitz-chupka-inghram-1957.yaml` | 1 | 1 | 2 |
-| `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` | 7 | 7 | 23 |
+| `data/literature/extracts/cardiff-2007-vacuum-pyrolysis-gsfc.yaml` | 7 | 7 | 34 |
 | `data/literature/extracts/costa-jacobson-2015.yaml` | 2 | 2 | 8 |
-| `data/literature/extracts/datz-1961-na2cl2.yaml` | 1 | 1 | 4 |
+| `data/literature/extracts/datz-1961-na2cl2.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/datz-and-smith-1961.yaml` | 3 | 3 | 6 |
 | `data/literature/extracts/datz-smith-taylor-1961-nacl-vapor.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/fedkin-grossman-ghiorso-2006.yaml` | 8 | 17 | 24 |
-| `data/literature/extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml` | 28 | 28 | 56 |
+| `data/literature/extracts/fegley-2023-chemical-equilibrium-calculations-bu.yaml` | 28 | 28 | 140 |
 | `data/literature/extracts/fray-schmitt-2009-ch4-1.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/fray-schmitt-2009-co-1.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/fray-schmitt-2009-nh3.yaml` | 1 | 1 | 4 |
@@ -17941,86 +17943,86 @@ hard issues: 0
 | `data/literature/extracts/habermann-daane-1964.yaml` | 2 | 2 | 6 |
 | `data/literature/extracts/iapws-95-psat-liquid.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/iupac-o2-solid-psat.yaml` | 1 | 1 | 4 |
-| `data/literature/extracts/ivtan-cro2-g.yaml` | 4 | 4 | 4 |
+| `data/literature/extracts/ivtan-cro2-g.yaml` | 4 | 4 | 8 |
 | `data/literature/extracts/ivtan-mno-coo-thermo.yaml` | 2 | 2 | 2 |
-| `data/literature/extracts/janaf-4th.yaml` | 51 | 51 | 170 |
-| `data/literature/extracts/kems-001-homma-1966.yaml` | 32 | 59 | 127 |
-| `data/literature/extracts/kems-002-ohno-1967.yaml` | 12 | 25 | 77 |
-| `data/literature/extracts/kems-003-pound-1972.yaml` | 18 | 18 | 62 |
-| `data/literature/extracts/kems-005-fedkin-2006.yaml` | 14 | 14 | 47 |
-| `data/literature/extracts/kems-006-zhang-2021.yaml` | 4 | 4 | 18 |
+| `data/literature/extracts/janaf-4th.yaml` | 51 | 51 | 175 |
+| `data/literature/extracts/kems-001-homma-1966.yaml` | 32 | 59 | 156 |
+| `data/literature/extracts/kems-002-ohno-1967.yaml` | 12 | 25 | 83 |
+| `data/literature/extracts/kems-003-pound-1972.yaml` | 18 | 18 | 70 |
+| `data/literature/extracts/kems-005-fedkin-2006.yaml` | 14 | 14 | 69 |
+| `data/literature/extracts/kems-006-zhang-2021.yaml` | 4 | 4 | 22 |
 | `data/literature/extracts/kems-007-costa-2015.yaml` | 4 | 4 | 18 |
-| `data/literature/extracts/kems-008-schaefer-fegley-2004.yaml` | 78 | 78 | 189 |
-| `data/literature/extracts/kems-009-safarian-2013.yaml` | 2 | 2 | 8 |
-| `data/literature/extracts/kems-010-richter-2007.yaml` | 18 | 99 | 124 |
-| `data/literature/extracts/kems-011-wetzel-gail-2013.yaml` | 17 | 17 | 41 |
-| `data/literature/extracts/kems-012-sossi-2019.yaml` | 106 | 526 | 797 |
-| `data/literature/extracts/kems-014-drowart-2005.yaml` | 8 | 8 | 26 |
-| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 38 | 285 | 341 |
-| `data/literature/extracts/kems-016-stolyarova-1992.yaml` | 10 | 10 | 50 |
-| `data/literature/extracts/kems-017-stolyarova-2013.yaml` | 11 | 11 | 25 |
-| `data/literature/extracts/kems-018-stolyarova-2012.yaml` | 1 | 1 | 5 |
-| `data/literature/extracts/kems-019-miller-armatys-2013.yaml` | 28 | 28 | 58 |
-| `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 38 | 38 | 109 |
-| `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 4 | 4 | 17 |
-| `data/literature/extracts/kems-022-demaria-1971.yaml` | 31 | 31 | 136 |
-| `data/literature/extracts/kems-023-demaria-1973.yaml` | 28 | 28 | 85 |
-| `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 22 | 67 |
-| `data/literature/extracts/kems-026-markova-1984.yaml` | 15 | 15 | 46 |
-| `data/literature/extracts/kems-027-plante-hastie-1983.yaml` | 26 | 26 | 70 |
-| `data/literature/extracts/kems-028-yakovlev-1984.yaml` | 19 | 19 | 58 |
-| `data/literature/extracts/kems-029-yakovlev-shornikov-2011.yaml` | 6 | 6 | 19 |
-| `data/literature/extracts/kems-031-halwax-2024.yaml` | 22 | 24 | 74 |
-| `data/literature/extracts/kems-032-copland-jacobson-2010.yaml` | 5 | 5 | 22 |
-| `data/literature/extracts/kems-033-shornikov-2010.yaml` | 5 | 5 | 13 |
-| `data/literature/extracts/kems-035-sauerborn-2005.yaml` | 60 | 60 | 213 |
-| `data/literature/extracts/kems-036-sesko-2024.yaml` | 8 | 8 | 38 |
+| `data/literature/extracts/kems-008-schaefer-fegley-2004.yaml` | 78 | 78 | 331 |
+| `data/literature/extracts/kems-009-safarian-2013.yaml` | 2 | 2 | 9 |
+| `data/literature/extracts/kems-010-richter-2007.yaml` | 18 | 99 | 156 |
+| `data/literature/extracts/kems-011-wetzel-gail-2013.yaml` | 17 | 17 | 84 |
+| `data/literature/extracts/kems-012-sossi-2019.yaml` | 106 | 526 | 992 |
+| `data/literature/extracts/kems-014-drowart-2005.yaml` | 8 | 8 | 34 |
+| `data/literature/extracts/kems-015-hashimoto-1983.yaml` | 38 | 285 | 403 |
+| `data/literature/extracts/kems-016-stolyarova-1992.yaml` | 10 | 10 | 60 |
+| `data/literature/extracts/kems-017-stolyarova-2013.yaml` | 11 | 11 | 46 |
+| `data/literature/extracts/kems-018-stolyarova-2012.yaml` | 1 | 1 | 6 |
+| `data/literature/extracts/kems-019-miller-armatys-2013.yaml` | 28 | 28 | 86 |
+| `data/literature/extracts/kems-020-hastie-1981-nbsir.yaml` | 38 | 38 | 169 |
+| `data/literature/extracts/kems-021-plante-1992-feo.yaml` | 4 | 4 | 21 |
+| `data/literature/extracts/kems-022-demaria-1971.yaml` | 31 | 31 | 164 |
+| `data/literature/extracts/kems-023-demaria-1973.yaml` | 28 | 28 | 86 |
+| `data/literature/extracts/kems-025-markova-1983.yaml` | 22 | 22 | 70 |
+| `data/literature/extracts/kems-026-markova-1984.yaml` | 15 | 15 | 69 |
+| `data/literature/extracts/kems-027-plante-hastie-1983.yaml` | 26 | 26 | 118 |
+| `data/literature/extracts/kems-028-yakovlev-1984.yaml` | 19 | 19 | 63 |
+| `data/literature/extracts/kems-029-yakovlev-shornikov-2011.yaml` | 6 | 6 | 25 |
+| `data/literature/extracts/kems-031-halwax-2024.yaml` | 22 | 24 | 96 |
+| `data/literature/extracts/kems-032-copland-jacobson-2010.yaml` | 5 | 5 | 27 |
+| `data/literature/extracts/kems-033-shornikov-2010.yaml` | 5 | 5 | 24 |
+| `data/literature/extracts/kems-035-sauerborn-2005.yaml` | 60 | 60 | 277 |
+| `data/literature/extracts/kems-036-sesko-2024.yaml` | 8 | 8 | 50 |
 | `data/literature/extracts/kems-037-richter-2002.yaml` | 4 | 4 | 15 |
-| `data/literature/extracts/kems-038-matchett-2006.yaml` | 3 | 3 | 13 |
-| `data/literature/extracts/kems-040-stolyarova-2015.yaml` | 2 | 2 | 9 |
-| `data/literature/extracts/kems-041-sossi-fegley-2018.yaml` | 155 | 155 | 574 |
-| `data/literature/extracts/kems-042-plante-1979.yaml` | 383 | 383 | 1149 |
-| `data/literature/extracts/kems-044-robinot-2026.yaml` | 19 | 19 | 56 |
-| `data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml` | 25 | 25 | 60 |
-| `data/literature/extracts/kems-047-turkdogan-1984-isij.yaml` | 6 | 6 | 18 |
-| `data/literature/extracts/kems-048-turkdogan-2001-sio2-gamma.yaml` | 12 | 12 | 36 |
-| `data/literature/extracts/kems-049-kato-1993-ms-review.yaml` | 26 | 26 | 78 |
-| `data/literature/extracts/kems-050-gorokhov-1977.yaml` | 3 | 3 | 5 |
-| `data/literature/extracts/kems-057-kambayashi-1985.yaml` | 25 | 25 | 75 |
-| `data/literature/extracts/kems-058-ohara-1987.yaml` | 18 | 18 | 54 |
-| `data/literature/extracts/kems-066-ichise-1977.yaml` | 24 | 24 | 76 |
-| `data/literature/extracts/kems-069-furukawa-1976.yaml` | 18 | 18 | 58 |
-| `data/literature/extracts/kems-087-yamada-kato-1980.yaml` | 16 | 16 | 53 |
-| `data/literature/extracts/kems-088-ichise-1975.yaml` | 16 | 16 | 53 |
-| `data/literature/extracts/kems-093-piacente-1975.yaml` | 34 | 34 | 101 |
-| `data/literature/extracts/kems-095-ueda-1986.yaml` | 18 | 18 | 59 |
-| `data/literature/extracts/kems-097-ikeda-1978.yaml` | 16 | 16 | 47 |
-| `data/literature/extracts/kems-103-fraser-1983.yaml` | 4 | 4 | 13 |
-| `data/literature/extracts/kems-105-yamada-1983.yaml` | 13 | 13 | 46 |
-| `data/literature/extracts/kems-111-ichise-1982.yaml` | 16 | 16 | 55 |
-| `data/literature/extracts/kems-112-ichise-1989.yaml` | 11 | 11 | 40 |
-| `data/literature/extracts/kems-114-nichols-1995.yaml` | 28 | 28 | 84 |
-| `data/literature/extracts/kems-116-nunoue-1987.yaml` | 12 | 12 | 45 |
-| `data/literature/extracts/kems-118-yamamoto-1983.yaml` | 11 | 11 | 42 |
-| `data/literature/extracts/kems-119-furukawa-1975.yaml` | 21 | 21 | 65 |
-| `data/literature/extracts/kems-120-ueshima-1984.yaml` | 8 | 8 | 27 |
-| `data/literature/extracts/kems-127-qi-1989.yaml` | 11 | 11 | 36 |
-| `data/literature/extracts/kems-132-nakajima-2016.yaml` | 11 | 11 | 23 |
-| `data/literature/extracts/kems-133-costa-2017.yaml` | 21 | 21 | 70 |
-| `data/literature/extracts/kems-137-bischof-2023.yaml` | 19 | 139 | 427 |
-| `data/literature/extracts/kems-138-bischof-2023.yaml` | 34 | 34 | 113 |
-| `data/literature/extracts/kems-139-jacobson-2024.yaml` | 8 | 8 | 20 |
-| `data/literature/extracts/kems-140-heck-2025.yaml` | 53 | 53 | 166 |
-| `data/literature/extracts/kems-169-nakazawa-1976.yaml` | 5 | 5 | 16 |
-| `data/literature/extracts/kems-184-behrens-1979.yaml` | 33 | 49 | 68 |
-| `data/literature/extracts/kems-188-nanjo-1976.yaml` | 6 | 6 | 19 |
-| `data/literature/extracts/kems-189-bischof-2021.yaml` | 16 | 16 | 41 |
-| `data/literature/extracts/kems-190-wu-1993.yaml` | 16 | 16 | 32 |
-| `data/literature/extracts/kems-198-ichise-ueshima-1989.yaml` | 14 | 14 | 44 |
-| `data/literature/extracts/kems-200-ueshima-1983.yaml` | 10 | 10 | 31 |
-| `data/literature/extracts/kems-201-ichise-1986.yaml` | 11 | 11 | 34 |
-| `data/literature/extracts/kems-ms2000-044.yaml` | 100 | 100 | 377 |
-| `data/literature/extracts/lamoreaux-hildenbrand-1984.yaml` | 20 | 20 | 64 |
+| `data/literature/extracts/kems-038-matchett-2006.yaml` | 3 | 3 | 18 |
+| `data/literature/extracts/kems-040-stolyarova-2015.yaml` | 2 | 2 | 11 |
+| `data/literature/extracts/kems-041-sossi-fegley-2018.yaml` | 155 | 155 | 721 |
+| `data/literature/extracts/kems-042-plante-1979.yaml` | 383 | 383 | 1311 |
+| `data/literature/extracts/kems-044-robinot-2026.yaml` | 19 | 19 | 81 |
+| `data/literature/extracts/kems-045-sossi-2018-pnas-cr.yaml` | 25 | 25 | 108 |
+| `data/literature/extracts/kems-047-turkdogan-1984-isij.yaml` | 6 | 6 | 36 |
+| `data/literature/extracts/kems-048-turkdogan-2001-sio2-gamma.yaml` | 12 | 12 | 58 |
+| `data/literature/extracts/kems-049-kato-1993-ms-review.yaml` | 26 | 26 | 83 |
+| `data/literature/extracts/kems-050-gorokhov-1977.yaml` | 3 | 3 | 10 |
+| `data/literature/extracts/kems-057-kambayashi-1985.yaml` | 25 | 25 | 111 |
+| `data/literature/extracts/kems-058-ohara-1987.yaml` | 18 | 18 | 87 |
+| `data/literature/extracts/kems-066-ichise-1977.yaml` | 24 | 24 | 126 |
+| `data/literature/extracts/kems-069-furukawa-1976.yaml` | 18 | 18 | 97 |
+| `data/literature/extracts/kems-087-yamada-kato-1980.yaml` | 16 | 16 | 79 |
+| `data/literature/extracts/kems-088-ichise-1975.yaml` | 16 | 16 | 84 |
+| `data/literature/extracts/kems-093-piacente-1975.yaml` | 34 | 34 | 155 |
+| `data/literature/extracts/kems-095-ueda-1986.yaml` | 18 | 18 | 93 |
+| `data/literature/extracts/kems-097-ikeda-1978.yaml` | 16 | 16 | 67 |
+| `data/literature/extracts/kems-103-fraser-1983.yaml` | 4 | 4 | 21 |
+| `data/literature/extracts/kems-105-yamada-1983.yaml` | 13 | 13 | 56 |
+| `data/literature/extracts/kems-111-ichise-1982.yaml` | 16 | 16 | 74 |
+| `data/literature/extracts/kems-112-ichise-1989.yaml` | 11 | 11 | 53 |
+| `data/literature/extracts/kems-114-nichols-1995.yaml` | 28 | 28 | 124 |
+| `data/literature/extracts/kems-116-nunoue-1987.yaml` | 12 | 12 | 52 |
+| `data/literature/extracts/kems-118-yamamoto-1983.yaml` | 11 | 11 | 58 |
+| `data/literature/extracts/kems-119-furukawa-1975.yaml` | 21 | 21 | 101 |
+| `data/literature/extracts/kems-120-ueshima-1984.yaml` | 8 | 8 | 44 |
+| `data/literature/extracts/kems-127-qi-1989.yaml` | 11 | 11 | 59 |
+| `data/literature/extracts/kems-132-nakajima-2016.yaml` | 11 | 11 | 48 |
+| `data/literature/extracts/kems-133-costa-2017.yaml` | 21 | 21 | 93 |
+| `data/literature/extracts/kems-137-bischof-2023.yaml` | 19 | 139 | 446 |
+| `data/literature/extracts/kems-138-bischof-2023.yaml` | 34 | 34 | 149 |
+| `data/literature/extracts/kems-139-jacobson-2024.yaml` | 8 | 8 | 34 |
+| `data/literature/extracts/kems-140-heck-2025.yaml` | 53 | 53 | 275 |
+| `data/literature/extracts/kems-169-nakazawa-1976.yaml` | 5 | 5 | 27 |
+| `data/literature/extracts/kems-184-behrens-1979.yaml` | 33 | 49 | 155 |
+| `data/literature/extracts/kems-188-nanjo-1976.yaml` | 6 | 6 | 29 |
+| `data/literature/extracts/kems-189-bischof-2021.yaml` | 16 | 16 | 55 |
+| `data/literature/extracts/kems-190-wu-1993.yaml` | 16 | 16 | 72 |
+| `data/literature/extracts/kems-198-ichise-ueshima-1989.yaml` | 14 | 14 | 60 |
+| `data/literature/extracts/kems-200-ueshima-1983.yaml` | 10 | 10 | 41 |
+| `data/literature/extracts/kems-201-ichise-1986.yaml` | 11 | 11 | 45 |
+| `data/literature/extracts/kems-ms2000-044.yaml` | 100 | 100 | 383 |
+| `data/literature/extracts/lamoreaux-hildenbrand-1984.yaml` | 20 | 20 | 68 |
 | `data/literature/extracts/lamoreaux-hildenbrand-hildenbrand-1987.yaml` | 6 | 6 | 15 |
 | `data/literature/extracts/lh87-al-o-gas-species.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/lh87-beo-g.yaml` | 1 | 1 | 4 |
@@ -18028,10 +18030,10 @@ hard issues: 0
 | `data/literature/extracts/lh87-geo-g.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/lh87-in2o-g.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/lh87-mgo-g.yaml` | 1 | 1 | 4 |
-| `data/literature/extracts/lh87-pbo-g.yaml` | 1 | 1 | 4 |
+| `data/literature/extracts/lh87-pbo-g.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/lh87-sno-g.yaml` | 1 | 1 | 4 |
-| `data/literature/extracts/murchison-degassing-2023-springer.yaml` | 27 | 27 | 85 |
-| `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` | 10 | 10 | 33 |
+| `data/literature/extracts/murchison-degassing-2023-springer.yaml` | 27 | 27 | 114 |
+| `data/literature/extracts/murchison-hydropyrolysis-1990s-gca.yaml` | 10 | 10 | 45 |
 | `data/literature/extracts/nasa-cea-thermo.yaml` | 1615 | 1615 | 1692 |
 | `data/literature/extracts/nist-srd69-p4.yaml` | 2 | 2 | 8 |
 | `data/literature/extracts/nist-webbook.yaml` | 46 | 46 | 139 |
@@ -18040,7 +18042,7 @@ hard issues: 0
 | `data/literature/extracts/pending-cacl2-kems-or-transpiration.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/pending-dual-primary-oso4.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/pending-kems-cro3.yaml` | 1 | 1 | 4 |
-| `data/literature/extracts/pending-mg2cl4.yaml` | 1 | 1 | 4 |
+| `data/literature/extracts/pending-mg2cl4.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/pending-mgcl2-measured-vp.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/pending-p4o6-vp.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/pending-pages-moo3-vp.yaml` | 1 | 1 | 4 |
@@ -18050,8 +18052,8 @@ hard issues: 0
 | `data/literature/extracts/pending-teo2-vp.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/pound-1972-cr-langmuir-knudsen.yaml` | 1 | 1 | 3 |
 | `data/literature/extracts/pound-1972-mccabe-cr.yaml` | 1 | 1 | 4 |
-| `data/literature/extracts/rau-1974-se-vp.yaml` | 1 | 1 | 4 |
-| `data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml` | 1 | 1 | 4 |
+| `data/literature/extracts/rau-1974-se-vp.yaml` | 1 | 1 | 5 |
+| `data/literature/extracts/ref-016-sio-kems-1700-2000k.yaml` | 1 | 1 | 5 |
 | `data/literature/extracts/ref-032-al.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/ref-032-bi.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/ref-032-ca.yaml` | 1 | 1 | 4 |
@@ -18066,27 +18068,27 @@ hard issues: 0
 | `data/literature/extracts/ref-032-zr.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/ref-052-k-o-gas.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/ref-052-na-o-gas.yaml` | 1 | 1 | 4 |
-| `data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml` | 10 | 10 | 30 |
+| `data/literature/extracts/reiss-2019-thermal-extraction-nulht2m.yaml` | 10 | 10 | 44 |
 | `data/literature/extracts/richter-et-al-2007.yaml` | 2 | 2 | 6 |
-| `data/literature/extracts/robinot-2025-promes-review.yaml` | 29 | 29 | 77 |
+| `data/literature/extracts/robinot-2025-promes-review.yaml` | 29 | 29 | 106 |
 | `data/literature/extracts/safarian-engh-2013-si-pure-langmuir.yaml` | 1 | 1 | 3 |
-| `data/literature/extracts/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml` | 15 | 15 | 48 |
+| `data/literature/extracts/schaefer-and-fegley-2007-icarus-outgassing-of-oc.yaml` | 15 | 15 | 69 |
 | `data/literature/extracts/sf04-magma-companion-workbook.yaml` | 7 | 7 | 28 |
-| `data/literature/extracts/slag-001-banya-1993.yaml` | 48 | 48 | 107 |
-| `data/literature/extracts/slag-002-banya-hino-nagasaka-1993.yaml` | 27 | 27 | 63 |
-| `data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml` | 18 | 18 | 43 |
-| `data/literature/extracts/smales-1971-lpsc-12022.yaml` | 2 | 2 | 8 |
+| `data/literature/extracts/slag-001-banya-1993.yaml` | 48 | 48 | 251 |
+| `data/literature/extracts/slag-002-banya-hino-nagasaka-1993.yaml` | 27 | 27 | 144 |
+| `data/literature/extracts/slag-003-hino-kitagawa-banya-1993.yaml` | 18 | 18 | 91 |
+| `data/literature/extracts/smales-1971-lpsc-12022.yaml` | 2 | 2 | 10 |
 | `data/literature/extracts/sossi-et-al-2019.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/span-wagner-1996-co2-psat.yaml` | 1 | 1 | 4 |
 | `data/literature/extracts/stebbins-carmichael-weill-1983.yaml` | 5 | 5 | 25 |
-| `data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml` | 8 | 8 | 25 |
-| `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` | 2 | 2 | 6 |
-| `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 7 | 15 |
-| `data/literature/extracts/ts1985.yaml` | 16 | 16 | 51 |
+| `data/literature/extracts/steurer-1985-vapor-phase-pyrolysis.yaml` | 8 | 8 | 44 |
+| `data/literature/extracts/steurer-1992-vapor-phase-pyrolysis.yaml` | 2 | 2 | 11 |
+| `data/literature/extracts/street-2010-thermal-properties-simulants.yaml` | 7 | 7 | 22 |
+| `data/literature/extracts/ts1985.yaml` | 16 | 16 | 69 |
 | `data/literature/extracts/wetzel-gail-2013-sio-arrhenius.yaml` | 1 | 1 | 4 |
-| `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 41 |
-| `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` | 15 | 15 | 35 |
-| `data/literature/extracts/yam1983.yaml` | 3 | 3 | 12 |
+| `data/literature/extracts/wilkerson-2021-jsc1a-tga-ms-poster.yaml` | 17 | 17 | 58 |
+| `data/literature/extracts/wilkerson-2023-jsc1a-outgassing.yaml` | 15 | 15 | 50 |
+| `data/literature/extracts/yam1983.yaml` | 3 | 3 | 15 |
 | `data/literature/gibbs_battery_residual_ledger.yaml` | 58 | 58 | 0 |
 | `data/literature/kems_measurements.yaml` | 6 | 6 | 12 |
 | `data/literature/langmuir_knudsen_flux_validation.yaml` | 3 | 3 | 6 |
@@ -18094,10 +18096,74 @@ hard issues: 0
 | `data/literature/refractory_vaporization_validation.yaml` | 13 | 13 | 9 |
 | `data/literature/species_rail_differential_ledger.yaml` | 23677 | 23673 | 3667 |
 
-## Advisory issue census
+## Hard issue census
 
-advisory issues: 129541
+hard issues: 1188
+
+MODEL_DERIVED / MEASURED_REDUCED keep their mapped evidence class. Parent pointers are not fabricated. Unstated derived_from / derivation is a hard conditional_field queued for page-grounding.
 
 | kind | count |
 |---|---:|
-| `identity_incomplete` | 129541 |
+| `conditional_field:derived_from` | 603 |
+| `conditional_field:derivation` | 585 |
+
+## Hard issues (first 50)
+
+- `observation[cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig6_hsc_1e-1_Torr_figure_only].derived_from` conditional_field: derived observation requires derived_from
+- `observation[cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig6_hsc_1e-1_Torr_figure_only].derivation` conditional_field: derived observation requires derivation
+- `observation[cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig7_hsc_1e-7_Torr_figure_only].derived_from` conditional_field: derived observation requires derived_from
+- `observation[cardiff-2007-vacuum-pyrolysis-gsfc::cardiff_2007_fig7_hsc_1e-7_Torr_figure_only].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_02_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_04_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_04_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_06_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_06_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_07_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_07_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_08_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_08_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_09_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_09_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_10_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_10_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_11_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_11_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_12_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_12_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_13_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_13_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_14_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_14_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_15_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_15_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_16_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_16_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_17_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_17_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_18_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_18_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_19_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_19_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_20_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_20_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_21_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_21_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_22_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_22_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_23_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_23_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_24_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_24_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_25_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_25_model].derivation` conditional_field: derived observation requires derivation
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_27_model].derived_from` conditional_field: derived observation requires derived_from
+- `observation[fegley-2023-chemical-equilibrium-calculations-bu::fegley_2023_table_27_model].derivation` conditional_field: derived observation requires derivation
+
+## Advisory issue census
+
+advisory issues: 112998
+
+| kind | count |
+|---|---:|
+| `identity_incomplete` | 112998 |

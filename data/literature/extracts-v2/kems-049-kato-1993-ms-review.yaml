@@ -6,8 +6,8 @@ observations:
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::3
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: unsupported quantity 'belton_fruehan_integration_curve'
     species:
       formula: V
       phase:
@@ -16,51 +16,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -334,8 +289,8 @@ observations:
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::8
   identity:
     quantity:
-      tag: value
-      value: transition_temperature
+      tag: unknown
+      reason: unsupported quantity 'phase_boundary'
     species:
       formula: Ge
       phase:
@@ -344,51 +299,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: value
-      value: phase_boundary
-    per:
-      tag: not_applicable
-      reason: profile transition_temperature does not use per
-    temperature_K:
-      tag: not_applicable
-      reason: profile transition_temperature does not use temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile transition_temperature does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile transition_temperature does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile transition_temperature does not use formation_elements
-    reference_state:
-      tag: not_applicable
-      reason: profile transition_temperature does not use reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile transition_temperature does not use reservoir
-    composition:
-      tag: not_applicable
-      reason: profile transition_temperature does not use composition
-    fO2_Pa:
-      tag: not_applicable
-      reason: profile transition_temperature does not use fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile transition_temperature does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile transition_temperature does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile transition_temperature does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile transition_temperature does not use wall
   value:
     kind: categorical
     categorical: bound_not_point_ordering
@@ -416,8 +326,8 @@ observations:
   experiment_id: c9dd2cac8fcb2ef2eda7ee97e23583710669a066600aeb87dd46aaf3d6f01f0b::kems-049-kato-1993-ms-review
   identity:
     quantity:
-      tag: value
-      value: activity_coefficient
+      tag: unknown
+      reason: unsupported quantity 'activity_Al_and_pO2_from_oxide_equilibria'
     species:
       formula: Al
       phase:
@@ -426,51 +336,6 @@ observations:
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
-    subtype:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use subtype
-    per:
-      tag: unknown
-      reason: source does not state per
-    temperature_K:
-      tag: unknown
-      reason: source does not state temperature_K
-    standard_pressure_Pa:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use standard_pressure_Pa
-    reaction:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reaction
-    formation_elements:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use formation_elements
-    reference_state:
-      tag: unknown
-      reason: source does not state reference_state
-    reservoir:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use reservoir
-    composition:
-      tag: unknown
-      reason: source does not state composition
-    fO2_Pa:
-      tag: unknown
-      reason: source does not state fO2_Pa
-    total_pressure_Pa:
-      tag: unknown
-      reason: source does not state total_pressure_Pa
-    sweep_gas:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sweep_gas
-    exposure:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use exposure
-    sample_mass_kg:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use sample_mass_kg
-    wall:
-      tag: not_applicable
-      reason: profile activity_coefficient does not use wall
   value:
     kind: unavailable
     unavailable_reason: source values have no printed scalar/series point
