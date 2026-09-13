@@ -83,6 +83,7 @@ import math
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, Mapping, TypedDict
 
+from engines.engine_commissioning import engine_commissioning
 from simulator.fidelity_vocabulary import STATUS_BEARING_NON_AUTHORITATIVE
 
 # CODATA / SI gas constant used by HT-PLAN r2 §H2 (exact for this instrument).
@@ -112,6 +113,8 @@ class MeltModelConstants(TypedDict):
 #   pMELTS / rhyolite-MELTS calibration papers' experimental T maxima for the
 #   liquid-solution dataset actually used by the ThermoEngine / alphaMELTS
 #   build pinned in this repo (per melt_model_id tag).
+#   The live number is data/engine_commissioning.yaml alphamelts
+#   temperature_K.certified maximum (one source with the adapter notice).
 #
 # S_ex_bound_J_molK provenance:
 #   HT-PLAN r2 §H2 init = 5 J mol⁻¹ K⁻¹, the lower end of the HT1-audit
@@ -123,7 +126,9 @@ class MeltModelConstants(TypedDict):
 #   (HT-PLAN decision point); do not retune W.
 MELT_ENVELOPE_CONSTANTS: Dict[str, MeltModelConstants] = {
     "MELTS-v1.0": {
-        "T_calib_max_K": 1700.0,
+        "T_calib_max_K": float(
+            engine_commissioning('alphamelts').temperature_K.certified.maximum
+        ),
         "S_ex_bound_J_molK": 5.0,
         "constants_version": "2026-08-10.ht-c3.1",
     },

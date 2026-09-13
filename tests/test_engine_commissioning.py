@@ -101,6 +101,17 @@ def _spy_prepared(called: list):
     return spy
 
 
+def test_melt_envelope_t_max_reads_commissioning_snapshot() -> None:
+    """C12 / G-P1-4: envelope T max has one source — the commissioning table."""
+    envelope_path = Path('simulator/melt_backend/melt_envelope.py')
+    source = envelope_path.read_text(encoding='utf-8')
+    assert '"T_calib_max_K": 1700.0' not in source
+    assert 'engine_commissioning' in source
+    assert MELT_ENVELOPE_CONSTANTS['MELTS-v1.0']['T_calib_max_K'] == (
+        engine_commissioning('alphamelts').temperature_K.certified.maximum
+    )
+
+
 def test_table_loads_and_pins_published_defaults() -> None:
     """Pin table defaults to the adapter/domain constants they replace.
 
@@ -141,7 +152,9 @@ def test_table_loads_and_pins_published_defaults() -> None:
         ALPHAMELTS_SUBPROCESS_MIN_TEMPERATURE_C + CELSIUS_TO_KELVIN_OFFSET
         == pytest.approx(1073.15)
     )
-    assert MELT_ENVELOPE_CONSTANTS['MELTS-v1.0']['T_calib_max_K'] == 1700.0
+    assert MELT_ENVELOPE_CONSTANTS['MELTS-v1.0']['T_calib_max_K'] == (
+        engine_commissioning('alphamelts').temperature_K.certified.maximum
+    )
     alphamelts = engine_commissioning('alphamelts')
     assert alphamelts.sio2_wt_pct.certified.as_tuple() == (
         DEFAULT_SILICATE_NETWORK_BAND_WT_PCT
