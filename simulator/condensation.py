@@ -2882,6 +2882,7 @@ class CondensationModel:
             upstream_hot_wall_min_C=self.upstream_hot_wall_min_C,
             temps=self.condensation_temperatures_C,
             vapor_pressure_data=self.vapor_pressure_data,
+            species_partial_pressures_pa=self.wall_species_partial_pressures_pa or None,
         )
         self.last_cold_spot_diagnostic = copy.deepcopy(diagnostic)
         self.cold_spot_history.append(copy.deepcopy(diagnostic))
@@ -7444,8 +7445,15 @@ def cold_spot_diagnostic(
     upstream_hot_wall_min_C: float | None = DEFAULT_UPSTREAM_HOT_WALL_MIN_C,
     temps: Mapping[str, float] | None = None,
     vapor_pressure_data: Mapping[str, Any] | None = None,
+    species_partial_pressures_pa: Mapping[str, float] | None = None,
 ) -> dict[str, Any]:
-    """Flag pipe segments colder than a flowing species' landing threshold."""
+    """Flag pipe segments that would condense flowing vapor too early.
+
+    Landing-temperature cold spots stay a fixed engineering-threshold
+    check. Upstream hot-wall fouling additionally uses local partial
+    pressure versus the existing wall Antoine P_sat when that pressure
+    is supplied; the uniform 1400 C floor remains as a coarse minimum.
+    """
 
     margin_C = _finite_nonnegative_value(margin_C, label='margin_C')
     findings: list[dict[str, Any]] = []
@@ -7471,6 +7479,16 @@ def cold_spot_diagnostic(
             vapor_pressure_data=vapor_pressure_data,
         )
         threshold_C = condensation_T_C - margin_C
+        p_local_pa = None
+        if species_partial_pressures_pa is not None:
+            raw_partial = species_partial_pressures_pa.get(species)
+            if raw_partial is not None:
+                try:
+                    candidate_pa = float(raw_partial)
+                except (TypeError, ValueError):
+                    candidate_pa = math.nan
+                if math.isfinite(candidate_pa) and candidate_pa > 0.0:
+                    p_local_pa = candidate_pa
         for segment in pipe_segments:
             downstream_number = _segment_stage_number(segment.downstream_stage)
             if downstream_number is None:
@@ -7497,6 +7515,42 @@ def cold_spot_diagnostic(
                         f'before stage {target_stage_number}'
                     ),
                 })
+            if p_local_pa is not None:
+                # Premise: fouling requires p_i > P_sat(T_wall) (mandate
+                # hot-wall invariant). Algebra: supersaturation iff
+                # p_local_Pa - P_sat_Pa > 0. Units: both pressures are Pa.
+                # Sanity: Fe P_sat(1673.15 K) ≈ 1.14 Pa, so a 100 Pa
+                # (1 mbar) Fe stream is ~88-fold supersaturated; Na
+                # P_sat at the same wall is ~0.93 MPa, so 100 Pa Na is
+                # undersaturated. SiO wall Antoine is not a P_sat
+                # curve; a refused P_sat does not invent a flag here
+                # (reactive P_sat ~= 0 is M30 deposition policy).
+                P_sat_pa, saturation_refused = _try_antoine_psat_pa(
+                    str(species),
+                    wall_T_C + CELSIUS_TO_KELVIN_OFFSET,
+                    vapor_pressure_data=vapor_pressure_data,
+                )
+                if (
+                    not saturation_refused
+                    and P_sat_pa is not None
+                    and math.isfinite(P_sat_pa)
+                    and p_local_pa > P_sat_pa
+                ):
+                    upstream_hot_wall_findings.append({
+                        'segment': segment.name,
+                        'account': segment.wall_deposit_account,
+                        'species': str(species),
+                        'kg_hr': kg_hr,
+                        'wall_temperature_C': wall_T_C,
+                        'upstream_hot_wall_min_C': hot_wall_threshold_C,
+                        'target_stage_number': target_stage_number,
+                        'warning': (
+                            f'upstream hot-wall violation {segment.name}: '
+                            f'{species} local pressure exceeds wall '
+                            f'saturation at {wall_T_C:.1f} C before stage '
+                            f'{target_stage_number}'
+                        ),
+                    })
             if wall_T_C >= threshold_C:
                 continue
             findings.append({
