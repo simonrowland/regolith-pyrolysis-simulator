@@ -421,6 +421,11 @@ def test_m09_nao05_scalar_vs_na2o_component_basis_mismatch() -> None:
     assert outcome.kind is IdentityEqualKind.IDENTITY_MISMATCH
     control = identity_equal(a, F.activity_identity(formula="NaO0.5", component_basis="NaO0.5"))
     assert control.kind is IdentityEqualKind.EQUAL
+    same_species = F.activity_identity(formula="Na2O", component_basis="NaO0.5")
+    other_basis = F.activity_identity(formula="Na2O", component_basis="Na2O")
+    basis_only = identity_equal(same_species, other_basis)
+    assert basis_only.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert identity_equal(same_species, F.activity_identity(formula="Na2O", component_basis="NaO0.5")).kind is IdentityEqualKind.EQUAL
 
 
 def test_m10_liquid_vs_solid_henrian_reference_state_mismatch() -> None:
@@ -445,6 +450,28 @@ def test_m10_liquid_vs_solid_henrian_reference_state_mismatch() -> None:
     assert identity_equal(liquid, henrian_solid).kind is IdentityEqualKind.IDENTITY_MISMATCH
     assert identity_equal(liquid, solid_raoultian).kind is IdentityEqualKind.IDENTITY_MISMATCH
     assert identity_equal(liquid, liquid).kind is IdentityEqualKind.EQUAL
+    assert identity_equal(solid_raoultian, solid_raoultian).kind is IdentityEqualKind.EQUAL
+    convention_only = F.activity_identity(
+        formula="P2O5",
+        convention=ReferenceStateConvention.HENRIAN_SOLID,
+        endmember_phase=Phase.CR,
+        component_basis="P2O5",
+    )
+    assert identity_equal(solid_raoultian, convention_only).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    from dataclasses import replace as _replace_ss
+
+    from simulator.battery.records import StandardState as _SS
+
+    bare_endmember = Species("P2O5", Phase.CR)
+    bare_ss = _SS(
+        convention=ReferenceStateConvention.HENRIAN_SOLID,
+        endmember=bare_endmember,
+        component_basis="P2O5",
+        reference_pressure_bar=Decimal("1"),
+    )
+    incomplete = _replace_ss(henrian_solid, reference_state=State.of(bare_ss))
+    nested_unknown = identity_equal(incomplete, incomplete)
+    assert nested_unknown.kind is IdentityEqualKind.IDENTITY_UNKNOWN
 
 
 def test_m12_rejected_admission_cannot_be_score_eligible() -> None:
@@ -867,7 +894,14 @@ def test_pi_p1_2_pref_is_not_psat() -> None:
     psat = F.psat_identity("Na", T_K=Decimal("1156"))
     assert pref.quantity is Quantity.P_REFERENCE
     assert psat.quantity is Quantity.P_SAT
-    assert identity_equal(pref, psat).kind is IdentityEqualKind.IDENTITY_MISMATCH
+    pref_vs_psat = identity_equal(pref, psat)
+    assert pref_vs_psat.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert pref_vs_psat.fields == ("quantity",)
+    same_reservoir_pref = F.pref_identity(endmember_formula="Na")
+    same_reservoir_psat = F.psat_identity("Na", T_K=Decimal("1156"))
+    quantity_only = identity_equal(same_reservoir_pref, same_reservoir_psat)
+    assert quantity_only.kind is IdentityEqualKind.IDENTITY_MISMATCH
+    assert quantity_only.fields == ("quantity",)
     assert identity_equal(psat, F.psat_identity("Na", T_K=Decimal("1156"))).kind is IdentityEqualKind.EQUAL
 
 
@@ -881,6 +915,9 @@ def test_pi_p1_5_fo2_channel_is_not_identity() -> None:
     a = F.activity_identity(fO2_Pa=Decimal("1e-8"))
     b = F.activity_identity(fO2_Pa=Decimal("1e-8"))
     assert identity_equal(a, b).kind is IdentityEqualKind.EQUAL
+    shifted = F.activity_identity(fO2_Pa=Decimal("1e-9"))
+    fo2_only = identity_equal(a, shifted)
+    assert fo2_only.kind is IdentityEqualKind.IDENTITY_MISMATCH
     from simulator.battery.records import FO2Control
     from simulator.battery.enums import FO2Channel
 

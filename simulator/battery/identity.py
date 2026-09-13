@@ -656,61 +656,85 @@ def _state_compare(
             (name,),
             f"{name} is required; not_applicable is not permitted",
         )
-    # value vs value
-    if not _values_equal(name, a.value, b.value):
-        return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_MISMATCH, (name,))
-    return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+    # value vs value — preserve nested three-valued outcomes
+    return _values_compare(name, a.value, b.value)
 
 
-def _values_equal(name: str, left: Any, right: Any) -> bool:
+def _mismatch(name: str) -> IdentityEqualOutcome:
+    return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_MISMATCH, (name,))
+
+
+def _values_compare(name: str, left: Any, right: Any) -> IdentityEqualOutcome:
     if isinstance(left, Decimal) or isinstance(right, Decimal):
-        return as_decimal(left) == as_decimal(right)
+        if as_decimal(left) == as_decimal(right):
+            return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+        return _mismatch(name)
     if isinstance(left, Fraction) or isinstance(right, Fraction):
-        return as_fraction(left) == as_fraction(right)
+        if as_fraction(left) == as_fraction(right):
+            return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+        return _mismatch(name)
     if isinstance(left, Species) and isinstance(right, Species):
-        return _species_equal(left, right).kind is IdentityEqualKind.EQUAL
+        return _species_equal(left, right)
     if isinstance(left, StandardState) and isinstance(right, StandardState):
-        return (
-            left.convention is right.convention
-            and left.component_basis == right.component_basis
-            and left.reference_pressure_bar == right.reference_pressure_bar
-            and _species_equal(left.endmember, right.endmember).kind
-            is IdentityEqualKind.EQUAL
-        )
+        if left.convention is not right.convention:
+            return _mismatch(name)
+        if left.component_basis != right.component_basis:
+            return _mismatch(name)
+        if left.reference_pressure_bar != right.reference_pressure_bar:
+            return _mismatch(name)
+        nested = _species_equal(left.endmember, right.endmember)
+        if nested.kind is IdentityEqualKind.EQUAL:
+            return nested
+        if nested.kind is IdentityEqualKind.IDENTITY_MISMATCH:
+            return _mismatch(name)
+        return IdentityEqualOutcome(nested.kind, nested.fields or (name,), nested.detail)
     if isinstance(left, Composition) and isinstance(right, Composition):
-        return (
+        if (
             left.basis == right.basis
             and left.amount_basis is right.amount_basis
             and left.components == right.components
-        )
+        ):
+            return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+        return _mismatch(name)
     if isinstance(left, Reaction) and isinstance(right, Reaction):
         if len(left.terms) != len(right.terms):
-            return False
+            return _mismatch(name)
         for a, b in zip(left.terms, right.terms, strict=True):
             if a.coefficient != b.coefficient:
-                return False
-            if _species_equal(a.species, b.species).kind is not IdentityEqualKind.EQUAL:
-                return False
-        return True
+                return _mismatch(name)
+            nested = _species_equal(a.species, b.species)
+            if nested.kind is IdentityEqualKind.IDENTITY_MISMATCH:
+                return _mismatch(name)
+            if nested.kind is not IdentityEqualKind.EQUAL:
+                return IdentityEqualOutcome(nested.kind, nested.fields or (name,), nested.detail)
+        return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
     if isinstance(left, tuple) and isinstance(right, tuple):
         if len(left) != len(right):
-            return False
+            return _mismatch(name)
         if left and isinstance(left[0], tuple) and len(left[0]) == 2:
-            # formation_elements: tuple[tuple[str, Species], ...]
             if [k for k, _ in left] != [k for k, _ in right]:
-                return False
+                return _mismatch(name)
             for (_ka, sa), (_kb, sb) in zip(left, right, strict=True):
                 if isinstance(sa, Species) and isinstance(sb, Species):
-                    if _species_equal(sa, sb).kind is not IdentityEqualKind.EQUAL:
-                        return False
+                    nested = _species_equal(sa, sb)
+                    if nested.kind is IdentityEqualKind.IDENTITY_MISMATCH:
+                        return _mismatch(name)
+                    if nested.kind is not IdentityEqualKind.EQUAL:
+                        return IdentityEqualOutcome(
+                            nested.kind, nested.fields or (name,), nested.detail
+                        )
                 elif sa != sb:
-                    return False
-            return True
-        return left == right
+                    return _mismatch(name)
+            return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+        if left == right:
+            return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+        return _mismatch(name)
     if isinstance(left, SweepIdentity) and isinstance(right, SweepIdentity):
         if left.species != right.species:
-            return False
+            return _mismatch(name)
         flow = _state_compare("sweep_gas.flow_sccm", left.flow_sccm, right.flow_sccm, required=left.species != "none", permitted_na=left.species == "none")
+        if flow.kind is not IdentityEqualKind.EQUAL:
+            return flow
         pp = _state_compare(
             "sweep_gas.partial_pressure_Pa",
             left.partial_pressure_Pa,
@@ -718,7 +742,7 @@ def _values_equal(name: str, left: Any, right: Any) -> bool:
             required=left.species != "none",
             permitted_na=left.species == "none",
         )
-        return flow.kind is IdentityEqualKind.EQUAL and pp.kind is IdentityEqualKind.EQUAL
+        return pp
     if isinstance(left, Exposure) and isinstance(right, Exposure):
         for field_name in ("area_m2", "duration_s", "schedule"):
             outcome = _state_compare(
@@ -729,8 +753,8 @@ def _values_equal(name: str, left: Any, right: Any) -> bool:
                 permitted_na=field_name == "schedule",
             )
             if outcome.kind is not IdentityEqualKind.EQUAL:
-                return False
-        return True
+                return outcome
+        return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
     if isinstance(left, WallIdentity) and isinstance(right, WallIdentity):
         for field_name in ("temperature_K", "material", "area_m2", "location"):
             required = field_name in {"temperature_K", "material"}
@@ -742,9 +766,11 @@ def _values_equal(name: str, left: Any, right: Any) -> bool:
                 permitted_na=not required,
             )
             if outcome.kind is not IdentityEqualKind.EQUAL:
-                return False
-        return True
-    return left == right
+                return outcome
+        return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+    if left == right:
+        return IdentityEqualOutcome(IdentityEqualKind.EQUAL)
+    return _mismatch(name)
 
 
 def validate_quantity_profile(identity: Identity) -> IdentityEqualOutcome:
