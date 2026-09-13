@@ -166,6 +166,32 @@ def test_unknown_rail_spelling_raises() -> None:
         canonicalize_rail("gibbs_thermochemistry")
 
 
+def test_h06_ledger_unknown_rail_spelling_raises(tmp_path: Path) -> None:
+    root = _write_min_tree(tmp_path)
+    (root / "data" / "literature" / "gibbs_battery_residual_ledger.yaml").write_text(
+        yaml.safe_dump(
+            {
+                "schema_version": 1,
+                "points": [
+                    {
+                        "key": "gibbs-rail-probe",
+                        "source_id": "janaf",
+                        "species": "Na",
+                        "comparison_quantity": "delta_fG",
+                        "temperature_K": 298.15,
+                        "table_kJ_mol": 0.0,
+                        "rail": "gibbs_thermochemistry",
+                    }
+                ],
+            },
+            sort_keys=False,
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(UnknownRailSpellingError):
+        migrate(root, write=False, validate=True)
+
+
 def test_g13_unknown_rail_spelling_raises_during_migrate(tmp_path: Path) -> None:
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
     extract["species"]["Na"]["observations"][0]["rail"] = "gibbs_thermochemistry"

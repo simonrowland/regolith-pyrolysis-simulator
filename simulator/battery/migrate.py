@@ -412,6 +412,14 @@ def canonicalize_rail(name: str) -> Rail:
     return mapped
 
 
+def require_rail_if_stated(row: Mapping[str, Any] | None) -> None:
+    if not isinstance(row, Mapping):
+        return
+    raw = row.get("rail")
+    if raw:
+        canonicalize_rail(str(raw))
+
+
 def work_filename(work_id: str) -> str:
     """Filesystem-safe name. DOI slash → underscore; work_id inside YAML is exact."""
 
@@ -2989,6 +2997,7 @@ class Migrator:
             for point in points:
                 if not isinstance(point, Mapping):
                     continue
+                require_rail_if_stated(point)
                 count.rows_in += 1
                 loc = locator_from_mapping(
                     point.get("source_locator"), fallback=str(point.get("observable_id"))
@@ -3070,6 +3079,7 @@ class Migrator:
                 for point in case.get("comparison_points") or []:
                     if not isinstance(point, Mapping):
                         continue
+                    require_rail_if_stated(point)
                     count.rows_in += 1
                     loc = locator_from_mapping(
                         point.get("source_locator"), fallback=str(point.get("observable_id"))
@@ -3130,6 +3140,7 @@ class Migrator:
         for meas_id, meas in measurements.items():
             if not isinstance(meas, Mapping):
                 continue
+            require_rail_if_stated(meas)
             count.rows_in += 1
             src = meas.get("source") if isinstance(meas.get("source"), Mapping) else {}
             citation = str((src or {}).get("citation") or meas_id)
@@ -3224,6 +3235,7 @@ class Migrator:
                 for formula, payload in block.items():
                     if not isinstance(payload, Mapping):
                         continue
+                    require_rail_if_stated(payload)
                     count.rows_in += 1
                     loc = Locator(
                         table=str(payload.get("table") or formula),
@@ -3264,6 +3276,7 @@ class Migrator:
             for i, row in enumerate(cao.get("raw_pCa") or []):
                 if not isinstance(row, Mapping):
                     continue
+                require_rail_if_stated(row)
                 count.rows_in += 1
                 loc = Locator(record=f"raw_pCa[{i}]")
                 t = _as_dec_or_none(row.get("temperature_K"))
@@ -3311,6 +3324,7 @@ class Migrator:
         for row_index, point in enumerate(points):
             if not isinstance(point, Mapping):
                 continue
+            require_rail_if_stated(point)
             count.rows_in += 1
             source_id = str(point.get("source_id") or path.stem)
             citation = source_id
@@ -3425,6 +3439,7 @@ class Migrator:
         if table is not None:
             self._lift_janaf_table(work, source_id, rel, count, table, evidence, doc)
             return
+        require_rail_if_stated(doc)
         count.rows_in += 1
         record_id = str(doc.get("record_id") or path.stem)
         formula = str(doc.get("formula") or record_id)
@@ -3577,6 +3592,7 @@ class Migrator:
             for row in rows:
                 if not isinstance(row, Mapping):
                     continue
+                require_rail_if_stated(row)
                 t_payload = row.get("temperature")
                 t = None
                 if isinstance(t_payload, Mapping):
