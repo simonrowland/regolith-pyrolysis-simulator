@@ -201,11 +201,23 @@ def test_doi_canonicalisation_and_alias_registry() -> None:
 
 
 def test_unknown_rail_spelling_raises() -> None:
+    from simulator.battery.migrate import RAIL_MAP
+
     assert canonicalize_rail("melt activities") is Rail.MELT_ACTIVITY
     assert canonicalize_rail("SiO_evolution") is Rail.SIO_EVOLUTION
     assert canonicalize_rail("integrated_bench") is Rail.PYROLYSIS_YIELD
+    assert RAIL_MAP.get("vapour") is Rail.VAPOUR
+    assert canonicalize_rail("vapour") is Rail.VAPOUR
     with pytest.raises(UnknownRailSpellingError):
         canonicalize_rail("gibbs_thermochemistry")
+
+
+def test_j05_vapour_spec_spelling_is_in_rail_map() -> None:
+    from simulator.battery.migrate import RAIL_MAP
+
+    assert "vapour" in RAIL_MAP
+    assert RAIL_MAP["vapour"] is Rail.VAPOUR
+    assert canonicalize_rail("vapour") is Rail.VAPOUR
 
 
 def test_h11_missing_extraction_date_is_unspecified(tmp_path: Path) -> None:
