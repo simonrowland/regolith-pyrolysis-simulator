@@ -1592,7 +1592,11 @@ class _MELTSBackendSupport(MeltBackend):
                 )
 
         sample_warnings: list[str] = []
+        evaluated_T_C: list[float] = []
+        sample_commissioning: dict[str, object] | None = None
+
         def sample_fraction(temperature_C: float) -> float:
+            nonlocal sample_commissioning
             try:
                 result = self.equilibrate(
                     float(temperature_C),
@@ -1614,6 +1618,14 @@ class _MELTSBackendSupport(MeltBackend):
                     tuple(result.warnings),
                     dict(result.diagnostics or {}),
                 )
+            evaluated_T_C.append(float(temperature_C))
+            notice = (result.diagnostics or {}).get('commissioning_notice')
+            if notice is not None and sample_commissioning is None:
+                sample_commissioning = {
+                    'commissioning_notice': dict(notice),
+                    'authority': result.diagnostics.get('authority'),
+                    'certified_band': result.diagnostics.get('certified_band'),
+                }
             for warning in result.warnings:
                 if warning not in sample_warnings:
                     sample_warnings.append(warning)
@@ -1640,6 +1652,19 @@ class _MELTSBackendSupport(MeltBackend):
                 f'findLiq={ptt_liquidus_C:.3f} C, '
                 f'bisection={result.liquidus_T_C:.3f} C'
             )
+        diagnostics_out = dict(result.diagnostics or {})
+        if sample_commissioning is not None:
+            notice = dict(sample_commissioning['commissioning_notice'])
+            if evaluated_T_C:
+                notice['evaluated_temperature_C'] = [
+                    min(evaluated_T_C),
+                    max(evaluated_T_C),
+                ]
+            diagnostics_out['commissioning_notice'] = notice
+            diagnostics_out['authority'] = sample_commissioning['authority']
+            diagnostics_out['certified_band'] = sample_commissioning[
+                'certified_band'
+            ]
         return LiquidusSolidusResult(
             liquidus_T_C=result.liquidus_T_C,
             liquidus_T_K=result.liquidus_T_K,
@@ -1649,7 +1674,7 @@ class _MELTSBackendSupport(MeltBackend):
             warnings=tuple(warnings_out),
             samples=result.samples,
             iterations=result.iterations,
-            diagnostics=dict(result.diagnostics or {}),
+            diagnostics=diagnostics_out,
         )
 
     def _unapplied_absolute_fo2_result(

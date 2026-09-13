@@ -540,3 +540,48 @@ def test_provider_band_only_high_silica_reaches_backend_and_notices(
         (result.diagnostic or {}).get('backend_status_reason')
         != 'silicate_window'
     )
+
+
+def test_liquidus_search_aggregates_commissioning_notice(monkeypatch) -> None:
+    """C04 / F4: liquidus diagnostics keep structured extrapolation evidence."""
+    backend = ThermoEngineBackend()
+    calls = _install_thermoengine_transport_spy(monkeypatch, backend)
+
+    def fake_equilibrate(**kwargs):
+        calls.append(kwargs)
+        temperature_C = float(kwargs['temperature_C'])
+        frac = max(0.0, min(1.0, (temperature_C - 1200.0) / 400.0))
+        masses = {}
+        if frac > 0.0:
+            masses['liquid'] = frac
+        if frac < 1.0:
+            masses['solid'] = 1.0 - frac
+        return ThermoEnginePayload(
+            phases_present=tuple(masses),
+            phase_masses_kg=masses,
+            liquid_fraction=frac,
+            liquid_composition_wt_pct=dict(kwargs['comp_wt']),
+            activity_coefficients={'SiO2': 0.4},
+            solved_fO2_log=kwargs['fO2_log'],
+        )
+
+    backend._thermoengine_transport.equilibrate = fake_equilibrate
+    result = backend.find_liquidus_solidus(
+        composition_kg={'SiO2': 85.0, 'FeO': 9.0, 'MgO': 6.0},
+        fO2_log=-9.0,
+        pressure_bar=1.0,
+        min_T_C=1000.0,
+        max_T_C=1800.0,
+        scan_step_C=100.0,
+        tolerance_C=2.0,
+    )
+
+    assert calls, 'liquidus search must evaluate engine samples'
+    assert result.status == 'ok'
+    assert result.diagnostics.get('authority') == 'extrapolated'
+    notice = result.diagnostics['commissioning_notice']
+    assert notice['kind'] == 'engine_commissioning'
+    assert 'certified_band' in result.diagnostics
+    evaluated = notice['evaluated_temperature_C']
+    assert evaluated[0] <= 1000.0
+    assert evaluated[-1] >= 1600.0
